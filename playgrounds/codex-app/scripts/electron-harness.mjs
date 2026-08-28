@@ -298,6 +298,16 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    currentSidebar: true,
+    frame: "workspace-project-menu",
+    id: "workspace-project-menu-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-environment-menu",
     id: "workspace-environment-menu",
     maxPixelRatio: 0.01,
@@ -381,10 +391,26 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "composer-goal",
+    id: "composer-goal-compact",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "composer-plan",
     id: "composer-plan",
     maxPixelRatio: 0.0225,
     scenario: "conversation-lifecycle",
+  },
+  {
+    frame: "composer-plan",
+    id: "composer-plan-compact",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
   },
   {
     frame: "composer-permissions-menu",

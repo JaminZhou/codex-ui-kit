@@ -104,6 +104,7 @@ export type ProjectIndexItemStatus =
 
 export interface ProjectIndexItem {
   actions?: ReactNode;
+  ariaLabel?: string;
   description?: ReactNode;
   disabled?: boolean;
   expanded?: boolean;
@@ -1305,6 +1306,7 @@ export interface ConversationProjectListboxProps
   label?: string;
   onDismiss?: () => void;
   onSelect: (projectId: string) => void;
+  pinnedItems?: readonly ProjectIndexItem[];
   selectedId?: string;
   triggerId?: string;
 }
@@ -1362,6 +1364,7 @@ export function ConversationProjectListbox({
   onBlur,
   onDismiss,
   onSelect,
+  pinnedItems = [],
   selectedId,
   triggerId,
   ...props
@@ -1369,7 +1372,8 @@ export function ConversationProjectListbox({
   const listboxId = useId();
   const listboxRef = useRef<HTMLDivElement | null>(null);
   const initialFocusCompleteRef = useRef(initialFocus === "none");
-  const enabledItems = items.filter(
+  const allItems = [...items, ...pinnedItems];
+  const enabledItems = allItems.filter(
     (item) => !projectIndexItemDisabled(item),
   );
   const enabledItemKey = enabledItems
@@ -1502,6 +1506,93 @@ export function ConversationProjectListbox({
     };
   }, [dismissBoundaryId, onDismiss, triggerId]);
 
+  const renderOption = (item: ProjectIndexItem, index: number) => {
+    const disabled = projectIndexItemDisabled(item);
+    const selected = item.id === selectedId;
+    const descriptionId = item.description
+      ? `${listboxId}-description-${index}`
+      : undefined;
+    const pathId = item.path
+      ? `${listboxId}-path-${index}`
+      : undefined;
+    const trailingId =
+      item.meta || item.statusLabel
+        ? `${listboxId}-trailing-${index}`
+        : undefined;
+    const describedBy = [descriptionId, pathId, trailingId]
+      .filter(Boolean)
+      .join(" ");
+    return (
+      <button
+        aria-describedby={describedBy || undefined}
+        aria-label={
+          item.ariaLabel ?? `Select project ${itemTextValue(item)}`
+        }
+        aria-selected={selected}
+        className="codex-ui-conversation-project-options__item"
+        data-project-id={item.id}
+        data-status={item.status}
+        disabled={disabled}
+        key={item.id}
+        onClick={() => {
+          onSelect(item.id);
+          if (triggerId && typeof window !== "undefined") {
+            window.setTimeout(() =>
+              document.getElementById(triggerId)?.focus(),
+            );
+          }
+        }}
+        onFocus={() => setActiveId(item.id)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape" && onDismiss) {
+            event.preventDefault();
+            onDismiss();
+            if (triggerId && typeof window !== "undefined") {
+              window.setTimeout(() =>
+                document.getElementById(triggerId)?.focus(),
+              );
+            }
+            return;
+          }
+          const nextId = moveProjectListboxFocus(event);
+          if (nextId) setActiveId(nextId);
+        }}
+        role="option"
+        tabIndex={!disabled && item.id === resolvedActiveId ? 0 : -1}
+        type="button"
+      >
+        {item.icon ? (
+          <span
+            aria-hidden="true"
+            className="codex-ui-conversation-project-options__icon"
+          >
+            {item.icon}
+          </span>
+        ) : null}
+        <span className="codex-ui-conversation-project-options__label">
+          {item.label}
+        </span>
+        {item.description ? (
+          <small id={descriptionId}>{item.description}</small>
+        ) : null}
+        {item.path ? <code id={pathId}>{item.path}</code> : null}
+        {item.meta || item.statusLabel ? (
+          <small id={trailingId}>
+            {item.meta}
+            {item.meta && item.statusLabel ? " · " : null}
+            {item.statusLabel}
+          </small>
+        ) : null}
+        <span
+          aria-hidden="true"
+          className="codex-ui-conversation-project-options__check"
+        >
+          {selected ? "✓" : ""}
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div
       {...props}
@@ -1532,96 +1623,24 @@ export function ConversationProjectListbox({
       ref={listboxRef}
       role="listbox"
     >
-      {items.map((item, index) => {
-        const disabled = projectIndexItemDisabled(item);
-        const selected = item.id === selectedId;
-        const descriptionId = item.description
-          ? `${listboxId}-description-${index}`
-          : undefined;
-        const pathId = item.path
-          ? `${listboxId}-path-${index}`
-          : undefined;
-        const trailingId =
-          item.meta || item.statusLabel
-            ? `${listboxId}-trailing-${index}`
-            : undefined;
-        const describedBy = [
-          descriptionId,
-          pathId,
-          trailingId,
-        ]
-          .filter(Boolean)
-          .join(" ");
-        return (
-          <button
-            aria-describedby={describedBy || undefined}
-            aria-label={`Select project ${itemTextValue(item)}`}
-            aria-selected={selected}
-            className="codex-ui-conversation-project-options__item"
-            data-project-id={item.id}
-            data-status={item.status}
-            disabled={disabled}
-            key={item.id}
-            onClick={() => {
-              onSelect(item.id);
-              if (triggerId && typeof window !== "undefined") {
-                window.setTimeout(() =>
-                  document.getElementById(triggerId)?.focus(),
-                );
-              }
-            }}
-            onFocus={() => setActiveId(item.id)}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" && onDismiss) {
-                event.preventDefault();
-                onDismiss();
-                if (triggerId && typeof window !== "undefined") {
-                  window.setTimeout(() =>
-                    document.getElementById(triggerId)?.focus(),
-                  );
-                }
-                return;
-              }
-              const nextId = moveProjectListboxFocus(event);
-              if (nextId) setActiveId(nextId);
-            }}
-            role="option"
-            tabIndex={
-              !disabled && item.id === resolvedActiveId ? 0 : -1
-            }
-            type="button"
-          >
-            {item.icon ? (
-              <span
-                aria-hidden="true"
-                className="codex-ui-conversation-project-options__icon"
-              >
-                {item.icon}
-              </span>
-            ) : null}
-            <span className="codex-ui-conversation-project-options__label">
-              {item.label}
-            </span>
-            {item.description ? (
-              <small id={descriptionId}>{item.description}</small>
-            ) : null}
-            {item.path ? <code id={pathId}>{item.path}</code> : null}
-            {item.meta || item.statusLabel ? (
-              <small id={trailingId}>
-                {item.meta}
-                {item.meta && item.statusLabel ? " · " : null}
-                {item.statusLabel}
-              </small>
-            ) : null}
-            <span
-              aria-hidden="true"
-              className="codex-ui-conversation-project-options__check"
-            >
-              {selected ? "✓" : ""}
-            </span>
-          </button>
-        );
-      })}
+      {pinnedItems.length > 0 ? (
+        <div className="codex-ui-conversation-project-options__layout">
+          <div className="codex-ui-conversation-project-options__scroll">
+            {items.map(renderOption)}
+          </div>
+          <div
+            aria-hidden="true"
+            className="codex-ui-conversation-project-options__divider"
+          />
+          <div className="codex-ui-conversation-project-options__pinned">
+            {pinnedItems.map((item, index) =>
+              renderOption(item, items.length + index),
+            )}
+          </div>
+        </div>
+      ) : (
+        items.map(renderOption)
+      )}
     </div>
   );
 }

@@ -292,10 +292,32 @@ describe("lifecycle visual policy", () => {
       "CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE",
     );
     expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "current 26.820 Composer mode pixel ratio",
+    );
+    expect(contract).toContain(
       'scene.id === "composer-resources-menu" ? 0.008 : 0.005',
     );
     expect(contract).toContain(
       "current-build Composer lifecycle pixel ratio",
+    );
+  });
+
+  it("gates current project options across wide and compact listboxes", () => {
+    expect(contract).toContain(
+      "CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_WORKSPACE_PROJECT_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain("height: 209");
+    expect(contract).toContain(
+      "current-build project list pixel ratio",
     );
   });
 

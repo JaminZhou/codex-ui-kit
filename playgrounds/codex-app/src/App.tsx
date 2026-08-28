@@ -1536,6 +1536,9 @@ const workspaceProjects = [
   },
 ];
 
+const workspaceNewProjectOptionId = "workspace:new-project";
+const workspaceNoProjectOptionId = "workspace:no-project";
+
 const currentProjectIndexUpdated = [
   "2m",
   "1h",
@@ -5891,6 +5894,24 @@ export function App() {
         .toLocaleLowerCase()
         .includes(workspaceProjectQuery.trim().toLocaleLowerCase()),
   );
+  const workspaceProjectPinnedItems = [
+    {
+      ariaLabel: "New project",
+      disabled: projectCreationStatus === "selecting",
+      icon: <CurrentBuildIcon name="composer-new-project" />,
+      id: workspaceNewProjectOptionId,
+      label:
+        projectCreationStatus === "selecting"
+          ? "Choosing project…"
+          : "New project",
+    },
+    {
+      ariaLabel: "Don't work in a project",
+      icon: <CurrentBuildIcon name="composer-clear-project" />,
+      id: workspaceNoProjectOptionId,
+      label: "Don't work in a project",
+    },
+  ];
   const filteredWorkspaceWorktrees =
     workspaceWorktrees.filter(
       ({ branch, id, label, status }) =>
@@ -6651,6 +6672,16 @@ export function App() {
               setWorkspaceOverlayState(null);
             }}
             onSelect={(projectId) => {
+              if (projectId === workspaceNewProjectOptionId) {
+                void createProject("workspace");
+                return;
+              }
+              if (projectId === workspaceNoProjectOptionId) {
+                openWorkspace(null);
+                setActiveFrame("workspace-no-project");
+                setWorkspaceProjectQuery("");
+                return;
+              }
               updateWorkspaceProjectId(projectId);
               setWorkspaceEnvironmentId("local");
               updateWorkspaceWorktreeId("main");
@@ -6658,7 +6689,10 @@ export function App() {
               setActiveFrame("workspace-ready");
               setWorkspaceProjectQuery("");
             }}
-            selectedId={workspaceProjectId ?? undefined}
+            pinnedItems={workspaceProjectPinnedItems}
+            selectedId={
+              workspaceProjectId ?? workspaceNoProjectOptionId
+            }
             triggerId={workspaceProjectTriggerId}
           />
           {filteredWorkspaceProjects.length === 0 ? (
@@ -6670,34 +6704,6 @@ export function App() {
               No projects found
             </p>
           ) : null}
-          <div className="demo-workspace-project-dialog__actions">
-            <button
-              aria-busy={projectCreationStatus === "selecting" || undefined}
-              disabled={projectCreationStatus === "selecting"}
-              onClick={() => void createProject("workspace")}
-              type="button"
-            >
-              <CurrentBuildIcon name="composer-new-project" />
-              {projectCreationStatus === "selecting"
-                ? "Choosing project…"
-                : "New project"}
-            </button>
-            <button
-              onClick={() => {
-                openWorkspace(null);
-                setActiveFrame("workspace-no-project");
-                window.setTimeout(() =>
-                  document
-                    .getElementById("demo-workspace-project-trigger")
-                    ?.focus(),
-                );
-              }}
-              type="button"
-            >
-              <CurrentBuildIcon name="composer-clear-project" />
-              Don&apos;t work in a project
-            </button>
-          </div>
           {projectCreationStatus === "error" &&
           projectCreationSource === "workspace" ? (
             <p className="demo-workspace-project-dialog__error" role="alert">

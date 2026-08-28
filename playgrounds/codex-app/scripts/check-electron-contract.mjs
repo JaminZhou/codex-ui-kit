@@ -1330,7 +1330,7 @@ try {
   const projectOverlayPaint = await themeProjectDialog.evaluate((dialog) => ({
     action: getComputedStyle(
       dialog.querySelector(
-        ".demo-workspace-project-dialog__actions button",
+        ".codex-ui-conversation-project-options__pinned [role=option]",
       ),
     ).color,
     background: getComputedStyle(dialog).backgroundColor,
@@ -6810,10 +6810,10 @@ try {
   await projectDialog.waitFor({ state: "hidden" });
   await projectDestination.click();
   if (
-    (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
+    (await projectDialog.getByRole("option", { name: "New project" }).count()) !==
       1 ||
     (await projectDialog
-      .getByRole("button", { name: "Don't work in a project" })
+      .getByRole("option", { name: "Don't work in a project" })
       .count()) !== 1
   ) {
     throw new Error(
@@ -11113,15 +11113,31 @@ try {
   const goalMode = await composerMenusPage.evaluate(() => {
     const mode = document.querySelector(".codex-ui-composer-mode");
     const input = document.querySelector(".codex-ui-composer__input");
-    if (!mode || !input) return null;
+    const surface = document.querySelector(".codex-ui-composer");
+    if (!mode || !input || !surface) return null;
     const rect = mode.getBoundingClientRect();
+    const inputRect = input.getBoundingClientRect();
+    const surfaceRect = surface.getBoundingClientRect();
     return {
       clearLabel: mode.getAttribute("aria-label"),
       height: rect.height,
+      input: {
+        height: inputRect.height,
+        left: inputRect.left,
+        top: inputRect.top,
+        width: inputRect.width,
+      },
       inputLabel: input.getAttribute("aria-label"),
       kind: mode.getAttribute("data-kind"),
       left: rect.left,
+      surface: {
+        height: surfaceRect.height,
+        left: surfaceRect.left,
+        top: surfaceRect.top,
+        width: surfaceRect.width,
+      },
       top: rect.top,
+      width: rect.width,
     };
   });
   if (
@@ -11130,9 +11146,18 @@ try {
     goalMode.clearLabel !== "Clear goal" ||
     goalMode.inputLabel !==
       "Describe your goal, define measurable outcomes for best results" ||
-    Math.abs(goalMode.left - 512) > 1 ||
+    Math.abs(goalMode.left - 516.0625) > 1 ||
     Math.abs(goalMode.top - 768) > 1 ||
-    Math.abs(goalMode.height - 28) > 1
+    Math.abs(goalMode.width - 63.796875) > 1 ||
+    Math.abs(goalMode.height - 28) > 1 ||
+    Math.abs(goalMode.surface.left - 359) > 1 ||
+    Math.abs(goalMode.surface.top - 670) > 1 ||
+    Math.abs(goalMode.surface.width - 736) > 1 ||
+    Math.abs(goalMode.surface.height - 134) > 1 ||
+    Math.abs(goalMode.input.left - 371) > 1 ||
+    Math.abs(goalMode.input.top - 690.5) > 1 ||
+    Math.abs(goalMode.input.width - 712) > 1 ||
+    Math.abs(goalMode.input.height - 44) > 1
   ) {
     throw new Error(
       `Electron current Composer Goal mode failed: ${JSON.stringify(goalMode)}`,
@@ -11157,17 +11182,51 @@ try {
   await composerMenusPage.waitForSelector(
     '.demo-root[data-composer-mode="plan"][data-composer-phase="plan"]',
   );
-  const planMode = await composerMenusPage.evaluate(() => ({
-    buttonCount: document.querySelectorAll(
+  const planMode = await composerMenusPage.evaluate(() => {
+    const mode = document.querySelector(
       '.codex-ui-composer-mode[data-kind="plan"][aria-label="Plan"]',
-    ).length,
-    inputLabel: document
-      .querySelector(".codex-ui-composer__input")
-      ?.getAttribute("aria-label"),
-  }));
+    );
+    const input = document.querySelector(".codex-ui-composer__input");
+    const surface = document.querySelector(".codex-ui-composer");
+    if (!mode || !input || !surface) return null;
+    const modeRect = mode.getBoundingClientRect();
+    const inputRect = input.getBoundingClientRect();
+    const surfaceRect = surface.getBoundingClientRect();
+    return {
+      input: {
+        height: inputRect.height,
+        left: inputRect.left,
+        top: inputRect.top,
+        width: inputRect.width,
+      },
+      inputLabel: input.getAttribute("aria-label"),
+      mode: {
+        height: modeRect.height,
+        left: modeRect.left,
+        top: modeRect.top,
+      },
+      surface: {
+        height: surfaceRect.height,
+        left: surfaceRect.left,
+        top: surfaceRect.top,
+        width: surfaceRect.width,
+      },
+    };
+  });
   if (
-    planMode.buttonCount !== 1 ||
-    planMode.inputLabel !== "Describe your task to generate a plan..."
+    !planMode ||
+    planMode.inputLabel !== "Describe your task to generate a plan..." ||
+    Math.abs(planMode.mode.left - 516.0625) > 1 ||
+    Math.abs(planMode.mode.top - 768) > 1 ||
+    Math.abs(planMode.mode.height - 28) > 1 ||
+    Math.abs(planMode.surface.left - 359) > 1 ||
+    Math.abs(planMode.surface.top - 706) > 1 ||
+    Math.abs(planMode.surface.width - 736) > 1 ||
+    Math.abs(planMode.surface.height - 98) > 1 ||
+    Math.abs(planMode.input.left - 371) > 1 ||
+    Math.abs(planMode.input.top - 720) > 1 ||
+    Math.abs(planMode.input.width - 712) > 1 ||
+    Math.abs(planMode.input.height - 44) > 1
   ) {
     throw new Error(
       `Electron current Composer Plan mode failed: ${JSON.stringify(planMode)}`,
@@ -11229,6 +11288,95 @@ try {
   }
 } finally {
   await composerMenusApp.close();
+}
+
+const compactComposerModesScene = {
+  frame: "composer-goal",
+  id: "electron-composer-modes-compact",
+  scenario: "conversation-lifecycle",
+  sidebarState: "hidden",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: compactComposerModesApp,
+  page: compactComposerModesPage,
+} = await launchScene(compactComposerModesScene, { capture: false });
+try {
+  const measureCompactComposerMode = (kind) =>
+    compactComposerModesPage.evaluate((expectedKind) => {
+      const mode = document.querySelector(
+        `.codex-ui-composer-mode[data-kind="${expectedKind}"]`,
+      );
+      const input = document.querySelector(".codex-ui-composer__input");
+      const surface = document.querySelector(".codex-ui-composer");
+      if (!mode || !input || !surface) return null;
+      const measure = (element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          height: rect.height,
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+        };
+      };
+      return {
+        input: measure(input),
+        mode: measure(mode),
+        surface: measure(surface),
+      };
+    }, kind);
+  const compactGoalMode = await measureCompactComposerMode("goal");
+  if (
+    !compactGoalMode ||
+    Math.abs(compactGoalMode.surface.left - 16) > 1 ||
+    Math.abs(compactGoalMode.surface.top - 530) > 1 ||
+    Math.abs(compactGoalMode.surface.width - 688) > 1 ||
+    Math.abs(compactGoalMode.surface.height - 134) > 1 ||
+    Math.abs(compactGoalMode.input.left - 28) > 1 ||
+    Math.abs(compactGoalMode.input.top - 550.5) > 1 ||
+    Math.abs(compactGoalMode.input.width - 664) > 1 ||
+    Math.abs(compactGoalMode.input.height - 44) > 1 ||
+    Math.abs(compactGoalMode.mode.left - 173.0625) > 1 ||
+    Math.abs(compactGoalMode.mode.top - 628) > 1 ||
+    Math.abs(compactGoalMode.mode.height - 28) > 1
+  ) {
+    throw new Error(
+      `Electron compact Composer Goal geometry failed: ${JSON.stringify(compactGoalMode)}`,
+    );
+  }
+  await compactComposerModesPage
+    .getByRole("button", { name: "Clear goal" })
+    .click();
+  await compactComposerModesPage
+    .getByRole("button", { name: "Add files and more" })
+    .click();
+  await compactComposerModesPage
+    .getByRole("option", { name: /Plan mode/ })
+    .click();
+  await compactComposerModesPage.waitForSelector(
+    '.demo-root[data-composer-mode="plan"][data-composer-phase="plan"]',
+  );
+  const compactPlanMode = await measureCompactComposerMode("plan");
+  if (
+    !compactPlanMode ||
+    Math.abs(compactPlanMode.surface.left - 16) > 1 ||
+    Math.abs(compactPlanMode.surface.top - 566) > 1 ||
+    Math.abs(compactPlanMode.surface.width - 688) > 1 ||
+    Math.abs(compactPlanMode.surface.height - 98) > 1 ||
+    Math.abs(compactPlanMode.input.left - 28) > 1 ||
+    Math.abs(compactPlanMode.input.top - 580) > 1 ||
+    Math.abs(compactPlanMode.input.width - 664) > 1 ||
+    Math.abs(compactPlanMode.input.height - 44) > 1 ||
+    Math.abs(compactPlanMode.mode.left - 173.0625) > 1 ||
+    Math.abs(compactPlanMode.mode.top - 628) > 1 ||
+    Math.abs(compactPlanMode.mode.height - 28) > 1
+  ) {
+    throw new Error(
+      `Electron compact Composer Plan geometry failed: ${JSON.stringify(compactPlanMode)}`,
+    );
+  }
+} finally {
+  await compactComposerModesApp.close();
 }
 
 const contextSummaryScene = {
@@ -12250,16 +12398,65 @@ try {
     name: "Choose a project",
   });
   await projectDialog.waitFor({ state: "visible" });
+  const projectPickerStructure = await projectDialog.evaluate((dialog) => {
+    const measure = (selector) => {
+      const element = dialog.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        height: rect.height,
+        width: rect.width,
+      };
+    };
+    const listbox = dialog.querySelector('[role="listbox"]');
+    const dialogRect = dialog.getBoundingClientRect();
+    return {
+      actionButtonCount: dialog.querySelectorAll(
+        '.codex-ui-conversation-project-options__pinned button:not([role="option"])',
+      ).length,
+      dialog: {
+        height: dialogRect.height,
+        width: dialogRect.width,
+      },
+      divider: measure(
+        ".codex-ui-conversation-project-options__divider",
+      ),
+      listbox: measure('[role="listbox"]'),
+      listboxChildCount: listbox?.children.length ?? 0,
+      optionCount: listbox?.querySelectorAll('[role="option"]').length ?? 0,
+      pinned: measure(
+        ".codex-ui-conversation-project-options__pinned",
+      ),
+      scroll: measure(
+        ".codex-ui-conversation-project-options__scroll",
+      ),
+    };
+  });
   if (
-    (await projectDialog.getByRole("button", { name: "New project" }).count()) !==
+    !projectPickerStructure.dialog ||
+    !projectPickerStructure.listbox ||
+    !projectPickerStructure.scroll ||
+    !projectPickerStructure.divider ||
+    !projectPickerStructure.pinned ||
+    Math.abs(projectPickerStructure.dialog.width - 260) > 1 ||
+    Math.abs(projectPickerStructure.dialog.height - 249.5) > 0.2 ||
+    Math.abs(projectPickerStructure.listbox.width - 252) > 1 ||
+    Math.abs(projectPickerStructure.listbox.height - 208.9375) > 0.2 ||
+    Math.abs(projectPickerStructure.scroll.height - 142.8125) > 0.2 ||
+    Math.abs(projectPickerStructure.divider.height - 9) > 0.2 ||
+    Math.abs(projectPickerStructure.pinned.height - 57.125) > 0.2 ||
+    projectPickerStructure.listboxChildCount !== 1 ||
+    projectPickerStructure.optionCount !== 16 ||
+    projectPickerStructure.actionButtonCount !== 0 ||
+    (await projectDialog.getByRole("option", { name: "New project" }).count()) !==
       1 ||
     (await projectDialog
-      .getByRole("button", { name: "Don't work in a project" })
+      .getByRole("option", { name: "Don't work in a project" })
       .count()) !== 1 ||
     JSON.stringify(
       await projectDialog
         .locator(
-          ".demo-workspace-project-dialog__actions [data-current-build-icon]",
+          ".codex-ui-conversation-project-options__pinned [data-current-build-icon]",
         )
         .evaluateAll((icons) =>
           icons.map((icon) => icon.getAttribute("data-current-build-icon")),
@@ -12279,10 +12476,13 @@ try {
   });
   await projectSearch.fill("__codex_ui_kit_no_project__");
   if (
-    (await projectDialog.getByRole("option").count()) !== 0 ||
+    (await projectDialog.getByRole("option").count()) !== 2 ||
     !(await projectDialog
       .getByText("No projects found", { exact: true })
-      .isVisible())
+      .isVisible()) ||
+    (await projectDialog
+      .getByRole("button", { name: "New project" })
+      .count()) !== 0
   ) {
     throw new Error("Electron current project picker empty state was incomplete.");
   }
@@ -12298,7 +12498,7 @@ try {
   );
   await initialProjectTrigger.click();
   await projectDialog
-    .getByRole("button", { name: "Don't work in a project" })
+    .getByRole("option", { name: "Don't work in a project" })
     .click();
   await projectCreationPage.waitForSelector(
     '.demo-root[data-frame="workspace-no-project"]',
@@ -12318,7 +12518,7 @@ try {
   });
   await restoredProjectTrigger.click();
   await projectDialog.waitFor({ state: "visible" });
-  await projectDialog.getByRole("button", { name: "New project" }).click();
+  await projectDialog.getByRole("option", { name: "New project" }).click();
   await projectCreationPage.waitForSelector(
     '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
   );
@@ -12335,7 +12535,7 @@ try {
   }
   await createdProjectTrigger.click();
   await projectDialog.waitFor({ state: "visible" });
-  await projectDialog.getByRole("button", { name: "New project" }).click();
+  await projectDialog.getByRole("option", { name: "New project" }).click();
   await projectCreationPage.waitForSelector(
     '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
   );
@@ -12575,7 +12775,7 @@ try {
   }
   await createdProjectBranchPage
     .getByRole("dialog", { name: "Choose a project" })
-    .getByRole("button", { name: "New project" })
+    .getByRole("option", { name: "New project" })
     .click();
   await createdProjectBranchPage.waitForSelector(
     '.demo-root[data-view="workspace"][data-frame="workspace-project-created"]',
@@ -12758,7 +12958,7 @@ try {
     .click();
   await createdProjectBranchPage
     .getByRole("dialog", { name: "Choose a project" })
-    .getByRole("button", { name: "New project" })
+    .getByRole("option", { name: "New project" })
     .click();
   await waitForBranchLabel(createdProjectBranchPage, "feat/selected-project");
   await createdProjectBranchPage
@@ -12976,7 +13176,7 @@ const {
 try {
   await knownProjectCreationPage
     .getByRole("dialog", { name: "Choose a project" })
-    .getByRole("button", { name: "New project" })
+    .getByRole("option", { name: "New project" })
     .click();
   await knownProjectCreationPage.waitForSelector(
     '.demo-root[data-view="workspace"][data-frame="workspace-ready"]',

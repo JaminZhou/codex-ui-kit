@@ -1363,6 +1363,26 @@ CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE=/absolute/path/to/composer-plan-main.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
+The current 26.820 mode gate also accepts exact surface-only wide and compact
+crops. Goal crops are 736×134 and 688×134; Plan crops are 736×98 and 688×98:
+
+```bash
+CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_REFERENCE=/absolute/path/to/goal-wide.png \
+CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_COMPACT_REFERENCE=/absolute/path/to/goal-compact.png \
+CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_REFERENCE=/absolute/path/to/plan-wide.png \
+CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_COMPACT_REFERENCE=/absolute/path/to/plan-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
+The current project picker gate accepts separate 252×209 listbox crops so the
+scrolling project rows and fixed action options remain visible at both widths:
+
+```bash
+CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE=/absolute/path/to/project-wide.png \
+CODEX_UI_KIT_WORKSPACE_PROJECT_COMPACT_REFERENCE=/absolute/path/to/project-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+```
+
 The current long-thread gate accepts one 906×820 main-only crop and masks all
 conversation content:
 

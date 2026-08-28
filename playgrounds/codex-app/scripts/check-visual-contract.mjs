@@ -166,6 +166,14 @@ const currentBuildComposerGoalReference =
   process.env.CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE;
 const currentBuildComposerPlanReference =
   process.env.CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE;
+const currentComposer26820GoalReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_REFERENCE;
+const currentComposer26820GoalCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_COMPACT_REFERENCE;
+const currentComposer26820PlanReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_REFERENCE;
+const currentComposer26820PlanCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_COMPACT_REFERENCE;
 const currentBuildAttachmentReadyReference =
   process.env.CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE;
 const currentBuildAttachmentCompletedReference =
@@ -356,8 +364,10 @@ const currentBuildComposerIconReferenceBounds = [
 ];
 const currentBuildWorkspaceProjectReference =
   process.env.CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE;
+const currentBuildWorkspaceProjectCompactReference =
+  process.env.CODEX_UI_KIT_WORKSPACE_PROJECT_COMPACT_REFERENCE;
 const currentBuildWorkspaceProjectReferenceSize = {
-  height: 143,
+  height: 209,
   width: 252,
 };
 const currentBuildWorkspaceEnvironmentReference =
@@ -859,6 +869,7 @@ for (const scene of selectedScenes) {
   let workspaceEnvironmentPickerBounds;
   let workspaceEnvironmentSettingsBounds;
   let workspaceProjectListboxBounds;
+  let currentComposer26820ModeBounds;
   let workspaceWorktreeMenuBounds;
   let workspaceBranchCreateBounds;
   let currentApprovalBounds;
@@ -1060,7 +1071,10 @@ for (const scene of selectedScenes) {
         if (active instanceof HTMLElement) active.blur();
       });
     }
-    if (scene.id === "workspace-project-menu") {
+    if (
+      scene.id === "workspace-project-menu" ||
+      scene.id === "workspace-project-menu-compact"
+    ) {
       workspaceProjectListboxBounds = await page
         .locator(
           ".demo-workspace-project-dialog .codex-ui-conversation-project-options",
@@ -1072,6 +1086,24 @@ for (const scene of selectedScenes) {
             left: Math.round(value.left),
             top: Math.round(value.top),
             width: Math.round(value.width),
+          };
+        });
+    }
+    if (
+      scene.id === "composer-goal" ||
+      scene.id === "composer-goal-compact" ||
+      scene.id === "composer-plan" ||
+      scene.id === "composer-plan-compact"
+    ) {
+      currentComposer26820ModeBounds = await page
+        .locator(".codex-ui-composer")
+        .evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            height: Math.round(rect.height),
+            left: Math.round(rect.left),
+            top: Math.round(rect.top),
+            width: Math.round(rect.width),
           };
         });
     }
@@ -2276,13 +2308,19 @@ for (const scene of selectedScenes) {
     });
   }
 
+  const workspaceProjectReference =
+    scene.id === "workspace-project-menu-compact"
+      ? currentBuildWorkspaceProjectCompactReference ??
+        currentBuildWorkspaceProjectReference
+      : currentBuildWorkspaceProjectReference;
   if (
-    scene.id === "workspace-project-menu" &&
-    currentBuildWorkspaceProjectReference
+    (scene.id === "workspace-project-menu" ||
+      scene.id === "workspace-project-menu-compact") &&
+    workspaceProjectReference
   ) {
     const reference = flattenPng(
       PNG.sync.read(
-        await readFile(currentBuildWorkspaceProjectReference),
+        await readFile(workspaceProjectReference),
       ),
       { blue: 48, green: 48, red: 48 },
     );
@@ -2324,7 +2362,7 @@ for (const scene of selectedScenes) {
     );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_WORKSPACE_PROJECT_MAX_DIFF_RATIO",
-      0.08,
+      0.05,
     );
     await writeFile(
       join(
@@ -3536,6 +3574,86 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build Composer lifecycle pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const currentComposer26820ModeReference =
+    scene.id === "composer-goal"
+      ? currentComposer26820GoalReference
+      : scene.id === "composer-goal-compact"
+        ? currentComposer26820GoalCompactReference
+        : scene.id === "composer-plan"
+          ? currentComposer26820PlanReference
+          : scene.id === "composer-plan-compact"
+            ? currentComposer26820PlanCompactReference
+            : undefined;
+  if (currentComposer26820ModeReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentComposer26820ModeReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    const compact = scene.id.endsWith("-compact");
+    const goal = scene.frame === "composer-goal";
+    const expectedSize = {
+      height: goal ? 134 : 98,
+      width: compact ? 688 : 736,
+    };
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 Composer mode reference must be exactly ${expectedSize.width}x${expectedSize.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const bounds = currentComposer26820ModeBounds;
+    if (
+      !bounds ||
+      bounds.width !== expectedSize.width ||
+      bounds.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 Composer mode bounds drifted: ${JSON.stringify(bounds)}.`,
+      );
+    }
+    const actualRegion = cropPng(
+      actual,
+      bounds.left,
+      bounds.top,
+      bounds.width,
+      bounds.height,
+    );
+    const comparison = comparePng(reference, actualRegion);
+    const maximumRatio = environmentRatio(
+      goal
+        ? compact
+          ? "CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_COMPACT_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_MAX_DIFF_RATIO"
+        : compact
+          ? "CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_COMPACT_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_MAX_DIFF_RATIO",
+      goal ? 0.045 : 0.04,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-26-820.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-26-820.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.820 Composer mode pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.820 Composer mode pixel ratio ${comparison.ratio}`,
     );
   }
 
