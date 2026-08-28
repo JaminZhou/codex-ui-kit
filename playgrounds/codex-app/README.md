@@ -906,6 +906,14 @@ screenshots and product project names remain local-only.
   failed-plus-unread, and restored worktree tails pass at 2.0833%, 0.7540%,
   and 0.1786%.
 
+The current `26.820.60940` continuation re-reaches the real failure boundary
+without changing the public component: a disposable repository produces both
+foreground-read failure and background failed-plus-unread, then succeeds via
+the product's `Retry` control after its scoped blocker is removed. The current
+84×30 failed-plus-unread tail passes the existing gate at 0%; Browser/CDP and
+Electron continue to lock the deterministic phase, geometry, path, color,
+animation, and action-replacement contracts.
+
 This slice does not create an environment or claim populated environment
 editing/repair coverage. Raw product screenshots and capture records remain
 local-only.
@@ -1298,11 +1306,13 @@ exact 20×20 rail, centered 8×8 dot, color, action geometry, and SVG paths.
 
 The follow-up `26.820.60940` edge probe supplies the current 140×29 empty crop and
 56×30 worktree loading/restored crops. Their foreground comparisons pass at
-2.4138%, 1.0714%, and 0%. The worktree row retains the product's raw
+2.4138%, 1.0714%, and 0%. A second current worktree probe adds the real
+foreground-read failure, background failed-plus-unread, and successful Retry
+recovery. Its 84×30 failed-plus-unread crop passes at 0%. The worktree row
+retains the product's raw
 `kind=local`; the runtime observation identifies it through the selected
 Worktree context, workspace summary, and exact branch marker. Collection
-loading, ordinary error, and worktree failure/Retry/unread composition remain
-explicitly earlier-build evidence.
+loading and ordinary error remain explicitly earlier-build evidence.
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:
 

@@ -287,8 +287,12 @@ regions pass at 2.7381% and 3.8393%. A separate empty project re-reaches the
 real New-local-worktree task also re-reaches loading → restored: the 30px row
 keeps the 14px branch at 39px beside the 20px spinner rail, then returns the
 branch to an 11px inset. Its privacy-safe 56×30 tails pass at 1.0714% and 0%.
-Ordinary error, collection loading, and worktree failure/Retry/unread
-composition remain previous-build evidence.
+A second current disposable probe now re-reaches controlled worktree failure,
+distinguishes foreground-read failure from background failed-plus-unread, and
+completes through the real `Retry` control with exactly one child worktree.
+The current three-track row keeps the 14px branch at 67px, red 16px error at
+38px, and blue 8px unread dot at 14px; its privacy-safe 84×30 tail passes at
+0%. Ordinary error and collection loading remain previous-build evidence.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:
@@ -345,7 +349,7 @@ project`. Real success, controlled failure, Retry, and restored states promote
 verification for this sampled lifecycle.
 
 The `26.820.60940` success follow-up re-reaches the same real selection and
-submission path without promoting the older failure boundary. It selects
+submission path. It selects
 `New local worktree`, retains `No environment` and `main`, submits an exact
 no-tool/no-file task, reaches loading and restored sidebar states, verifies the
 Worktree workspace summary, and cleans the exact task/worktree. This promotes
@@ -353,6 +357,12 @@ current runtime evidence for `conversation.context-controls`,
 `composer.project-worktree-selection`, `app.new-thread-workspace-selection`,
 `workspace.worktrees`, and `app.sidebar-worktree-status-indicators`; their
 broader implementation/Browser/Electron status remains partial.
+The subsequent current failure continuation promotes that sampled repair
+boundary as well. A disposable regular-file `.git/worktrees` blocker produces
+the real failure surface and background branch/error/unread composition;
+moving it aside and activating `Retry` creates one child worktree and removes
+the failure. The current 84×30 failure tail is pixel-identical to the replay,
+while ordinary error and collection loading remain unsampled on 26.820.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and
