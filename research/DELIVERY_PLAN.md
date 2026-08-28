@@ -14,10 +14,11 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 36 groups have current-build runtime evidence, 38 have previous-build-only
+- 38 groups have current-build runtime evidence, 36 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
-  Composer, primary navigation, project-group lifecycle, Help and account
+  Composer, project picker and Goal/Plan modes, primary navigation,
+  project-group lifecycle, Help and account
   menus, route restoration, Projects Index, shared project/Recents rows and
   actions, plus real active/unread status rails. It locks the new
   collapsed-shell removal of Back/Forward, the one-pixel 559px/415px compact

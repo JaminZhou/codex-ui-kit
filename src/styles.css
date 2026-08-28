@@ -15956,6 +15956,40 @@ button.codex-ui-generated-image-gallery__image {
   z-index: 40;
 }
 
+.codex-ui-conversation-project-options:has(
+    > .codex-ui-conversation-project-options__layout
+  ) {
+  overflow: hidden;
+}
+
+.codex-ui-conversation-project-options__layout {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  min-height: 0;
+}
+
+.codex-ui-conversation-project-options__scroll {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 0.25rem;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.codex-ui-conversation-project-options__divider {
+  border-block-start: 1px solid var(--codex-ui-border-light);
+  flex: 0 0 auto;
+  margin: 0.25rem 0.375rem;
+}
+
+.codex-ui-conversation-project-options__pinned {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+}
+
 .codex-ui-conversation-project-options__item {
   align-items: center;
   appearance: none;

@@ -46,7 +46,12 @@
       "id": "conversation.context-controls",
       "area": "conversation",
       "ownership": "cross-layer",
-      "packageEvidence": ["composer-project-selector", "worktree-environment-dropdown"],
+      "packageEvidence": [
+        "composer-project-selector",
+        "worktree-environment-dropdown",
+        "browser-cdp:current-wide-compact-context-and-project-routing",
+        "electron:current-wide-compact-context-and-project-routing"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:new-chat-project-local-main-context-controls",
@@ -58,18 +63,25 @@
         "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.810.52044:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.818.41509:new-local-worktree-current-context-controls-exact-labels-and-no-environment-state",
-        "cdp-26.820.60940:new-local-worktree-selected-context-no-environment-main-start-and-real-task-success"
+        "cdp-26.820.60940:new-local-worktree-selected-context-no-environment-main-start-and-real-task-success",
+        "cdp-26.820.60940:project-local-main-context-wide-compact-current-geometry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
       "id": "conversation.project-picker",
       "area": "conversation",
       "ownership": "cross-layer",
-      "packageEvidence": ["composer-project-selector", "project-selector-items"],
+      "packageEvidence": [
+        "composer-project-selector",
+        "project-selector-items",
+        "browser-cdp:current-scroll-fixed-option-listbox-and-focus",
+        "electron:current-scroll-fixed-option-listbox-and-focus",
+        "pixel:current-wide-compact-project-listbox"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:new-chat-project-popover-260x250-listbox-14-options",
@@ -77,11 +89,12 @@
         "cdp-26.727.40816:new-chat-project-dialog-260x249.5-listbox-252x142.81",
         "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options",
         "cdp-26.803.61601:project-dialog-260x221-search-listbox-252x143.5-fourteen-options-new-project-only-and-native-panel-entry",
-        "cdp-26.810.52044:project-dialog-260x249.5-search-listbox-252x142.81-fourteen-options-new-and-clear-project-empty-escape-focus-clear-restore"
+        "cdp-26.810.52044:project-dialog-260x249.5-search-listbox-252x142.81-fourteen-options-new-and-clear-project-empty-escape-focus-clear-restore",
+        "cdp-26.820.60940:project-dialog-260x249.5-listbox-252x208.9375-scroll-142.8125-divider-9-pinned-options-57.125-empty-focus-restore"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -649,16 +662,22 @@
       "id": "composer.modes",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["home-composer-mode-toggle"],
+      "packageEvidence": [
+        "home-composer-mode-toggle",
+        "browser-cdp:current-wide-compact-goal-plan-geometry-and-focus",
+        "electron:current-wide-compact-goal-plan-geometry-and-focus",
+        "pixel:current-wide-compact-goal-plan-surfaces"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:model-effort-speed-menu",
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
-        "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus"
+        "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus",
+        "cdp-26.820.60940:goal-736x134-688x134-plan-736x98-688x98-active-mode-placeholder-clear-focus"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

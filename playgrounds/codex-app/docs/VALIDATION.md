@@ -131,6 +131,16 @@ Every deterministic scenario has one ID and produces four evidence layers:
    geometry/boundaries and use hard 0.5%, 0.5%, and 0.8% limits. Goal and Plan
    main-region references use `CODEX_UI_KIT_COMPOSER_GOAL_REFERENCE` and
    `CODEX_UI_KIT_COMPOSER_PLAN_REFERENCE` with 0.5% limits. The current
+   26.820 Goal and Plan surfaces additionally accept exact wide/compact crops
+   through `CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_REFERENCE`,
+   `CODEX_UI_KIT_CURRENT_COMPOSER_26_820_GOAL_COMPACT_REFERENCE`,
+   `CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_REFERENCE`, and
+   `CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_COMPACT_REFERENCE`; these retain
+   the complete 736/688px Composer surface under 4.5%/4% hard limits. Project
+   selection accepts 252×209 wide and compact listbox crops through
+   `CODEX_UI_KIT_WORKSPACE_PROJECT_REFERENCE` and
+   `CODEX_UI_KIT_WORKSPACE_PROJECT_COMPACT_REFERENCE` under a 5% hard limit.
+   The current
    long-thread main-region reference uses
    `CODEX_UI_KIT_LONG_THREAD_REFERENCE`; its mask excludes all conversation
    content and retains the compact rail and floating control under a 1% hard

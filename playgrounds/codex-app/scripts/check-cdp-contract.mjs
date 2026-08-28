@@ -3524,6 +3524,11 @@ for (const scene of selectedScenes) {
             document.documentElement.clientWidth,
           project: projectDialog
             ? {
+                divider: rect(
+                  projectListbox?.querySelector(
+                    ".codex-ui-conversation-project-options__divider",
+                  ),
+                ),
                 optionCount:
                   projectListbox?.querySelectorAll('[role="option"]')
                     .length ?? 0,
@@ -3534,17 +3539,27 @@ for (const scene of selectedScenes) {
                   ).length ?? 0,
                 actionLabels: Array.from(
                   projectDialog.querySelectorAll(
-                    ".demo-workspace-project-dialog__actions button",
+                    ".codex-ui-conversation-project-options__pinned [role=\"option\"]",
                   ),
                   (button) => button.textContent?.trim() ?? "",
                 ),
                 actionIconNames: Array.from(
                   projectDialog.querySelectorAll(
-                    ".demo-workspace-project-dialog__actions [data-current-build-icon]",
+                    ".codex-ui-conversation-project-options__pinned [data-current-build-icon]",
                   ),
                   (icon) => icon.getAttribute("data-current-build-icon"),
                 ),
                 listbox: rect(projectListbox),
+                pinned: rect(
+                  projectListbox?.querySelector(
+                    ".codex-ui-conversation-project-options__pinned",
+                  ),
+                ),
+                scroll: rect(
+                  projectListbox?.querySelector(
+                    ".codex-ui-conversation-project-options__scroll",
+                  ),
+                ),
               }
             : null,
           prompt: rect(prompt),
@@ -3620,6 +3635,8 @@ for (const scene of selectedScenes) {
         continue;
       }
       const projectExpected = scene.frame === "workspace-project-menu";
+      const projectCompactExpected =
+        scene.id === "workspace-project-menu-compact";
       const environmentExpected =
         scene.frame === "workspace-environment-menu";
       const localEnvironmentExpected =
@@ -3635,7 +3652,9 @@ for (const scene of selectedScenes) {
       const newWorktreeExpected =
         scene.frame === "workspace-new-worktree" ||
         worktreeEnvironmentExpected;
-      const compactExpected = scene.frame === "workspace-compact-ready";
+      const compactExpected =
+        scene.frame === "workspace-compact-ready" ||
+        projectCompactExpected;
       const currentHomeExpected = scene.frame.startsWith("current-home-");
       const currentHomeCompactExpected =
         currentHomeExpected && scene.frame.endsWith("-compact");
@@ -3803,8 +3822,13 @@ for (const scene of selectedScenes) {
           Math.abs(contract.project.rect.width - 260) > 1 ||
           Math.abs(contract.project.rect.height - 249.5) > 0.2 ||
           Math.abs(contract.project.listbox.width - 252) > 1 ||
-          Math.abs(contract.project.listbox.height - 142.81) > 0.2 ||
-          contract.project.optionCount !== 14 ||
+          Math.abs(contract.project.listbox.height - 208.94) > 0.2 ||
+          Math.abs(contract.project.scroll.width - 252) > 1 ||
+          Math.abs(contract.project.scroll.height - 142.81) > 0.2 ||
+          Math.abs(contract.project.divider.height - 9) > 0.2 ||
+          Math.abs(contract.project.pinned.width - 252) > 1 ||
+          Math.abs(contract.project.pinned.height - 57.13) > 0.2 ||
+          contract.project.optionCount !== 16 ||
           contract.project.selectedCount !== 1 ||
           JSON.stringify(contract.project.actionLabels) !==
             JSON.stringify([
@@ -3833,16 +3857,19 @@ for (const scene of selectedScenes) {
         });
         await search.fill("__codex_ui_kit_no_project__");
         if (
-          (await projectDialog.getByRole("option").count()) !== 0 ||
+          (await projectDialog.getByRole("option").count()) !== 2 ||
           !(await projectDialog
             .getByText("No projects found", { exact: true })
             .isVisible()) ||
           (await projectDialog
-            .getByRole("button", { name: "New project" })
+            .getByRole("option", { name: "New project" })
             .count()) !== 1 ||
           (await projectDialog
-            .getByRole("button", { name: "Don't work in a project" })
-            .count()) !== 1
+            .getByRole("option", { name: "Don't work in a project" })
+            .count()) !== 1 ||
+          (await projectDialog
+            .getByRole("button", { name: "New project" })
+            .count()) !== 0
         ) {
           throw new Error(
             `${scene.id}: workspace empty project search did not preserve both fixed actions.`,
@@ -3860,7 +3887,7 @@ for (const scene of selectedScenes) {
         );
         await originalTrigger.click();
         await projectDialog
-          .getByRole("button", { name: "Don't work in a project" })
+          .getByRole("option", { name: "Don't work in a project" })
           .click();
         await page.waitForSelector(
           '.demo-root[data-frame="workspace-no-project"]',
@@ -8172,6 +8199,12 @@ for (const scene of selectedScenes) {
         );
         const composer = surface?.querySelector(".codex-ui-composer");
         const textarea = composer?.querySelector("textarea");
+        const fieldset = composer?.querySelector(
+          ".codex-ui-composer__fieldset",
+        );
+        const toolbar = composer?.querySelector(
+          ".codex-ui-composer__toolbar",
+        );
         const queue = document.querySelector(
           ".codex-ui-composer-dock__queue",
         );
@@ -8224,6 +8257,12 @@ for (const scene of selectedScenes) {
             layout: composer.getAttribute("data-layout"),
             rect: rect(composer),
           },
+          fieldset: fieldset
+            ? {
+                rect: rect(fieldset),
+                height: getComputedStyle(fieldset).height,
+              }
+            : null,
           context: context
             ? {
                 controls: Array.from(
@@ -8404,6 +8443,13 @@ for (const scene of selectedScenes) {
             rect: rect(textarea),
             value: textarea.value,
           },
+          toolbar: toolbar
+            ? {
+                marginBottom: getComputedStyle(toolbar).marginBottom,
+                marginTop: getComputedStyle(toolbar).marginTop,
+                rect: rect(toolbar),
+              }
+            : null,
           threadFollowing: root.getAttribute("data-thread-following"),
           viewport: viewport
             ? {
@@ -8486,7 +8532,7 @@ for (const scene of selectedScenes) {
         }) ||
         !conversation.dock.rect ||
         conversation.dock.rect.width <
-          (scene.id === "thread-current-26-820-compact-away" ? 680 : 700) ||
+          (scene.windowSize?.width === 720 ? 680 : 700) ||
         conversation.dock.rect.width > 740
       ) {
         throw new Error(
@@ -8515,34 +8561,74 @@ for (const scene of selectedScenes) {
           `${scene.id}: multiline Composer contract failed: ${JSON.stringify(conversation)}`,
         );
       }
+      const composerModeExpected =
+        scene.frame === "composer-goal" || scene.frame === "composer-plan";
+      const goalModeExpected = scene.frame === "composer-goal";
+      const compactComposerModeExpected = scene.id.endsWith("-compact");
+      const expectedModeComposerLeft = compactComposerModeExpected
+        ? 16
+        : 359;
+      const expectedModeComposerWidth = compactComposerModeExpected
+        ? 688
+        : 736;
+      const expectedModeComposerHeight = goalModeExpected ? 134 : 98;
+      const expectedModeComposerTop =
+        (compactComposerModeExpected ? 664 : 804) -
+        expectedModeComposerHeight;
+      const expectedModeInputTop =
+        expectedModeComposerTop + (goalModeExpected ? 20.5 : 14);
+      const expectedModeIndicatorLeft =
+        expectedModeComposerLeft + 157.0625;
       if (
-        (scene.id === "composer-goal" || scene.id === "composer-plan") &&
+        composerModeExpected &&
         (conversation.phase !==
-          (scene.id === "composer-goal" ? "goal" : "plan") ||
+          (goalModeExpected ? "goal" : "plan") ||
           conversation.mode !==
-            (scene.id === "composer-goal" ? "goal" : "plan") ||
+            (goalModeExpected ? "goal" : "plan") ||
           conversation.composer.layout !== "multiline" ||
           !conversation.modeIndicator ||
           conversation.modeIndicator.kind !== conversation.mode ||
           conversation.modeIndicator.label !==
-            (scene.id === "composer-goal" ? "Goal" : "Plan") ||
+            (goalModeExpected ? "Goal" : "Plan") ||
           conversation.modeIndicator.clearLabel !==
-            (scene.id === "composer-goal" ? "Clear goal" : "Plan") ||
+            (goalModeExpected ? "Clear goal" : "Plan") ||
           conversation.modeIndicator.svgCount !== 1 ||
-          Math.abs(conversation.composer.rect.left - 359) > 1 ||
-          Math.abs(conversation.composer.rect.top - 706) > 1 ||
-          Math.abs(conversation.composer.rect.width - 736) > 1 ||
-          Math.abs(conversation.composer.rect.height - 98) > 1 ||
-          Math.abs(conversation.textarea.rect.left - 371) > 1 ||
-          Math.abs(conversation.textarea.rect.top - 720) > 1 ||
-          Math.abs(conversation.textarea.rect.width - 712) > 1 ||
+          Math.abs(
+            conversation.composer.rect.left - expectedModeComposerLeft
+          ) > 1 ||
+          Math.abs(
+            conversation.composer.rect.top - expectedModeComposerTop
+          ) > 1 ||
+          Math.abs(
+            conversation.composer.rect.width - expectedModeComposerWidth
+          ) > 1 ||
+          Math.abs(
+            conversation.composer.rect.height - expectedModeComposerHeight
+          ) > 1 ||
+          Math.abs(
+            conversation.textarea.rect.left -
+              (expectedModeComposerLeft + 12)
+          ) > 1 ||
+          Math.abs(
+            conversation.textarea.rect.top - expectedModeInputTop
+          ) > 1 ||
+          Math.abs(
+            conversation.textarea.rect.width -
+              (expectedModeComposerWidth - 24)
+          ) > 1 ||
           Math.abs(conversation.textarea.rect.height - 44) > 1 ||
           conversation.textarea.label !==
-            (scene.id === "composer-goal"
+            (goalModeExpected
               ? "Describe your goal, define measurable outcomes for best results"
               : "Describe your task to generate a plan...") ||
-          Math.abs(conversation.modeIndicator.rect.left - 512) > 1 ||
-          Math.abs(conversation.modeIndicator.rect.top - 768) > 1 ||
+          Math.abs(
+            conversation.modeIndicator.rect.left -
+              expectedModeIndicatorLeft
+          ) > 1 ||
+          Math.abs(
+            conversation.modeIndicator.rect.top -
+              (compactComposerModeExpected ? 628 : 768)
+          ) > 1 ||
           Math.abs(conversation.modeIndicator.rect.height - 28) > 1)
       ) {
         throw new Error(
@@ -11858,7 +11944,13 @@ for (const scene of selectedScenes) {
         ? contract.review.firstContentLabel
         : scene.id.startsWith("attachment-current-post-picker")
           ? "Message ChatGPT"
-          : "Message composer";
+          : scene.id === "composer-goal" || scene.id === "composer-plan"
+            ? "Message composer"
+            : scene.frame === "composer-goal"
+            ? "Describe your goal, define measurable outcomes for best results"
+            : scene.frame === "composer-plan"
+              ? "Describe your task to generate a plan..."
+              : "Message composer";
       if (!expectedFocus) {
         throw new Error(`${scene.id}: expected focus target is missing.`);
       }

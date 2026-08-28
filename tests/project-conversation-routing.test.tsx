@@ -453,6 +453,64 @@ describe("project conversation routing", () => {
     );
   });
 
+  it("keeps pinned project actions inside the listbox navigation order", () => {
+    const onSelect = vi.fn();
+    render(
+      <ConversationProjectListbox
+        items={[
+          { id: "ui-kit", label: "UI Kit" },
+          { id: "desktop", label: "Desktop" },
+        ]}
+        onSelect={onSelect}
+        pinnedItems={[
+          {
+            ariaLabel: "New project",
+            id: "new-project",
+            label: "New project",
+          },
+          {
+            ariaLabel: "Don't work in a project",
+            id: "no-project",
+            label: "Don't work in a project",
+          },
+        ]}
+        selectedId="ui-kit"
+      />,
+    );
+
+    const listbox = screen.getByRole("listbox", {
+      name: "Conversation projects",
+    });
+    const options = within(listbox).getAllByRole("option");
+    const uiKit = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    const newProject = screen.getByRole("option", {
+      name: "New project",
+    });
+    const noProject = screen.getByRole("option", {
+      name: "Don't work in a project",
+    });
+    expect(options).toHaveLength(4);
+    expect(
+      listbox
+        .querySelector(".codex-ui-conversation-project-options__scroll")
+        ?.contains(uiKit),
+    ).toBe(true);
+    expect(
+      listbox
+        .querySelector(".codex-ui-conversation-project-options__pinned")
+        ?.contains(newProject),
+    ).toBe(true);
+
+    fireEvent.keyDown(uiKit, { key: "End" });
+    expect(document.activeElement).toBe(noProject);
+    fireEvent.keyDown(noProject, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(uiKit);
+    fireEvent.click(newProject);
+    expect(onSelect).toHaveBeenCalledWith("new-project");
+  });
+
   it("focuses a selected option when controlled items become enabled", () => {
     const renderListbox = (disabled: boolean) => (
       <>

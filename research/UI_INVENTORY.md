@@ -161,7 +161,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 36 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
+Current inventory: 89 surface groups; 38 have current-build runtime evidence, 36 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 30 groups and Electron verification covers 30.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -798,6 +798,26 @@ Their 906×820 regional gates pass at `0.003763528` and `0.003486243`, so
 `composer.modes` was Browser/Electron verified on `26.727.40816` and is now
 `partial_legacy`. Native file-panel selection remains outside Renderer CDP;
 the current pasted-image lifecycle is independently refreshed below.
+
+The `26.820.60940` refresh supersedes that legacy mode sample. Goal now uses
+736/688×134 wide/compact surfaces with a 20.5px input inset; Plan retains
+736/688×98 with a 14px inset. Browser/CDP and Electron verify both responsive
+geometries, exact placeholders, 28px mode controls, clear/focus restoration,
+and Add-resources transitions. Unmasked surface-only product ratios are
+3.9787%/4.2390% for Goal and 3.6241%/3.6130% for Plan under 4.5% and 4%
+ceilings, promoting `composer.modes` to current-build Browser/Electron
+verification for this sampled vocabulary.
+
+The same refresh supersedes the prior project-picker structure. The outer
+dialog remains 260×249.5, but one 252×208.9375 listbox now owns a 142.8125px
+scroll region, 9px divider, and 57.125px fixed region. `New project` and
+`Don't work in a project` are options in the same keyboard order; a no-match
+query leaves exactly those two options. Wide/compact Browser/CDP and Electron
+verify focus, search, reversible no-project selection, and the adjacent
+project/local/main context geometry. Unmasked 252×209 product crops pass at
+4.3119% and 3.0702% under 5%, promoting `conversation.project-picker` and
+the sampled `conversation.context-controls` path to current-build
+Browser/Electron verification.
 
 The `26.727.40816` long-thread probe re-observes an 82-message compact
 navigation
