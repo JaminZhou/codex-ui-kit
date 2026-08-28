@@ -24,6 +24,8 @@ import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpCurrentIntegrationRecoveryTrace from "../fixtures/traces/mcp-current-integration-recovery.jsonl?raw";
 import mcpCurrent26818RecoveryTrace from "../fixtures/traces/mcp-current-26-818-recovery.jsonl?raw";
 import mcpCurrent26818SuccessTrace from "../fixtures/traces/mcp-current-26-818-success.jsonl?raw";
+import mcpCurrent26820RecoveryTrace from "../fixtures/traces/mcp-current-26-820-recovery.jsonl?raw";
+import mcpCurrent26820SuccessTrace from "../fixtures/traces/mcp-current-26-820-success.jsonl?raw";
 import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
 import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
@@ -72,6 +74,8 @@ export type ReplayScenarioId =
   | "mcp-current-integration-recovery"
   | "mcp-current-26-818-recovery"
   | "mcp-current-26-818-success"
+  | "mcp-current-26-820-recovery"
+  | "mcp-current-26-820-success"
   | "mcp-current-recovery"
   | "mcp-current-success"
   | "mcp-tool-call"
@@ -336,6 +340,18 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Recover current 26.818 Codex MCP lookup",
     "The runtime-observed 26.818 product keeps an Invalid URL failure, recovery Search, and successful Fetch in one expanded integration group.",
     mcpCurrent26818RecoveryTrace,
+  ),
+  "mcp-current-26-820-success": scenario(
+    "mcp-current-26-820-success",
+    "查找 MCP 官方文档",
+    "The runtime-observed 26.820 product searches and fetches the current learn.chatgpt.com MCP page with regular-weight, non-expandable call rows.",
+    mcpCurrent26820SuccessTrace,
+  ),
+  "mcp-current-26-820-recovery": scenario(
+    "mcp-current-26-820-recovery",
+    "查找 MCP 官方文档",
+    "The runtime-observed 26.820 product first shows an ungrouped failed Fetch row, then a captured same-turn Search and Fetch recovery sequence without an error-output card.",
+    mcpCurrent26820RecoveryTrace,
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",

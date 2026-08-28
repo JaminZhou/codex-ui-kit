@@ -3541,6 +3541,282 @@ try {
   await currentMcp26818RecoveryApp.close();
 }
 
+const currentMcp26820SuccessScene = {
+  currentSidebar: true,
+  frame: "mcp-current-26-820-success",
+  id: "electron-current-mcp-26-820-success",
+  scenario: "mcp-current-26-820-success",
+  sidebarState: "hidden",
+  summaryState: "hidden",
+};
+const {
+  app: currentMcp26820SuccessApp,
+  page: currentMcp26820SuccessPage,
+} = await launchScene(currentMcp26820SuccessScene, { capture: false });
+
+try {
+  const timeline = currentMcp26820SuccessPage.getByRole("button", {
+    name: "Worked for 34s",
+  });
+  if ((await timeline.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("26.820 Electron MCP timeline should start collapsed.");
+  }
+  await timeline.click();
+  const group = currentMcp26820SuccessPage.getByTestId(
+    "mcp-tool-call-group",
+  );
+  await group
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const currentState = await currentMcp26820SuccessPage.evaluate(() => {
+    const answer = document.querySelector(".demo-current-mcp-answer");
+    const group = document.querySelector(".codex-ui-mcp-tool-call-group");
+    return {
+      answer: answer instanceof HTMLElement
+        ? answer.innerText
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .join("\n")
+        : null,
+      callLabels: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+        ),
+        (element) => element.textContent?.trim(),
+      ),
+      errorCards: document.querySelectorAll(
+        ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+      ).length,
+      groupStatus: group?.getAttribute("data-status"),
+      linkHref: answer?.querySelector("a")?.getAttribute("href"),
+      rowButtons: document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call button, .codex-ui-mcp-tool-call-group .codex-ui-tool-call summary",
+      ).length,
+      title: document
+        .querySelector(".codex-ui-thread-header__title")
+        ?.textContent?.trim(),
+    };
+  });
+  if (
+    currentState.title !== "查找 MCP 官方文档" ||
+    JSON.stringify(currentState.callLabels) !==
+      JSON.stringify(["Search OpenAI docs", "Fetch OpenAI doc"]) ||
+    currentState.groupStatus !== "completed" ||
+    currentState.rowButtons !== 0 ||
+    currentState.errorCards !== 0 ||
+    currentState.answer !==
+      "Model Context Protocol\nhttps://learn.chatgpt.com/docs/extend/mcp" ||
+    currentState.linkHref !== "https://learn.chatgpt.com/docs/extend/mcp"
+  ) {
+    throw new Error(
+      `26.820 Electron MCP success drifted: ${JSON.stringify(currentState)}`,
+    );
+  }
+} finally {
+  await currentMcp26820SuccessApp.close();
+}
+
+const currentMcp26820FailureScene = {
+  currentSidebar: true,
+  frame: "mcp-current-26-820-recovery-failed",
+  id: "electron-current-mcp-26-820-failed",
+  scenario: "mcp-current-26-820-recovery",
+  sidebarState: "hidden",
+  summaryState: "hidden",
+};
+const {
+  app: currentMcp26820FailureApp,
+  page: currentMcp26820FailurePage,
+} = await launchScene(currentMcp26820FailureScene, { capture: false });
+
+try {
+  await currentMcp26820FailurePage
+    .getByRole("button", { name: "Working for 3s" })
+    .click();
+  const failedState = await currentMcp26820FailurePage.evaluate(() => {
+    const failed = document.querySelector(
+      '[data-item-id="mcp-current-26-820-fetch-invalid"]',
+    );
+    return {
+      errorCards: document.querySelectorAll(
+        ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+      ).length,
+      failedLabel: failed
+        ?.querySelector(".codex-ui-tool-call__label")
+        ?.textContent?.trim(),
+      groupCount: document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group",
+      ).length,
+      rowButtons:
+        failed?.querySelectorAll("button, details, summary").length ?? 0,
+      stopButton: Boolean(
+        document.querySelector('button[aria-label="Stop"]'),
+      ),
+      thinking: Boolean(document.querySelector(".codex-ui-thread-thinking")),
+    };
+  });
+  if (
+    failedState.failedLabel !== "Fetch OpenAI doc" ||
+    failedState.groupCount !== 0 ||
+    failedState.errorCards !== 0 ||
+    failedState.rowButtons !== 0 ||
+    !failedState.stopButton ||
+    failedState.thinking
+  ) {
+    throw new Error(
+      `26.820 Electron failed MCP row drifted: ${JSON.stringify(failedState)}`,
+    );
+  }
+} finally {
+  await currentMcp26820FailureApp.close();
+}
+
+const currentMcp26820RecoveryScene = {
+  currentSidebar: true,
+  frame: "mcp-current-26-820-recovery-completed",
+  id: "electron-current-mcp-26-820-recovery",
+  scenario: "mcp-current-26-820-recovery",
+  sidebarState: "hidden",
+  summaryState: "pinned",
+};
+const {
+  app: currentMcp26820RecoveryApp,
+  page: currentMcp26820RecoveryPage,
+} = await launchScene(currentMcp26820RecoveryScene, { capture: false });
+
+try {
+  const readSources = () =>
+    currentMcp26820RecoveryPage.evaluate(() => {
+      const rect = (element) => {
+        const bounds = element?.getBoundingClientRect();
+        return bounds
+          ? {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            }
+          : null;
+      };
+      const dock = document.querySelector(
+        ".demo-current-mcp-source-summary-dock",
+      );
+      return {
+        composer: rect(document.querySelector(".codex-ui-composer")),
+        open: dock?.getAttribute("data-open"),
+        panel: rect(
+          dock?.querySelector(".demo-current-mcp-source-summary-panel"),
+        ),
+        pinned: dock?.getAttribute("data-pinned"),
+        thread: rect(
+          document.querySelector(".codex-ui-thread-viewport__content"),
+        ),
+      };
+    });
+  const toggle = currentMcp26820RecoveryPage.getByRole("button", {
+    name: "Toggle pinned summary",
+  });
+  const pinnedSources = await readSources();
+  await toggle.click();
+  const unpinnedSources = await readSources();
+  await currentMcp26820RecoveryPage.mouse.click(600, 600);
+  const outsideSources = await readSources();
+  await toggle.click();
+  const repinnedSources = await readSources();
+  if (
+    pinnedSources.open !== "true" ||
+    pinnedSources.pinned !== "true" ||
+    Math.abs((pinnedSources.panel?.left ?? 0) - 864) > 1 ||
+    Math.abs((pinnedSources.panel?.height ?? 0) - 189) > 1 ||
+    Math.abs((pinnedSources.composer?.left ?? 0) - 64) > 1 ||
+    unpinnedSources.open !== "true" ||
+    unpinnedSources.pinned !== "false" ||
+    Math.abs((unpinnedSources.panel?.left ?? 0) - 1235) > 2 ||
+    Math.abs((unpinnedSources.thread?.left ?? 0)) > 1 ||
+    outsideSources.open !== "true" ||
+    outsideSources.pinned !== "false" ||
+    Math.abs((outsideSources.panel?.left ?? 0) - 1235) > 2 ||
+    repinnedSources.open !== "true" ||
+    repinnedSources.pinned !== "true" ||
+    Math.abs((repinnedSources.panel?.left ?? 0) - 864) > 1
+  ) {
+    throw new Error(
+      `26.820 Electron MCP Sources drifted: ${JSON.stringify({ outsideSources, pinnedSources, repinnedSources, unpinnedSources })}`,
+    );
+  }
+
+  await toggle.click();
+  await currentMcp26820RecoveryPage
+    .getByRole("button", { name: "Worked for 17s" })
+    .click();
+  const group = currentMcp26820RecoveryPage.getByTestId(
+    "mcp-tool-call-group",
+  );
+  await group
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const wideState = await currentMcp26820RecoveryPage.evaluate(() => ({
+    callLabels: Array.from(
+      document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call__label",
+      ),
+      (element) => element.textContent?.trim(),
+    ),
+    errorCards: document.querySelectorAll(
+      ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+    ).length,
+    rowButtons: document.querySelectorAll(
+      ".codex-ui-mcp-tool-call-group .codex-ui-tool-call button, .codex-ui-mcp-tool-call-group .codex-ui-tool-call summary",
+    ).length,
+  }));
+  await currentMcp26820RecoveryApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await currentMcp26820RecoveryPage.waitForFunction(
+    () => window.innerWidth === 720 && window.innerHeight === 680,
+    undefined,
+    { timeout: 5_000 },
+  );
+  const compactState = await currentMcp26820RecoveryPage.evaluate(() => {
+    const group = document.querySelector(
+      ".codex-ui-mcp-tool-call-group > .codex-ui-activity__disclosure > .codex-ui-activity__header",
+    );
+    const bounds = group?.getBoundingClientRect();
+    return {
+      group: bounds
+        ? { left: bounds.left, top: bounds.top }
+        : null,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    };
+  });
+  if (
+    JSON.stringify(wideState.callLabels) !==
+      JSON.stringify([
+        "Fetch OpenAI doc",
+        "Search OpenAI docs",
+        "Fetch OpenAI doc",
+      ]) ||
+    wideState.errorCards !== 0 ||
+    wideState.rowButtons !== 0 ||
+    compactState.horizontalOverflow > 1 ||
+    Math.abs((compactState.group?.left ?? 0) - 16) > 1 ||
+    Math.abs((compactState.group?.top ?? 0) - 120) > 1
+  ) {
+    throw new Error(
+      `26.820 Electron MCP recovery drifted: ${JSON.stringify({ compactState, wideState })}`,
+    );
+  }
+} finally {
+  await currentMcp26820RecoveryApp.close();
+}
+
 const currentIntegrationRecoveryScene = {
   frame: "mcp-current-integration-recovered",
   id: "electron-current-integration-recovery",
@@ -13580,5 +13856,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818 MCP success/recovery/Sources interaction, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818 plus 26.820 MCP success/failure/recovery/Sources interaction, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

@@ -309,11 +309,13 @@
         "cdp-26.810.52044:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
         "cdp-26.810.52044:current-mcp-success-computed-styles-exact-icons-and-1180x820-regional-pixel-gate",
         "cdp-26.818.41509:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
-        "cdp-26.818.41509:current-mcp-success-computed-styles-public-favicon-and-unmasked-tool-group-pixel-gate"
+        "cdp-26.818.41509:current-mcp-success-computed-styles-public-favicon-and-unmasked-tool-group-pixel-gate",
+        "cdp-26.820.60940:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
+        "cdp-26.820.60940:current-mcp-success-computed-styles-noninteractive-call-rows-and-unmasked-tool-group-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -335,11 +337,13 @@
         "cdp-26.810.52044:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820-and-720x680",
         "cdp-26.810.52044:current-mcp-recovery-computed-styles-exact-icons-and-720x680-card-pixel-gate",
         "cdp-26.818.41509:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820-and-720x680",
-        "cdp-26.818.41509:current-mcp-recovery-computed-styles-public-favicon-and-unmasked-720x680-card-pixel-gate"
+        "cdp-26.818.41509:current-mcp-recovery-computed-styles-public-favicon-and-unmasked-720x680-card-pixel-gate",
+        "cdp-26.820.60940:real-openai-developer-docs-invalid-url-fetch-search-fetch-recovery-expanded-1180x820-and-720x680",
+        "cdp-26.820.60940:current-mcp-direct-failure-and-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -519,11 +523,12 @@
         "cdp:floating-background-process-section",
         "cdp-26.721:bottom-panel-toggle-resize-close-restore",
         "cdp-26.727.40816:bottom-terminal-and-right-pr-panel-open-read-only",
-        "cdp-26.818.41509:pinned-sources-summary-floating-dismissed-and-repinned-thread-layout"
+        "cdp-26.818.41509:pinned-sources-summary-floating-dismissed-and-repinned-thread-layout",
+        "cdp-26.820.60940:pinned-sources-summary-offscreen-unpinned-and-repinned-thread-layout"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -535,11 +540,13 @@
       "runtimeEvidence": [
         "cdp:source-summary-view-all-and-sources-tabpanel",
         "cdp-26.818.41509:pinned-sources-summary-300x189-floating-dismissed-and-repinned",
-        "cdp-26.818.41509:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate"
+        "cdp-26.818.41509:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate",
+        "cdp-26.820.60940:pinned-sources-summary-300x189-offscreen-unpinned-and-repinned",
+        "cdp-26.820.60940:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

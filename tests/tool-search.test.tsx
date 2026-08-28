@@ -79,6 +79,38 @@ describe("ToolCallCard", () => {
     expect(html).not.toContain("<details");
   });
 
+  it("can keep a completed or failed tool row non-expandable", () => {
+    const { rerender } = render(
+      <ToolCallCard
+        collapsible={false}
+        name="Fetch OpenAI doc"
+        result="Fetched"
+        status="completed"
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Fetch OpenAI doc" }),
+    ).toBeNull();
+    expect(screen.queryByText("Fetched")).toBeNull();
+
+    rerender(
+      <ToolCallCard
+        collapsible={false}
+        error="Invalid URL"
+        failedLabel="Fetch OpenAI doc"
+        name="Fetch OpenAI doc"
+        status="failed"
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Fetch OpenAI doc" }),
+    ).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getByText("Fetch OpenAI doc")).toBeTruthy();
+  });
+
   it("renders a completed empty-result disclosure", () => {
     const html = renderToStaticMarkup(
       <ToolCallCard
