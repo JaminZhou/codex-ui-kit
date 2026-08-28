@@ -685,6 +685,54 @@ describe("lifecycle visual policy", () => {
     expect(contract.match(/masks: \[\]/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
   });
 
+  it("gates runtime-observed 26.820 command success, failure, and interruption without output cards", () => {
+    for (const scene of [
+      "command-current-26-820-success-running",
+      "command-current-26-820-success-completed",
+      "command-current-26-820-success-compact",
+      "command-current-26-820-failure-completed",
+      "command-current-26-820-failure-recovered",
+      "command-current-26-820-failure-compact",
+      "command-current-26-820-interruption-running",
+      "command-current-26-820-interruption-stopped-immediate",
+      "command-current-26-820-interruption-recovered",
+      "command-current-26-820-interruption-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_820_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      'scene.scenario.startsWith("command-current-26-820-")',
+    );
+    expect(cdpContract).toContain(
+      "current 26.820 command evidence contract failed",
+    );
+    expect(electronContract).toContain(
+      "currentCommand26820ElectronCases",
+    );
+    expect(electronContract).toContain(
+      "Electron current 26.820 command contract drifted",
+    );
+    expect(appSource).toContain("isCurrentCommand26820Replay");
+    expect(appSource).toContain("hideRawCommand");
+    expect(appStyles).toContain(
+      '[data-scenario^="command-current-26-820"]',
+    );
+    expect(contract).toContain(
+      "current 26.820 command success region pixel ratio",
+    );
+    expect(contract).toContain(
+      "current 26.820 stopped-command region pixel ratio",
+    );
+  });
+
   it("gates the current manual context-compaction running frame", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE",

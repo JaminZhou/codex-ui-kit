@@ -2649,6 +2649,17 @@ export function App() {
     mode === "replay" && scenarioId === "command-failure-recovery";
   const isCurrentCommandInterruptionReplay =
     mode === "replay" && scenarioId === "interruption";
+  const isCurrentCommand26820SuccessReplay =
+    mode === "replay" && scenarioId === "command-current-26-820-success";
+  const isCurrentCommand26820FailureReplay =
+    mode === "replay" && scenarioId === "command-current-26-820-failure";
+  const isCurrentCommand26820InterruptionReplay =
+    mode === "replay" &&
+    scenarioId === "command-current-26-820-interruption";
+  const isCurrentCommand26820Replay =
+    isCurrentCommand26820SuccessReplay ||
+    isCurrentCommand26820FailureReplay ||
+    isCurrentCommand26820InterruptionReplay;
   const isCurrentContextCompactionReplay =
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
@@ -3730,7 +3741,9 @@ export function App() {
   const current26820LongFrame =
     isConversationLifecycle && current26820LongThreadFrame(activeFrame);
   const current26820HeaderFrame =
-    current26820LongFrame || isCurrentMcp26820Replay;
+    current26820LongFrame ||
+    isCurrentMcp26820Replay ||
+    isCurrentCommand26820Replay;
   const currentWindowedFrame = legacyWindowedFrame || current26820LongFrame;
   const windowedHistorySize = current26820LongFrame
     ? current26820LongHistorySize
@@ -4634,6 +4647,7 @@ export function App() {
       : (isConversationLifecycle && replayComposerRunning) ||
         (isCurrentTransportRecoveryReplay && isTurnActive(state.status)) ||
         ((isCurrentCommandInterruptionReplay ||
+          isCurrentCommand26820Replay ||
           isCurrentContextCompactionReplay ||
           isCurrentMixedToolReplay ||
           isCurrentSubagentReplay ||
@@ -4644,6 +4658,7 @@ export function App() {
     ((isConversationLifecycle ||
       isCurrentAttachmentReplay ||
       isCurrentCommandInterruptionReplay ||
+      isCurrentCommand26820Replay ||
       isCurrentContextCompactionReplay) &&
       replayComposerSubmitting);
   const displayedStatus =
@@ -4736,6 +4751,7 @@ export function App() {
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
+      isCurrentCommand26820Replay ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
@@ -5075,7 +5091,9 @@ export function App() {
         current26820HeaderFrame
           ? current26820LongFrame
             ? "LONG THREAD 01"
-            : "查找 MCP 官方文档"
+            : isCurrentCommand26820Replay
+              ? scenario.label
+              : "查找 MCP 官方文档"
           : mode === "replay"
             ? scenario.label
             : "Live local thread"
@@ -5103,6 +5121,7 @@ export function App() {
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
+      isCurrentCommand26820Replay ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
@@ -8632,6 +8651,10 @@ export function App() {
                 (scenarioId === "interruption" &&
                   message.id ===
                     "assistant-command-interruption-recovery") ||
+                (isCurrentCommand26820Replay &&
+                  message.id.startsWith(
+                    "assistant-command-current-26-820-",
+                  )) ||
                 (isCurrentSubagentReplay &&
                   message.id.startsWith("assistant-subagent-")) ||
                 (isCurrentMixedToolReplay &&
@@ -8649,6 +8672,7 @@ export function App() {
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ||
+                isCurrentCommand26820Replay ||
                 isCurrentBasicMessageReplay ||
                 isCurrentMarkdown26818Replay ||
                 isCurrentMarkdown26820MediaReplay ||
@@ -9423,6 +9447,88 @@ export function App() {
                 ) : (
                   <>Did not run {command.command}</>
                 )
+              }
+            />
+          </ActivityTimeline>
+        );
+      }
+      if (
+        isCurrentCommand26820Replay &&
+        command.id.startsWith("command-current-26-820-")
+      ) {
+        const running =
+          command.status === "running" && state.status === "running";
+        if (isCurrentCommand26820InterruptionReplay) {
+          const stopped = !running;
+          const execution = (
+            <CommandExecution
+              command={command.command}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              hideRawCommand
+              indicator={
+                stopped ? (
+                  <span
+                    aria-hidden="true"
+                    className="demo-command-stop-indicator"
+                  />
+                ) : undefined
+              }
+              open={false}
+              status={stopped ? "interrupted" : "running"}
+              terminalIcon={
+                <CurrentBuildIcon name="thread-command-terminal" />
+              }
+              summary={
+                stopped ? (
+                  <>Background terminal stopped with {command.command}</>
+                ) : (
+                  <>Running {command.command}</>
+                )
+              }
+            />
+          );
+          return running ? (
+            <ActivityTimeline
+              key={`command:${command.id}`}
+              open
+              summary={<TurnDuration durationMs={10_000} status="working" />}
+            >
+              {execution}
+            </ActivityTimeline>
+          ) : (
+            <Fragment key={`command:${command.id}`}>{execution}</Fragment>
+          );
+        }
+        const turnDurationMs = isCurrentCommand26820SuccessReplay
+          ? 22_000
+          : 12_000;
+        return (
+          <ActivityTimeline
+            key={`command:${command.id}`}
+            open={initialSelection.capture ? true : undefined}
+            summary={
+              <TurnDuration
+                durationMs={running
+                  ? isCurrentCommand26820SuccessReplay
+                    ? 9_000
+                    : 5_000
+                  : turnDurationMs}
+                status={running ? "working" : "worked"}
+              />
+            }
+          >
+            <CommandExecution
+              command={command.command}
+              data-item-id={command.id}
+              data-testid="command-execution"
+              hideRawCommand
+              status={command.status}
+              terminalIcon={
+                <CurrentBuildIcon name="thread-command-terminal" />
+              }
+              summary={
+                <>{running ? "Running " : "Ran "}{command.command}</>
               }
             />
           </ActivityTimeline>
@@ -10291,6 +10397,7 @@ export function App() {
         isConversationLifecycle ||
         isCurrentAttachmentReplay ||
         isCurrentCommandInterruptionReplay ||
+        isCurrentCommand26820Replay ||
         isCurrentContextCompactionReplay ||
         isCurrentSubagentReplay
           ? composerPhase
@@ -10714,7 +10821,8 @@ export function App() {
                   currentWindowedFrame ||
                   isCurrentLongCommandReplay ||
                   isCurrentCommandFailureReplay ||
-                  isCurrentCommandInterruptionReplay
+                  isCurrentCommandInterruptionReplay ||
+                  isCurrentCommand26820Replay
                     ? "start"
                     : "end",
                 onFollowingChange: setThreadFollowing,

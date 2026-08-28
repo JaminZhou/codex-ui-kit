@@ -2981,6 +2981,142 @@ textarea {
   --codex-ui-conversation-thread-header-height: 2.9375rem;
 }
 
+.demo-root[data-scenario^="command-current-26-820"] {
+  -webkit-font-smoothing: antialiased;
+  --codex-ui-conversation-thread-header-height: 2.9375rem;
+  --codex-ui-user-message-compact-max-width: 70%;
+  --codex-ui-user-message-max-width: 70%;
+}
+
+.demo-root[data-scenario^="command-current-26-820"],
+.demo-root[data-scenario^="command-current-26-820"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-thread-header__navigation {
+  padding-inline-start: 5.125rem;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-thread-header__identity {
+  flex: 0 1 auto;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  border-radius: 22px;
+  line-height: 22px;
+  padding: 10px 16px;
+  white-space: pre-wrap;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  :is(
+    .codex-ui-thread-header__title,
+    .codex-ui-agent-message .codex-ui-agent-message__content,
+    .codex-ui-activity-timeline__toggle,
+    .codex-ui-turn-duration,
+    .codex-ui-command-execution,
+    .codex-ui-command-execution *
+  ) {
+  font-weight: 400;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  :is(
+    .codex-ui-activity-timeline__toggle,
+    .codex-ui-turn-duration,
+    .codex-ui-command-execution
+  ) {
+  color: oklab(0.903646 0.0000412762 0.0000180602 / 0.6);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-command-execution
+  > .codex-ui-activity__header {
+  gap: 6px;
+  min-height: 21px;
+  padding: 0;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-command-execution
+  .codex-ui-activity__summary {
+  color: oklab(0.903646 0.0000412762 0.0000180602 / 0.6);
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-command-execution[data-execution-status="running"]
+  .codex-ui-activity__summary {
+  color: rgb(223, 223, 223);
+}
+
+.demo-root[data-scenario="command-current-26-820-interruption"]
+  [data-item-id="command-current-26-820-interruption"] {
+  transform: translateY(2px);
+}
+
+.demo-root[data-scenario="command-current-26-820-interruption"]
+  [data-item-id="user-command-current-26-820-interruption-recovery"] {
+  margin-top: 4px;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-command-execution__summary-command {
+  color: inherit;
+  display: inline-block;
+  max-width: min(50rem, calc(100vw - 19rem));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-thread-viewport {
+  scrollbar-width: none;
+}
+
+.demo-root[data-scenario^="command-current-26-820"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.demo-root[data-scenario="command-current-26-820-interruption"]
+  .codex-ui-thread-interruption-summary::before {
+  content: none;
+}
+
+.demo-root[data-scenario="command-current-26-820-interruption"]
+  .codex-ui-thread-interruption-summary__label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  min-height: 21px;
+}
+
+.demo-root[data-scenario="command-current-26-820-interruption"]
+  .codex-ui-thread-interruption-summary__rule {
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .demo-root[data-scenario="command-current-26-820-interruption"][data-frame="command-current-26-820-interruption-recovered"]
+    .codex-ui-agent-turn {
+    transform: translateY(43px);
+  }
+
+  .demo-root[data-scenario^="command-current-26-820"]
+    .codex-ui-command-execution__summary-command {
+    max-width: calc(100vw - 9.5rem);
+  }
+}
+
 .demo-root:is(
     [data-scenario="mcp-current-26-820-success"],
     [data-scenario="mcp-current-26-820-recovery"]

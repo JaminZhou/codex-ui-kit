@@ -111,12 +111,17 @@ observation from a previous build remains historical evidence.
   offset, retains nine mounted turns at `scrollTop = -900`, and returns to
   latest with eight. Browser/CDP and Electron repeat both flows; local-only
   structural comparisons pass at 0.8085% and 0.8397% under 1% limits.
-- The previous 26.818 command task revalidates exact exit-code-7 failure and
-  same-thread recovery plus a 58-second Stop and same-thread recovery. The
-  independent traces preserve the sampled `Worked for 10s`, stopped
-  background-terminal row, exact replies, actions, and glyphs. Browser/CDP and
-  Electron cover 1180×820 and 720×680; unmasked failure and interruption
-  regions pass at 4.4354% and 3.9512% under independent hard limits.
+- The current 26.820 command tasks revalidate a 12-second success, exact
+  exit-code-7 acknowledgement and same-thread recovery, plus a stopped
+  120-second loop and second same-thread recovery. The current Renderer uses
+  neutral noninteractive `Ran …` rows for both exit 0 and exit 7, hides Shell,
+  output, and exit-code cards while the protocol retains output/exit code, and
+  uses a square `Background terminal stopped with …` row after interruption.
+  The sampled interruption changes from `You stopped after 0s` to a 16-second
+  settled duration; that one timing is not generalized. Browser/CDP covers ten
+  frames, Electron repeats wide/compact states, and unmasked current-product
+  regions pass at 1.5813% success, 1.5826% failure recovery, 5.4109% stopped,
+  and 2.3502% compact recovery under independent hard limits.
 - A fresh `26.818.41509` MCP slice reaches a real OpenAI Developer Docs
   Search → Fetch success and an invalid-URL Fetch → Search → Fetch recovery.
   It also records the 300×189 pinned Sources summary, its 316px layout
@@ -156,7 +161,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 31 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 22 groups and Electron verification covers 22.
+Current inventory: 89 surface groups; 34 have current-build runtime evidence, 40 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 25 groups and Electron verification covers 25.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

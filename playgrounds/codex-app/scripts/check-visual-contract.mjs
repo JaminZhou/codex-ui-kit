@@ -250,6 +250,22 @@ const currentCommandLifecycleReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentCommand26820SuccessReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_REFERENCE;
+const currentCommand26820FailureReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_820_REFERENCE;
+const currentCommand26820InterruptionStoppedReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_REFERENCE;
+const currentCommand26820InterruptionCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_REFERENCE;
+const currentCommand26820WideReferenceSize = {
+  height: 820,
+  width: 1180,
+};
+const currentCommand26820CompactReferenceSize = {
+  height: 680,
+  width: 720,
+};
 const currentBuildContextCompactionReference =
   process.env.CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE;
 const currentBuildContextCompactionReferenceSize = {
@@ -1617,6 +1633,146 @@ for (const scene of selectedScenes) {
       referenceSize: currentCommandLifecycleReferenceSize,
       sceneId: scene.id,
     });
+  }
+
+  if (
+    scene.id === "command-current-26-820-success-completed" &&
+    currentCommand26820SuccessReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentCommand26820SuccessReference),
+    );
+    if (
+      reference.width !== currentCommand26820WideReferenceSize.width ||
+      reference.height !== currentCommand26820WideReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 command success comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 222, 307, 736, 130),
+      cropPng(actual, 222, 308, 736, 130),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_MAX_DIFF_RATIO",
+      0.02,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.820 command success region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.820 command success region pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "command-current-26-820-failure-recovered" &&
+    currentCommand26820FailureReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentCommand26820FailureReference),
+    );
+    if (
+      reference.width !== currentCommand26820WideReferenceSize.width ||
+      reference.height !== currentCommand26820WideReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 command failure comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 206, 302, 736, 125),
+      cropPng(actual, 222, 303, 736, 125),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_820_MAX_DIFF_RATIO",
+      0.02,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.820 command failure region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.820 command failure region pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "command-current-26-820-interruption-stopped-immediate" &&
+    currentCommand26820InterruptionStoppedReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentCommand26820InterruptionStoppedReference),
+    );
+    if (
+      reference.width !== currentCommand26820WideReferenceSize.width ||
+      reference.height !== currentCommand26820WideReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 stopped-command comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 222, 282, 736, 74),
+      cropPng(actual, 222, 283, 736, 74),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_MAX_DIFF_RATIO",
+      0.055,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.820 stopped-command region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.820 stopped-command region pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "command-current-26-820-interruption-compact" &&
+    currentCommand26820InterruptionCompactReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentCommand26820InterruptionCompactReference),
+    );
+    if (
+      reference.width !== currentCommand26820CompactReferenceSize.width ||
+      reference.height !== currentCommand26820CompactReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 compact interruption comparison requires exact 720x680 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 16, 294, 688, 242),
+      cropPng(actual, 16, 291, 688, 242),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_MAX_DIFF_RATIO",
+      0.03,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.820 compact interruption region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.820 compact interruption region pixel ratio ${comparison.ratio}`,
+    );
   }
 
   if (scene.id === "workspace-ready" && currentBuildWorkspaceReference) {
