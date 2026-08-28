@@ -1400,4 +1400,17 @@ CODEX_UI_KIT_ATTACHMENT_COMPLETED_REFERENCE=/absolute/path/to/attachment-complet
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
+The current `26.820.60940` post-picker and immersive-preview gates accept two
+local-only 720×680 full-product references. The picker comparison crops the
+owned 640×178 Composer; the preview comparison independently gates
+Download/Close, the fitted image, and the zoom toolbar so the optional Edit
+image feature state does not weaken the required controls:
+
+```bash
+CODEX_UI_KIT_CURRENT_ATTACHMENT_PICKER_REFERENCE=/absolute/path/to/post-picker-720.png \
+CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_REFERENCE=/absolute/path/to/image-preview-720.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+    -- --scenes=attachment-current-post-picker-compact,attachment-current-preview-compact
+```
+
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the evidence model.

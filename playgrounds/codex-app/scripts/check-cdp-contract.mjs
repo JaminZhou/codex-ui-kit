@@ -2950,17 +2950,24 @@ for (const scene of selectedScenes) {
           },
         ),
       );
+      const currentAttachmentPickerScene = scene.id.startsWith(
+        "attachment-current-post-picker",
+      ) || scene.id.startsWith("attachment-current-preview");
       const expectedCurrentComposerIcons = [
         { height: 16, name: "composer-add-files", width: 16 },
-        {
-          height: 16,
-          name:
-            scene.scenario.startsWith("mcp-") ||
-            scene.scenario === "current-basic-message"
-            ? "composer-permission"
-            : "composer-permission-ask",
-          width: 16,
-        },
+        ...(currentAttachmentPickerScene
+          ? []
+          : [
+              {
+                height: 16,
+                name:
+                  scene.scenario.startsWith("mcp-") ||
+                  scene.scenario === "current-basic-message"
+                    ? "composer-permission"
+                    : "composer-permission-ask",
+                width: 16,
+              },
+            ]),
         { height: 14, name: "composer-model-chevron", width: 14 },
         { height: 16, name: "composer-dictate", width: 16 },
       ];
@@ -8450,6 +8457,245 @@ for (const scene of selectedScenes) {
       }
     }
     if (
+      scene.id.startsWith("attachment-current-post-picker") ||
+      scene.id.startsWith("attachment-current-preview")
+    ) {
+      const currentAttachmentPicker = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const composer = document.querySelector(".codex-ui-composer");
+        const row = composer?.querySelector(".codex-ui-composer__attachments");
+        const attachments = Array.from(
+          composer?.querySelectorAll(".codex-ui-composer-attachment") ?? [],
+        );
+        const file = attachments.find(
+          (attachment) => attachment.getAttribute("data-kind") === "file",
+        );
+        const image = attachments.find(
+          (attachment) => attachment.getAttribute("data-kind") === "image",
+        );
+        const dialog = document.querySelector(
+          '.codex-ui-image-preview[data-presentation="immersive"]',
+        );
+        const previewImage = dialog?.querySelector(
+          ".codex-ui-image-preview__immersive-stage > img",
+        );
+        const toolbar = dialog?.querySelector(
+          ".codex-ui-image-preview__zoom-toolbar",
+        );
+        const attachmentData = (attachment) => ({
+          icon: rect(
+            attachment?.querySelector(
+              ".codex-ui-composer-attachment__icon > svg",
+            ),
+          ),
+          image: rect(attachment?.querySelector("img")),
+          label: rect(
+            attachment?.querySelector(
+              ".codex-ui-composer-attachment__label",
+            ),
+          ),
+          labelText:
+            attachment
+              ?.querySelector(".codex-ui-composer-attachment__label")
+              ?.textContent?.trim() ?? null,
+          metaText:
+            attachment
+              ?.querySelector(".codex-ui-composer-attachment__meta")
+              ?.textContent?.trim() ?? null,
+          rect: rect(attachment),
+          remove: rect(
+            attachment?.querySelector(
+              ".codex-ui-composer-attachment__remove",
+            ),
+          ),
+          radius: attachment
+            ? getComputedStyle(attachment).borderRadius
+            : null,
+        });
+        return {
+          buttons: Array.from(
+            composer?.querySelectorAll("button[aria-label]") ?? [],
+            (button) => button.getAttribute("aria-label"),
+          ),
+          composer: rect(composer),
+          composerBackground: composer
+            ? getComputedStyle(composer).backgroundColor
+            : null,
+          composerRadius: composer
+            ? getComputedStyle(composer).borderRadius
+            : null,
+          documentPath:
+            file?.querySelector(".codex-ui-composer-attachment__icon path")
+              ?.getAttribute("d") ?? null,
+          file: attachmentData(file),
+          horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+          image: attachmentData(image),
+          modelText:
+            composer
+              ?.querySelector(".demo-current-composer-model")
+              ?.textContent?.trim() ?? null,
+          preview: dialog
+            ? {
+                activeRole: document.activeElement?.getAttribute("role"),
+                buttons: Array.from(
+                  dialog.querySelectorAll("button[aria-label]"),
+                  (button) => ({
+                    label: button.getAttribute("aria-label"),
+                    rect: rect(button),
+                  }),
+                ),
+                image: rect(previewImage),
+                imageRadius: previewImage
+                  ? getComputedStyle(previewImage).borderRadius
+                  : null,
+                rect: rect(dialog),
+                toolbar: rect(toolbar),
+                zoomText: toolbar?.querySelector("span")?.textContent ?? null,
+              }
+            : null,
+          row: rect(row),
+          rowPadding: row ? getComputedStyle(row).padding : null,
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.id.endsWith("compact");
+      const composer = currentAttachmentPicker.composer;
+      const row = currentAttachmentPicker.row;
+      const file = currentAttachmentPicker.file;
+      const image = currentAttachmentPicker.image;
+      const expectsPreview = scene.id.startsWith(
+        "attachment-current-preview",
+      );
+      if (
+        !composer ||
+        !row ||
+        !file.rect ||
+        !file.icon ||
+        !file.label ||
+        !file.remove ||
+        !image.rect ||
+        !image.image ||
+        !image.remove ||
+        Math.abs(composer.width - 640) > 0.1 ||
+        Math.abs(composer.height - 178) > 0.1 ||
+        currentAttachmentPicker.composerRadius !== "25px" ||
+        currentAttachmentPicker.composerBackground !==
+          "rgba(45, 45, 45, 0.867)" ||
+        Math.abs(row.width - 640) > 0.1 ||
+        Math.abs(row.height - 94) > 0.1 ||
+        currentAttachmentPicker.rowPadding !== "8px 8px 6px" ||
+        Math.abs(file.rect.width - 224) > 0.1 ||
+        Math.abs(file.rect.height - 52) > 0.1 ||
+        file.radius !== "17px" ||
+        Math.abs(file.icon.width - 24) > 0.1 ||
+        Math.abs(file.icon.height - 24) > 0.1 ||
+        Math.abs(file.label.width - 128) > 0.1 ||
+        Math.abs(file.label.height - 21) > 0.1 ||
+        Math.abs(file.remove.width - 16) > 0.1 ||
+        Math.abs(file.remove.height - 16) > 0.1 ||
+        file.labelText !== "codex-ui-kit-attachment-evidence.txt" ||
+        file.metaText !== "TXT" ||
+        !currentAttachmentPicker.documentPath?.startsWith(
+          "M3.685 13.9927V7.82571",
+        ) ||
+        Math.abs(image.rect.width - 80) > 0.1 ||
+        Math.abs(image.rect.height - 80) > 0.1 ||
+        image.radius !== "17px" ||
+        Math.abs(image.image.width - 78) > 0.1 ||
+        Math.abs(image.image.height - 78) > 0.1 ||
+        Math.abs(image.remove.width - 16) > 0.1 ||
+        Math.abs(image.remove.height - 16) > 0.1 ||
+        Math.abs(image.rect.left - file.rect.right - 8) > 0.1 ||
+        Math.abs(image.rect.bottom - file.rect.bottom) > 0.1 ||
+        currentAttachmentPicker.modelText !== "Instant" ||
+        JSON.stringify(currentAttachmentPicker.buttons) !==
+          JSON.stringify([
+            "Remove codex-ui-kit-attachment-evidence.txt",
+            "shell-notification-success-stack.png",
+            "Remove shell-notification-success-stack.png",
+            "Add files and more",
+            "Dictate",
+            "Send",
+          ]) ||
+        currentAttachmentPicker.horizontalOverflow !== 0 ||
+        Boolean(currentAttachmentPicker.preview) !== expectsPreview
+      ) {
+        throw new Error(
+          `${scene.id}: current attachment picker contract failed: ${JSON.stringify(currentAttachmentPicker)}`,
+        );
+      }
+      if (expectsPreview) {
+        const preview = currentAttachmentPicker.preview;
+        const expectedImage = compact
+          ? { height: 455.86, left: 32, top: 88.07, width: 656 }
+          : { height: 676, left: 103.66, top: 48, width: 972.68 };
+        const expectedToolbar = compact
+          ? { left: 284, top: 604 }
+          : { left: 514, top: 744 };
+        const expectedButtons = compact
+          ? [
+              ["Download image", 618, 12, 40, 40],
+              ["Close image preview", 666, 12, 42, 40],
+              ["Zoom out image", 288, 608, 36, 36],
+              ["Zoom in image", 396, 608, 36, 36],
+            ]
+          : [
+              ["Download image", 1078, 12, 40, 40],
+              ["Close image preview", 1126, 12, 42, 40],
+              ["Zoom out image", 518, 748, 36, 36],
+              ["Zoom in image", 626, 748, 36, 36],
+            ];
+        if (
+          !preview ||
+          !preview.rect ||
+          !preview.image ||
+          !preview.toolbar ||
+          preview.activeRole !== "dialog" ||
+          preview.rect.left !== 0 ||
+          preview.rect.top !== 0 ||
+          preview.rect.width !== currentAttachmentPicker.viewport.width ||
+          preview.rect.height !== currentAttachmentPicker.viewport.height ||
+          Math.abs(preview.image.left - expectedImage.left) > 0.2 ||
+          Math.abs(preview.image.top - expectedImage.top) > 0.2 ||
+          Math.abs(preview.image.width - expectedImage.width) > 0.2 ||
+          Math.abs(preview.image.height - expectedImage.height) > 0.2 ||
+          preview.imageRadius !== "12.5px" ||
+          Math.abs(preview.toolbar.left - expectedToolbar.left) > 0.1 ||
+          Math.abs(preview.toolbar.top - expectedToolbar.top) > 0.1 ||
+          Math.abs(preview.toolbar.width - 152) > 0.1 ||
+          Math.abs(preview.toolbar.height - 44) > 0.1 ||
+          preview.zoomText !== (compact ? "56%" : "82%") ||
+          preview.buttons.length !== expectedButtons.length ||
+          preview.buttons.some((button, index) => {
+            const expected = expectedButtons[index];
+            return (
+              button.label !== expected[0] ||
+              Math.abs(button.rect.left - expected[1]) > 0.1 ||
+              Math.abs(button.rect.top - expected[2]) > 0.1 ||
+              Math.abs(button.rect.width - expected[3]) > 0.1 ||
+              Math.abs(button.rect.height - expected[4]) > 0.1
+            );
+          })
+        ) {
+          throw new Error(
+            `${scene.id}: current attachment preview contract failed: ${JSON.stringify(preview)}`,
+          );
+        }
+      }
+      contract.currentAttachmentPicker = currentAttachmentPicker;
+    }
+    if (
       scene.id === "attachment-current-ready" ||
       scene.id === "attachment-current-completed"
     ) {
@@ -8517,21 +8763,21 @@ for (const scene of selectedScenes) {
             !attachmentLifecycle.remove ||
             attachmentLifecycle.messageAttachment !== null ||
             attachmentLifecycle.phase !== "attachment" ||
-            Math.abs(attachmentLifecycle.composer.height - 180) > 1 ||
-            Math.abs(attachmentLifecycle.composer.top - 624) > 1 ||
+            Math.abs(attachmentLifecycle.composer.height - 192) > 1 ||
+            Math.abs(attachmentLifecycle.composer.top - 612) > 1 ||
             Math.abs(attachmentLifecycle.composerAttachment.width - 80) > 1 ||
             Math.abs(attachmentLifecycle.composerAttachment.height - 80) > 1 ||
-            Math.abs(attachmentLifecycle.composerAttachment.left - 368.05) >
+            Math.abs(attachmentLifecycle.composerAttachment.left - 367.05) >
               1 ||
-            Math.abs(attachmentLifecycle.composerAttachment.top - 633) > 1 ||
+            Math.abs(attachmentLifecycle.composerAttachment.top - 620) > 1 ||
             Math.abs(attachmentLifecycle.composerImage.width - 78) > 1 ||
             Math.abs(attachmentLifecycle.composerImage.height - 78) > 1 ||
-            Math.abs(attachmentLifecycle.composerImage.left - 369.05) > 1 ||
-            Math.abs(attachmentLifecycle.composerImage.top - 634) > 1 ||
+            Math.abs(attachmentLifecycle.composerImage.left - 368.05) > 1 ||
+            Math.abs(attachmentLifecycle.composerImage.top - 621) > 1 ||
             Math.abs(attachmentLifecycle.remove.width - 16) > 1 ||
             Math.abs(attachmentLifecycle.remove.height - 16) > 1 ||
-            Math.abs(attachmentLifecycle.remove.left - 427.05) > 1 ||
-            Math.abs(attachmentLifecycle.remove.top - 638) > 1 ||
+            Math.abs(attachmentLifecycle.remove.left - 426.05) > 1 ||
+            Math.abs(attachmentLifecycle.remove.top - 625) > 1 ||
             attachmentLifecycle.composerAttachmentRadius !== "17px"
           : attachmentLifecycle.composerAttachment !== null ||
             !attachmentLifecycle.messageAttachment ||
@@ -8725,7 +8971,6 @@ for (const scene of selectedScenes) {
           : 0;
       contract.attachmentVariants = variant;
       const expectedCount = scene.id === "attachment-preview-error" ? 1 : 5;
-      const expectsOverflow = scene.id !== "attachment-preview-error";
       const expectsSubmitDisabled = [
         "attachment-preview-error",
         "attachment-upload-error",
@@ -8744,11 +8989,11 @@ for (const scene of selectedScenes) {
         variant.phase !== "attachment" ||
         !variant.statuses.includes(expectedStatus) ||
         variant.submitDisabled !== expectsSubmitDisabled ||
-        (expectsOverflow && !(variant.overflow > 0)) ||
-        variant.cardHeights.some((height) => Math.abs(height - 64) > 1) ||
+        (variant.overflow ?? Infinity) > 1 ||
+        variant.cardHeights.some((height) => Math.abs(height - 52) > 1) ||
         variant.cardContentGaps.some((gap) => Math.abs(gap - 10) > 1) ||
         (variant.constrainedCardWidth !== null &&
-          variant.constrainedCardWidth > 257) ||
+          variant.constrainedCardWidth > 224) ||
         variant.statusWithinOpenButton !== 0 ||
         variant.iconSizes.some(
           ({ height, width }) =>
@@ -10652,11 +10897,14 @@ for (const scene of selectedScenes) {
       scene.id !== "composer-disabled" &&
       scene.id !== "approval-current-pending" &&
       scene.id !== "approval-current-options" &&
-      scene.id !== "current-review-undo-failed"
+      scene.id !== "current-review-undo-failed" &&
+      !scene.id.startsWith("attachment-current-preview")
     ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
         ? contract.review.firstContentLabel
-        : "Message composer";
+        : scene.id.startsWith("attachment-current-post-picker")
+          ? "Message ChatGPT"
+          : "Message composer";
       if (!expectedFocus) {
         throw new Error(`${scene.id}: expected focus target is missing.`);
       }

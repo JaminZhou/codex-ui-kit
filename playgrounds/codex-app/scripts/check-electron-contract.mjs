@@ -1813,6 +1813,110 @@ try {
   await attachmentApp.close();
 }
 
+const currentAttachmentPickerScene = {
+  currentSidebar: true,
+  frame: "attachment-current-post-picker",
+  id: "electron-current-attachment-picker",
+  scenario: "attachment-lifecycle",
+  sidebarState: "hidden",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: currentAttachmentPickerApp,
+  page: currentAttachmentPickerPage,
+} = await launchScene(currentAttachmentPickerScene, { capture: false });
+
+try {
+  const currentAttachments = currentAttachmentPickerPage.locator(
+    ".codex-ui-composer .codex-ui-composer-attachment",
+  );
+  await currentAttachments.first().waitFor();
+  const currentPickerGeometry = await currentAttachmentPickerPage.evaluate(() => {
+    const composer = document.querySelector(".codex-ui-composer");
+    const tray = document.querySelector(".codex-ui-composer__attachments");
+    const rect = composer?.getBoundingClientRect();
+    return {
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      composer: rect ? { height: rect.height, width: rect.width } : null,
+      overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+    };
+  });
+  if (
+    currentPickerGeometry.attachmentCount !== 2 ||
+    Math.abs((currentPickerGeometry.composer?.width ?? 0) - 640) > 1 ||
+    Math.abs((currentPickerGeometry.composer?.height ?? 0) - 178) > 1 ||
+    (currentPickerGeometry.overflow ?? Infinity) > 1
+  ) {
+    throw new Error(
+      `Electron current attachment picker geometry failed: ${JSON.stringify(currentPickerGeometry)}`,
+    );
+  }
+
+  const imageTrigger = currentAttachmentPickerPage.getByRole("button", {
+    exact: true,
+    name: "shell-notification-success-stack.png",
+  });
+  await imageTrigger.click();
+  const previewDialog = currentAttachmentPickerPage.getByRole("dialog", {
+    exact: true,
+    name: "Image preview",
+  });
+  await previewDialog.waitFor();
+  const initialPreview = await currentAttachmentPickerPage.evaluate(() => ({
+    activeElementRole: document.activeElement?.getAttribute("role"),
+    zoom: document
+      .querySelector(".codex-ui-image-preview__zoom-toolbar span")
+      ?.textContent?.trim(),
+  }));
+  if (
+    initialPreview.activeElementRole !== "dialog" ||
+    initialPreview.zoom !== "56%"
+  ) {
+    throw new Error(
+      `Electron current attachment preview initial state failed: ${JSON.stringify(initialPreview)}`,
+    );
+  }
+  await currentAttachmentPickerPage
+    .getByRole("button", { name: "Zoom in image" })
+    .click();
+  await currentAttachmentPickerPage
+    .getByText("66%", { exact: true })
+    .waitFor();
+  await currentAttachmentPickerPage
+    .getByRole("button", { name: "Zoom out image" })
+    .click();
+  await currentAttachmentPickerPage
+    .getByText("56%", { exact: true })
+    .waitFor();
+  await previewDialog.press("Escape");
+  await previewDialog.waitFor({ state: "detached" });
+  if (!(await imageTrigger.evaluate((element) => element === document.activeElement))) {
+    throw new Error(
+      "Electron current attachment preview did not restore image-trigger focus.",
+    );
+  }
+
+  await currentAttachmentPickerPage
+    .getByRole("button", {
+      name: "Remove codex-ui-kit-attachment-evidence.txt",
+    })
+    .click();
+  await currentAttachmentPickerPage
+    .getByRole("button", {
+      name: "Remove shell-notification-success-stack.png",
+    })
+    .click();
+  if ((await currentAttachments.count()) !== 0) {
+    throw new Error(
+      "Electron current attachment removal did not empty the picker tray.",
+    );
+  }
+} finally {
+  await currentAttachmentPickerApp.close();
+}
+
 const repositoryRoot = resolve(process.cwd(), "../..");
 const nativeAttachmentScene = {
   frame: "attachment-empty",
@@ -1868,7 +1972,7 @@ try {
     !nativeSelection.labels.includes("README.md") ||
     !nativeSelection.labels.includes("src") ||
     !nativeSelection.labels.includes("/") ||
-    !(nativeSelection.overflow > 0) ||
+    (nativeSelection.overflow ?? Infinity) > 1 ||
     nativeSelection.submitDisabled
   ) {
     throw new Error(
@@ -13047,5 +13151,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818 MCP success/recovery/Sources interaction, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818 MCP success/recovery/Sources interaction, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

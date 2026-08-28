@@ -154,6 +154,10 @@ const currentBuildAttachmentReadyReference =
   process.env.CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE;
 const currentBuildAttachmentCompletedReference =
   process.env.CODEX_UI_KIT_ATTACHMENT_COMPLETED_REFERENCE;
+const currentAttachmentPickerReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_PICKER_REFERENCE;
+const currentAttachmentPreviewReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_REFERENCE;
 const currentBuildAttachmentReferenceSize = {
   height: 820,
   width: 906,
@@ -3460,6 +3464,128 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build attachment pixel ratio ${comparison.ratio}`,
+    );
+  }
+  if (
+    scene.id === "attachment-current-post-picker-compact" &&
+    currentAttachmentPickerReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentAttachmentPickerReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== 720 ||
+      reference.height !== 680 ||
+      actual.width !== 720 ||
+      actual.height !== 680
+    ) {
+      throw new Error(
+        `${scene.id}: current attachment picker comparison requires exact 720x680 reference and playground frames.`,
+      );
+    }
+    const referenceComposer = cropPng(reference, 43, 347, 640, 178);
+    const actualComposer = cropPng(
+      flattenPng(clonePng(actual), { blue: 24, green: 24, red: 24 }),
+      39,
+      486,
+      640,
+      178,
+    );
+    const comparison = comparePng(referenceComposer, actualComposer, 0.1);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_PICKER_MAX_DIFF_RATIO",
+      0.02,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(actualComposer),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-product.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current attachment picker product pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current attachment picker product pixel ratio ${comparison.ratio}`,
+    );
+  }
+  if (
+    scene.id === "attachment-current-preview-compact" &&
+    currentAttachmentPreviewReference
+  ) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentAttachmentPreviewReference)),
+      { blue: 0, green: 0, red: 0 },
+    );
+    if (
+      reference.width !== 720 ||
+      reference.height !== 680 ||
+      actual.width !== 720 ||
+      actual.height !== 680
+    ) {
+      throw new Error(
+        `${scene.id}: current attachment preview comparison requires exact 720x680 reference and playground frames.`,
+      );
+    }
+    const flattenedActual = flattenPng(clonePng(actual), {
+      blue: 0,
+      green: 0,
+      red: 0,
+    });
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(flattenedActual, left, top, width, height),
+        0.1,
+      );
+    const actionsComparison = compareRegion({
+      height: 40,
+      left: 618,
+      top: 12,
+      width: 90,
+    });
+    const imageComparison = compareRegion({
+      height: 456,
+      left: 32,
+      top: 88,
+      width: 656,
+    });
+    const toolbarComparison = compareRegion({
+      height: 44,
+      left: 284,
+      top: 604,
+      width: 152,
+    });
+    const maximumActionsRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_ACTIONS_MAX_DIFF_RATIO",
+      0.001,
+    );
+    const maximumImageRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_IMAGE_MAX_DIFF_RATIO",
+      0.005,
+    );
+    const maximumToolbarRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_TOOLBAR_MAX_DIFF_RATIO",
+      0.025,
+    );
+    if (
+      actionsComparison.ratio > maximumActionsRatio ||
+      imageComparison.ratio > maximumImageRatio ||
+      toolbarComparison.ratio > maximumToolbarRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current attachment preview product pixel ratios exceed limits: ${JSON.stringify({ actions: actionsComparison.ratio, image: imageComparison.ratio, toolbar: toolbarComparison.ratio })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current attachment preview product pixel ratios ${JSON.stringify({ actions: actionsComparison.ratio, image: imageComparison.ratio, toolbar: toolbarComparison.ratio })}`,
     );
   }
   if (currentBuildApprovalReference) {

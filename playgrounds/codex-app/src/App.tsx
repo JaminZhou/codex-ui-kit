@@ -44,6 +44,7 @@ import {
   GitSettingsPage,
   HooksSettingsPage,
   IconButton,
+  ImagePreviewDialog,
   LocalEnvironmentDialog,
   Menu,
   MenuItem,
@@ -725,6 +726,10 @@ function initialComposerMode(frame: string | null): ComposerMode {
 
 const attachmentPreviewDataUrl =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9WlS8AAAAASUVORK5CYII=";
+const currentAttachmentProductPreviewUrl = new URL(
+  "../tests/visual/baselines/shell-notification-success-stack.png",
+  import.meta.url,
+).href;
 
 type DemoComposerAttachmentStatus =
   | "error"
@@ -746,6 +751,29 @@ interface DemoComposerAttachmentItem {
 function attachmentItemsForFrame(
   frame: string | null,
 ): DemoComposerAttachmentItem[] {
+  if (
+    frame === "attachment-current-post-picker" ||
+    frame === "attachment-current-preview"
+  ) {
+    return [
+      {
+        id: "current-product-text",
+        kind: "file",
+        label: "codex-ui-kit-attachment-evidence.txt",
+        layout: "card",
+        meta: "TXT",
+        status: "ready",
+      },
+      {
+        id: "current-product-image",
+        kind: "image",
+        label: "shell-notification-success-stack.png",
+        layout: "image",
+        previewSrc: currentAttachmentProductPreviewUrl,
+        status: "ready",
+      },
+    ];
+  }
   if (frame === "composer-attachment" || frame === "attachment-ready") {
     return [
       {
@@ -2196,6 +2224,13 @@ export function App() {
   const [composerAttachments, setComposerAttachments] = useState<
     DemoComposerAttachmentItem[]
   >(() => attachmentItemsForFrame(initialSelection.frame));
+  const [attachmentPreviewId, setAttachmentPreviewId] = useState<
+    string | null
+  >(
+    initialSelection.frame === "attachment-current-preview"
+      ? "current-product-image"
+      : null,
+  );
   const [submittedComposerAttachments, setSubmittedComposerAttachments] =
     useState<DemoComposerAttachmentItem[]>([]);
   const [submittedComposerPrompt, setSubmittedComposerPrompt] = useState<
@@ -3054,6 +3089,9 @@ export function App() {
     setComposerMode(initialComposerMode(frame));
     setComposerResourceActiveId("files");
     setComposerAttachments(attachmentItemsForFrame(frame));
+    setAttachmentPreviewId(
+      frame === "attachment-current-preview" ? "current-product-image" : null,
+    );
     setSubmittedComposerAttachments([]);
     setSubmittedComposerPrompt(null);
     setQueuedPrompts([]);
@@ -4903,7 +4941,11 @@ export function App() {
   const showLifecycleComposer = isConversationLifecycle;
   const currentComposerComposition =
     currentHeaderReplay || showLifecycleComposer || isCurrentApprovalReplay;
+  const currentProductAttachmentFrame =
+    activeFrame === "attachment-current-post-picker" ||
+    activeFrame === "attachment-current-preview";
   const removeComposerAttachment = (id: string) => {
+    if (attachmentPreviewId === id) setAttachmentPreviewId(null);
     setComposerAttachments((items) => {
       const next = items.filter((item) => item.id !== id);
       if (next.length === 0) {
@@ -5029,7 +5071,7 @@ export function App() {
   const composerAttachmentNodes = composerAttachments.map((attachment) => (
     <ComposerAttachment
       icon={
-        attachment.kind === "folder" ? (
+        currentProductAttachmentFrame ? undefined : attachment.kind === "folder" ? (
           <CurrentBuildIcon name="composer-project" />
         ) : attachment.kind === "file" ? (
           <span className="demo-current-file-type">
@@ -5042,7 +5084,16 @@ export function App() {
       label={attachment.label}
       layout={attachment.layout}
       meta={attachment.meta}
-      onOpen={() => undefined}
+      openLabel={
+        currentProductAttachmentFrame ? attachment.label : undefined
+      }
+      onOpen={
+        attachment.kind === "image"
+          ? () => setAttachmentPreviewId(attachment.id)
+          : currentProductAttachmentFrame
+            ? undefined
+            : () => undefined
+      }
       onRemove={() => removeComposerAttachment(attachment.id)}
       onRetry={
         attachment.status === "error" ||
@@ -5058,7 +5109,13 @@ export function App() {
   const composerSurface = (
     <AgentComposer
       actions={
-        showMeasuredComposer || showLifecycleComposer ? (
+        currentProductAttachmentFrame ? (
+          <span className="demo-composer-controls">
+            <button aria-label="Add files and more" type="button">
+              <CurrentBuildIcon name="composer-add-files" />
+            </button>
+          </span>
+        ) : showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-controls">
             <button
               aria-expanded={composerOverlay === "resources"}
@@ -5160,7 +5217,17 @@ export function App() {
       aria-busy={composerIsDisabled || undefined}
       attachments={composerAttachmentNodes}
       controls={
-        showMeasuredComposer || showLifecycleComposer ? (
+        currentProductAttachmentFrame ? (
+          <span className="demo-composer-actions">
+            <span className="demo-current-composer-model">
+              <span>Instant</span>
+              <CurrentBuildIcon name="composer-model-chevron" />
+            </span>
+            <button aria-label="Dictate" type="button">
+              <CurrentBuildIcon name="composer-dictate" />
+            </button>
+          </span>
+        ) : showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
             {isCurrentBasicMessageReplay ? (
               <button
@@ -5205,6 +5272,8 @@ export function App() {
           ? "Describe your goal, define measurable outcomes for best results"
           : composerMode === "plan"
             ? "Describe your task to generate a plan..."
+            : currentProductAttachmentFrame
+              ? "Message ChatGPT"
             : showMeasuredComposer || showLifecycleComposer
               ? "Do anything"
               : mode === "live"
@@ -5221,7 +5290,8 @@ export function App() {
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay ||
         isCurrentTransportRecoveryReplay ||
-        isCurrentBasicMessageReplay
+        isCurrentBasicMessageReplay ||
+        currentProductAttachmentFrame
           ? "Send"
           : undefined
       }
@@ -5288,12 +5358,17 @@ export function App() {
           ? "Describe your goal, define measurable outcomes for best results"
           : composerMode === "plan"
             ? "Describe your task to generate a plan..."
-            : "Message composer"
+            : currentProductAttachmentFrame
+              ? "Message ChatGPT"
+              : "Message composer"
       }
       ref={composerInputRef}
       value={composerValue}
     />
   );
+  const attachmentPreviewImage = attachmentPreviewId
+    ? composerAttachments.find(({ id }) => id === attachmentPreviewId)
+    : undefined;
   const regularComposer = showLifecycleComposer ? (
     <ComposerDock
       composer={composerSurface}
@@ -10015,6 +10090,29 @@ export function App() {
           </select>
         </label>
       ) : null}
+      <ImagePreviewDialog
+        closeLabel="Close image preview"
+        downloadLabel="Download image"
+        imageId={attachmentPreviewImage?.id}
+        images={
+          attachmentPreviewImage?.previewSrc
+            ? [
+                {
+                  alt: attachmentPreviewImage.label,
+                  downloadSrc: attachmentPreviewImage.previewSrc,
+                  id: attachmentPreviewImage.id,
+                  src: attachmentPreviewImage.previewSrc,
+                },
+              ]
+            : []
+        }
+        onOpenChange={(open) => {
+          if (!open) setAttachmentPreviewId(null);
+        }}
+        open={Boolean(attachmentPreviewImage?.previewSrc)}
+        presentation="immersive"
+        title="Image preview"
+      />
       <AppNotificationRegion
         notifications={
           view === "shell"

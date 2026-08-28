@@ -39,7 +39,7 @@ describe("composer visual contract", () => {
       '.codex-ui-composer-attachment[data-layout="card"]',
     );
     expect(styles).toMatch(
-      /\.codex-ui-composer-attachment\[data-layout="card"\] \{[\s\S]*?gap: 0\.625rem;[\s\S]*?max-width: 16rem;[\s\S]*?padding: 0\.75rem 2rem 0\.75rem 0\.75rem;/,
+      /\.codex-ui-composer-attachment\[data-layout="card"\] \{[\s\S]*?border-radius: 1\.0625rem;[\s\S]*?gap: 0\.625rem;[\s\S]*?max-width: 14rem;[\s\S]*?padding: 0\.375rem 2\.5rem 0\.375rem 0\.375rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-composer-attachment\[data-layout="card"\][\s\S]*?> \.codex-ui-composer-attachment__open \{[\s\S]*?gap: 0\.625rem;/,

@@ -322,6 +322,43 @@ describe("generated images", () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
+  it("renders the current immersive preview controls and zoom state", () => {
+    const onDownload = vi.fn();
+    const onEdit = vi.fn();
+    const onOpenChange = vi.fn();
+    render(
+      <ImagePreviewDialog
+        downloadLabel="Download image"
+        editLabel="Edit image"
+        images={images.slice(0, 1)}
+        onDownload={onDownload}
+        onEdit={onEdit}
+        onOpenChange={onOpenChange}
+        open
+        presentation="immersive"
+        title="Image preview"
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Image preview" });
+    expect(dialog.getAttribute("data-presentation")).toBe("immersive");
+    expect(document.activeElement).toBe(dialog);
+    fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Zoom in image" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Edit image" }));
+    fireEvent.click(screen.getByRole("button", { name: "Download image" }));
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in image" }));
+    expect(onEdit).toHaveBeenCalledWith(images[0]);
+    expect(onDownload).toHaveBeenCalledWith(images[0]);
+    expect(screen.getByText("110%")).toBeTruthy();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Close image preview" }),
+    );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
   it("releases the modal lock when an open preview loses all images", async () => {
     const renderPreview = (previewImages: GeneratedImageItem[]) => (
       <>
