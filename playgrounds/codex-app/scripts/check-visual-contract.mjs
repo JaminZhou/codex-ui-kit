@@ -1799,7 +1799,8 @@ for (const scene of selectedScenes) {
   }
 
   if (
-    scene.id === "projects-index-ready" &&
+    (scene.id === "projects-index-ready" ||
+      scene.id === "projects-index-route-continuity") &&
     currentProjectsIndexReference
   ) {
     const reference = flattenPng(
@@ -1837,6 +1838,14 @@ for (const scene of selectedScenes) {
       },
     ]).flat();
     const comparisons = {
+      ...(scene.id === "projects-index-route-continuity"
+        ? {
+            chrome: comparePng(
+              cropPng(reference, 82, 0, 102, 46),
+              cropPng(actual, 82, 0, 102, 46),
+            ),
+          }
+        : {}),
       create: comparePng(
         cropPng(reference, 1102, 0, 78, 46),
         cropPng(actual, 1102, 0, 78, 46),
@@ -1847,9 +1856,13 @@ for (const scene of selectedScenes) {
       ),
     };
     const limits = {
+      chrome: environmentRatio(
+        "CODEX_UI_KIT_CURRENT_ROUTE_CHROME_MAX_DIFF_RATIO",
+        0.04,
+      ),
       create: environmentRatio(
         "CODEX_UI_KIT_CURRENT_PROJECTS_CREATE_MAX_DIFF_RATIO",
-        0.04,
+        scene.id === "projects-index-route-continuity" ? 0.055 : 0.04,
       ),
       route: environmentRatio(
         "CODEX_UI_KIT_CURRENT_PROJECTS_ROUTE_MAX_DIFF_RATIO",

@@ -384,10 +384,10 @@ describe("lifecycle visual policy", () => {
       'darkShell.newChatCurrent !== "page"',
     );
     expect(cdpContract).toContain(
-      'darkShell.back.cursor !== "not-allowed"',
+      'darkShell.back.cursor !== "default"',
     );
     expect(cdpContract).toContain(
-      'darkShell.forward.cursor !== "not-allowed"',
+      'darkShell.forward.cursor !== "default"',
     );
     expect(contract).toContain(
       "CODEX_UI_KIT_CURRENT_DARK_SHELL_REFERENCE",

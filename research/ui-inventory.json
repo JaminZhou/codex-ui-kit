@@ -734,7 +734,8 @@
         "cdp-26.803.61601:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
         "cdp-26.810.52044:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
         "cdp-26.818.41509:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
-        "cdp-26.820.60940:new-chat-pull-requests-sites-scheduled-plugins-and-route-restoration"
+        "cdp-26.820.60940:new-chat-pull-requests-sites-scheduled-plugins-and-route-restoration",
+        "cdp-26.820.60940:projects-back-forward-restoration-and-unified-source-fixed-route-drift"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -946,11 +947,12 @@
         "cdp-26.803.61601:visible-titlebar-sidebar-back-forward-28-buttons-16-icons-and-disabled-not-allowed-cursor",
         "cdp-26.810.52044:visible-titlebar-sidebar-back-forward-28-buttons-16-icons",
         "cdp-26.818.41509:visible-titlebar-sidebar-back-forward-28px-controls",
-        "cdp-26.820.60940:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome"
+        "cdp-26.820.60940:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
+        "cdp-26.820.60940:projects-back-forward-x88-120-152-opacity-0.4-720-hide-show-and-selected-chat-restoration"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1029,7 +1031,8 @@
         "cdp-26.721:projects-entry-and-deidentified-list-structure",
         "cdp-26.810.52044:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact-and-owned-pixel-lifecycle",
         "cdp-26.818.41509:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact",
-        "cdp-26.820.60940:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact"
+        "cdp-26.820.60940:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact",
+        "cdp-26.820.60940:projects-location-key-back-forward-1180-720-hide-show-and-selected-chat-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
