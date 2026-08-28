@@ -85,12 +85,14 @@ The authoritative current-build inventory is:
   and 0%. The real selection, context, workspace summary, exact response, and
   cleanup additionally promote the five sampled worktree-related inventory
   groups to 26.820 runtime evidence while retaining partial verification. A
-  separate previous-build probe reached controlled
-  failure, failed-plus-unread composition, Retry, and restored rows. It locks
-  that build's entry labels, 264×91.125 Environment menu, 14px branch marker,
-  20px loading rail, exact status primitives, and action replacement;
-  privacy-safe loading/error/restored tails pass at 2.0833%, 0.7540%, and
-  0.1786%.
+  second current disposable probe now distinguishes foreground-read failure
+  from a real background failed-plus-unread task, moves the scoped blocker
+  aside, and proves that `Retry` creates exactly one child worktree. The
+  current failed row retains the 14px branch at 67px, red 16px error at 38px,
+  and blue 8px unread dot at 14px; its privacy-safe 84×30 tail has 0%
+  foreground-mask difference from the replay. The previous
+  loading/error/restored ratios of
+  2.0833%, 0.7540%, and 0.1786% remain build-scoped regression evidence.
 - The previous Codex Desktop `26.810.52044` (`6662`) visual probe revalidated the
   exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
   sidebar/menu/window-chrome/Composer/environment/Settings/completed-thread icons plus

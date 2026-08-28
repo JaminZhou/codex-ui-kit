@@ -815,7 +815,8 @@
         "cdp-26.818.41509:live-no-chats-29px-empty-row-current-asar-one-heading-four-row-loading-and-five-item-show-more-browser-electron-twelve-row-expansion",
         "cdp-26.820.60940:privacy-safe-content-dependent-project-and-recents-local-history-with-shared-30px-rows",
         "cdp-26.820.60940:live-five-row-show-more-one-way-eleven-row-expansion-no-show-less-and-browser-electron-twelve-row-replay",
-        "cdp-26.820.60940:live-no-chats-306.90625-by-29-row-exact-computed-style-and-2.4138-percent-regional-pixel"
+        "cdp-26.820.60940:live-no-chats-306.90625-by-29-row-exact-computed-style-and-2.4138-percent-regional-pixel",
+        "cdp-26.820.60940:disposable-background-worktree-failed-plus-unread-30px-row-three-track-geometry-and-zero-percent-regional-pixel"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -876,7 +877,8 @@
         "cdp-26.803.61601:disposable-real-worktree-create-controlled-failure-retry-recovery-and-restored-14px-branch-20px-status-rail",
         "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails",
         "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails-and-unmasked-tail-pixels",
-        "cdp-26.820.60940:disposable-real-worktree-success-loading-to-restored-30px-row-14px-branch-20px-spinner-rail-and-regional-pixels"
+        "cdp-26.820.60940:disposable-real-worktree-success-loading-to-restored-30px-row-14px-branch-20px-spinner-rail-and-regional-pixels",
+        "cdp-26.820.60940:disposable-real-worktree-controlled-failure-foreground-read-background-unread-retry-recovery-and-zero-percent-regional-pixel"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1298,7 +1300,8 @@
         "cdp-26.803.61601:real-worktree-task-cross-restart-persistence-with-selection-restored-thread",
         "cdp-26.803.61601:missing-working-directory-model-only-turn-session-latched-warning-and-restart-recovery",
         "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-retry-recovery",
-        "cdp-26.820.60940:disposable-real-worktree-selected-context-loading-restored-success-and-exact-cleanup"
+        "cdp-26.820.60940:disposable-real-worktree-selected-context-loading-restored-success-and-exact-cleanup",
+        "cdp-26.820.60940:disposable-regular-file-worktrees-blocker-real-retry-one-child-worktree-and-exact-cleanup"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

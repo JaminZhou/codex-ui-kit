@@ -444,10 +444,12 @@ slot. It is split into:
   setting-up, failed, and restored presentation. The previous 26.818 slice
   re-reached real create, controlled failure, failed-plus-unread composition,
   Retry recovery, and exact 30px trailing geometry through product CDP,
-  Browser/CDP, Electron, and local-only pixels. The current 26.820 slice
-  re-reaches a real loading → restored success with current computed geometry
-  and privacy-safe local pixels; failure/Retry/unread composition remains tied
-  to 26.818;
+  Browser/CDP, Electron, and local-only pixels. The current 26.820 slices now
+  re-reach real loading, controlled failure, foreground-read failure,
+  failed-plus-unread composition, Retry recovery, and restored success. The
+  current 84×30 failure tail has 0% foreground-mask difference while the
+  existing Browser/CDP and Electron contracts keep exact geometry, paths,
+  color, animation, and action replacement;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior. The 26.820 Dark/Light × wide/compact account menu
   is current Browser/Electron verified with menu-surface focus, weight 400,
@@ -469,12 +471,12 @@ Help menu, account-menu matrix, Projects Index, shared 30px project/Recents
 history rows, shared Pin/Archive actions, and real active/unread status rails.
 The current edge refresh additionally re-observes a real waiting-on-approval
 project row as the shared spinner visual and replaces the older reversible
-long-list replay with the live one-way `Show more` lifecycle. This follow-up
-re-observes a real empty collection and a real worktree loading →
-restored success. Remaining Stage 1 work includes re-observing ordinary error,
-collection loading, worktree failure/Retry/unread composition, plus broader
-route lifecycle feedback, global
-notification runtime evidence, and selection continuity beyond New chat.
+long-list replay with the live one-way `Show more` lifecycle. The current
+worktree follow-ups re-observe a real empty collection and the complete sampled
+loading → controlled failure → failed-plus-unread → Retry → restored boundary.
+Remaining Stage 1 work includes re-observing ordinary error and collection
+loading, plus broader route lifecycle feedback, global notification runtime
+evidence, and selection continuity beyond New chat.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -593,6 +595,13 @@ controlled failure, Retry, and restored states. Browser/CDP, Electron, and
 three sampled-product tail comparisons now gate that entry/repair
 lifecycle. Projects-route loading/error/partial-error, populated environment
 editing, and Remote connections remain independent work.
+The current `26.820.60940` continuation repeats the controlled failure with a
+regular-file `.git/worktrees` blocker scoped to one disposable repository.
+It observes the exact branch/error/unread three-track row, removes the blocker,
+uses the real `Retry` control, and verifies root plus one child worktree before
+exact cleanup. The current failure tail passes at 0%; ordinary sidebar error,
+collection loading, populated environment editing, repair variants, and Remote
+connections remain independent work.
 
 Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
 branch menu and 400×190.56 create-and-checkout dialog. The public
@@ -757,7 +766,12 @@ without confusing package readiness with full product reconstruction.
    reaches a real create, controlled failure, and Retry recovery in isolated
    disposable repositories; it gates the new entry vocabulary,
    queued/creating/setting-up/failed/restored semantics, the exact
-   branch/error/spinner primitives, and owned pixels.
+   branch/error/spinner primitives, and owned pixels. The current
+   `26.820.60940` continuation now re-reaches controlled failure twice to
+   distinguish a foreground-read error from the real background
+   failed-plus-unread composition, then proves that Retry creates exactly one
+   child worktree. Its current 84×30 product tail has 0% foreground-mask
+   difference from the replay.
 3. **Tool recovery and mixed thread — previous success/recovery evidence**:
    `26.818.41509` covers a real Search → Fetch success, a real invalid-URL
    Fetch → Search → Fetch recovery, 720×680 compact geometry, and the pinned →

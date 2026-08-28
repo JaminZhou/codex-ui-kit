@@ -471,6 +471,38 @@ Browser/CDP and Electron repeat that one-way behavior with twelve replay rows.
 Privacy-safe 28×30 and 140×32 product crops pass at 2.7381% and 3.8393%; raw
 titles, thread IDs, profiles, and full screenshots remain local-only.
 
+### Current `26.820.60940` worktree failure and Retry recovery
+
+The current continuation uses a new isolated profile on loopback-only port
+9882 and one disposable single-commit Git repository. The product selects
+`New local worktree`, `No environment`, and `main`. Only the disposable
+repository's `.git/worktrees` location is replaced by a regular blocker file;
+the user repository and pre-existing app process remain untouched.
+
+The first task reaches `Worktree setup failed` with `Edit environment` and
+`Retry` while remaining in the foreground. It has a branch plus red error and
+no blue unread dot, which is the expected read-state composition. The second
+task navigates to New chat before settlement and reaches the full background
+failed-plus-unread row: 306.90625×30 overall, 14×14 branch marker at a 67px
+right inset, red 16×16 error at 38px, and blue 8×8 unread dot at 14px. The
+privacy-safe 84×30 tail is reduced to a foreground mask and differs from the
+independent replay by 0% under the 6.5% limit.
+
+After the blocker is moved aside, the real `Retry` control removes the failure
+surface, traverses a branch-plus-spinner phase, and creates exactly one child
+worktree. The exact model response remains available and the recovered
+background row retains the branch plus the independent unread rail. Browser/CDP
+and Electron continue to gate the deterministic lifecycle and action
+replacement; this current product capture supplies the build-specific
+computed geometry and pixel evidence.
+
+Cleanup archives both exact disposable tasks, removes the exact child through
+its owner repository, verifies the repository again lists only its root,
+terminates only the isolated process, and confirms port 9882 is closed while
+the pre-existing process remains running. The isolated profile and repository
+move recoverably to Trash. Task titles, IDs, project/repository paths, full
+screenshots, and raw conversation data are not committed.
+
 ### Previous `26.803.61601` worktree persistence and directory recovery
 
 A separate fresh-profile probe uses one disposable repository and one
