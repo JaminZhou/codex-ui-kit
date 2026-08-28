@@ -390,7 +390,13 @@ function CurrentMcpLink({ href }: { href: string }) {
   );
 }
 
-function CurrentMcpAnswer({ recovery }: { recovery?: boolean }) {
+function CurrentMcpAnswer({
+  current26820 = false,
+  recovery = false,
+}: {
+  current26820?: boolean;
+  recovery?: boolean;
+}) {
   const href = recovery
     ? "https://learn.chatgpt.com/docs/mcp-server"
     : "https://learn.chatgpt.com/docs/extend/mcp";
@@ -400,7 +406,15 @@ function CurrentMcpAnswer({ recovery }: { recovery?: boolean }) {
       data-markdown-text-style="assistant-message"
     >
       <p>
-        {recovery ? (
+        {current26820 ? (
+          <>
+            {recovery
+              ? "Use Codex with the Agents SDK"
+              : "Model Context Protocol"}
+            <br />
+            <CurrentMcpLink href={href} />
+          </>
+        ) : recovery ? (
           <>
             RECOVERY COMPLETE
             <br />
@@ -2657,14 +2671,22 @@ export function App() {
     mode === "replay" && scenarioId === "mcp-current-26-818-recovery";
   const isCurrentMcp26818Replay =
     isCurrentMcp26818SuccessReplay || isCurrentMcp26818RecoveryReplay;
+  const isCurrentMcp26820SuccessReplay =
+    mode === "replay" && scenarioId === "mcp-current-26-820-success";
+  const isCurrentMcp26820RecoveryReplay =
+    mode === "replay" && scenarioId === "mcp-current-26-820-recovery";
+  const isCurrentMcp26820Replay =
+    isCurrentMcp26820SuccessReplay || isCurrentMcp26820RecoveryReplay;
   const isCurrentMcpSuccessReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-success" ||
-      scenarioId === "mcp-current-26-818-success");
+      scenarioId === "mcp-current-26-818-success" ||
+      scenarioId === "mcp-current-26-820-success");
   const isCurrentMcpRecoveryReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-recovery" ||
-      scenarioId === "mcp-current-26-818-recovery");
+      scenarioId === "mcp-current-26-818-recovery" ||
+      scenarioId === "mcp-current-26-820-recovery");
 
   useEffect(() => {
     setReviewPanelWidth(isCurrentReviewFilesReplay ? 382.4375 : 370);
@@ -3707,6 +3729,8 @@ export function App() {
     isConversationLifecycle && activeFrame === "thread-windowed";
   const current26820LongFrame =
     isConversationLifecycle && current26820LongThreadFrame(activeFrame);
+  const current26820HeaderFrame =
+    current26820LongFrame || isCurrentMcp26820Replay;
   const currentWindowedFrame = legacyWindowedFrame || current26820LongFrame;
   const windowedHistorySize = current26820LongFrame
     ? current26820LongHistorySize
@@ -4612,7 +4636,8 @@ export function App() {
         ((isCurrentCommandInterruptionReplay ||
           isCurrentContextCompactionReplay ||
           isCurrentMixedToolReplay ||
-          isCurrentSubagentReplay) &&
+          isCurrentSubagentReplay ||
+          isCurrentMcp26820Replay) &&
           state.status === "running");
   const composerIsDisabled =
     liveStartPending ||
@@ -4743,13 +4768,42 @@ export function App() {
   const header = (
     <ThreadHeader
       endActions={
-        current26820LongFrame ? (
+        current26820HeaderFrame ? (
           <div className="demo-current-long-thread-header-actions">
             <button aria-label="Share thread" type="button">
               <span aria-hidden="true">↥</span>
               <span>Share</span>
             </button>
-            <button aria-label="Thread settings" type="button">
+            <button
+              aria-label={
+                isCurrentMcp26820Replay
+                  ? "Toggle pinned summary"
+                  : "Thread settings"
+              }
+              aria-pressed={
+                isCurrentMcp26820Replay
+                  ? mcpSourceSummaryPinned
+                  : undefined
+              }
+              onClick={
+                isCurrentMcp26820Replay
+                  ? () => {
+                      if (mcpSourceSummaryOpen && mcpSourceSummaryPinned) {
+                        setMcpSourceSummaryPinned(false);
+                        return;
+                      }
+                      setMcpSourceSummaryOpen(true);
+                      setMcpSourceSummaryPinned(true);
+                    }
+                  : undefined
+              }
+              ref={
+                isCurrentMcp26820Replay
+                  ? mcpSourceSummaryTriggerRef
+                  : undefined
+              }
+              type="button"
+            >
               <CurrentBuildIcon name="thread-header-summary" />
             </button>
             <button aria-label="Toggle bottom panel" type="button">
@@ -4878,7 +4932,7 @@ export function App() {
                   </ThreadSummaryPanel>
                 )}
               </ThreadSummaryPopover>
-            ) : isCurrentMcp26818Replay ? (
+            ) : isCurrentMcp26818Replay || isCurrentMcp26820Replay ? (
               <button
                 aria-label="Toggle pinned summary"
                 aria-pressed={mcpSourceSummaryPinned}
@@ -4970,7 +5024,7 @@ export function App() {
         )
       }
       navigation={
-        current26820LongFrame ? (
+        current26820HeaderFrame ? (
           <div className="demo-current-long-thread-header-navigation">
             <button aria-label="Open quick chat" type="button">
               <CurrentBuildIcon name="sidebar-quick-chat" />
@@ -5000,14 +5054,14 @@ export function App() {
         )
       }
       subtitle={
-        current26820LongFrame || currentHeaderReplay
+        current26820HeaderFrame || currentHeaderReplay
           ? undefined
           : mode === "replay"
           ? `${scenario.id} · ${replayCount}/${scenario.events.length} events`
           : state.threadId ?? "Local app-server"
       }
       startActions={
-        current26820LongFrame ? (
+        current26820HeaderFrame ? (
           <button
             aria-label="Thread actions"
             className="demo-current-long-thread-title-actions"
@@ -5018,8 +5072,10 @@ export function App() {
         ) : undefined
       }
       title={
-        current26820LongFrame
-          ? "LONG THREAD 01"
+        current26820HeaderFrame
+          ? current26820LongFrame
+            ? "LONG THREAD 01"
+            : "查找 MCP 官方文档"
           : mode === "replay"
             ? scenario.label
             : "Live local thread"
@@ -8541,11 +8597,15 @@ export function App() {
                 (isCurrentMcpSuccessReplay &&
                   (message.id === "assistant-current-mcp-success" ||
                     message.id ===
-                      "assistant-current-mcp-26-818-success")) ||
+                      "assistant-current-mcp-26-818-success" ||
+                    message.id ===
+                      "assistant-current-mcp-26-820-success")) ||
                 (isCurrentMcpRecoveryReplay &&
                   (message.id === "assistant-current-mcp-recovery" ||
                     message.id ===
-                      "assistant-current-mcp-26-818-recovery")) ||
+                      "assistant-current-mcp-26-818-recovery" ||
+                    message.id ===
+                      "assistant-current-mcp-26-820-recovery")) ||
                 (scenarioId === "mcp-current-integration-recovery" &&
                   (message.id ===
                     "assistant-current-integration-unavailable" ||
@@ -8700,6 +8760,12 @@ export function App() {
               ) : message.id ===
                 "assistant-current-mcp-26-818-recovery" ? (
                 <CurrentMcpAnswer recovery />
+              ) : message.id ===
+                "assistant-current-mcp-26-820-success" ? (
+                <CurrentMcpAnswer current26820 />
+              ) : message.id ===
+                "assistant-current-mcp-26-820-recovery" ? (
+                <CurrentMcpAnswer current26820 recovery />
               ) : (
                 <AgentMarkdown
                   allowWideMedia={isCurrentMarkdown26820MediaReplay}
@@ -8862,6 +8928,31 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
+      if (
+        isCurrentMcp26820RecoveryReplay &&
+        activeFrame === "mcp-current-26-820-recovery-failed" &&
+        toolCall.id === "mcp-current-26-820-fetch-invalid"
+      ) {
+        return (
+          <ActivityTimeline
+            key={`mcp-current-26-820-failed:${toolCall.turnId}`}
+            open={initialSelection.capture ? true : undefined}
+            summary={<TurnDuration durationMs={3_000} status="working" />}
+          >
+            <ToolCallCard
+              className="demo-current-26-820-mcp-failed-call"
+              collapsible={false}
+              data-item-id={toolCall.id}
+              failedLabel={toolCall.toolLabel}
+              icon={<CurrentBuildIcon name="thread-mcp-tool" />}
+              name={toolCall.toolLabel}
+              role="listitem"
+              source={toolCall.server}
+              status="failed"
+            />
+          </ActivityTimeline>
+        );
+      }
       if (scenarioId === "mcp-recovery-mixed-thread") {
         const failedCall = calls.find(
           ({ id }) => id === "mcp-fetch-invalid",
@@ -9015,14 +9106,18 @@ export function App() {
           (activeFrame === "mcp-current-running" ||
             activeFrame === "mcp-current-success" ||
             activeFrame === "mcp-current-26-818-running" ||
-            activeFrame === "mcp-current-26-818-success")) ||
+            activeFrame === "mcp-current-26-818-success" ||
+            activeFrame === "mcp-current-26-820-running" ||
+            activeFrame === "mcp-current-26-820-success")) ||
         (isCurrentMcpRecoveryReplay &&
           (activeFrame === "mcp-current-recovery-failed" ||
             activeFrame === "mcp-current-recovery-retrying" ||
             activeFrame === "mcp-current-recovery-completed" ||
             activeFrame === "mcp-current-26-818-recovery-failed" ||
             activeFrame === "mcp-current-26-818-recovery-retrying" ||
-            activeFrame === "mcp-current-26-818-recovery-completed")) ||
+            activeFrame === "mcp-current-26-818-recovery-completed" ||
+            activeFrame === "mcp-current-26-820-recovery-retrying" ||
+            activeFrame === "mcp-current-26-820-recovery-completed")) ||
         (scenarioId === "mcp-current-integration-recovery" &&
           (activeFrame === "mcp-current-integration-recovering" ||
             activeFrame === "mcp-current-integration-recovered")) ||
@@ -9084,24 +9179,35 @@ export function App() {
               const presentation = mcpToolCallPresentation(call);
               return (
                 <ToolCallCard
+                  collapsible={!isCurrentMcp26820Replay}
                   data-item-id={call.id}
                   disclosureIcon={
-                    isCurrentMcpReplay ? (
+                    isCurrentMcpReplay && !isCurrentMcp26820Replay ? (
                       <CurrentBuildIcon name="thread-activity-chevron" />
                     ) : undefined
                   }
                   disclosureMode={
-                    isCurrentMcpReplay ? "overlay-button" : undefined
+                    isCurrentMcpReplay && !isCurrentMcp26820Replay
+                      ? "overlay-button"
+                      : undefined
                   }
-                  error={presentation.error}
+                  error={
+                    isCurrentMcp26820Replay
+                      ? undefined
+                      : presentation.error
+                  }
                   errorLanguage={
-                    call.status === "failed" ? "plaintext" : undefined
+                    call.status === "failed" && !isCurrentMcp26820Replay
+                      ? "plaintext"
+                      : undefined
                   }
                   errorPresentation={
-                    call.status === "failed" ? "output" : undefined
+                    call.status === "failed" && !isCurrentMcp26820Replay
+                      ? "output"
+                      : undefined
                   }
                   failedAriaLabel={
-                    call.status === "failed"
+                    call.status === "failed" && !isCurrentMcp26820Replay
                       ? `${call.toolLabel} failed`
                       : undefined
                   }
@@ -9132,7 +9238,7 @@ export function App() {
                       : undefined
                   }
                   onViewRawOutput={
-                    call.status === "failed"
+                    call.status === "failed" && !isCurrentMcp26820Replay
                       ? (value) =>
                           setRawToolOutput({
                             name: call.toolLabel,
@@ -9141,7 +9247,7 @@ export function App() {
                       : undefined
                   }
                   rawOutput={
-                    call.status === "failed"
+                    call.status === "failed" && !isCurrentMcp26820Replay
                       ? {
                           arguments: call.arguments,
                           error: call.error,
@@ -10208,10 +10314,14 @@ export function App() {
       data-sidebar-current={currentSidebarComposition || undefined}
       data-sidebar-state={initialSelection.sidebarState ?? undefined}
       data-summary-open={
-        isCurrentMcp26818Replay ? mcpSourceSummaryOpen : undefined
+        isCurrentMcp26818Replay || isCurrentMcp26820Replay
+          ? mcpSourceSummaryOpen
+          : undefined
       }
       data-summary-pinned={
-        isCurrentMcp26818Replay ? mcpSourceSummaryPinned : undefined
+        isCurrentMcp26818Replay || isCurrentMcp26820Replay
+          ? mcpSourceSummaryPinned
+          : undefined
       }
       data-status={displayedStatus}
       data-theme={appliedTheme}
@@ -10686,6 +10796,7 @@ export function App() {
 
                 {state.status === "running" &&
                 !isCurrentContextCompactionReplay &&
+                !isCurrentMcp26820Replay &&
                 !activeTurnHasWork &&
                 !state.messages.some(
                   ({ role, status, turnId }) =>
@@ -10699,11 +10810,20 @@ export function App() {
               </AgentTurn>
             </ConversationThreadShell>
 
-            {isCurrentMcp26818Replay ? (
+            {isCurrentMcp26818Replay || isCurrentMcp26820Replay ? (
               <ThreadSummaryDock
                 anchorRef={mcpSourceSummaryTriggerRef}
                 className="demo-current-mcp-source-summary-dock"
-                onOpenChange={setMcpSourceSummaryOpen}
+                onOpenChange={(open) => {
+                  if (
+                    isCurrentMcp26820Replay &&
+                    !open &&
+                    !mcpSourceSummaryPinned
+                  ) {
+                    return;
+                  }
+                  setMcpSourceSummaryOpen(open);
+                }}
                 open={mcpSourceSummaryOpen}
                 pinned={mcpSourceSummaryPinned}
               >

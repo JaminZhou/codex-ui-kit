@@ -124,6 +124,22 @@ const currentMcp26818SourcesReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentMcp26820SuccessReference =
+  process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_820_REFERENCE;
+const currentMcp26820FailureReference =
+  process.env.CODEX_UI_KIT_CURRENT_MCP_FAILURE_26_820_REFERENCE;
+const currentMcp26820RecoveryCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_820_COMPACT_REFERENCE;
+const currentMcp26820SourcesReference =
+  process.env.CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_820_REFERENCE;
+const currentMcp26820WideReferenceSize = {
+  height: 820,
+  width: 1180,
+};
+const currentMcp26820CompactReferenceSize = {
+  height: 680,
+  width: 720,
+};
 const currentIntegrationRecoveryReference =
   process.env.CODEX_UI_KIT_CURRENT_INTEGRATION_RECOVERY_REFERENCE;
 const currentIntegrationRecoveryReferenceSize = {
@@ -5322,6 +5338,147 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: 26.818 MCP Sources panel pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-current-26-820-success" &&
+    currentMcp26820SuccessReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcp26820SuccessReference),
+    );
+    if (
+      reference.width !== currentMcp26820WideReferenceSize.width ||
+      reference.height !== currentMcp26820WideReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: 26.820 MCP success comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 222, 255, 736, 205),
+      cropPng(actual, 222, 255, 736, 205),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_820_MAX_DIFF_RATIO",
+      0.023,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: 26.820 MCP success region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: 26.820 MCP success region pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-current-26-820-recovery-failed" &&
+    currentMcp26820FailureReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcp26820FailureReference),
+    );
+    if (
+      reference.width !== currentMcp26820WideReferenceSize.width ||
+      reference.height !== currentMcp26820WideReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: 26.820 failed MCP comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 222, 237, 736, 90),
+      cropPng(actual, 222, 216, 736, 90),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_FAILURE_26_820_MAX_DIFF_RATIO",
+      0.034,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: 26.820 failed MCP row ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: 26.820 failed MCP row pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-current-26-820-recovery-compact" &&
+    currentMcp26820RecoveryCompactReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcp26820RecoveryCompactReference),
+    );
+    if (
+      reference.width !== currentMcp26820CompactReferenceSize.width ||
+      reference.height !== currentMcp26820CompactReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: 26.820 MCP compact recovery comparison requires exact 720x680 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const comparison = comparePng(
+      cropPng(reference, 16, 76, 688, 235),
+      cropPng(actual, 16, 76, 688, 235),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_820_COMPACT_MAX_DIFF_RATIO",
+      0.013,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: 26.820 MCP compact recovery ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: 26.820 MCP compact recovery pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "mcp-current-26-820-sources-pinned" &&
+    currentMcp26820SourcesReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcp26820SourcesReference),
+    );
+    if (
+      reference.width !== currentMcp26820WideReferenceSize.width ||
+      reference.height !== currentMcp26820WideReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: 26.820 MCP Sources comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const masks = [{ height: 14, left: 145, top: 0, width: 155 }];
+    const comparison = comparePng(
+      maskPng(cropPng(reference, 864, 59, 300, 189), masks),
+      maskPng(cropPng(actual, 864, 59, 300, 189), masks),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_820_MAX_DIFF_RATIO",
+      0.02,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: 26.820 MCP Sources panel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: 26.820 MCP Sources panel pixel ratio ${comparison.ratio}`,
     );
   }
 

@@ -43,6 +43,7 @@ export interface ToolCallCardProps
   activeLabel?: ReactNode;
   children?: ReactNode;
   completedLabel?: ReactNode;
+  collapsible?: boolean;
   defaultOpen?: boolean;
   disclosureIcon?: AgentActivityProps["disclosureIcon"];
   disclosureIndicator?: AgentActivityProps["disclosureIndicator"];
@@ -73,6 +74,7 @@ export function ToolCallCard({
   children,
   className,
   completedLabel,
+  collapsible = true,
   defaultOpen = false,
   disclosureIcon,
   disclosureIndicator,
@@ -112,11 +114,12 @@ export function ToolCallCard({
   const hasError =
     error !== undefined && error !== null && error !== false;
   const canExpand =
-    status === "completed" ||
-    status === "failed" ||
-    hasContent ||
-    hasError ||
-    structuredContent !== undefined;
+    collapsible &&
+    (status === "completed" ||
+      status === "failed" ||
+      hasContent ||
+      hasError ||
+      structuredContent !== undefined);
   const label =
     status === "running" || status === "pending"
       ? (activeLabel ?? name)

@@ -156,7 +156,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 27 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 18 groups and Electron verification covers 18.
+Current inventory: 89 surface groups; 31 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 22 groups and Electron verification covers 22.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1155,6 +1155,32 @@ real native compact resize. Four reviewed internal baselines pass, and the
 optional local-only 688×71 group comparison differs by 0.6449% under a 1.3%
 hard limit. This promotes the row to current-build Browser/Electron verified
 without claiming that the unavailable GitHub transport itself reconnected.
+
+Build `26.820.60940` now supersedes the sampled primary MCP and Sources
+anchors. One real turn completes Search → Fetch in 34 seconds; another starts
+with a standalone invalid Fetch and completes Search → Fetch in a separate
+integration group within the same turn in 17 seconds. Completed and failed
+call rows are 21px noninteractive text rows on this build: they expose neither
+the former disclosure button nor the neutral failure output card. The observed
+recovery is one captured outcome rather than a claim that every failed call
+automatically retries.
+
+At 720×680 the activity and group begin at x=16 and the call labels at x=38,
+with zero horizontal overflow. The 300×189 Sources summary remains mounted
+offscreen after unpinning and an outside click; repinning restores it and the
+reserved conversation track. Browser/CDP and Electron cover success, direct
+failure, deterministic retrying/completed replay states, compact geometry, and
+the Sources lifecycle. Seven reviewed internal baselines pass. Optional
+local-only product comparisons differ by 2.1978% for success, 3.3530% for the
+direct failed row, 1.2123% for compact recovery, and 1.7707% for Sources under
+independent 2.3%, 3.4%, 1.3%, and 2% hard limits. The replay-only in-progress
+Search frame is not promoted as a current-product pixel because that transient
+state was not captured live.
+
+This promotes `thread.mcp-tool-events`, `thread.mcp-tool-failure-retry`,
+`thread.panel-system`, and `thread.sources-panel` to current-build runtime,
+Browser, and Electron evidence. Their implementation remains partial for the
+open variants below.
 
 Authentication, elicitation, MCP approvals, same-transport disconnect/reconnect,
 other integrations, and cancellation remain open.

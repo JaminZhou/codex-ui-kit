@@ -68,6 +68,49 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates runtime-observed 26.820 MCP success, failure, recovery, and Sources regions", () => {
+    for (const scene of [
+      "mcp-current-26-820-success",
+      "mcp-current-26-820-recovery-failed",
+      "mcp-current-26-820-recovery-retrying",
+      "mcp-current-26-820-recovery-completed",
+      "mcp-current-26-820-recovery-compact",
+      "mcp-current-26-820-sources-pinned",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_820_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_FAILURE_26_820_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_820_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_820_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      'scene.scenario === "mcp-current-26-820-success"',
+    );
+    expect(cdpContract).toContain(
+      "current 26.820 failed MCP row contract failed",
+    );
+    expect(cdpContract).toContain(
+      "current 26.820 MCP evidence contract failed",
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-820-success"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-820-failed"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-820-recovery"',
+    );
+    expect(appSource).toContain("collapsible={!isCurrentMcp26820Replay}");
+    expect(appStyles).toContain(
+      '[data-scenario="mcp-current-26-820-recovery"]',
+    );
+  });
+
   it("keeps the main gate strict while scoping raster tolerance to the sidebar", () => {
     expect(contract).toContain(
       "const defaultLifecycleMainPixelRatio = 0.0025",

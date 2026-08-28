@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 27 groups have current-build runtime evidence, 47 have previous-build-only
+- 31 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -48,14 +48,20 @@ exit gates; it does not replace the inventory.
   styles, geometry, labels, glyphs, actions, and recovery states; Electron
   repeats both flows at 1180×820 and 720×680. Unmasked product-region
   comparisons pass at 4.4354% under 5% for failure and 3.9512% under 4.5% for
-  interruption. The previous 26.818 MCP task promoted `thread.mcp-tool-events`,
+  interruption. The current 26.820 MCP task promotes `thread.mcp-tool-events`,
   `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
-  `thread.sources-panel`. It reaches real Search → Fetch success,
-  invalid-URL Fetch → Search → Fetch recovery, the 720×680 error card, and the
-  300×189 Sources summary through pinned, floating, dismissed, and repinned
-  states. Browser/CDP and Electron repeat the flows; unmasked sampled-product
-  regions pass at 2.1854% for success, 1.1649% for compact recovery, and
-  2.5926% for Sources under independent hard limits. A separate previous
+  `thread.sources-panel`. It reaches one real Search → Fetch success and one
+  captured invalid-URL Fetch → Search → Fetch recovery. Current completed and
+  failed call rows are noninteractive, keep the failed call outside the
+  recovered group, and do not expose the old error card or row disclosures.
+  The 300×189 Sources summary stays mounted offscreen after unpinning and an
+  outside click, then repins in place. Browser/CDP and Electron repeat the
+  deterministic frames; unmasked sampled-product regions pass at 2.1978% for
+  success, 3.3530% for the direct failed row, 1.2123% for compact recovery,
+  and 1.7707% for Sources under independent hard limits. The live capture
+  establishes one same-turn recovery, not a universal automatic-retry rule,
+  and the replay-only in-progress Search frame is not promoted as a product
+  pixel. A separate previous
   26.818 no-tool task promoted `thread.messages-markdown`. It reaches heading,
   strong text, inline code, blockquote, list, a narrow table, and TypeScript
   code at 1180×820 and 720×680. The sampled external URL is source-owned and
@@ -806,11 +812,13 @@ without confusing package readiness with full product reconstruction.
    failed-plus-unread composition, then proves that Retry creates exactly one
    child worktree. Its current 84×30 product tail has 0% foreground-mask
    difference from the replay.
-3. **Tool recovery and mixed thread — previous success/recovery evidence**:
-   `26.818.41509` covers a real Search → Fetch success, a real invalid-URL
+3. **Tool recovery and mixed thread — current sampled success/recovery evidence**:
+   `26.820.60940` covers one real Search → Fetch success, one real invalid-URL
    Fetch → Search → Fetch recovery, 720×680 compact geometry, and the pinned →
-   floating → dismissed → repinned Sources summary, with Browser/CDP, Electron,
-   and unmasked local-only pixel gates. The previous `26.803.41515` unavailable
+   offscreen-unpinned → repinned Sources summary, with Browser/CDP, Electron,
+   and unmasked local-only pixel gates. Completed and failed call rows are
+   intentionally noninteractive on this build; the direct failure has no
+   expanded error card. The previous `26.803.41515` unavailable
    GitHub integration followed by same-thread OpenAI Developer Docs fallback
    remains regression evidence. The schema-valid current-style mixed
    replay now adds Web Search → Browser open/find, MCP Search → Fetch,

@@ -47,6 +47,8 @@ const currentReplayComposerScenarios = new Set([
   "mcp-current-integration-recovery",
   "mcp-current-26-818-recovery",
   "mcp-current-26-818-success",
+  "mcp-current-26-820-recovery",
+  "mcp-current-26-820-success",
   "mcp-current-recovery",
   "mcp-current-success",
   "mcp-recovery-mixed-thread",
@@ -6398,7 +6400,7 @@ for (const scene of selectedScenes) {
               .map((element) => element.getAttribute("data-item-id")),
             failedCallAccessibleLabel: mcpGroup
               .querySelector(
-                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-26-818-fetch-invalid"] .codex-ui-tool-call__label',
+                '[data-item-id="mcp-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-26-818-fetch-invalid"] .codex-ui-tool-call__label, [data-item-id="mcp-current-26-820-fetch-invalid"] .codex-ui-tool-call__label',
               )
               ?.getAttribute("aria-label"),
             groupExpanded:
@@ -6454,7 +6456,7 @@ for (const scene of selectedScenes) {
           }
         : null;
       const failedMcpCall = document.querySelector(
-        '[data-item-id="mcp-fetch-invalid"], [data-item-id="mcp-current-fetch-invalid"], [data-item-id="mcp-current-26-818-fetch-invalid"]',
+        '[data-item-id="mcp-fetch-invalid"], [data-item-id="mcp-current-fetch-invalid"], [data-item-id="mcp-current-26-818-fetch-invalid"], [data-item-id="mcp-current-26-820-fetch-invalid"]',
       );
       const mcpFailure = failedMcpCall
         ? {
@@ -9934,6 +9936,9 @@ for (const scene of selectedScenes) {
       );
     }
     if (scene.toolCount !== undefined) {
+      const isCurrentMcp26820 =
+        scene.scenario === "mcp-current-26-820-success" ||
+        scene.scenario === "mcp-current-26-820-recovery";
       if (
         !contract.mcp ||
         contract.mcp.toolCount !== scene.toolCount ||
@@ -9950,12 +9955,16 @@ for (const scene of selectedScenes) {
           scene.id === "mcp-current-26-818-success" ||
           scene.id === "mcp-current-26-818-recovery-completed" ||
           scene.id === "mcp-current-26-818-sources-pinned" ||
+          isCurrentMcp26820 ||
           scene.id === "mcp-current-integration-recovered" ||
           scene.id === "mcp-current-recovery-completed") &&
           (contract.mcp.groupStyle.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
-            contract.mcp.groupStyle.fontWeight !== "445" ||
-            !contract.mcp.groupStyle.color.includes("0.6"))) ||
+            contract.mcp.groupStyle.fontWeight !==
+              (isCurrentMcp26820 ? "400" : "445") ||
+            (isCurrentMcp26820
+              ? contract.mcp.groupStyle.color !== "rgb(223, 223, 223)"
+              : !contract.mcp.groupStyle.color.includes("0.6")))) ||
         JSON.stringify(contract.mcp.callLabels) !==
           JSON.stringify(scene.callLabels)
       ) {
@@ -9985,6 +9994,15 @@ for (const scene of selectedScenes) {
               },
               index,
             ) => {
+              if (isCurrentMcp26820) {
+                return (
+                  buttonRect !== null ||
+                  chevronVisible !== null ||
+                  expanded !== null ||
+                  label !== null ||
+                  labelRect !== null
+                );
+              }
               const status = contract.mcp.callStatuses[index];
               if (status === "running") {
                 return (
@@ -10013,6 +10031,223 @@ for (const scene of selectedScenes) {
         );
       }
     }
+    if (scene.failedRowLabel !== undefined) {
+      const failed26820 = await page.evaluate(() => {
+        const row = document.querySelector(
+          '[data-item-id="mcp-current-26-820-fetch-invalid"]',
+        );
+        const label = row?.querySelector(".codex-ui-tool-call__label");
+        const bounds = row?.getBoundingClientRect();
+        const style = row ? getComputedStyle(row) : null;
+        return {
+          errorCards: document.querySelectorAll(
+            ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+          ).length,
+          groupCount: document.querySelectorAll(
+            ".codex-ui-mcp-tool-call-group",
+          ).length,
+          label: label?.textContent?.trim(),
+          row: bounds
+            ? {
+                height: bounds.height,
+                left: bounds.left,
+                width: bounds.width,
+              }
+            : null,
+          rowColor: style?.color,
+          rowDisclosureCount:
+            row?.querySelectorAll(
+              "details, summary, button[aria-expanded]",
+            ).length ?? 0,
+          stopButton: Boolean(
+            document.querySelector('button[aria-label="Stop"]'),
+          ),
+          thinkingPlaceholder: Boolean(
+            document.querySelector(".codex-ui-thread-thinking"),
+          ),
+        };
+      });
+      if (
+        contract.mcp !== null ||
+        !contract.mcpFailure ||
+        contract.mcpFailure.accessibleLabel !== null ||
+        contract.mcpFailure.errorOutput !== null ||
+        contract.mcpFailure.expanded ||
+        contract.mcpFailure.status !== "failed" ||
+        !contract.mcpFailure.timelineExpanded ||
+        contract.mcpFailure.timelineLabel !== scene.timelineLabel ||
+        failed26820.groupCount !== 0 ||
+        failed26820.errorCards !== 0 ||
+        failed26820.label !== scene.failedRowLabel ||
+        failed26820.rowDisclosureCount !== 0 ||
+        !failed26820.stopButton ||
+        failed26820.thinkingPlaceholder ||
+        !failed26820.row ||
+        Math.abs(failed26820.row.height - 21) > 0.1 ||
+        Math.abs(failed26820.row.left - 222) > 1 ||
+        !failed26820.rowColor?.includes("0.6")
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 failed MCP row contract failed: ${JSON.stringify({ failed26820, mcp: contract.mcp, mcpFailure: contract.mcpFailure })}`,
+        );
+      }
+    }
+    if (
+      scene.scenario === "mcp-current-26-820-success" ||
+      scene.scenario === "mcp-current-26-820-recovery"
+    ) {
+      const current26820 = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const style = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = getComputedStyle(element);
+          return {
+            color: value.color,
+            fontFamily: value.fontFamily,
+            fontSize: value.fontSize,
+            fontWeight: value.fontWeight,
+            lineHeight: value.lineHeight,
+          };
+        };
+        const timeline = document.querySelector(
+          ".codex-ui-activity-timeline__toggle",
+        );
+        const groupHeader = document.querySelector(
+          ".codex-ui-mcp-tool-call-group > .codex-ui-activity__disclosure > .codex-ui-activity__header",
+        );
+        const answer = document.querySelector(".demo-current-mcp-answer");
+        const answerLink = answer?.querySelector("a");
+        const composer = document.querySelector(".codex-ui-composer");
+        return {
+          answer: answer instanceof HTMLElement
+            ? answer.innerText
+                .split("\n")
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .join("\n")
+            : null,
+          answerHref: answerLink?.getAttribute("href") ?? null,
+          answerStyle: style(answer),
+          composer: rect(composer),
+          errorCardCount: document.querySelectorAll(
+            ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+          ).length,
+          group: rect(groupHeader),
+          groupStyle: style(groupHeader),
+          headerIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-thread-header [data-current-build-icon]",
+            ),
+            (element) => element.getAttribute("data-current-build-icon"),
+          ),
+          headerTitle: document
+            .querySelector(".codex-ui-thread-header__title")
+            ?.textContent?.trim(),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          rowDisclosureCount: document.querySelectorAll(
+            ".codex-ui-mcp-tool-call-group .codex-ui-tool-call details, .codex-ui-mcp-tool-call-group .codex-ui-tool-call summary, .codex-ui-mcp-tool-call-group .codex-ui-tool-call button[aria-expanded]",
+          ).length,
+          rows: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-mcp-tool-call-group .codex-ui-tool-call",
+            ),
+            (row) => {
+              const header = row.querySelector(
+                ":scope > .codex-ui-activity__header",
+              );
+              const label = row.querySelector(
+                ".codex-ui-tool-call__label",
+              );
+              return {
+                header: rect(header),
+                label: label?.textContent?.trim(),
+                labelRect: rect(label),
+                status: row.getAttribute("data-status"),
+                style: style(row),
+              };
+            },
+          ),
+          stopButton: Boolean(
+            document.querySelector('button[aria-label="Stop"]'),
+          ),
+          timeline: rect(timeline),
+          timelineLabel: timeline?.textContent?.trim(),
+          timelineStyle: style(timeline),
+        };
+      });
+      const compact = scene.id === "mcp-current-26-820-recovery-compact";
+      const pinned = scene.id === "mcp-current-26-820-sources-pinned";
+      const success = scene.scenario === "mcp-current-26-820-success";
+      const failed = scene.failedRowLabel !== undefined;
+      const expectedTimelineTop = compact ? 76 : success ? 255 : 216;
+      const expectedGroupTop = compact ? 120 : success ? 299 : 260;
+      const expectedContentLeft = pinned ? 64 : compact ? 16 : 222.046875;
+      const completed = scene.id.endsWith("-success") ||
+        scene.id.includes("recovery-completed") || pinned || compact;
+      const expectedAnswer = success
+        ? "Model Context Protocol\nhttps://learn.chatgpt.com/docs/extend/mcp"
+        : "Use Codex with the Agents SDK\nhttps://learn.chatgpt.com/docs/mcp-server";
+      const expectedHref = success
+        ? "https://learn.chatgpt.com/docs/extend/mcp"
+        : "https://learn.chatgpt.com/docs/mcp-server";
+      if (
+        current26820.headerTitle !== "查找 MCP 官方文档" ||
+        !current26820.headerIcons.includes("thread-header-summary") ||
+        !current26820.headerIcons.includes("thread-header-bottom-panel") ||
+        !current26820.headerIcons.includes("thread-header-side-panel") ||
+        current26820.horizontalOverflow > 1 ||
+        current26820.errorCardCount !== 0 ||
+        current26820.rowDisclosureCount !== 0 ||
+        current26820.timelineLabel !== scene.timelineLabel ||
+        !current26820.timeline ||
+        Math.abs(current26820.timeline.top - expectedTimelineTop) > 1 ||
+        Math.abs(current26820.timeline.left - expectedContentLeft) > 1 ||
+        Math.abs(current26820.timeline.height - 23) > 0.1 ||
+        current26820.timelineStyle?.fontSize !== "14px" ||
+        current26820.timelineStyle?.fontWeight !== "400" ||
+        current26820.timelineStyle?.lineHeight !== "21px" ||
+        current26820.stopButton === completed ||
+        (completed &&
+          (current26820.answer !== expectedAnswer ||
+            current26820.answerHref !== expectedHref ||
+            current26820.answerStyle?.fontWeight !== "400")) ||
+        (!completed && current26820.answer !== null) ||
+        (!failed &&
+          (!current26820.group ||
+            Math.abs(current26820.group.top - expectedGroupTop) > 1 ||
+            Math.abs(current26820.group.left - expectedContentLeft) > 1 ||
+            Math.abs(current26820.group.height - 21) > 0.1 ||
+            current26820.groupStyle?.color !== "rgb(223, 223, 223)" ||
+            current26820.groupStyle?.fontWeight !== "400" ||
+            current26820.rows.length !== scene.toolCount ||
+            current26820.rows.some((row, index) =>
+              !row.header ||
+              !row.labelRect ||
+              Math.abs(row.header.top - (expectedGroupTop + 25 + index * 25)) > 1 ||
+              Math.abs(row.header.height - 21) > 0.1 ||
+              Math.abs(row.labelRect.left - (expectedContentLeft + 22)) > 1 ||
+              row.style?.fontWeight !== "400" ||
+              (row.status === "failed" &&
+                !row.style?.color.includes("0.6")),
+            )))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 MCP evidence contract failed: ${JSON.stringify(current26820)}`,
+        );
+      }
+      contract.currentMcp26820 = current26820;
+    }
     if (
       scene.errorOutput !== undefined &&
       (!contract.mcpFailure ||
@@ -10034,7 +10269,12 @@ for (const scene of selectedScenes) {
       );
     }
 
-    if (scene.id === "mcp-current-26-818-sources-pinned") {
+    if (
+      scene.id === "mcp-current-26-818-sources-pinned" ||
+      scene.id === "mcp-current-26-820-sources-pinned"
+    ) {
+      const current26820Sources =
+        scene.id === "mcp-current-26-820-sources-pinned";
       const readSources = () =>
         page.evaluate(() => {
           const rect = (element) => {
@@ -10137,7 +10377,8 @@ for (const scene of selectedScenes) {
         Math.abs(initialSources.panel.rect.height - 189) > 1 ||
         initialSources.panel.style?.backgroundColor !== "rgb(45, 45, 45)" ||
         initialSources.panel.style?.borderRadius !== "25px" ||
-        initialSources.panel.style?.fontWeight !== "445" ||
+        initialSources.panel.style?.fontWeight !==
+          (current26820Sources ? "400" : "445") ||
         initialSources.panel.style?.lineHeight !== "21px" ||
         !initialSources.outputs.rect ||
         Math.abs(initialSources.outputs.rect.left - 864) > 1 ||
@@ -10188,22 +10429,32 @@ for (const scene of selectedScenes) {
         !floatingSources.thread ||
         Math.abs(floatingSources.thread.left) > 1 ||
         !floatingSources.mcpGroup ||
-        Math.abs(floatingSources.mcpGroup.left - 222) > 1
+        Math.abs(floatingSources.mcpGroup.left - 222) > 1 ||
+        (current26820Sources &&
+          Math.abs((floatingSources.panel.rect?.left ?? 0) - 1235) > 2)
       ) {
         throw new Error(
           `${scene.id}: floating MCP Sources state failed: ${JSON.stringify(floatingSources)}`,
         );
       }
       await page.mouse.click(600, 600);
-      await page.waitForSelector(
-        '.demo-current-mcp-source-summary-dock[data-open="false"]',
-      );
+      if (!current26820Sources) {
+        await page.waitForSelector(
+          '.demo-current-mcp-source-summary-dock[data-open="false"]',
+        );
+      }
       const dismissedSources = await readSources();
       if (
-        dismissedSources.dock.open !== "false" ||
-        dismissedSources.dock.pinned !== "false" ||
-        dismissedSources.surface.style?.opacity !== "0" ||
-        dismissedSources.surface.style?.pointerEvents !== "none"
+        (current26820Sources
+          ? dismissedSources.dock.open !== "true" ||
+            dismissedSources.dock.pinned !== "false" ||
+            Math.abs(
+              (dismissedSources.panel.rect?.left ?? 0) - 1235,
+            ) > 2
+          : dismissedSources.dock.open !== "false" ||
+            dismissedSources.dock.pinned !== "false" ||
+            dismissedSources.surface.style?.opacity !== "0" ||
+            dismissedSources.surface.style?.pointerEvents !== "none")
       ) {
         throw new Error(
           `${scene.id}: dismissed MCP Sources state failed: ${JSON.stringify(dismissedSources)}`,
