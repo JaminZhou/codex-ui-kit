@@ -856,6 +856,79 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("preserves current 26.820 command output while the thread uses compact rows", () => {
+    const success = replayScenarios["command-current-26-820-success"];
+    const failure = replayScenarios["command-current-26-820-failure"];
+    const completedSuccess = reduceProtocolTrace(success.events);
+    const completedFailure = reduceProtocolTrace(failure.events);
+
+    expect(completedSuccess.commands[0]).toMatchObject({
+      durationMs: 12_000,
+      exitCode: 0,
+      status: "completed",
+    });
+    expect(completedSuccess.commands[0]?.output).toContain(
+      "CURRENT 26.820 SUCCESS 012",
+    );
+    expect(completedSuccess.turnDurationsMs).toMatchObject({
+      "turn-command-current-26-820-success": 22_000,
+    });
+    expect(completedFailure.commands[0]).toMatchObject({
+      exitCode: 7,
+      output:
+        "CURRENT 26.820 FAILURE STDOUT\nCURRENT 26.820 FAILURE STDERR\n",
+      status: "failed",
+    });
+    expect(completedFailure.messages.at(-1)).toMatchObject({
+      id: "assistant-command-current-26-820-failure-recovery",
+      text: "CURRENT 26.820 COMMAND RECOVERY ACCEPTED",
+    });
+    expect(completedFailure.turnDurationsMs).toMatchObject({
+      "turn-command-current-26-820-failure": 12_000,
+      "turn-command-current-26-820-failure-recovery": 1_400,
+    });
+  });
+
+  it("replays the current 26.820 immediate and settled interruption durations", () => {
+    const scenario = replayScenarios[
+      "command-current-26-820-interruption"
+    ];
+    const immediate = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames[
+          "command-current-26-820-interruption-stopped-immediate"
+        ],
+      ),
+    );
+    const settled = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["command-current-26-820-interruption-settled"],
+      ),
+    );
+    const recovered = reduceProtocolTrace(scenario.events);
+    const interruptionDuration = (state: typeof immediate) =>
+      state.messages.find(
+        ({ id }) => id === "user-command-current-26-820-interruption",
+      )?.interruptionDurationMs;
+
+    expect(immediate.status).toBe("interrupted");
+    expect(interruptionDuration(immediate)).toBe(0);
+    expect(settled.status).toBe("interrupted");
+    expect(settled.commands[0]).toMatchObject({
+      durationMs: 16_000,
+      exitCode: 0,
+      status: "completed",
+    });
+    expect(interruptionDuration(settled)).toBe(16_000);
+    expect(recovered.status).toBe("completed");
+    expect(interruptionDuration(recovered)).toBe(16_000);
+    expect(recovered.messages.at(-1)?.text).toBe(
+      "CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED",
+    );
+  });
+
   it("replays current command Stop, persistent stopped row, and recovery", () => {
     const scenario = replayScenarios.interruption;
     const running = reduceProtocolTrace(

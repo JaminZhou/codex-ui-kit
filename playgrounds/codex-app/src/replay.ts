@@ -10,6 +10,9 @@ import currentBasicMessageTrace from "../fixtures/traces/current-basic-message.j
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
+import commandCurrent26820FailureTrace from "../fixtures/traces/command-current-26-820-failure.jsonl?raw";
+import commandCurrent26820InterruptionTrace from "../fixtures/traces/command-current-26-820-interruption.jsonl?raw";
+import commandCurrent26820SuccessTrace from "../fixtures/traces/command-current-26-820-success.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
@@ -49,6 +52,9 @@ export type ReplayScenarioId =
   | "approval-similar-commands"
   | "attachment-lifecycle"
   | "background-terminal"
+  | "command-current-26-820-failure"
+  | "command-current-26-820-interruption"
+  | "command-current-26-820-success"
   | "command-failure-recovery"
   | "conversation-lifecycle"
   | "streaming-recovery"
@@ -178,6 +184,24 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Recover from command failure",
     "The current installed Codex stdout/stderr probe exits 7, preserves its exact shell card, and accepts the observed same-thread recovery response.",
     commandFailureRecoveryTrace,
+  ),
+  "command-current-26-820-success": scenario(
+    "command-current-26-820-success",
+    "Observe long-running shell command",
+    "The runtime-observed 26.820 product keeps a successful long-running command as a regular-weight, noninteractive command row inside the expandable activity timeline while retaining protocol output outside the visible thread.",
+    commandCurrent26820SuccessTrace,
+  ),
+  "command-current-26-820-failure": scenario(
+    "command-current-26-820-failure",
+    "Observe command failure",
+    "The runtime-observed 26.820 product keeps an exit-7 command as a noninteractive Ran row without exposing stdout, stderr, or an exit-code card, then accepts a same-thread recovery.",
+    commandCurrent26820FailureTrace,
+  ),
+  "command-current-26-820-interruption": scenario(
+    "command-current-26-820-interruption",
+    "监控 CURRENT 26.820 中断",
+    "The runtime-observed 26.820 product moves from a running terminal row through an immediate zero-second stop to a settled sixteen-second stop and same-thread recovery.",
+    commandCurrent26820InterruptionTrace,
   ),
   "terminal-lifecycle": scenario(
     "terminal-lifecycle",

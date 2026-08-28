@@ -216,11 +216,12 @@
         "cdp-26.803.61601:real-command-success-exit-7-and-current-terminal-glyph-with-computed-styles-and-owned-regional-pixels",
         "cdp-26.810.52044:real-pwd-success-expanded-worked-for-and-terminal-glyph",
         "cdp-26.810.52044:real-exit-7-shell-stderr-stdout-and-persistent-stopped-command-row",
-        "cdp-26.818.41509:real-exit-7-shell-current-stdout-stderr-terminal-glyph-and-unmasked-region"
+        "cdp-26.818.41509:real-exit-7-shell-current-stdout-stderr-terminal-glyph-and-unmasked-region",
+        "cdp-26.820.60940:real-twelve-second-command-success-exit-7-neutral-ran-row-and-stopped-background-terminal-row"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -233,11 +234,12 @@
         "cdp-26.730.61309:real-command-exit-7-followed-by-successful-no-tool-turn-in-the-same-thread",
         "cdp-26.803.61601:real-exit-7-expanded-shell-and-successful-no-tool-recovery-in-the-same-thread",
         "cdp-26.810.52044:real-exit-7-expanded-shell-stderr-before-stdout-and-successful-no-tool-recovery",
-        "cdp-26.818.41509:real-exit-7-exact-response-and-successful-no-tool-recovery-in-the-same-thread"
+        "cdp-26.818.41509:real-exit-7-exact-response-and-successful-no-tool-recovery-in-the-same-thread",
+        "cdp-26.820.60940:real-exit-7-neutral-ran-row-hidden-output-and-exit-code-followed-by-exact-no-tool-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -457,11 +459,12 @@
         "cdp-26.803.61601:exact-stop-20-viewbox-16px-render-28px-control-and-send-recovery",
         "cdp-26.803.61601:real-command-stop-background-terminal-stopping-settlement-and-same-thread-recovery",
         "cdp-26.810.52044:real-command-stop-persistent-background-terminal-stopped-row-and-same-thread-recovery",
-        "cdp-26.818.41509:real-command-stop-58s-persistent-background-terminal-row-and-same-thread-recovery"
+        "cdp-26.818.41509:real-command-stop-58s-persistent-background-terminal-row-and-same-thread-recovery",
+        "cdp-26.820.60940:real-command-stop-zero-second-immediate-sixteen-second-settlement-and-exact-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

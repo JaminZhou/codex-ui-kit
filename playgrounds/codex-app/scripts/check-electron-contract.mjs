@@ -9973,6 +9973,168 @@ for (const responsiveCase of currentCommandResponsiveCases) {
   }
 }
 
+const currentCommand26820ElectronCases = [
+  {
+    assistantTexts: ["CURRENT 26.820 LONG COMMAND OBSERVED"],
+    commandStatus: "completed",
+    frame: "command-current-26-820-success-completed",
+    interruption: null,
+    scenario: "command-current-26-820-success",
+    timelineLabel: "Worked for 22s",
+    title: "Observe long-running shell command",
+  },
+  {
+    assistantTexts: [
+      "CURRENT 26.820 COMMAND FAILURE OBSERVED",
+      "CURRENT 26.820 COMMAND RECOVERY ACCEPTED",
+    ],
+    commandStatus: "failed",
+    frame: "command-current-26-820-failure-recovered",
+    interruption: null,
+    scenario: "command-current-26-820-failure",
+    timelineLabel: "Worked for 12s",
+    title: "Observe command failure",
+  },
+  {
+    assistantTexts: [],
+    commandStatus: "interrupted",
+    frame: "command-current-26-820-interruption-stopped-immediate",
+    interruption: "You stopped after 0s",
+    scenario: "command-current-26-820-interruption",
+    timelineLabel: null,
+    title: "监控 CURRENT 26.820 中断",
+  },
+  {
+    assistantTexts: ["CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED"],
+    commandStatus: "interrupted",
+    frame: "command-current-26-820-interruption-recovered",
+    interruption: "You stopped after 16s",
+    scenario: "command-current-26-820-interruption",
+    timelineLabel: null,
+    title: "监控 CURRENT 26.820 中断",
+  },
+];
+
+for (const currentCase of currentCommand26820ElectronCases) {
+  const { app: currentCommandApp, page: currentCommandPage } =
+    await launchScene(
+      {
+        currentSidebar: true,
+        frame: currentCase.frame,
+        id: `electron-${currentCase.frame}`,
+        scenario: currentCase.scenario,
+        sidebarState: "hidden",
+      },
+      { capture: false },
+    );
+  try {
+    if (currentCase.timelineLabel) {
+      const timeline = currentCommandPage.getByRole("button", {
+        exact: true,
+        name: currentCase.timelineLabel,
+      });
+      if ((await timeline.getAttribute("aria-expanded")) !== "true") {
+        await timeline.click();
+      }
+    }
+    const readCurrentCommand = () =>
+      currentCommandPage.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                height: value.height,
+                left: value.left,
+                width: value.width,
+              }
+            : null;
+        };
+        const command = document.querySelector(
+          '[data-item-id^="command-current-26-820-"]',
+        );
+        const commandHeader = command?.querySelector(
+          ":scope > .codex-ui-activity__header",
+        );
+        return {
+          assistantTexts: Array.from(
+            document.querySelectorAll(
+              '[data-item-id^="assistant-command-current-26-820-"] .codex-ui-markdown',
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          command: rect(commandHeader),
+          commandStatus: command?.getAttribute("data-execution-status"),
+          composer: rect(document.querySelector(".codex-ui-composer")),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          interruption:
+            document
+              .querySelector(".codex-ui-thread-interruption-summary__label")
+              ?.textContent?.trim() ?? null,
+          rowDisclosureCount:
+            command?.querySelectorAll(
+              "button, details, summary, [role=button]",
+            ).length ?? 0,
+          shellCount:
+            command?.querySelectorAll(
+              ".codex-ui-command-execution__shell, .codex-ui-command-output, pre",
+            ).length ?? 0,
+          stopCount: document.querySelectorAll(
+            'button[aria-label="Stop"]',
+          ).length,
+          title: document
+            .querySelector(".codex-ui-thread-header__title")
+            ?.textContent?.trim(),
+        };
+      });
+    const wide = await readCurrentCommand();
+    await currentCommandApp.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+    });
+    await currentCommandPage.waitForFunction(
+      () => window.innerWidth === 720 && window.innerHeight === 680,
+      undefined,
+      { timeout: 5_000 },
+    );
+    const compact = await readCurrentCommand();
+    if (
+      wide.title !== currentCase.title ||
+      compact.title !== currentCase.title ||
+      wide.commandStatus !== currentCase.commandStatus ||
+      compact.commandStatus !== currentCase.commandStatus ||
+      JSON.stringify(wide.assistantTexts) !==
+        JSON.stringify(currentCase.assistantTexts) ||
+      JSON.stringify(compact.assistantTexts) !==
+        JSON.stringify(currentCase.assistantTexts) ||
+      wide.interruption !== currentCase.interruption ||
+      compact.interruption !== currentCase.interruption ||
+      wide.horizontalOverflow !== 0 ||
+      compact.horizontalOverflow !== 0 ||
+      wide.rowDisclosureCount !== 0 ||
+      compact.rowDisclosureCount !== 0 ||
+      wide.shellCount !== 0 ||
+      compact.shellCount !== 0 ||
+      wide.stopCount !== 0 ||
+      compact.stopCount !== 0 ||
+      Math.abs((wide.command?.left ?? 0) - 222) > 1 ||
+      Math.abs((wide.command?.width ?? 0) - 736) > 1 ||
+      Math.abs((compact.command?.left ?? 0) - 16) > 1 ||
+      Math.abs((compact.command?.width ?? 0) - 688) > 1 ||
+      Math.abs((wide.composer?.left ?? 0) - 222) > 1 ||
+      Math.abs((wide.composer?.width ?? 0) - 736) > 1 ||
+      Math.abs((compact.composer?.left ?? 0) - 16) > 1 ||
+      Math.abs((compact.composer?.width ?? 0) - 688) > 1
+    ) {
+      throw new Error(
+        `${currentCase.frame}: Electron current 26.820 command contract drifted: ${JSON.stringify({ compact, wide })}`,
+      );
+    }
+  } finally {
+    await currentCommandApp.close();
+  }
+}
+
 const contextCompactionScene = {
   frame: "context-compaction-ready",
   id: "electron-current-context-compaction",

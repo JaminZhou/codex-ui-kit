@@ -35,6 +35,9 @@ if (requestedSceneIds && selectedScenes.length !== requestedSceneIds.size) {
 const currentReplayComposerScenarios = new Set([
   "attachment-lifecycle",
   "approval-review-timeout",
+  "command-current-26-820-failure",
+  "command-current-26-820-interruption",
+  "command-current-26-820-success",
   "command-failure-recovery",
   "compaction",
   "context-summary",
@@ -2986,6 +2989,7 @@ for (const scene of selectedScenes) {
                 height: 16,
                 name:
                   scene.scenario.startsWith("mcp-") ||
+                  scene.scenario.startsWith("command-current-26-820-") ||
                   scene.scenario === "current-basic-message"
                     ? "composer-permission"
                     : "composer-permission-ask",
@@ -6491,6 +6495,9 @@ for (const scene of selectedScenes) {
           }
         : null;
       const commandExecution =
+        document.querySelector(
+          '[data-item-id^="command-current-26-820-"]',
+        ) ??
         document.querySelector('[data-item-id="command-interruption"]') ??
         document.querySelector('[data-item-id="command-failure-output"]') ??
         document.querySelector('[data-item-id="command-long-output"]');
@@ -10867,6 +10874,188 @@ for (const scene of selectedScenes) {
           })}`,
         );
       }
+    }
+
+    if (scene.scenario.startsWith("command-current-26-820-")) {
+      const commandOutput = contract.commandOutput;
+      const compact = scene.id.endsWith("-compact");
+      const running = scene.id.endsWith("-running");
+      const success = scene.scenario.endsWith("-success");
+      const failure = scene.scenario.endsWith("-failure");
+      const interruption = scene.scenario.endsWith("-interruption");
+      const recovered = scene.id.endsWith("-recovered") || compact;
+      const currentCommand = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const execution = document.querySelector(
+          '[data-item-id^="command-current-26-820-"]',
+        );
+        const header = execution?.querySelector(
+          ":scope > .codex-ui-activity__header",
+        );
+        const timeline = execution
+          ?.closest(".codex-ui-activity-timeline")
+          ?.querySelector(".codex-ui-activity-timeline__toggle");
+        const root = document.querySelector(".demo-root");
+        return {
+          assistantTexts: Array.from(
+            document.querySelectorAll(
+              '[data-item-id^="assistant-command-current-26-820-"] .codex-ui-markdown',
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          composerPhase: root?.getAttribute("data-composer-phase"),
+          header: rect(header),
+          headerIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-thread-header [data-current-build-icon]",
+            ),
+            (element) => element.getAttribute("data-current-build-icon"),
+          ),
+          headerStyle: header
+            ? {
+                color: getComputedStyle(header).color,
+                fontFamily: getComputedStyle(header).fontFamily,
+                fontSize: getComputedStyle(header).fontSize,
+                fontWeight: getComputedStyle(header).fontWeight,
+                lineHeight: getComputedStyle(header).lineHeight,
+              }
+            : null,
+          headerTitle: document
+            .querySelector(".codex-ui-thread-header__title")
+            ?.textContent?.trim(),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          preCount: execution?.querySelectorAll("pre").length ?? 0,
+          rowDisclosureCount:
+            execution?.querySelectorAll(
+              "details, summary, button[aria-expanded]",
+            ).length ?? 0,
+          stopCount: Array.from(document.querySelectorAll("button")).filter(
+            (button) => button.getAttribute("aria-label") === "Stop",
+          ).length,
+          timeline: rect(timeline),
+          visibleProtocolOutput: Boolean(
+            execution?.querySelector(
+              ".codex-ui-command-output, .codex-ui-command-execution__shell, .codex-ui-command-execution__footer",
+            ),
+          ),
+        };
+      });
+      const expectedTitle = success
+        ? "Observe long-running shell command"
+        : failure
+          ? "Observe command failure"
+          : "监控 CURRENT 26.820 中断";
+      const expectedRootStatus = running
+        ? "running"
+        : interruption && !recovered
+          ? "interrupted"
+          : "completed";
+      const expectedCommandStatus = running
+        ? "running"
+        : failure
+          ? "failed"
+          : interruption
+            ? "interrupted"
+            : "completed";
+      const expectedTimelineLabel = interruption
+        ? running
+          ? "Working for 10s"
+          : null
+        : success
+          ? running
+            ? "Working for 9s"
+            : "Worked for 22s"
+          : "Worked for 12s";
+      const expectedSummaryPrefix = interruption
+        ? running
+          ? "Running for i in $(seq 1 120)"
+          : "Background terminal stopped with for i in $(seq 1 120)"
+        : running
+          ? "Running "
+          : "Ran ";
+      const expectedInterruptionText = interruption && !running
+        ? recovered
+          ? "You stopped after 16s"
+          : "You stopped after 0s"
+        : null;
+      if (
+        !commandOutput ||
+        contract.rootStatus !== expectedRootStatus ||
+        commandOutput.status !== expectedCommandStatus ||
+        !commandOutput.summary?.startsWith(expectedSummaryPrefix) ||
+        commandOutput.executionExpanded ||
+        commandOutput.shell !== null ||
+        commandOutput.output !== null ||
+        commandOutput.footer !== null ||
+        commandOutput.commandLabel !== null ||
+        commandOutput.copyLabels.length !== 0 ||
+        commandOutput.timelineExpanded !== (expectedTimelineLabel !== null) ||
+        commandOutput.timelineLabel !== expectedTimelineLabel ||
+        currentCommand.headerTitle !== expectedTitle ||
+        !currentCommand.headerIcons.includes("thread-header-summary") ||
+        !currentCommand.headerIcons.includes("thread-header-bottom-panel") ||
+        !currentCommand.headerIcons.includes("thread-header-side-panel") ||
+        currentCommand.horizontalOverflow > 1 ||
+        currentCommand.preCount !== 0 ||
+        currentCommand.rowDisclosureCount !== 0 ||
+        currentCommand.visibleProtocolOutput ||
+        currentCommand.composerPhase !== (running ? "running" : "idle") ||
+        currentCommand.stopCount !== (running ? 1 : 0) ||
+        !currentCommand.header ||
+        Math.abs(currentCommand.header.left - (compact ? 16 : 222.046875)) >
+          1 ||
+        Math.abs(currentCommand.header.height - 21) > 0.1 ||
+        currentCommand.headerStyle?.fontFamily !==
+          '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+        currentCommand.headerStyle?.fontSize !== "14px" ||
+        currentCommand.headerStyle?.fontWeight !== "400" ||
+        currentCommand.headerStyle?.lineHeight !== "21px" ||
+        (expectedTimelineLabel !== null &&
+          (!currentCommand.timeline ||
+            Math.abs(
+              currentCommand.timeline.left - (compact ? 16 : 222.046875),
+            ) > 1 ||
+            Math.abs(currentCommand.timeline.height - 23) > 0.1)) ||
+        (expectedTimelineLabel === null && currentCommand.timeline !== null) ||
+        (expectedInterruptionText === null
+          ? contract.interruption !== null
+          : contract.interruption?.label?.text !== expectedInterruptionText ||
+            contract.interruption.label.style.fontWeight !== "400" ||
+            contract.interruption.label.style.fontSize !== "14px" ||
+            contract.interruption.label.style.lineHeight !== "21px" ||
+            contract.interruption.rule?.style.height !== "1px" ||
+            contract.interruption.rule?.style.marginTop !== "8px") ||
+        (success && !running &&
+          currentCommand.assistantTexts[0] !==
+            "CURRENT 26.820 LONG COMMAND OBSERVED") ||
+        (failure &&
+          (currentCommand.assistantTexts[0] !==
+            "CURRENT 26.820 COMMAND FAILURE OBSERVED" ||
+            (recovered &&
+              currentCommand.assistantTexts[1] !==
+                "CURRENT 26.820 COMMAND RECOVERY ACCEPTED"))) ||
+        (interruption &&
+          (recovered
+            ? currentCommand.assistantTexts[0] !==
+              "CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED"
+            : currentCommand.assistantTexts.length !== 0))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 command evidence contract failed: ${JSON.stringify({ commandOutput, currentCommand, interruption: contract.interruption, rootStatus: contract.rootStatus })}`,
+        );
+      }
+      contract.currentCommand26820 = currentCommand;
     }
 
     if (

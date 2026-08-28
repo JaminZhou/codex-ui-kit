@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 31 groups have current-build runtime evidence, 43 have previous-build-only
+- 34 groups have current-build runtime evidence, 40 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -39,16 +39,19 @@ exit gates; it does not replace the inventory.
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
   no-mask 768×774 product comparison at 0.4320% changed pixels.
-  The previous 26.818 command task promoted command execution, failure recovery,
-  and interruption recovery. One exact shell command emitted the
-  sampled stdout/stderr pair, exited 7, exposed `Worked for 10s`, and accepted
-  an exact no-tool recovery. A second 120-second command was stopped after 58
-  seconds, retained the stopped background-terminal row, and accepted a second
-  exact recovery in the same task. Browser/CDP locks the sampled computed
-  styles, geometry, labels, glyphs, actions, and recovery states; Electron
-  repeats both flows at 1180×820 and 720×680. Unmasked product-region
-  comparisons pass at 4.4354% under 5% for failure and 3.9512% under 4.5% for
-  interruption. The current 26.820 MCP task promotes `thread.mcp-tool-events`,
+  The current 26.820 command tasks promote `thread.command-execution`,
+  `thread.command-failure-recovery`, and `thread.interruption-stop`. They reach
+  one 12-second success, one exit-code-7 stdout/stderr command followed by an
+  exact no-tool recovery, and one stopped 120-second loop followed by a second
+  exact recovery. The current Renderer presents exit 0 and exit 7 as neutral,
+  noninteractive `Ran …` rows, hides the old Shell/output/exit-code cards while
+  the protocol retains those fields, and uses a square
+  `Background terminal stopped with …` row. The sampled stop reports 0 seconds
+  immediately and 16 seconds after settlement; it is one observation rather
+  than a universal timing rule. Browser/CDP gates ten frames, Electron repeats
+  the wide/compact terminal states, and unmasked current-product regions pass
+  at 1.5813%, 1.5826%, 5.4109%, and 2.3502% under independent 2%, 2%, 5.5%, and
+  3% ceilings. The current 26.820 MCP task promotes `thread.mcp-tool-events`,
   `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
   `thread.sources-panel`. It reaches one real Search → Fetch success and one
   captured invalid-URL Fetch → Search → Fetch recovery. Current completed and
