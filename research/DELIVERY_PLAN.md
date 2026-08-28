@@ -770,8 +770,8 @@ without confusing package readiness with full product reconstruction.
    `26.820.60940` continuation now re-reaches controlled failure twice to
    distinguish a foreground-read error from the real background
    failed-plus-unread composition, then proves that Retry creates exactly one
-   child worktree. Its current 84×30 product tail is pixel-identical to the
-   replay.
+   child worktree. Its current 84×30 product tail has 0% foreground-mask
+   difference from the replay.
 3. **Tool recovery and mixed thread — previous success/recovery evidence**:
    `26.818.41509` covers a real Search → Fetch success, a real invalid-URL
    Fetch → Search → Fetch recovery, 720×680 compact geometry, and the pinned →

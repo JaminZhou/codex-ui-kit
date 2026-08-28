@@ -361,8 +361,9 @@ The subsequent current failure continuation promotes that sampled repair
 boundary as well. A disposable regular-file `.git/worktrees` blocker produces
 the real failure surface and background branch/error/unread composition;
 moving it aside and activating `Retry` creates one child worktree and removes
-the failure. The current 84×30 failure tail is pixel-identical to the replay,
-while ordinary error and collection loading remain unsampled on 26.820.
+the failure. The current 84×30 failure tail has 0% foreground-mask difference
+from the replay, while ordinary error and collection loading remain unsampled
+on 26.820.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and

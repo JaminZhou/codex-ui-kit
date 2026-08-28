@@ -89,8 +89,9 @@ The authoritative current-build inventory is:
   from a real background failed-plus-unread task, moves the scoped blocker
   aside, and proves that `Retry` creates exactly one child worktree. The
   current failed row retains the 14px branch at 67px, red 16px error at 38px,
-  and blue 8px unread dot at 14px; its privacy-safe 84×30 tail is
-  pixel-identical to the replay. The previous loading/error/restored ratios of
+  and blue 8px unread dot at 14px; its privacy-safe 84×30 tail has 0%
+  foreground-mask difference from the replay. The previous
+  loading/error/restored ratios of
   2.0833%, 0.7540%, and 0.1786% remain build-scoped regression evidence.
 - The previous Codex Desktop `26.810.52044` (`6662`) visual probe revalidated the
   exact 1180×820 dark/resting asset fingerprint and now retains 115 exact
