@@ -4072,7 +4072,14 @@ describe("application sidebar", () => {
       <AppSidebarCollection isLoading loadingLabel="Loading chats" />,
     );
 
-    const loading = screen.getByRole("status", { name: "Loading chats" });
+    const loading = screen.getByRole("status");
+    expect(loading.getAttribute("aria-label")).toBeNull();
+    expect(loading.getAttribute("aria-live")).toBe("polite");
+    expect(
+      loading.querySelector(
+        ".codex-ui-app-sidebar__collection-loading-label",
+      )?.textContent,
+    ).toBe("Loading chats");
     expect(
       loading.querySelectorAll(
         ".codex-ui-app-sidebar__collection-loading-heading > span",

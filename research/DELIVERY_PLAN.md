@@ -476,7 +476,11 @@ worktree follow-ups re-observe a real empty collection and the complete sampled
 loading → controlled failure → failed-plus-unread → Retry → restored boundary.
 Remaining Stage 1 work includes re-observing ordinary error and collection
 loading, plus broader route lifecycle feedback, global notification runtime
-evidence, and selection continuity beyond New chat.
+evidence, and selection continuity beyond New chat. The current 26.820 ASAR
+source and Browser/Electron gates now lock the exact ordinary-error paths and
+loading accessibility/skeleton structure, but isolated app-server termination
+and blocked/latency-injected ChatGPT loading did not reach either row-level
+state; those negative probes do not satisfy the runtime gate.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:

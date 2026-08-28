@@ -1312,7 +1312,15 @@ recovery. Its 84×30 failed-plus-unread crop passes at 0%. The worktree row
 retains the product's raw
 `kind=local`; the runtime observation identifies it through the selected
 Worktree context, workspace summary, and exact branch marker. Collection
-loading and ordinary error remain explicitly earlier-build evidence.
+loading and ordinary error remain explicitly earlier-build runtime evidence.
+A decode of the same installed ASAR now locks the current collection loader's
+`role=status`, `aria-live=polite`, screen-reader-only `Loading chats` text,
+18%-wide heading, four shimmer rows, and the ordinary task error's exact
+three-path 21×21 source icon through Browser/CDP and Electron. Killing only an
+isolated app-server reached the global crash screen and recovered the task to
+idle; an isolated blocked/latency-injected ChatGPT source still hydrated
+persisted rows without exposing the loader, so neither negative probe is
+reported as current product pixels.
 
 The App shell gate uses only the 120×46 application-owned titlebar crop:
 

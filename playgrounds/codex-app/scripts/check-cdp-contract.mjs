@@ -4,6 +4,12 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
 
+const currentSidebarErrorPathData = [
+  "M10.6 9.70459C11.0142 9.70461 11.35 10.0404 11.35 10.4546V13.7876C11.35 14.2018 11.0142 14.5376 10.6 14.5376C10.1858 14.5376 9.84998 14.2018 9.84998 13.7876V10.4546C9.84998 10.0404 10.1858 9.70459 10.6 9.70459Z",
+  "M10.6 6.2876C11.1292 6.28762 11.558 6.71732 11.558 7.24658C11.5578 7.77569 11.1291 8.20457 10.6 8.20459C10.0708 8.20459 9.64215 7.7757 9.64197 7.24658C9.64197 6.71731 10.0707 6.2876 10.6 6.2876Z",
+  "M10.6 2.53955C14.9713 2.53955 18.515 6.08326 18.515 10.4546C18.515 14.8259 14.9713 18.3696 10.6 18.3696C6.22864 18.3696 2.68494 14.8259 2.68494 10.4546C2.68494 6.08326 6.22864 2.53955 10.6 2.53955ZM10.6 3.86963C6.96318 3.86963 4.01501 6.81779 4.01501 10.4546C4.01501 14.0914 6.96318 17.0396 10.6 17.0396C14.2368 17.0396 17.1849 14.0914 17.1849 10.4546C17.1849 6.81779 14.2368 3.86963 10.6 3.86963Z",
+];
+
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
 const requestedScenesArgument = process.argv.find((argument) =>
@@ -6348,6 +6354,11 @@ for (const scene of selectedScenes) {
             header: rect(sidebarHeader),
             collection: collection
               ? {
+                  accessibleLabelCount: collection.querySelectorAll(
+                    ".codex-ui-app-sidebar__collection-loading-label",
+                  ).length,
+                  ariaLabel: collection.getAttribute("aria-label"),
+                  ariaLive: collection.getAttribute("aria-live"),
                   fixture: collection.getAttribute(
                     "data-sidebar-collection-fixture",
                   ),
@@ -6361,6 +6372,7 @@ for (const scene of selectedScenes) {
                     ".codex-ui-app-sidebar__collection-loading-rows > span",
                   ).length,
                   rect: rect(collection),
+                  role: collection.getAttribute("role"),
                   state: collectionState?.getAttribute("data-state") ?? null,
                   stateStyle: collectionState
                     ? {
@@ -6484,6 +6496,10 @@ for (const scene of selectedScenes) {
                     : null,
                   attentionRect: attention ? rect(attention) : null,
                   errorRect: error ? rect(error) : null,
+                  errorPathData: Array.from(
+                    error?.querySelectorAll("path") ?? [],
+                    (path) => path.getAttribute("d"),
+                  ),
                   fixture: item.getAttribute("data-sidebar-status-fixture"),
                   pathData: Array.from(
                     spinner?.querySelectorAll("path") ?? [],
@@ -8528,7 +8544,9 @@ for (const scene of selectedScenes) {
               fixture.attentionColor !== "rgb(131, 195, 255)")) ||
           (fixture.visualStatus === "error" &&
             (fixture.errorRect?.width !== 16 ||
-              fixture.errorRect?.height !== 16)) ||
+              fixture.errorRect?.height !== 16 ||
+              JSON.stringify(fixture.errorPathData) !==
+                JSON.stringify(currentSidebarErrorPathData))) ||
           (fixture.visualStatus === "loading" &&
             (fixture.animationDuration !== "1e-06s" ||
               fixture.animationName !== "none" ||
@@ -8636,8 +8654,13 @@ for (const scene of selectedScenes) {
         scene.id === "current-sidebar-collection-loading" &&
         (collection.fixture !== "loading" ||
           collection.state !== "loading" ||
+          collection.accessibleLabelCount !== 1 ||
+          collection.ariaLabel !== null ||
+          collection.ariaLive !== "polite" ||
           collection.loadingHeadingCount !== 1 ||
-          collection.loadingRowCount !== 4)
+          collection.loadingRowCount !== 4 ||
+          collection.role !== "status" ||
+          collection.text !== "Loading chats")
       ) {
         throw new Error(
           `${scene.id}: current loading collection contract failed: ${JSON.stringify(collection)}`,

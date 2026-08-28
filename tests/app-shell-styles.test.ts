@@ -199,6 +199,9 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       ".codex-ui-app-sidebar__collection-loading-rows > span::before",
     );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__collection-loading-label \{[\s\S]*?clip-path: inset\(50%\);[\s\S]*?position: absolute;[\s\S]*?width: 1px;/,
+    );
     expect(styles).toContain(
       "animation: codex-ui-app-sidebar-shimmer 3s linear infinite;",
     );

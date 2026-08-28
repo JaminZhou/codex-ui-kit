@@ -292,7 +292,13 @@ distinguishes foreground-read failure from background failed-plus-unread, and
 completes through the real `Retry` control with exactly one child worktree.
 The current three-track row keeps the 14px branch at 67px, red 16px error at
 38px, and blue 8px unread dot at 14px; its privacy-safe 84×30 tail passes at
-0%. Ordinary error and collection loading remain previous-build evidence.
+0%. The same installed ASAR now independently locks the ordinary error's exact
+three-path 21×21 icon and the collection loader's polite status,
+screen-reader-only label, 18% heading, and four seeded shimmer rows through
+Browser/CDP and Electron. Safe isolated attempts reached global app-server
+crash recovery and persisted-row hydration, not those two row-level runtime
+states, so ordinary error and collection loading remain previous-build runtime
+evidence.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:

@@ -170,6 +170,24 @@ hydrated. The replay's one-heading/four-row loading state therefore remains
 package-structural and Browser/Electron implementation evidence, not promoted
 current runtime evidence.
 
+The 2026-08-28 reachability follow-up decoded the installed renderer bundle
+and confirmed that the current loader is gated by the ChatGPT/unified source's
+project or conversation loading flags (or its initial sidebar preference
+read), while pure Codex source bypasses that global skeleton. The component is
+a polite status with screen-reader-only `Loading chats`, one fixed 18% heading,
+and four seeded 30–72% shimmer rows. A fresh isolated profile with a blocked
+Chromium proxy, ChatGPT mode, hard reload, and renderer latency still hydrated
+persisted rows before the global loading branch became observable.
+
+The same source audit confirms that an ordinary task row becomes `error` only
+for a `systemError` runtime status or a latest-turn system error; a
+`needs_resume` task is deliberately reduced to idle. Terminating only the
+isolated app-server therefore exercised the global crash recovery screen and,
+after Restart, returned the disposable task to idle instead of manufacturing
+an ordinary error row. Both isolated profiles and the disposable task were
+cleaned recoverably, port 9882 was closed, and the original app process stayed
+running. These negative probes are reachability evidence, not current pixels.
+
 ### Previous `26.818.41509` global-shell baseline
 
 The prior build note retains the current-home, account-menu, conversation,

@@ -4,7 +4,7 @@
     "appVersion": "26.820.60940",
     "buildNumber": "7119",
     "sampledAt": "2026-08-27",
-    "reverifiedAt": "2026-08-27",
+    "reverifiedAt": "2026-08-28",
     "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -802,7 +802,11 @@
       "id": "app.sidebar-thread-history",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "packageEvidence": [
+        "app-main",
+        "app-main-current-sidebar-loading-source",
+        "thread-app-shell-chrome"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:recents-dense-scroll-history-running-queued-unread-error",
@@ -847,7 +851,11 @@
       "id": "app.sidebar-status-indicators",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "packageEvidence": [
+        "app-main",
+        "app-main-current-task-status-source",
+        "thread-app-shell-chrome"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
