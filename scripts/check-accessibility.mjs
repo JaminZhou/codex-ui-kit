@@ -12,6 +12,7 @@ import {
   contrastRatio,
   partitionSemanticIncomplete,
   partitionWcagIncomplete,
+  partitionWcagViolations,
 } from "./accessibility-policy.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -483,6 +484,7 @@ const overlayCases = [
 ];
 const failures = [];
 let incompleteWcagChecks = 0;
+let acceptedTargetSizeExceptions = 0;
 let manualReviewSemanticChecks = 0;
 let overlayStateChecks = 0;
 let threadShellChecks = 0;
@@ -541,16 +543,25 @@ async function runAxe(page, wcagSelectors = []) {
       id: entry.id,
       impact: entry.impact,
       nodeCount: entry.nodes.length,
-      nodes: entry.nodes.map((node) => ({
-        failureSummary: node.failureSummary,
-        reviews: [...node.any, ...node.all, ...node.none]
-          .map((check) => ({
-            messageKey: check.data?.messageKey,
-            needsReview: check.data?.needsReview,
-          }))
-          .filter((review) => review.messageKey || review.needsReview),
-        target: node.target,
-      })),
+      nodes: entry.nodes.map((node) => {
+        const selector = node.target
+          .map((part) => (Array.isArray(part) ? part.join(" ") : part))
+          .join(" ");
+        const target = document.querySelector(selector);
+        return {
+          failureSummary: node.failureSummary,
+          reviews: [...node.any, ...node.all, ...node.none]
+            .map((check) => ({
+              messageKey: check.data?.messageKey,
+              needsReview: check.data?.needsReview,
+            }))
+            .filter((review) => review.messageKey || review.needsReview),
+          target: node.target,
+          targetSizeException: target
+            ?.closest("[data-accessibility-target-size-exception]")
+            ?.getAttribute("data-accessibility-target-size-exception"),
+        };
+      }),
     });
     const semanticReport = await globalThis.axe.run(document, {
       runOnly: { type: "rule", values: rules },
@@ -586,13 +597,19 @@ function applyIncompletePolicy(result, verifiedControlIds = new Set()) {
     verifiedControlIds,
   );
   const wcag = partitionWcagIncomplete(wcagPopupControls.unexpected);
+  const wcagViolations = partitionWcagViolations(result.wcag.violations);
   result.semantic.incomplete = semantic.unexpected;
   result.wcag.incomplete = wcag.unexpected;
+  result.wcag.violations = wcagViolations.unexpected;
   manualReviewSemanticChecks += semantic.manualReview.reduce(
     (total, entry) => total + entry.nodeCount,
     0,
   );
   incompleteWcagChecks += wcag.manualReview.reduce(
+    (total, entry) => total + entry.nodeCount,
+    0,
+  );
+  acceptedTargetSizeExceptions += wcagViolations.acceptedExceptions.reduce(
     (total, entry) => total + entry.nodeCount,
     0,
   );
@@ -802,5 +819,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports, ${threadShellChecks} current thread-shell checks, and ${overlayStateChecks} open overlay states (${incompleteWcagChecks} contrast and ${manualReviewSemanticChecks} verified popup-control manual-review nodes)`,
+  `accessibility contract ok: ${semanticRules.length} strict semantic rules and WCAG A/AA/2.2 across ${cases.length} viewports, ${threadShellChecks} current thread-shell checks, and ${overlayStateChecks} open overlay states (${incompleteWcagChecks} contrast, ${manualReviewSemanticChecks} verified popup-control manual-review nodes, and ${acceptedTargetSizeExceptions} compact message-navigation target-size exception nodes)`,
 );

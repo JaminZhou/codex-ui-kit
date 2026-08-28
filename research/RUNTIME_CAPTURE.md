@@ -1759,6 +1759,33 @@ Electron, reviewed internal rasters, and optional local-only product regions
 cover the same boundary. Actual upload failure/progress and plugin attachments
 remain unsampled product transitions.
 
+## Current `26.820.60940` thirty-turn sample
+
+Use one isolated, loopback-only second process and one disposable task. The
+test prompt sequence must be explicitly user-authorized and must prohibit
+tools and file changes. Capture only after every reply exactly matches
+`LONG THREAD NN.`; do not reuse a private existing thread as fixture data.
+
+The accepted flow normalizes to 1180×820, hides the sidebar, closes any pinned
+summary, and records latest plus a click on message 15. It then resizes to
+720×680, applies a bounded away-from-latest scroll, activates the 32×32px
+return control, and verifies latest restoration. Record viewport/content/
+Composer/rail/floating-control rectangles, reverse-origin `scrollTop` and
+`scrollHeight`, total and mounted turn counts, button counts, computed marker
+geometry, `aria-current`, and horizontal overflow. The current product's
+message-15 jump with message 30 still current is evidence, not a reason to
+rewrite the observed state.
+
+Current source inspection is paired with runtime evidence: four messages are
+the minimum rail count, while at least 48px of content start-side space is the
+independent responsive visibility gate. A 720px capture therefore requires an
+absent rail, not a compressed rail. Product screenshots and raw messages stay
+local-only; optional visual comparison masks message regions and gates only
+the owned header, rail, floating control, Composer, and surrounding structure.
+After capture, archive the exact disposable task, terminate only the exact
+isolated process tree, verify its port is closed, and move the exact temporary
+profile recoverably to Trash.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

@@ -38,6 +38,31 @@ export function partitionWcagIncomplete(entries) {
   return { manualReview, unexpected };
 }
 
+export function isExpectedTargetSizeViolation(entry) {
+  return (
+    entry.id === "target-size" &&
+    entry.nodes.length > 0 &&
+    entry.nodes.every(
+      (node) =>
+        node.targetSizeException === "dense-message-navigation",
+    )
+  );
+}
+
+export function partitionWcagViolations(entries) {
+  const acceptedExceptions = [];
+  const unexpected = [];
+
+  for (const entry of entries) {
+    (isExpectedTargetSizeViolation(entry)
+      ? acceptedExceptions
+      : unexpected
+    ).push(entry);
+  }
+
+  return { acceptedExceptions, unexpected };
+}
+
 export function isExpectedPopupControlIncomplete(entry, verifiedControlIds) {
   if (entry.id !== "aria-valid-attr-value" || entry.nodes.length === 0) {
     return false;

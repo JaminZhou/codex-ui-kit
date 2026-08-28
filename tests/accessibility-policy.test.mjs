@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   contrastRatio,
   isExpectedPopupControlIncomplete,
+  isExpectedTargetSizeViolation,
   isExpectedWcagIncomplete,
   partitionSemanticIncomplete,
   partitionWcagIncomplete,
+  partitionWcagViolations,
 } from "../scripts/accessibility-policy.mjs";
 
 const gradientContrast = {
@@ -45,6 +47,61 @@ describe("accessibility incomplete-result policy", () => {
     const result = partitionWcagIncomplete([gradientContrast, targetSize]);
     expect(result.manualReview).toEqual([gradientContrast]);
     expect(result.unexpected).toEqual([targetSize]);
+  });
+});
+
+const denseNavigationTargetSize = {
+  id: "target-size",
+  impact: "serious",
+  nodeCount: 2,
+  nodes: [
+    {
+      failureSummary: "Target has insufficient size",
+      target: ['button[aria-label="Jump to user message 1"]'],
+      targetSizeException: "dense-message-navigation",
+    },
+    {
+      failureSummary: "Target has insufficient size",
+      target: ['button[aria-label="Jump to user message 2"]'],
+      targetSizeException: "dense-message-navigation",
+    },
+  ],
+};
+
+describe("dense navigation target-size policy", () => {
+  it("accepts only target-size failures owned by the compact navigation rail", () => {
+    expect(isExpectedTargetSizeViolation(denseNavigationTargetSize)).toBe(true);
+    expect(
+      isExpectedTargetSizeViolation({
+        ...denseNavigationTargetSize,
+        id: "color-contrast",
+      }),
+    ).toBe(false);
+    expect(
+      isExpectedTargetSizeViolation({
+        ...denseNavigationTargetSize,
+        nodes: [
+          ...denseNavigationTargetSize.nodes,
+          {
+            failureSummary: "Target has insufficient size",
+            target: ["button.unrelated"],
+          },
+        ],
+      }),
+    ).toBe(false);
+  });
+
+  it("keeps mixed and unrelated violations on the failure path", () => {
+    const unrelated = {
+      ...denseNavigationTargetSize,
+      nodes: [{ ...denseNavigationTargetSize.nodes[0], targetSizeException: undefined }],
+    };
+    const result = partitionWcagViolations([
+      denseNavigationTargetSize,
+      unrelated,
+    ]);
+    expect(result.acceptedExceptions).toEqual([denseNavigationTargetSize]);
+    expect(result.unexpected).toEqual([unrelated]);
   });
 });
 

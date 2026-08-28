@@ -119,21 +119,25 @@ describe("thread navigation surfaces", () => {
   });
 
   it("reveals the user-message rail only at the current stable item threshold", () => {
-    const items = Array.from({ length: 10 }, (_, index) => ({
+    const items = Array.from({ length: 4 }, (_, index) => ({
       id: `message-${index + 1}`,
       label: `Message ${index + 1}`,
     }));
     const { rerender } = render(
-      <ThreadMessageNavigationRail items={items.slice(0, 9)} />,
+      <ThreadMessageNavigationRail items={items.slice(0, 3)} />,
     );
     expect(screen.queryByRole("navigation", { name: "User messages" })).toBeNull();
 
     rerender(
-      <ThreadMessageNavigationRail activeIds={["message-10"]} items={items} />,
+      <ThreadMessageNavigationRail activeIds={["message-4"]} items={items} />,
     );
-    expect(screen.getByRole("navigation", { name: "User messages" })).toBeTruthy();
     expect(
-      screen.getByRole("button", { name: "Jump to user message 10" }).getAttribute(
+      screen.getByRole("navigation", { name: "User messages" }).getAttribute(
+        "data-density",
+      ),
+    ).toBe("compact");
+    expect(
+      screen.getByRole("button", { name: "Jump to user message 4" }).getAttribute(
         "aria-current",
       ),
     ).toBe("true");

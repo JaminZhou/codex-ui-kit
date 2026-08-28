@@ -10119,6 +10119,232 @@ try {
   await currentWindowedApp.close();
 }
 
+const current26820LongThreadScene = {
+  currentSidebar: true,
+  frame: "thread-current-26-820-middle",
+  id: "electron-current-26-820-long-thread",
+  scenario: "conversation-lifecycle",
+  sidebarState: "hidden",
+};
+const {
+  app: current26820LongThreadApp,
+  page: current26820LongThreadPage,
+} = await launchScene(current26820LongThreadScene, { capture: false });
+try {
+  await current26820LongThreadPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="current-26-820"][data-thread-following="false"] [data-selected-message-index="15"][data-mounted-turn-count="11"]',
+  );
+  const current26820Geometry =
+    await current26820LongThreadPage.evaluate(() => {
+      const rect = (selector) => {
+        const element = document.querySelector(selector);
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const viewport = document.querySelector(
+        ".codex-ui-conversation-thread-shell__viewport",
+      );
+      const activeNavigation = document.querySelector(
+        '.codex-ui-message-navigation-rail__button[aria-current="true"]',
+      );
+      return {
+        activeNavigation:
+          activeNavigation?.getAttribute("aria-label") ?? null,
+        composer: rect(".codex-ui-composer"),
+        mountedTurns: document.querySelectorAll("[data-windowed-turn]")
+          .length,
+        navigation: rect(".codex-ui-message-navigation-rail"),
+        navigationButtons: document.querySelectorAll(
+          ".codex-ui-message-navigation-rail__button",
+        ).length,
+        placeholders: document.querySelectorAll(
+          ".codex-ui-thread-virtualized-placeholder",
+        ).length,
+        viewport:
+          viewport instanceof HTMLElement
+            ? {
+                flexDirection: getComputedStyle(viewport).flexDirection,
+                rect: rect(
+                  ".codex-ui-conversation-thread-shell__viewport",
+                ),
+                scrollHeight: viewport.scrollHeight,
+                scrollTop: viewport.scrollTop,
+              }
+            : null,
+      };
+    });
+  if (
+    current26820Geometry.activeNavigation !==
+      "Jump to user message 30" ||
+    current26820Geometry.navigationButtons !== 30 ||
+    current26820Geometry.mountedTurns !== 11 ||
+    current26820Geometry.placeholders !== 2 ||
+    !current26820Geometry.navigation ||
+    Math.abs(current26820Geometry.navigation.left - 17) > 1 ||
+    Math.abs(current26820Geometry.navigation.top - 283.5) > 1 ||
+    Math.abs(current26820Geometry.navigation.width - 36) > 1 ||
+    Math.abs(current26820Geometry.navigation.height - 300) > 1 ||
+    !current26820Geometry.composer ||
+    Math.abs(current26820Geometry.composer.left - 222.5) > 1 ||
+    Math.abs(current26820Geometry.composer.top - 706) > 1 ||
+    Math.abs(current26820Geometry.composer.width - 736) > 1 ||
+    Math.abs(current26820Geometry.composer.height - 98) > 1 ||
+    !current26820Geometry.viewport ||
+    current26820Geometry.viewport.flexDirection !== "column-reverse" ||
+    Math.abs(current26820Geometry.viewport.scrollTop + 2_346) > 1 ||
+    Math.abs(current26820Geometry.viewport.scrollHeight - 4_618) > 2
+  ) {
+    throw new Error(
+      `Electron current 26.820 long-thread geometry failed: ${JSON.stringify(current26820Geometry)}`,
+    );
+  }
+
+  await current26820LongThreadPage
+    .getByRole("button", { name: "Jump to user message 29" })
+    .click();
+  await current26820LongThreadPage.waitForSelector(
+    '[data-selected-message-index="29"] [data-item-id="current-windowed-user-29"]',
+  );
+  await current26820LongThreadPage
+    .getByRole("button", { name: "Jump to user message 15" })
+    .click();
+  await current26820LongThreadPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "15" &&
+      document.querySelector(
+        '[data-item-id="current-windowed-user-15"]',
+      ) &&
+      document
+        .querySelector(
+          '.codex-ui-message-navigation-rail__button[aria-current="true"]',
+        )
+        ?.getAttribute("aria-label") === "Jump to user message 30" &&
+      viewport instanceof HTMLElement &&
+      Math.abs(viewport.scrollTop + 2_346) <= 1
+    );
+  });
+  await current26820LongThreadPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await current26820LongThreadPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-thread-following") === "true" &&
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "30" &&
+      document.querySelectorAll("[data-windowed-turn]").length === 8 &&
+      viewport instanceof HTMLElement &&
+      viewport.scrollTop === 0
+    );
+  });
+} finally {
+  await current26820LongThreadApp.close();
+}
+
+const current26820CompactAwayScene = {
+  currentSidebar: true,
+  frame: "thread-current-26-820-compact-away",
+  id: "electron-current-26-820-compact-away",
+  scenario: "conversation-lifecycle",
+  sidebarState: "hidden",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: current26820CompactAwayApp,
+  page: current26820CompactAwayPage,
+} = await launchScene(current26820CompactAwayScene, { capture: false });
+try {
+  await current26820CompactAwayPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    const navigation = document.querySelector(
+      ".codex-ui-conversation-thread-shell__message-navigation",
+    );
+    return (
+      document.querySelectorAll("[data-windowed-turn]").length === 9 &&
+      viewport instanceof HTMLElement &&
+      Math.abs(viewport.scrollTop + 900) <= 1 &&
+      navigation instanceof HTMLElement &&
+      getComputedStyle(navigation).display === "none"
+    );
+  });
+  const compactGeometry = await current26820CompactAwayPage.evaluate(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    return {
+      composer: rect(".codex-ui-composer"),
+      floating: rect(".codex-ui-thread-floating-button"),
+      viewport: rect(
+        ".codex-ui-conversation-thread-shell__viewport",
+      ),
+    };
+  });
+  if (
+    !compactGeometry.composer ||
+    Math.abs(compactGeometry.composer.left - 16) > 1 ||
+    Math.abs(compactGeometry.composer.top - 566) > 1 ||
+    Math.abs(compactGeometry.composer.width - 688) > 1 ||
+    Math.abs(compactGeometry.composer.height - 98) > 1 ||
+    !compactGeometry.floating ||
+    Math.abs(compactGeometry.floating.left - 344) > 1 ||
+    Math.abs(compactGeometry.floating.top - 510) > 1 ||
+    Math.abs(compactGeometry.floating.width - 32) > 1 ||
+    Math.abs(compactGeometry.floating.height - 32) > 1 ||
+    !compactGeometry.viewport ||
+    Math.abs(compactGeometry.viewport.top - 47) > 1 ||
+    Math.abs(compactGeometry.viewport.width - 720) > 1 ||
+    Math.abs(compactGeometry.viewport.height - 633) > 1
+  ) {
+    throw new Error(
+      `Electron current 26.820 compact-away geometry failed: ${JSON.stringify(compactGeometry)}`,
+    );
+  }
+  await current26820CompactAwayPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await current26820CompactAwayPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "30" &&
+      document.querySelectorAll("[data-windowed-turn]").length === 8 &&
+      viewport instanceof HTMLElement &&
+      viewport.scrollTop === 0
+    );
+  });
+} finally {
+  await current26820CompactAwayApp.close();
+}
+
 const composerMenusScene = {
   frame: "composer-multiline",
   id: "electron-composer-current-menus",

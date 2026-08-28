@@ -72,6 +72,12 @@ describe("current conversation thread shell visual contract", () => {
       ".codex-ui-conversation-thread-shell__message-navigation {\n  bottom: var(\n    --codex-ui-conversation-thread-composer-dock-height",
     );
     expect(styles).toContain("overflow: clip");
+    expect(styles).toContain(
+      "@container codex-ui-conversation-thread-body (max-width: 53.999rem)",
+    );
+    expect(styles).toContain(
+      "container-name: codex-ui-conversation-thread-body",
+    );
   });
 
   it("keeps completed assistant actions visible like the sampled thread", () => {

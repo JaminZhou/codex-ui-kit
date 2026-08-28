@@ -98,11 +98,12 @@
         "cdp-26.721:synthetic-thread-emulated-800x600-responsive-geometry",
         "cdp-26.803.61601:completed-thread-1180x820-and-720x680-header-thread-composer-geometry-zero-overflow-and-responsive-collapse",
         "cdp-26.810.52044:completed-successful-command-thread-header-actions-and-composer-assets",
-        "cdp-26.818.41509:completed-basic-thread-wide-and-820x680-compact-shell-composer-geometry-zero-overflow"
+        "cdp-26.818.41509:completed-basic-thread-wide-and-820x680-compact-shell-composer-geometry-zero-overflow",
+        "cdp-26.820.60940:thirty-turn-wide-and-720x680-shell-header-timeline-composer-geometry-zero-overflow"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -118,11 +119,12 @@
         "cdp-26.803.61601:completed-user-bubble-assistant-flat-response-four-actions-14x22-typography-and-twelve-exact-thread-assets",
         "cdp-26.803.61601:real-plain-text-streaming-wide-to-compact-reverse-origin-follow-and-natural-completion",
         "cdp-26.810.52044:completed-assistant-copy-good-bad-and-fork-actions",
-        "cdp-26.818.41509:fixed-user-assistant-turn-four-exact-actions-five-composer-controls-and-0.432-percent-unmasked-thread-region"
+        "cdp-26.818.41509:fixed-user-assistant-turn-four-exact-actions-five-composer-controls-and-0.432-percent-unmasked-thread-region",
+        "cdp-26.820.60940:thirty-exact-user-prompts-and-assistant-replies-wide-and-compact-turn-window"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -133,11 +135,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:ten-turn-reverse-scroll-windowed-thread",
-        "cdp-26.727.40816:real-82-message-compact-navigation-seven-mounted-turns-reverse-scroll-and-return"
+        "cdp-26.727.40816:real-82-message-compact-navigation-seven-mounted-turns-reverse-scroll-and-return",
+        "cdp-26.820.60940:real-thirty-turn-wide-eleven-mounted-compact-nine-mounted-reverse-scroll-and-eight-mounted-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -495,11 +498,12 @@
       "packageEvidence": ["thread-user-message-navigation-rail"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721:ten-user-message-36x10-navigation-rail"
+        "cdp-26.721:ten-user-message-36x10-navigation-rail",
+        "cdp-26.820.60940:four-item-minimum-thirty-button-36x10-wide-rail-48px-spatial-gate-and-compact-hide"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

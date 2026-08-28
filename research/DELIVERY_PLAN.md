@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 23 groups have current-build runtime evidence, 51 have previous-build-only
+- 27 groups have current-build runtime evidence, 47 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -26,6 +26,15 @@ exit gates; it does not replace the inventory.
   menu with a 221×187 Quartz window, and all six fixed SVG sources are
   unchanged. Current regional pixels pass for the native project menu,
   shared task actions, active spinner, and unread dot.
+  The current 30-turn long-thread slice additionally promotes
+  `thread.shell`, `thread.messages-basic`, `thread.virtualized-timeline`, and
+  `thread.message-navigation`: the 1180×820 frame mounts 11 turns, exposes the
+  30-button compact rail, materializes message 15 while retaining the sampled
+  stale message-30 current marker, and returns to latest with eight turns. The
+  720×680 frame hides the rail at zero content offset, mounts nine turns at
+  `scrollTop = -900`, and restores latest through the 32×32px control. CDP,
+  Electron, reviewed baselines, and local-only product references gate the
+  current responsive boundary under a 1% structural pixel limit.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
@@ -826,7 +835,12 @@ without confusing package readiness with full product reconstruction.
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
    resources, multiline/long-input geometry, active Goal/Plan modes, and the
-   sampled long-thread navigation/windowing contract are also delivered. A
+   sampled long-thread navigation/windowing contract are also delivered. The
+   current `26.820.60940` refresh replaces the old runtime anchor with the
+   sampled four-item/48px rail gates, 30-message responsive composition,
+   11/9/8 mounted-turn windows, message materialization, stale-current-marker
+   boundary, and wide/compact structural pixel comparisons. Broader host
+   eviction heuristics remain partial. A
    real command approval pending → denied path additionally confirms
    non-execution and restores the current Composer. Allow once and the
    matching-command persistence rule are now delivered. Schema-validated
