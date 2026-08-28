@@ -124,6 +124,7 @@ import {
   useReducer,
   useRef,
   useState,
+  type CSSProperties,
 } from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
@@ -2145,7 +2146,7 @@ export function App() {
     string[]
   >(() =>
     initialSelection.frame === "shell-notification-queue"
-      ? ["permission", "background", "restored", "update"]
+      ? ["success", "permission", "background", "update"]
       : [],
   );
   const [shellNotificationAction, setShellNotificationAction] = useState<
@@ -10017,6 +10018,14 @@ export function App() {
                     setShellQueuedNotificationIds((current) =>
                       current.filter((candidate) => candidate !== id),
                     );
+                  if (id === "success") {
+                    return {
+                      heading: "Chat unpinned",
+                      id,
+                      onDismiss: remove,
+                      tone: "success" as const,
+                    };
+                  }
                   if (id === "permission") {
                     return {
                       actionLabel: "Review",
@@ -10070,7 +10079,13 @@ export function App() {
               ]
             : []
         }
-        position="bottom-end"
+        style={
+          initialSelection.frame === "shell-notification-queue"
+            ? ({
+                "--codex-ui-app-sidebar-width": "322.90625px",
+              } as CSSProperties)
+            : undefined
+        }
       />
       {appServerCrashed ? (
         <AppServerCrashRecovery

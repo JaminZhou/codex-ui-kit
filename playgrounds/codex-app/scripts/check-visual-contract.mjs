@@ -32,6 +32,8 @@ if (
 const root = process.cwd();
 const baselineDirectory = join(root, "tests", "visual", "baselines");
 const artifactDirectory = join(root, "artifacts", "visual");
+const currentNotificationReference =
+  process.env.CODEX_UI_KIT_CURRENT_NOTIFICATION_REFERENCE;
 const currentBuildMultiFileReference =
   process.env.CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE;
 const currentBuildMultiFileReferenceSize = {
@@ -1317,6 +1319,47 @@ for (const scene of selectedScenes) {
   if (baseline.width !== actual.width || baseline.height !== actual.height) {
     throw new Error(
       `${scene.id}: image dimensions changed from ${baseline.width}x${baseline.height} to ${actual.width}x${actual.height}.`,
+    );
+  }
+
+  if (
+    scene.id === "shell-notification-queue" &&
+    currentNotificationReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentNotificationReference),
+    );
+    if (reference.width !== 172 || reference.height !== 42) {
+      throw new Error(
+        `${scene.id}: current notification reference must be exactly 172x42, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const currentNotification = cropPng(actual, 666, 48, 172, 42);
+    const comparison = comparePng(reference, currentNotification, 0.12);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_NOTIFICATION_MAX_DIFF_RATIO",
+      0.015,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(currentNotification),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current notification pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current notification pixel ratio ${comparison.ratio}`,
     );
   }
 

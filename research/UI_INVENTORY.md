@@ -129,7 +129,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 20 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Current inventory: 89 surface groups; 21 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 11 groups and Electron verification covers 11.
 Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -393,7 +393,8 @@ wide/compact geometry, prompt focus/selection, and external Light pixels are
 now recorded, and the preference was restored to System. This remains scoped
 to the visible current home and shell. The later account-menu matrix closes
 the footer/account Light and compact gap; broader Settings routes, route
-lifecycle feedback, and global notifications still require live evidence.
+lifecycle feedback, and unsampled notification tones still require live
+evidence.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, fatal App Server recovery,
@@ -407,18 +408,23 @@ results remain build-scoped evidence from `26.721.81911`.
 The public `AppWindowChrome`, `AppRouteOutlet`, and `AppNotificationRegion`
 contracts cover host-owned navigation, ready/loading/empty/error/offline/
 reconnecting/stale outlet states, and portalled global feedback. Browser CDP
-passes the shared 36-frame matrix. Real Electron acceptance drives offline → retry →
+passes the shared lifecycle matrix. Real Electron acceptance drives offline → retry →
 loading → ready → restored notification and the native 1180×820 → 720×680 →
 1180×820 responsive transition while preserving the selected route and
 restoring only auto-collapsed surfaces. Four deterministic App shell pixel
 frames pass. The 3.93% 120×46 window-chrome comparison is retained as a
 `26.721.81911` regression result. Offline/error/reconnecting/stale and global
-notification runtime evidence is still missing, so the implementation remains
-`partial`. The current notification-queue fixture now limits four items to
-three visible alerts, exposes the hidden count and list positions, and restores
-focus after action/dismissal in Browser/CDP, Electron, and one reviewed pixel
-baseline. Those independent gates still do not promote
-`cross-layer.global-notifications` to current-build runtime parity.
+notification variants remain incomplete, so the implementation remains
+`partial`. A current 26.820 isolated ChatGPT task now reaches the reversible
+Pin chat → `⌘Z` success path and emits `Chat unpinned`. The public region
+matches its top-center Sonner structure, polite `Notifications alt+T` section,
+focusable unstyled list item, exact success/Close paths, computed 170.4375×42px
+dark geometry, and three-visible mounted queue. Browser/CDP, Electron, one
+reviewed baseline, and an unmasked 0.8029% product crop promote
+`cross-layer.global-notifications` to current runtime evidence for the sampled
+success path. The unsampled info, warning, and danger replays reuse exact
+current-source icon paths but are not promoted to runtime evidence, nor is
+simultaneous live stacking.
 
 A separate current-build probe safely terminates only one isolated process's
 validated App Server child and reaches the dedicated 408×400 fatal recovery

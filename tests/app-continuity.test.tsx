@@ -190,7 +190,7 @@ describe("AppRouteOutlet", () => {
 });
 
 describe("AppNotificationRegion", () => {
-  it("portals global feedback with alert and dismissal semantics", async () => {
+  it("portals global feedback with current live-region and dismissal semantics", async () => {
     const onDismiss = vi.fn();
     render(
       <AppNotificationRegion
@@ -207,17 +207,37 @@ describe("AppNotificationRegion", () => {
     );
 
     const region = await screen.findByRole("region", {
-      name: "Notifications",
+      name: "Notifications alt+T",
     });
     expect(region.parentElement).toBe(document.body);
-    expect(screen.getByRole("alert")).toBeTruthy();
-    fireEvent.click(
-      screen.getByRole("button", { name: "Dismiss notification" }),
+    expect(region.getAttribute("aria-live")).toBe("polite");
+    expect(screen.queryByRole("alert")).toBeNull();
+    const toaster = region.querySelector("[data-sonner-toaster]");
+    const toast = region.querySelector("[data-sonner-toast]");
+    expect(toaster?.getAttribute("data-sonner-theme")).toBe("light");
+    expect(toast?.getAttribute("tabindex")).toBe("0");
+    expect(toast?.getAttribute("data-promise")).toBe("false");
+    expect(toast?.getAttribute("data-removed")).toBe("false");
+    expect(toast?.getAttribute("data-swipe-out")).toBe("false");
+    expect(toast?.getAttribute("data-swiped")).toBe("false");
+    expect(toast?.getAttribute("data-swiping")).toBe("false");
+    expect(
+      toast
+        ?.querySelector(".codex-ui-app-notification__leading svg")
+        ?.getAttribute("viewBox"),
+    ).toBe("0 0 20 20");
+    expect(
+      toast
+        ?.querySelector(".codex-ui-app-notification__leading path")
+        ?.getAttribute("d"),
+    ).toBe(
+      "M7.231 7.231a.665.665 0 0 1 .94 0L10 9.06l1.828-1.829.104-.085a.666.666 0 0 1 .921.922l-.084.104L10.94 10l1.829 1.828a.665.665 0 0 1-.94.94L10 10.94l-1.828 1.83a.665.665 0 0 1-.94-.94L9.06 10 7.23 8.172a.665.665 0 0 1 0-.94Z",
     );
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 
-  it("bounds a notification queue and exposes its hidden count", async () => {
+  it("keeps overflowed notifications mounted while collapsing visibility", async () => {
     render(
       <AppNotificationRegion
         maxVisible={2}
@@ -231,15 +251,21 @@ describe("AppNotificationRegion", () => {
     );
 
     const region = await screen.findByRole("region", {
-      name: "Notifications",
+      name: "Notifications alt+T",
     });
     expect(region.getAttribute("data-total-count")).toBe("4");
     expect(region.getAttribute("data-visible-count")).toBe("2");
     expect(region.getAttribute("data-hidden-count")).toBe("2");
     expect(screen.getByText("First")).toBeTruthy();
     expect(screen.getByText("Second")).toBeTruthy();
-    expect(screen.queryByText("Third")).toBeNull();
-    expect(screen.getByText("2 more notifications")).toBeTruthy();
+    expect(screen.getByText("Third")).toBeTruthy();
+    expect(screen.getByText("Fourth")).toBeTruthy();
+    expect(
+      Array.from(region.querySelectorAll("[data-sonner-toast]"), (toast) =>
+        toast.getAttribute("data-visible"),
+      ),
+    ).toEqual(["true", "true", "false", "false"]);
+    expect(screen.queryByText("2 more notifications")).toBeNull();
   });
 
   it("moves focus to the next queued control when the active item is removed", async () => {
@@ -262,14 +288,14 @@ describe("AppNotificationRegion", () => {
 
     render(<Queue />);
     const [firstDismiss] = await screen.findAllByRole("button", {
-      name: "Dismiss notification",
+      name: "Close",
     });
     firstDismiss.focus();
     fireEvent.click(firstDismiss);
 
     await waitFor(() => {
       const remainingDismiss = screen.getByRole("button", {
-        name: "Dismiss notification",
+        name: "Close",
       });
       expect(document.activeElement).toBe(remainingDismiss);
     });
@@ -292,7 +318,7 @@ describe("AppNotificationRegion", () => {
 
     render(<Queue />);
     const dismissButtons = await screen.findAllByRole("button", {
-      name: "Dismiss notification",
+      name: "Close",
     });
     dismissButtons[1].focus();
     fireEvent.click(dismissButtons[1]);
@@ -344,7 +370,7 @@ describe("AppNotificationRegion", () => {
 
     expect(
       (await screen.findByRole("region", {
-        name: "Notifications",
+        name: "Notifications alt+T",
       })).getAttribute("data-theme"),
     ).toBe("dark");
 
@@ -370,7 +396,7 @@ describe("AppNotificationRegion", () => {
     );
     expect(
       screen
-        .getByRole("region", { name: "Notifications" })
+        .getByRole("region", { name: "Notifications alt+T" })
         .getAttribute("data-theme"),
     ).toBe("dark");
 
@@ -395,7 +421,7 @@ describe("AppNotificationRegion", () => {
     await waitFor(() =>
       expect(
         screen
-          .getByRole("region", { name: "Notifications" })
+          .getByRole("region", { name: "Notifications alt+T" })
           .getAttribute("data-theme"),
       ).toBe("light"),
     );
@@ -428,12 +454,12 @@ describe("AppNotificationRegion", () => {
       .closest<HTMLElement>("[data-codex-ui-dialog-id]")
       ?.dataset.codexUiDialogId;
     const region = await screen.findByRole("region", {
-      name: "Notifications",
+      name: "Notifications alt+T",
     });
     expect(region.dataset.codexUiDialogOwner).toBe(dialogId);
 
     const dismiss = screen.getByRole("button", {
-      name: "Dismiss notification",
+      name: "Close",
     });
     dismiss.focus();
     fireEvent.keyDown(dismiss, { key: "Tab" });

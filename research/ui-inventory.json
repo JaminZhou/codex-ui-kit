@@ -1006,11 +1006,17 @@
       "id": "cross-layer.global-notifications",
       "area": "cross-layer",
       "ownership": "cross-layer",
-      "packageEvidence": ["app-main"],
-      "runtimeStatus": "not_sampled",
+      "packageEvidence": [
+        "app-main",
+        "app-main-current-global-notification-source"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.820.60940:chatgpt-pin-undo-success-notification-top-center"
+      ],
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
