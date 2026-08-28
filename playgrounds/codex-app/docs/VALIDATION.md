@@ -187,17 +187,20 @@ and 3.5714% for unread. The unread foreground-mask ceiling is 4% because the
 measured 306.90625px product row places the exact 8×8 dot on a fractional
 raster origin; CDP and Electron continue to freeze its 20×20 rail, 14px dot
 right inset, and `rgb(131, 195, 255)` paint.
-The current collection slice keeps the ordinary error glyph, the
-one-heading/four-row loading skeleton, and the 29px `No chats` state as
-explicit 26.818 evidence. On 26.820, semantic waiting uses the shared spinner,
-and five-to-twelve expansion is one-way: `Show more` has no `aria-expanded`
-and disappears without exposing `Show less`. Optional privacy-safe 28×30
-waiting and 140×32 Show-more crops are supplied through
+The current collection slice keeps the ordinary error glyph and the
+one-heading/four-row loading skeleton as explicit 26.818 runtime/package
+evidence. On 26.820, semantic waiting uses the shared spinner, five-to-twelve
+expansion is one-way, and a real empty project re-reaches the 29px `No chats`
+state: `Show more` has no `aria-expanded` and disappears without exposing
+`Show less`. Optional privacy-safe 28×30 waiting and 140×32 Show-more crops
+are supplied through
 `CODEX_UI_KIT_CURRENT_SIDEBAR_WAITING_STATUS_REFERENCE` and
 `CODEX_UI_KIT_CURRENT_SIDEBAR_SHOW_MORE_REFERENCE`; their foreground
-comparisons are capped at 4% and 5%. The older 140×29 empty product crop uses
+comparisons are capped at 4% and 5%. The current 140×29 empty product crop uses
 `CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE`; its foreground
-comparison is capped at 6%, while computed typography and padding remain exact.
+comparison passes at 2.4138% under 6%, while computed typography and padding
+remain exact. Current 56×30 worktree loading/restored crops pass at 1.0714%
+and 0%; failure/Retry/unread composition remains tied to 26.818.
 
 The layers do not vote on the same claim. Protocol proves lifecycle behavior;
 CDP explains layout; Electron proves the desktop host; pixels catch final
