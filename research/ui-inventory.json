@@ -1014,7 +1014,8 @@
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.820.60940:chatgpt-pin-undo-success-notification-top-center"
+        "cdp-26.820.60940:chatgpt-pin-undo-success-notification-top-center",
+        "cdp-26.820.60940:four-reversible-pin-undo-success-notifications-three-visible-centered-stack"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",

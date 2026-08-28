@@ -198,10 +198,26 @@ mounted, exposes only the front three, and continues focus after an action;
 hover or keyboard focus expands the visible queue, bottom-end variants grow
 into the viewport, and dialog-owned variants sit above the modal layer.
 Browser/CDP and Electron repeat the contract. An unmasked 172×42 comparison
-passes at 0.8029% under 1.5%. Other tones and simultaneous product stacking
-remain source-structural or replay evidence rather than newly claimed runtime
-states; their replay uses the installed renderer's exact info, warning, and
-danger icon paths instead of substitute geometry.
+passes at 0.8029% under 1.5%. At this capture boundary, other tones and
+simultaneous product stacking remained source-structural or replay evidence;
+the next follow-up promotes stacking while the replay continues to use the
+installed renderer's exact info, warning, and danger icon paths.
+
+The 2026-08-28 simultaneous-notification follow-up uses a second isolated
+profile on loopback port `9884` and performs four reversible Pin chat → `⌘Z`
+transitions before the four-second duration expires. Every chat is restored to
+its original unpinned state. CDP records four mounted `Chat unpinned` items with
+only the first three visible: the collapsed stack uses scales
+1/0.95/0.90/0.85, translations 0/8/16/24px, centered transform origin, and
+y=48/57.05/66.10/75.15 alert tops. The fourth item has opacity 0 and no pointer
+events. Hover expands the visible items to roughly 49px intervals. The public
+queue initially exposed a real mismatch (2.5% scale and 4px translation per
+layer); it now matches the product in Browser/CDP and Electron, and the
+unmasked 172×64 collapsed crop passes at 0.2907% under 2%. A blocked-proxy Pin
+attempt did not reach the product error toast and was undone, so info, warning,
+and danger tones remain unsampled. The exact isolated process was terminated,
+its profile moved recoverably to Trash, port `9884` closed, and the original app
+process remained running.
 
 The route-continuity follow-up uses another unique profile on loopback port
 `9883`. The fresh profile initially entered the unified ChatGPT source, where

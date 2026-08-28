@@ -12962,6 +12962,90 @@ try {
   await notificationQueueApp.close();
 }
 
+const notificationSuccessStackScene = {
+  frame: "shell-notification-success-stack",
+  id: "electron-shell-notification-success-stack",
+  scenario: "streaming-recovery",
+  shellState: "ready",
+  view: "shell",
+};
+const {
+  app: notificationSuccessStackApp,
+  page: notificationSuccessStackPage,
+} = await launchScene(notificationSuccessStackScene, { capture: false });
+try {
+  const successNotifications = notificationSuccessStackPage.locator(
+    ".codex-ui-app-notification",
+  );
+  const collapsedSuccessStack = await successNotifications.evaluateAll(
+    (notifications) =>
+      notifications.map((notification) => {
+        const alert = notification.querySelector(
+          ".codex-ui-app-notification__alert",
+        );
+        const rect = alert?.getBoundingClientRect();
+        return {
+          index: notification.getAttribute("data-index"),
+          text: notification.textContent?.trim(),
+          tone: notification.getAttribute("data-tone"),
+          top: rect?.top,
+          visible: notification.getAttribute("data-visible"),
+          width: rect?.width,
+        };
+      }),
+  );
+  const expectedWidths = [170.4375, 161.9156, 153.3938, 144.8718];
+  const expectedTops = [48, 57.05, 66.1, 75.15];
+  if (
+    collapsedSuccessStack.length !== 4 ||
+    collapsedSuccessStack.some(
+      (notification, index) =>
+        notification.index !== String(index) ||
+        notification.text !== "Chat unpinned" ||
+        notification.tone !== "success" ||
+        notification.visible !== (index < 3 ? "true" : "false") ||
+        Math.abs((notification.width ?? Infinity) - expectedWidths[index]) > 1 ||
+        Math.abs((notification.top ?? Infinity) - expectedTops[index]) > 1,
+    )
+  ) {
+    throw new Error(
+      `Electron current success stack failed: ${JSON.stringify(collapsedSuccessStack)}`,
+    );
+  }
+  await successNotifications.first().hover();
+  await notificationSuccessStackPage.waitForTimeout(250);
+  const expandedSuccessStack = await successNotifications.evaluateAll(
+    (notifications) =>
+      notifications.map((notification) => ({
+        expanded: notification.getAttribute("data-expanded"),
+        opacity: getComputedStyle(notification).opacity,
+        pointerEvents: getComputedStyle(notification).pointerEvents,
+        top: notification.getBoundingClientRect().top,
+        visible: notification.getAttribute("data-visible"),
+      })),
+  );
+  if (
+    expandedSuccessStack.length !== 4 ||
+    expandedSuccessStack.some(({ expanded }) => expanded !== "true") ||
+    expandedSuccessStack.slice(0, 3).some(
+      ({ pointerEvents, visible }, index, notifications) =>
+        visible !== "true" ||
+        pointerEvents !== "auto" ||
+        (index > 0 &&
+          notifications[index].top - notifications[index - 1].top < 40),
+    ) ||
+    expandedSuccessStack[3].visible !== "false" ||
+    expandedSuccessStack[3].opacity !== "0" ||
+    expandedSuccessStack[3].pointerEvents !== "none"
+  ) {
+    throw new Error(
+      `Electron current success stack expansion failed: ${JSON.stringify(expandedSuccessStack)}`,
+    );
+  }
+} finally {
+  await notificationSuccessStackApp.close();
+}
+
 console.log(
-  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818 MCP success/recovery/Sources interaction, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818 MCP success/recovery/Sources interaction, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

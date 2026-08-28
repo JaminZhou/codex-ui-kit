@@ -412,7 +412,7 @@ describe("lifecycle visual policy", () => {
     );
     expect(contract).toContain("left: 323, top: 46, width: 857");
     expect(contract).toContain("left: 323, top: 46, width: 397");
-    expect(contract).toContain("0.025");
+    expect(contract).toContain("0.05");
     expect(cdpContract).toContain(
       'scene.id === "current-dark-shell-compact"',
     );

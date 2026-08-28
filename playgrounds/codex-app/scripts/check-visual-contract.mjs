@@ -34,6 +34,8 @@ const baselineDirectory = join(root, "tests", "visual", "baselines");
 const artifactDirectory = join(root, "artifacts", "visual");
 const currentNotificationReference =
   process.env.CODEX_UI_KIT_CURRENT_NOTIFICATION_REFERENCE;
+const currentNotificationStackReference =
+  process.env.CODEX_UI_KIT_CURRENT_NOTIFICATION_STACK_REFERENCE;
 const currentBuildMultiFileReference =
   process.env.CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE;
 const currentBuildMultiFileReferenceSize = {
@@ -1360,6 +1362,51 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current notification pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "shell-notification-success-stack" &&
+    currentNotificationStackReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentNotificationStackReference),
+    );
+    if (reference.width !== 172 || reference.height !== 64) {
+      throw new Error(
+        `${scene.id}: current notification stack reference must be exactly 172x64, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const currentNotificationStack = cropPng(actual, 666, 48, 172, 64);
+    const comparison = comparePng(
+      reference,
+      currentNotificationStack,
+      0.12,
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_NOTIFICATION_STACK_MAX_DIFF_RATIO",
+      0.02,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(currentNotificationStack),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current notification stack pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current notification stack pixel ratio ${comparison.ratio}`,
     );
   }
 

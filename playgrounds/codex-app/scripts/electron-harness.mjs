@@ -1758,6 +1758,14 @@ export const visualScenes = [
     view: "shell",
   },
   {
+    frame: "shell-notification-success-stack",
+    id: "shell-notification-success-stack",
+    maxPixelRatio: 0.005,
+    scenario: "streaming-recovery",
+    shellState: "ready",
+    view: "shell",
+  },
+  {
     frame: "shell-loading",
     id: "shell-loading",
     maxPixelRatio: 0.005,
