@@ -2058,7 +2058,6 @@ export function AppSidebarCollectionState({
     const accessibleLabel = label ?? "Loading chats";
     return (
       <div
-        aria-label={accessibleLabel}
         aria-live="polite"
         className={[
           "codex-ui-app-sidebar__collection-loading",
@@ -2070,6 +2069,9 @@ export function AppSidebarCollectionState({
         role="status"
         {...props}
       >
+        <span className="codex-ui-app-sidebar__collection-loading-label">
+          {accessibleLabel}
+        </span>
         <span
           aria-hidden="true"
           className="codex-ui-app-sidebar__collection-loading-heading"
