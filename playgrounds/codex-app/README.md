@@ -186,7 +186,8 @@ The eleventh slice completes the first application-shell continuity contract:
   1920×1080/2560×1440 checks;
 - a body-portalled, top-center Sonner-style notification region with a polite
   `Notifications alt+T` section, three-visible mounted queue, exact current
-  info/success/warning/danger/Close paths, action focus continuation, and an
+  info/success/warning/danger/Close paths, hover/focus queue expansion, safe
+  bottom-end anchoring, dialog-owned layering, action focus continuation, and an
   optional unmasked
   `CODEX_UI_KIT_CURRENT_NOTIFICATION_REFERENCE` 172×42 product crop gate;
 - Browser CDP coverage across the shared lifecycle matrix and real Electron

@@ -419,7 +419,8 @@ notification variants remain incomplete, so the implementation remains
 Pin chat → `⌘Z` success path and emits `Chat unpinned`. The public region
 matches its top-center Sonner structure, polite `Notifications alt+T` section,
 focusable unstyled list item, exact success/Close paths, computed 170.4375×42px
-dark geometry, and three-visible mounted queue. Browser/CDP, Electron, one
+dark geometry, three-visible mounted queue, interaction expansion, viewport-safe
+bottom anchoring, and dialog-owned layering. Browser/CDP, Electron, one
 reviewed baseline, and an unmasked 0.8029% product crop promote
 `cross-layer.global-notifications` to current runtime evidence for the sampled
 success path. The unsampled info, warning, and danger replays reuse exact

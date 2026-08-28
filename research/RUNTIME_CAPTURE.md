@@ -195,6 +195,8 @@ polite `Notifications alt+T` section, focusable list item, exact two-path
 success icon and Close path, 170.4375×42px geometry, 15px radius, 8px padding,
 14/21px typography, and dark success tokens. The public queue keeps four items
 mounted, exposes only the front three, and continues focus after an action;
+hover or keyboard focus expands the visible queue, bottom-end variants grow
+into the viewport, and dialog-owned variants sit above the modal layer.
 Browser/CDP and Electron repeat the contract. An unmasked 172×42 comparison
 passes at 0.8029% under 1.5%. Other tones and simultaneous product stacking
 remain source-structural or replay evidence rather than newly claimed runtime

@@ -12705,6 +12705,27 @@ try {
       `Electron current notification geometry failed: ${JSON.stringify(frontAlertContract)}`,
     );
   }
+  await frontNotification.hover();
+  const expandedQueueTops = await notificationQueuePage
+    .locator('.codex-ui-app-notification[data-visible="true"]')
+    .evaluateAll((notifications) =>
+      notifications.map((notification) => ({
+        expanded: notification.getAttribute("data-expanded"),
+        top: notification.getBoundingClientRect().top,
+      })),
+    );
+  if (
+    expandedQueueTops.length !== 3 ||
+    expandedQueueTops.some(({ expanded }) => expanded !== "true") ||
+    !expandedQueueTops.every(
+      ({ top }, index, notifications) =>
+        index === 0 || top > notifications[index - 1].top,
+    )
+  ) {
+    throw new Error(
+      `Electron notification queue did not expand for interaction: ${JSON.stringify(expandedQueueTops)}`,
+    );
+  }
   await notificationQueuePage
     .getByRole("button", { name: "Review", exact: true })
     .click();

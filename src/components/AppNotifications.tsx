@@ -115,6 +115,8 @@ export function AppNotificationRegion({
   ...props
 }: AppNotificationRegionProps) {
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
+  const [focusWithin, setFocusWithin] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [inferredTheme, setInferredTheme] = useState<string>();
   const regionRef = useRef<HTMLElement>(null);
@@ -129,6 +131,7 @@ export function AppNotificationRegion({
   const visibleCount = Math.min(notifications.length, visibleLimit);
   const hiddenCount = notifications.length - visibleCount;
   const portalTheme = theme ?? overlayEnvironment.theme ?? inferredTheme;
+  const expanded = focusWithin || hovered;
 
   useEffect(() => setMounted(true), []);
   useLayoutEffect(() => {
@@ -243,10 +246,19 @@ export function AppNotificationRegion({
     >
       <ol
         className="codex-ui-app-notification-toaster"
+        data-expanded={expanded}
         data-sonner-theme="light"
         data-sonner-toaster="true"
         data-x-position={position === "top-center" ? "center" : "right"}
         data-y-position={position === "bottom-end" ? "bottom" : "top"}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setFocusWithin(false);
+          }
+        }}
+        onFocusCapture={() => setFocusWithin(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         tabIndex={-1}
       >
         {notifications.map((notification, index) => {
@@ -268,7 +280,7 @@ export function AppNotificationRegion({
             <li
               className="codex-ui-app-notification"
               data-dismissible={Boolean(notification.onDismiss)}
-              data-expanded="false"
+              data-expanded={expanded}
               data-front={index === 0}
               data-index={index}
               data-mounted="true"

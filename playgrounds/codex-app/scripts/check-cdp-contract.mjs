@@ -4261,6 +4261,38 @@ for (const scene of selectedScenes) {
             `${scene.id}: notification queue contract failed: ${JSON.stringify(contract)}`,
           );
         }
+        await page
+          .locator('.codex-ui-app-notification[data-index="0"]')
+          .hover();
+        const expandedQueue = await page.evaluate(() => {
+          const toaster = document.querySelector(
+            ".codex-ui-app-notification-toaster",
+          );
+          const visible = Array.from(
+            document.querySelectorAll(
+              '.codex-ui-app-notification[data-visible="true"]',
+            ),
+          );
+          return {
+            expanded: toaster?.getAttribute("data-expanded"),
+            itemExpanded: visible.map((item) =>
+              item.getAttribute("data-expanded"),
+            ),
+            tops: visible.map((item) => item.getBoundingClientRect().top),
+          };
+        });
+        if (
+          expandedQueue.expanded !== "true" ||
+          expandedQueue.itemExpanded.some((value) => value !== "true") ||
+          expandedQueue.tops.length !== 3 ||
+          !expandedQueue.tops.every(
+            (top, index, tops) => index === 0 || top > tops[index - 1],
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: notification queue expansion failed: ${JSON.stringify(expandedQueue)}`,
+          );
+        }
         await page.getByRole("button", { name: "Review", exact: true }).click();
         await page.waitForFunction(() => {
           const root = document.querySelector(".demo-root");

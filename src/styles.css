@@ -2295,6 +2295,10 @@
   z-index: 60;
 }
 
+.codex-ui-app-notification-region[data-codex-ui-dialog-owner] {
+  z-index: 1150;
+}
+
 .codex-ui-app-notification-region[data-position="top-center"],
 .codex-ui-app-notification-region[data-position="top-end"] {
   inset-block-start: calc(var(--codex-ui-app-window-chrome-height) + 0.125rem);
@@ -2323,6 +2327,18 @@
   max-width: min(24rem, 100%);
 }
 
+.codex-ui-app-notification-toaster[data-expanded="true"] {
+  align-items: center;
+  flex-direction: column;
+  gap: var(--codex-ui-spacing);
+  height: auto;
+}
+
+.codex-ui-app-notification-region[data-position$="end"]
+  .codex-ui-app-notification-toaster[data-expanded="true"] {
+  align-items: flex-end;
+}
+
 .codex-ui-app-notification {
   list-style: none;
   max-width: 100%;
@@ -2345,6 +2361,27 @@
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+.codex-ui-app-notification-region[data-position="bottom-end"]
+  .codex-ui-app-notification {
+  bottom: 0;
+  top: auto;
+  transform: translateY(
+      calc(
+        var(--codex-ui-app-notification-index) * var(--codex-ui-spacing) * -1
+      )
+    )
+    scale(calc(1 - var(--codex-ui-app-notification-index) * 0.025));
+  transform-origin: bottom right;
+}
+
+.codex-ui-app-notification-toaster[data-expanded="true"]
+  .codex-ui-app-notification[data-visible="true"] {
+  bottom: auto;
+  position: relative;
+  top: auto;
+  transform: none;
 }
 
 .codex-ui-app-notification__overflow-label {

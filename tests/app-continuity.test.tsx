@@ -221,6 +221,11 @@ describe("AppNotificationRegion", () => {
     expect(toast?.getAttribute("data-swipe-out")).toBe("false");
     expect(toast?.getAttribute("data-swiped")).toBe("false");
     expect(toast?.getAttribute("data-swiping")).toBe("false");
+    fireEvent.mouseEnter(toaster as HTMLElement);
+    expect(toaster?.getAttribute("data-expanded")).toBe("true");
+    expect(toast?.getAttribute("data-expanded")).toBe("true");
+    fireEvent.mouseLeave(toaster as HTMLElement);
+    expect(toaster?.getAttribute("data-expanded")).toBe("false");
     expect(
       toast
         ?.querySelector(".codex-ui-app-notification__leading svg")

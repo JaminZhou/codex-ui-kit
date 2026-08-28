@@ -50,10 +50,19 @@ describe("application continuity visual contract", () => {
       /\.codex-ui-app-notification-region\s*\{[^}]*pointer-events:\s*none;[^}]*position:\s*fixed;[^}]*z-index:\s*60;/s,
     );
     expect(styles).toMatch(
+      /\.codex-ui-app-notification-region\[data-codex-ui-dialog-owner\]\s*\{[^}]*z-index:\s*1150;/s,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-app-notification-region\[data-position="top-center"\],[\s\S]*?inset-block-start:\s*calc\(var\(--codex-ui-app-window-chrome-height\) \+ 0\.125rem\);/,
     );
     expect(styles).toMatch(
       /\.codex-ui-app-notification__alert\s*\{[^}]*border-radius:\s*0\.9375rem;[^}]*box-shadow:\s*0 4px 12px rgb\(0 0 0 \/ 0\.1\);/s,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-notification-region\[data-position="bottom-end"\][\s\S]*?\.codex-ui-app-notification\s*\{[^}]*bottom:\s*0;[^}]*top:\s*auto;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-notification-toaster\[data-expanded="true"\][\s\S]*?\.codex-ui-app-notification\[data-visible="true"\]\s*\{[^}]*position:\s*relative;[^}]*transform:\s*none;/,
     );
     expect(styles).toContain("background: #011c0b");
     expect(styles).toContain("color: #40c977");
