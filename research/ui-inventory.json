@@ -4,7 +4,7 @@
     "appVersion": "26.820.60940",
     "buildNumber": "7119",
     "sampledAt": "2026-08-27",
-    "reverifiedAt": "2026-08-28",
+    "reverifiedAt": "2026-08-29",
     "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -412,7 +412,11 @@
         "permissions-mode-dropdown",
         "ApprovalRequest",
         "AutomaticApprovalReview",
-        "app-asar-26.803.41515:session-file-approval-and-auto-review-lifecycle-candidates"
+        "app-asar-26.803.41515:session-file-approval-and-auto-review-lifecycle-candidates",
+        "replay:current-26.820-external-file-pending-denied-and-allowed",
+        "browser-cdp:current-26.820-external-file-approval-six-frame-contract",
+        "electron:current-26.820-external-file-deny-and-allow-once-settlement",
+        "pixel:current-26.820-wide-compact-card-and-options-product-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -420,11 +424,12 @@
         "cdp-26.721:ask-for-approval-command-card-denied-without-execution",
         "cdp-26.727.40816:real-command-approval-pending-denied-no-execution-computed-styles-and-masked-regional-pixels",
         "cdp-26.730.61309:real-command-approval-allow-once-completed-computed-styles-and-masked-pending-completed-pixels",
-        "cdp-26.730.61309:real-command-approval-similar-rule-repeated-command-no-second-prompt-computed-styles-and-masked-menu-completed-pixels"
+        "cdp-26.730.61309:real-command-approval-similar-rule-repeated-command-no-second-prompt-computed-styles-and-masked-menu-completed-pixels",
+        "cdp-26.820.60940:real-external-file-edit-pending-denied-no-file-and-allow-once-created-then-trashed"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -622,16 +627,22 @@
       "id": "composer.permissions",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["permissions-mode-dropdown"],
+      "packageEvidence": [
+        "permissions-mode-dropdown",
+        "browser-cdp:current-three-mode-menu-and-focus-restoration",
+        "electron:current-three-mode-menu-and-focus-restoration",
+        "pixel:reviewed-current-three-mode-permission-menu"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:permission-menu-four-modes",
         "cdp-26.721.81911:ask-approve-full-custom-permission-menu",
-        "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222"
+        "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222",
+        "cdp-26.820.60940:ask-approve-full-three-mode-menu-476x175-and-ask-risk-boundary"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

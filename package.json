@@ -68,6 +68,7 @@
     "capture:current-long-thread": "node scripts/capture-current-long-thread.mjs",
     "capture:current-mcp": "node scripts/capture-current-mcp.mjs",
     "capture:current-command": "node scripts/capture-current-command.mjs",
+    "capture:current-approval": "node scripts/capture-current-approval.mjs",
     "capture:current-sidebar-rows": "node scripts/capture-current-sidebar-rows.mjs",
     "update:visual-assets": "node scripts/update-current-visual-assets.mjs --write",
     "update:visual-assets:review": "node scripts/update-current-visual-assets.mjs --review-only --write",

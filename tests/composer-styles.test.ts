@@ -82,7 +82,7 @@ describe("composer visual contract", () => {
       ".codex-ui-composer-dock__surface",
     );
     expect(styles).toMatch(
-      /\.codex-ui-composer-permission-menu \{[\s\S]*?padding: 0\.25rem;[\s\S]*?width: min\(30\.0234375rem,/,
+      /\.codex-ui-composer-permission-menu \{[\s\S]*?padding: 0\.25rem;[\s\S]*?width: min\(29\.779296875rem,/,
     );
     expect(styles).toMatch(
       /\.codex-ui-composer-resource-picker \{[\s\S]*?height: 20rem;[\s\S]*?padding: 0\.25rem;[\s\S]*?width: 100%;/,

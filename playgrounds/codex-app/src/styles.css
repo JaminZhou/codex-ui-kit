@@ -2543,6 +2543,191 @@ textarea {
   );
 }
 
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval {
+  background: rgba(45, 45, 45, 0.96);
+  border-radius: 25px;
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.08),
+    0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  min-height: 149.5px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"] {
+  -webkit-font-smoothing: antialiased;
+  --codex-ui-conversation-thread-header-height: 2.9375rem;
+  --codex-ui-user-message-compact-max-width: 70%;
+  --codex-ui-user-message-max-width: 70%;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"],
+.demo-root[data-scenario="approval-current-26-820-file"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .codex-ui-thread-header__navigation {
+  padding-inline-start: 5.125rem;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .codex-ui-thread-header__identity {
+  flex: 0 1 auto;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  :is(
+    .codex-ui-thread-header__title,
+    .codex-ui-agent-message .codex-ui-agent-message__content,
+    .codex-ui-turn-duration,
+    .codex-ui-approval-request__description,
+    .codex-ui-approval-request__button
+  ) {
+  font-weight: 400;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  border-radius: 22px;
+  line-height: 22px;
+  padding: 10px 16px;
+  white-space: pre-wrap;
+}
+
+.demo-current-26-820-file-approval__duration {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  line-height: 21px;
+  padding-bottom: 12px;
+  width: 100%;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__header {
+  gap: 8px;
+  padding: 16px 16px 6px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__identity {
+  font-size: 13px;
+  gap: 8px;
+  line-height: 20px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__identity-icon,
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__identity-icon
+  > svg {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__heading {
+  gap: 0;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__heading
+  h3 {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.demo-current-26-820-file-approval__file {
+  align-items: center;
+  display: inline-flex;
+}
+
+.demo-current-26-820-file-approval__file {
+  color: #83c3ff;
+  gap: 4px;
+  min-width: 0;
+}
+
+.demo-current-26-820-file-approval__file
+  [data-current-build-icon="review-file-text"] {
+  color: rgba(255, 255, 255, 0.5);
+  flex: 0 0 12px;
+  height: 12px !important;
+  width: 12px !important;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__description {
+  background: transparent;
+  border-radius: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  line-height: 20px;
+  padding: 0;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__actions {
+  padding: 8px 16px 16px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__button[data-action="reject"] {
+  min-width: 85.125px;
+  width: 85.125px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__split
+  > .codex-ui-approval-request__button[data-action="approve"] {
+  border-radius: 9999px 0 0 9999px;
+  min-width: 106.84375px;
+  width: 106.84375px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .demo-current-26-820-file-approval
+  .codex-ui-approval-request__options-toggle {
+  border-radius: 0 9999px 9999px 0;
+  color: rgba(23, 23, 23, 0.55);
+  flex-basis: 23px;
+  width: 23px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .codex-ui-approval-request__options-menu {
+  min-width: 168px;
+  width: 168px;
+}
+
+.demo-root[data-scenario="approval-current-26-820-file"]
+  .codex-ui-approval-request__options-menu
+  button {
+  min-height: 28.5625px;
+}
+
+.demo-root[data-frame="approval-current-26-820-file-denied"]
+  .codex-ui-conversation-thread-shell__thread,
+.demo-root[data-frame="approval-current-26-820-file-allowed"]
+  .codex-ui-conversation-thread-shell__thread {
+  min-height: calc(
+    100dvh - var(--codex-ui-conversation-thread-header-height) + 4.5rem
+  );
+}
+
 .demo-root[data-scenario="mcp-tool-call"]
   .codex-ui-activity-timeline__toggle,
 .demo-root[data-scenario="mcp-current-integration-recovery"]

@@ -1,4 +1,5 @@
 import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
+import approvalCurrent26820FileTrace from "../fixtures/traces/approval-current-26-820-file.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import approvalForSessionTrace from "../fixtures/traces/approval-for-session.jsonl?raw";
 import approvalReviewTimeoutTrace from "../fixtures/traces/approval-review-timeout.jsonl?raw";
@@ -46,6 +47,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
   | "approval-allow-once"
+  | "approval-current-26-820-file"
   | "approval-denied"
   | "approval-for-session"
   | "approval-review-timeout"
@@ -142,6 +144,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Approval allowed once",
     "A current command pauses in the Composer dock, is allowed exactly once, completes, and restores the unchanged approval policy.",
     approvalAllowOnceTrace,
+  ),
+  "approval-current-26-820-file": scenario(
+    "approval-current-26-820-file",
+    "Observe approval denial",
+    "The runtime-observed 26.820 external-file edit pauses in the current Permissions card, exposes one-time and conversation-scoped choices, preserves a denied no-write result, and completes an independently allowed write.",
+    approvalCurrent26820FileTrace,
   ),
   "approval-denied": scenario(
     "approval-denied",
