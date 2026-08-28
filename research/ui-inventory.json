@@ -148,29 +148,35 @@
         "conversation-markdown",
         "app-asar-26.803.41515:inline-markdown-follow-state-machine-and-table-container-actions",
         "app-asar-26.818.41509:code-block-word-wrap-control-and-svg-path",
+        "app-asar-26.820.60940:katex-0.16.45-image-preview-loading-unavailable-media-grid-and-render-error-retry",
         "replay:public-delta-link-fence-nested-task-list-table-and-twelve-section-completion",
         "replay:current-eighteen-column-markdown-table-copy-expand-and-preview",
         "replay:current-26.818-heading-inline-code-quote-list-full-width-table-code-block-and-source-owned-url-text",
+        "replay:current-26.820-block-math-literal-unsupported-source-and-loaded-unavailable-media-grid",
         "browser-cdp:five-markdown-streaming-large-checkpoints-and-138-frame-matrix",
         "browser-cdp:wide-table-resting-hover-copy-preview-and-focus-contract",
         "browser-cdp:current-26.818-wide-and-720px-computed-style-geometry-response-action-and-zero-overflow-contract",
+        "browser-cdp:current-26.820-wide-and-720px-katex-media-fallback-preview-focus-and-zero-overflow-contract",
         "electron:code-copy-table-focus-user-scroll-away-and-return-to-latest",
         "electron:wide-table-copy-horizontal-wheel-preview-and-focus-restoration",
         "electron:current-26.818-wide-and-720px-markdown-contract",
+        "electron:current-26.820-wide-and-720px-katex-media-fallback-preview-and-focus-restoration",
         "pixel:four-reviewed-markdown-streaming-large-baselines",
         "pixel:three-reviewed-wide-table-baselines-including-720px-actions-and-current-build-preview-regions",
-        "pixel:current-26.818-unmasked-wide-and-720px-markdown-root-regions"
+        "pixel:current-26.818-unmasked-wide-and-720px-markdown-root-regions",
+        "pixel:two-reviewed-current-26.820-wide-and-720px-markdown-media-replay-baselines"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:heading-lists-table-inline-code-code-block-quote-link-sample",
         "cdp-26.721:synthetic-heading-inline-code-link-quote-list-table-code-block-906x820",
         "cdp-26.803.41515:real-eighteen-column-table-copy-expand-and-preview-1180x820",
-        "cdp-26.818.41509:real-heading-strong-inline-code-quote-list-full-width-table-code-block-and-source-owned-external-url-text-1180x820-720x680"
+        "cdp-26.818.41509:real-heading-strong-inline-code-quote-list-full-width-table-code-block-and-source-owned-external-url-text-1180x820-720x680",
+        "cdp-26.820.60940:real-double-dollar-block-math-literal-single-dollar-heading-external-image-source-and-footnote-syntax"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

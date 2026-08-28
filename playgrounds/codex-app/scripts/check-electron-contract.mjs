@@ -2220,6 +2220,84 @@ async function currentMarkdown26818Contract(page) {
   });
 }
 
+async function currentMarkdown26820MediaContract(page) {
+  return page.evaluate(() => {
+    const item = document.querySelector(
+      '[data-item-id="assistant-markdown-media"]',
+    );
+    const root = item?.querySelector(".codex-ui-markdown");
+    const rect = (element) => {
+      const bounds = element?.getBoundingClientRect();
+      return bounds
+        ? {
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null;
+    };
+    const rootStyle = root ? getComputedStyle(root) : null;
+    const display = root?.querySelector(".katex-display");
+    const displayStyle = display ? getComputedStyle(display) : null;
+    const grid = root?.querySelector(
+      ".codex-ui-markdown__media-grid-paragraph",
+    );
+    return {
+      actions: Array.from(
+        item?.querySelectorAll(".demo-turn-actions button") ?? [],
+        (button) => ({
+          icon: button
+            .querySelector("[data-current-build-icon]")
+            ?.getAttribute("data-current-build-icon"),
+          label: button.getAttribute("aria-label"),
+          rect: rect(button),
+        }),
+      ),
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      math: {
+        annotation: root?.querySelector(".katex annotation")?.textContent,
+        display: rect(display),
+        marginBlockEnd: displayStyle?.marginBlockEnd,
+        marginBlockStart: displayStyle?.marginBlockStart,
+        mathMlCount: root?.querySelectorAll("math").length,
+      },
+      media: {
+        footnoteSections: root?.querySelectorAll("section[data-footnotes]").length,
+        grid: rect(grid),
+        items: Array.from(
+          root?.querySelectorAll(
+            "[data-markdown-image-preview-trigger], [data-markdown-image-state]",
+          ) ?? [],
+          (element) => ({
+            href: element.getAttribute("href"),
+            image: rect(element.querySelector("img")),
+            label: element.getAttribute("aria-label"),
+            rect: rect(element),
+            state:
+              element.getAttribute("data-markdown-image-state") ?? "ready",
+            tag: element.tagName,
+          }),
+        ),
+        literalText: root?.textContent,
+      },
+      paragraphCount: root?.querySelectorAll("p").length,
+      root: root
+        ? {
+            color: rootStyle?.color,
+            fontFamily: rootStyle?.fontFamily,
+            fontSize: rootStyle?.fontSize,
+            fontWeight: rootStyle?.fontWeight,
+            lineHeight: rootStyle?.lineHeight,
+            rect: rect(root),
+          }
+        : null,
+    };
+  });
+}
+
 for (const currentMarkdownScene of [
   {
     currentSidebar: true,
@@ -2313,6 +2391,131 @@ for (const currentMarkdownScene of [
     }
   } finally {
     await currentMarkdownApp.close();
+  }
+}
+
+for (const currentMarkdownMediaScene of [
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-820-media-complete",
+    id: "electron-markdown-current-26-820-media",
+    scenario: "markdown-current-26-820-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-820-media-complete",
+    id: "electron-markdown-current-26-820-media-compact",
+    scenario: "markdown-current-26-820-media",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const { app: markdownMediaApp, page: markdownMediaPage } =
+    await launchScene(currentMarkdownMediaScene, { capture: false });
+  try {
+    const compact = currentMarkdownMediaScene.id.endsWith("-compact");
+    const expectedWidth = compact ? 688 : 736;
+    const expectedActions = [
+      ["Copy", "thread-assistant-copy"],
+      ["Good response", "thread-assistant-good"],
+      ["Bad response", "thread-assistant-bad"],
+      ["Fork chat from here", "thread-assistant-fork"],
+    ];
+    const nativeBounds = await markdownMediaApp.evaluate(
+      ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const contract = await currentMarkdown26820MediaContract(markdownMediaPage);
+    const [loaded, unavailable] = contract.media.items;
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      !contract.root?.rect ||
+      Math.abs(contract.root.rect.width - expectedWidth) > 1 ||
+      Math.abs(contract.root.rect.height - 442.515625) > 1 ||
+      Math.abs(contract.root.rect.left - (compact ? 16 : 359)) > 1 ||
+      contract.root.color !== "rgb(223, 223, 223)" ||
+      contract.root.fontFamily !==
+        '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+      contract.root.fontSize !== "14px" ||
+      contract.root.fontWeight !== "445" ||
+      contract.root.lineHeight !== "22px" ||
+      contract.paragraphCount !== 7 ||
+      contract.actions.length !== 4 ||
+      contract.actions.some(
+        (action, index) =>
+          action.label !== expectedActions[index]?.[0] ||
+          action.icon !== expectedActions[index]?.[1] ||
+          Math.abs(action.rect.width - 26) > 0.5 ||
+          Math.abs(action.rect.height - 26) > 0.5,
+      ) ||
+      contract.math.annotation !==
+        "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
+      contract.math.mathMlCount !== 1 ||
+      !contract.math.display ||
+      Math.abs(contract.math.display.width - expectedWidth) > 1 ||
+      Math.abs(contract.math.display.height - 41.9375) > 1 ||
+      contract.math.marginBlockStart !== "14px" ||
+      contract.math.marginBlockEnd !== "14px" ||
+      contract.media.footnoteSections !== 0 ||
+      !contract.media.literalText.includes("# Current 26.820 media output") ||
+      !contract.media.literalText.includes("$E = mc^2$") ||
+      !contract.media.literalText.includes("[^1]") ||
+      !contract.media.literalText.includes("![External preview]") ||
+      !contract.media.grid ||
+      Math.abs(contract.media.grid.width - expectedWidth) > 1 ||
+      Math.abs(contract.media.grid.height - 163.578125) > 1 ||
+      contract.media.items.length !== 2 ||
+      loaded?.tag !== "BUTTON" ||
+      loaded.state !== "ready" ||
+      loaded.label !== "Loaded preview" ||
+      !loaded.image ||
+      Math.abs(loaded.rect.width - 200) > 1 ||
+      Math.abs(loaded.image.width - 199.96875) > 1 ||
+      Math.abs(loaded.image.height - 139.578125) > 1 ||
+      unavailable?.tag !== "A" ||
+      unavailable.state !== "unavailable" ||
+      unavailable.label !== "Unavailable preview" ||
+      unavailable.href !==
+        "https://example.invalid/codex-ui-kit-missing.png" ||
+      Math.abs(unavailable.rect.width - 96) > 1 ||
+      Math.abs(unavailable.rect.height - 96) > 1 ||
+      contract.horizontalOverflow !== 0
+    ) {
+      throw new Error(
+        `${currentMarkdownMediaScene.id}: current 26.820 Markdown media Electron contract failed: ${JSON.stringify({ contract, nativeBounds })}`,
+      );
+    }
+
+    const trigger = markdownMediaPage.getByRole("button", {
+      name: "Loaded preview",
+    });
+    await trigger.click();
+    const dialog = markdownMediaPage.getByRole("dialog", {
+      name: "Loaded preview",
+    });
+    await dialog.waitFor({ state: "visible" });
+    const preview = await dialog.evaluate((element) => ({
+      imageCount: element.querySelectorAll(
+        ".codex-ui-image-preview__immersive-stage img",
+      ).length,
+      presentation: element.getAttribute("data-presentation"),
+    }));
+    if (preview.presentation !== "immersive" || preview.imageCount !== 1) {
+      throw new Error(
+        `${currentMarkdownMediaScene.id}: current 26.820 Markdown media preview failed: ${JSON.stringify(preview)}`,
+      );
+    }
+    await markdownMediaPage
+      .getByRole("button", { name: "Close image preview" })
+      .click();
+    await dialog.waitFor({ state: "detached" });
+    if (!(await trigger.evaluate((element) => element === document.activeElement))) {
+      throw new Error(
+        `${currentMarkdownMediaScene.id}: current 26.820 Markdown preview did not restore focus.`,
+      );
+    }
+  } finally {
+    await markdownMediaApp.close();
   }
 }
 

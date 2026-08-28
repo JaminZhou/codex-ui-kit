@@ -1,16 +1,46 @@
 import {
+  Children,
+  Component,
   isValidElement,
   useEffect,
   useMemo,
   useRef,
   useState,
   type HTMLAttributes,
+  type ImgHTMLAttributes,
   type ReactNode,
   type TableHTMLAttributes,
 } from "react";
-import ReactMarkdown, { type Components } from "react-markdown";
+import ReactMarkdown, { type Components, type Options } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Dialog } from "./Dialog.js";
+import {
+  ImagePreviewDialog,
+  type GeneratedImageItem,
+} from "./ResourceSurfaces.js";
+
+interface MarkdownMathRuntime {
+  rehypeKatex: (typeof import("rehype-katex"))["default"];
+  remarkMath: (typeof import("remark-math"))["default"];
+}
+
+let loadedMarkdownMathRuntime: MarkdownMathRuntime | undefined;
+let markdownMathRuntimePromise: Promise<MarkdownMathRuntime> | undefined;
+
+function loadMarkdownMathRuntime() {
+  markdownMathRuntimePromise ??= Promise.all([
+    import("rehype-katex"),
+    import("remark-math"),
+  ]).then(([rehypeModule, remarkModule]) => {
+    const runtime = {
+      rehypeKatex: rehypeModule.default,
+      remarkMath: remarkModule.default,
+    };
+    loadedMarkdownMathRuntime = runtime;
+    return runtime;
+  });
+  return markdownMathRuntimePromise;
+}
 
 export type CodeCopyHandler = (code: string) => void | Promise<void>;
 
@@ -770,8 +800,288 @@ export function stabilizeStreamingMarkdown(source: string) {
   return stabilized;
 }
 
+export type MarkdownImageStatus =
+  | "auto"
+  | "loading"
+  | "ready"
+  | "unavailable";
+
+export type MarkdownImageStatusResolver = (
+  source: string,
+  alt: string,
+) => MarkdownImageStatus;
+
+export interface MarkdownImageProps
+  extends Omit<ImgHTMLAttributes<HTMLImageElement>, "children"> {
+  allowWide?: boolean;
+  loadingLabel?: string;
+  preview?: boolean;
+  previewLabel?: string;
+  status?: MarkdownImageStatus;
+  unavailableLabel?: string;
+}
+
+function MarkdownImageFallbackIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="codex-ui-markdown-image__fallback-icon"
+      fill="none"
+      viewBox="0 0 20 21"
+    >
+      <path
+        d="M16.0012 7.78796C16.0012 7.07693 16.0013 6.58359 15.97 6.20007C15.9469 5.91812 15.9091 5.72861 15.8577 5.58484L15.802 5.45496C15.6481 5.15285 15.4137 4.89982 15.1262 4.72351L14.9993 4.6532C14.8413 4.57274 14.6297 4.51592 14.2542 4.48523C13.8707 4.45391 13.3771 4.453 12.6663 4.453H7.33325C6.62221 4.453 6.12888 4.4539 5.74536 4.48523C5.46351 4.50826 5.27388 4.54512 5.13013 4.59656L5.00024 4.6532C4.69799 4.80722 4.44511 5.04134 4.2688 5.32898L4.19849 5.45496C4.11798 5.61296 4.06122 5.82437 4.03052 6.20007C3.99918 6.58359 3.99829 7.07693 3.99829 7.78796V12.1815L5.01782 11.1629L5.19458 11.0028C6.1104 10.2557 7.46195 10.3092 8.31567 11.1629L13.6038 16.451C13.8548 16.4469 14.0675 16.4399 14.2542 16.4247C14.6295 16.394 14.8413 16.3371 14.9993 16.2567L15.1262 16.1854C15.4136 16.0091 15.6481 15.756 15.802 15.454L15.8577 15.3241C15.9091 15.1803 15.9469 14.9906 15.97 14.7088C16.0013 14.3254 16.0012 13.8318 16.0012 13.121V7.78796ZM7.37525 12.1034C7.00846 11.7366 6.42786 11.714 6.03442 12.035L5.95825 12.1034L4.0022 14.0594C4.00634 14.3101 4.0153 14.5224 4.03052 14.7088C4.0612 15.0844 4.11803 15.296 4.19849 15.454L4.2688 15.5809C4.44511 15.8683 4.69813 16.1028 5.00024 16.2567L5.13013 16.3124C5.2739 16.3638 5.46341 16.4016 5.74536 16.4247C6.12888 16.456 6.62222 16.4559 7.33325 16.4559H11.7268L7.37525 12.1034ZM13.0852 8.37097C13.085 7.81792 12.6363 7.37 12.0833 7.37C11.5302 7.37 11.0815 7.81792 11.0813 8.37097C11.0813 8.92418 11.53 9.37293 12.0833 9.37293C12.6365 9.37293 13.0852 8.92418 13.0852 8.37097ZM17.3313 13.121C17.3313 13.81 17.3319 14.367 17.2952 14.8172C17.2624 15.2182 17.1974 15.5794 17.053 15.9159L16.9866 16.0585C16.7211 16.5794 16.3172 17.0151 15.8215 17.3192L15.6038 17.4413C15.227 17.6332 14.8206 17.7124 14.3625 17.7499C13.9123 17.7866 13.3553 17.786 12.6663 17.786H7.33325C6.64416 17.786 6.0872 17.7866 5.63696 17.7499C5.23628 17.7171 4.87563 17.6519 4.53931 17.5077L4.39673 17.4413C3.87561 17.1757 3.43911 16.772 3.13501 16.2762L3.01294 16.0585C2.82097 15.6817 2.74177 15.2752 2.70435 14.8172C2.66758 14.367 2.66821 13.8099 2.66821 13.121V7.78796C2.66821 7.09887 2.66756 6.54192 2.70435 6.09168C2.74176 5.63388 2.82113 5.22806 3.01294 4.85144L3.13501 4.63269C3.4391 4.13698 3.87569 3.73313 4.39673 3.46765L4.53931 3.40125C4.8756 3.25701 5.23632 3.1918 5.63696 3.15906C6.0872 3.12227 6.64416 3.12293 7.33325 3.12293H12.6663C13.3553 3.12293 13.9123 3.12229 14.3625 3.15906C14.8206 3.19648 15.227 3.27568 15.6038 3.46765L15.8215 3.58972C16.3174 3.89382 16.7211 4.33032 16.9866 4.85144L17.053 4.99402C17.1973 5.33034 17.2624 5.69099 17.2952 6.09168C17.332 6.54192 17.3313 7.09887 17.3313 7.78796V13.121Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function publicMarkdownImageHref(source: string | undefined) {
+  if (!source) return undefined;
+  try {
+    const url = new URL(source);
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? source
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function MarkdownImage({
+  allowWide = false,
+  alt = "",
+  className,
+  loadingLabel = "Image loading",
+  onError,
+  preview = true,
+  previewLabel = "Open image preview",
+  src,
+  status = "auto",
+  title,
+  unavailableLabel = "Image unavailable",
+  ...imageProps
+}: MarkdownImageProps) {
+  const [failedSource, setFailedSource] = useState<string>();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setFailedSource(undefined);
+    setOpen(false);
+  }, [src]);
+
+  if (!src) return null;
+  const resolvedStatus =
+    status === "auto"
+      ? failedSource === src
+        ? "unavailable"
+        : "ready"
+      : status;
+  const stateLabel = alt ||
+    (resolvedStatus === "loading" ? loadingLabel : unavailableLabel);
+  const fallbackHref = publicMarkdownImageHref(src);
+  const fallbackContents =
+    resolvedStatus === "loading" ? (
+      <span aria-hidden="true" className="codex-ui-markdown-image__spinner" />
+    ) : (
+      <MarkdownImageFallbackIcon />
+    );
+
+  if (resolvedStatus === "loading" || resolvedStatus === "unavailable") {
+    const fallbackClassName = [
+      "codex-ui-markdown-image__fallback",
+      allowWide && "codex-ui-markdown-image__fallback--wide",
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    return resolvedStatus === "unavailable" && fallbackHref ? (
+      <a
+        aria-label={stateLabel}
+        className={fallbackClassName}
+        data-markdown-image-state={resolvedStatus}
+        href={fallbackHref}
+        title={title}
+      >
+        {fallbackContents}
+      </a>
+    ) : (
+      <button
+        aria-label={stateLabel}
+        className={fallbackClassName}
+        data-markdown-image-state={resolvedStatus}
+        disabled
+        title={title}
+        type="button"
+      >
+        {fallbackContents}
+      </button>
+    );
+  }
+
+  const image: GeneratedImageItem = {
+    alt,
+    height:
+      typeof imageProps.height === "number" ? imageProps.height : undefined,
+    id: src,
+    src,
+    width: typeof imageProps.width === "number" ? imageProps.width : undefined,
+  };
+  const triggerLabel = alt || previewLabel;
+
+  return (
+    <>
+      <button
+        aria-label={triggerLabel}
+        className={[
+          "codex-ui-markdown-image__trigger",
+          allowWide && "codex-ui-markdown-image__trigger--wide",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        data-markdown-image-preview-trigger="true"
+        onClick={() => preview && setOpen(true)}
+        type="button"
+      >
+        <img
+          {...imageProps}
+          alt={alt}
+          className={["codex-ui-markdown-image", className]
+            .filter(Boolean)
+            .join(" ")}
+          loading="lazy"
+          onError={(event) => {
+            setFailedSource(src);
+            onError?.(event);
+          }}
+          src={src}
+          title={title}
+        />
+      </button>
+      {preview ? (
+        <ImagePreviewDialog
+          imageId={src}
+          images={[image]}
+          onOpenChange={setOpen}
+          open={open}
+          presentation="immersive"
+          title={triggerLabel}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function onlyMarkdownImages(children: ReactNode, imageComponent: unknown) {
+  const nodes = Children.toArray(children).filter(
+    (child) => typeof child !== "string" || child.trim().length > 0,
+  );
+  if (
+    nodes.length === 0 ||
+    nodes.some(
+      (child) => !isValidElement(child) || child.type !== imageComponent,
+    )
+  ) {
+    return undefined;
+  }
+  return nodes;
+}
+
+interface RemarkPositionedNode {
+  children?: RemarkPositionedNode[];
+  position?: {
+    end?: { offset?: number };
+    start?: { offset?: number };
+  };
+  type?: string;
+}
+
+function remarkPreserveUnsupportedFootnotes() {
+  return (tree: RemarkPositionedNode, file: { value?: unknown }) => {
+    const source = typeof file.value === "string" ? file.value : "";
+    const visit = (node: RemarkPositionedNode) => {
+      if (!node.children) return;
+      node.children = node.children.map((child) => {
+        const start = child.position?.start?.offset;
+        const end = child.position?.end?.offset;
+        if (
+          (child.type === "footnoteReference" ||
+            child.type === "footnoteDefinition") &&
+          typeof start === "number" &&
+          typeof end === "number"
+        ) {
+          const value = source.slice(start, end);
+          return child.type === "footnoteDefinition"
+            ? {
+                children: [{ type: "text", value } as RemarkPositionedNode],
+                type: "paragraph",
+              }
+            : ({ type: "text", value } as RemarkPositionedNode);
+        }
+        visit(child);
+        return child;
+      });
+    };
+    visit(tree);
+  };
+}
+
+interface MarkdownRenderBoundaryProps {
+  children: ReactNode;
+  onRetry?: () => void;
+  resetKey: string;
+  retryLabel: ReactNode;
+  title: ReactNode;
+}
+
+interface MarkdownRenderBoundaryState {
+  failed: boolean;
+}
+
+class MarkdownRenderBoundary extends Component<
+  MarkdownRenderBoundaryProps,
+  MarkdownRenderBoundaryState
+> {
+  state: MarkdownRenderBoundaryState = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidUpdate(previousProps: MarkdownRenderBoundaryProps) {
+    if (
+      this.state.failed &&
+      previousProps.resetKey !== this.props.resetKey
+    ) {
+      this.setState({ failed: false });
+    }
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div className="codex-ui-markdown__render-error" role="alert">
+        <div className="codex-ui-markdown__render-error-title">
+          {this.props.title}
+        </div>
+        <button
+          onClick={() => {
+            this.setState({ failed: false });
+            this.props.onRetry?.();
+          }}
+          type="button"
+        >
+          {this.props.retryLabel}
+        </button>
+      </div>
+    );
+  }
+}
+
 export interface AgentMarkdownProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  allowWideMedia?: boolean;
   allowWideTables?: boolean;
   children: string;
   codeHighlighter?: CodeHighlighter | false;
@@ -779,14 +1089,24 @@ export interface AgentMarkdownProps
   codeBlockWrap?: boolean;
   codeBlockWrapToggleable?: boolean;
   components?: Components;
+  imageLoadingLabel?: string;
+  imagePreview?: boolean;
+  imagePreviewLabel?: string;
+  imageSourceResolver?: (source: string) => string;
+  imageStatus?: MarkdownImageStatus | MarkdownImageStatusResolver;
+  imageUnavailableLabel?: string;
   linkTarget?: "_blank" | "_parent" | "_self" | "_top";
   onCopyCode?: CodeCopyHandler;
   onCopyTable?: MarkdownTableCopyHandler;
+  onRetryRender?: () => void;
+  renderErrorTitle?: ReactNode;
+  retryRenderLabel?: ReactNode;
   streaming?: boolean;
   tableCopyable?: boolean;
 }
 
 export function AgentMarkdown({
+  allowWideMedia = false,
   allowWideTables = false,
   children,
   className,
@@ -795,15 +1115,38 @@ export function AgentMarkdown({
   codeBlockWrap = false,
   codeBlockWrapToggleable = false,
   components,
+  imageLoadingLabel = "Image loading",
+  imagePreview = true,
+  imagePreviewLabel = "Open image preview",
+  imageSourceResolver,
+  imageStatus = "auto",
+  imageUnavailableLabel = "Image unavailable",
   linkTarget,
   onCopyCode,
   onCopyTable,
+  onRetryRender,
+  renderErrorTitle = "Markdown couldn't render",
+  retryRenderLabel = "Try again",
   streaming = false,
   tableCopyable = true,
   ...props
 }: AgentMarkdownProps) {
   const classes = ["codex-ui-markdown", className].filter(Boolean).join(" ");
   const source = streaming ? stabilizeStreamingMarkdown(children) : children;
+  const [mathRuntime, setMathRuntime] = useState<MarkdownMathRuntime | undefined>(
+    loadedMarkdownMathRuntime,
+  );
+  const needsMathRuntime = source.includes("$$");
+  useEffect(() => {
+    if (!needsMathRuntime || mathRuntime) return;
+    let current = true;
+    void loadMarkdownMathRuntime().then((runtime) => {
+      if (current) setMathRuntime(runtime);
+    });
+    return () => {
+      current = false;
+    };
+  }, [mathRuntime, needsMathRuntime]);
   const onCopyCodeRef = useRef(onCopyCode);
   onCopyCodeRef.current = onCopyCode;
   const hasCodeCopyHandler = onCopyCode !== undefined;
@@ -826,6 +1169,33 @@ export function AgentMarkdown({
         hasTableCopyHandler
           ? (payload) => onCopyTableRef.current?.(payload)
           : undefined;
+      const MarkdownImageComponent: NonNullable<Components["img"]> = ({
+        alt = "",
+        node: _node,
+        src,
+        ...imageProps
+      }) => {
+        const resolvedStatus =
+          typeof imageStatus === "function"
+            ? imageStatus(src ?? "", alt)
+            : imageStatus;
+        const resolvedSource = src && imageSourceResolver
+          ? imageSourceResolver(src)
+          : src;
+        return (
+          <MarkdownImage
+            allowWide={allowWideMedia}
+            alt={alt}
+            loadingLabel={imageLoadingLabel}
+            preview={imagePreview}
+            previewLabel={imagePreviewLabel}
+            src={resolvedSource}
+            status={resolvedStatus}
+            unavailableLabel={imageUnavailableLabel}
+            {...imageProps}
+          />
+        );
+      };
 
       return {
         a({ children: linkChildren, node: _node, ...linkProps }) {
@@ -870,9 +1240,7 @@ export function AgentMarkdown({
             </InlineCode>
           );
         },
-        img({ alt = "", node: _node, ...imageProps }) {
-          return <img alt={alt} loading="lazy" {...imageProps} />;
-        },
+        img: MarkdownImageComponent,
         input({
           "aria-label": inputAriaLabel,
           checked,
@@ -906,6 +1274,29 @@ export function AgentMarkdown({
 
           return <pre {...preProps}>{preChildren}</pre>;
         },
+        p({ children: paragraphChildren, node: _node, ...paragraphProps }) {
+          const images = allowWideMedia
+            ? onlyMarkdownImages(paragraphChildren, MarkdownImageComponent)
+            : undefined;
+          if (images) {
+            return (
+              <p
+                {...paragraphProps}
+                className={[
+                  "codex-ui-markdown__media-paragraph",
+                  images.length > 1 &&
+                    "codex-ui-markdown__media-grid-paragraph",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                data-markdown-image-grid={images.length > 1 || undefined}
+              >
+                {images}
+              </p>
+            );
+          }
+          return <p {...paragraphProps}>{paragraphChildren}</p>;
+        },
         table({ children: tableChildren, node, ...tableProps }) {
           const markdownSource = extractMarkdownTableSource(
             sourceSnapshotRef.current,
@@ -927,6 +1318,7 @@ export function AgentMarkdown({
       };
     },
     [
+      allowWideMedia,
       allowWideTables,
       codeBlockCopyable,
       codeBlockWrap,
@@ -935,10 +1327,36 @@ export function AgentMarkdown({
       components,
       hasCodeCopyHandler,
       hasTableCopyHandler,
+      imageLoadingLabel,
+      imagePreview,
+      imagePreviewLabel,
+      imageSourceResolver,
+      imageStatus,
+      imageUnavailableLabel,
       linkTarget,
       tableCopyable,
     ],
   );
+  const rehypePlugins: NonNullable<Options["rehypePlugins"]> = mathRuntime
+    ? [
+        [
+          mathRuntime.rehypeKatex,
+          { strict: "ignore", throwOnError: false },
+        ],
+      ]
+    : [];
+  const remarkPlugins: NonNullable<Options["remarkPlugins"]> = [
+    remarkGfm,
+    ...(mathRuntime
+      ? [
+          [
+            mathRuntime.remarkMath,
+            { singleDollarTextMath: false },
+          ] as NonNullable<Options["remarkPlugins"]>[number],
+        ]
+      : []),
+    remarkPreserveUnsupportedFootnotes,
+  ];
 
   return (
     <div
@@ -946,9 +1364,20 @@ export function AgentMarkdown({
       data-streaming={streaming || undefined}
       {...props}
     >
-      <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
-        {source}
-      </ReactMarkdown>
+      <MarkdownRenderBoundary
+        onRetry={onRetryRender}
+        resetKey={source}
+        retryLabel={retryRenderLabel}
+        title={renderErrorTitle}
+      >
+        <ReactMarkdown
+          components={markdownComponents}
+          rehypePlugins={rehypePlugins}
+          remarkPlugins={remarkPlugins}
+        >
+          {source}
+        </ReactMarkdown>
+      </MarkdownRenderBoundary>
     </div>
   );
 }

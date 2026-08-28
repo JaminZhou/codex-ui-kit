@@ -1,4 +1,5 @@
 @import "./tokens.css";
+@import "katex/dist/katex.min.css";
 
 .codex-ui-thread,
 .codex-ui-thread *,
@@ -12360,11 +12361,137 @@ summary.codex-ui-activity__header::after {
   min-width: 0;
 }
 
-.codex-ui-markdown img {
-  border-radius: var(--codex-ui-radius-lg);
+.codex-ui-markdown .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.codex-ui-markdown__media-paragraph {
+  text-align: left;
+}
+
+.codex-ui-markdown__media-grid-paragraph {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.codex-ui-markdown-image__trigger {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  cursor: zoom-in;
+  display: inline-block;
+  max-width: min(100%, 44rem);
+  padding: 0;
+  vertical-align: top;
+}
+
+.codex-ui-markdown-image__trigger--wide {
+  max-width: 100%;
+}
+
+.codex-ui-markdown-image {
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  box-shadow: 0 0.125rem 0.5rem rgb(0 0 0 / 0.12);
   display: block;
   height: auto;
+  margin-block: 0.75rem;
+  max-height: 12.5rem;
+  max-width: 12.5rem;
+  object-fit: contain;
+  width: auto;
+}
+
+.codex-ui-markdown-image__trigger:focus-visible {
+  border-radius: var(--codex-ui-radius-md);
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-markdown-image__fallback {
+  align-items: center;
+  appearance: none;
+  background: var(--codex-ui-background-button-secondary-hover);
+  border: 0;
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  display: inline-flex;
+  height: auto;
+  justify-content: center;
+  margin-block: 0.75rem;
+  max-height: min(48vh, 32rem);
+  max-width: min(100%, 44rem);
+  min-height: 6rem;
+  min-width: 6rem;
+  padding: 0;
+  text-decoration: none;
+}
+
+.codex-ui-markdown-image__fallback--wide {
   max-width: 100%;
+}
+
+.codex-ui-markdown-image__fallback[href] {
+  cursor: pointer;
+}
+
+.codex-ui-markdown-image__fallback-icon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+@keyframes codex-ui-markdown-image-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.codex-ui-markdown-image__spinner {
+  animation: codex-ui-markdown-image-spin 800ms linear infinite;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  border-right-color: transparent;
+  height: 1.25rem;
+  opacity: 0.7;
+  width: 1.25rem;
+}
+
+.codex-ui-markdown__render-error {
+  background: color-mix(in srgb, var(--codex-ui-text) 5%, transparent);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  padding: 0.5rem 0.75rem;
+}
+
+.codex-ui-markdown__render-error-title {
+  color: var(--codex-ui-text);
+  font-weight: var(--codex-ui-font-weight-medium);
+  margin-bottom: 0.5rem;
+}
+
+.codex-ui-markdown__render-error button {
+  appearance: none;
+  background: var(--codex-ui-background-button-secondary);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.codex-ui-markdown__render-error button:hover {
+  background: var(--codex-ui-background-button-secondary-hover);
+}
+
+.codex-ui-markdown__render-error button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
 }
 
 @keyframes codex-ui-markdown-stream-enter {

@@ -731,6 +731,18 @@ const currentAttachmentProductPreviewUrl = new URL(
   import.meta.url,
 ).href;
 
+function currentMarkdownMediaSource(source: string) {
+  return source.includes("current-markdown-preview.png")
+    ? currentAttachmentProductPreviewUrl
+    : source;
+}
+
+function currentMarkdownMediaStatus(source: string) {
+  return source.includes("codex-ui-kit-missing.png")
+    ? ("unavailable" as const)
+    : ("ready" as const);
+}
+
 type DemoComposerAttachmentStatus =
   | "error"
   | "preview-error"
@@ -2610,6 +2622,8 @@ export function App() {
     mode === "replay" && scenarioId === "current-basic-message";
   const isCurrentMarkdown26818Replay =
     mode === "replay" && scenarioId === "markdown-current-26-818";
+  const isCurrentMarkdown26820MediaReplay =
+    mode === "replay" && scenarioId === "markdown-current-26-820-media";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentReviewFilesReplay =
@@ -8398,6 +8412,8 @@ export function App() {
                 message.id === "assistant-markdown") ||
                 (isCurrentMarkdown26818Replay &&
                   message.id === "assistant-markdown") ||
+                (isCurrentMarkdown26820MediaReplay &&
+                  message.id === "assistant-markdown-media") ||
                 (scenarioId === "markdown-table-actions" &&
                   message.id === "assistant-markdown-table-actions") ||
                 (scenarioId === "markdown-streaming-large" &&
@@ -8457,17 +8473,20 @@ export function App() {
                 scenarioId === "long-command-output" ||
                 isCurrentBasicMessageReplay ||
                 isCurrentMarkdown26818Replay ||
+                isCurrentMarkdown26820MediaReplay ||
                 isCurrentSubagentReplay ? (
                   <McpResponseActions
                     copyLabel={
                       isCurrentBasicMessageReplay ||
-                      isCurrentMarkdown26818Replay
+                      isCurrentMarkdown26818Replay ||
+                      isCurrentMarkdown26820MediaReplay
                         ? "Copy"
                         : undefined
                     }
                     label={
                       isCurrentBasicMessageReplay ||
-                      isCurrentMarkdown26818Replay
+                      isCurrentMarkdown26818Replay ||
+                      isCurrentMarkdown26820MediaReplay
                         ? null
                         : message.id === "assistant-workflow" ||
                       message.id === "assistant-approval-denied" ||
@@ -8480,7 +8499,8 @@ export function App() {
                     }
                     toolbar={
                       !isCurrentBasicMessageReplay &&
-                      !isCurrentMarkdown26818Replay
+                      !isCurrentMarkdown26818Replay &&
+                      !isCurrentMarkdown26820MediaReplay
                     }
                   />
                 ) : (
@@ -8564,8 +8584,19 @@ export function App() {
                 <CurrentMcpAnswer recovery />
               ) : (
                 <AgentMarkdown
+                  allowWideMedia={isCurrentMarkdown26820MediaReplay}
                   allowWideTables={scenarioId === "markdown-table-actions"}
                   codeBlockWrapToggleable={isCurrentMarkdown26818Replay}
+                  imageSourceResolver={
+                    isCurrentMarkdown26820MediaReplay
+                      ? currentMarkdownMediaSource
+                      : undefined
+                  }
+                  imageStatus={
+                    isCurrentMarkdown26820MediaReplay
+                      ? currentMarkdownMediaStatus
+                      : undefined
+                  }
                   linkTarget="_blank"
                   streaming={message.status === "running"}
                 >

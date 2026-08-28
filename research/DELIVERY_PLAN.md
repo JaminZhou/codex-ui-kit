@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 22 groups have current-build runtime evidence, 52 have previous-build-only
+- 23 groups have current-build runtime evidence, 51 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -59,6 +59,16 @@ exit gates; it does not replace the inventory.
   that the expanded Projects wrapper is
   content-dependent; the sanitized gate now derives its height from the live
   Recent chats group instead of freezing a private-data-dependent 119px value.
+  A current 26.820 follow-up reaches double-dollar block math while preserving
+  single-dollar math, escaped heading/image source, and footnote syntax as
+  literal text. The installed renderer independently confirms KaTeX 0.16.45,
+  media grouping, preview, loading/unavailable fallbacks, and render retry.
+  The public implementation ships the matching fonts and exercises a loaded
+  image plus an unavailable external source at 1180×820 and 720×680.
+  Browser/CDP and Electron lock KaTeX/MathML semantics, 200px/96px media
+  geometry, four response actions, immersive preview and focus restoration;
+  two reviewed replay pixels are committed. A current-product media raster was
+  not reached, so the result is not a whole-Markdown pixel-parity claim.
   A previous 26.818 sidebar task promoted thread history, task actions, and
   ordinary active/completed/unread status. Project tasks and Recents share
   19×20 Pin/Archive controls with an 8px gap; the 20×20 status rail keeps the

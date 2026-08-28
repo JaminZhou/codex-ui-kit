@@ -73,6 +73,90 @@ describe("AgentMarkdown", () => {
     expect(html).not.toContain("node=");
   });
 
+  it("renders current block math while preserving single-dollar and footnote source text", async () => {
+    const { container } = render(
+      <AgentMarkdown>{`Inline math: $E = mc^2$.
+
+$$
+\\int_0^1 x^2 \\, dx = \\frac{1}{3}
+$$
+
+Footnote reference.[^1]
+
+[^1]: A compact source note.`}</AgentMarkdown>,
+    );
+    await waitFor(() =>
+      expect(container.querySelector(".katex-display")).toBeTruthy(),
+    );
+    const html = container.innerHTML;
+
+    expect(html).toContain("Inline math: $E = mc^2$.");
+    expect(html).toContain('class="katex-display"');
+    expect(html).toContain('encoding="application/x-tex"');
+    expect(html).toContain("Footnote reference.[^1]");
+    expect(html).toContain("[^1]: A compact source note.");
+    expect(html).not.toContain("data-footnotes");
+  });
+
+  it("renders controlled Markdown image loading and unavailable fallbacks", () => {
+    const html = renderToStaticMarkup(
+      <AgentMarkdown
+        allowWideMedia
+        imageStatus={(source) =>
+          source.includes("loading") ? "loading" : "unavailable"
+        }
+      >
+        {`![Loading preview](https://example.com/loading.png)
+![Unavailable preview](https://example.com/missing.png)`}
+      </AgentMarkdown>,
+    );
+
+    expect(html).toContain('data-markdown-image-grid="true"');
+    expect(html).toContain("codex-ui-markdown__media-grid-paragraph");
+    expect(html).toContain('data-markdown-image-state="loading"');
+    expect(html).toContain('aria-label="Loading preview"');
+    expect(html).toContain('data-markdown-image-state="unavailable"');
+    expect(html).toContain('aria-label="Unavailable preview"');
+    expect(html).toContain('href="https://example.com/missing.png"');
+  });
+
+  it("opens an immersive preview from a rendered Markdown image", async () => {
+    render(
+      <AgentMarkdown>
+        {"![Preview](https://example.com/preview.png)"}
+      </AgentMarkdown>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Preview" }));
+    expect(
+      await screen.findByRole("dialog", { name: "Preview" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Close image preview" })).toBeTruthy();
+  });
+
+  it("offers a retry boundary when a host Markdown component throws", async () => {
+    const onRetryRender = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const BrokenParagraph = () => {
+      throw new Error("synthetic Markdown render failure");
+    };
+
+    render(
+      <AgentMarkdown
+        components={{ p: BrokenParagraph }}
+        onRetryRender={onRetryRender}
+      >
+        Broken paragraph
+      </AgentMarkdown>,
+    );
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Markdown couldn't render",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(onRetryRender).toHaveBeenCalledOnce());
+  });
+
   it("stabilizes incomplete streaming fences and links", () => {
     expect(stabilizeStreamingMarkdown("```ts\nconst value = 1;")).toBe(
       "```ts\nconst value = 1;\n```",

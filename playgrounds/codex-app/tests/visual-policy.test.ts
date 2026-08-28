@@ -489,6 +489,39 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates current 26.820 Markdown math, media, and fallbacks at wide and compact widths", () => {
+    expect(electronHarness).toContain(
+      'id: "markdown-current-26-820-media"',
+    );
+    expect(electronHarness).toContain(
+      'id: "markdown-current-26-820-media-compact"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "markdown-current-26-820-media"',
+    );
+    expect(cdpContract).toContain(
+      'scene.id === "markdown-current-26-820-media-compact"',
+    );
+    expect(cdpContract).toContain(
+      "current 26.820 Markdown media contract failed",
+    );
+    expect(electronContract).toContain(
+      'id: "electron-markdown-current-26-820-media"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-markdown-current-26-820-media-compact"',
+    );
+    expect(electronContract).toContain(
+      "current 26.820 Markdown media Electron contract failed",
+    );
+    expect(appStyles).toContain(
+      '.demo-root[data-scenario="markdown-current-26-820-media"]',
+    );
+    expect(appSource).toContain(
+      "allowWideMedia={isCurrentMarkdown26820MediaReplay}",
+    );
+  });
+
   it("gates the current long-thread navigation and return control", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_LONG_THREAD_REFERENCE",

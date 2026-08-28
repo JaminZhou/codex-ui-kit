@@ -702,6 +702,22 @@ export const visualScenes = [
     windowSize: { height: 680, width: 720 },
   },
   {
+    currentSidebar: true,
+    frame: "markdown-current-26-820-media-complete",
+    id: "markdown-current-26-820-media",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-820-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-820-media-complete",
+    id: "markdown-current-26-820-media-compact",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-820-media",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "markdown-table-complete",
     id: "markdown-table-actions-hover",
     markdownTableState: "hover",
@@ -1883,6 +1899,14 @@ export async function launchScene(
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (scene.scenario === "markdown-current-26-820-media") {
+    await page.waitForSelector(
+      '[data-item-id="assistant-markdown-media"] .katex-display',
+    );
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
+  }
   if (scene.sidebarSectionKind) {
     await page
       .locator(

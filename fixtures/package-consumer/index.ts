@@ -79,6 +79,7 @@ import {
   InlineNotice,
   LoadingShimmer,
   LocalEnvironmentDialog,
+  MarkdownImage,
   type LocalEnvironmentGroup,
   Menu,
   MenuCheckboxItem,
@@ -322,6 +323,7 @@ void ImagePreviewDialog;
 void InlineNotice;
 void LoadingShimmer;
 void LocalEnvironmentDialog;
+void MarkdownImage;
 void ActivityTimeline;
 void AgentMarkdown;
 void AgentPlan;
