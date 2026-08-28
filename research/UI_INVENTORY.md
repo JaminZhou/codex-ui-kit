@@ -129,7 +129,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 15 have current-build runtime evidence, 58 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Current inventory: 89 surface groups; 20 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 16 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
 Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -281,8 +281,14 @@ waiting-on-approval task shows that 26.820 replaced the old text pill with the
 same 16×16 spinner, and a live project collection now performs a one-way
 five-to-eleven reveal with no `Show less`. Independent replay keeps a
 content-independent five-to-twelve gate; waiting and `Show more` product
-regions pass at 2.7381% and 3.8393%. Error, empty/loading, and worktree states
-remain previous-build evidence.
+regions pass at 2.7381% and 3.8393%. A separate empty project re-reaches the
+306.90625×29 `No chats` row with exact 14px/21px type, `4px 32px` padding,
+0.5 opacity, and a 2.4138% foreground-only product comparison. A disposable
+real New-local-worktree task also re-reaches loading → restored: the 30px row
+keeps the 14px branch at 39px beside the 20px spinner rail, then returns the
+branch to an 11px inset. Its privacy-safe 56×30 tails pass at 1.0714% and 0%.
+Ordinary error, collection loading, and worktree failure/Retry/unread
+composition remain previous-build evidence.
 
 The current sidebar lifecycle follow-up splits the broad historical project,
 action, and footer rows into three independently gated current-build groups:
@@ -337,6 +343,16 @@ project`. Real success, controlled failure, Retry, and restored states promote
 `app.new-thread-workspace-selection`, `workspace.worktrees`, and
 `app.sidebar-worktree-status-indicators` to current-build Browser/Electron
 verification for this sampled lifecycle.
+
+The `26.820.60940` success follow-up re-reaches the same real selection and
+submission path without promoting the older failure boundary. It selects
+`New local worktree`, retains `No environment` and `main`, submits an exact
+no-tool/no-file task, reaches loading and restored sidebar states, verifies the
+Worktree workspace summary, and cleans the exact task/worktree. This promotes
+current runtime evidence for `conversation.context-controls`,
+`composer.project-worktree-selection`, `app.new-thread-workspace-selection`,
+`workspace.worktrees`, and `app.sidebar-worktree-status-indicators`; their
+broader implementation/Browser/Electron status remains partial.
 
 The same current-build manifest now supplies exact visible Sidebar, Back, and
 Forward primitives to the private playground window chrome. Browser/CDP and

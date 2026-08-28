@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 15 groups have current-build runtime evidence, 58 have previous-build-only
+- 20 groups have current-build runtime evidence, 53 have previous-build-only
   runtime evidence, and 16 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -444,7 +444,10 @@ slot. It is split into:
   setting-up, failed, and restored presentation. The previous 26.818 slice
   re-reached real create, controlled failure, failed-plus-unread composition,
   Retry recovery, and exact 30px trailing geometry through product CDP,
-  Browser/CDP, Electron, and local-only pixels;
+  Browser/CDP, Electron, and local-only pixels. The current 26.820 slice
+  re-reaches a real loading → restored success with current computed geometry
+  and privacy-safe local pixels; failure/Retry/unread composition remains tied
+  to 26.818;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior. The 26.820 Dark/Light × wide/compact account menu
   is current Browser/Electron verified with menu-surface focus, weight 400,
@@ -466,9 +469,11 @@ Help menu, account-menu matrix, Projects Index, shared 30px project/Recents
 history rows, shared Pin/Archive actions, and real active/unread status rails.
 The current edge refresh additionally re-observes a real waiting-on-approval
 project row as the shared spinner visual and replaces the older reversible
-long-list replay with the live one-way `Show more` lifecycle. Remaining Stage
-1 work includes re-observing ordinary error and collection empty/loading,
-worktree-specific status, plus broader route lifecycle feedback, global
+long-list replay with the live one-way `Show more` lifecycle. This follow-up
+re-observes a real empty collection and a real worktree loading →
+restored success. Remaining Stage 1 work includes re-observing ordinary error,
+collection loading, worktree failure/Retry/unread composition, plus broader
+route lifecycle feedback, global
 notification runtime evidence, and selection continuity beyond New chat.
 
 The same workstream also covers shell gaps that otherwise distort every

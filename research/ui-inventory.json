@@ -57,7 +57,8 @@
         "cdp-26.803.41515:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.810.52044:visible-composer-project-worktree-branch-exact-assets",
-        "cdp-26.818.41509:new-local-worktree-current-context-controls-exact-labels-and-no-environment-state"
+        "cdp-26.818.41509:new-local-worktree-current-context-controls-exact-labels-and-no-environment-state",
+        "cdp-26.820.60940:new-local-worktree-selected-context-no-environment-main-start-and-real-task-success"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -589,7 +590,8 @@
         "cdp-26.803.61601:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.803.61601:work-in-five-action-menu-external-codex-web-anchor-and-exact-icons",
         "cdp-26.810.52044:visible-composer-context-and-work-in-five-action-exact-assets",
-        "cdp-26.818.41509:work-in-new-local-worktree-no-environment-main-context-and-current-menus"
+        "cdp-26.818.41509:work-in-new-local-worktree-no-environment-main-context-and-current-menus",
+        "cdp-26.820.60940:work-in-new-local-worktree-selection-no-environment-main-context-and-real-submit"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -812,7 +814,8 @@
         "cdp-26.818.41509:project-task-active-complete-unread-and-content-dependent-recents-current",
         "cdp-26.818.41509:live-no-chats-29px-empty-row-current-asar-one-heading-four-row-loading-and-five-item-show-more-browser-electron-twelve-row-expansion",
         "cdp-26.820.60940:privacy-safe-content-dependent-project-and-recents-local-history-with-shared-30px-rows",
-        "cdp-26.820.60940:live-five-row-show-more-one-way-eleven-row-expansion-no-show-less-and-browser-electron-twelve-row-replay"
+        "cdp-26.820.60940:live-five-row-show-more-one-way-eleven-row-expansion-no-show-less-and-browser-electron-twelve-row-replay",
+        "cdp-26.820.60940:live-no-chats-306.90625-by-29-row-exact-computed-style-and-2.4138-percent-regional-pixel"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -872,7 +875,8 @@
         "cdp-26.727.40816:project-status-indicators",
         "cdp-26.803.61601:disposable-real-worktree-create-controlled-failure-retry-recovery-and-restored-14px-branch-20px-status-rail",
         "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails",
-        "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails-and-unmasked-tail-pixels"
+        "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails-and-unmasked-tail-pixels",
+        "cdp-26.820.60940:disposable-real-worktree-success-loading-to-restored-30px-row-14px-branch-20px-spinner-rail-and-regional-pixels"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1044,7 +1048,8 @@
         "cdp-26.803.61601:new-chat-project-dialog-new-project-only-and-native-directory-panel-entry",
         "cdp-26.803.61601:new-chat-branch-create-dialog-and-git-settings-prefix-entry",
         "cdp-26.818.41509:new-local-worktree-success-controlled-failure-retry-and-recovery",
-        "cdp-26.818.41509:current-home-four-wide-two-compact-suggestion-cards-selection-project-portal-focus-and-unmasked-main-pixels"
+        "cdp-26.818.41509:current-home-four-wide-two-compact-suggestion-cards-selection-project-portal-focus-and-unmasked-main-pixels",
+        "cdp-26.820.60940:new-local-worktree-selection-real-submit-exact-response-and-archived-cleanup"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1292,7 +1297,8 @@
         "cdp-26.721:local-environment-worktree-groups-and-main-context",
         "cdp-26.803.61601:real-worktree-task-cross-restart-persistence-with-selection-restored-thread",
         "cdp-26.803.61601:missing-working-directory-model-only-turn-session-latched-warning-and-restart-recovery",
-        "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-retry-recovery"
+        "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-retry-recovery",
+        "cdp-26.820.60940:disposable-real-worktree-selected-context-loading-restored-success-and-exact-cleanup"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

@@ -1296,6 +1296,14 @@ unread default ceiling is 4% to cover the measured 306.90625px product row's
 fractional dot rasterization; the CDP and Electron contracts still require the
 exact 20×20 rail, centered 8×8 dot, color, action geometry, and SVG paths.
 
+The follow-up `26.820.60940` edge probe supplies the current 140×29 empty crop and
+56×30 worktree loading/restored crops. Their foreground comparisons pass at
+2.4138%, 1.0714%, and 0%. The worktree row retains the product's raw
+`kind=local`; the runtime observation identifies it through the selected
+Worktree context, workspace summary, and exact branch marker. Collection
+loading, ordinary error, and worktree failure/Retry/unread composition remain
+explicitly earlier-build evidence.
+
 The App shell gate uses only the 120×46 application-owned titlebar crop:
 
 ```bash

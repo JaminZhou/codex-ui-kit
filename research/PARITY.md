@@ -77,8 +77,15 @@ The authoritative current-build inventory is:
   real waiting-on-approval project task keeps the shared 16×16 spinner, while
   a five-row `Show more` control reveals all current rows and disappears with
   no `Show less`. Browser/CDP and Electron repeat the one-way reveal; local
-  waiting/Show-more regions pass at 2.7381% and 3.8393%. A second
-  previous-build probe reached real New local worktree success, controlled
+  waiting/Show-more regions pass at 2.7381% and 3.8393%. A current empty
+  project additionally re-reaches the exact 306.90625×29 `No chats` row and
+  passes its foreground-only 140×29 comparison at 2.4138%. A current
+  disposable New-local-worktree success re-reaches loading → restored with
+  the same 30px row and 14px branch geometry; its 56×30 tails pass at 1.0714%
+  and 0%. The real selection, context, workspace summary, exact response, and
+  cleanup additionally promote the five sampled worktree-related inventory
+  groups to 26.820 runtime evidence while retaining partial verification. A
+  separate previous-build probe reached controlled
   failure, failed-plus-unread composition, Retry, and restored rows. It locks
   that build's entry labels, 264×91.125 Environment menu, 14px branch marker,
   20px loading rail, exact status primitives, and action replacement;

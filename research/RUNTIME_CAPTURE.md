@@ -142,6 +142,34 @@ shell now omits Back and Forward, while the collapsed 600px Projects content
 is 559px with 415/128 columns. Raw pixels remain local-only. See
 [`26.820.60940.md`](26.820.60940.md).
 
+#### Current sidebar empty and worktree success
+
+A second isolated process on loopback port `9882` uses a unique profile under
+`/private/tmp`. The empty probe creates one disposable project without source
+folders, expands it, and records only the fixed `No chats` label, computed
+style, geometry, and a local-only 140×29 crop. The worktree probe selects the
+real `codex-ui-kit` project, chooses `New local worktree`, sends an exact
+no-tool/no-file response request, and tracks only the newly created row ID in
+memory. It captures privacy-safe 56×30 tails once `.animate-spin` appears and
+again after the spinner disappears, then archives the exact disposable tasks
+and verifies the repository's temporary worktree count returns to its starting
+value.
+
+The worktree row's raw `data-app-action-sidebar-thread-kind` remains `local`
+in the sampled product. The probe therefore identifies worktree ownership from
+the selected Worktree execution context, the workspace summary, and the
+14×14 branch marker rather than treating that raw attribute as authoritative.
+The loading transition locks a 30px row, branch at a 39px right inset, and a
+20px trailing spinner rail; restored locks the same branch at 11px. Exact task
+IDs, titles, repository labels, profile paths, full screenshots, and raw
+conversation records remain local-only.
+
+Hard reload tracing did not expose the collection loading skeleton in the
+26.820 runtime: navigation appeared only after persisted rows were already
+hydrated. The replay's one-heading/four-row loading state therefore remains
+package-structural and Browser/Electron implementation evidence, not promoted
+current runtime evidence.
+
 ### Previous `26.818.41509` global-shell baseline
 
 The prior build note retains the current-home, account-menu, conversation,
