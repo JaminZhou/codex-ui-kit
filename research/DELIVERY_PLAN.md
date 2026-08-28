@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 21 groups have current-build runtime evidence, 53 have previous-build-only
+- 22 groups have current-build runtime evidence, 52 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -336,13 +336,15 @@ exit gates; it does not replace the inventory.
   lifecycle, and current-build ready/completed regional gates pass at 0.39%
   and 0.79% under 1.5% limits. The `26.803.41515` attachment follow-up now
   adds current source-structural file-card/upload/error/progress evidence,
-  public file/folder/image/error components, five-item horizontal overflow,
+  public file/folder/image/error components, five-item wrapping containment,
   retry and preview recovery, and a trusted Electron file/folder selection
   bridge. Browser/CDP and Electron verify the independent variants at
-  1180×820 and 820×680. The real product native panel remained host-owned and
-  unautomatable, so post-picker file cards and failure/progress transitions
-  are not promoted to product runtime or pixel evidence. Plugin attachment
-  variants and a public non-image App Server input type remain open.
+  1180×820 and 820×680. The `26.820.60940` follow-up now reaches real
+  post-picker text/image cards and immersive image preview in isolated
+  processes, then locks their wide/compact Browser/CDP, Electron, and
+  local-only product pixels. Actual failure/progress transitions, plugin
+  attachment variants, and a public non-image App Server input type remain
+  open.
   The preceding `26.727.40816` results remain previous-build evidence.
   Attachment variants outside that sampled image path and Terminal
   multi-tab/process behavior remain historical regression evidence. Review
@@ -823,8 +825,10 @@ without confusing package readiness with full product reconstruction.
    `26.803.41515` structural evidence; safe real-product reachability remains
    an explicit evidence gap. File/folder/multi-item/upload/error/preview
    attachment variants and the independent Electron picker bridge are now
-   delivered, while real product post-picker runtime/pixel evidence and plugin
-   variants remain open;
+   delivered. The current post-picker text/image composition and immersive
+   preview are additionally runtime-observed on `26.820.60940` and pass
+   Browser/CDP, Electron, and local-only product-region pixels. Actual upload
+   failure/progress and plugin variants remain open;
    retain queue pause/Resume only as a legacy compatibility fixture.
 6. **Coding workspace entry**: current selected/no-project destination,
    project/Local/branch context, New worktree/environment-empty state, and
@@ -869,8 +873,10 @@ without confusing package readiness with full product reconstruction.
     pasted-image attachment lifecycle and single-agent successful delegation
     lifecycle are also delivered. Native file/folder selection, multi-item
     overflow, upload/error, and preview recovery now have independent
-    Browser/Electron gates plus current source-structural evidence; retain the
-    real product post-picker transition as an explicit evidence gap. Markdown
+    Browser/Electron gates plus current source-structural evidence. The real
+    post-picker mixed text/image cards and immersive preview are now reached
+    and pixel-gated on `26.820.60940`; retain actual upload failure/progress and
+    plugin attachment variants as explicit gaps. Markdown
     link/fence mutation, nested/task lists, a multi-column table, long-content
     following, completion actions, and Electron scroll-away/return are now
     delivered independently. Very-large-table Copy/Expand/Preview is now also
@@ -890,12 +896,11 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the fast local merge gate: latest-head `pnpm check`, complete
-`pnpm check:codex-app:acceptance`, a fresh clean Codex review on that exact
-head, and zero unresolved bot review threads. Once those pass, squash merge
-and clean the exact branch immediately. GitHub CI is not queried or awaited;
-fresh Codex findings are fixed, replied to, and resolved before another review
-round.
+Each PR uses the fast local merge gate: latest-head `pnpm check` plus complete
+`pnpm check:codex-app:acceptance`. Once those pass, squash merge and clean the
+exact branch immediately. GitHub CI and bot review are not queried or awaited
+for this exploration workflow; failures discovered by the required local gates
+still block the merge.
 
 ## Planning rules
 

@@ -1740,6 +1740,25 @@ and 3.5% ceilings. Private paths, screenshots, and disposable profiles are not
 committed; both isolated profiles were moved recoverably to Trash after their
 exact processes, handlers, and loopback listeners were gone.
 
+## Current `26.820.60940` post-picker attachment sample
+
+Two user-authorized isolated instances on ports `9885` and `9886` selected one
+synthetic text file plus one public repository image and opened the resulting
+image preview. This closes the earlier post-picker observation gap without
+touching the user's pre-existing Codex process. Raw screenshots and profiles
+remain local-only and were moved recoverably to Trash after exact PID and port
+cleanup.
+
+The compact product measurement locks a 640×178 Composer, a wrapping 640×94
+attachment row, a 224×52 text-file card, an 80×80 image card, 8px gap, exact
+document and Remove assets, and no horizontal overflow. The immersive preview
+locks 56% compact and 82% wide fit, top-right Download/Close controls, a bottom
+152×44 zoom toolbar, dialog focus, Escape dismissal, and trigger-focus return.
+Edit image is feature-state-dependent and remains optional. Browser/CDP,
+Electron, reviewed internal rasters, and optional local-only product regions
+cover the same boundary. Actual upload failure/progress and plugin attachments
+remain unsampled product transitions.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

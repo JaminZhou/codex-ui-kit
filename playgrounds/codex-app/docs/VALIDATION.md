@@ -327,3 +327,12 @@ replacing the legacy generic attachment frame. Browser/CDP locks the exact
 736×180 Composer, 80×80 draft/sent attachments, 78×78 draft image, Remove
 action, ownership, radii, and completed 736×98 Composer; Electron drives the
 same interaction and verifies the exact final response, focus, and permission.
+
+Four additional `26.820.60940` frames cover the real post-picker composition
+and immersive preview at 1180×820 and 720×680. CDP locks the 640×178 Composer,
+wrapping 640×94 tray, 224×52 text-file card, 80×80 image card, exact SVG paths,
+56%/82% fit, modal focus, toolbar geometry, labels, and zero overflow. Electron
+drives open, zoom, Escape/focus restoration, and removal. The two optional
+local-only 720×680 product references independently gate the Composer and the
+preview's required controls/image/toolbar; Edit image is excluded because it
+is feature-state-dependent.

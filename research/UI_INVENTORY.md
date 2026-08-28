@@ -138,7 +138,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 21 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 12 groups and Electron verification covers 12.
+Current inventory: 89 surface groups; 22 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
 Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1208,7 +1208,7 @@ and 2.1642% under 4%, 5%, and 3.5% limits. This promotes only command denial;
 Allow once/matching-rule paths retain their previous-build evidence and other
 approval kinds remain open.
 
-The current attachment slice used a separate `26.730.61309` new chat and a
+The earlier attachment slice used a separate `26.730.61309` new chat and a
 synthetic 1×1 PNG delivered through the Composer paste path, avoiding the
 native macOS file panel. The ready Composer measures 736×180px at
 x=359.05/y=624. Its attachment surface is 80×80px with a 78×78px image,
@@ -1230,11 +1230,23 @@ pasted-image path. The later `26.803.41515` follow-up adds source-structural
 evidence for 256px file cards, 40px icon wells, extension/line/folder
 subtitles, file-copy upload/error labels, and image progress semantics. The
 independent package and playground now cover file/folder/image cards,
-attachment-only submit, five-item overflow, bounded progress, failure/retry,
+attachment-only submit, five-item wrapping containment, bounded progress, failure/retry,
 preview recovery, and a trusted Electron file/folder selection bridge. The
-real product native panel could not be automated, so post-picker file cards,
-actual transfer failure/progress, exact file-type icons, and plugin resources
-remain separate runtime/pixel gates.
+real product native panel could not be automated in that slice.
+
+The `26.820.60940` follow-up closes the post-picker and immersive-preview gap
+with a user-authorized native selection in two isolated processes. At 720×680
+the real Composer is 640×178px; its 640×94 wrapping tray bottom-aligns a
+224×52 text-file card and an 80×80 image card with an 8px gap. The exact
+document and Remove assets, 24×24/16×16 geometry, 17px radii, 78×78 image,
+`TXT` metadata, and zero document overflow are locked. Opening the image owns
+the whole viewport, fits it at 56% compact and 82% wide, exposes top-right
+Download/Close plus a bottom 152×44 zoom toolbar, and restores trigger focus
+after Escape. Edit image remains optional because it appeared in one product
+feature state but not a fresh profile. Browser/CDP covers four frames,
+Electron drives open/zoom/dismiss/remove, and local-only product regions pass
+at 1.6117%, 0%, 0.2811%, and 1.9288%. Actual upload failure/progress and plugin
+resources remain open.
 
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests

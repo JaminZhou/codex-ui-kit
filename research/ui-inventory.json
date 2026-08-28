@@ -671,11 +671,12 @@
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
         "cdp-26.730.61309:pasted-image-ready-remove-resubmit-complete-and-message-ownership",
         "cdp-26.803.41515:files-and-folders-menu-no-dom-file-input-and-rejected-synthetic-paste-drop",
-        "cdp-26.803.41515:source-structural-file-card-256px-40px-icon-extension-line-folder-subtitles-upload-progress-error-and-preview-fallback"
+        "cdp-26.803.41515:source-structural-file-card-256px-40px-icon-extension-line-folder-subtitles-upload-progress-error-and-preview-fallback",
+        "cdp-26.820.60940:post-picker-mixed-text-image-cards-and-immersive-image-preview-wide-compact"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

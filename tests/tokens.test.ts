@@ -41,7 +41,7 @@ describe("visual token contract", () => {
       "--codex-ui-composer-attachment-gap: calc(var(--codex-ui-spacing) * 2)",
     );
     expect(tokens).toContain(
-      "--codex-ui-composer-attachment-card-height: calc(var(--codex-ui-spacing) * 16)",
+      "--codex-ui-composer-attachment-card-height: 3.25rem",
     );
   });
 

@@ -589,34 +589,94 @@ export function GeneratedImageGallery({
 export interface ImagePreviewDialogProps {
   closeLabel?: string;
   downloadLabel?: string;
+  editLabel?: string;
   imageId?: string | null;
   images: GeneratedImageItem[];
   nextLabel?: string;
+  onDownload?: (image: GeneratedImageItem) => void;
+  onEdit?: (image: GeneratedImageItem) => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;
   previousLabel?: string;
+  presentation?: "dialog" | "immersive";
   title?: ReactNode;
+  zoomInLabel?: string;
+  zoomOutLabel?: string;
+}
+
+function ImagePreviewDownloadIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 20 20">
+      <path
+        d="M2.66831 12.6664V12.5004C2.66831 12.1331 2.96607 11.8353 3.33334 11.8353C3.70061 11.8353 3.99838 12.1331 3.99838 12.5004V12.6664C3.99838 13.3773 3.99929 13.8708 4.03061 14.2543C4.0613 14.6299 4.11812 14.8414 4.19858 14.9994L4.26889 15.1263C4.4452 15.4138 4.69823 15.6482 5.00034 15.8021L5.13022 15.8578C5.27399 15.9092 5.4635 15.9471 5.74545 15.9701C6.12897 16.0014 6.62231 16.0013 7.33334 16.0013H12.6664C13.3772 16.0013 13.8708 16.0014 14.2542 15.9701C14.6296 15.9394 14.8414 15.8825 14.9994 15.8021L15.1263 15.7308C15.4137 15.5545 15.6482 15.3014 15.8021 14.9994L15.8578 14.8695C15.9092 14.7258 15.947 14.5361 15.9701 14.2543C16.0014 13.8708 16.0013 13.3772 16.0013 12.6664V12.5004C16.0013 12.1332 16.2992 11.8355 16.6664 11.8353C17.0336 11.8353 17.3314 12.1331 17.3314 12.5004V12.6664C17.3314 13.3554 17.332 13.9125 17.2953 14.3627C17.2625 14.7636 17.1975 15.1248 17.0531 15.4613L16.9867 15.6039C16.7212 16.1248 16.3173 16.5606 15.8216 16.8646L15.6039 16.9867C15.2271 17.1787 14.8206 17.2579 14.3626 17.2953C13.9124 17.3321 13.3554 17.3314 12.6664 17.3314H7.33334C6.64425 17.3314 6.0873 17.3321 5.63706 17.2953C5.23651 17.2626 4.87562 17.1982 4.5394 17.0541L4.39682 16.9867C3.8757 16.7212 3.4392 16.3175 3.1351 15.8217L3.01303 15.6039C2.82106 15.2271 2.74186 14.8207 2.70444 14.3627C2.66767 13.9125 2.66831 13.3554 2.66831 12.6664ZM9.3353 3.33337C9.3353 2.9661 9.63307 2.66833 10.0003 2.66833C10.3675 2.66851 10.6654 2.96621 10.6654 3.33337V10.8939L12.8626 8.69666L12.9671 8.61169C13.2253 8.44097 13.5767 8.4693 13.804 8.69666C14.0634 8.95633 14.0635 9.37748 13.804 9.63708L10.4701 12.9701C10.3454 13.0947 10.1766 13.1653 10.0003 13.1654C9.82397 13.1654 9.65434 13.0948 9.52963 12.9701L6.19663 9.63708L6.11166 9.53259C5.9411 9.27445 5.96934 8.92394 6.19663 8.69666C6.42392 8.46937 6.77442 8.44113 7.03256 8.61169L7.13705 8.69666L9.3353 10.8949V3.33337Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function ImagePreviewCloseIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 21 21">
+      <path
+        d="M14.6549 5.57307C14.9283 5.2997 15.3718 5.2997 15.6451 5.57307C15.9185 5.84643 15.9185 6.28993 15.6451 6.5633L11.3903 10.8182L15.6451 15.0731L15.735 15.1834C15.9141 15.4551 15.8842 15.8242 15.6451 16.0633C15.4061 16.3024 15.0369 16.3322 14.7653 16.1531L14.6549 16.0633L10.4 11.8084L6.14515 16.0633C5.87178 16.3367 5.42828 16.3367 5.15492 16.0633C4.88155 15.7899 4.88155 15.3464 5.15492 15.0731L9.4098 10.8182L5.15492 6.5633L5.06507 6.45295C4.88597 6.18128 4.91584 5.81214 5.15492 5.57307C5.39399 5.33399 5.76313 5.30413 6.0348 5.48322L6.14515 5.57307L10.4 9.82795L14.6549 5.57307Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function ImagePreviewZoomOutIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 20 20">
+      <path
+        d="M3.5 10.0002C3.5 9.63297 3.79777 9.33521 4.16504 9.33521H15.835C16.2022 9.33521 16.5 9.63297 16.5 10.0002C16.5 10.3675 16.2022 10.6652 15.835 10.6652H4.16504C3.79777 10.6652 3.5 10.3675 3.5 10.0002Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function ImagePreviewZoomInIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 20 20">
+      <path
+        d="M9.33496 16.5V10.665H3.5C3.13273 10.665 2.83496 10.3673 2.83496 10C2.83496 9.63273 3.13273 9.33496 3.5 9.33496H9.33496V3.5C9.33496 3.13273 9.63273 2.83496 10 2.83496C10.3673 2.83496 10.665 3.13273 10.665 3.5V9.33496H16.5L16.6338 9.34863C16.9369 9.41057 17.165 9.67857 17.165 10C17.165 10.3214 16.9369 10.5894 16.6338 10.6514L16.5 10.665H10.665V16.5C10.665 16.8673 10.3673 17.165 10 17.165C9.63273 17.165 9.33496 16.8673 9.33496 16.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
 }
 
 export function ImagePreviewDialog({
   closeLabel = "Close image preview",
   downloadLabel = "Download",
+  editLabel = "Edit image",
   imageId,
   images,
   nextLabel = "Next image",
+  onDownload,
+  onEdit,
   onOpenChange,
   open,
   previousLabel = "Previous image",
+  presentation = "dialog",
   title = "Generated image",
+  zoomInLabel = "Zoom in image",
+  zoomOutLabel = "Zoom out image",
 }: ImagePreviewDialogProps) {
   const titleId = useId();
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const closeRef = useRef<HTMLButtonElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const previewImageRef = useRef<HTMLImageElement>(null);
+  const previewStageRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const [inferredTheme, setInferredTheme] = useState<string>();
   const requestedIndex = imageId ? images.findIndex((image) => image.id === imageId) : 0;
   const [activeIndex, setActiveIndex] = useState(Math.max(0, requestedIndex));
+  const [intrinsicSize, setIntrinsicSize] = useState({ height: 0, width: 0 });
+  const [zoomScale, setZoomScale] = useState(100);
   const visible = open && images.length > 0;
   const portalTheme = overlayEnvironment.theme ?? inferredTheme;
 
@@ -647,24 +707,76 @@ export function ImagePreviewDialog({
     );
   }, [images.length]);
 
+  useLayoutEffect(() => {
+    if (!visible || presentation !== "immersive") return;
+    const stage = previewStageRef.current;
+    const image = previewImageRef.current;
+    if (!stage || !image) return;
+    const updateFit = () => {
+      if (!image.naturalWidth || !image.naturalHeight) return;
+      const nextFit = Math.max(
+        1,
+        Math.min(
+          100,
+          Math.min(
+            stage.clientWidth / image.naturalWidth,
+            stage.clientHeight / image.naturalHeight,
+          ) * 100,
+        ),
+      );
+      setIntrinsicSize({ height: image.naturalHeight, width: image.naturalWidth });
+      setZoomScale(nextFit);
+    };
+    updateFit();
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(updateFit);
+    observer?.observe(stage);
+    window.addEventListener("resize", updateFit);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateFit);
+    };
+  }, [activeIndex, presentation, visible]);
+
   useEffect(() => {
     if (!visible || typeof document === "undefined") return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
     const modalLock = acquireDocumentScrollLock({
       containsFocus: (target) => previewRef.current?.contains(target) ?? false,
-      getInitialFocus: () => closeRef.current,
+      getInitialFocus: () =>
+        presentation === "immersive" ? previewRef.current : closeRef.current,
       priority: 1200,
       returnFocus: returnFocusRef.current,
     });
-    if (modalLock.isTop()) closeRef.current?.focus();
+    if (modalLock.isTop()) {
+      (presentation === "immersive"
+        ? previewRef.current
+        : closeRef.current
+      )?.focus();
+    }
     return () => {
       modalLock.release()?.focus();
     };
-  }, [visible]);
+  }, [presentation, visible]);
 
   if (!visible || typeof document === "undefined") return null;
   const activeImage = images[Math.min(activeIndex, images.length - 1)];
   if (!activeImage) return null;
+
+  const downloadActiveImage = () => {
+    if (onDownload) {
+      onDownload(activeImage);
+      return;
+    }
+    const source = activeImage.downloadSrc ?? activeImage.src;
+    if (!source) return;
+    const anchor = document.createElement("a");
+    anchor.download = "";
+    anchor.href = source;
+    anchor.click();
+  };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape") {
@@ -689,7 +801,12 @@ export function ImagePreviewDialog({
       const last = focusable[focusable.length - 1];
       if (!first || !last) return;
       const focusInside = event.currentTarget.contains(document.activeElement);
-      if (event.shiftKey && (!focusInside || document.activeElement === first)) {
+      if (
+        event.shiftKey &&
+        (!focusInside ||
+          document.activeElement === event.currentTarget ||
+          document.activeElement === first)
+      ) {
         event.preventDefault();
         last.focus();
       } else if (!event.shiftKey && (!focusInside || document.activeElement === last)) {
@@ -698,6 +815,126 @@ export function ImagePreviewDialog({
       }
     }
   };
+
+  if (presentation === "immersive") {
+    return createPortal(
+      <div
+        aria-labelledby={titleId}
+        aria-modal="true"
+        className="codex-ui-image-preview"
+        data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
+        data-codex-ui-overlay-layer={overlayEnvironment.layer}
+        data-presentation="immersive"
+        data-theme={portalTheme}
+        onKeyDown={handleKeyDown}
+        ref={previewRef}
+        role="dialog"
+        tabIndex={-1}
+      >
+        <button
+          aria-hidden="true"
+          className="codex-ui-image-preview__backdrop"
+          onClick={() => onOpenChange(false)}
+          tabIndex={-1}
+          type="button"
+        />
+        <div className="codex-ui-image-preview__immersive-surface">
+          <h2 className="codex-ui-image-preview__sr-only" id={titleId}>
+            {title}
+          </h2>
+          <div className="codex-ui-image-preview__immersive-actions">
+            {onEdit ? (
+              <button
+                aria-label={editLabel}
+                data-edit-action=""
+                onClick={() => onEdit(activeImage)}
+                type="button"
+              >
+                <span aria-hidden="true">⌁</span>
+              </button>
+            ) : null}
+            {activeImage.downloadSrc ?? activeImage.src ? (
+              <button
+                aria-label={downloadLabel}
+                onClick={downloadActiveImage}
+                type="button"
+              >
+                <ImagePreviewDownloadIcon />
+              </button>
+            ) : null}
+            <button
+              aria-label={closeLabel}
+              onClick={() => onOpenChange(false)}
+              ref={closeRef}
+              type="button"
+            >
+              <ImagePreviewCloseIcon />
+            </button>
+          </div>
+          <div
+            className="codex-ui-image-preview__immersive-stage"
+            ref={previewStageRef}
+          >
+            <img
+              alt={activeImage.alt ?? `Generated image ${activeIndex + 1}`}
+              draggable={false}
+              onLoad={(event) => {
+                const image = event.currentTarget;
+                const stage = previewStageRef.current;
+                if (!stage || !image.naturalWidth || !image.naturalHeight) return;
+                const fit = Math.max(
+                  1,
+                  Math.min(
+                    100,
+                    Math.min(
+                      stage.clientWidth / image.naturalWidth,
+                      stage.clientHeight / image.naturalHeight,
+                    ) * 100,
+                  ),
+                );
+                setIntrinsicSize({
+                  height: image.naturalHeight,
+                  width: image.naturalWidth,
+                });
+                setZoomScale(fit);
+              }}
+              ref={previewImageRef}
+              referrerPolicy="no-referrer"
+              src={activeImage.src}
+              style={
+                intrinsicSize.width > 0
+                  ? {
+                      height: `${(intrinsicSize.height * zoomScale) / 100}px`,
+                      width: `${(intrinsicSize.width * zoomScale) / 100}px`,
+                    }
+                  : undefined
+              }
+            />
+          </div>
+          <div className="codex-ui-image-preview__zoom-toolbar">
+            <button
+              aria-label={zoomOutLabel}
+              disabled={zoomScale <= 10}
+              onClick={() => setZoomScale((current) => Math.max(10, current - 10))}
+              type="button"
+            >
+              <ImagePreviewZoomOutIcon />
+            </button>
+            <span>{Math.round(zoomScale)}%</span>
+            <button
+              aria-label={zoomInLabel}
+              disabled={zoomScale >= 400}
+              onClick={() => setZoomScale((current) => Math.min(400, current + 10))}
+              type="button"
+            >
+              <ImagePreviewZoomInIcon />
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body,
+    );
+  }
 
   return createPortal(
     <div
