@@ -12632,15 +12632,99 @@ try {
   const queue = notificationQueuePage.locator(
     ".codex-ui-app-notification-region",
   );
+  const frontNotification = notificationQueuePage.locator(
+    '.codex-ui-app-notification[data-index="0"]',
+  );
+  const frontAlert = frontNotification.locator(
+    ".codex-ui-app-notification__alert",
+  );
   if (
     (await queue.getAttribute("data-total-count")) !== "4" ||
     (await queue.getAttribute("data-visible-count")) !== "3" ||
     (await queue.getAttribute("data-hidden-count")) !== "1" ||
+    (await queue.getAttribute("data-position")) !== "top-center" ||
+    (await queue.getAttribute("aria-label")) !== "Notifications alt+T" ||
+    (await queue.getAttribute("aria-live")) !== "polite" ||
+    (await queue
+      .locator("[data-sonner-toaster]")
+      .getAttribute("data-sonner-theme")) !== "light" ||
     (await notificationQueuePage
       .locator(".codex-ui-app-notification")
-      .count()) !== 3
+      .count()) !== 4 ||
+    JSON.stringify(
+      await notificationQueuePage
+        .locator(".codex-ui-app-notification")
+        .evaluateAll((notifications) =>
+          notifications.map((notification) =>
+            notification.getAttribute("data-visible"),
+          ),
+        ),
+    ) !== JSON.stringify(["true", "true", "true", "false"]) ||
+    (await frontNotification.textContent())?.trim() !== "Chat unpinned" ||
+    (await frontNotification.getAttribute("data-promise")) !== "false" ||
+    (await frontNotification.getAttribute("data-removed")) !== "false" ||
+    (await frontNotification.getAttribute("role")) !== null ||
+    (await frontNotification.getAttribute("data-swipe-out")) !== "false" ||
+    (await frontNotification.getAttribute("data-swiped")) !== "false" ||
+    (await frontNotification.getAttribute("data-swiping")) !== "false" ||
+    (await frontNotification.getAttribute("tabindex")) !== "0"
   ) {
     throw new Error("Electron notification queue did not enforce its bound.");
+  }
+  const frontAlertContract = await frontAlert.evaluate((alert) => {
+    const rect = alert.getBoundingClientRect();
+    const style = getComputedStyle(alert);
+    return {
+      backgroundColor: style.backgroundColor,
+      borderRadius: style.borderRadius,
+      boxShadow: style.boxShadow,
+      color: style.color,
+      height: rect.height,
+      iconPaths: Array.from(
+        alert.querySelectorAll(
+          ".codex-ui-app-notification__leading path",
+        ),
+        (path) => path.getAttribute("d"),
+      ),
+      top: rect.top,
+      width: rect.width,
+    };
+  });
+  if (
+    frontAlertContract.backgroundColor !== "rgb(1, 28, 11)" ||
+    frontAlertContract.borderRadius !== "15px" ||
+    frontAlertContract.boxShadow !==
+      "rgba(0, 0, 0, 0.1) 0px 4px 12px 0px" ||
+    frontAlertContract.color !== "rgb(64, 201, 119)" ||
+    Math.abs(frontAlertContract.height - 42) > 1 ||
+    Math.abs(frontAlertContract.top - 48) > 1 ||
+    Math.abs(frontAlertContract.width - 170.4375) > 1 ||
+    frontAlertContract.iconPaths.length !== 2
+  ) {
+    throw new Error(
+      `Electron current notification geometry failed: ${JSON.stringify(frontAlertContract)}`,
+    );
+  }
+  await frontNotification.hover();
+  const expandedQueueTops = await notificationQueuePage
+    .locator('.codex-ui-app-notification[data-visible="true"]')
+    .evaluateAll((notifications) =>
+      notifications.map((notification) => ({
+        expanded: notification.getAttribute("data-expanded"),
+        top: notification.getBoundingClientRect().top,
+      })),
+    );
+  if (
+    expandedQueueTops.length !== 3 ||
+    expandedQueueTops.some(({ expanded }) => expanded !== "true") ||
+    !expandedQueueTops.every(
+      ({ top }, index, notifications) =>
+        index === 0 || top > notifications[index - 1].top,
+    )
+  ) {
+    throw new Error(
+      `Electron notification queue did not expand for interaction: ${JSON.stringify(expandedQueueTops)}`,
+    );
   }
   await notificationQueuePage
     .getByRole("button", { name: "Review", exact: true })

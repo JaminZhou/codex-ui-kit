@@ -4020,14 +4020,62 @@ for (const scene of selectedScenes) {
         const notificationRegion = document.querySelector(
           ".codex-ui-app-notification-region",
         );
+        const notificationToaster = notificationRegion?.querySelector(
+          "[data-sonner-toaster]",
+        );
         const notifications = Array.from(
           document.querySelectorAll(".codex-ui-app-notification"),
-          (notification) => ({
-            position: notification.getAttribute("aria-posinset"),
-            role: notification.getAttribute("role"),
-            setSize: notification.getAttribute("aria-setsize"),
-            text: notification.textContent?.replace(/\s+/g, " ").trim(),
-          }),
+          (notification) => {
+            const alert = notification.querySelector(
+              ".codex-ui-app-notification__alert",
+            );
+            const icon = notification.querySelector(
+              ".codex-ui-app-notification__leading svg",
+            );
+            const close = notification.querySelector(
+              ".codex-ui-app-notification__dismiss svg",
+            );
+            return {
+              alert: alert
+                ? {
+                    rect: rect(alert),
+                    style: {
+                      backgroundColor: getComputedStyle(alert).backgroundColor,
+                      borderColor: getComputedStyle(alert).borderColor,
+                      borderRadius: getComputedStyle(alert).borderRadius,
+                      boxShadow: getComputedStyle(alert).boxShadow,
+                      color: getComputedStyle(alert).color,
+                      fontSize: getComputedStyle(alert).fontSize,
+                      fontWeight: getComputedStyle(alert).fontWeight,
+                      lineHeight: getComputedStyle(alert).lineHeight,
+                      padding: getComputedStyle(alert).padding,
+                    },
+                  }
+                : null,
+              closePaths: close
+                ? Array.from(close.querySelectorAll("path"), (path) =>
+                    path.getAttribute("d"),
+                  )
+                : [],
+              front: notification.getAttribute("data-front"),
+              iconPaths: icon
+                ? Array.from(icon.querySelectorAll("path"), (path) =>
+                    path.getAttribute("d"),
+                  )
+                : [],
+              index: notification.getAttribute("data-index"),
+              promise: notification.getAttribute("data-promise"),
+              removed: notification.getAttribute("data-removed"),
+              role: notification.getAttribute("role"),
+              swipeOut: notification.getAttribute("data-swipe-out"),
+              swiped: notification.getAttribute("data-swiped"),
+              swiping: notification.getAttribute("data-swiping"),
+              tabIndex: notification.getAttribute("tabindex"),
+              text: notification.textContent?.replace(/\s+/g, " ").trim(),
+              tone: notification.getAttribute("data-tone"),
+              visible: notification.getAttribute("data-visible"),
+            };
+          },
         );
         return {
           chrome: {
@@ -4047,17 +4095,35 @@ for (const scene of selectedScenes) {
           main: rect(main),
           notification: notifications[0]
             ? {
+                alert: notifications[0].alert,
+                closePaths: notifications[0].closePaths,
+                front: notifications[0].front,
+                iconPaths: notifications[0].iconPaths,
+                index: notifications[0].index,
+                promise: notifications[0].promise,
+                removed: notifications[0].removed,
                 role: notifications[0].role,
+                swipeOut: notifications[0].swipeOut,
+                swiped: notifications[0].swiped,
+                swiping: notifications[0].swiping,
+                tabIndex: notifications[0].tabIndex,
                 text: notifications[0].text,
+                tone: notifications[0].tone,
+                visible: notifications[0].visible,
               }
             : null,
           notificationRegion: notificationRegion
             ? {
+                ariaLabel: notificationRegion.getAttribute("aria-label"),
+                ariaLive: notificationRegion.getAttribute("aria-live"),
                 hiddenCount: notificationRegion.getAttribute(
                   "data-hidden-count",
                 ),
                 position: notificationRegion.getAttribute("data-position"),
                 rect: rect(notificationRegion),
+                sonnerTheme:
+                  notificationToaster?.getAttribute("data-sonner-theme") ??
+                  null,
                 totalCount: notificationRegion.getAttribute(
                   "data-total-count",
                 ),
@@ -4143,20 +4209,88 @@ for (const scene of selectedScenes) {
         );
       }
       if (scene.id === "shell-notification-queue") {
+        const successPaths = [
+          "M12.1599 7.63617C12.3713 7.33596 12.7863 7.26372 13.0866 7.47504C13.3867 7.68642 13.4589 8.10153 13.2477 8.40179L9.28876 14.0268C9.17264 14.1917 8.98808 14.2954 8.7868 14.308C8.61044 14.319 8.43764 14.2592 8.30634 14.144L8.25262 14.0912L6.16962 11.7993L6.08954 11.6918C5.93136 11.4259 5.97666 11.0761 6.21454 10.8598C6.45225 10.6439 6.80379 10.6326 7.05341 10.8149L7.15399 10.9047L8.67841 12.5815L12.1599 7.63617Z",
+          "M9.99506 2.81226C14.3664 2.81226 17.9101 6.35596 17.9101 10.7273C17.9101 15.0986 14.3664 18.6423 9.99506 18.6423C5.62372 18.6423 2.08002 15.0986 2.08002 10.7273C2.08002 6.35596 5.62372 2.81226 9.99506 2.81226ZM9.99506 4.14233C6.35826 4.14233 3.4101 7.0905 3.4101 10.7273C3.4101 14.3641 6.35826 17.3123 9.99506 17.3123C13.6319 17.3123 16.58 14.3641 16.58 10.7273C16.58 7.0905 13.6319 4.14233 9.99506 4.14233Z",
+        ];
+        const closePath =
+          "M14.6549 5.57307C14.9283 5.2997 15.3718 5.2997 15.6451 5.57307C15.9185 5.84643 15.9185 6.28993 15.6451 6.5633L11.3903 10.8182L15.6451 15.0731L15.735 15.1834C15.9141 15.4551 15.8842 15.8242 15.6451 16.0633C15.4061 16.3024 15.0369 16.3322 14.7653 16.1531L14.6549 16.0633L10.4 11.8084L6.14515 16.0633C5.87178 16.3367 5.42828 16.3367 5.15492 16.0633C4.88155 15.7899 4.88155 15.3464 5.15492 15.0731L9.4098 10.8182L5.15492 6.5633L5.06507 6.45295C4.88597 6.18128 4.91584 5.81214 5.15492 5.57307C5.39399 5.33399 5.76313 5.30413 6.0348 5.48322L6.14515 5.57307L10.4 9.82795L14.6549 5.57307Z";
         if (
-          contract.notificationRegion?.position !== "bottom-end" ||
+          contract.notificationRegion?.position !== "top-center" ||
+          contract.notificationRegion.ariaLabel !== "Notifications alt+T" ||
+          contract.notificationRegion.ariaLive !== "polite" ||
           contract.notificationRegion.totalCount !== "4" ||
           contract.notificationRegion.visibleCount !== "3" ||
           contract.notificationRegion.hiddenCount !== "1" ||
-          contract.notifications.length !== 3 ||
-          JSON.stringify(contract.notifications.map(({ position }) => position)) !==
-            JSON.stringify(["1", "2", "3"]) ||
-          contract.notifications.some(({ setSize }) => setSize !== "4") ||
-          contract.notifications[0].text !==
-            "Permission requiredA local command is waiting for approval.Review"
+          contract.notificationRegion.sonnerTheme !== "light" ||
+          contract.notifications.length !== 4 ||
+          JSON.stringify(contract.notifications.map(({ index }) => index)) !==
+            JSON.stringify(["0", "1", "2", "3"]) ||
+          JSON.stringify(contract.notifications.map(({ visible }) => visible)) !==
+            JSON.stringify(["true", "true", "true", "false"]) ||
+          contract.notification?.front !== "true" ||
+          contract.notification.index !== "0" ||
+          contract.notification.promise !== "false" ||
+          contract.notification.removed !== "false" ||
+          contract.notification.role !== null ||
+          contract.notification.swipeOut !== "false" ||
+          contract.notification.swiped !== "false" ||
+          contract.notification.swiping !== "false" ||
+          contract.notification.tabIndex !== "0" ||
+          contract.notification.text !== "Chat unpinned" ||
+          contract.notification.tone !== "success" ||
+          JSON.stringify(contract.notification.iconPaths) !==
+            JSON.stringify(successPaths) ||
+          JSON.stringify(contract.notification.closePaths) !==
+            JSON.stringify([closePath]) ||
+          !contract.notification.alert ||
+          Math.abs(contract.notification.alert.rect.top - 48) > 1 ||
+          Math.abs(contract.notification.alert.rect.height - 42) > 1 ||
+          Math.abs(contract.notification.alert.rect.width - 170.4375) > 1 ||
+          contract.notification.alert.style.backgroundColor !== "rgb(1, 28, 11)" ||
+          contract.notification.alert.style.borderRadius !== "15px" ||
+          contract.notification.alert.style.boxShadow !==
+            "rgba(0, 0, 0, 0.1) 0px 4px 12px 0px" ||
+          contract.notification.alert.style.color !== "rgb(64, 201, 119)" ||
+          contract.notification.alert.style.fontSize !== "14px" ||
+          contract.notification.alert.style.fontWeight !== "400" ||
+          contract.notification.alert.style.lineHeight !== "21px" ||
+          contract.notification.alert.style.padding !== "8px"
         ) {
           throw new Error(
             `${scene.id}: notification queue contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        await page
+          .locator('.codex-ui-app-notification[data-index="0"]')
+          .hover();
+        const expandedQueue = await page.evaluate(() => {
+          const toaster = document.querySelector(
+            ".codex-ui-app-notification-toaster",
+          );
+          const visible = Array.from(
+            document.querySelectorAll(
+              '.codex-ui-app-notification[data-visible="true"]',
+            ),
+          );
+          return {
+            expanded: toaster?.getAttribute("data-expanded"),
+            itemExpanded: visible.map((item) =>
+              item.getAttribute("data-expanded"),
+            ),
+            tops: visible.map((item) => item.getBoundingClientRect().top),
+          };
+        });
+        if (
+          expandedQueue.expanded !== "true" ||
+          expandedQueue.itemExpanded.some((value) => value !== "true") ||
+          expandedQueue.tops.length !== 3 ||
+          !expandedQueue.tops.every(
+            (top, index, tops) => index === 0 || top > tops[index - 1],
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: notification queue expansion failed: ${JSON.stringify(expandedQueue)}`,
           );
         }
         await page.getByRole("button", { name: "Review", exact: true }).click();

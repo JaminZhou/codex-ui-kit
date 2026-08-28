@@ -184,7 +184,12 @@ The eleventh slice completes the first application-shell continuity contract:
 - exact 961/960 and 721/720 boundary gates, current-build auto-collapse versus
   explicit pinning without an edge-hover preview, and structural
   1920×1080/2560×1440 checks;
-- a body-portalled global notification region;
+- a body-portalled, top-center Sonner-style notification region with a polite
+  `Notifications alt+T` section, three-visible mounted queue, exact current
+  info/success/warning/danger/Close paths, hover/focus queue expansion, safe
+  bottom-end anchoring, dialog-owned layering, action focus continuation, and an
+  optional unmasked
+  `CODEX_UI_KIT_CURRENT_NOTIFICATION_REFERENCE` 172×42 product crop gate;
 - Browser CDP coverage across the shared lifecycle matrix and real Electron
   offline → retry → ready plus 1180×820 → 720×680 → 1180×820 acceptance;
 - four deterministic pixel frames and an optional 120×46 current-build

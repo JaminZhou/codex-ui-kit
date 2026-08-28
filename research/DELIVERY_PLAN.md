@@ -14,8 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 20 groups have current-build runtime evidence, 53 have previous-build-only
-  runtime evidence, and 16 have not been sampled.
+- 21 groups have current-build runtime evidence, 53 have previous-build-only
+  runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
   menus, route restoration, Projects Index, shared project/Recents rows and
@@ -354,7 +354,7 @@ exit gates; it does not replace the inventory.
   project-named single Terminal tab and close/add controls passed independent
   Browser, Electron, and regional pixel gates before the broader current
   Terminal refresh superseded them.
-  Global notification runtime evidence, light-theme shell evidence, unsampled
+  Unsampled global notification tones, light-theme shell evidence, unsampled
   long-thread window sizes/eviction heuristics, direct-shell failure/restart
   semantics, background agent-process reopening, current-product review submission and
   mutating comment/merge transitions, and the remaining Markdown, tool, and
@@ -475,10 +475,15 @@ long-list replay with the live one-way `Show more` lifecycle. The current
 worktree follow-ups re-observe a real empty collection and the complete sampled
 loading → controlled failure → failed-plus-unread → Retry → restored boundary.
 Remaining Stage 1 work includes re-observing ordinary error and collection
-loading, plus broader route lifecycle feedback, global notification runtime
-evidence, and selection continuity beyond New chat. The current 26.820 ASAR
-source and Browser/Electron gates now lock the exact ordinary-error paths and
-loading accessibility/skeleton structure, but isolated app-server termination
+loading, plus broader route lifecycle feedback, unsampled notification tones,
+and selection continuity beyond New chat. The sampled current 26.820 success
+path is now reached through reversible Pin chat → `⌘Z`; its exact top-center
+Sonner structure, live-region semantics, SVG paths, geometry, Browser/CDP,
+Electron, and 0.8029% product crop pass. The current 26.820 ASAR
+source also locks the exact info, warning, and danger notification icons used
+by replay without promoting those unsampled tones. Browser/Electron gates lock
+the exact ordinary-error paths and loading accessibility/skeleton structure,
+but isolated app-server termination
 and blocked/latency-injected ChatGPT loading did not reach either row-level
 state; those negative probes do not satisfy the runtime gate.
 
@@ -787,17 +792,18 @@ without confusing package readiness with full product reconstruction.
    command approval, file Review, and delegated audit across wide and 720px
    layouts. Retain true same-transport disconnect/reconnect and a single real
    product task spanning the full composition as separate unsampled boundaries.
-4. **App shell continuity — fatal recovery delivered; notification runtime
-   remains open**: window chrome, global feedback, loading/error/offline
+4. **App shell continuity — fatal recovery and sampled success notification
+   delivered**: window chrome, global feedback, loading/error/offline
    states, route and selection restoration. Current-build evidence covers
    window chrome, loading, in-session route restoration, and a safely reached
    fatal App Server child exit through dedicated recovery Renderer and Restart.
    The public fatal-recovery component passes Browser/CDP, Electron, compact
    geometry, and local-only full/core pixels. The bounded four-item global
-   notification queue and complete response-stream retry/failure/follow-up
-   state machine pass independent Browser/Electron/pixel gates, but retain
-   `not_sampled` runtime status until those exact product transitions are
-   reached.
+   notification queue now matches the real top-center three-visible Sonner
+   contract and a reversible current success transition in Browser/CDP,
+   Electron, and product pixels. Other notification tones, simultaneous live
+   stacking, and the complete response-stream retry/failure/follow-up state
+   machine retain their recorded evidence levels.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add

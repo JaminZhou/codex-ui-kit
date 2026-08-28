@@ -188,6 +188,21 @@ an ordinary error row. Both isolated profiles and the disposable task were
 cleaned recoverably, port 9882 was closed, and the original app process stayed
 running. These negative probes are reachability evidence, not current pixels.
 
+The 2026-08-28 notification follow-up then uses a reversible ChatGPT Pin chat →
+`⌘Z` transition in a fresh isolated profile and directly reaches the current
+`Chat unpinned` success toast. CDP records the top-center Sonner container,
+polite `Notifications alt+T` section, focusable list item, exact two-path
+success icon and Close path, 170.4375×42px geometry, 15px radius, 8px padding,
+14/21px typography, and dark success tokens. The public queue keeps four items
+mounted, exposes only the front three, and continues focus after an action;
+hover or keyboard focus expands the visible queue, bottom-end variants grow
+into the viewport, and dialog-owned variants sit above the modal layer.
+Browser/CDP and Electron repeat the contract. An unmasked 172×42 comparison
+passes at 0.8029% under 1.5%. Other tones and simultaneous product stacking
+remain source-structural or replay evidence rather than newly claimed runtime
+states; their replay uses the installed renderer's exact info, warning, and
+danger icon paths instead of substitute geometry.
+
 ### Previous `26.818.41509` global-shell baseline
 
 The prior build note retains the current-home, account-menu, conversation,
