@@ -161,7 +161,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 34 have current-build runtime evidence, 40 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 25 groups and Electron verification covers 25.
+Current inventory: 89 surface groups; 36 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -753,6 +753,18 @@ top groups cover files/folders, active-app attachment, project, Goal, Plan
 mode, skill recording, and plugin resources. Lower installed entries are
 host-provided data and are not copied into the public fixture.
 
+The current `26.820.60940` permission follow-up supersedes the old four-mode
+menu. It now exposes exactly three 47.109375px rows — `Ask for approval`,
+`Approve for me`, and `Full access` — inside a 476.46875×175.375px menu at
+x=425/y=591 in the sampled product frame. `Custom (config.toml)` is no longer
+present. The descriptions are also current: Ask always requests external-file
+and internet approval, Approve asks only for potentially unsafe actions, and
+Full access is unrestricted. Ask is not an every-shell-command guarantee: the
+sampled `/private/tmp` write and Calculator launch ran directly, while a
+Desktop file edit produced a real approval. Browser/CDP and Electron lock all
+three rows, the checked mode, exact menu geometry, Escape dismissal, and focus
+restoration; the reviewed internal permission-menu raster is updated.
+
 The independent public contract adds `ComposerDock`,
 `ComposerContextBar`, `ComposerContextControl`, `ComposerPermissionMenu`, and
 `ComposerResourcePicker`, keeps context, queue, overlays, and input ownership
@@ -1278,6 +1290,23 @@ The local-only card, menu, and Composer comparisons pass at 3.2558%, 4.7096%,
 and 2.1642% under 4%, 5%, and 3.5% limits. This promotes only command denial;
 Allow once/matching-rule paths retain their previous-build evidence and other
 approval kinds remain open.
+
+The current `26.820.60940` external-file follow-up supersedes that sampled
+card/menu boundary. A disposable Desktop edit produces a turn-owned
+Permissions card measuring 736×149.5px at x=222.239/y=654.5 wide and
+688×149.5px at x=16/y=514.5 compact. The card has a 25px radius, exact
+`Deny`/`Allow once` split actions, and an options menu containing only
+`Allow once` and `Allow this conversation`; the older `Allow all edits`
+wording is absent. Deny leaves the target absent and yields the exact sanitized
+denial reply after 130 seconds. A separate real Allow-once transition creates
+the exact requested content, verifies its SHA-256, and the disposable file is
+then moved to Trash. Browser/CDP covers six pending/options/settled frames,
+Electron repeats both decisions, and six reviewed internal baselines are
+committed. Unmasked product card/menu regions differ by 6.0489% wide, 6.1328%
+compact, and 5.1795% for the compact options menu under independent 6.2%,
+6.3%, and 5.5% ceilings. Exact geometry remains separately hard-gated, so the
+regional ratio is not used to conceal layout drift. Session approval lifetime,
+automatic-review runtime reachability, and other approval kinds remain open.
 
 The earlier attachment slice used a separate `26.730.61309` new chat and a
 synthetic 1×1 PNG delivered through the Composer paste path, avoiding the

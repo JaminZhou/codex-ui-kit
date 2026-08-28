@@ -8742,6 +8742,137 @@ try {
   await rejectedApprovalApp.close();
 }
 
+const current26820FileApprovalBaseScene = {
+  currentSidebar: true,
+  scenario: "approval-current-26-820-file",
+  sidebarState: "hidden",
+  windowSize: { height: 680, width: 720 },
+};
+
+const {
+  app: current26820FileApprovalOptionsApp,
+  page: current26820FileApprovalOptionsPage,
+} = await launchScene(
+  {
+    ...current26820FileApprovalBaseScene,
+    frame: "approval-current-26-820-file-deny-pending",
+    id: "electron-current-26-820-file-approval-options",
+  },
+  { capture: false },
+);
+try {
+  const approval = current26820FileApprovalOptionsPage.getByTestId(
+    "current-approval-request",
+  );
+  await approval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const menu = current26820FileApprovalOptionsPage.locator(
+    ".codex-ui-approval-request__options-menu",
+  );
+  await menu.waitFor();
+  const options = await menu
+    .locator('[role="menuitem"]')
+    .allTextContents();
+  const menuRect = await menu.evaluate((element) => {
+    const value = element.getBoundingClientRect();
+    return {
+      height: value.height,
+      left: value.left,
+      top: value.top,
+      width: value.width,
+    };
+  });
+  if (
+    JSON.stringify(options.map((value) => value.trim())) !==
+      JSON.stringify(["Allow once", "Allow this conversation"]) ||
+    Math.abs(menuRect.left - 519) > 1 ||
+    Math.abs(menuRect.top - 551) > 1 ||
+    Math.abs(menuRect.width - 168) > 1 ||
+    Math.abs(menuRect.height - 67.125) > 1
+  ) {
+    throw new Error(
+      `Electron current 26.820 file approval options drifted: ${JSON.stringify({ menuRect, options })}`,
+    );
+  }
+  await current26820FileApprovalOptionsPage.keyboard.press("Escape");
+  await current26820FileApprovalOptionsPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+        "Approval options" &&
+      document.querySelectorAll(
+        ".codex-ui-approval-request__options-menu",
+      ).length === 0,
+  );
+} finally {
+  await current26820FileApprovalOptionsApp.close();
+}
+
+for (const decision of ["Deny", "Allow once"]) {
+  const denied = decision === "Deny";
+  const { app, page } = await launchScene(
+    {
+      ...current26820FileApprovalBaseScene,
+      frame: denied
+        ? "approval-current-26-820-file-deny-pending"
+        : "approval-current-26-820-file-allow-pending",
+      id: `electron-current-26-820-file-${denied ? "denied" : "allowed"}`,
+    },
+    { capture: false },
+  );
+  try {
+    await page
+      .getByTestId("current-approval-request")
+      .getByRole("button", { exact: true, name: decision })
+      .click();
+    const expectedFrame = denied
+      ? "approval-current-26-820-file-denied"
+      : "approval-current-26-820-file-allowed";
+    const expectedReply = denied
+      ? "Jamin，写入权限被拒绝，文件未创建。"
+      : "Jamin，文件已创建。";
+    await page.waitForSelector(
+      `.demo-root[data-frame="${expectedFrame}"]`,
+    );
+    await page.getByText(expectedReply, { exact: true }).waitFor();
+    const settled = await page.evaluate(() => ({
+      approvalCount: document.querySelectorAll(
+        '[data-testid="current-approval-request"]',
+      ).length,
+      composerLabel:
+        document
+          .querySelector(".codex-ui-composer textarea")
+          ?.getAttribute("aria-label") ?? null,
+      permissionIcon:
+        document
+          .querySelector(
+            ".demo-composer-permission-trigger [data-current-build-icon]",
+          )
+          ?.getAttribute("data-current-build-icon") ?? null,
+      permissionLabel:
+        document
+          .querySelector(".demo-composer-permission-trigger")
+          ?.textContent?.trim() ?? null,
+      status:
+        document.querySelector(".demo-root")?.getAttribute("data-status") ??
+        null,
+    }));
+    if (
+      settled.approvalCount !== 0 ||
+      settled.composerLabel !== "Message composer" ||
+      settled.permissionIcon !== "composer-permission-ask" ||
+      settled.permissionLabel !== "Ask for approval" ||
+      settled.status !== "completed"
+    ) {
+      throw new Error(
+        `Electron current 26.820 file approval did not settle ${decision}: ${JSON.stringify(settled)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const currentDeniedApprovalScene = {
   frame: "approval-current-pending",
   id: "electron-current-approval-denied",
@@ -10865,10 +10996,10 @@ try {
   if (
     !permissionGeometry ||
     Math.abs(permissionGeometry.left - 401) > 1 ||
-    Math.abs(permissionGeometry.top - 544) > 1 ||
-    Math.abs(permissionGeometry.width - 480.375) > 1 ||
-    Math.abs(permissionGeometry.height - 222.5) > 1 ||
-    permissionGeometry.itemHeights.length !== 4 ||
+    Math.abs(permissionGeometry.top - 591.171875) > 1 ||
+    Math.abs(permissionGeometry.width - 476.46875) > 1 ||
+    Math.abs(permissionGeometry.height - 175.375) > 1 ||
+    permissionGeometry.itemHeights.length !== 3 ||
     permissionGeometry.itemHeights.some(
       (height) => Math.abs(height - 47.125) > 1,
     )

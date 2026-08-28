@@ -63,6 +63,8 @@ const currentReplayComposerScenarios = new Set([
 ]);
 const currentApprovalComposerScenes = new Set([
   "approval-current-allow-once-completed",
+  "approval-current-26-820-file-allowed-compact",
+  "approval-current-26-820-file-denied-compact",
   "approval-current-denied",
   "approval-current-similar-repeated-completed",
   "approval-current-session-repeated-completed",
@@ -7201,6 +7203,241 @@ for (const scene of selectedScenes) {
     if (contract.horizontalOverflow > 1) {
       throw new Error(`${scene.id}: horizontal overflow ${contract.horizontalOverflow}px.`);
     }
+    if (scene.scenario === "approval-current-26-820-file") {
+      const optionsScene =
+        scene.id === "approval-current-26-820-file-options-compact";
+      if (optionsScene) {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { name: "Approval options" })
+          .click();
+        await page
+          .locator(
+            '.codex-ui-approval-request__options-menu [role="menuitem"]',
+          )
+          .filter({ hasText: "Allow this conversation" })
+          .waitFor();
+      }
+      const currentFileApproval = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const approval = document.querySelector(
+          ".demo-current-26-820-file-approval",
+        );
+        const composer = document.querySelector(".codex-ui-composer");
+        const menu = document.querySelector(
+          ".codex-ui-approval-request__options-menu",
+        );
+        const permissionTrigger = document.querySelector(
+          ".demo-composer-permission-trigger",
+        );
+        const style = approval ? getComputedStyle(approval) : null;
+        return {
+          approval: approval
+            ? {
+                actions: Array.from(
+                  approval.querySelectorAll("button"),
+                  (button) => ({
+                    ariaLabel: button.getAttribute("aria-label"),
+                    rect: rect(button),
+                    shortcut:
+                      button
+                        .querySelector(
+                          ".codex-ui-approval-request__shortcut",
+                        )
+                        ?.textContent?.trim() ?? null,
+                    text: button.textContent?.replace(/\s+/g, " ").trim(),
+                  }),
+                ),
+                backgroundColor: style?.backgroundColor ?? null,
+                borderRadius: style?.borderRadius ?? null,
+                description:
+                  approval
+                    .querySelector(
+                      ".codex-ui-approval-request__description",
+                    )
+                    ?.textContent?.trim() ?? null,
+                fileIcon:
+                  approval
+                    .querySelector(
+                      '.demo-current-26-820-file-approval__file [data-current-build-icon]',
+                    )
+                    ?.getAttribute("data-current-build-icon") ?? null,
+                identity:
+                  approval
+                    .querySelector(
+                      ".codex-ui-approval-request__identity",
+                    )
+                    ?.textContent?.trim() ?? null,
+                identityIcon:
+                  approval
+                    .querySelector(
+                      ".codex-ui-approval-request__identity-icon [data-current-build-icon]",
+                    )
+                    ?.getAttribute("data-current-build-icon") ?? null,
+                question:
+                  approval
+                    .querySelector(
+                      ".demo-current-26-820-file-approval__question",
+                    )
+                    ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+                rect: rect(approval),
+              }
+            : null,
+          assistantText:
+            [...document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"]',
+            )]
+              .at(-1)
+              ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+          composer: rect(composer),
+          fileStatus:
+            document
+              .querySelector('[data-testid="file-change-group"]')
+              ?.getAttribute("data-file-status") ?? null,
+          menu: menu
+            ? {
+                items: Array.from(
+                  menu.querySelectorAll('[role="menuitem"]'),
+                  (item) => item.textContent?.trim() ?? "",
+                ),
+                rect: rect(menu),
+              }
+            : null,
+          permissionIcon:
+            permissionTrigger
+              ?.querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon") ?? null,
+          permissionLabel:
+            permissionTrigger?.textContent?.trim() ?? null,
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const pending = scene.frame?.endsWith("pending");
+      const expectedFileName = scene.frame?.includes("allow-pending")
+        ? "codex-ui-kit-26-820-approval-allowed.txt"
+        : "codex-ui-kit-26-820-approval-file.txt";
+      if (
+        pending &&
+        (!currentFileApproval.approval ||
+          Math.abs(
+            currentFileApproval.approval.rect.left - (compact ? 16 : 222.5),
+          ) > 1 ||
+          Math.abs(
+            currentFileApproval.approval.rect.top - (compact ? 514.5 : 654.5),
+          ) > 1 ||
+          Math.abs(
+            currentFileApproval.approval.rect.width - (compact ? 688 : 736),
+          ) > 1 ||
+          Math.abs(currentFileApproval.approval.rect.height - 149.5) > 1 ||
+          currentFileApproval.approval.borderRadius !== "25px" ||
+          currentFileApproval.approval.identity !== "Permissions" ||
+          currentFileApproval.approval.identityIcon !==
+            "composer-permission-ask" ||
+          currentFileApproval.approval.fileIcon !== "review-file-text" ||
+          currentFileApproval.approval.question !==
+            `Allow ChatGPT to edit the contents of ${expectedFileName}?` ||
+          currentFileApproval.approval.description !==
+            "Create the requested Desktop text file with the exact requested content." ||
+          !currentFileApproval.approval.actions.some(
+            ({ shortcut, text }) => shortcut === "Esc" && text === "DenyEsc",
+          ) ||
+          !currentFileApproval.approval.actions.some(
+            ({ shortcut, text }) =>
+              shortcut === "⏎" && text === "Allow once⏎",
+          ) ||
+          !currentFileApproval.approval.actions.some(
+            ({ ariaLabel }) => ariaLabel === "Approval options",
+          ) ||
+          currentFileApproval.composer !== null)
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 file approval card contract failed: ${JSON.stringify(currentFileApproval)}`,
+        );
+      }
+      if (
+        optionsScene &&
+        (!currentFileApproval.menu ||
+          JSON.stringify(currentFileApproval.menu.items) !==
+            JSON.stringify(["Allow once", "Allow this conversation"]) ||
+          Math.abs(currentFileApproval.menu.rect.width - 168) > 1 ||
+          Math.abs(currentFileApproval.menu.rect.height - 67.125) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 file approval options contract failed: ${JSON.stringify(currentFileApproval)}`,
+        );
+      }
+      if (optionsScene) {
+        await page.keyboard.press("Escape");
+        const dismissed = await page.evaluate(() => ({
+          activeLabel: document.activeElement?.getAttribute("aria-label"),
+          menuCount: document.querySelectorAll(
+            ".codex-ui-approval-request__options-menu",
+          ).length,
+        }));
+        if (
+          dismissed.activeLabel !== "Approval options" ||
+          dismissed.menuCount !== 0
+        ) {
+          throw new Error(
+            `${scene.id}: current approval options did not dismiss cleanly: ${JSON.stringify(dismissed)}`,
+          );
+        }
+      }
+      if (
+        !pending &&
+        (currentFileApproval.approval !== null ||
+          !currentFileApproval.composer ||
+          Math.abs(currentFileApproval.composer.left - 16) > 1 ||
+          Math.abs(currentFileApproval.composer.top - 566) > 1 ||
+          Math.abs(currentFileApproval.composer.width - 688) > 1 ||
+          Math.abs(currentFileApproval.composer.height - 98) > 1 ||
+          currentFileApproval.permissionLabel !== "Ask for approval" ||
+          currentFileApproval.permissionIcon !== "composer-permission-ask" ||
+          currentFileApproval.assistantText !==
+            (scene.frame?.endsWith("denied")
+              ? "Jamin，写入权限被拒绝，文件未创建。"
+              : "Jamin，文件已创建。"))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 file approval settlement contract failed: ${JSON.stringify(currentFileApproval)}`,
+        );
+      }
+      if (scene.id === "approval-current-26-820-file-deny-pending") {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { exact: true, name: "Deny" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-26-820-file-denied"]',
+        );
+        await page
+          .getByText("Jamin，写入权限被拒绝，文件未创建。", {
+            exact: true,
+          })
+          .waitFor();
+      }
+      if (
+        scene.id === "approval-current-26-820-file-allow-pending-compact"
+      ) {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { exact: true, name: "Allow once" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-26-820-file-allowed"]',
+        );
+        await page.getByText("Jamin，文件已创建。", { exact: true }).waitFor();
+      }
+    }
     if (
       scene.scenario === "approval-denied" ||
       scene.scenario === "approval-allow-once" ||
@@ -8318,17 +8555,17 @@ for (const scene of selectedScenes) {
           !conversation.permissionMenu ||
           conversation.resourcePicker !== null ||
           conversation.permissionMenu.checkedCount !== 1 ||
-          conversation.permissionMenu.labels.length !== 4 ||
+          conversation.permissionMenu.labels.length !== 3 ||
           !conversation.permissionMenu.labels[0]?.includes(
             "Ask for approval",
           ) ||
-          !conversation.permissionMenu.labels[3]?.includes(
-            "Custom (config.toml)",
+          !conversation.permissionMenu.labels[2]?.includes(
+            "Full access",
           ) ||
           Math.abs(conversation.permissionMenu.rect.left - 401) > 1 ||
-          Math.abs(conversation.permissionMenu.rect.top - 544) > 1 ||
-          Math.abs(conversation.permissionMenu.rect.width - 480.375) > 1 ||
-          Math.abs(conversation.permissionMenu.rect.height - 222.5) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.top - 591.171875) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.width - 476.46875) > 1 ||
+          Math.abs(conversation.permissionMenu.rect.height - 175.375) > 1 ||
           conversation.permissionMenu.optionRects.some(
             (option) =>
               !option || Math.abs(option.height - 47.125) > 1,
@@ -11611,6 +11848,9 @@ for (const scene of selectedScenes) {
       scene.id !== "composer-disabled" &&
       scene.id !== "approval-current-pending" &&
       scene.id !== "approval-current-options" &&
+      !scene.id.includes("approval-current-26-820-file-deny-pending") &&
+      scene.id !== "approval-current-26-820-file-options-compact" &&
+      scene.id !== "approval-current-26-820-file-allow-pending-compact" &&
       scene.id !== "current-review-undo-failed" &&
       !scene.id.startsWith("attachment-current-preview")
     ) {

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 34 groups have current-build runtime evidence, 40 have previous-build-only
+- 36 groups have current-build runtime evidence, 38 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, Help and account
@@ -51,7 +51,16 @@ exit gates; it does not replace the inventory.
   than a universal timing rule. Browser/CDP gates ten frames, Electron repeats
   the wide/compact terminal states, and unmasked current-product regions pass
   at 1.5813%, 1.5826%, 5.4109%, and 2.3502% under independent 2%, 2%, 5.5%, and
-  3% ceilings. The current 26.820 MCP task promotes `thread.mcp-tool-events`,
+  3% ceilings. The current 26.820 external-file approval task promotes
+  `thread.approval-permission-events` and `composer.permissions`. It replaces
+  the historical four-mode Composer menu with the current three-mode
+  Ask/Approve/Full contract, proves that Ask is risk-scoped rather than an
+  every-shell guarantee, and reaches real pending → denied/no-file plus
+  pending → Allow once/file-created transitions. Browser/CDP locks six
+  approval frames and the permission menu; Electron repeats both decisions.
+  Unmasked product regions pass at 6.0489% wide, 6.1328% compact, and 5.1795%
+  for the options menu under 6.2%, 6.3%, and 5.5% ceilings, with exact geometry
+  independently gated. The current 26.820 MCP task promotes `thread.mcp-tool-events`,
   `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
   `thread.sources-panel`. It reaches one real Search → Fetch success and one
   captured invalid-URL Fetch → Search → Fetch recovery. Current completed and
@@ -851,10 +860,11 @@ without confusing package readiness with full product reconstruction.
    sampled four-item/48px rail gates, 30-message responsive composition,
    11/9/8 mounted-turn windows, message materialization, stale-current-marker
    boundary, and wide/compact structural pixel comparisons. Broader host
-   eviction heuristics remain partial. A
-   real command approval pending → denied path additionally confirms
-   non-execution and restores the current Composer. Allow once and the
-   matching-command persistence rule are now delivered. Schema-validated
+   eviction heuristics remain partial. Current external-file approval now
+   covers pending → denied/no-file and pending → Allow once/file-created at
+   wide and compact widths, while the Composer permission selector is the
+   exact three-mode 26.820 menu. Historical matching-command persistence
+   remains regression evidence. Schema-validated
    `acceptForSession` file approval and automatic-review timeout replays now
    pass Browser/CDP, Electron, and internal regional pixels against current
    `26.803.41515` structural evidence; safe real-product reachability remains

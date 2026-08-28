@@ -10564,7 +10564,7 @@ summary.codex-ui-activity__header::after {
   gap: 0;
   padding: 0.25rem;
   translate: 1px 0;
-  width: min(30.0234375rem, calc(100vw - 1rem));
+  width: min(29.779296875rem, calc(100vw - 1rem));
 }
 
 .codex-ui-composer-permission-menu__header {
@@ -10572,6 +10572,7 @@ summary.codex-ui-activity__header::after {
   color: var(--codex-ui-text-secondary);
   display: flex;
   font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-normal);
   justify-content: space-between;
   line-height: 1.1607142857rem;
   min-height: 1.625rem;
@@ -10586,6 +10587,7 @@ summary.codex-ui-activity__header::after {
   align-items: center;
   border-radius: 0.625rem;
   font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-normal);
   height: 2.9453125rem;
   line-height: 1.1607142857rem;
   min-height: 0;

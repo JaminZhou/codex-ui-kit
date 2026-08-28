@@ -926,12 +926,6 @@ const composerPermissionOptions: readonly ComposerPermissionOption[] = [
     id: "full",
     label: "Full access",
   },
-  {
-    description: "Uses permissions defined in config.toml",
-    icon: "○",
-    id: "custom",
-    label: "Custom (config.toml)",
-  },
 ];
 
 const composerResourceGroups: readonly ComposerResourceGroup[] = [
@@ -2632,9 +2626,13 @@ export function App() {
   const isCurrentApprovalReplay =
     mode === "replay" &&
     (scenarioId === "approval-allow-once" ||
+      scenarioId === "approval-current-26-820-file" ||
       scenarioId === "approval-denied" ||
       scenarioId === "approval-similar-commands" ||
       scenarioId === "approval-for-session");
+  const isCurrentApproval26820FileReplay =
+    mode === "replay" &&
+    scenarioId === "approval-current-26-820-file";
   const isCurrentApprovalSimilarReplay =
     mode === "replay" && scenarioId === "approval-similar-commands";
   const isCurrentApprovalSessionReplay =
@@ -3291,6 +3289,22 @@ export function App() {
   ) => {
     if (mode === "replay") {
       if (isCurrentApprovalReplay) {
+        if (isCurrentApproval26820FileReplay) {
+          const nextFrame =
+            decision === "decline"
+              ? "approval-current-26-820-file-denied"
+              : "approval-current-26-820-file-allowed";
+          setReplayApprovalResolution(null);
+          setReplaySessionApprovalScope(
+            decision === "acceptForSession" ? "session" : null,
+          );
+          setReplayCount(
+            scenario.frames[nextFrame] ?? scenario.events.length,
+          );
+          setActiveFrame(nextFrame);
+          requestAnimationFrame(() => composerInputRef.current?.focus());
+          return;
+        }
         if (
           scenarioId === "approval-for-session" &&
           decision === "acceptForSession"
@@ -3742,6 +3756,7 @@ export function App() {
     isConversationLifecycle && current26820LongThreadFrame(activeFrame);
   const current26820HeaderFrame =
     current26820LongFrame ||
+    isCurrentApproval26820FileReplay ||
     isCurrentMcp26820Replay ||
     isCurrentCommand26820Replay;
   const currentWindowedFrame = legacyWindowedFrame || current26820LongFrame;
@@ -4747,6 +4762,7 @@ export function App() {
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "attachment-lifecycle" ||
+      isCurrentApproval26820FileReplay ||
       isCurrentAutomaticReviewReplay ||
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
@@ -4820,7 +4836,13 @@ export function App() {
               }
               type="button"
             >
-              <CurrentBuildIcon name="thread-header-summary" />
+              <CurrentBuildIcon
+                name={
+                  isCurrentApproval26820FileReplay
+                    ? "thread-header-actions"
+                    : "thread-header-summary"
+                }
+              />
             </button>
             <button aria-label="Toggle bottom panel" type="button">
               <CurrentBuildIcon name="thread-header-bottom-panel" />
@@ -5048,9 +5070,11 @@ export function App() {
             <button aria-label="New chat" type="button">
               <CurrentBuildIcon name="sidebar-new-chat" />
             </button>
-            <span aria-hidden="true">
-              <CurrentBuildIcon name="thread-header-project" />
-            </span>
+            {isCurrentApproval26820FileReplay ? null : (
+              <span aria-hidden="true">
+                <CurrentBuildIcon name="thread-header-project" />
+              </span>
+            )}
           </div>
         ) : currentHeaderReplay ? (
           isCurrentSubagentReplay ? undefined : (
@@ -5093,7 +5117,9 @@ export function App() {
             ? "LONG THREAD 01"
             : isCurrentCommand26820Replay
               ? scenario.label
-              : "查找 MCP 官方文档"
+              : isCurrentApproval26820FileReplay
+                ? scenario.label
+                : "查找 MCP 官方文档"
           : mode === "replay"
             ? scenario.label
             : "Live local thread"
@@ -5113,6 +5139,7 @@ export function App() {
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "attachment-lifecycle" ||
+      scenarioId === "approval-current-26-820-file" ||
       scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
       scenarioId === "approval-similar-commands" ||
@@ -5606,24 +5633,46 @@ export function App() {
   const currentPendingApproval = isCurrentApprovalReplay
     ? state.approvals.find(({ decision }) => decision === "pending")
     : undefined;
+  const currentPendingApprovalFileName =
+    currentPendingApproval?.command.split("/").filter(Boolean).at(-1) ??
+    "codex-ui-kit-26-820-approval-file.txt";
   const composer = currentPendingApproval ? (
     <ApprovalRequest
       approvalOptionsIcon={
         <CurrentBuildIcon name="composer-model-chevron" />
       }
       autoFocus={false}
+      className={
+        isCurrentApproval26820FileReplay
+          ? "demo-current-26-820-file-approval"
+          : undefined
+      }
       data-item-id={currentPendingApproval.itemId}
       data-testid="current-approval-request"
-      description={currentPendingApproval.command}
+      description={
+        isCurrentApproval26820FileReplay
+          ? currentPendingApproval.reason
+          : currentPendingApproval.command
+      }
       identity={
-        currentPendingApproval.kind === "file" ? "Edit files" : "Terminal"
+        isCurrentApproval26820FileReplay
+          ? "Permissions"
+          : currentPendingApproval.kind === "file"
+            ? "Edit files"
+            : "Terminal"
       }
       identityIcon={
-        currentPendingApproval.kind === "file" ? undefined : (
-          <CurrentBuildIcon name="thread-command-terminal" />
-        )
+        isCurrentApproval26820FileReplay ? (
+          <CurrentBuildIcon name="composer-permission-ask" />
+        ) : currentPendingApproval.kind === "file" ? undefined : (
+            <CurrentBuildIcon name="thread-command-terminal" />
+          )
       }
-      kind={currentPendingApproval.kind}
+      kind={
+        isCurrentApproval26820FileReplay
+          ? "permission"
+          : currentPendingApproval.kind
+      }
       onApprove={() =>
         respondToApproval(currentPendingApproval.requestId, "accept")
       }
@@ -5632,12 +5681,15 @@ export function App() {
       }
       presentation="composer"
       scopedApproveAction={{
-        info:
-          currentPendingApproval.kind === "file"
+        info: isCurrentApproval26820FileReplay
+          ? undefined
+          : currentPendingApproval.kind === "file"
             ? "Allow this and future file edits in this conversation without asking again"
             : "Allow future commands that match this proposed rule",
         label:
-          currentPendingApproval.kind === "file"
+          isCurrentApproval26820FileReplay
+            ? "Allow this conversation"
+            : currentPendingApproval.kind === "file"
             ? "Allow all edits"
             : "Allow similar commands",
         onClick: () =>
@@ -5650,7 +5702,16 @@ export function App() {
           ),
       }}
       title={
-        currentPendingApproval.kind === "file"
+        isCurrentApproval26820FileReplay ? (
+          <span className="demo-current-26-820-file-approval__question">
+            Allow ChatGPT to edit the contents of{" "}
+            <span className="demo-current-26-820-file-approval__file">
+              <CurrentBuildIcon name="review-file-text" />
+              <span>{currentPendingApprovalFileName}</span>
+            </span>
+            ?
+          </span>
+        ) : currentPendingApproval.kind === "file"
           ? "Allow ChatGPT to edit the following file?"
           : scenarioId === "approval-denied"
             ? "是否允许创建这个指定的 Desktop 哨兵文件?"
@@ -8633,10 +8694,15 @@ export function App() {
                 (scenarioId === "mcp-recovery-mixed-thread" &&
                   (message.id === "assistant-recovery" ||
                     message.id === "assistant-workflow")) ||
-                ((scenarioId === "approval-denied" ||
+                ((scenarioId === "approval-current-26-820-file" ||
+                  scenarioId === "approval-denied" ||
                   scenarioId === "approval-allow-once" ||
                   scenarioId === "approval-similar-commands") &&
-                  (message.id === "assistant-approval-denied" ||
+                  (message.id ===
+                    "assistant-approval-current-26-820-denied" ||
+                    message.id ===
+                      "assistant-approval-current-26-820-allowed" ||
+                    message.id === "assistant-approval-denied" ||
                     message.id === "assistant-approval-approved" ||
                     message.id === "assistant-approval-allow-once" ||
                     message.id === "assistant-approval-similar-first" ||
@@ -8668,6 +8734,7 @@ export function App() {
                 isCurrentMcpReplay ||
                 scenarioId === "mcp-tool-call" ||
                 scenarioId === "mcp-recovery-mixed-thread" ||
+                scenarioId === "approval-current-26-820-file" ||
                 scenarioId === "approval-allow-once" ||
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
@@ -8691,6 +8758,10 @@ export function App() {
                       isCurrentMarkdown26820MediaReplay
                         ? null
                         : message.id === "assistant-workflow" ||
+                      message.id ===
+                        "assistant-approval-current-26-820-denied" ||
+                      message.id ===
+                        "assistant-approval-current-26-820-allowed" ||
                       message.id === "assistant-approval-denied" ||
                       message.id === "assistant-approval-approved" ||
                       message.id === "assistant-approval-allow-once" ||
@@ -9777,6 +9848,26 @@ export function App() {
 
     const fileChange = state.fileChanges.find(({ id }) => id === entry.id);
     if (!fileChange || undoneFileIds.has(fileChange.id)) return null;
+    if (
+      isCurrentApproval26820FileReplay &&
+      fileChange.id.startsWith("file-approval-current-26-820-")
+    ) {
+      const pending = fileChange.status === "streaming";
+      const allowed = fileChange.id.endsWith("allowed");
+      return (
+        <div
+          className="demo-current-26-820-file-approval__duration"
+          key={`file-change:${fileChange.id}`}
+        >
+          <TurnDuration
+            durationMs={
+              pending ? (allowed ? 25_000 : 109_000) : allowed ? 26_000 : 130_000
+            }
+            status={pending ? "working" : "worked"}
+          />
+        </div>
+      );
+    }
     const changes = fileChange.changes.map((change) => {
       const stats = changeStats(change);
       return {
