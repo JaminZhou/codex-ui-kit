@@ -520,11 +520,33 @@ const conversationHostFrames = new Set([
   "composer-running",
   "thread-scroll-away",
   "thread-windowed",
+  "thread-current-26-820-middle",
+  "thread-current-26-820-compact-away",
 ]);
 
 const currentWindowedHistorySize = 82;
 const currentWindowedTurnWindowSize = 7;
 const currentWindowedInitialIndex = 39;
+const current26820LongHistorySize = 30;
+const current26820LongMiddleIndex = 14;
+const current26820LongCompactIndex = 23;
+
+function current26820LongThreadFrame(frame: string | null) {
+  return (
+    frame === "thread-current-26-820-middle" ||
+    frame === "thread-current-26-820-compact-away"
+  );
+}
+
+function initialWindowedMessageIndex(frame: string | null) {
+  if (frame === "thread-current-26-820-middle") {
+    return current26820LongMiddleIndex;
+  }
+  if (frame === "thread-current-26-820-compact-away") {
+    return current26820LongCompactIndex;
+  }
+  return currentWindowedInitialIndex;
+}
 
 function replayCountForSelection(
   scenario: ReplayScenario,
@@ -2306,13 +2328,14 @@ export function App() {
     );
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away" &&
-      initialSelection.frame !== "thread-windowed",
+      initialSelection.frame !== "thread-windowed" &&
+      !current26820LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
   const [scenarioSelectionVersion, setScenarioSelectionVersion] =
     useState(0);
   const [windowedSelectedMessageIndex, setWindowedSelectedMessageIndex] =
-    useState(currentWindowedInitialIndex);
+    useState(() => initialWindowedMessageIndex(initialSelection.frame));
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
     () =>
@@ -3129,7 +3152,7 @@ export function App() {
     setMcpSourceSummaryPinned(false);
     setActiveFrame(frame);
     setScenarioSelectionVersion((version) => version + 1);
-    setWindowedSelectedMessageIndex(currentWindowedInitialIndex);
+    setWindowedSelectedMessageIndex(initialWindowedMessageIndex(frame));
     setReviewOpen(false);
     setReviewSelection(null);
     setFileRevertErrorOpen(false);
@@ -3680,20 +3703,33 @@ export function App() {
     });
   };
 
-  const currentWindowedFrame =
+  const legacyWindowedFrame =
     isConversationLifecycle && activeFrame === "thread-windowed";
+  const current26820LongFrame =
+    isConversationLifecycle && current26820LongThreadFrame(activeFrame);
+  const currentWindowedFrame = legacyWindowedFrame || current26820LongFrame;
+  const windowedHistorySize = current26820LongFrame
+    ? current26820LongHistorySize
+    : currentWindowedHistorySize;
+  const windowedTurnWindowSize = current26820LongFrame
+    ? threadFollowing
+      ? 8
+      : activeFrame === "thread-current-26-820-compact-away"
+        ? 9
+        : 11
+    : currentWindowedTurnWindowSize;
 
   const returnToLatest = useCallback(() => {
     const viewport = threadViewportRef.current;
     if (!viewport) return;
     if (currentWindowedFrame) {
-      setWindowedSelectedMessageIndex(currentWindowedHistorySize - 1);
+      setWindowedSelectedMessageIndex(windowedHistorySize - 1);
     }
     viewport.scrollTo({
       behavior: "smooth",
       top: currentWindowedFrame ? 0 : viewport.scrollHeight,
     });
-  }, [currentWindowedFrame]);
+  }, [currentWindowedFrame, windowedHistorySize]);
 
   useLayoutEffect(() => {
     if (scenarioSelectionVersion === 0) return;
@@ -3702,8 +3738,13 @@ export function App() {
     let resetFrame = 0;
     const layoutFrame = window.requestAnimationFrame(() => {
       resetFrame = window.requestAnimationFrame(() => {
-        viewport.scrollTop =
-          activeFrame === "thread-windowed" ? -28_484 : viewport.scrollHeight;
+        viewport.scrollTop = activeFrame === "thread-windowed"
+          ? -28_484
+          : activeFrame === "thread-current-26-820-middle"
+            ? -2_346
+            : activeFrame === "thread-current-26-820-compact-away"
+              ? -900
+              : viewport.scrollHeight;
         viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
       });
     });
@@ -3737,9 +3778,15 @@ export function App() {
     let scrollFrame = window.requestAnimationFrame(() => {
       scrollFrame = window.requestAnimationFrame(() => {
         const messagesAfter =
-          currentWindowedHistorySize - 1 - windowedSelectedMessageIndex;
-        const distanceFromLatest =
-          messagesAfter === 0 ? 0 : messagesAfter * 672 + 320;
+          windowedHistorySize - 1 - windowedSelectedMessageIndex;
+        const distanceFromLatest = messagesAfter === 0
+          ? 0
+          : current26820LongFrame
+            ? activeFrame === "thread-current-26-820-compact-away" &&
+                windowedSelectedMessageIndex === current26820LongCompactIndex
+              ? 900
+              : messagesAfter * 148 + 126
+            : messagesAfter * 672 + 320;
         viewport.scrollTop = -Math.min(
           viewport.scrollHeight - viewport.clientHeight,
           distanceFromLatest,
@@ -3748,11 +3795,12 @@ export function App() {
           const selectedTurn = viewport.querySelector<HTMLElement>(
             `[data-windowed-turn="${windowedSelectedMessageIndex + 1}"]`,
           );
-          if (selectedTurn && messagesAfter > 0) {
+          if (selectedTurn && messagesAfter > 0 && !current26820LongFrame) {
             const viewportBounds = viewport.getBoundingClientRect();
             const selectedBounds = selectedTurn.getBoundingClientRect();
             viewport.scrollTop +=
-              selectedBounds.top - (viewportBounds.top + 180);
+              selectedBounds.top -
+              (viewportBounds.top + (current26820LongFrame ? 196 : 180));
           }
           viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
         });
@@ -3762,7 +3810,13 @@ export function App() {
       window.cancelAnimationFrame(scrollFrame);
       window.cancelAnimationFrame(alignmentFrame);
     };
-  }, [currentWindowedFrame, windowedSelectedMessageIndex]);
+  }, [
+    activeFrame,
+    current26820LongFrame,
+    currentWindowedFrame,
+    windowedHistorySize,
+    windowedSelectedMessageIndex,
+  ]);
 
   const lastEvent = scenario.events[Math.max(0, replayCount - 1)];
   const currentSidebarComposition =
@@ -4663,6 +4717,7 @@ export function App() {
       isCurrentMarkdown26818Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
+      current26820LongFrame ||
       scenarioId === "current-review-rename" ||
       isCurrentReviewFilesReplay);
   const usesCurrentAskPermission =
@@ -4688,7 +4743,23 @@ export function App() {
   const header = (
     <ThreadHeader
       endActions={
-        currentHeaderReplay ? (
+        current26820LongFrame ? (
+          <div className="demo-current-long-thread-header-actions">
+            <button aria-label="Share thread" type="button">
+              <span aria-hidden="true">↥</span>
+              <span>Share</span>
+            </button>
+            <button aria-label="Thread settings" type="button">
+              <CurrentBuildIcon name="thread-header-summary" />
+            </button>
+            <button aria-label="Toggle bottom panel" type="button">
+              <CurrentBuildIcon name="thread-header-bottom-panel" />
+            </button>
+            <button aria-label="Toggle side panel" type="button">
+              <CurrentBuildIcon name="thread-header-side-panel" />
+            </button>
+          </div>
+        ) : currentHeaderReplay ? (
           <div className="demo-current-mcp-header-actions">
             {isCurrentSubagentReplay ? null : (
               <button aria-label="Open integration menu" type="button">
@@ -4899,7 +4970,19 @@ export function App() {
         )
       }
       navigation={
-        currentHeaderReplay ? (
+        current26820LongFrame ? (
+          <div className="demo-current-long-thread-header-navigation">
+            <button aria-label="Open quick chat" type="button">
+              <CurrentBuildIcon name="sidebar-quick-chat" />
+            </button>
+            <button aria-label="New chat" type="button">
+              <CurrentBuildIcon name="sidebar-new-chat" />
+            </button>
+            <span aria-hidden="true">
+              <CurrentBuildIcon name="thread-header-project" />
+            </span>
+          </div>
+        ) : currentHeaderReplay ? (
           isCurrentSubagentReplay ? undefined : (
             <span aria-hidden="true" className="demo-current-mcp-folder">
               ▱
@@ -4917,13 +5000,30 @@ export function App() {
         )
       }
       subtitle={
-        currentHeaderReplay
+        current26820LongFrame || currentHeaderReplay
           ? undefined
           : mode === "replay"
           ? `${scenario.id} · ${replayCount}/${scenario.events.length} events`
           : state.threadId ?? "Local app-server"
       }
-      title={mode === "replay" ? scenario.label : "Live local thread"}
+      startActions={
+        current26820LongFrame ? (
+          <button
+            aria-label="Thread actions"
+            className="demo-current-long-thread-title-actions"
+            type="button"
+          >
+            ···
+          </button>
+        ) : undefined
+      }
+      title={
+        current26820LongFrame
+          ? "LONG THREAD 01"
+          : mode === "replay"
+            ? scenario.label
+            : "Live local thread"
+      }
     />
   );
 
@@ -5387,7 +5487,9 @@ export function App() {
     <ComposerDock
       composer={composerSurface}
       context={
-        !composerIsRunning && !queueInterrupted ? (
+        !current26820LongFrame &&
+        !composerIsRunning &&
+        !queueInterrupted ? (
           <ComposerContextBar>
             <ComposerContextControl
               icon={<CurrentBuildIcon name="composer-project" />}
@@ -8245,9 +8347,11 @@ export function App() {
     </AppRouteOutlet>
   );
   const messageNavigationItems = currentWindowedFrame
-    ? Array.from({ length: currentWindowedHistorySize }, (_, index) => ({
+    ? Array.from({ length: windowedHistorySize }, (_, index) => ({
         id: `current-windowed-user-${index + 1}`,
-        label: `Synthetic user checkpoint ${index + 1}`,
+        label: current26820LongFrame
+          ? `LONG THREAD ${String(index + 1).padStart(2, "0")}`
+          : `Synthetic user checkpoint ${index + 1}`,
       }))
     : state.messages
         .filter(({ role }) => role === "user")
@@ -8255,16 +8359,30 @@ export function App() {
           id: message.id,
           label: message.text,
         }));
-  const currentWindowStart = Math.min(
-    currentWindowedHistorySize - currentWindowedTurnWindowSize,
-    Math.max(
-      0,
-      windowedSelectedMessageIndex -
-        Math.floor(currentWindowedTurnWindowSize / 2),
-    ),
-  );
+  const currentWindowStart =
+    current26820LongFrame &&
+    activeFrame === "thread-current-26-820-middle" &&
+    windowedSelectedMessageIndex === current26820LongMiddleIndex
+      ? 6
+      : current26820LongFrame &&
+          activeFrame === "thread-current-26-820-compact-away" &&
+          windowedSelectedMessageIndex === current26820LongCompactIndex
+        ? 18
+        : Math.min(
+            windowedHistorySize - windowedTurnWindowSize,
+            Math.max(
+              0,
+              windowedSelectedMessageIndex -
+                Math.floor(windowedTurnWindowSize / 2),
+            ),
+          );
   const currentWindowEnd =
-    currentWindowStart + currentWindowedTurnWindowSize;
+    currentWindowStart + windowedTurnWindowSize;
+  const windowedPlaceholderRem = current26820LongFrame
+    ? activeFrame === "thread-current-26-820-compact-away"
+      ? 11.003
+      : 10.59535
+    : 42;
   const timelineContent = state.timeline.map((entry, entryIndex) => {
     if (entry.kind === "streamError") {
       const streamError = state.streamErrors.find(({ id }) => id === entry.id);
@@ -9572,19 +9690,21 @@ export function App() {
   });
   const currentWindowedContent = currentWindowedFrame ? (
     <div
-      data-mounted-turn-count={currentWindowedTurnWindowSize}
+      data-mounted-turn-count={windowedTurnWindowSize}
       data-selected-message-index={windowedSelectedMessageIndex + 1}
-      data-total-message-count={currentWindowedHistorySize}
+      data-total-message-count={windowedHistorySize}
     >
       {currentWindowStart > 0 ? (
         <ThreadVirtualizedPlaceholder
           data-hidden-entry-count={currentWindowStart}
           data-window-side="before"
-          estimatedHeight={`${currentWindowStart * 42}rem`}
+          estimatedHeight={`${
+            currentWindowStart * windowedPlaceholderRem
+          }rem`}
         />
       ) : null}
       {Array.from(
-        { length: currentWindowedTurnWindowSize },
+        { length: windowedTurnWindowSize },
         (_, offset) => {
           const messageIndex = currentWindowStart + offset;
           return (
@@ -9597,23 +9717,30 @@ export function App() {
                 data-item-id={`current-windowed-user-${messageIndex + 1}`}
                 role="user"
               >
-                Synthetic user checkpoint {messageIndex + 1}
+                {current26820LongFrame
+                  ? `Do not use tools or modify files. Reply with exactly: LONG THREAD ${String(
+                      messageIndex + 1,
+                    ).padStart(2, "0")}.`
+                  : `Synthetic user checkpoint ${messageIndex + 1}`}
               </AgentMessage>
               <AgentMessage role="assistant">
-                The host keeps only the nearby deterministic turn window mounted.
+                {current26820LongFrame
+                  ? `LONG THREAD ${String(messageIndex + 1).padStart(2, "0")}.`
+                  : "The host keeps only the nearby deterministic turn window mounted."}
               </AgentMessage>
             </AgentTurn>
           );
         },
       )}
-      {currentWindowEnd < currentWindowedHistorySize ? (
+      {currentWindowEnd < windowedHistorySize ? (
         <ThreadVirtualizedPlaceholder
           data-hidden-entry-count={
-            currentWindowedHistorySize - currentWindowEnd
+            windowedHistorySize - currentWindowEnd
           }
           data-window-side="after"
           estimatedHeight={`${
-            (currentWindowedHistorySize - currentWindowEnd) * 42
+            (windowedHistorySize - currentWindowEnd) *
+            windowedPlaceholderRem
           }rem`}
         />
       ) : null}
@@ -10005,7 +10132,9 @@ export function App() {
         currentWindowedFrame
           ? [
               `current-windowed-user-${
-                windowedSelectedMessageIndex + 1
+                current26820LongFrame
+                  ? windowedHistorySize
+                  : windowedSelectedMessageIndex + 1
               }`,
             ]
           : undefined
@@ -10013,7 +10142,7 @@ export function App() {
       density={currentWindowedFrame ? "compact" : "regular"}
       initialScroll={currentWindowedFrame ? "end" : "start"}
       items={messageNavigationItems}
-      minItems={10}
+      minItems={current26820LongFrame ? 4 : 10}
       onNavigate={(item, behavior) => {
         if (currentWindowedFrame) {
           const nextIndex =
@@ -10021,11 +10150,11 @@ export function App() {
           if (
             Number.isInteger(nextIndex) &&
             nextIndex >= 0 &&
-            nextIndex < currentWindowedHistorySize
+            nextIndex < windowedHistorySize
           ) {
             setWindowedSelectedMessageIndex(nextIndex);
             setThreadFollowing(
-              nextIndex === currentWindowedHistorySize - 1,
+              nextIndex === windowedHistorySize - 1,
             );
           }
           return;
@@ -10090,9 +10219,10 @@ export function App() {
         isConversationLifecycle ? threadFollowing : undefined
       }
       data-windowed-timeline={
-        isConversationLifecycle &&
-        activeFrame === "thread-windowed"
-          ? "current"
+        currentWindowedFrame
+          ? current26820LongFrame
+            ? "current-26-820"
+            : "current"
           : undefined
       }
       data-shell-state={view === "shell" ? shellState : undefined}
@@ -10467,7 +10597,8 @@ export function App() {
               viewportProps={{
                 defaultFollowing:
                   activeFrame !== "thread-scroll-away" &&
-                  activeFrame !== "thread-windowed",
+                  activeFrame !== "thread-windowed" &&
+                  !current26820LongFrame,
                 followKey: state.eventCount,
                 latestOrigin:
                   currentWindowedFrame ||

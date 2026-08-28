@@ -34,6 +34,12 @@ describe("thread navigation visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-message-navigation-rail\[data-density="compact"\] \{[\s\S]*?--codex-ui-message-navigation-row-height: 0\.625rem;[\s\S]*?--codex-ui-message-navigation-marker-width: 1\.875rem;/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-message-navigation-rail\[data-density="compact"\][\s\S]*?\.codex-ui-message-navigation-rail__marker \{\s*width: 0\.375rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-message-navigation-rail\[data-density="compact"\][\s\S]*?\.codex-ui-message-navigation-rail__button\[data-active\][\s\S]*?width: 1\.625rem;/,
+    );
     expect(styles).toContain("-webkit-line-clamp: 3");
   });
 });

@@ -155,12 +155,12 @@ function hasPreviewContent(value: ReactNode) {
 export function ThreadMessageNavigationRail({
   activeIds = [],
   className,
-  density = "regular",
+  density = "compact",
   initialScroll = "start",
   insetInlineStart = "var(--codex-ui-message-navigation-inset)",
   items,
   label = "User messages",
-  minItems = 10,
+  minItems = 4,
   onNavigate,
   style,
 }: ThreadMessageNavigationRailProps) {
@@ -315,6 +315,9 @@ export function ThreadMessageNavigationRail({
       className={["codex-ui-message-navigation-rail", className]
         .filter(Boolean)
         .join(" ")}
+      data-accessibility-target-size-exception={
+        density === "compact" ? "dense-message-navigation" : undefined
+      }
       data-density={density}
       data-initial-scroll={initialScroll}
       style={{ ...style, insetInlineStart }}

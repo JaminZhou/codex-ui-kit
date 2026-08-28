@@ -354,6 +354,19 @@ The authoritative current-build inventory is:
   selection and restoration with synthetic content, while a masked regional
   gate compares only the rail and floating control at 0.59%. Host eviction
   policy outside this sampled state remains an open product boundary.
+- The current `26.820.60940` long-thread refresh uses one exact 30-prompt,
+  tool-free disposable thread. It supersedes the runtime anchor with the
+  current four-item source minimum, 48px spatial gate, 36×10px compact rail,
+  11-turn wide and nine-turn compact mounted windows, reverse-origin
+  `scrollTop` values, and eight-turn return-to-latest state. At 1180×820,
+  navigation materializes message 15 while the sampled product keeps message
+  30 as `aria-current`; at 720×680 the rail is absent and the 32×32px return
+  control remains. Browser/CDP and Electron exercise message 29 → 15 → latest
+  and compact return. Reviewed internal baselines pass, and optional
+  local-only current-product structural comparisons pass at 0.8085% wide and
+  0.8397% compact under a 1% hard limit. This verifies the sampled current
+  shell, basic messages, virtualized timeline, and message navigation without
+  claiming unsampled host eviction behavior or whole-product parity.
 - The `26.727.40816` approval slice observed a real 736×162 command approval,
   drives `Deny`, confirms the command did not execute, and verifies the
   completed activity, final response, response actions, restored 736×98

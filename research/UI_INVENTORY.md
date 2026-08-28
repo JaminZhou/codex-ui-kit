@@ -104,6 +104,13 @@ observation from a previous build remains historical evidence.
   20px user bubble, four exact response-action assets, and all five Composer
   control hit targets. The local-only 768×774 product crop is compared without
   masks at 0.4320% changed pixels under a 0.5% hard limit.
+- The current 26.820 thirty-turn task refreshes that shell and adds responsive
+  virtualization/navigation evidence. Wide mode exposes the 30-button
+  36×10px rail, 11 mounted turns, message-15 materialization, and the sampled
+  stale message-30 current marker. Compact mode hides the rail at zero content
+  offset, retains nine mounted turns at `scrollTop = -900`, and returns to
+  latest with eight. Browser/CDP and Electron repeat both flows; local-only
+  structural comparisons pass at 0.8085% and 0.8397% under 1% limits.
 - The previous 26.818 command task revalidates exact exit-code-7 failure and
   same-thread recovery plus a 58-second Stop and same-thread recovery. The
   independent traces preserve the sampled `Worked for 10s`, stopped
@@ -149,7 +156,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 23 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
+Current inventory: 89 surface groups; 27 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 18 groups and Electron verification covers 18.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -788,6 +795,28 @@ limit. `thread.virtualized-timeline` was Browser/Electron verified for this
 sampled `26.727.40816` contract and is now `partial_legacy`; unobserved window
 sizes
 and host eviction heuristics do not become product-level claims.
+
+The current `26.820.60940` follow-up supersedes that sampled runtime boundary
+with one disposable 30-turn thread whose prompts and replies were exact and
+tool-free. At 1180×820, after hiding the sidebar and closing the pinned
+summary, the 768px thread has 205.5px of start-side space, so the 30-button
+36×10px compact rail is visible. The product mounts 11 nearby turns after
+jumping to message 15, keeps reverse-origin `scrollTop = -2346`, and retains
+the last message as `aria-current`; navigation still materializes message 15,
+so the stale current marker is recorded as a current-product boundary rather
+than silently corrected. At 720×680 the content start offset is zero, the rail
+is absent, nine turns remain mounted at `scrollTop = -900`, and the 32×32px
+return control restores latest with eight turns mounted and `scrollTop = 0`.
+Current source establishes an independent four-item minimum and a 48px spatial
+gate. The public component now defaults to the observed compact density and
+four-item threshold, hides the overlay below the 864px shell gate, and keeps
+host-owned window selection explicit. Browser/CDP and Electron drive message
+29 → 15 → latest plus compact return; local-only structural product pixels
+pass at `0.008084952` wide and `0.008396650` compact under a 1% limit. This
+promotes `thread.shell`, `thread.messages-basic`,
+`thread.virtualized-timeline`, and `thread.message-navigation` for the sampled
+current-build slice while retaining `partial` implementation status for
+unobserved eviction policies and broader thread variants.
 
 Three `26.721.41059` scenarios cover an expanded read-only command, a
 pending command approval, and an applied file card with the Review panel open.

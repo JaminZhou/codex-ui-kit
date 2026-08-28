@@ -172,6 +172,10 @@ const currentBuildLongThreadReferenceSize = {
   height: 820,
   width: 906,
 };
+const current26820LongThreadWideReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_820_LONG_THREAD_WIDE_REFERENCE;
+const current26820LongThreadCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_820_LONG_THREAD_COMPACT_REFERENCE;
 const currentBuildApprovalPendingReference =
   process.env.CODEX_UI_KIT_APPROVAL_PENDING_REFERENCE;
 const currentBuildApprovalDeniedReference =
@@ -1389,7 +1393,7 @@ for (const scene of selectedScenes) {
     );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_CURRENT_NOTIFICATION_STACK_MAX_DIFF_RATIO",
-      0.02,
+      0.01,
     );
     await writeFile(
       join(artifactDirectory, `${scene.id}.current-build.png`),
@@ -3378,6 +3382,76 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current-build long-thread pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  const current26820LongThreadReference =
+    scene.id === "thread-current-26-820-middle"
+      ? current26820LongThreadWideReference
+      : scene.id === "thread-current-26-820-compact-away"
+        ? current26820LongThreadCompactReference
+        : undefined;
+  if (current26820LongThreadReference) {
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(current26820LongThreadReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    const expectedSize =
+      scene.id === "thread-current-26-820-middle"
+        ? { height: 820, width: 1180 }
+        : { height: 680, width: 720 };
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.820 reference and playground must both be exactly ${expectedSize.width}x${expectedSize.height}.`,
+      );
+    }
+    const masks =
+      scene.id === "thread-current-26-820-middle"
+        ? [
+            { height: 592, left: 54, top: 48, width: 1106 },
+            { height: 592, left: 1160, top: 48, width: 20 },
+          ]
+        : [
+            { height: 510, left: 0, top: 48, width: 336 },
+            { height: 510, left: 384, top: 48, width: 336 },
+            { height: 454, left: 336, top: 48, width: 48 },
+            { height: 8, left: 336, top: 550, width: 48 },
+          ];
+    const comparison = comparePng(
+      maskPng(clonePng(reference), masks),
+      maskPng(clonePng(flattenPng(actual, {
+        blue: 24,
+        green: 24,
+        red: 24,
+      })), masks),
+    );
+    const maximumRatio = environmentRatio(
+      scene.id === "thread-current-26-820-middle"
+        ? "CODEX_UI_KIT_CURRENT_26_820_LONG_THREAD_WIDE_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_26_820_LONG_THREAD_COMPACT_MAX_DIFF_RATIO",
+      0.02,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-26-820.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.820 structural pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.820 structural pixel ratio ${comparison.ratio}`,
     );
   }
 

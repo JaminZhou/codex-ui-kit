@@ -256,6 +256,28 @@ for (const scene of selectedScenes) {
         return viewport instanceof HTMLElement && viewport.scrollTop < -10_000;
       });
     }
+    if (scene.id === "thread-current-26-820-middle") {
+      await page.waitForFunction(() => {
+        const viewport = document.querySelector(
+          ".codex-ui-conversation-thread-shell__viewport",
+        );
+        return (
+          viewport instanceof HTMLElement &&
+          Math.abs(viewport.scrollTop + 2_346) <= 1
+        );
+      });
+    }
+    if (scene.id === "thread-current-26-820-compact-away") {
+      await page.waitForFunction(() => {
+        const viewport = document.querySelector(
+          ".codex-ui-conversation-thread-shell__viewport",
+        );
+        return (
+          viewport instanceof HTMLElement &&
+          Math.abs(viewport.scrollTop + 900) <= 1
+        );
+      });
+    }
     if (scene.id === "current-light-shell") {
       const lightShell = await page.evaluate(() => {
         const metric = (selector) => {
@@ -7987,6 +8009,7 @@ for (const scene of selectedScenes) {
           },
           floating: {
             hidden: floating.getAttribute("aria-hidden"),
+            rect: rect(floating),
             show: floating.hasAttribute("data-show"),
           },
           messageCount: document.querySelectorAll(
@@ -7998,7 +8021,9 @@ for (const scene of selectedScenes) {
             ).length,
             buttonCount: navigation.querySelectorAll("button").length,
             density: navigation.getAttribute("data-density"),
+            display: getComputedStyle(navigation).display,
             label: navigation.getAttribute("aria-label"),
+            rect: rect(navigation),
             list: navigationList
               ? {
                   clientHeight: navigationList.clientHeight,
@@ -8171,6 +8196,8 @@ for (const scene of selectedScenes) {
         "composer-queued",
         "composer-auto-continued",
         "composer-queue-paused",
+        "thread-current-26-820-middle",
+        "thread-current-26-820-compact-away",
       ].includes(scene.id);
       const expectedCurrentIconNames = [
         ...(expectsContext
@@ -8212,7 +8239,8 @@ for (const scene of selectedScenes) {
           );
         }) ||
         !conversation.dock.rect ||
-        conversation.dock.rect.width < 700 ||
+        conversation.dock.rect.width <
+          (scene.id === "thread-current-26-820-compact-away" ? 680 : 700) ||
         conversation.dock.rect.width > 740
       ) {
         throw new Error(
@@ -8470,6 +8498,98 @@ for (const scene of selectedScenes) {
       ) {
         throw new Error(
           `${scene.id}: virtualized window contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "thread-current-26-820-middle" &&
+        (conversation.placeholder.count !== 2 ||
+          conversation.navigation.buttonCount !== 30 ||
+          conversation.navigation.activeCount !== 1 ||
+          conversation.navigation.density !== "compact" ||
+          conversation.navigation.display === "none" ||
+          !conversation.navigation.rect ||
+          Math.abs(conversation.navigation.rect.left - 17) > 1 ||
+          Math.abs(conversation.navigation.rect.top - 283.5) > 1 ||
+          Math.abs(conversation.navigation.rect.width - 36) > 1 ||
+          Math.abs(conversation.navigation.rect.height - 300) > 1 ||
+          !conversation.navigation.list ||
+          conversation.navigation.list.clientHeight !== 300 ||
+          conversation.navigation.list.scrollHeight !== 300 ||
+          !conversation.navigation.selectedMarker ||
+          conversation.navigation.selectedMarker.opacity !== "1" ||
+          Math.abs(
+            conversation.navigation.selectedMarker.button.width - 36,
+          ) > 1 ||
+          Math.abs(
+            conversation.navigation.selectedMarker.button.height - 10,
+          ) > 1 ||
+          !conversation.viewport ||
+          conversation.viewport.latestOrigin !== "start" ||
+          conversation.viewport.flexDirection !== "column-reverse" ||
+          Math.abs(conversation.viewport.scrollTop + 2_346) > 1 ||
+          Math.abs(conversation.viewport.scrollHeight - 4_618) > 2 ||
+          Math.abs(conversation.viewport.rect.left - 1) > 1 ||
+          Math.abs(conversation.viewport.rect.top - 47) > 1 ||
+          Math.abs(conversation.viewport.rect.width - 1_179) > 1 ||
+          Math.abs(conversation.viewport.rect.height - 773) > 1 ||
+          !conversation.composer.rect ||
+          Math.abs(conversation.composer.rect.left - 222.5) > 1 ||
+          Math.abs(conversation.composer.rect.top - 706) > 1 ||
+          Math.abs(conversation.composer.rect.width - 736) > 1 ||
+          Math.abs(conversation.composer.rect.height - 98) > 1 ||
+          !conversation.windowed ||
+          conversation.windowed.mountedTurnCount !== 11 ||
+          conversation.windowed.mountedUserBubbleCount !== 11 ||
+          conversation.windowed.placeholderCount !== 2 ||
+          conversation.windowed.selectedMessageIndex !== "15" ||
+          conversation.windowed.totalMessageCount !== "30" ||
+          conversation.threadFollowing !== "false" ||
+          !conversation.floating.show ||
+          conversation.floating.hidden !== "false")
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 middle-window contract failed: ${JSON.stringify(conversation)}`,
+        );
+      }
+      if (
+        scene.id === "thread-current-26-820-compact-away" &&
+        (conversation.placeholder.count !== 2 ||
+          conversation.navigation.buttonCount !== 30 ||
+          conversation.navigation.activeCount !== 1 ||
+          conversation.navigation.density !== "compact" ||
+          !conversation.navigation.rect ||
+          conversation.navigation.rect.width !== 0 ||
+          conversation.navigation.rect.height !== 0 ||
+          !conversation.viewport ||
+          conversation.viewport.latestOrigin !== "start" ||
+          conversation.viewport.flexDirection !== "column-reverse" ||
+          Math.abs(conversation.viewport.scrollTop + 900) > 1 ||
+          Math.abs(conversation.viewport.rect.left) > 1 ||
+          Math.abs(conversation.viewport.rect.top - 47) > 1 ||
+          Math.abs(conversation.viewport.rect.width - 720) > 1 ||
+          Math.abs(conversation.viewport.rect.height - 633) > 1 ||
+          Math.abs(conversation.viewport.scrollHeight - 4_882) > 2 ||
+          !conversation.windowed ||
+          conversation.windowed.mountedTurnCount !== 9 ||
+          conversation.windowed.mountedUserBubbleCount !== 9 ||
+          conversation.windowed.placeholderCount !== 2 ||
+          conversation.windowed.totalMessageCount !== "30" ||
+          conversation.threadFollowing !== "false" ||
+          !conversation.floating.show ||
+          conversation.floating.hidden !== "false" ||
+          !conversation.floating.rect ||
+          Math.abs(conversation.floating.rect.left - 344) > 1 ||
+          Math.abs(conversation.floating.rect.top - 510) > 1 ||
+          Math.abs(conversation.floating.rect.width - 32) > 1 ||
+          Math.abs(conversation.floating.rect.height - 32) > 1 ||
+          !conversation.composer.rect ||
+          Math.abs(conversation.composer.rect.left - 16) > 1 ||
+          Math.abs(conversation.composer.rect.top - 566) > 1 ||
+          Math.abs(conversation.composer.rect.width - 688) > 1 ||
+          Math.abs(conversation.composer.rect.height - 98) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.820 compact-away contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (scene.id === "composer-permissions-menu") {

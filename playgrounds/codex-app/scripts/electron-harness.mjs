@@ -515,6 +515,23 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    currentSidebar: true,
+    frame: "thread-current-26-820-middle",
+    id: "thread-current-26-820-middle",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+    sidebarState: "hidden",
+  },
+  {
+    currentSidebar: true,
+    frame: "thread-current-26-820-compact-away",
+    id: "thread-current-26-820-compact-away",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "conversation-completed",
     id: "conversation-completed",
     maxPixelRatio: 0.0225,
