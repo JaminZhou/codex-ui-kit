@@ -67,6 +67,15 @@ observation from a previous build remains historical evidence.
   the new one-pixel route inset produces a 559px content width and 415/128
   columns; hiding the sidebar now also hides Back and Forward. Details are in
   [`26.820.60940.md`](26.820.60940.md).
+- A later current 26.820 route-continuity probe locks Projects → Back → Forward
+  location restoration, x=88/120/152 titlebar controls, `opacity: 0.4`
+  unavailable navigation, 720px pinned continuity, explicit Hide/Show, and
+  1180px restoration. Browser/CDP and Electron also preserve a selected
+  project chat across Back/Forward. Local-only current-product comparisons pass
+  at 2.6428% for the titlebar, 4.9332% for Create, and 0.3054% for the masked
+  Projects route. The fresh profile's unified source omitted Pull requests, so
+  that fixed-entry drift remains source-scoped rather than being relabeled as
+  an ASAR change.
 - The previous 26.818 New chat home sample covers the sampled Dark and Light product
   preferences at 1180×820 and 720×680. It locks the persisted 322.90625px
   sidebar, 56px mark, four wide/two compact prompt cards, exact five SVG
@@ -129,7 +138,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 21 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 11 groups and Electron verification covers 11.
+Current inventory: 89 surface groups; 21 have current-build runtime evidence, 53 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 12 groups and Electron verification covers 12.
 Prior acceptance outside those 10 sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

@@ -230,7 +230,7 @@
   background: transparent;
   border: 0;
   color: inherit;
-  cursor: pointer;
+  cursor: default;
   font: inherit;
 }
 
@@ -2141,12 +2141,8 @@
 }
 
 .codex-ui-app-window-chrome__action:disabled {
-  color: color-mix(
-    in srgb,
-    var(--codex-ui-text-tertiary) 55%,
-    transparent
-  );
-  cursor: not-allowed;
+  cursor: default;
+  opacity: 0.4;
 }
 
 .codex-ui-app-route-outlet {
@@ -4475,6 +4471,7 @@
     top: auto;
     transform: none;
     width: auto;
+    z-index: 10;
   }
 
   .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]

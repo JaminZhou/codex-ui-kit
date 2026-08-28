@@ -12617,6 +12617,215 @@ try {
   await appServerCrashApp.close();
 }
 
+const routeContinuityScene = {
+  currentSidebar: true,
+  frame: "route-continuity-projects",
+  id: "electron-route-continuity",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "projects",
+};
+const {
+  app: routeContinuityApp,
+  page: routeContinuityPage,
+} = await launchScene(routeContinuityScene, { capture: false });
+try {
+  const readRouteState = () =>
+    routeContinuityPage.evaluate(() => {
+      const control = (label) => {
+        const element = document.querySelector(
+          `button[aria-label="${label}"]`,
+        );
+        if (
+          !(element instanceof HTMLButtonElement) ||
+          !element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          })
+        ) {
+          return null;
+        }
+        const bounds = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          cursor: style.cursor,
+          disabled: element.disabled,
+          left: bounds.left,
+          opacity: style.opacity,
+        };
+      };
+      const root = document.querySelector(".demo-root");
+      return {
+        back: control("Back"),
+        forward: control("Forward"),
+        historyIndex: root?.getAttribute("data-route-history-index"),
+        historyLength: root?.getAttribute("data-route-history-length"),
+        navigationVisible:
+          document
+            .querySelector(".codex-ui-app-shell__sidebar")
+            ?.checkVisibility({
+              checkOpacity: true,
+              checkVisibilityCSS: true,
+            }) ?? false,
+        projectsVisible: Boolean(
+          document.querySelector(".demo-projects-route"),
+        ),
+        selectedProjectChat: (() => {
+          const selected = document.querySelector(
+            ".demo-project-index-chat-route",
+          );
+          return selected
+            ? {
+                chatId: selected.getAttribute("data-chat-id"),
+                projectId: selected.getAttribute("data-project-id"),
+              }
+            : null;
+        })(),
+        view: root?.getAttribute("data-view"),
+        viewport: { height: innerHeight, width: innerWidth },
+      };
+    });
+  const projects = await readRouteState();
+  await routeContinuityPage
+    .getByRole("button", { exact: true, name: "Back" })
+    .click();
+  await routeContinuityPage.waitForSelector(
+    '.demo-root[data-view="workspace"]',
+  );
+  const back = await readRouteState();
+  await routeContinuityPage
+    .getByRole("button", { exact: true, name: "Forward" })
+    .click();
+  await routeContinuityPage.waitForSelector(
+    '.demo-root[data-view="projects"]',
+  );
+  const forward = await readRouteState();
+  await routeContinuityApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await routeContinuityPage.waitForFunction(
+    () => innerWidth === 720 && innerHeight === 680,
+  );
+  await routeContinuityPage.waitForSelector(
+    '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-pinned]',
+  );
+  const compactVisible = await readRouteState();
+  await routeContinuityPage
+    .getByRole("button", { name: "Hide sidebar" })
+    .click();
+  await routeContinuityPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".codex-ui-app-shell__sidebar")
+        ?.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        }),
+  );
+  const compactCollapsed = await readRouteState();
+  await routeContinuityPage
+    .getByRole("button", { name: "Show sidebar" })
+    .click();
+  await routeContinuityApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(1_180, 820);
+  });
+  await routeContinuityPage.waitForFunction(
+    () => innerWidth === 1_180 && innerHeight === 820,
+  );
+  const restored = await readRouteState();
+  const projectRow = routeContinuityPage
+    .locator("[data-project-row-wrapper]")
+    .filter({
+      has: routeContinuityPage
+        .locator(".codex-ui-project-index__label")
+        .filter({ hasText: /^codex-ui-kit$/ }),
+    });
+  await projectRow
+    .getByRole("button", { name: "Expand project codex-ui-kit" })
+    .click();
+  await routeContinuityPage
+    .getByRole("button", {
+      name: "Open chat Match the current projects index",
+    })
+    .click();
+  await routeContinuityPage.waitForSelector(
+    '.demo-root[data-view="workspace"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="project-index-parity"]',
+  );
+  const selectedChat = await readRouteState();
+  await routeContinuityPage
+    .getByRole("button", { exact: true, name: "Back" })
+    .click();
+  await routeContinuityPage.waitForSelector(
+    '.demo-root[data-view="projects"]',
+  );
+  const selectionBack = await readRouteState();
+  await routeContinuityPage
+    .getByRole("button", { exact: true, name: "Forward" })
+    .click();
+  await routeContinuityPage.waitForSelector(
+    '.demo-root[data-view="workspace"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="project-index-parity"]',
+  );
+  const selectionForward = await readRouteState();
+  const routeContinuity = {
+    back,
+    compactCollapsed,
+    compactVisible,
+    forward,
+    projects,
+    restored,
+    selectedChat,
+    selectionBack,
+    selectionForward,
+  };
+  if (
+    projects.view !== "projects" ||
+    projects.historyIndex !== "1" ||
+    projects.historyLength !== "2" ||
+    projects.back?.disabled !== false ||
+    projects.forward?.disabled !== true ||
+    projects.forward?.opacity !== "0.4" ||
+    projects.forward?.cursor !== "default" ||
+    Math.abs((projects.back?.left ?? Infinity) - 120) > 1 ||
+    Math.abs((projects.forward?.left ?? Infinity) - 152) > 1 ||
+    back.view !== "workspace" ||
+    back.historyIndex !== "0" ||
+    back.back?.disabled !== true ||
+    back.forward?.disabled !== false ||
+    forward.view !== "projects" ||
+    forward.historyIndex !== "1" ||
+    !forward.projectsVisible ||
+    compactVisible.viewport.width !== 720 ||
+    !compactVisible.navigationVisible ||
+    compactCollapsed.navigationVisible ||
+    compactCollapsed.back !== null ||
+    compactCollapsed.forward !== null ||
+    compactCollapsed.view !== "projects" ||
+    restored.viewport.width !== 1_180 ||
+    restored.view !== "projects" ||
+    !restored.navigationVisible ||
+    restored.back?.disabled !== false ||
+    restored.forward?.disabled !== true ||
+    selectedChat.view !== "workspace" ||
+    selectedChat.historyIndex !== "2" ||
+    selectedChat.historyLength !== "3" ||
+    selectedChat.selectedProjectChat?.projectId !== "codex-ui-kit" ||
+    selectedChat.selectedProjectChat?.chatId !== "project-index-parity" ||
+    selectionBack.view !== "projects" ||
+    selectionBack.historyIndex !== "1" ||
+    selectionBack.forward?.disabled !== false ||
+    selectionForward.view !== "workspace" ||
+    selectionForward.historyIndex !== "2" ||
+    selectionForward.selectedProjectChat?.projectId !== "codex-ui-kit" ||
+    selectionForward.selectedProjectChat?.chatId !== "project-index-parity"
+  ) {
+    throw new Error(
+      `Electron route continuity contract failed: ${JSON.stringify(routeContinuity)}`,
+    );
+  }
+} finally {
+  await routeContinuityApp.close();
+}
+
 const notificationQueueScene = {
   frame: "shell-notification-queue",
   id: "electron-shell-notification-queue",

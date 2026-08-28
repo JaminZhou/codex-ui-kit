@@ -475,8 +475,12 @@ long-list replay with the live one-way `Show more` lifecycle. The current
 worktree follow-ups re-observe a real empty collection and the complete sampled
 loading → controlled failure → failed-plus-unread → Retry → restored boundary.
 Remaining Stage 1 work includes re-observing ordinary error and collection
-loading, plus broader route lifecycle feedback, unsampled notification tones,
-and selection continuity beyond New chat. The sampled current 26.820 success
+loading, plus broader route lifecycle feedback and unsampled notification
+tones. Current 26.820 Projects → Back → Forward now preserves the product
+location key across 1180/720, explicit Hide/Show, and width restoration. The
+independent Browser/Electron route stack additionally preserves a selected
+project chat through Back/Forward, closing the previous selection-continuity
+gap beyond New chat. The sampled current 26.820 success
 path is now reached through reversible Pin chat → `⌘Z`; its exact top-center
 Sonner structure, live-region semantics, SVG paths, geometry, Browser/CDP,
 Electron, and 0.8029% product crop pass. The current 26.820 ASAR

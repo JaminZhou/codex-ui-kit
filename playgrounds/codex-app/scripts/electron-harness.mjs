@@ -41,6 +41,15 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
+    frame: "route-continuity-projects",
+    id: "projects-index-route-continuity",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "projects",
+  },
+  {
+    currentSidebar: true,
     frame: "projects-index-expanded",
     id: "projects-index-expanded",
     maxPixelRatio: 0.01,

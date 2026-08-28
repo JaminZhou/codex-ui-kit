@@ -203,6 +203,23 @@ remain source-structural or replay evidence rather than newly claimed runtime
 states; their replay uses the installed renderer's exact info, warning, and
 danger icon paths instead of substitute geometry.
 
+The route-continuity follow-up uses another unique profile on loopback port
+`9883`. The fresh profile initially entered the unified ChatGPT source, where
+the current fixed stack omitted Pull requests despite the identical installed
+fingerprint. The probe therefore records this as account/source or remote
+feature-state drift and navigates the still-current `/projects` route through
+the product's single memory router instead of forcing an absent fixed entry.
+
+The sanitized record proves Projects → Back → Forward location-key restoration,
+28×28px controls at x=88/120/152, full-opacity enabled controls, the unavailable
+direction at `opacity: 0.4`, 720px pinned continuity, Hide removing visible
+Back/Forward, and 1180px route restoration. The independent playground also
+repeats Projects → selected fixture chat → Back → Forward. Its current-product
+comparison passes at 2.6428% for the titlebar controls, 4.9332% for the
+system-font Create crop, and 0.3054% for the privacy-masked Projects route.
+The full screenshot, location keys, profile path, and account-owned rows remain
+local-only.
+
 ### Previous `26.818.41509` global-shell baseline
 
 The prior build note retains the current-home, account-menu, conversation,

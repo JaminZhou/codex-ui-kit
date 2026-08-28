@@ -1250,12 +1250,14 @@ CODEX_UI_KIT_CURRENT_LIGHT_SHELL_COMPACT_REFERENCE=/absolute/path/to/current-lig
 The current Projects Index gate accepts one untracked 1180×820 product frame.
 It aligns the main route independently from the wider product sidebar, masks
 project-owned row content, and compares Create as a separate application-owned
-region:
+region. The route-continuity scene additionally compares the Sidebar, Back,
+and Forward titlebar crop and exercises Projects → selected chat → Back →
+Forward across 1180px, 720px, and explicit Hide/Show:
 
 ```bash
 CODEX_UI_KIT_CURRENT_PROJECTS_INDEX_REFERENCE=/absolute/path/to/current-projects-index.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=projects-index-ready,projects-index-expanded,projects-index-compact
+  --scenes=projects-index-ready,projects-index-route-continuity,projects-index-expanded,projects-index-compact
 ```
 
 The current sidebar lifecycle gates accept Dark/Light account-menu references

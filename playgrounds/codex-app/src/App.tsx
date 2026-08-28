@@ -182,13 +182,14 @@ import {
   resolveDemoThemePreference,
   type DemoThemePreference,
 } from "./theme";
-
-type DemoView =
-  | "conversation"
-  | "projects"
-  | "pull-request"
-  | "shell"
-  | "workspace";
+import {
+  canMoveDemoRoute,
+  createDemoRouteHistory,
+  currentDemoRoute,
+  moveDemoRoute,
+  pushDemoRoute,
+  type DemoView,
+} from "./route-history";
 
 type SidebarGlyphName =
   | "activity"
@@ -1799,7 +1800,19 @@ export function App() {
   const [theme, setTheme] = useState<DemoThemePreference>(
     initialSelection.theme,
   );
-  const [view, setView] = useState<DemoView>(initialSelection.view);
+  const [routeHistory, setRouteHistory] = useState(() =>
+    createDemoRouteHistory(
+      initialSelection.view,
+      initialSelection.frame === "route-continuity-projects"
+        ? ["workspace"]
+        : [],
+    ),
+  );
+  const view = currentDemoRoute(routeHistory);
+  const setView = (nextView: DemoView) =>
+    setRouteHistory((current) => pushDemoRoute(current, nextView));
+  const navigateRouteHistory = (delta: -1 | 1) =>
+    setRouteHistory((current) => moveDemoRoute(current, delta));
   const themeAvailable = isDemoThemeView(view);
   const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
@@ -9978,6 +9991,8 @@ export function App() {
       data-app-server-state={appServerCrashed ? "crashed" : "running"}
       data-notification-action={shellNotificationAction ?? undefined}
       data-current-home={currentHomeFrame || undefined}
+      data-route-history-index={routeHistory.index}
+      data-route-history-length={routeHistory.entries.length}
       data-view={view}
     >
       {!initialSelection.capture && themeAvailable ? (
@@ -10121,6 +10136,7 @@ export function App() {
         layoutMode={
           (initialSelection.capture &&
             activeFrame !== "pr-compact-detail" &&
+            initialSelection.frame !== "route-continuity-projects" &&
             activeFrame !== "subagent-current-compact-720" &&
             ![
               "compact-collapsed",
@@ -10255,11 +10271,14 @@ export function App() {
                         );
                       },
                     }
-                  : {
-                      disabled: true,
-                      icon: <CurrentBuildIcon name="window-chrome-back" />,
-                      label: "Back",
-                  }
+                  : sidebarOpen
+                    ? {
+                        disabled: !canMoveDemoRoute(routeHistory, -1),
+                        icon: <CurrentBuildIcon name="window-chrome-back" />,
+                        label: "Back",
+                        onClick: () => navigateRouteHistory(-1),
+                      }
+                    : undefined
               }
               endActions={
                 view === "projects" ? (
@@ -10275,11 +10294,16 @@ export function App() {
                   </Button>
                 ) : undefined
               }
-              forwardAction={{
-                disabled: true,
-                icon: <CurrentBuildIcon name="window-chrome-forward" />,
-                label: "Forward",
-              }}
+              forwardAction={
+                sidebarOpen
+                  ? {
+                      disabled: !canMoveDemoRoute(routeHistory, 1),
+                      icon: <CurrentBuildIcon name="window-chrome-forward" />,
+                      label: "Forward",
+                      onClick: () => navigateRouteHistory(1),
+                    }
+                  : undefined
+              }
               sidebarAction={{
                 "aria-expanded": sidebarOpen,
                 icon: <CurrentBuildIcon name="window-chrome-sidebar" />,

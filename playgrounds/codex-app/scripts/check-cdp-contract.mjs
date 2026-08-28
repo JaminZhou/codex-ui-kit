@@ -2131,11 +2131,11 @@ for (const scene of selectedScenes) {
           ]) ||
         darkShell.newChatCurrent !== "page" ||
         !darkShell.back?.disabled ||
-        darkShell.back.cursor !== "not-allowed" ||
+        darkShell.back.cursor !== "default" ||
         darkShell.back.width !== 28 ||
         darkShell.back.height !== 28 ||
         !darkShell.forward?.disabled ||
-        darkShell.forward.cursor !== "not-allowed" ||
+        darkShell.forward.cursor !== "default" ||
         darkShell.forward.width !== 28 ||
         darkShell.forward.height !== 28 ||
         JSON.stringify(darkShell.contextIcons) !==
@@ -2372,9 +2372,181 @@ for (const scene of selectedScenes) {
           `Current projects index contract failed: ${JSON.stringify(projectIndex)}`,
         );
       }
+      let routeContinuity = null;
+      if (scene.id === "projects-index-route-continuity") {
+        const readRouteState = () =>
+          page.evaluate(() => {
+            const control = (label) => {
+              const element = document.querySelector(
+                `button[aria-label="${label}"]`,
+              );
+              if (
+                !(element instanceof HTMLButtonElement) ||
+                !element.checkVisibility({
+                  checkOpacity: true,
+                  checkVisibilityCSS: true,
+                })
+              ) {
+                return null;
+              }
+              const bounds = element.getBoundingClientRect();
+              const style = getComputedStyle(element);
+              return {
+                cursor: style.cursor,
+                disabled: element.disabled,
+                left: bounds.left,
+                opacity: style.opacity,
+              };
+            };
+            const root = document.querySelector(".demo-root");
+            return {
+              back: control("Back"),
+              forward: control("Forward"),
+              historyIndex: root?.getAttribute("data-route-history-index"),
+              historyLength: root?.getAttribute("data-route-history-length"),
+              navigationVisible:
+                document
+                  .querySelector(".codex-ui-app-shell__sidebar")
+                  ?.checkVisibility({
+                    checkOpacity: true,
+                    checkVisibilityCSS: true,
+                  }) ?? false,
+              projectsVisible: Boolean(
+                document.querySelector(".demo-projects-route"),
+              ),
+              selectedProjectChat: (() => {
+                const selected = document.querySelector(
+                  ".demo-project-index-chat-route",
+                );
+                return selected
+                  ? {
+                      chatId: selected.getAttribute("data-chat-id"),
+                      projectId: selected.getAttribute("data-project-id"),
+                    }
+                  : null;
+              })(),
+              view: root?.getAttribute("data-view"),
+              viewport: { height: innerHeight, width: innerWidth },
+            };
+          });
+        const projects = await readRouteState();
+        await page.getByRole("button", { exact: true, name: "Back" }).click();
+        await page.waitForSelector('.demo-root[data-view="workspace"]');
+        const back = await readRouteState();
+        await page
+          .getByRole("button", { exact: true, name: "Forward" })
+          .click();
+        await page.waitForSelector('.demo-root[data-view="projects"]');
+        const forward = await readRouteState();
+        await page.setViewportSize({ height: 680, width: 720 });
+        await page.waitForSelector(
+          '.codex-ui-app-shell[data-layout-mode="narrow"][data-sidebar-pinned]',
+        );
+        const compactVisible = await readRouteState();
+        await page.getByRole("button", { name: "Hide sidebar" }).click();
+        await page.waitForFunction(
+          () =>
+            !document
+              .querySelector(".codex-ui-app-shell__sidebar")
+              ?.checkVisibility({
+                checkOpacity: true,
+                checkVisibilityCSS: true,
+              }),
+        );
+        const compactCollapsed = await readRouteState();
+        await page.getByRole("button", { name: "Show sidebar" }).click();
+        await page.setViewportSize({ height: 820, width: 1_180 });
+        const restored = await readRouteState();
+        const projectRow = page
+          .locator("[data-project-row-wrapper]")
+          .filter({
+            has: page
+              .locator(".codex-ui-project-index__label")
+              .filter({ hasText: /^codex-ui-kit$/ }),
+          });
+        await projectRow
+          .getByRole("button", { name: "Expand project codex-ui-kit" })
+          .click();
+        await page
+          .getByRole("button", {
+            name: "Open chat Match the current projects index",
+          })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-view="workspace"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="project-index-parity"]',
+        );
+        const selectedChat = await readRouteState();
+        await page.getByRole("button", { exact: true, name: "Back" }).click();
+        await page.waitForSelector('.demo-root[data-view="projects"]');
+        const selectionBack = await readRouteState();
+        await page
+          .getByRole("button", { exact: true, name: "Forward" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-view="workspace"] .demo-project-index-chat-route[data-project-id="codex-ui-kit"][data-chat-id="project-index-parity"]',
+        );
+        const selectionForward = await readRouteState();
+        routeContinuity = {
+          back,
+          compactCollapsed,
+          compactVisible,
+          forward,
+          projects,
+          restored,
+          selectedChat,
+          selectionBack,
+          selectionForward,
+        };
+        if (
+          projects.view !== "projects" ||
+          projects.historyIndex !== "1" ||
+          projects.historyLength !== "2" ||
+          projects.back?.disabled !== false ||
+          projects.forward?.disabled !== true ||
+          projects.forward?.opacity !== "0.4" ||
+          projects.forward?.cursor !== "default" ||
+          Math.abs((projects.back?.left ?? Infinity) - 120) > 1 ||
+          Math.abs((projects.forward?.left ?? Infinity) - 152) > 1 ||
+          back.view !== "workspace" ||
+          back.historyIndex !== "0" ||
+          back.back?.disabled !== true ||
+          back.forward?.disabled !== false ||
+          forward.view !== "projects" ||
+          forward.historyIndex !== "1" ||
+          !forward.projectsVisible ||
+          compactVisible.viewport.width !== 720 ||
+          !compactVisible.navigationVisible ||
+          compactCollapsed.navigationVisible ||
+          compactCollapsed.back !== null ||
+          compactCollapsed.forward !== null ||
+          compactCollapsed.view !== "projects" ||
+          restored.viewport.width !== 1_180 ||
+          restored.view !== "projects" ||
+          !restored.navigationVisible ||
+          restored.back?.disabled !== false ||
+          restored.forward?.disabled !== true ||
+          selectedChat.view !== "workspace" ||
+          selectedChat.historyIndex !== "2" ||
+          selectedChat.historyLength !== "3" ||
+          selectedChat.selectedProjectChat?.projectId !== "codex-ui-kit" ||
+          selectedChat.selectedProjectChat?.chatId !== "project-index-parity" ||
+          selectionBack.view !== "projects" ||
+          selectionBack.historyIndex !== "1" ||
+          selectionBack.forward?.disabled !== false ||
+          selectionForward.view !== "workspace" ||
+          selectionForward.historyIndex !== "2" ||
+          selectionForward.selectedProjectChat?.projectId !== "codex-ui-kit" ||
+          selectionForward.selectedProjectChat?.chatId !==
+            "project-index-parity"
+        ) {
+          throw new Error(
+            `Current route continuity contract failed: ${JSON.stringify(routeContinuity)}`,
+          );
+        }
+      }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
-        `${JSON.stringify(projectIndex, null, 2)}\n`,
+        `${JSON.stringify(routeContinuity ? { projectIndex, routeContinuity } : projectIndex, null, 2)}\n`,
       );
       continue;
     }
