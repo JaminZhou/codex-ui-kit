@@ -2158,9 +2158,11 @@ export function App() {
   const [shellQueuedNotificationIds, setShellQueuedNotificationIds] = useState<
     string[]
   >(() =>
-    initialSelection.frame === "shell-notification-queue"
-      ? ["success", "permission", "background", "update"]
-      : [],
+    initialSelection.frame === "shell-notification-success-stack"
+      ? ["success-a", "success-b", "success-c", "success-d"]
+      : initialSelection.frame === "shell-notification-queue"
+        ? ["success", "permission", "background", "update"]
+        : [],
   );
   const [shellNotificationAction, setShellNotificationAction] = useState<
     string | null
@@ -10033,7 +10035,7 @@ export function App() {
                     setShellQueuedNotificationIds((current) =>
                       current.filter((candidate) => candidate !== id),
                     );
-                  if (id === "success") {
+                  if (id === "success" || id.startsWith("success-")) {
                     return {
                       heading: "Chat unpinned",
                       id,
@@ -10095,7 +10097,8 @@ export function App() {
             : []
         }
         style={
-          initialSelection.frame === "shell-notification-queue"
+          initialSelection.frame === "shell-notification-queue" ||
+          initialSelection.frame === "shell-notification-success-stack"
             ? ({
                 "--codex-ui-app-sidebar-width": "322.90625px",
               } as CSSProperties)

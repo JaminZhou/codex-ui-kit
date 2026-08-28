@@ -4373,7 +4373,8 @@ for (const scene of selectedScenes) {
           contract.outlet.contentBusy !== null) ||
         ((scene.shellState === "stale") !== contract.outlet.preserved) ||
         ((scene.id === "shell-restored" ||
-          scene.id === "shell-notification-queue") !==
+          scene.id === "shell-notification-queue" ||
+          scene.id === "shell-notification-success-stack") !==
           Boolean(contract.notification))
       ) {
         throw new Error(
@@ -4504,6 +4505,68 @@ for (const scene of selectedScenes) {
           );
         }
         contract.afterAction = focus;
+      }
+      if (scene.id === "shell-notification-success-stack") {
+        const expectedWidths = [170.4375, 161.9156, 153.3938, 144.8718];
+        const expectedTops = [48, 57.05, 66.1, 75.15];
+        if (
+          contract.notificationRegion?.totalCount !== "4" ||
+          contract.notificationRegion.visibleCount !== "3" ||
+          contract.notificationRegion.hiddenCount !== "1" ||
+          contract.notifications.length !== 4 ||
+          contract.notifications.some(
+            (notification, index) =>
+              notification.text !== "Chat unpinned" ||
+              notification.tone !== "success" ||
+              notification.index !== String(index) ||
+              notification.visible !== (index < 3 ? "true" : "false") ||
+              !notification.alert ||
+              Math.abs(notification.alert.rect.width - expectedWidths[index]) >
+                1 ||
+              Math.abs(notification.alert.rect.top - expectedTops[index]) > 1,
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: current success stack contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        await page
+          .locator('.codex-ui-app-notification[data-index="0"]')
+          .hover();
+        await page.waitForTimeout(250);
+        const expandedSuccessStack = await page.evaluate(() =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-app-notification"),
+            (notification) => ({
+              expanded: notification.getAttribute("data-expanded"),
+              opacity: getComputedStyle(notification).opacity,
+              pointerEvents: getComputedStyle(notification).pointerEvents,
+              top: notification.getBoundingClientRect().top,
+              visible: notification.getAttribute("data-visible"),
+            }),
+          ),
+        );
+        if (
+          expandedSuccessStack.length !== 4 ||
+          expandedSuccessStack.some(
+            ({ expanded }) => expanded !== "true",
+          ) ||
+          expandedSuccessStack.slice(0, 3).some(
+            ({ pointerEvents, visible }, index, notifications) =>
+              visible !== "true" ||
+              pointerEvents !== "auto" ||
+              (index > 0 &&
+                notifications[index].top - notifications[index - 1].top < 40),
+          ) ||
+          expandedSuccessStack[3].visible !== "false" ||
+          expandedSuccessStack[3].opacity !== "0" ||
+          expandedSuccessStack[3].pointerEvents !== "none"
+        ) {
+          throw new Error(
+            `${scene.id}: current success stack expansion failed: ${JSON.stringify(expandedSuccessStack)}`,
+          );
+        }
+        contract.expandedSuccessStack = expandedSuccessStack;
       }
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),

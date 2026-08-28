@@ -189,7 +189,10 @@ The eleventh slice completes the first application-shell continuity contract:
   info/success/warning/danger/Close paths, hover/focus queue expansion, safe
   bottom-end anchoring, dialog-owned layering, action focus continuation, and an
   optional unmasked
-  `CODEX_UI_KIT_CURRENT_NOTIFICATION_REFERENCE` 172×42 product crop gate;
+  `CODEX_UI_KIT_CURRENT_NOTIFICATION_REFERENCE` 172×42 product crop gate. The
+  separate `shell-notification-success-stack` frame locks the current four-
+  mounted/three-visible same-tone stack and accepts an optional unmasked
+  `CODEX_UI_KIT_CURRENT_NOTIFICATION_STACK_REFERENCE` 172×64 product crop;
 - Browser CDP coverage across the shared lifecycle matrix and real Electron
   offline → retry → ready plus 1180×820 → 720×680 → 1180×820 acceptance;
 - four deterministic pixel frames and an optional 120×46 current-build

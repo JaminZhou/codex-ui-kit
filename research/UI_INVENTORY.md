@@ -432,9 +432,12 @@ dark geometry, three-visible mounted queue, interaction expansion, viewport-safe
 bottom anchoring, and dialog-owned layering. Browser/CDP, Electron, one
 reviewed baseline, and an unmasked 0.8029% product crop promote
 `cross-layer.global-notifications` to current runtime evidence for the sampled
-success path. The unsampled info, warning, and danger replays reuse exact
-current-source icon paths but are not promoted to runtime evidence, nor is
-simultaneous live stacking.
+success path. A later four-chat Pin → `⌘Z` probe reaches four simultaneous
+success items, restores every chat, and locks the real three-visible/four-
+mounted stack, 1/0.95/0.90/0.85 scales, 0/8/16/24px offsets, centered transform
+origin, hover expansion, Browser/Electron contracts, and a 0.2907% unmasked
+172×64 product crop. The unsampled info, warning, and danger replays reuse exact
+current-source icon paths but are not promoted to runtime evidence.
 
 A separate current-build probe safely terminates only one isolated process's
 validated App Server child and reaches the dedicated 408×400 fatal recovery

@@ -70,6 +70,12 @@ describe("application continuity visual contract", () => {
     expect(styles).toMatch(
       /\.codex-ui-app-notification-toaster\[data-expanded="true"\][\s\S]*?\.codex-ui-app-notification\[data-visible="true"\]\s*\{[^}]*position:\s*relative;[^}]*transform:\s*none;/,
     );
+    expect(styles).toMatch(
+      /\.codex-ui-app-notification-toaster\[data-expanded="true"\]\s*\{[^}]*gap:\s*calc\(var\(--codex-ui-spacing\) \* 2\);/s,
+    );
+    expect(styles).toContain(
+      "scale(calc(1 - var(--codex-ui-app-notification-index) * 0.05))",
+    );
     expect(styles).toContain("background: #011c0b");
     expect(styles).toContain("color: #40c977");
     expect(styles).toContain("@keyframes codex-ui-route-spinner");

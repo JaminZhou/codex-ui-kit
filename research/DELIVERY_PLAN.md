@@ -805,9 +805,11 @@ without confusing package readiness with full product reconstruction.
    geometry, and local-only full/core pixels. The bounded four-item global
    notification queue now matches the real top-center three-visible Sonner
    contract and a reversible current success transition in Browser/CDP,
-   Electron, and product pixels. Other notification tones, simultaneous live
-   stacking, and the complete response-stream retry/failure/follow-up state
-   machine retain their recorded evidence levels.
+   Electron, and product pixels. Four reversible Pin/Undo transitions now also
+   lock simultaneous same-tone stacking, centered 5%/8px layer geometry, hover
+   expansion, and a 0.2907% product crop. Other notification tones and the
+   complete response-stream retry/failure/follow-up state machine retain their
+   recorded evidence levels.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
