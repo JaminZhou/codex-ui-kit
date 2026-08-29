@@ -127,6 +127,8 @@ export function SearchActivity({
             {entry.favicon ??
               (entry.faviconUrl ? (
                 <img alt="" src={entry.faviconUrl} />
+              ) : kind === "web" ? (
+                <SearchIcon kind="web" />
               ) : null)}
             <span>{entry.detail}</span>
           </>

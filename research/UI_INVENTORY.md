@@ -73,6 +73,14 @@ observation from a previous build remains historical evidence.
   variable-height tooltip, progress, all-complete removal, and settled answer.
   CDP/Electron gate the lifecycle and its tight local-only eight-step product
   comparison passes at 2.8869%. Broader reasoning,
+  A separate current read-only Search/Browser probe covers the two-level Web
+  Search disclosure, the generic MCP-backed Browser activity group, and the
+  419.59375px one-tab Browser workspace. CDP gates six frames; Electron repeats
+  both open lifecycles and collapse/reopen. The local-only Search, Browser
+  activity, and Browser-chrome comparisons pass at 10.32%, 8.45%, and 2.80%.
+  External page content is explicitly source-owned and excluded. Multi-tab,
+  authentication, download, permission, history, and page error states remain
+  incomplete.
   account/settings, other feature-state,
   and exact visual-asset captures remain previous-build evidence until
   recaptured.
@@ -170,7 +178,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 13 have current-build runtime evidence, 61 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Current inventory: 89 surface groups; 16 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

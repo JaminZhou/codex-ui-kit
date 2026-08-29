@@ -60,6 +60,16 @@ The authoritative current-build inventory is:
   project action menu still uses the frozen Electron native context-menu
   provider; its native window, exact icon sources, and pixel gate remain
   previous-build evidence until recaptured.
+- A current read-only Search/Browser follow-up reaches real Web Search and the
+  in-app Browser without project-file access. It locks `Worked for 21s` →
+  `Searched the web`, the current generic MCP-backed `Used the browser, loaded
+  a tool` group, and the 419.59375px one-tab Browser workspace with 46px/40px
+  chrome rows. Six Browser/CDP frames, two Electron lifecycle checks, and six
+  reviewed replay baselines cover the sampled states. Local-only product
+  comparisons pass at 10.32% for Search text, 8.45% for Browser activity, and
+  2.80% for Browser chrome. External page pixels and unsampled multi-tab,
+  authentication, download, permission, history, and error states are not
+  claimed.
 - The previous 26.820 account-menu matrix supersedes the previous focus and
   typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
   remains 306.90625×188.375px with six 28.5625px rows, five exact icons, one

@@ -288,6 +288,10 @@ const currentThinking26825ReferenceSize = {
 };
 const currentPlan26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_PLAN_26_825_REFERENCE;
+const currentSearch26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_SEARCH_26_825_REFERENCE;
+const currentBrowser26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_BROWSER_26_825_REFERENCE;
 const currentPlan26825ReferenceSize = {
   height: 820,
   width: 1180,
@@ -894,6 +898,7 @@ for (const scene of selectedScenes) {
   let currentCommandInterruptionBounds;
   let currentThinking26825Bounds;
   let currentPlan26825Bounds;
+  let currentSearchBrowser26825Bounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -1115,6 +1120,36 @@ for (const scene of selectedScenes) {
           trigger: rect(
             document.querySelector(
               ".codex-ui-composer-plan-progress__trigger",
+            ),
+          ),
+        };
+      });
+    }
+    if (
+      scene.id === "conversation-search-current-26-825-open" ||
+      scene.id === "conversation-browser-current-26-825-open"
+    ) {
+      currentSearchBrowser26825Bounds = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                height: Math.round(value.height),
+                left: Math.round(value.left),
+                top: Math.round(value.top),
+                width: Math.round(value.width),
+              }
+            : null;
+        };
+        return {
+          activity: rect(
+            document.querySelector(
+              ".demo-current-search-26-825-timeline .codex-ui-search-activity, .demo-current-browser-26-825-timeline .codex-ui-browser-activity",
+            ),
+          ),
+          browser: rect(
+            document.querySelector(
+              ".codex-ui-app-shell__side-panel",
             ),
           ),
         };
@@ -1638,6 +1673,160 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current 26.825 Plan foreground pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "conversation-search-current-26-825-open" &&
+    currentSearch26825Reference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentSearch26825Reference),
+    );
+    const bounds = currentSearchBrowser26825Bounds?.activity;
+    if (
+      reference.width !== 1180 ||
+      reference.height !== 820 ||
+      actual.width !== 1180 ||
+      actual.height !== 820 ||
+      !bounds
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Search comparison requires exact 1180x820 frames and an activity region.`,
+      );
+    }
+    const crop = { height: 79, width: 420 };
+    const referenceCrop = cropPng(
+      reference,
+      379,
+      276,
+      crop.width,
+      crop.height,
+    );
+    const actualCrop = cropPng(
+      actual,
+      bounds.left - 4,
+      bounds.top - 4,
+      crop.width,
+      crop.height,
+    );
+    const comparison = comparePng(
+      foregroundMaskPng(referenceCrop, 12),
+      foregroundMaskPng(actualCrop, 12),
+      0,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceCrop),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualCrop),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SEARCH_26_825_MAX_DIFF_RATIO",
+      0.11,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 Search foreground pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 Search foreground pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "conversation-browser-current-26-825-open" &&
+    currentBrowser26825Reference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentBrowser26825Reference),
+    );
+    const bounds = currentSearchBrowser26825Bounds?.activity;
+    const browserBounds = currentSearchBrowser26825Bounds?.browser;
+    if (
+      reference.width !== 1180 ||
+      reference.height !== 820 ||
+      actual.width !== 1180 ||
+      actual.height !== 820 ||
+      !bounds ||
+      !browserBounds ||
+      browserBounds.left !== 760 ||
+      browserBounds.width !== 420
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Browser comparison requires exact 1180x820 frames, activity geometry, and a 420px Browser side panel.`,
+      );
+    }
+    const activityCrop = { height: 104, width: 413 };
+    const referenceActivity = cropPng(
+      reference,
+      335,
+      322,
+      activityCrop.width,
+      activityCrop.height,
+    );
+    const actualActivity = cropPng(
+      actual,
+      bounds.left - 4,
+      bounds.top - 4,
+      activityCrop.width,
+      activityCrop.height,
+    );
+    const activityComparison = comparePng(
+      foregroundMaskPng(referenceActivity, 12),
+      foregroundMaskPng(actualActivity, 12),
+      0,
+    );
+    const referenceChrome = cropPng(reference, 760, 0, 420, 86);
+    const actualChrome = cropPng(actual, 760, 0, 420, 86);
+    const chromeComparison = comparePng(
+      referenceChrome,
+      actualChrome,
+      0.12,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceActivity),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualActivity),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product-chrome.png`),
+      PNG.sync.write(referenceChrome),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build-chrome.png`),
+      PNG.sync.write(actualChrome),
+    );
+    const maximumActivityRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_BROWSER_26_825_ACTIVITY_MAX_DIFF_RATIO",
+      0.1,
+    );
+    const maximumChromeRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_BROWSER_26_825_CHROME_MAX_DIFF_RATIO",
+      0.08,
+    );
+    if (
+      activityComparison.ratio > maximumActivityRatio ||
+      chromeComparison.ratio > maximumChromeRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Browser pixel ratios exceed their gates: ${JSON.stringify({ activity: activityComparison.ratio, chrome: chromeComparison.ratio })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 Browser pixel ratios activity=${activityComparison.ratio}, chrome=${chromeComparison.ratio}`,
     );
   }
 

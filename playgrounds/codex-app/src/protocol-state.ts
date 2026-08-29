@@ -170,11 +170,14 @@ export interface DemoFileChange {
 export interface DemoMcpToolCall {
   appName: string;
   arguments: JsonValue;
+  browserUrl: string | null;
+  browserUse: boolean;
   content: JsonValue[];
   durationMs: number | null;
   error: string | null;
   id: string;
   progress: string[];
+  readOnlyHint: boolean;
   server: string;
   status: "completed" | "failed" | "pending" | "running";
   structuredContent: JsonValue | null;
@@ -1418,6 +1421,10 @@ export function reduceProtocolNotification(
       const existing = state.mcpToolCalls.find(({ id }) => id === itemId);
       const appContext = isRecord(item.appContext) ? item.appContext : {};
       const result = isRecord(item.result) ? item.result : {};
+      const resultMeta = isRecord(result._meta) ? result._meta : {};
+      const browserUseMeta = isRecord(resultMeta.browser_use)
+        ? resultMeta.browser_use
+        : {};
       const error = isRecord(item.error) ? item.error : {};
       const server = asString(item.server) ?? existing?.server ?? "mcp";
       const tool = asString(item.tool) ?? existing?.tool ?? "tool";
@@ -1435,11 +1442,18 @@ export function reduceProtocolNotification(
             item.arguments,
             existing?.arguments ?? null,
           ),
+          browserUrl:
+            asString(browserUseMeta.url) ?? existing?.browserUrl ?? null,
+          browserUse:
+            resultMeta["codex/browserUse"] === true ||
+            existing?.browserUse === true,
           content: resultContent,
           durationMs: asNumber(item.durationMs),
           error: asString(error.message),
           id: itemId,
           progress: existing?.progress ?? [],
+          readOnlyHint:
+            item.readOnlyHint === true || existing?.readOnlyHint === true,
           server,
           status,
           structuredContent:

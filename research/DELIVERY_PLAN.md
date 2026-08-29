@@ -14,8 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.31414` (`7287`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 13 groups have current-build runtime evidence, 61 have previous-build-only
-  runtime evidence, and 15 have not been sampled.
+- 16 groups have current-build runtime evidence, 59 have previous-build-only
+  runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.31414` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider, Help menu, route restoration, and Projects Index. It locks the
@@ -48,6 +48,19 @@ exit gates; it does not replace the inventory.
   baselines and a 2.8869% foreground product comparison cover the 1180×820
   composition. Free-form reasoning and unsampled reasoning variants remain P0
   work, so the combined inventory group stays partial.
+  A further read-only current-build probe now promotes
+  `thread.search-tool-events`, `thread.browser-tool-events`, and
+  `workspace.browser`. Web Search preserves the two-level `Worked for 21s` →
+  `Searched the web` disclosure and two 14/21px result rows. Browser presents
+  the current generic read-only MCP sequence as `Used the browser, loaded a
+  tool`, retains the skill/connect/navigation steps, and opens a 419.59375px
+  one-tab workspace with a 46px tab strip and 40px navigation toolbar.
+  Browser/CDP covers six collapsed/expanded frames, Electron repeats both open
+  lifecycles, and local-only product comparisons pass at 10.32% for Search,
+  8.45% for Browser activity, and 2.80% for Browser chrome. External page
+  pixels remain source-owned and are excluded behind an explicit content
+  boundary. Multi-tab, authentication, downloads, permission prompts, and
+  page-owned states remain incomplete.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a

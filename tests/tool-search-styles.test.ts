@@ -18,7 +18,10 @@ describe("tool and search visual contract", () => {
 
   it("keeps grouped result alignment and 14px favicons", () => {
     expect(styles).toMatch(
-      /\.codex-ui-tool-call \.codex-ui-activity__body,[\s\S]*?margin: 0\.25rem 0 0 1\.5rem/,
+      /\.codex-ui-tool-call \.codex-ui-activity__body \{[\s\S]*?margin: 0\.25rem 0 0 1\.5rem/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-search-activity \.codex-ui-activity__body \{[\s\S]*?margin: 0;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-search-activity__entries img,[\s\S]*?height: 0\.875rem;[\s\S]*?width: 0\.875rem/,
