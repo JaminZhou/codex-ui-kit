@@ -379,6 +379,13 @@ export const visualScenes = [
     scenario: "conversation-lifecycle",
   },
   {
+    frame: "conversation-thinking-current-26-825",
+    id: "conversation-thinking-current-26-825",
+    maxPixelRatio: 0.0225,
+    scenario: "conversation-lifecycle",
+    sidebarState: "hidden",
+  },
+  {
     frame: "composer-multiline",
     id: "composer-multiline",
     maxPixelRatio: 0.0225,

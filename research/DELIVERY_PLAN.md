@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.31414` (`7287`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 63 have previous-build-only
+- 13 groups have current-build runtime evidence, 61 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.825.31414` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -32,6 +32,16 @@ exit gates; it does not replace the inventory.
   `scrollTop = -900`, and restores latest through the 32×32px control. CDP,
   Electron, reviewed baselines, and local-only product references gate the
   current responsive boundary under a 1% structural pixel limit.
+  The current activity follow-up additionally re-observes
+  `thread.activity-reasoning-plan` and `thread.command-execution` for one
+  no-tool turn and two safe terminal turns. It replaces the continuous
+  gradient with the installed 600ms-delay, 1s/48-step, 4s-period cadenced
+  loading text; locks the 14/21px, weight-400 Thinking label with a
+  38.5%-foreground base and 75%-foreground sweep; and confirms 60%-foreground
+  collapsed/expanded `Worked for` plus `Ran …` rows. Browser/CDP, Electron, a
+  reviewed 1180×820 baseline, and a 0.6% tight current-product foreground
+  comparison gate the pre-answer state. Plan writing/completion and the rest of
+  reasoning remain P0 work rather than being promoted by this narrow sample.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a

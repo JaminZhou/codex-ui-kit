@@ -27,10 +27,20 @@ describe("complete thread visual contract", () => {
       "--codex-ui-loading-shimmer-muted: var(--codex-ui-gray-300)",
     );
     expect(tokens).toContain("--codex-ui-message-highlight-duration: 1400ms");
-    expect(styles).toContain("steps(48, end) infinite");
+    expect(styles).toContain("animation-duration: 1s");
+    expect(styles).toContain("animation-iteration-count: 1");
+    expect(styles).toContain("animation-timing-function: steps(48, end)");
+    expect(styles).toContain(
+      "@keyframes codex-ui-cadenced-loading-shimmer-sweep",
+    );
+    expect(styles).toContain(
+      "@keyframes codex-ui-cadenced-loading-shimmer-highlight",
+    );
     expect(styles).toContain("@keyframes codex-ui-message-target-highlight");
     expect(styles).toContain(".codex-ui-agent-message__content:focus-visible");
-    expect(styles).toContain(".codex-ui-loading-shimmer {\n    animation: none");
+    expect(styles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.codex-ui-loading-shimmer--active[\s\S]*?animation: none;/,
+    );
     expect(styles).toContain("scroll-behavior: auto");
   });
 
