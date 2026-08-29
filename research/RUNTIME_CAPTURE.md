@@ -121,9 +121,21 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
-### Current `26.820.60940` global-shell baseline
+### Current `26.825.31414` global-shell baseline
 
-The current installed build is `26.820.60940` (`7119`) with Chromium
+The current installed build is `26.825.31414` (`7287`) with Chromium
+`151.0.7922.174`, a 284029139-byte `app.asar`, and SHA-256
+`8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255`.
+One isolated second process on loopback port `9895` repeats structural main
+Renderer selection, the New chat 1180/820/721/720 matrix, sidebar lifecycle,
+Help menu, Pull requests round trip, and Projects Index. The fixed route stack
+now omits `Sites`, while the persisted sidebar width is 321.875px. The capture
+records no private labels or screenshots. See
+[`26.825.31414.md`](26.825.31414.md).
+
+### Previous `26.820.60940` global-shell baseline
+
+The previously installed build was `26.820.60940` (`7119`) with Chromium
 `151.0.7922.170`, a 282402769-byte `app.asar`, and SHA-256
 `c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9`.
 One isolated second process on loopback port `9881` re-runs the structural main
@@ -537,7 +549,7 @@ Browser/CDP and Electron repeat that one-way behavior with twelve replay rows.
 Privacy-safe 28×30 and 140×32 product crops pass at 2.7381% and 3.8393%; raw
 titles, thread IDs, profiles, and full screenshots remain local-only.
 
-### Current `26.820.60940` worktree failure and Retry recovery
+### Previous `26.820.60940` worktree failure and Retry recovery
 
 The current continuation uses a new isolated profile on loopback-only port
 9882 and one disposable single-commit Git repository. The product selects
@@ -1740,7 +1752,7 @@ and 3.5% ceilings. Private paths, screenshots, and disposable profiles are not
 committed; both isolated profiles were moved recoverably to Trash after their
 exact processes, handlers, and loopback listeners were gone.
 
-## Current `26.820.60940` post-picker attachment sample
+## Previous `26.820.60940` post-picker attachment sample
 
 Two user-authorized isolated instances on ports `9885` and `9886` selected one
 synthetic text file plus one public repository image and opened the resulting
@@ -1759,7 +1771,7 @@ Electron, reviewed internal rasters, and optional local-only product regions
 cover the same boundary. Actual upload failure/progress and plugin attachments
 remain unsampled product transitions.
 
-## Current `26.820.60940` thirty-turn sample
+## Previous `26.820.60940` thirty-turn sample
 
 Use one isolated, loopback-only second process and one disposable task. The
 test prompt sequence must be explicitly user-authorized and must prohibit

@@ -45,29 +45,29 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.820.60940` (`7119`)
-- Package and scoped shell lifecycle sampled on 2026-08-27
+- Codex Desktop `26.825.31414` (`7287`)
+- Package and scoped shell lifecycle sampled on 2026-08-29
 - `app.asar` SHA-256:
-  `c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9`
+  `8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer evidence now covers the New chat shell,
+- Fresh current-build Renderer evidence covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
   New chat, current Composer geometry, zero horizontal overflow, and stable
   sidebar scroll ownership. Structural target ranking excludes the avatar
   overlay without using private text. The exact `scrollHeight` remains
   content-dependent, so the contract locks the unique scroll owner and visible
-  geometry rather than private task counts. It also revalidates the 320px Help
-  menu, the Dark/Light × wide/compact account menu, and the content-dependent
-  Projects Index. At the collapsed 600px gate,
-  the new one-pixel route inset produces a 559px content width and 415/128
-  columns; hiding the sidebar now also hides Back and Forward. Details are in
-  [`26.820.60940.md`](26.820.60940.md).
-- A later current 26.820 route-continuity probe locks Projects → Back → Forward
+  geometry rather than private task counts. It revalidates the 320px Help menu
+  and content-dependent Projects Index. The sidebar is now 321.875px wide;
+  the collapsed 600px Projects route remains 559px with 415/128 columns.
+  `Sites` is absent from every sampled fixed-route stack. Details are in
+  [`26.825.31414.md`](26.825.31414.md). Account/settings, feature-state, and
+  exact visual-asset captures remain previous-build evidence until recaptured.
+- A previous 26.820 route-continuity probe locks Projects → Back → Forward
   location restoration, x=88/120/152 titlebar controls, `opacity: 0.4`
   unavailable navigation, 720px pinned continuity, explicit Hide/Show, and
   1180px restoration. Browser/CDP and Electron also preserve a selected
@@ -83,7 +83,7 @@ observation from a previous build remains historical evidence.
   return, and zero compact overflow. Four unmasked owned-main comparisons pass
   between 0.2708% and 1.7855% under a 2.5% hard limit; the product preference
   was restored to System after capture.
-- The current 26.820 account-menu sample covers Dark and Light at 1180×820 and
+- The previous 26.820 account-menu sample covers Dark and Light at 1180×820 and
   720×680. It locks the 322.90625px sidebar, 306.90625×188.375px portalled
   menu, six 28.5625px rows at weight 400, 9px visual divider, five exact
   sampled icons, one avatar, menu-surface focus, zero role separators, zero
@@ -104,14 +104,14 @@ observation from a previous build remains historical evidence.
   20px user bubble, four exact response-action assets, and all five Composer
   control hit targets. The local-only 768×774 product crop is compared without
   masks at 0.4320% changed pixels under a 0.5% hard limit.
-- The current 26.820 thirty-turn task refreshes that shell and adds responsive
+- The previous 26.820 thirty-turn task refreshes that shell and adds responsive
   virtualization/navigation evidence. Wide mode exposes the 30-button
   36×10px rail, 11 mounted turns, message-15 materialization, and the sampled
   stale message-30 current marker. Compact mode hides the rail at zero content
   offset, retains nine mounted turns at `scrollTop = -900`, and returns to
   latest with eight. Browser/CDP and Electron repeat both flows; local-only
   structural comparisons pass at 0.8085% and 0.8397% under 1% limits.
-- The current 26.820 command tasks revalidate a 12-second success, exact
+- The previous 26.820 command tasks revalidate a 12-second success, exact
   exit-code-7 acknowledgement and same-thread recovery, plus a stopped
   120-second loop and second same-thread recovery. The current Renderer uses
   neutral noninteractive `Ran …` rows for both exit 0 and exit 7, hides Shell,
@@ -138,7 +138,7 @@ observation from a previous build remains historical evidence.
   exact response actions, system typography, and zero horizontal overflow.
   Unmasked wide and compact Markdown-root comparisons pass at 1.1682% and
   1.1932% under independent 1.3% hard limits.
-- A current 26.820 no-tool follow-up reaches one double-dollar block equation
+- A previous 26.820 no-tool follow-up reaches one double-dollar block equation
   and records the current 736/687px response roots and 14/22px computed
   typography. Single-dollar math, the escaped heading/image source, and
   footnote reference/definition remain literal in both sampled replies. The
@@ -161,7 +161,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 42 have current-build runtime evidence, 32 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 34 groups and Electron verification covers 34.
+Current inventory: 89 surface groups; 11 have current-build runtime evidence, 63 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -300,7 +300,7 @@ are 2.0833%, 0.7540%, and 0.1786%, while Browser/CDP and Electron lock the
 30px row, 14px branch marker, 20px loading rail, exact spinner/error paths,
 three-track failure composition, action replacement, and recovery.
 
-The current `26.820.60940` follow-up re-observes the shared ordinary row
+The previous `26.820.60940` follow-up re-observes the shared ordinary row
 system without relabelling the unsampled states. Project tasks and Recents
 remain 30px rows with the same current 19×20 Pin/Archive controls, 8px gap,
 35px/8px right insets, and exact current SVG paths. A real active task and
@@ -342,7 +342,7 @@ pointer/Enter/Space transitions, the current 721→720 visible-sidebar rule,
 explicit Hide/Show, a 221×187 native project menu with six fixed actions and
 one conditional unread action, and a 320×272.06 Help menu with a `What's new` heading
 and eight items. The 46px footer now contains a 75.67×28 Voice action plus
-32×32 Help. The current 26.820 account-menu follow-up additionally locks the
+32×32 Help. The previous 26.820 account-menu follow-up additionally locks the
 Dark/Light × wide/compact 306.90625×188.375px account surface, menu-surface
 focus, 400 weight, responsive pinning, and its six-row focus-return lifecycle.
 Browser/CDP and Electron repeat the lifecycle; the current
@@ -447,7 +447,7 @@ restoring only auto-collapsed surfaces. Four deterministic App shell pixel
 frames pass. The 3.93% 120×46 window-chrome comparison is retained as a
 `26.721.81911` regression result. Offline/error/reconnecting/stale and global
 notification variants remain incomplete, so the implementation remains
-`partial`. A current 26.820 isolated ChatGPT task now reaches the reversible
+`partial`. A previous 26.820 isolated ChatGPT task now reaches the reversible
 Pin chat → `⌘Z` success path and emits `Chat unpinned`. The public region
 matches its top-center Sonner structure, polite `Notifications alt+T` section,
 focusable unstyled list item, exact success/Close paths, computed 170.4375×42px
@@ -753,7 +753,7 @@ top groups cover files/folders, active-app attachment, project, Goal, Plan
 mode, skill recording, and plugin resources. Lower installed entries are
 host-provided data and are not copied into the public fixture.
 
-The current `26.820.60940` permission follow-up supersedes the old four-mode
+The previous `26.820.60940` permission follow-up supersedes the old four-mode
 menu. It now exposes exactly three 47.109375px rows — `Ask for approval`,
 `Approve for me`, and `Full access` — inside a 476.46875×175.375px menu at
 x=425/y=591 in the sampled product frame. `Custom (config.toml)` is no longer
@@ -833,7 +833,7 @@ sampled `26.727.40816` contract and is now `partial_legacy`; unobserved window
 sizes
 and host eviction heuristics do not become product-level claims.
 
-The current `26.820.60940` follow-up supersedes that sampled runtime boundary
+The previous `26.820.60940` follow-up supersedes that sampled runtime boundary
 with one disposable 30-turn thread whose prompts and replies were exact and
 tool-free. At 1180×820, after hiding the sidebar and closing the pinned
 summary, the 768px thread has 205.5px of start-side space, so the 30-button
@@ -957,7 +957,7 @@ current-build Browser/Electron verification for this sampled three-file and
 failure family. Binary/conflict notices and successful Undo remain outside the
 current product sample, so implementation status remains partial.
 
-The current `26.820.60940` Review refresh supersedes that runtime boundary.
+The previous `26.820.60940` Review refresh supersedes that runtime boundary.
 One disposable three-file task now produces the exact `+4 −4` aggregate in a
 737×174 wide card and 688×174 compact card. A marker-backed move remains two
 modified source/destination files with `+1 −0` and `+0 −1` in 737×138 and
@@ -1333,7 +1333,7 @@ and 2.1642% under 4%, 5%, and 3.5% limits. This promotes only command denial;
 Allow once/matching-rule paths retain their previous-build evidence and other
 approval kinds remain open.
 
-The current `26.820.60940` external-file follow-up supersedes that sampled
+The previous `26.820.60940` external-file follow-up supersedes that sampled
 card/menu boundary. A disposable Desktop edit produces a turn-owned
 Permissions card measuring 736×149.5px at x=222.239/y=654.5 wide and
 688×149.5px at x=16/y=514.5 compact. The card has a 25px radius, exact
@@ -1581,7 +1581,7 @@ product-level evidence still verifies only the sampled completed Markdown
 vocabulary against `26.721.41059`; its current status remains
 `partial_legacy`.
 
-The current `26.820.60940` follow-up supersedes that status for the sampled
+The previous `26.820.60940` follow-up supersedes that status for the sampled
 Markdown group. Two isolated no-tool replies render double-dollar block math
 through KaTeX while leaving single-dollar math, escaped heading/image source,
 and footnote syntax literal. Package inspection separately confirms the image

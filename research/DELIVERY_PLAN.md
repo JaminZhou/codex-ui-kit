@@ -11,22 +11,18 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
+  Desktop `26.825.31414` (`7287`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 42 groups have current-build runtime evidence, 32 have previous-build-only
+- 11 groups have current-build runtime evidence, 63 have previous-build-only
   runtime evidence, and 15 have not been sampled.
-- The scoped `26.820.60940` refresh revalidates the global shell, responsive
-  Composer, project picker and Goal/Plan modes, primary navigation,
-  project-group lifecycle, Help and account
-  menus, route restoration, Projects Index, shared project/Recents rows and
-  actions, plus real active/unread status rails. It locks the new
-  collapsed-shell removal of Back/Forward, the one-pixel 559px/415px compact
-  Projects drift, and the 306.90625px row's fractional unread raster. The
-  project action menu remains a six-action/three-separator Electron native
-  menu with a 221×187 Quartz window, and all six fixed SVG sources are
-  unchanged. Current regional pixels pass for the native project menu,
-  shared task actions, active spinner, and unread dot.
+- The scoped `26.825.31414` refresh revalidates the global shell, responsive
+  Composer, primary navigation, project-group lifecycle, project-menu
+  provider, Help menu, route restoration, and Projects Index. It locks the
+  321.875px sidebar, the existing 559px/415px compact Projects layout, and the
+  removal of `Sites` from the sampled fixed-route stack. Conversation content,
+  account/settings, lifecycle variants, exact visual assets, and the following
+  26.820 slices remain previous-build evidence until re-observed.
   The current 30-turn long-thread slice additionally promotes
   `thread.shell`, `thread.messages-basic`, `thread.virtualized-timeline`, and
   `thread.message-navigation`: the 1180×820 frame mounts 11 turns, exposes the
@@ -40,7 +36,7 @@ exit gates; it does not replace the inventory.
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
   no-mask 768×774 product comparison at 0.4320% changed pixels.
-  The current 26.820 command tasks promote `thread.command-execution`,
+  The previous 26.820 command tasks promote `thread.command-execution`,
   `thread.command-failure-recovery`, and `thread.interruption-stop`. They reach
   one 12-second success, one exit-code-7 stdout/stderr command followed by an
   exact no-tool recovery, and one stopped 120-second loop followed by a second
@@ -52,7 +48,7 @@ exit gates; it does not replace the inventory.
   than a universal timing rule. Browser/CDP gates ten frames, Electron repeats
   the wide/compact terminal states, and unmasked current-product regions pass
   at 1.5813%, 1.5826%, 5.4109%, and 2.3502% under independent 2%, 2%, 5.5%, and
-  3% ceilings. The current 26.820 external-file approval task promotes
+  3% ceilings. The previous 26.820 external-file approval task promotes
   `thread.approval-permission-events` and `composer.permissions`. It replaces
   the historical four-mode Composer menu with the current three-mode
   Ask/Approve/Full contract, proves that Ask is risk-scoped rather than an
@@ -61,7 +57,7 @@ exit gates; it does not replace the inventory.
   approval frames and the permission menu; Electron repeats both decisions.
   Unmasked product regions pass at 6.0489% wide, 6.1328% compact, and 5.1795%
   for the options menu under 6.2%, 6.3%, and 5.5% ceilings, with exact geometry
-  independently gated. The current 26.820 MCP task promotes `thread.mcp-tool-events`,
+  independently gated. The previous 26.820 MCP task promotes `thread.mcp-tool-events`,
   `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
   `thread.sources-panel`. It reaches one real Search → Fetch success and one
   captured invalid-URL Fetch → Search → Fetch recovery. Current completed and
@@ -87,7 +83,7 @@ exit gates; it does not replace the inventory.
   that the expanded Projects wrapper is
   content-dependent; the sanitized gate now derives its height from the live
   Recent chats group instead of freezing a private-data-dependent 119px value.
-  A current 26.820 follow-up reaches double-dollar block math while preserving
+  A previous 26.820 follow-up reaches double-dollar block math while preserving
   single-dollar math, escaped heading/image source, and footnote syntax as
   literal text. The installed renderer independently confirms KaTeX 0.16.45,
   media grouping, preview, loading/unavailable fallbacks, and render retry.
@@ -454,7 +450,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.820.60940`;
+  surfaces re-observed on `26.825.31414`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no
@@ -485,7 +481,7 @@ slot. It is split into:
   setting-up, failed, and restored presentation. The previous 26.818 slice
   re-reached real create, controlled failure, failed-plus-unread composition,
   Retry recovery, and exact 30px trailing geometry through product CDP,
-  Browser/CDP, Electron, and local-only pixels. The current 26.820 slices now
+  Browser/CDP, Electron, and local-only pixels. The previous 26.820 slices now
   re-reach real loading, controlled failure, foreground-read failure,
   failed-plus-unread composition, Retry recovery, and restored success. The
   current 84×30 failure tail has 0% foreground-mask difference while the
@@ -506,7 +502,7 @@ verified. Its empty state is tied to a live `No chats` project row; loading and
 the five-item `Show more` boundary are locked to that build's ASAR structure,
 then repeated through Browser/CDP, Electron, and reviewed pixels. The New chat
 selection, project portal, Dark/Light, 1180/720, and footer/account matrices are
-also previous-build evidence. The current 26.820 slices revalidate the global
+also previous-build evidence. The previous 26.820 slices revalidate the global
 shell, primary navigation, project-group lifecycle, project-actions provider,
 Help menu, account-menu matrix, Projects Index, shared 30px project/Recents
 history rows, shared Pin/Archive actions, and real active/unread status rails.
@@ -517,14 +513,14 @@ worktree follow-ups re-observe a real empty collection and the complete sampled
 loading → controlled failure → failed-plus-unread → Retry → restored boundary.
 Remaining Stage 1 work includes re-observing ordinary error and collection
 loading, plus broader route lifecycle feedback and unsampled notification
-tones. Current 26.820 Projects → Back → Forward now preserves the product
+tones. Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
 independent Browser/Electron route stack additionally preserves a selected
 project chat through Back/Forward, closing the previous selection-continuity
-gap beyond New chat. The sampled current 26.820 success
+gap beyond New chat. The sampled previous 26.820 success
 path is now reached through reversible Pin chat → `⌘Z`; its exact top-center
 Sonner structure, live-region semantics, SVG paths, geometry, Browser/CDP,
-Electron, and 0.8029% product crop pass. The current 26.820 ASAR
+Electron, and 0.8029% product crop pass. The previous 26.820 ASAR
 source also locks the exact info, warning, and danger notification icons used
 by replay without promoting those unsampled tones. Browser/Electron gates lock
 the exact ordinary-error paths and loading accessibility/skeleton structure,
@@ -649,7 +645,7 @@ controlled failure, Retry, and restored states. Browser/CDP, Electron, and
 three sampled-product tail comparisons now gate that entry/repair
 lifecycle. Projects-route loading/error/partial-error, populated environment
 editing, and Remote connections remain independent work.
-The current `26.820.60940` continuation repeats the controlled failure with a
+The previous `26.820.60940` continuation repeats the controlled failure with a
 regular-file `.git/worktrees` blocker scoped to one disposable repository.
 It observes the exact branch/error/unread three-track row, removes the blocker,
 uses the real `Retry` control, and verifies root plus one child worktree before
@@ -858,7 +854,7 @@ without confusing package readiness with full product reconstruction.
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
    resources, multiline/long-input geometry, active Goal/Plan modes, and the
    sampled long-thread navigation/windowing contract are also delivered. The
-   current `26.820.60940` refresh replaces the old runtime anchor with the
+   previous `26.820.60940` refresh replaces the old runtime anchor with the
    sampled four-item/48px rail gates, 30-message responsive composition,
    11/9/8 mounted-turn windows, message materialization, stale-current-marker
    boundary, and wide/compact structural pixel comparisons. Broader host
