@@ -146,15 +146,16 @@ observation from a previous build remains historical evidence.
   and the 720×680 recovery card. Browser/CDP and Electron repeat those states.
   Unmasked sampled-product regions pass at 2.1854% for success, 1.1649% for
   compact recovery, and 2.5926% for Sources under independent hard limits.
-- A fresh no-tool Markdown task reaches heading, strong text, inline code,
-  blockquote, list, a narrow two-column table, and a TypeScript code block at
-  1180×820 and 720×680. In this sampled source-annotated response, the external
-  URL is owned by Sources and the visible `public link` text is not an inline
-  anchor. Browser/CDP and Electron lock the 736/688×358 roots, full-width
-  tables, 73px code block with interactive word-wrap and Copy controls, four
-  exact response actions, system typography, and zero horizontal overflow.
-  Unmasked wide and compact Markdown-root comparisons pass at 1.1682% and
-  1.1932% under independent 1.3% hard limits.
+- A fresh `26.825.31414` no-tool Markdown task reaches a semantic heading,
+  strong text, inline code, a real public external link with favicon,
+  blockquote, list, a two-column table, a TypeScript code block, one rendered
+  double-dollar equation, and one literal single-dollar equation. Browser/CDP
+  and Electron lock the 736/688px roots, 14/22.75px typography, table alignment,
+  code language/action icons, word-wrap and Copy interactions, four exact
+  response actions, KaTeX plus MathML semantics, and zero horizontal overflow.
+  The unmasked current-product response-root comparison passes at 1.3292%
+  under an independent 2% hard limit. The prior 26.818 Markdown slice remains
+  regression coverage rather than current evidence.
 - A previous 26.820 no-tool follow-up reaches one double-dollar block equation
   and records the current 736/687px response roots and 14/22px computed
   typography. Single-dollar math, the escaped heading/image source, and
@@ -178,7 +179,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 16 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 13 groups and Electron verification covers 13.
+Current inventory: 89 surface groups; 17 have current-build runtime evidence, 58 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1610,6 +1611,19 @@ fallback, four response actions, pointer-opened immersive preview, focus
 restoration, and zero overflow. Two reviewed replay rasters are committed; a
 current-product media raster remains unclaimed because the live replies did
 not emit raw image media.
+
+The current `26.825.31414` follow-up re-observes the completed Markdown group
+against the installed product. Its isolated no-tool reply adds a real public
+external link and favicon to the heading, strong text, inline code, quote,
+list, two-column table, TypeScript fence, block equation, and literal inline
+equation. Browser/CDP and Electron verify the 736/688px wide and compact roots,
+14/22.75px typography, table alignment, exact code-language and action icons,
+word-wrap and Copy behavior, four response actions, KaTeX/MathML semantics,
+external-link behavior, and zero overflow. The unmasked current-product
+response-root comparison passes at `0.013291909550957657` under its independent
+0.02 limit. This advances the sampled group to current evidence; it does not
+claim current reachability for rich streaming, citations, live media, renderer
+errors, or plugin-provided Markdown variants.
 
 Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint adds
 current source-structural evidence for `inline-markdown`, the in-progress

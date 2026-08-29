@@ -127,7 +127,9 @@ import {
   useReducer,
   useRef,
   useState,
+  type AnchorHTMLAttributes,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import {
@@ -1361,6 +1363,82 @@ function McpResponseActions({
     </span>
   );
 }
+
+// Public source: https://openai.com/favicon.ico, captured from the current
+// Codex external-link renderer so visual acceptance stays deterministic.
+const currentMarkdownOpenAiFavicon =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAIAAAC0D9CtAAABFWlDQ1BfAAB4nJWQsUoDQRCGPyUgioWCpcV1gqDGBEMCIsScBttEIbG73B2HJjmPy4m+gY29rQ9haWFhZStYW/gAVqn9N1dsQFJkhtn9dvZnZ2dgEWOFIgzjLG01j51O99JZ+mZBPjHPHyXMNqnGX7n2c4f5bTkIR772X0WWqrieDMQbUc73hns5Pxq+y5JM/Gw4PW81xC/itWiKe1PsJ6nRv4sPh4Nb3/6b1TC+aGvvKDZpciOPGBCyR5s+V3gilxpF9mnIXerimtYDTnWuUOWEsqIqNreu2JW6LlVFUTLzzEsGD1DeVukVm7v+gdcnWP+wua2+vn0Eb12bszNOvNSz0x8XZvTk/OvJ4YwYn11RadJR5Q9AT0aJf0or6QAAAn9JREFUeJyUUztoWgEUrZpPTZMGQkhCAhUsJORXMoWQkM8QMiVKpsTBQZxEsA6CKSKCiINOCg6ikwjiIDrooAiKg4Ko4CBGB3+oET8YFMG/PfaFFEqH9g3vXS7n3nvuOffNrK+vf/jPZ+Y9IpFIq6uru7u7V1dXCJCp1+t+vz+ZTCKYTCa/kcSc2dnZ29tbPp9Pp9MRI0Mmk4Hr9/uZTEan0zmdzsFgQNRQFhcXAXp4eFAoFJubm4VCweFwBAKB4XCIPN5bW1uY3Gg0MHA8Hk9rlpaWGAwGChCk02mtVntxcQFuYrE4Eon4fL5wOHxzc3N2doZ2qVRqyu3g4MBisezt7RWLRb1ez2QwXyovZrP5/v4eybW1NZvNVqlUZDIZOrJYrFqtRsbS2AE9JBLJc/J54dOCwWDAkFAoZDQahd+FtC80oFutFmAAT1cFV/D2er0cDof+lY5UqVRSq9Xlcvno6Ojpx5Pb4242m71eb25uDuCp1qAOfUDs+PgYG0OcjY0NjUYDBJvNdrlcXC735OQEokMnwgMyISu2isfj19fXmAB9UYDhyIMkZES7RCIxGo3ePIVf+Jyfn6Mr6IpEIgjF4/GoVGoul0MxhUJ5bb6urKzAdAJMxlA0pn6kLn9ePj09VavU+Xx+fn4elGg0GgrgjMFouLu7A22Ap3PgFJze2dk5/HYITVVqVbVaBQ7eM5lMrIpDEQqFEC3565l6CtLtdvvy8hKawAqP2xONRk0mk0Ag2N7ettvtj4+P+/v7nU5HqVTGYrG3eyNuRyqVglKtWuv1e5gcDAZxGVAFS3a7XblcbrVaiZP7y41ib6xLqARQNpv940ZJ7//Pv/8LPwEAAP//uhbiMQAAAAZJREFUAwCcbFyQ5jiGKgAAAABJRU5ErkJggg==";
+
+function CurrentMarkdownCodeLanguageIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <path d="M4.46951 6.27289C4.68734 5.97727 5.10354 5.91356 5.3992 6.13129C5.69464 6.34921 5.75762 6.76637 5.53982 7.06195L3.32791 10.0639L5.5369 13.0131C5.75668 13.3071 5.69695 13.7237 5.40311 13.9438C5.10923 14.1637 4.69261 14.1037 4.47244 13.81L2.04178 10.5639C1.82214 10.2704 1.8206 9.86789 2.03787 9.57269L4.46951 6.27289Z" />
+      <path d="M14.6053 6.13129C14.9009 5.9136 15.3171 5.97728 15.5349 6.27289L17.9666 9.57269C18.1837 9.86787 18.1823 10.2705 17.9627 10.5639L15.532 13.81C15.312 14.1038 14.8953 14.1635 14.6013 13.9438C14.3074 13.7237 14.2476 13.3071 14.4676 13.0131L16.6765 10.0639L14.4646 7.06195C14.2468 6.76628 14.3096 6.34915 14.6053 6.13129Z" />
+      <path d="M11.0584 6.37347C11.2205 6.04395 11.6194 5.90772 11.949 6.06976C12.2782 6.23191 12.4135 6.63003 12.2517 6.95941L8.94119 13.6928C8.77923 14.0222 8.381 14.1581 8.05154 13.9965C7.72196 13.8345 7.58577 13.4355 7.74783 13.1059L11.0584 6.37347Z" />
+    </svg>
+  );
+}
+
+function CurrentMarkdownCodeWrapIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="codex-ui-code-block__wrap-icon"
+      viewBox="0 0 20 20"
+    >
+      <path d="M10.0002 12.6685C10.3674 12.6686 10.6653 12.9663 10.6653 13.3335V16.6665C10.6653 17.0337 10.3674 17.3314 10.0002 17.3315C9.63297 17.3315 9.33521 17.0338 9.33521 16.6665V13.3335C9.33521 12.9662 9.63297 12.6685 10.0002 12.6685Z" />
+      <path d="M13.6956 7.02979C13.9553 6.77009 14.3773 6.77009 14.637 7.02979L16.9592 9.35303C17.3166 9.71036 17.3166 10.2906 16.9592 10.6479L14.637 12.9712C14.3772 13.2305 13.9551 13.2307 13.6956 12.9712C13.436 12.7116 13.4363 12.2895 13.6956 12.0298L15.0598 10.6655H3.33325C2.96615 10.6655 2.66848 10.3675 2.66821 10.0005C2.66821 9.63322 2.96598 9.33545 3.33325 9.33545H15.0598L13.6956 7.97119C13.436 7.71164 13.4363 7.28952 13.6956 7.02979Z" />
+      <path d="M10.0002 2.66846C10.3674 2.66859 10.6653 2.96631 10.6653 3.3335V6.6665C10.6653 7.03369 10.3674 7.33141 10.0002 7.33154C9.63297 7.33154 9.33521 7.03377 9.33521 6.6665V3.3335C9.33521 2.96623 9.63297 2.66846 10.0002 2.66846Z" />
+    </svg>
+  );
+}
+
+function CurrentMarkdownCodeCopyIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="demo-current-markdown-code-copy-icon"
+      viewBox="0 0 20 20"
+    >
+      <path
+        clipRule="evenodd"
+        d="M15.1006 1.78516C16.793 1.78556 18.165 3.15808 18.165 4.85059V10.8838C18.1649 12.5762 16.7929 13.9478 15.1006 13.9482H13.998V15.0508C13.9976 16.7431 12.626 18.1151 10.9336 18.1152H4.90039C3.20789 18.1152 1.83537 16.7432 1.83496 15.0508V9.01758C1.83496 7.32482 3.20764 5.95215 4.90039 5.95215H6.00195V4.85059C6.00195 3.15783 7.37463 1.78516 9.06738 1.78516H15.1006ZM4.90039 7.28223C3.94218 7.28223 3.16504 8.05936 3.16504 9.01758V15.0508C3.16544 16.0087 3.94243 16.7852 4.90039 16.7852H10.9336C11.8914 16.785 12.6676 16.0086 12.668 15.0508V9.01758C12.668 8.05945 11.8917 7.28237 10.9336 7.28223H4.90039ZM9.06738 3.11523C8.10917 3.11523 7.33203 3.89237 7.33203 4.85059V5.95215H10.9336C12.6262 5.95229 13.998 7.32491 13.998 9.01758V12.6182H15.1006C16.0584 12.6178 16.8348 11.8416 16.835 10.8838V4.85059C16.835 3.89262 16.0585 3.11564 15.1006 3.11523H9.06738Z"
+        fillRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function CurrentMarkdownExternalLink({
+  children,
+  node: _node,
+  ...linkProps
+}: AnchorHTMLAttributes<HTMLAnchorElement> & {
+  children?: ReactNode;
+  node?: unknown;
+}) {
+  return (
+    <a
+      {...linkProps}
+      className="demo-current-markdown-link"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <span className="demo-current-markdown-link__mention">
+        <span aria-hidden="true" className="demo-current-markdown-link__icon">
+          <img alt="" src={currentMarkdownOpenAiFavicon} />
+        </span>
+        <span>{children}</span>
+      </span>
+    </a>
+  );
+}
+
+const currentMarkdownCodeCopyLabel = <CurrentMarkdownCodeCopyIcon />;
+const currentMarkdownCodeLanguageIcon = <CurrentMarkdownCodeLanguageIcon />;
+const currentMarkdownCodeWrapIcon = <CurrentMarkdownCodeWrapIcon />;
+const currentMarkdownComponents = { a: CurrentMarkdownExternalLink };
+const currentMarkdownLanguageLabels = { ts: "TypeScript" };
 
 const pullRequestFiles = [
   {
@@ -2700,6 +2778,8 @@ export function App() {
     mode === "replay" && scenarioId === "markdown-current-26-818";
   const isCurrentMarkdown26820MediaReplay =
     mode === "replay" && scenarioId === "markdown-current-26-820-media";
+  const isCurrentMarkdown26825Replay =
+    mode === "replay" && scenarioId === "markdown-current-26-825";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentPlan26825Replay =
@@ -4814,6 +4894,7 @@ export function App() {
       isCurrentPlan26825Replay ||
       isCurrentSearch26825Replay ||
       isCurrentMarkdown26818Replay ||
+      isCurrentMarkdown26825Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
       current26820LongFrame ||
@@ -5177,6 +5258,7 @@ export function App() {
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       isCurrentMarkdown26818Replay ||
+      isCurrentMarkdown26825Replay ||
       isCurrentMcpReplay ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
@@ -8770,6 +8852,22 @@ export function App() {
               }
             />
           ) : null}
+          {isCurrentMarkdown26825Replay &&
+          message.id === "assistant-markdown-current-26-825" ? (
+            <ActivityTimeline
+              className="demo-current-markdown-26-825__duration"
+              summary={
+                <TurnDuration
+                  durationMs={
+                    (message.turnId
+                      ? state.turnDurationsMs[message.turnId]
+                      : undefined) ?? 15_000
+                  }
+                  status="worked"
+                />
+              }
+            />
+          ) : null}
           <AgentMessage
             actions={
               mode === "replay" &&
@@ -8779,6 +8877,8 @@ export function App() {
                   message.id === "assistant-markdown") ||
                 (isCurrentMarkdown26820MediaReplay &&
                   message.id === "assistant-markdown-media") ||
+                (isCurrentMarkdown26825Replay &&
+                  message.id === "assistant-markdown-current-26-825") ||
                 (scenarioId === "markdown-table-actions" &&
                   message.id === "assistant-markdown-table-actions") ||
                 (scenarioId === "markdown-streaming-large" &&
@@ -8854,19 +8954,22 @@ export function App() {
                 isCurrentBasicMessageReplay ||
                 isCurrentMarkdown26818Replay ||
                 isCurrentMarkdown26820MediaReplay ||
+                isCurrentMarkdown26825Replay ||
                 isCurrentSubagentReplay ? (
                   <McpResponseActions
                     copyLabel={
                       isCurrentBasicMessageReplay ||
                       isCurrentMarkdown26818Replay ||
-                      isCurrentMarkdown26820MediaReplay
+                      isCurrentMarkdown26820MediaReplay ||
+                      isCurrentMarkdown26825Replay
                         ? "Copy"
                         : undefined
                     }
                     label={
                       isCurrentBasicMessageReplay ||
                       isCurrentMarkdown26818Replay ||
-                      isCurrentMarkdown26820MediaReplay
+                      isCurrentMarkdown26820MediaReplay ||
+                      isCurrentMarkdown26825Replay
                         ? null
                         : message.id === "assistant-workflow" ||
                       message.id ===
@@ -8884,7 +8987,8 @@ export function App() {
                     toolbar={
                       !isCurrentBasicMessageReplay &&
                       !isCurrentMarkdown26818Replay &&
-                      !isCurrentMarkdown26820MediaReplay
+                      !isCurrentMarkdown26820MediaReplay &&
+                      !isCurrentMarkdown26825Replay
                     }
                   />
                 ) : (
@@ -8976,7 +9080,40 @@ export function App() {
                 <AgentMarkdown
                   allowWideMedia={isCurrentMarkdown26820MediaReplay}
                   allowWideTables={scenarioId === "markdown-table-actions"}
-                  codeBlockWrapToggleable={isCurrentMarkdown26818Replay}
+                  codeBlockCopyAriaLabel={
+                    isCurrentMarkdown26825Replay ? "Copy" : undefined
+                  }
+                  codeBlockCopyLabel={
+                    isCurrentMarkdown26825Replay
+                      ? currentMarkdownCodeCopyLabel
+                      : undefined
+                  }
+                  codeBlockLanguageIcon={
+                    isCurrentMarkdown26825Replay
+                      ? currentMarkdownCodeLanguageIcon
+                      : undefined
+                  }
+                  codeBlockLanguageLabels={
+                    isCurrentMarkdown26825Replay
+                      ? currentMarkdownLanguageLabels
+                      : undefined
+                  }
+                  codeBlockWrapIcon={
+                    isCurrentMarkdown26825Replay
+                      ? currentMarkdownCodeWrapIcon
+                      : undefined
+                  }
+                  codeBlockWrapToggleable={
+                    isCurrentMarkdown26818Replay || isCurrentMarkdown26825Replay
+                  }
+                  components={
+                    isCurrentMarkdown26825Replay
+                      ? currentMarkdownComponents
+                      : undefined
+                  }
+                  density={
+                    isCurrentMarkdown26825Replay ? "compact" : "regular"
+                  }
                   imageSourceResolver={
                     isCurrentMarkdown26820MediaReplay
                       ? currentMarkdownMediaSource
@@ -11062,7 +11199,8 @@ export function App() {
         sidebarWidth={
           currentHomeFrame ||
           isCurrentBrowser26825Replay ||
-          isCurrentSearch26825Replay
+          isCurrentSearch26825Replay ||
+          isCurrentMarkdown26825Replay
             ? 322.90625
             : undefined
         }

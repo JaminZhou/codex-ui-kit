@@ -27,6 +27,7 @@ import markdownTableActionsTrace from "../fixtures/traces/markdown-table-actions
 import markdownStreamingLargeTrace from "../fixtures/traces/markdown-streaming-large.jsonl?raw";
 import markdownCurrent26818Trace from "../fixtures/traces/markdown-current-26-818.jsonl?raw";
 import markdownCurrent26820MediaTrace from "../fixtures/traces/markdown-current-26-820-media.jsonl?raw";
+import markdownCurrent26825Trace from "../fixtures/traces/markdown-current-26-825.jsonl?raw";
 import markdownTrace from "../fixtures/traces/markdown.jsonl?raw";
 import mcpCurrentIntegrationRecoveryTrace from "../fixtures/traces/mcp-current-integration-recovery.jsonl?raw";
 import mcpCurrent26818RecoveryTrace from "../fixtures/traces/mcp-current-26-818-recovery.jsonl?raw";
@@ -83,6 +84,7 @@ export type ReplayScenarioId =
   | "markdown"
   | "markdown-current-26-818"
   | "markdown-current-26-820-media"
+  | "markdown-current-26-825"
   | "markdown-table-actions"
   | "markdown-streaming-large"
   | "mcp-current-integration-recovery"
@@ -354,6 +356,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Current 26.820 Markdown media",
     "The runtime-observed 26.820 block math and source-preservation boundary plus package-observed image preview, grid, loading, and unavailable states.",
     markdownCurrent26820MediaTrace,
+  ),
+  "markdown-current-26-825": scenario(
+    "markdown-current-26-825",
+    "Render Markdown sample",
+    "The current 26.825 heading, inline semantics, link, quote, list, table, code block, inline-math preservation, and block-math rendering boundary.",
+    markdownCurrent26825Trace,
   ),
   "markdown-table-actions": scenario(
     "markdown-table-actions",

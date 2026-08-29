@@ -2220,6 +2220,109 @@ async function currentMarkdown26818Contract(page) {
   });
 }
 
+async function currentMarkdown26825Contract(page) {
+  return page.evaluate(() => {
+    const item = document.querySelector(
+      '[data-item-id="assistant-markdown-current-26-825"]',
+    );
+    const root = item?.querySelector(".codex-ui-markdown");
+    const rect = (element) => {
+      const bounds = element?.getBoundingClientRect();
+      return bounds
+        ? {
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null;
+    };
+    const style = (element) => {
+      if (!(element instanceof Element)) return null;
+      const computed = getComputedStyle(element);
+      return {
+        backgroundColor: computed.backgroundColor,
+        color: computed.color,
+        fontFamily: computed.fontFamily,
+        fontSize: computed.fontSize,
+        fontWeight: computed.fontWeight,
+        lineHeight: computed.lineHeight,
+        padding: computed.padding,
+        rect: rect(element),
+        textAlign: computed.textAlign,
+      };
+    };
+    const link = root?.querySelector('a[href="https://openai.com/codex/"]');
+    const display = root?.querySelector(".katex-display");
+    return {
+      actions: Array.from(
+        item?.querySelectorAll(".demo-turn-actions button") ?? [],
+        (button) => ({
+          icon: button
+            .querySelector("[data-current-build-icon]")
+            ?.getAttribute("data-current-build-icon"),
+          label: button.getAttribute("aria-label"),
+          rect: rect(button),
+        }),
+      ),
+      code: style(root?.querySelector(".codex-ui-code-block__body code")),
+      codeActions: Array.from(
+        root?.querySelectorAll(".codex-ui-code-block__header button") ?? [],
+        (button) => ({
+          label: button.getAttribute("aria-label"),
+          pressed: button.getAttribute("aria-pressed"),
+          rect: rect(button),
+        }),
+      ),
+      codeBlock: style(root?.querySelector(".codex-ui-code-block")),
+      codeHeader: style(root?.querySelector(".codex-ui-code-block__header")),
+      codeLanguageLabel: root
+        ?.querySelector(".codex-ui-code-block__language-label")
+        ?.textContent?.trim(),
+      duration: document
+        .querySelector(".demo-current-markdown-26-825__duration")
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim(),
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      inlineCode: style(root?.querySelector(".codex-ui-inline-code")),
+      link: link
+        ? {
+            favicon: rect(link.querySelector("img")),
+            href: link.getAttribute("href"),
+            label: link.textContent?.trim(),
+            target: link.getAttribute("target"),
+          }
+        : null,
+      math: {
+        annotation: root?.querySelector(".katex annotation")?.textContent,
+        display: rect(display),
+        katexCount: root?.querySelectorAll(".katex").length,
+        mathMlCount: root?.querySelectorAll("math").length,
+      },
+      root: style(root),
+      semantics: {
+        blockquotes: root?.querySelectorAll("blockquote").length,
+        codeBlocks: root?.querySelectorAll(".codex-ui-code-block").length,
+        headings: root?.querySelectorAll("h1").length,
+        lists: root?.querySelectorAll("ul").length,
+        paragraphs: root?.querySelectorAll("p").length,
+        tables: root?.querySelectorAll("table").length,
+      },
+      table: style(root?.querySelector("table")),
+      tableHeaders: Array.from(root?.querySelectorAll("th") ?? [], (header) => ({
+        style: style(header),
+        text: header.textContent?.trim(),
+      })),
+      tableScroll: rect(
+        root?.querySelector(".codex-ui-markdown__table-scroll"),
+      ),
+      text: root?.textContent,
+    };
+  });
+}
+
 async function currentMarkdown26820MediaContract(page) {
   return page.evaluate(() => {
     const item = document.querySelector(
@@ -2387,6 +2490,176 @@ for (const currentMarkdownScene of [
     ) {
       throw new Error(
         `${currentMarkdownScene.id}: current 26.818 Markdown Electron wrap toggle failed: ${JSON.stringify(wrapped)}`,
+      );
+    }
+  } finally {
+    await currentMarkdownApp.close();
+  }
+}
+
+for (const currentMarkdownScene of [
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-complete",
+    id: "electron-markdown-current-26-825",
+    scenario: "markdown-current-26-825",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-complete",
+    id: "electron-markdown-current-26-825-compact",
+    scenario: "markdown-current-26-825",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const { app: currentMarkdownApp, page: currentMarkdownPage } =
+    await launchScene(currentMarkdownScene, { capture: false });
+  try {
+    const compact = currentMarkdownScene.id.endsWith("-compact");
+    const expectedWidth = compact ? 688 : 736;
+    const expectedActions = [
+      ["Copy", "thread-assistant-copy"],
+      ["Good response", "thread-assistant-good"],
+      ["Bad response", "thread-assistant-bad"],
+      ["Fork chat from here", "thread-assistant-fork"],
+    ];
+    const nativeBounds = await currentMarkdownApp.evaluate(
+      ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const contract = await currentMarkdown26825Contract(currentMarkdownPage);
+    const [surfaceHeader, stateHeader] = contract.tableHeaders;
+    const [wrapAction, copyAction] = contract.codeActions;
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      !contract.root?.rect ||
+      Math.abs(contract.root.rect.width - expectedWidth) > 0.5 ||
+      Math.abs(contract.root.rect.height - 465.4375) > 0.5 ||
+      Math.abs(contract.root.rect.left - (compact ? 16 : 383.453125)) > 0.5 ||
+      contract.root.color !== "rgb(255, 255, 255)" ||
+      contract.root.fontFamily !==
+        '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+      contract.root.fontSize !== "14px" ||
+      contract.root.fontWeight !== "400" ||
+      !contract.root.lineHeight.startsWith("22.75") ||
+      contract.duration !== "Worked for 15s" ||
+      contract.semantics.headings !== 1 ||
+      contract.semantics.paragraphs !== 4 ||
+      contract.semantics.blockquotes !== 1 ||
+      contract.semantics.lists !== 1 ||
+      contract.semantics.tables !== 1 ||
+      contract.semantics.codeBlocks !== 1 ||
+      contract.actions.length !== 4 ||
+      contract.actions.some(
+        (action, index) =>
+          action.label !== expectedActions[index]?.[0] ||
+          action.icon !== expectedActions[index]?.[1] ||
+          Math.abs(action.rect.width - 26) > 0.5 ||
+          Math.abs(action.rect.height - 26) > 0.5 ||
+          Math.abs(
+            action.rect.left -
+              (contract.root.rect.left - 4 + index * 28),
+          ) > 0.5,
+      ) ||
+      contract.link?.href !== "https://openai.com/codex/" ||
+      contract.link.label !== "public link" ||
+      contract.link.target !== "_blank" ||
+      Math.abs(contract.link.favicon.width - 16) > 0.5 ||
+      Math.abs(contract.link.favicon.height - 16) > 0.5 ||
+      !contract.table?.rect ||
+      Math.abs(contract.table.rect.width - expectedWidth) > 0.5 ||
+      Math.abs(contract.table.rect.height - 81.5) > 0.5 ||
+      !contract.tableScroll ||
+      Math.abs(contract.tableScroll.width - expectedWidth) > 0.5 ||
+      surfaceHeader?.text !== "Surface" ||
+      stateHeader?.text !== "State" ||
+      surfaceHeader.style.textAlign !== "start" ||
+      stateHeader.style.textAlign !== "start" ||
+      contract.codeLanguageLabel !== "TypeScript" ||
+      !contract.codeBlock?.rect ||
+      contract.codeBlock.backgroundColor !== "rgba(255, 255, 255, 0.05)" ||
+      Math.abs(contract.codeBlock.rect.width - expectedWidth) > 0.5 ||
+      Math.abs(contract.codeBlock.rect.height - 82) > 0.5 ||
+      !contract.codeHeader?.rect ||
+      contract.codeHeader.fontSize !== "13px" ||
+      contract.codeHeader.fontWeight !== "500" ||
+      contract.codeHeader.padding !== "6px 6px 6px 20px" ||
+      Math.abs(contract.codeHeader.rect.height - 48) > 0.5 ||
+      !contract.code?.rect ||
+      contract.code.fontSize !== "12px" ||
+      contract.code.lineHeight !== "20px" ||
+      !contract.inlineCode?.rect ||
+      contract.inlineCode.fontSize !== "12.25px" ||
+      contract.inlineCode.fontWeight !== "500" ||
+      contract.codeActions.length !== 2 ||
+      wrapAction.label !== "Enable word wrap" ||
+      wrapAction.pressed !== "false" ||
+      copyAction.label !== "Copy" ||
+      contract.math.katexCount !== 1 ||
+      contract.math.mathMlCount !== 1 ||
+      contract.math.annotation !==
+        "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
+      !contract.math.display ||
+      Math.abs(contract.math.display.width - expectedWidth) > 0.5 ||
+      Math.abs(contract.math.display.height - 41.9375) > 0.5 ||
+      !contract.text.includes("Inline math: $E = mc^2$.") ||
+      !contract.text.includes("CURRENT MARKDOWN DONE") ||
+      contract.horizontalOverflow !== 0
+    ) {
+      throw new Error(
+        `${currentMarkdownScene.id}: current 26.825 Markdown Electron contract failed: ${JSON.stringify({ contract, nativeBounds })}`,
+      );
+    }
+
+    await currentMarkdownPage.evaluate(() => {
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async (value) => {
+            window.__codexMarkdownCurrent26825CopiedText = value;
+          },
+        },
+      });
+    });
+    const currentMarkdownCodeCopy = currentMarkdownPage.locator(
+      '[data-item-id="assistant-markdown-current-26-825"] .codex-ui-code-block__copy',
+    );
+    await currentMarkdownCodeCopy.click();
+    await currentMarkdownPage
+      .locator(
+        '[data-item-id="assistant-markdown-current-26-825"] .codex-ui-code-block__copy[data-copied="true"]',
+      )
+      .waitFor();
+    await currentMarkdownPage
+      .getByRole("button", { name: "Enable word wrap" })
+      .click();
+    const interaction = await currentMarkdownPage.evaluate(() => {
+      const block = document.querySelector(
+        '[data-item-id="assistant-markdown-current-26-825"] .codex-ui-code-block',
+      );
+      const toggle = block?.querySelector(".codex-ui-code-block__wrap");
+      const tableScroll = document.querySelector(
+        '[data-item-id="assistant-markdown-current-26-825"] .codex-ui-markdown__table-scroll',
+      );
+      tableScroll?.focus();
+      return {
+        copiedText: window.__codexMarkdownCurrent26825CopiedText,
+        tableFocused: document.activeElement === tableScroll,
+        wrapLabel: toggle?.getAttribute("aria-label"),
+        wrapPressed: toggle?.getAttribute("aria-pressed"),
+        wrapped: block?.getAttribute("data-wrap"),
+      };
+    });
+    if (
+      interaction.copiedText !== "const ready = true;" ||
+      !interaction.tableFocused ||
+      interaction.wrapLabel !== "Disable word wrap" ||
+      interaction.wrapPressed !== "true" ||
+      interaction.wrapped !== "true"
+    ) {
+      throw new Error(
+        `${currentMarkdownScene.id}: current 26.825 Markdown Electron interaction failed: ${JSON.stringify(interaction)}`,
       );
     }
   } finally {

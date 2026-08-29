@@ -39,6 +39,16 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain("padding-inline-end: 1.5rem");
   });
 
+  it("ships the current compact Markdown density as an opt-in contract", () => {
+    expect(styles).toContain('.codex-ui-markdown[data-density="compact"]');
+    expect(styles).toContain("line-height: 1.421875rem");
+    expect(styles).toContain("font-size: 1.3125rem");
+    expect(styles).toContain("border-radius: 1.25rem");
+    expect(styles).toContain("height: 3rem");
+    expect(styles).toContain("font-size: 0.75rem");
+    expect(styles).toContain("inset-inline-end: -2rem");
+  });
+
   it("keeps links identifiable and lets custom copy labels size to content", () => {
     expect(styles).toContain("text-decoration: underline");
     expect(styles).toContain("font: inherit");

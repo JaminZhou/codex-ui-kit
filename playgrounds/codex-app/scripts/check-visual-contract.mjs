@@ -70,6 +70,8 @@ const currentMarkdown26818Reference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_REFERENCE;
 const currentMarkdown26818CompactReference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE;
+const currentMarkdown26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_REFERENCE;
 const currentBuildMarkdownTablePreviewReference =
   process.env.CODEX_UI_KIT_MARKDOWN_TABLE_PREVIEW_REFERENCE;
 const currentBuildMarkdownTablePreviewReferenceSize = {
@@ -5612,6 +5614,53 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current 26.818 Markdown pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "markdown-current-26-825" &&
+    currentMarkdown26825Reference
+  ) {
+    const expected = { height: 466, width: 737 };
+    const reference = PNG.sync.read(
+      await readFile(currentMarkdown26825Reference),
+    );
+    if (
+      reference.width !== expected.width ||
+      reference.height !== expected.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Markdown response reference must be exactly ${expected.width}x${expected.height}, received ${reference.width}x${reference.height}.`,
+      );
+    }
+    const main = cropPng(actual, 383, 161, expected.width, expected.height);
+    const comparison = comparePng(reference, main);
+    const currentBuildActualPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.png`,
+    );
+    const currentBuildDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    await writeFile(currentBuildActualPath, PNG.sync.write(main));
+    if (comparison.pixels > 0) {
+      await writeFile(
+        currentBuildDiffPath,
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MAX_DIFF_RATIO",
+      0.02,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 Markdown response pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 Markdown response pixel ratio ${comparison.ratio}`,
     );
   }
 

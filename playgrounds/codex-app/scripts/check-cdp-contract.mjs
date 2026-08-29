@@ -46,6 +46,7 @@ const currentReplayComposerScenarios = new Set([
   "current-mixed-tool-thread",
   "current-plan-26-825",
   "current-search-26-825",
+  "markdown-current-26-825",
   "current-review-files",
   "current-review-rename",
   "interruption",
@@ -3007,6 +3008,7 @@ for (const scene of selectedScenes) {
                   scene.scenario === "current-plan-26-825" ||
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
+                  scene.scenario === "markdown-current-26-825" ||
                   scene.scenario === "current-basic-message"
                     ? "composer-permission"
                     : "composer-permission-ask",
@@ -6280,7 +6282,7 @@ for (const scene of selectedScenes) {
         }),
       );
       const markdownItem = document.querySelector(
-        '[data-item-id="assistant-markdown"], [data-item-id="assistant-markdown-media"]',
+        '[data-item-id="assistant-markdown"], [data-item-id="assistant-markdown-media"], [data-item-id="assistant-markdown-current-26-825"]',
       );
       const markdownRoot = markdownItem?.querySelector(".codex-ui-markdown");
       const markdownItemId = markdownItem?.getAttribute("data-item-id");
@@ -6302,6 +6304,7 @@ for (const scene of selectedScenes) {
           marginBlockStart: style.marginBlockStart,
           padding: style.padding,
           rect: rect(element),
+          textAlign: style.textAlign,
         };
       };
       const markdown = markdownRoot
@@ -6334,6 +6337,10 @@ for (const scene of selectedScenes) {
                 ".codex-ui-code-block__header button",
               ),
               (button) => ({
+                iconPathData: Array.from(
+                  button.querySelectorAll("svg path"),
+                  (path) => path.getAttribute("d"),
+                ),
                 label: button.getAttribute("aria-label"),
                 pressed: button.getAttribute("aria-pressed"),
                 rect: rect(button),
@@ -6342,6 +6349,18 @@ for (const scene of selectedScenes) {
             codeBlock: markdownStyle(
               markdownRoot.querySelector(".codex-ui-code-block"),
             ),
+            codeHeader: markdownStyle(
+              markdownRoot.querySelector(".codex-ui-code-block__header"),
+            ),
+            codeLanguageIconPathData: Array.from(
+              markdownRoot.querySelectorAll(
+                ".codex-ui-code-block__language-icon svg path",
+              ),
+              (path) => path.getAttribute("d"),
+            ),
+            codeLanguageLabel: markdownRoot
+              .querySelector(".codex-ui-code-block__language-label")
+              ?.textContent?.trim(),
             copyLabel: markdownRoot
               .querySelector(".codex-ui-code-block__copy")
               ?.getAttribute("aria-label"),
@@ -6389,9 +6408,45 @@ for (const scene of selectedScenes) {
               literalText: markdownRoot.textContent,
             },
             linkTarget: markdownRoot
-              .querySelector('a[href^="https://example.com"]')
+              .querySelector(
+                'a[href^="https://example.com"], a[href="https://openai.com/codex/"]',
+              )
               ?.getAttribute("target"),
+            externalLink: (() => {
+              const link = markdownRoot.querySelector(
+                'a[href="https://openai.com/codex/"]',
+              );
+              const favicon = link?.querySelector("img");
+              return link
+                ? {
+                    faviconRect: rect(favicon),
+                    faviconSource: favicon?.getAttribute("src"),
+                    href: link.getAttribute("href"),
+                    label: link.textContent?.trim(),
+                    mentionStyle: markdownStyle(
+                      link.querySelector(
+                        ".demo-current-markdown-link__mention",
+                      ),
+                    ),
+                    rect: rect(link),
+                    style: markdownStyle(link),
+                  }
+                : null;
+            })(),
             paragraph: markdownStyle(markdownRoot.querySelector("p")),
+            quoteMarker: (() => {
+              const quote = markdownRoot.querySelector("blockquote");
+              if (!quote) return null;
+              const style = getComputedStyle(quote, "::after");
+              return {
+                backgroundColor: style.backgroundColor,
+                borderRadius: style.borderRadius,
+                bottom: style.bottom,
+                content: style.content,
+                top: style.top,
+                width: style.width,
+              };
+            })(),
             root: markdownStyle(markdownRoot),
             semantics: {
               blockquotes: markdownRoot.querySelectorAll("blockquote").length,
@@ -6404,12 +6459,33 @@ for (const scene of selectedScenes) {
               tables: markdownRoot.querySelectorAll("table").length,
             },
             table: markdownStyle(markdownRoot.querySelector("table")),
+            tableCells: Array.from(
+              markdownRoot.querySelectorAll("td"),
+              (cell) => ({
+                style: markdownStyle(cell),
+                text: cell.textContent?.trim(),
+              }),
+            ),
+            tableCopyLabel: markdownRoot
+              .querySelector(".codex-ui-markdown__table-actions button")
+              ?.getAttribute("aria-label"),
+            tableHeaders: Array.from(
+              markdownRoot.querySelectorAll("th"),
+              (header) => ({
+                style: markdownStyle(header),
+                text: header.textContent?.trim(),
+              }),
+            ),
             tableScroll: markdownStyle(
               markdownRoot.querySelector(
                 ".codex-ui-markdown__table-scroll",
               ),
             ),
             unorderedList: markdownStyle(markdownRoot.querySelector("ul")),
+            durationLabel: document
+              .querySelector(".demo-current-markdown-26-825__duration")
+              ?.textContent?.replace(/\s+/g, " ")
+              .trim(),
           }
         : null;
       const mcpGroup = document.querySelector(
@@ -9583,7 +9659,8 @@ for (const scene of selectedScenes) {
     );
     const expectedSidebarWidth =
       scene.scenario === "current-search-26-825" ||
-      scene.scenario === "current-browser-26-825"
+      scene.scenario === "current-browser-26-825" ||
+      scene.scenario === "markdown-current-26-825"
         ? 322.90625
         : 274;
     if (
@@ -11365,6 +11442,201 @@ for (const scene of selectedScenes) {
       if (!(await previewTrigger.evaluate((element) => element === document.activeElement))) {
         throw new Error(
           `${scene.id}: current 26.820 Markdown preview did not restore trigger focus.`,
+        );
+      }
+    }
+
+    if (
+      scene.id === "markdown-current-26-825" ||
+      scene.id === "markdown-current-26-825-compact"
+    ) {
+      const markdown = contract.markdown;
+      const compact = scene.id.endsWith("-compact");
+      const expectedWidth = compact ? 688 : 736;
+      const expectedActionLabels = [
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ];
+      const expectedActionIcons = [
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ];
+      const [surfaceHeader, stateHeader] = markdown?.tableHeaders ?? [];
+      const [markdownCell, readyCell] = markdown?.tableCells ?? [];
+      const [wrapAction, copyAction] = markdown?.codeActions ?? [];
+      if (
+        !markdown ||
+        markdown.semantics.headings !== 1 ||
+        markdown.semantics.paragraphs !== 4 ||
+        markdown.semantics.blockquotes !== 1 ||
+        markdown.semantics.lists !== 1 ||
+        markdown.semantics.tables !== 1 ||
+        markdown.semantics.codeBlocks !== 1 ||
+        markdown.durationLabel !== "Worked for 15s" ||
+        markdown.actionCount !== 4 ||
+        markdown.actions.some(
+          (action, index) =>
+            action.label !== expectedActionLabels[index] ||
+            action.icon !== expectedActionIcons[index] ||
+            Math.abs(action.rect.width - 26) > 0.5 ||
+            Math.abs(action.rect.height - 26) > 0.5 ||
+            Math.abs(
+              action.rect.left - (markdown.root.rect.left - 4 + index * 28),
+            ) > 0.5 ||
+            Math.abs(action.rect.top - (markdown.root.rect.bottom + 3)) > 0.5,
+        ) ||
+        markdown.copyLabel !== "Copy" ||
+        markdown.codeActions.length !== 2 ||
+        wrapAction?.label !== "Enable word wrap" ||
+        wrapAction.pressed !== "false" ||
+        wrapAction.iconPathData.length !== 3 ||
+        copyAction?.label !== "Copy" ||
+        copyAction.pressed !== null ||
+        copyAction.iconPathData.length !== 1 ||
+        [wrapAction, copyAction].some(
+          (action) =>
+            !action ||
+            Math.abs(action.rect.width - 36) > 0.5 ||
+            Math.abs(action.rect.height - 36) > 0.5,
+        ) ||
+        Math.abs(wrapAction.rect.left - (markdown.root.rect.right - 80)) > 0.5 ||
+        Math.abs(copyAction.rect.left - (markdown.root.rect.right - 43)) > 0.5 ||
+        markdown.codeLanguageLabel !== "TypeScript" ||
+        markdown.codeLanguageIconPathData.length !== 3 ||
+        markdown.linkTarget !== "_blank" ||
+        markdown.externalLink?.href !== "https://openai.com/codex/" ||
+        markdown.externalLink.label !== "public link" ||
+        markdown.externalLink.style.color !== "rgb(86, 133, 209)" ||
+        markdown.externalLink.mentionStyle.fontWeight !== "500" ||
+        !markdown.externalLink.faviconSource?.startsWith(
+          "data:image/png;base64,",
+        ) ||
+        Math.abs(markdown.externalLink.faviconRect.width - 16) > 0.5 ||
+        Math.abs(markdown.externalLink.faviconRect.height - 16) > 0.5 ||
+        Math.abs(markdown.externalLink.rect.width - 90.015625) > 0.5 ||
+        Math.abs(markdown.root.rect.width - expectedWidth) > 0.5 ||
+        Math.abs(markdown.root.rect.height - 465.4375) > 0.5 ||
+        markdown.root.color !== "rgb(255, 255, 255)" ||
+        markdown.root.fontFamily !==
+          '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+        markdown.root.fontSize !== "14px" ||
+        markdown.root.fontWeight !== "400" ||
+        !markdown.root.lineHeight.startsWith("22.75") ||
+        Math.abs(markdown.heading.rect.top - markdown.root.rect.top) > 0.5 ||
+        Math.abs(markdown.heading.rect.height - 28) > 0.5 ||
+        markdown.heading.fontSize !== "21px" ||
+        markdown.heading.fontWeight !== "600" ||
+        markdown.heading.lineHeight !== "28px" ||
+        markdown.heading.marginBlockEnd !== "7px" ||
+        markdown.paragraph.fontSize !== "14px" ||
+        markdown.paragraph.fontWeight !== "400" ||
+        !markdown.paragraph.lineHeight.startsWith("22.75") ||
+        markdown.paragraph.marginBlockStart !== "7px" ||
+        markdown.paragraph.marginBlockEnd !== "3.5px" ||
+        Math.abs(markdown.paragraph.rect.height - 23.75) > 0.5 ||
+        markdown.blockquote.lineHeight !== "21px" ||
+        markdown.blockquote.marginBlockEnd !== "7px" ||
+        markdown.blockquote.padding !== "7px 0px 7px 21px" ||
+        Math.abs(markdown.blockquote.rect.height - 36.75) > 0.5 ||
+        markdown.quoteMarker?.backgroundColor !==
+          "rgba(255, 255, 255, 0.157)" ||
+        markdown.quoteMarker.borderRadius !== "1.75px" ||
+        markdown.quoteMarker.top !== "7px" ||
+        markdown.quoteMarker.bottom !== "7px" ||
+        markdown.quoteMarker.width !== "3.5px" ||
+        markdown.unorderedList.marginBlockStart !== "0px" ||
+        markdown.unorderedList.marginBlockEnd !== "0px" ||
+        !markdown.unorderedList.padding.startsWith("0px 0px 0px 22.75") ||
+        Math.abs(markdown.unorderedList.rect.height - 45.5) > 0.5 ||
+        Math.abs(markdown.table.rect.width - expectedWidth) > 0.5 ||
+        Math.abs(markdown.table.rect.height - 81.5) > 0.5 ||
+        markdown.table.fontSize !== "12.25px" ||
+        markdown.tableCopyLabel !== "Copy table" ||
+        markdown.tableHeaders.length !== 2 ||
+        markdown.tableCells.length !== 2 ||
+        surfaceHeader?.text !== "Surface" ||
+        stateHeader?.text !== "State" ||
+        markdownCell?.text !== "Markdown" ||
+        readyCell?.text !== "Ready" ||
+        surfaceHeader.style.textAlign !== "start" ||
+        stateHeader.style.textAlign !== "start" ||
+        surfaceHeader.style.padding !== "7px 21px 7px 0px" ||
+        stateHeader.style.padding !== "7px 35px 7px 0px" ||
+        markdownCell.style.padding !== "8.75px 21px 21px 0px" ||
+        readyCell.style.padding !== "8.75px 0px 21px" ||
+        Math.abs(
+          stateHeader.style.rect.left - readyCell.style.rect.left,
+        ) > 0.5 ||
+        markdown.inlineCode.fontSize !== "12.25px" ||
+        !markdown.inlineCode.lineHeight.startsWith("22.75") ||
+        markdown.inlineCode.fontWeight !== "500" ||
+        markdown.inlineCode.padding !== "2.1px 4.2px" ||
+        markdown.inlineCode.borderRadius !== "7.5px" ||
+        markdown.codeBlock.backgroundColor !== "rgba(255, 255, 255, 0.05)" ||
+        markdown.codeBlock.borderRadius !== "20px" ||
+        markdown.codeBlock.marginBlockStart !== "17.5px" ||
+        markdown.codeBlock.marginBlockEnd !== "17.5px" ||
+        Math.abs(markdown.codeBlock.rect.width - expectedWidth) > 0.5 ||
+        Math.abs(markdown.codeBlock.rect.height - 82) > 0.5 ||
+        Math.abs(
+          markdown.codeBlock.rect.top - markdown.root.rect.top - 250.5,
+        ) > 0.5 ||
+        markdown.codeHeader.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+        markdown.codeHeader.color !== "rgb(255, 255, 255)" ||
+        markdown.codeHeader.fontSize !== "13px" ||
+        markdown.codeHeader.fontWeight !== "500" ||
+        markdown.codeHeader.lineHeight !== "18.5714px" ||
+        markdown.codeHeader.padding !== "6px 6px 6px 20px" ||
+        Math.abs(markdown.codeHeader.rect.width - (expectedWidth - 2)) > 0.5 ||
+        Math.abs(markdown.codeHeader.rect.height - 48) > 0.5 ||
+        markdown.code.fontSize !== "12px" ||
+        markdown.code.fontWeight !== "400" ||
+        markdown.code.lineHeight !== "20px" ||
+        Math.abs(markdown.code.rect.left - (markdown.root.rect.left + 21)) >
+          0.5 ||
+        markdown.math.katexCount !== 1 ||
+        markdown.math.mathMlCount !== 1 ||
+        markdown.math.annotation !==
+          "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
+        !markdown.math.display ||
+        Math.abs(markdown.math.display.rect.width - expectedWidth) > 0.5 ||
+        Math.abs(markdown.math.display.rect.height - 41.9375) > 0.5 ||
+        markdown.math.display.marginBlockStart !== "14px" ||
+        markdown.math.display.marginBlockEnd !== "14px" ||
+        !markdown.media.literalText.includes("Inline math: $E = mc^2$.") ||
+        !markdown.media.literalText.includes("CURRENT MARKDOWN DONE") ||
+        contract.horizontalOverflow !== 0
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 Markdown contract failed: ${JSON.stringify(markdown)}`,
+        );
+      }
+      const wrapToggle = page.getByRole("button", {
+        name: "Enable word wrap",
+      });
+      await wrapToggle.click();
+      const wrapped = await page.evaluate(() => {
+        const block = document.querySelector(
+          '[data-item-id="assistant-markdown-current-26-825"] .codex-ui-code-block',
+        );
+        const toggle = block?.querySelector(".codex-ui-code-block__wrap");
+        return {
+          label: toggle?.getAttribute("aria-label"),
+          pressed: toggle?.getAttribute("aria-pressed"),
+          wrapped: block?.getAttribute("data-wrap"),
+        };
+      });
+      if (
+        wrapped.label !== "Disable word wrap" ||
+        wrapped.pressed !== "true" ||
+        wrapped.wrapped !== "true"
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 Markdown wrap toggle failed: ${JSON.stringify(wrapped)}`,
         );
       }
     }
