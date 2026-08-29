@@ -3,7 +3,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AgentPlan, AgentReasoning, ProposedPlan } from "../src";
+import {
+  AgentPlan,
+  AgentReasoning,
+  ComposerPlanProgress,
+  ProposedPlan,
+} from "../src";
 
 afterEach(cleanup);
 
@@ -98,6 +103,46 @@ describe("AgentPlan", () => {
 
     fireEvent.click(button);
     expect(screen.getByText("Run desktop acceptance")).toBeTruthy();
+  });
+});
+
+describe("ComposerPlanProgress", () => {
+  it("renders the current step and exposes the full plan as a tooltip", () => {
+    render(
+      <ComposerPlanProgress
+        defaultOpen
+        steps={steps}
+      />,
+    );
+
+    const trigger = screen.getByRole("button", {
+      name: "Step 2 / 3. Show plan",
+    });
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("tooltip")).toBeTruthy();
+    expect(screen.getByText("Inspect the component model")).toBeTruthy();
+    expect(
+      screen
+        .getByText("Implement plan states")
+        .closest("li")
+        ?.getAttribute("aria-current"),
+    ).toBe("step");
+
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("tooltip")).toBeNull();
+  });
+
+  it("disappears when every plan step completes", () => {
+    const completed = steps.map((item) => ({
+      ...item,
+      status: "completed" as const,
+    }));
+    const { container } = render(
+      <ComposerPlanProgress steps={completed} />,
+    );
+
+    expect(container.innerHTML).toBe("");
   });
 });
 

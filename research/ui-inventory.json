@@ -201,12 +201,17 @@
       "id": "thread.activity-reasoning-plan",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["is-plan-event-enabled", "plan-summary-page"],
+      "packageEvidence": [
+        "is-plan-event-enabled",
+        "plan-summary-page",
+        "composer-plan-progress"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:thinking-working-worked-activity",
         "cdp:worked-activity-group-disclosure",
-        "cdp-26.825.31414:real-no-tool-and-terminal-thinking-cadence-worked-for-disclosure-and-ran-row"
+        "cdp-26.825.31414:real-no-tool-and-terminal-thinking-cadence-worked-for-disclosure-and-ran-row",
+        "cdp-26.825.31414:real-three-five-eight-ten-step-plan-writing-progress-tooltip-and-completion-removal"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
