@@ -280,7 +280,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   "current-review-files": scenario(
     "current-review-files",
     "Update current Review probe files",
-    "The current 26.810 Review workspace covers added, modified, and deleted files, toolbar and file-tree interactions, compact overlay behavior, and the observed Undo failure boundary.",
+    "The current 26.820 Review workspace covers added, modified, and deleted files, toolbar and file-tree interactions, compact overlay behavior, and the observed latest-turn selection boundary.",
     currentReviewFilesTrace,
   ),
   "multi-file-review": scenario(

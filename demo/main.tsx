@@ -1306,20 +1306,25 @@ function WorkflowFileDiffFixture() {
 
 const currentReviewWorkspaceFiles = [
   {
-    additions: 1,
+    additions: 2,
     change: "added" as const,
     deletions: 0,
     lines: [
       {
-        content: "added current review probe",
+        content: "added first line",
         kind: "addition" as const,
         newLineNumber: 1,
       },
+      {
+        content: "added second line",
+        kind: "addition" as const,
+        newLineNumber: 2,
+      },
     ],
-    path: "research/current-review-26-810-probe/added.txt",
+    path: "codex-ui-kit-review-26-820/added.txt",
   },
   {
-    additions: 1,
+    additions: 2,
     change: "modified" as const,
     deletions: 2,
     lines: [
@@ -1339,9 +1344,18 @@ const currentReviewWorkspaceFiles = [
         newLineNumber: 2,
         oldLineNumber: 2,
       },
-      { content: "", kind: "deletion" as const, oldLineNumber: 3 },
+      {
+        content: "line to remove",
+        kind: "deletion" as const,
+        oldLineNumber: 3,
+      },
+      {
+        content: "new alpha line",
+        kind: "addition" as const,
+        newLineNumber: 3,
+      },
     ],
-    path: "research/current-review-26-810-probe/alpha.txt",
+    path: "codex-ui-kit-review-26-820/alpha.txt",
   },
   {
     additions: 0,
@@ -1355,7 +1369,48 @@ const currentReviewWorkspaceFiles = [
       },
       { content: "", kind: "deletion" as const, oldLineNumber: 2 },
     ],
-    path: "research/current-review-26-810-probe/obsolete.txt",
+    path: "codex-ui-kit-review-26-820/obsolete.txt",
+  },
+];
+
+const currentReviewRenameWorkspaceFiles = [
+  {
+    additions: 0,
+    change: "modified" as const,
+    deletions: 1,
+    lines: [
+      {
+        content: "rename-only baseline",
+        kind: "context" as const,
+        newLineNumber: 1,
+        oldLineNumber: 1,
+      },
+      {
+        content: "__CODEX_REVIEW_RENAME_MARKER__",
+        kind: "deletion" as const,
+        oldLineNumber: 2,
+      },
+    ],
+    path: "codex-ui-kit-review-26-820/rename-destination.txt",
+  },
+  {
+    additions: 1,
+    change: "modified" as const,
+    deletions: 0,
+    lines: [
+      {
+        content: "rename-only baseline",
+        kind: "context" as const,
+        newLineNumber: 1,
+        oldLineNumber: 1,
+      },
+      {
+        content: "__CODEX_REVIEW_RENAME_MARKER__",
+        kind: "addition" as const,
+        newLineNumber: 2,
+      },
+    ],
+    path: "codex-ui-kit-review-26-820/rename-source.txt",
   },
 ];
 
@@ -1379,7 +1434,7 @@ function CurrentReviewFileCardFixture() {
         changes={changes}
         description={
           <span className="current-review-file-card-fixture__stats">
-            <span data-stat="additions">+2</span>
+            <span data-stat="additions">+4</span>
             <span data-stat="deletions">−4</span>
           </span>
         }
@@ -1399,12 +1454,20 @@ function CurrentReviewFileCardFixture() {
   );
 }
 
-function CurrentReviewWorkspaceFixture() {
+function CurrentReviewWorkspaceFixture({
+  files = currentReviewWorkspaceFiles,
+  rootLabel = "codex-ui-kit-review-26-820",
+  sceneId = "current-review-workspace",
+}: {
+  files?: typeof currentReviewWorkspaceFiles;
+  rootLabel?: string;
+  sceneId?: string;
+} = {}) {
   return (
     <main
       className="current-thread-pixel-fixture current-review-workspace-fixture"
       data-theme="dark"
-      data-visual-scene="current-review-workspace"
+      data-visual-scene={sceneId}
     >
       <WorkspacePanel
         actions={
@@ -1435,7 +1498,7 @@ function CurrentReviewWorkspaceFixture() {
           {
             content: (
               <FileReviewWorkspace
-                files={currentReviewWorkspaceFiles}
+                files={files}
                 icons={{
                   collapseAll: (
                     <CurrentThreadBuildIcon name="review-collapse-all" />
@@ -1465,7 +1528,7 @@ function CurrentReviewWorkspaceFixture() {
                     <CurrentThreadBuildIcon name="review-split-diff" />
                   ),
                 }}
-                rootLabel="research/current-review-26-810-probe"
+                rootLabel={rootLabel}
               />
             ),
             id: "review",
@@ -4614,6 +4677,8 @@ const currentThreadCapture =
   capture === "current-thread-streaming" ||
   capture === "current-thread-streaming-compact";
 const currentReviewWorkspaceCapture = capture === "current-review-workspace";
+const currentReviewRenameWorkspaceCapture =
+  capture === "current-review-workspace-rename";
 const currentReviewFileCardCapture = capture === "current-review-file-card";
 const currentCommandLifecycleState: CurrentCommandLifecycleState | undefined =
   capture === "current-command-success"
@@ -4662,6 +4727,11 @@ const continuityPixelState: ContinuityPixelState | undefined =
 createRoot(document.getElementById("root")!).render(
   currentReviewFileCardCapture ? (
     <CurrentReviewFileCardFixture />
+  ) : currentReviewRenameWorkspaceCapture ? (
+    <CurrentReviewWorkspaceFixture
+      files={currentReviewRenameWorkspaceFiles}
+      sceneId="current-review-workspace-rename"
+    />
   ) : currentReviewWorkspaceCapture ? (
     <CurrentReviewWorkspaceFixture />
   ) : currentCommandLifecycleState ? (

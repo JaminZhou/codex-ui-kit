@@ -105,7 +105,9 @@ describe("current-thread visual contract", () => {
       "current-compact-context-running",
       "current-compact-context-completed",
       "current-review-file-card",
+      "current-review-file-card-compact",
       "current-review-workspace",
+      "current-review-workspace-compact",
     ]);
     expect(packageJson.scripts["check:visual:streaming"]).toContain(
       "--scenes=current-thread-streaming,current-thread-streaming-compact",
@@ -120,7 +122,7 @@ describe("current-thread visual contract", () => {
       "--scenes=current-medium-message-navigation,current-compact-scroll-away,current-compact-interrupted,current-compact-context-running,current-compact-context-completed",
     );
     expect(packageJson.scripts["check:visual:review"]).toContain(
-      "--scenes=current-review-file-card,current-review-workspace",
+      "--scenes=current-review-file-card,current-review-file-card-compact,current-review-workspace,current-review-workspace-compact",
     );
   });
 

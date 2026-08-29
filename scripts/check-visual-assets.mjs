@@ -254,10 +254,23 @@ for (const icon of manifest.icons ?? []) {
   ) {
     throw new Error(`incomplete runtime evidence for ${icon.id}`);
   }
+  const iconBaselineContext = icon.baselineContext ?? baselineContext;
+  if (
+    icon.baselineContext &&
+    (!icon.baselineContext.appVersion ||
+      !icon.baselineContext.buildNumber ||
+      !/^[a-f0-9]{64}$/.test(icon.baselineContext.appAsarSha256 ?? "") ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(icon.baselineContext.capturedAt ?? "") ||
+      icon.baselineContext.theme !== "dark" ||
+      icon.baselineContext.viewport?.width !== 1180 ||
+      icon.baselineContext.viewport?.height !== 820)
+  ) {
+    throw new Error(`invalid component-scoped baseline for ${icon.id}`);
+  }
   const sha256 = createHash("sha256")
     .update(
       canonicalize({
-        baselineContext,
+        baselineContext: iconBaselineContext,
         primitives: icon.primitives,
         renderSize: icon.renderSize,
         rootAttributes: icon.rootAttributes,
@@ -524,16 +537,26 @@ if (
   manifest.projectPickerObservation?.surface?.rect?.width !== 260 ||
   manifest.projectPickerObservation?.listbox?.rect?.height !== 142.81 ||
   manifest.projectPickerObservation?.listbox?.rect?.width !== 252 ||
+  manifest.reviewBaseline?.appAsarSha256 !==
+    "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9" ||
+  manifest.reviewBaseline?.appVersion !== "26.820.60940" ||
+  manifest.reviewBaseline?.buildNumber !== "7119" ||
+  manifest.reviewBaseline?.capturedAt !== "2026-08-29" ||
+  manifest.reviewBaseline?.interactionState !==
+    "open-current-review-workspace" ||
+  manifest.reviewBaseline?.theme !== "dark" ||
+  manifest.reviewBaseline?.viewport?.width !== 1180 ||
+  manifest.reviewBaseline?.viewport?.height !== 820 ||
   canonicalize(manifest.reviewObservation?.fileNames) !==
-    canonicalize(["added.txt", "alpha.txt", "obsolete.txt"]) ||
-  manifest.reviewObservation?.copyPathCount !== 4 ||
-  manifest.reviewObservation?.fileTextIconCount !== 4 ||
-  manifest.reviewObservation?.openInCount !== 4 ||
-  manifest.reviewObservation?.toggleFileDiffCount !== 4 ||
+    canonicalize(["rename-destination.txt", "rename-source.txt"]) ||
+  manifest.reviewObservation?.copyPathCount !== 2 ||
+  manifest.reviewObservation?.fileTextIconCount !== 2 ||
+  manifest.reviewObservation?.openInCount !== 2 ||
+  manifest.reviewObservation?.toggleFileDiffCount !== 2 ||
   manifest.reviewObservation?.filter?.placeholder !== "Filter files…" ||
-  Math.abs((manifest.reviewObservation?.filter?.rect?.width ?? 0) - 181.86) >
+  Math.abs((manifest.reviewObservation?.filter?.rect?.width ?? 0) - 203) >
     0.15 ||
-  Math.abs((manifest.reviewObservation?.panel?.rect?.width ?? 0) - 382.44) >
+  Math.abs((manifest.reviewObservation?.panel?.rect?.width ?? 0) - 419.59) >
     0.15 ||
   manifest.reviewObservation?.panel?.rect?.height !== 820 ||
   manifest.reviewObservation?.splitDiffLabel !== "Switch to split diff"

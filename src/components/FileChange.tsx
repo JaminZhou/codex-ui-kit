@@ -1541,17 +1541,36 @@ export function FileReviewWorkspace({
 export interface FileRevertErrorDialogProps {
   closeIcon?: ReactNode;
   description?: ReactNode;
+  onSelectFile?: (path: string) => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;
+  skippedFiles?: readonly string[];
+  statusIcon?: ReactNode;
   title?: ReactNode;
+}
+
+function FileRevertErrorIcon() {
+  return (
+    <svg aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M7.231 7.231a.665.665 0 0 1 .94 0L10 9.06l1.828-1.829.104-.085a.666.666 0 0 1 .921.922l-.084.104L10.94 10l1.829 1.828a.665.665 0 0 1-.94.94L10 10.94l-1.828 1.83a.665.665 0 0 1-.94-.94L9.06 10 7.23 8.172a.665.665 0 0 1 0-.94Z" />
+      <path
+        clipRule="evenodd"
+        d="M10 2.085a7.915 7.915 0 1 1 0 15.83 7.915 7.915 0 0 1 0-15.83Zm0 1.33a6.585 6.585 0 1 0 0 13.17 6.585 6.585 0 0 0 0-13.17Z"
+        fillRule="evenodd"
+      />
+    </svg>
+  );
 }
 
 export function FileRevertErrorDialog({
   closeIcon,
-  description = "Git apply error: error: patch with only garbage at line 4",
+  description = "There were issues reverting some files",
+  onSelectFile,
   onOpenChange,
   open,
-  title = "Failed to revert changes",
+  skippedFiles = [],
+  statusIcon = <FileRevertErrorIcon />,
+  title = "No changes reverted",
 }: FileRevertErrorDialogProps) {
   return (
     <Dialog
@@ -1571,9 +1590,48 @@ export function FileRevertErrorDialog({
       onOpenChange={onOpenChange}
       open={open}
       size="compact"
-      title={title}
+      title={
+        <>
+          <span className="codex-ui-file-revert-error-dialog__status-icon">
+            {statusIcon}
+          </span>
+          <span>{title}</span>
+        </>
+      }
     >
-      <span aria-hidden="true" />
+      {skippedFiles.length > 0 ? (
+        <section
+          aria-label={`Skipped files (${skippedFiles.length})`}
+          className="codex-ui-file-revert-error-dialog__skipped"
+        >
+          <div className="codex-ui-file-revert-error-dialog__skipped-label">
+            Skipped ({skippedFiles.length})
+          </div>
+          <div role="list">
+            {skippedFiles.map((path) =>
+              onSelectFile ? (
+                <button
+                  className="codex-ui-file-revert-error-dialog__file"
+                  key={path}
+                  onClick={() => onSelectFile(path)}
+                  role="listitem"
+                  type="button"
+                >
+                  {path}
+                </button>
+              ) : (
+                <div
+                  className="codex-ui-file-revert-error-dialog__file"
+                  key={path}
+                  role="listitem"
+                >
+                  {path}
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      ) : null}
     </Dialog>
   );
 }

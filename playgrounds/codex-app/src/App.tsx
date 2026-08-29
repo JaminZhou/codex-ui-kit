@@ -464,7 +464,11 @@ function querySelection() {
     ? (requestedSummaryState as "floating" | "hidden" | "pinned")
     : null;
   const layoutMode =
-    params.get("layout") === "wide" ? ("wide" as const) : undefined;
+    params.get("layout") === "wide"
+      ? ("wide" as const)
+      : params.get("layout") === "narrow"
+        ? ("narrow" as const)
+        : undefined;
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
@@ -2484,7 +2488,10 @@ export function App() {
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
   const [reviewPanelWidth, setReviewPanelWidth] = useState(
-    initialSelection.scenarioId === "current-review-files" ? 382.4375 : 370,
+    initialSelection.scenarioId === "current-review-files" ||
+      initialSelection.scenarioId === "current-review-rename"
+      ? 419.59375
+      : 370,
   );
   const [fileRevertErrorOpen, setFileRevertErrorOpen] = useState(
     initialSelection.frame === "undo-failed",
@@ -2518,6 +2525,12 @@ export function App() {
     useState(false);
   const [undoneFileIds, setUndoneFileIds] = useState<Set<string>>(
     () => new Set(),
+  );
+  const [revertedCurrentReviewIds, setRevertedCurrentReviewIds] = useState<
+    Set<string>
+  >(() => new Set());
+  const [currentReviewConflictArmed, setCurrentReviewConflictArmed] = useState(
+    initialSelection.frame === "undo-failed",
   );
   const [liveError, setLiveError] = useState<string | null>(null);
   const liveStartPendingRef = useRef(false);
@@ -2677,6 +2690,10 @@ export function App() {
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentReviewFilesReplay =
     mode === "replay" && scenarioId === "current-review-files";
+  const isCurrentReviewRenameReplay =
+    mode === "replay" && scenarioId === "current-review-rename";
+  const isCurrentReview26820Replay =
+    isCurrentReviewFilesReplay || isCurrentReviewRenameReplay;
   const isCurrentMcp26818SuccessReplay =
     mode === "replay" && scenarioId === "mcp-current-26-818-success";
   const isCurrentMcp26818RecoveryReplay =
@@ -2701,8 +2718,8 @@ export function App() {
       scenarioId === "mcp-current-26-820-recovery");
 
   useEffect(() => {
-    setReviewPanelWidth(isCurrentReviewFilesReplay ? 382.4375 : 370);
-  }, [isCurrentReviewFilesReplay]);
+    setReviewPanelWidth(isCurrentReview26820Replay ? 419.59375 : 370);
+  }, [isCurrentReview26820Replay]);
   const isCurrentMcpReplay =
     mode === "replay" &&
     (scenarioId === "current-mixed-tool-thread" ||
@@ -7667,7 +7684,7 @@ export function App() {
     { additions: 0, deletions: 0 },
   );
   const reviewPanel = reviewFileChange ? (
-    isCurrentReviewFilesReplay ? (
+    isCurrentReview26820Replay ? (
       <WorkspacePanel
         actions={
           <>
@@ -7724,7 +7741,7 @@ export function App() {
                     path: file.path,
                   });
                 }}
-                rootLabel="current-review-26-810-probe"
+                rootLabel="codex-ui-kit-review-26-820"
                 selectionKey={reviewSelectionKey}
                 selectedPath={resolvedReview?.selectedPath}
               />
@@ -9884,7 +9901,8 @@ export function App() {
         previousPath: change.previousPath,
       };
     });
-    const indicator = isCurrentReviewFilesReplay ? (
+    const currentReviewReverted = revertedCurrentReviewIds.has(fileChange.id);
+    const indicator = isCurrentReview26820Replay ? (
       <CurrentBuildIcon name="review-file-text" />
     ) : (
       <svg
@@ -9902,8 +9920,27 @@ export function App() {
           {mode === "replay" ? (
             <button
               onClick={() => {
-                if (isCurrentReviewFilesReplay) {
-                  setFileRevertErrorOpen(true);
+                if (isCurrentReview26820Replay) {
+                  if (currentReviewReverted) {
+                    setRevertedCurrentReviewIds((current) => {
+                      const next = new Set(current);
+                      next.delete(fileChange.id);
+                      return next;
+                    });
+                    setCurrentReviewConflictArmed(true);
+                    return;
+                  }
+                  if (currentReviewConflictArmed) {
+                    setFileRevertErrorOpen(true);
+                    return;
+                  }
+                  setRevertedCurrentReviewIds((current) =>
+                    new Set(current).add(fileChange.id),
+                  );
+                  if (resolvedReview?.fileChangeId === fileChange.id) {
+                    setReviewOpen(false);
+                    setReviewSelection(null);
+                  }
                   return;
                 }
                 setUndoneFileIds((current) => {
@@ -9918,7 +9955,8 @@ export function App() {
               }}
               type="button"
             >
-              Undo <span aria-hidden="true">↶</span>
+              {currentReviewReverted ? "Reapply" : "Undo"}{" "}
+              <span aria-hidden="true">↶</span>
             </button>
           ) : null}
           <button
@@ -9942,7 +9980,7 @@ export function App() {
           data-item-id={fileChange.id}
           data-testid="file-change-group"
           description={
-            isCurrentReviewFilesReplay ? (
+            isCurrentReview26820Replay ? (
               <span className="demo-current-review-card-stats">
                 <span data-stat="additions">+{reviewTotals.additions}</span>
                 <span data-stat="deletions">−{reviewTotals.deletions}</span>
@@ -10711,6 +10749,7 @@ export function App() {
         onBottomPanelHeightChange={setTerminalHeight}
         layoutMode={
           (initialSelection.capture &&
+            initialSelection.layoutMode !== "narrow" &&
             activeFrame !== "pr-compact-detail" &&
             initialSelection.frame !== "route-continuity-projects" &&
             activeFrame !== "subagent-current-compact-720" &&
@@ -10782,7 +10821,9 @@ export function App() {
               ? 390
             : subagentPanelSelected
               ? 220
-              : undefined
+              : isCurrentReview26820Replay
+                ? 374.328125
+                : undefined
         }
         sidePanelMinWidth={
           view === "pull-request"
@@ -11134,8 +11175,19 @@ export function App() {
       </Dialog>
       <FileRevertErrorDialog
         closeIcon={<CurrentBuildIcon name="review-close" />}
+        onSelectFile={(path) => {
+          const target = state.fileChanges.find(({ changes }) =>
+            changes.some((change) => change.path === path),
+          );
+          if (!target) return;
+          setReviewSelectionKey((current) => current + 1);
+          setReviewSelection({ fileChangeId: target.id, path });
+          setFileRevertErrorOpen(false);
+          openReviewPanel();
+        }}
         onOpenChange={setFileRevertErrorOpen}
         open={fileRevertErrorOpen}
+        skippedFiles={["rename-destination.txt"]}
       />
     </div>
   );

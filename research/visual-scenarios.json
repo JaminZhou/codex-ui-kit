@@ -1312,6 +1312,61 @@
       ]
     },
     {
+      "capture": "current-review-file-card",
+      "colorScheme": "dark",
+      "fixtureId": "current-review-file-card",
+      "geometry": {
+        "card": ".codex-ui-file-change-group",
+        "header": ".codex-ui-file-change-group__header",
+        "indicator": ".codex-ui-file-change-group__indicator"
+      },
+      "expectedGeometry": {
+        "card": {
+          "height": 174,
+          "left": 0,
+          "top": 0,
+          "width": 688
+        },
+        "header": {
+          "height": {
+            "value": 65,
+            "tolerance": 1
+          },
+          "left": 0,
+          "top": 0,
+          "width": 688
+        },
+        "indicator": {
+          "height": {
+            "value": 41,
+            "tolerance": 1
+          },
+          "left": 12,
+          "top": 12,
+          "width": 40
+        }
+      },
+      "id": "current-review-file-card-compact",
+      "masks": [],
+      "maximumDiffRatio": 0.05,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_CURRENT_REVIEW_FILE_CARD_COMPACT_REFERENCE",
+      "regions": [
+        {
+          "height": 65,
+          "maximumDiffRatio": 0.06,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 109,
+          "maximumDiffRatio": 0.055,
+          "name": "files",
+          "top": 65
+        }
+      ]
+    },
+    {
       "capture": "current-review-workspace",
       "colorScheme": "dark",
       "geometry": {
@@ -1328,27 +1383,27 @@
           "height": 18,
           "top": 99,
           "width": {
-            "value": 182,
-            "tolerance": 2
+            "value": 203,
+            "tolerance": 1
           }
         },
         "header": {
           "height": 46,
           "left": 0,
           "top": 0,
-          "width": 383
+          "width": 419
         },
         "panel": {
           "height": 820,
           "left": 0,
           "top": 0,
-          "width": 383
+          "width": 419
         },
         "toolbar": {
           "height": 40,
           "left": 0,
           "top": 46,
-          "width": 383
+          "width": 419
         }
       },
       "id": "current-review-workspace",
@@ -1371,6 +1426,73 @@
         },
         {
           "height": 734,
+          "maximumDiffRatio": 0.05,
+          "name": "review-body",
+          "top": 86
+        }
+      ]
+    },
+    {
+      "capture": "current-review-workspace-rename",
+      "colorScheme": "dark",
+      "fixtureId": "current-review-workspace-rename",
+      "geometry": {
+        "filter": ".codex-ui-file-review-workspace__filter input",
+        "header": ".codex-ui-workspace-panel__header",
+        "panel": ".codex-ui-workspace-panel",
+        "toolbar": ".codex-ui-file-review-workspace__toolbar"
+      },
+      "expectedGeometry": {
+        "filter": {
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "445",
+          "height": 18,
+          "top": 99,
+          "width": {
+            "value": 160,
+            "tolerance": 1
+          }
+        },
+        "header": {
+          "height": 46,
+          "left": 0,
+          "top": 0,
+          "width": 345
+        },
+        "panel": {
+          "height": 680,
+          "left": 0,
+          "top": 0,
+          "width": 345
+        },
+        "toolbar": {
+          "height": 40,
+          "left": 0,
+          "top": 46,
+          "width": 345
+        }
+      },
+      "id": "current-review-workspace-compact",
+      "masks": [],
+      "maximumDiffRatio": 0.05,
+      "pixelThreshold": 0.05,
+      "referenceEnv": "CODEX_UI_KIT_CURRENT_REVIEW_RENAME_WORKSPACE_COMPACT_REFERENCE",
+      "regions": [
+        {
+          "height": 46,
+          "maximumDiffRatio": 0.06,
+          "name": "header",
+          "top": 0
+        },
+        {
+          "height": 40,
+          "maximumDiffRatio": 0.06,
+          "name": "toolbar",
+          "top": 46
+        },
+        {
+          "height": 594,
           "maximumDiffRatio": 0.05,
           "name": "review-body",
           "top": 86

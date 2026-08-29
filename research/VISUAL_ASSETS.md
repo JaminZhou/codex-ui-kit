@@ -168,9 +168,14 @@ pnpm update:visual-assets:review
 The updater requires the exact dark 1180×820 `review-workspace` capture,
 matches seventeen semantic SVG groups, rejects missing or ambiguous geometry,
 resolves same-document `<use>` references into replayable symbol paths, and
-stores the fixed panel/filter/file observation. The replay subset is updated
-in the same write, and URL-bearing visual scalars are sanitized before captured
-JSON reaches stdout.
+stores the current panel/filter/two-file observation. Review-only promotion
+uses a component-scoped baseline context, so a fresh Review capture on the
+same installed fingerprint can update those seventeen sources without
+silently relabeling unrelated icons as newly observed. A cross-build capture
+must still match the declared current fingerprint and replaces changed Review
+geometry instead of preserving stale same-build observations. The replay
+subset inherits each icon's component baseline in the same write, and
+URL-bearing visual scalars are sanitized before captured JSON reaches stdout.
 
 The targeted updater proves the `completed-thread` capture mode and exact
 baseline context before promoting Send, four assistant actions, and seven

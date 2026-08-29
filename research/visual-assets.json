@@ -133188,6 +133188,18 @@
       "sha256": "5a935c9dbd72acad8367a051dfd49205cd1424254d03a5dd62f0bd4e81e679ca"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-tab",
       "ownerAriaLabel": null,
       "ownerEvidence": "current Review tab glyph selected by exact tab text",
@@ -133412,7 +133424,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -133897,7 +133909,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -134387,7 +134399,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -134651,9 +134663,21 @@
       "sourceClassName": "icon-xs shrink-0",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "77c80caebdf91991e3aac25833be7b29a0e07b2dc60ef828e5ea375bf6699811"
+      "sha256": "5e702654a95cbdc861726ffccd2266a913100404bebcb88d77c4532b2b57ce5a"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-close",
       "ownerAriaLabel": "Close Review tab",
       "primitives": [
@@ -134878,7 +134902,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -135368,7 +135392,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -135632,9 +135656,21 @@
       "sourceClassName": "",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "75cfd4a5cc599abdb7e14849d53fbf31b6b84ffe9deb400885a49e49ac94ff6c"
+      "sha256": "5763c749d18a89e48091b000dc4dfcd56129f956b7c77fc52f752e71516393eb"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-open-tab",
       "ownerAriaLabel": "Open side panel tab",
       "primitives": [
@@ -135859,7 +135895,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -136349,7 +136385,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -136613,9 +136649,21 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "6035c5d0f0717f7aa76933765985045a3175f24148c65f3293b55b68e3051aef"
+      "sha256": "6a642224d25c2755a3c81753e1055682873e3890285d9e79b54b31d366ecd140"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-expand",
       "ownerAriaLabel": "Expand panel",
       "primitives": [
@@ -136840,7 +136888,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -137330,7 +137378,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -137594,18 +137642,28 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "ad24b76301780e5eddff5622e7eaf2b48c40c19bf9d8e7e03316bc9125d92225"
+      "sha256": "254ccf49d79f195abe4dd0e59c68766438b9c052726b90ecc3eddb49b3c9b0bc"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-scope-chevron",
       "ownerAriaLabel": "Last Turn",
       "primitives": [
         {
           "attributes": {
-            "d": "M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z",
-            "fill": "currentColor",
-            "stroke": "currentColor",
-            "stroke-width": "0.6"
+            "d": "M8.71677 4.71677C8.87298 4.56056 9.12696 4.56056 9.28317 4.71677C9.43938 4.87298 9.43938 5.12696 9.28317 5.28317L6.45993 8.10642C6.20609 8.36023 5.79384 8.36023 5.54001 8.10642L2.71677 5.28317C2.56056 5.12696 2.56056 4.87298 2.71677 4.71677C2.87298 4.56056 3.12696 4.56056 3.28317 4.71677L5.99997 7.43356L8.71677 4.71677Z",
+            "fill": "currentColor"
           },
           "computedStyle": {
             "-webkit-border-horizontal-spacing": "0px",
@@ -137781,7 +137839,7 @@
             "cursor": "default",
             "cx": "0px",
             "cy": "0px",
-            "d": "path(\"M 15.2793 7.71101 C 15.539 7.45131 15.961 7.45131 16.2207 7.71101 C 16.4804 7.97071 16.4804 8.39272 16.2207 8.65242 L 10.4707 14.4024 C 10.211 14.6621 9.78902 14.6621 9.52932 14.4024 L 3.77932 8.65242 L 3.69436 8.54792 C 3.52385 8.28979 3.55205 7.93828 3.77932 7.71101 C 4.00659 7.48374 4.3581 7.45554 4.61623 7.62605 L 4.72073 7.71101 L 10 12.9903 L 15.2793 7.71101 Z\")",
+            "d": "path(\"M 8.71677 4.71677 C 8.87298 4.56056 9.12696 4.56056 9.28317 4.71677 C 9.43938 4.87298 9.43938 5.12696 9.28317 5.28317 L 6.45993 8.10642 C 6.20609 8.36023 5.79384 8.36023 5.54001 8.10642 L 2.71677 5.28317 C 2.56056 5.12696 2.56056 4.87298 2.71677 4.71677 C 2.87298 4.56056 3.12696 4.56056 3.28317 4.71677 L 5.99997 7.43356 L 8.71677 4.71677 Z\")",
             "direction": "ltr",
             "display": "inline",
             "dominant-baseline": "auto",
@@ -137823,7 +137881,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -138000,14 +138058,14 @@
             "speak": "normal",
             "stop-color": "rgb(0, 0, 0)",
             "stop-opacity": "1",
-            "stroke": "rgb(223, 223, 223)",
+            "stroke": "none",
             "stroke-dasharray": "none",
             "stroke-dashoffset": "0px",
             "stroke-linecap": "butt",
             "stroke-linejoin": "miter",
             "stroke-miterlimit": "4",
             "stroke-opacity": "1",
-            "stroke-width": "0.6px",
+            "stroke-width": "1px",
             "tab-size": "4",
             "table-layout": "auto",
             "text-align": "center",
@@ -138089,13 +138147,12 @@
       ],
       "region": "review-panel",
       "renderSize": {
-        "height": 14,
-        "width": 14
+        "height": 12,
+        "width": 12
       },
       "rootAttributes": {
-        "fill": "none",
-        "height": "21",
-        "width": "20"
+        "height": "12",
+        "width": "12"
       },
       "rootComputedStyle": {
         "-webkit-border-horizontal-spacing": "0px",
@@ -138170,7 +138227,7 @@
         "background-size": "auto",
         "baseline-shift": "0px",
         "baseline-source": "auto",
-        "block-size": "14px",
+        "block-size": "12px",
         "border-block-end-color": "rgb(223, 223, 223)",
         "border-block-end-style": "solid",
         "border-block-end-width": "0px",
@@ -138278,7 +138335,7 @@
         "dynamic-range-limit": "no-limit",
         "empty-cells": "show",
         "field-sizing": "fixed",
-        "fill": "none",
+        "fill": "rgb(0, 0, 0)",
         "fill-opacity": "1",
         "fill-rule": "nonzero",
         "filter": "none",
@@ -138286,7 +138343,7 @@
         "flex-direction": "row",
         "flex-grow": "0",
         "flex-line-count": "1",
-        "flex-shrink": "1",
+        "flex-shrink": "0",
         "flex-wrap": "nowrap",
         "float": "none",
         "flood-color": "rgb(0, 0, 0)",
@@ -138313,7 +138370,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -138325,14 +138382,14 @@
         "grid-template-areas": "none",
         "grid-template-columns": "none",
         "grid-template-rows": "none",
-        "height": "14px",
+        "height": "12px",
         "hyphenate-character": "auto",
         "hyphenate-limit-chars": "auto",
         "hyphens": "manual",
         "image-orientation": "from-image",
         "image-rendering": "auto",
         "initial-letter": "normal",
-        "inline-size": "14px",
+        "inline-size": "12px",
         "inset-block-end": "auto",
         "inset-block-start": "auto",
         "inset-inline-end": "auto",
@@ -138422,7 +138479,7 @@
         "padding-top": "0px",
         "paint-order": "normal",
         "perspective": "none",
-        "perspective-origin": "7px 7px",
+        "perspective-origin": "6px 6px",
         "pointer-events": "auto",
         "position": "static",
         "position-anchor": "normal",
@@ -138541,7 +138598,7 @@
         "touch-action": "auto",
         "transform": "none",
         "transform-box": "view-box",
-        "transform-origin": "7px 7px",
+        "transform-origin": "6px 6px",
         "transform-style": "flat",
         "transition-behavior": "normal",
         "transition-delay": "0s",
@@ -138564,7 +138621,7 @@
         "visibility": "visible",
         "white-space-collapse": "collapse",
         "widows": "2",
-        "width": "14px",
+        "width": "12px",
         "will-change": "auto",
         "word-break": "normal",
         "word-spacing": "0px",
@@ -138574,12 +138631,24 @@
         "z-index": "auto",
         "zoom": "1"
       },
-      "sourceClassName": "icon-2xs",
+      "sourceClassName": "_Icon_qvjuo_1",
       "status": "runtime-observed",
-      "viewBox": "0 0 20 21",
-      "sha256": "2d29e974dba59c6508940f7d02e94e4dd7b3d194191b4e7f5bd4eb19079dda0a"
+      "viewBox": "0 0 12 12",
+      "sha256": "beb7d3de1f130d5458b855452849e0455b937f918afc33214d1dfe473bc3a0fb"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-options",
       "ownerAriaLabel": "Review options",
       "primitives": [
@@ -138804,7 +138873,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -139288,7 +139357,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -139772,7 +139841,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -140262,7 +140331,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -140526,9 +140595,21 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "188d6255075397718c508362eda91cfb1417ba46fef259885808c3c42f5473b6"
+      "sha256": "21e712f67321d73dff01a0a8d841454b946a33d938cec7ed382a6fd2afedcad5"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-collapse-all",
       "ownerAriaLabel": "Collapse all diffs",
       "primitives": [
@@ -140755,7 +140836,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -141241,7 +141322,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -141728,7 +141809,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -142215,7 +142296,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -142702,7 +142783,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -143189,7 +143270,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -143679,7 +143760,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -143943,9 +144024,21 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 24 24",
-      "sha256": "a54e3ef688e8d0080f51f60aeb13c3a7cfd0ffc4c5ae85d7d11c8f910bc7d594"
+      "sha256": "cfc2c631807319b511d67546c9443ed02e21cdc58da3167b7a63a913898dd44e"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-jump-file",
       "ownerAriaLabel": "Jump to file",
       "primitives": [
@@ -144169,7 +144262,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -144652,7 +144745,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -145142,7 +145235,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -145406,9 +145499,21 @@
       "sourceClassName": "icon-xs text-codex-description",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "b449eca41d454912fa274f816b19af559f9ed858ef11baedf58b4f28734d348b"
+      "sha256": "fa7f542e0715e5af6940082f52576df79bb837239e68d7cb6bdd98defe700eb0"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-split-diff",
       "ownerAriaLabel": "Switch to split diff",
       "primitives": [
@@ -145638,7 +145743,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -146123,7 +146228,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -146608,7 +146713,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -147098,7 +147203,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -147362,9 +147467,21 @@
       "sourceClassName": "icon-xs",
       "status": "runtime-observed",
       "viewBox": "0 0 24 24",
-      "sha256": "20e427b769f9e1b99df2ada80968351f52d299e334c7453f9a1a4a7e59cd1ddc"
+      "sha256": "ad7bd4c220f7a21458b1497aa6773e7fbe7091813f8ee7ff56d3f41be29d72ee"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-files-toggle",
       "ownerAriaLabel": "Hide files",
       "primitives": [
@@ -147588,7 +147705,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -148078,7 +148195,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -148342,9 +148459,21 @@
       "sourceClassName": "icon-sm",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "864d0bb6e4c1d35edc469d7a2a4cba14487dbdff7991a6446ce7e2b9be136d66"
+      "sha256": "cf7ff083eb80595a80e8da5379d9b2a9a7825869274316c39b6f5916db230db8"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-commit-or-push",
       "ownerAriaLabel": "Commit or push",
       "primitives": [
@@ -148569,7 +148698,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -149053,7 +149182,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -149537,7 +149666,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -150027,7 +150156,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -150291,9 +150420,21 @@
       "sourceClassName": "icon-xs shrink-0",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "718fb51a93e65401097474e8c807cd9ae29616cafc216fefd9cfccb505635e75"
+      "sha256": "f696d89da3a1c41920f4ddd91437ec21da9b7953af2a529d989aaf7907301db9"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-more-git",
       "ownerAriaLabel": "More Git actions",
       "primitives": [
@@ -150520,7 +150661,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -151010,7 +151151,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -151274,9 +151415,21 @@
       "sourceClassName": "icon-2xs opacity-50",
       "status": "runtime-observed",
       "viewBox": "0 0 20 21",
-      "sha256": "a3ed95e297cd6d0da58bf4f1ec56d6b2b82520ab1e995fec2c688015532e9994"
+      "sha256": "5559603a549865a2b1e3de5eee6eefe998a8fd726756a608aa8cb11f50c5230c"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-copy-path",
       "ownerAriaLabel": "Copy path",
       "primitives": [
@@ -151501,7 +151654,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -151991,7 +152144,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -152255,9 +152408,21 @@
       "sourceClassName": "icon-2xs",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "b5a5815012bcce67d3e81dad7ff4285ddc1a1fa188a7350a2efbcc5291fcb781"
+      "sha256": "910b2a8e7219189afb098c9a125269833a86fb1d8d26d3a76a7ec990fa7e17fc"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-file-toggle",
       "ownerAriaLabel": "Toggle file diff",
       "primitives": [
@@ -152482,7 +152647,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -152972,7 +153137,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -153236,9 +153401,21 @@
       "sourceClassName": "ease-basic icon-2xs transition-transform duration-basic motion-reduce:transition-none rotate-90",
       "status": "runtime-observed",
       "viewBox": "0 0 20 20",
-      "sha256": "934e8232bb9a1d6501932c9be589df21de2e848ba30c4a31edfb522dbbd57d33"
+      "sha256": "20b09298c3cb9a7c598633c280022c85ac3d5749a9d03a74c98b7fb75d76ba7f"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-open-in",
       "ownerAriaLabel": "Open in",
       "primitives": [
@@ -153463,7 +153640,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -153953,7 +154130,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -154217,9 +154394,21 @@
       "sourceClassName": "icon-2xs",
       "status": "runtime-observed",
       "viewBox": "0 0 21 21",
-      "sha256": "278f23a8ec79a11194ae7b6524494af818da199405cbd4688677cd06011435aa"
+      "sha256": "1746f427d21f256f8bef92aaefe82549ee128024b1c8ec4a04af8b885050a36e"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-search",
       "ownerAriaLabel": null,
       "ownerEvidence": "current Review Filter files search glyph selected structurally from its exact input",
@@ -154447,7 +154636,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -154937,7 +155126,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -155201,9 +155390,21 @@
       "sourceClassName": "icon-xs ms-2 shrink-0 text-tertiary",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "7e37fa432e2545726aa44b3ff2bb616c98c44b745ab1aa608593b29e23166ab6"
+      "sha256": "312895730f7a8ef585ec0125c52f2d776e2a0df72a77ceca3a72f1ecc20c51f1"
     },
     {
+      "baselineContext": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
       "id": "review-file-text",
       "ownerAriaLabel": null,
       "ownerEvidence": "current visible Review text-file use resolved against its exact runtime SVG symbol",
@@ -155432,7 +155633,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -155916,7 +156117,7 @@
             "font-variant-numeric": "normal",
             "font-variant-position": "normal",
             "font-variation-settings": "normal",
-            "font-weight": "445",
+            "font-weight": "400",
             "forced-color-adjust": "auto",
             "grid-auto-columns": "auto",
             "grid-auto-flow": "row",
@@ -156402,7 +156603,7 @@
         "font-variant-numeric": "normal",
         "font-variant-position": "normal",
         "font-variation-settings": "normal",
-        "font-weight": "445",
+        "font-weight": "400",
         "forced-color-adjust": "auto",
         "grid-auto-columns": "auto",
         "grid-auto-flow": "row",
@@ -156666,7 +156867,7 @@
       "sourceClassName": "size-4 shrink-0",
       "status": "runtime-observed",
       "viewBox": "0 0 16 16",
-      "sha256": "ad9b7c4bd216fdb0872d87a9f4ac0c26bee93e074e883090ece9bb9c22f8cebe"
+      "sha256": "0c8decd01f7dc110d083104cce0ece09d5e1870455ff1cef6d821bde189c8750"
     }
   ],
   "remainingApproximationIds": [],
@@ -157273,20 +157474,19 @@
     }
   },
   "reviewObservation": {
-    "copyPathCount": 4,
+    "copyPathCount": 2,
     "fileNames": [
-      "added.txt",
-      "alpha.txt",
-      "obsolete.txt"
+      "rename-destination.txt",
+      "rename-source.txt"
     ],
-    "fileTextIconCount": 4,
+    "fileTextIconCount": 2,
     "filter": {
       "placeholder": "Filter files…",
       "rect": {
         "height": 18,
-        "left": 989.14,
+        "left": 968,
         "top": 99,
-        "width": 181.86
+        "width": 203
       },
       "style": {
         "clipPath": "none",
@@ -157300,7 +157500,7 @@
         "flexShrink": "1",
         "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
         "fontSize": "14px",
-        "fontWeight": "445",
+        "fontWeight": "400",
         "height": "18px",
         "lineHeight": "18px",
         "mask": "none",
@@ -157317,19 +157517,19 @@
         "strokeOpacity": "1",
         "strokeWidth": "1px",
         "transform": "none",
-        "transformOrigin": "90.9297px 9px",
+        "transformOrigin": "101.5px 9px",
         "vectorEffect": "none",
         "visibility": "visible",
-        "width": "181.859px"
+        "width": "203px"
       }
     },
-    "openInCount": 4,
+    "openInCount": 2,
     "panel": {
       "rect": {
         "height": 820,
-        "left": 797.56,
+        "left": 760.41,
         "top": 0,
-        "width": 382.44
+        "width": 419.59
       },
       "style": {
         "backgroundColor": "rgba(0, 0, 0, 0)",
@@ -157337,7 +157537,7 @@
       }
     },
     "splitDiffLabel": "Switch to split diff",
-    "toggleFileDiffCount": 4,
+    "toggleFileDiffCount": 2,
     "toolbarLabels": [
       "Last Turn",
       "Review options",
@@ -157348,5 +157548,17 @@
       "Commit or push",
       "More Git actions"
     ]
+  },
+  "reviewBaseline": {
+    "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+    "appVersion": "26.820.60940",
+    "buildNumber": "7119",
+    "interactionState": "open-current-review-workspace",
+    "theme": "dark",
+    "viewport": {
+      "height": 820,
+      "width": 1180
+    },
+    "capturedAt": "2026-08-29"
   }
 }
