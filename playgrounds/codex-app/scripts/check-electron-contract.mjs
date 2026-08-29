@@ -5599,7 +5599,7 @@ const { app: currentReviewApp, page: currentReviewPage } = await launchScene(
 
 try {
   await currentReviewPage.waitForSelector(
-    '.codex-ui-app-shell[data-side-panel-open] [data-testid="review-panel"]',
+    '.codex-ui-app-shell[data-side-panel-open] [data-testid="current-review-workspace"]',
   );
   const initialCurrentReview = await currentReviewPage.evaluate(() => ({
     changeKinds: Array.from(
@@ -5607,17 +5607,17 @@ try {
       (element) => element.getAttribute("data-change"),
     ),
     diffCount: document.querySelectorAll(
-      ".codex-ui-file-review .codex-ui-file-diff",
+      ".codex-ui-file-review-workspace__diff",
     ).length,
     fileCount: document.querySelectorAll(
-      ".codex-ui-file-review__file",
+      '.codex-ui-file-review-workspace__tree [role="treeitem"]',
     ).length,
     markerLines: Array.from(
       document.querySelectorAll(".codex-ui-file-diff__line"),
       (element) => element.textContent?.trim(),
     ).filter((text) => text?.includes("__CODEX_TEMP_RENAME_MARKER__")),
     paths: Array.from(
-      document.querySelectorAll(".codex-ui-file-review__header"),
+      document.querySelectorAll(".codex-ui-file-review-workspace__file-identity"),
       (element) => element.textContent?.replace(/\s+/g, " ").trim(),
     ),
   }));
@@ -5627,22 +5627,21 @@ try {
     initialCurrentReview.diffCount !== 2 ||
     initialCurrentReview.fileCount !== 2 ||
     initialCurrentReview.markerLines.length !== 2 ||
-    !initialCurrentReview.paths[0]?.includes("rename-only.txt") ||
-    !initialCurrentReview.paths[1]?.includes("renamed-only.txt")
+    !initialCurrentReview.paths[0]?.includes("rename-source.txt") ||
+    !initialCurrentReview.paths[1]?.includes("rename-destination.txt")
   ) {
     throw new Error(
       `Electron current Review rename content failed: ${JSON.stringify(initialCurrentReview)}`,
     );
   }
 
-  const renamedPath =
-    ".research/current-review-probe/renamed-only.txt";
+  const renamedPath = "rename-destination.txt";
   await currentReviewPage
-    .getByRole("button", { name: `Select review for ${renamedPath}` })
+    .getByRole("treeitem", { name: `Select ${renamedPath}` })
     .click();
   if (
     (await currentReviewPage
-      .getByRole("listitem", { name: `Review file ${renamedPath}` })
+      .getByRole("treeitem", { name: `Select ${renamedPath}` })
       .getAttribute("data-selected")) !== "true"
   ) {
     throw new Error(
@@ -5651,7 +5650,7 @@ try {
   }
 
   await currentReviewPage
-    .getByRole("button", { exact: true, name: "Close review" })
+    .getByRole("button", { exact: true, name: "Close tab" })
     .click();
   await currentReviewPage.waitForSelector(
     ".codex-ui-app-shell:not([data-side-panel-open])",
@@ -5661,11 +5660,11 @@ try {
     .click();
   if (
     (await currentReviewPage
-      .getByRole("listitem", { name: `Review file ${renamedPath}` })
+      .getByRole("treeitem", { name: `Select ${renamedPath}` })
       .getAttribute("data-selected")) !== "true" ||
     (await currentReviewPage
-      .getByRole("list", {
-        name: "Review diff for .research/current-review-probe/rename-only.txt",
+      .getByRole("listitem", {
+        name: "Review file rename-source.txt",
       })
       .count()) !== 1
   ) {
@@ -5675,14 +5674,36 @@ try {
   }
 
   await currentReviewPage
-    .getByRole("button", { exact: true, name: "Undo" })
+    .getByRole("button", { exact: false, name: /^Undo/ })
     .click();
-  await currentReviewPage.waitForSelector('[data-testid="file-change-group"]', {
-    state: "detached",
-  });
   await currentReviewPage.waitForSelector(
     ".codex-ui-app-shell:not([data-side-panel-open])",
   );
+  if (
+    (await currentReviewPage.locator('[data-testid="file-change-group"]').count()) !==
+      1 ||
+    (await currentReviewPage
+      .getByRole("button", { exact: false, name: /^Reapply/ })
+      .count()) !== 1
+  ) {
+    throw new Error("Electron current Review Undo did not retain a Reapply card.");
+  }
+  await currentReviewPage
+    .getByRole("button", { exact: false, name: /^Reapply/ })
+    .click();
+  await currentReviewPage
+    .getByRole("button", { exact: false, name: /^Undo/ })
+    .click();
+  const conflictDialog = currentReviewPage.getByRole("dialog", {
+    name: "No changes reverted",
+  });
+  await conflictDialog.waitFor();
+  if (
+    (await conflictDialog.getByText("Skipped (1)").count()) !== 1 ||
+    (await conflictDialog.getByText(renamedPath, { exact: true }).count()) !== 1
+  ) {
+    throw new Error("Electron current Review conflict did not identify the skipped file.");
+  }
 } finally {
   await currentReviewApp.close();
 }
@@ -5733,18 +5754,17 @@ try {
     initialReviewFiles.diffCount !== 3 ||
     initialReviewFiles.treeCount !== 3 ||
     initialReviewFiles.exactIconNames.length < 17 ||
-    Math.abs((initialReviewFiles.panel?.width ?? 0) - 382.4375) > 1 ||
+    Math.abs((initialReviewFiles.panel?.width ?? 0) - 419.59375) > 1 ||
     Math.abs((initialReviewFiles.toolbar?.height ?? 0) - 40) > 1 ||
     Math.abs((initialReviewFiles.filter?.height ?? 0) - 18) > 1 ||
-    Math.abs((initialReviewFiles.filter?.width ?? 0) - 182) > 1
+    Math.abs((initialReviewFiles.filter?.width ?? 0) - 203) > 1
   ) {
     throw new Error(
       `Electron current Review workspace failed: ${JSON.stringify(initialReviewFiles)}`,
     );
   }
 
-  const requestedReviewPath =
-    "research/current-review-26-810-probe/alpha.txt";
+  const requestedReviewPath = "alpha.txt";
   await currentReviewFilesPage
     .getByRole("button", { exact: true, name: "Close tab" })
     .click();
@@ -5841,7 +5861,7 @@ try {
   });
   if (
     splitDiff.splitDiffCount !== 3 ||
-    splitDiff.paneCount !== 12 ||
+    splitDiff.paneCount !== 14 ||
     splitDiff.before !== "alpha baseline" ||
     splitDiff.after !== "alpha updated"
   ) {
@@ -5907,13 +5927,9 @@ try {
   }
 
   await currentReviewFilesPage
-    .getByRole("button", { exact: true, name: "Undo" })
+    .getByRole("button", { exact: false, name: /^Undo/ })
     .click();
-  const failureDialog = currentReviewFilesPage.getByRole("dialog", {
-    name: "Failed to revert changes",
-  });
-  await failureDialog.waitFor();
-  const failureState = await currentReviewFilesPage.evaluate(() => ({
+  const revertedState = await currentReviewFilesPage.evaluate(() => ({
     fileGroupCount: document.querySelectorAll(
       '[data-testid="file-change-group"]',
     ).length,
@@ -5921,14 +5937,21 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-side-panel-open") ?? false,
+    reapplyCount: [...document.querySelectorAll("button")].filter((button) =>
+      button.textContent?.trim().startsWith("Reapply"),
+    ).length,
   }));
-  if (failureState.fileGroupCount !== 1 || !failureState.panelOpen) {
+  if (
+    revertedState.fileGroupCount !== 1 ||
+    revertedState.panelOpen ||
+    revertedState.reapplyCount !== 1
+  ) {
     throw new Error(
-      `Electron current Review Undo failure lost state: ${JSON.stringify(failureState)}`,
+      `Electron current Review Undo settlement lost state: ${JSON.stringify(revertedState)}`,
     );
   }
-  await failureDialog
-    .getByRole("button", { exact: true, name: "Close" })
+  await currentReviewFilesPage
+    .getByRole("button", { exact: false, name: /^Reapply/ })
     .click();
 } finally {
   await currentReviewFilesApp.close();

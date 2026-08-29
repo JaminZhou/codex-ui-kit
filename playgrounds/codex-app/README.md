@@ -1101,13 +1101,24 @@ CODEX_UI_KIT_MULTI_FILE_REVIEW_REFERENCE=/absolute/path/to/main-only-reference.p
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual
 ```
 
-The current rename gate accepts the exact 906×820 current-build main-region
-capture and checks the conversation and Review ownership regions separately:
+The current `26.820.60940` Review gate uses local-only component crops for the
+wide/compact three-file card, wide three-file workspace, and compact rename
+workspace. The root checker hard-gates exact geometry and independent 5%
+pixel ceilings:
 
 ```bash
-CODEX_UI_KIT_CURRENT_REVIEW_REFERENCE=/absolute/path/to/current-review-rename.png \
-  pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-review-rename
+CODEX_UI_KIT_CURRENT_REVIEW_FILE_CARD_REFERENCE=/absolute/path/to/review-card-wide.png \
+CODEX_UI_KIT_CURRENT_REVIEW_FILE_CARD_COMPACT_REFERENCE=/absolute/path/to/review-card-compact.png \
+CODEX_UI_KIT_CURRENT_REVIEW_WORKSPACE_REFERENCE=/absolute/path/to/review-panel-wide.png \
+CODEX_UI_KIT_CURRENT_REVIEW_RENAME_WORKSPACE_COMPACT_REFERENCE=/absolute/path/to/review-rename-panel-compact.png \
+  pnpm check:visual:review
 ```
+
+The protocol-backed playground separately keeps eight reviewed wide/compact
+file-card, workspace, rename, and Undo-conflict baselines. CDP and Electron
+drive Undo → Reapply, the second Undo conflict, skipped-path selection, Review
+close/reopen, and responsive overlay behavior. The product crops remain
+outside the repository.
 
 The command-failure gate accepts the unmodified full-window current-build
 reference and masks non-owning private/dynamic regions internally:

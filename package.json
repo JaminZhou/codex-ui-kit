@@ -61,7 +61,7 @@
     "check:visual:workflow": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-thread-tool-call,current-thread-approval,current-workspace-file-diff",
     "check:visual:tool-recovery": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-compact-search-tool,current-compact-browser-tool,current-compact-mcp-unavailable,current-compact-command-failure",
     "check:visual:continuity": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-medium-message-navigation,current-compact-scroll-away,current-compact-interrupted,current-compact-context-running,current-compact-context-completed",
-    "check:visual:review": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-review-file-card,current-review-workspace",
+    "check:visual:review": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-review-file-card,current-review-file-card-compact,current-review-workspace,current-review-workspace-compact",
     "check:research": "node scripts/check-research-inventory.mjs && node scripts/check-visual-assets.mjs && node scripts/update-current-thread-visual-assets.mjs",
     "capture:current-baseline": "node scripts/capture-current-baseline.mjs",
     "capture:current-account-menu": "node scripts/capture-current-account-menu.mjs",

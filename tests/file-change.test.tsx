@@ -912,20 +912,27 @@ describe("FileReviewWorkspace", () => {
 });
 
 describe("FileRevertErrorDialog", () => {
-  it("renders the observed Git apply failure and closes from its full-width action", () => {
+  it("renders the current skipped-file failure and closes from its full-width action", () => {
     const onOpenChange = vi.fn();
+    const onSelectFile = vi.fn();
     render(
-      <FileRevertErrorDialog onOpenChange={onOpenChange} open />,
+      <FileRevertErrorDialog
+        onOpenChange={onOpenChange}
+        onSelectFile={onSelectFile}
+        open
+        skippedFiles={["rename-destination.txt"]}
+      />,
     );
 
     expect(
-      screen.getByRole("dialog", { name: "Failed to revert changes" }),
+      screen.getByRole("dialog", { name: "No changes reverted" }),
     ).toBeTruthy();
     expect(
-      screen.getByText(
-        "Git apply error: error: patch with only garbage at line 4",
-      ),
+      screen.getByText("There were issues reverting some files"),
     ).toBeTruthy();
+    expect(screen.getByText("Skipped (1)")).toBeTruthy();
+    fireEvent.click(screen.getByRole("listitem"));
+    expect(onSelectFile).toHaveBeenCalledWith("rename-destination.txt");
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });

@@ -84,6 +84,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "20fac0eb3af8eb4a1d22145af3bc6bc0a69304de4df322436fdabaa6b1d80080",
       "viewBox": "0 0 20 20"
     },
@@ -222,6 +234,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "e42ce47764d17605c912f0d1fe5cb8601c35efd32c7d16ff5472ae7b46b1233e",
       "viewBox": "0 0 20 20"
     },
@@ -293,6 +317,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "14px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "fce0619b4ea5b07521d63a8816a59dc5b16a2ee9fa2d8eb2917aeb195fa3a638",
       "viewBox": "0 0 16 16"
@@ -433,6 +469,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "006e290b4ae0d3fb5e4a635a10a7dafe08d153f1602afd8cbd835f08a5e032e5",
       "viewBox": "0 0 20 20"
     },
@@ -505,6 +553,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "8ab7b6b9a02cc6522f9f8005418495b364cd90d6a350274713b9e6854529f550",
       "viewBox": "0 0 20 20"
@@ -579,7 +639,19 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "75cfd4a5cc599abdb7e14849d53fbf31b6b84ffe9deb400885a49e49ac94ff6c",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "5763c749d18a89e48091b000dc4dfcd56129f956b7c77fc52f752e71516393eb",
       "viewBox": "0 0 21 21"
     },
     {
@@ -828,7 +900,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "a54e3ef688e8d0080f51f60aeb13c3a7cfd0ffc4c5ae85d7d11c8f910bc7d594",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "cfc2c631807319b511d67546c9443ed02e21cdc58da3167b7a63a913898dd44e",
       "viewBox": "0 0 24 24"
     },
     {
@@ -965,7 +1049,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "718fb51a93e65401097474e8c807cd9ae29616cafc216fefd9cfccb505635e75",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "f696d89da3a1c41920f4ddd91437ec21da9b7953af2a529d989aaf7907301db9",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1038,7 +1134,19 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "b5a5815012bcce67d3e81dad7ff4285ddc1a1fa188a7350a2efbcc5291fcb781",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "910b2a8e7219189afb098c9a125269833a86fb1d8d26d3a76a7ec990fa7e17fc",
       "viewBox": "0 0 21 21"
     },
     {
@@ -1111,7 +1219,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "ad24b76301780e5eddff5622e7eaf2b48c40c19bf9d8e7e03316bc9125d92225",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "254ccf49d79f195abe4dd0e59c68766438b9c052726b90ecc3eddb49b3c9b0bc",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1215,7 +1335,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "ad9b7c4bd216fdb0872d87a9f4ac0c26bee93e074e883090ece9bb9c22f8cebe",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "0c8decd01f7dc110d083104cce0ece09d5e1870455ff1cef6d821bde189c8750",
       "viewBox": "0 0 16 16"
     },
     {
@@ -1288,7 +1420,19 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "934e8232bb9a1d6501932c9be589df21de2e848ba30c4a31edfb522dbbd57d33",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "20b09298c3cb9a7c598633c280022c85ac3d5749a9d03a74c98b7fb75d76ba7f",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1360,7 +1504,19 @@
         "visibility": "visible",
         "width": "18px"
       },
-      "sourceSha256": "864d0bb6e4c1d35edc469d7a2a4cba14487dbdff7991a6446ce7e2b9be136d66",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "cf7ff083eb80595a80e8da5379d9b2a9a7825869274316c39b6f5916db230db8",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1463,7 +1619,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "b449eca41d454912fa274f816b19af559f9ed858ef11baedf58b4f28734d348b",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "fa7f542e0715e5af6940082f52576df79bb837239e68d7cb6bdd98defe700eb0",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1538,7 +1706,19 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "a3ed95e297cd6d0da58bf4f1ec56d6b2b82520ab1e995fec2c688015532e9994",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "5559603a549865a2b1e3de5eee6eefe998a8fd726756a608aa8cb11f50c5230c",
       "viewBox": "0 0 20 21"
     },
     {
@@ -1611,7 +1791,19 @@
         "visibility": "visible",
         "width": "14px"
       },
-      "sourceSha256": "278f23a8ec79a11194ae7b6524494af818da199405cbd4688677cd06011435aa",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "1746f427d21f256f8bef92aaefe82549ee128024b1c8ec4a04af8b885050a36e",
       "viewBox": "0 0 21 21"
     },
     {
@@ -1684,7 +1876,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "6035c5d0f0717f7aa76933765985045a3175f24148c65f3293b55b68e3051aef",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "6a642224d25c2755a3c81753e1055682873e3890285d9e79b54b31d366ecd140",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1821,7 +2025,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "188d6255075397718c508362eda91cfb1417ba46fef259885808c3c42f5473b6",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "21e712f67321d73dff01a0a8d841454b946a33d938cec7ed382a6fd2afedcad5",
       "viewBox": "0 0 21 21"
     },
     {
@@ -1829,10 +2045,8 @@
       "primitives": [
         {
           "attributes": {
-            "d": "M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z",
-            "fill": "currentColor",
-            "stroke": "currentColor",
-            "stroke-width": "0.6"
+            "d": "M8.71677 4.71677C8.87298 4.56056 9.12696 4.56056 9.28317 4.71677C9.43938 4.87298 9.43938 5.12696 9.28317 5.28317L6.45993 8.10642C6.20609 8.36023 5.79384 8.36023 5.54001 8.10642L2.71677 5.28317C2.56056 5.12696 2.56056 4.87298 2.71677 4.71677C2.87298 4.56056 3.12696 4.56056 3.28317 4.71677L5.99997 7.43356L8.71677 4.71677Z",
+            "fill": "currentColor"
           },
           "computedStyle": {
             "clip-path": "none",
@@ -1845,14 +2059,14 @@
             "opacity": "1",
             "paint-order": "normal",
             "shape-rendering": "auto",
-            "stroke": "rgb(223, 223, 223)",
+            "stroke": "none",
             "stroke-dasharray": "none",
             "stroke-dashoffset": "0px",
             "stroke-linecap": "butt",
             "stroke-linejoin": "miter",
             "stroke-miterlimit": "4",
             "stroke-opacity": "1",
-            "stroke-width": "0.6px",
+            "stroke-width": "1px",
             "transform": "none",
             "transform-origin": "0px 0px",
             "vector-effect": "none",
@@ -1863,22 +2077,21 @@
         }
       ],
       "renderSize": {
-        "height": 14,
-        "width": 14
+        "height": 12,
+        "width": 12
       },
       "rootAttributes": {
-        "fill": "none",
-        "height": "21",
-        "width": "20"
+        "height": "12",
+        "width": "12"
       },
       "rootComputedStyle": {
         "clip-path": "none",
         "color": "rgb(223, 223, 223)",
         "display": "block",
-        "fill": "none",
+        "fill": "rgb(0, 0, 0)",
         "fill-opacity": "1",
         "filter": "none",
-        "height": "14px",
+        "height": "12px",
         "opacity": "1",
         "paint-order": "normal",
         "shape-rendering": "auto",
@@ -1891,13 +2104,25 @@
         "stroke-opacity": "1",
         "stroke-width": "1px",
         "transform": "none",
-        "transform-origin": "7px 7px",
+        "transform-origin": "6px 6px",
         "vector-effect": "none",
         "visibility": "visible",
-        "width": "14px"
+        "width": "12px"
       },
-      "sourceSha256": "2d29e974dba59c6508940f7d02e94e4dd7b3d194191b4e7f5bd4eb19079dda0a",
-      "viewBox": "0 0 20 21"
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "beb7d3de1f130d5458b855452849e0455b937f918afc33214d1dfe473bc3a0fb",
+      "viewBox": "0 0 12 12"
     },
     {
       "id": "review-search",
@@ -1971,7 +2196,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "7e37fa432e2545726aa44b3ff2bb616c98c44b745ab1aa608593b29e23166ab6",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "312895730f7a8ef585ec0125c52f2d776e2a0df72a77ceca3a72f1ecc20c51f1",
       "viewBox": "0 0 16 16"
     },
     {
@@ -2115,7 +2352,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "20e427b769f9e1b99df2ada80968351f52d299e334c7453f9a1a4a7e59cd1ddc",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "ad7bd4c220f7a21458b1497aa6773e7fbe7091813f8ee7ff56d3f41be29d72ee",
       "viewBox": "0 0 24 24"
     },
     {
@@ -2220,7 +2469,19 @@
         "visibility": "visible",
         "width": "16px"
       },
-      "sourceSha256": "77c80caebdf91991e3aac25833be7b29a0e07b2dc60ef828e5ea375bf6699811",
+      "sourceBaseline": {
+        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+        "appVersion": "26.820.60940",
+        "buildNumber": "7119",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-29"
+      },
+      "sourceSha256": "5e702654a95cbdc861726ffccd2266a913100404bebcb88d77c4532b2b57ce5a",
       "viewBox": "0 0 20 20"
     },
     {
@@ -2294,6 +2555,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "4a452510b4e08dddc71398131a3ae66247d2d2dc504b1d48ce7cd9dbc14e7a4b",
       "viewBox": "0 0 16 16"
@@ -2402,6 +2675,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "5fb845b5b497707b4548366680b75b598e129636ab739f2f7427d7fc6c76063e",
       "viewBox": "0 0 16 16"
     },
@@ -2475,6 +2760,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "2a82e0d8bf565202bdcfc77b451a9c06f4c41ba38252cbafddb51e3162c58017",
       "viewBox": "0 0 20 21"
     },
@@ -2546,6 +2843,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "d41ed321c47ca2265e527566e50585251cfca29bf87c7b766bb980f3add6fe97",
       "viewBox": "0 0 20 20"
@@ -2620,6 +2929,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "7f33060d46ba03511a8634f7d2191f44b1946361b90c413a461e80213804f0ef",
       "viewBox": "0 0 21 21"
     },
@@ -2692,6 +3013,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "accb2f9668e351373268e5f8e03e44f66cab4b3d3333cb99e935c10474501831",
       "viewBox": "0 0 20 21"
@@ -2830,6 +3163,18 @@
         "visibility": "visible",
         "width": "18px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "ecb188bc86d4b3f40a0af91223bf3ae87893e2e043277c6d1ffe2068ecdffb42",
       "viewBox": "0 0 21 21"
     },
@@ -2937,6 +3282,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "e7e3765ac3647f7a1eca12b8155fa7a543e50bcbb24566e144ce7d1ec4645a54",
       "viewBox": "0 0 20 20"
     },
@@ -3012,6 +3369,18 @@
         "visibility": "visible",
         "width": "14px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "2de59d846f7b4dc2c898c7c604ea20b5c09fd61567816ab197256a23e4271503",
       "viewBox": "0 0 20 21"
     },
@@ -3083,6 +3452,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "f00041eab10e74a737db28ce861f3dd559fcdfb97c8249dae90966605e20749d",
       "viewBox": "0 0 20 20"
@@ -3159,6 +3540,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "34d88aab6402fe3bf798120699274b68f2bcc4589c9215098204861f6966a747",
       "viewBox": "0 0 16 16"
     },
@@ -3231,6 +3624,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "65ad3ce1c7e504acfbb64658b023bcf8d6a36a8eee1962d04c466aec52b8111e",
       "viewBox": "0 0 20 20"
@@ -3371,6 +3776,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "f56b781903303ca01a06a10b996f77ef10fd8c7804bc6f9adefaf7a43cd5dbe3",
       "viewBox": "0 0 20 20"
     },
@@ -3444,6 +3861,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "ba06a325181496cd0b1b95c0ce09734454e5dddc40316f952817fff5c39016c6",
       "viewBox": "0 0 20 20"
     },
@@ -3516,6 +3945,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "14px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "af33cab2e6b819f3a6f14c134d17aa643f1d7445d2ec49804871d4d27c4a87e6",
       "viewBox": "0 0 20 20"
@@ -3682,6 +4123,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "b669ae21e0e193abf3a7248db90899804f6bccd53239a1b8df15ef06052981d7",
       "viewBox": "0 0 16 16"
     },
@@ -3754,6 +4207,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "baaec5f1ed49f7f240455de700418ef1f0a14f203ac9150ec0931c6cbc73a13c",
       "viewBox": "0 0 20 20"
@@ -3828,6 +4293,18 @@
         "visibility": "visible",
         "width": "16px"
       },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
+      },
       "sourceSha256": "0ba8f00bffe4884d4723ad7bd4efb0c92fd9eaac375180d094f9a2ca4117647b",
       "viewBox": "0 0 20 20"
     },
@@ -3900,6 +4377,18 @@
         "vector-effect": "none",
         "visibility": "visible",
         "width": "16px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "6e7e8791b8bf69a586ff994721fff518af391d9efdc66cd2e620dd2a4aedc90f",
+        "appVersion": "26.810.52044",
+        "buildNumber": "6662",
+        "interactionState": "resting-and-open-sidebar-menus",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-18"
       },
       "sourceSha256": "4285025cb2bd98f495eb999a53c81d978e5ce5b1c33d2ea5f0afce3b6820e6ec",
       "viewBox": "0 0 20 20"

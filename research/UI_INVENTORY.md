@@ -161,7 +161,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 38 have current-build runtime evidence, 36 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 30 groups and Electron verification covers 30.
+Current inventory: 89 surface groups; 42 have current-build runtime evidence, 32 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 34 groups and Electron verification covers 34.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -956,6 +956,28 @@ geometry contracts.
 current-build Browser/Electron verification for this sampled three-file and
 failure family. Binary/conflict notices and successful Undo remain outside the
 current product sample, so implementation status remains partial.
+
+The current `26.820.60940` Review refresh supersedes that runtime boundary.
+One disposable three-file task now produces the exact `+4 −4` aggregate in a
+737×174 wide card and 688×174 compact card. A marker-backed move remains two
+modified source/destination files with `+1 −0` and `+0 −1` in 737×138 and
+688×138 cards. The real workspace expands to 419.59375×820 wide and uses a
+345.671875×680 compact overlay; its 46px header, 40px toolbar, 250px wide file
+cap, compact 40/60 split, 203/159.796875px filters, and six-item 200×197.375px
+scope menu are independently hard-gated.
+
+Undo now has a sampled reversible success path through Reapply. An external
+edit then reaches the current 420×247.6875 `No changes reverted` dialog with a
+single skipped path while preserving both card and panel state. Browser/CDP
+and Electron drive all eight wide/compact file, rename, and conflict frames;
+eight reviewed internal screenshots pass. Local-only product crops pass at
+2.9976%/3.0323% for the wide/compact file card, 4.6219% for the wide
+three-file workspace, and 3.3747% for the compact rename workspace under 5%
+limits. This keeps `thread.file-change-diff`,
+`workspace.side-panel-shell`, `workspace.editor-diff`, and
+`workspace.multi-file-review` current-build Browser/Electron verified.
+Implementation remains partial for unsampled binary/merge-conflict content,
+larger file sets, and additional host failure variants.
 
 The refreshed Pull request lifecycle keeps the controlled, resizable workspace
 panel but follows the `26.727.40816` non-modal overlay geometry. The

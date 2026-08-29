@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.820.60940` (`7119`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 38 groups have current-build runtime evidence, 36 have previous-build-only
+- 42 groups have current-build runtime evidence, 32 have previous-build-only
   runtime evidence, and 15 have not been sampled.
 - The scoped `26.820.60940` refresh revalidates the global shell, responsive
   Composer, project picker and Goal/Plan modes, primary navigation,
@@ -152,12 +152,13 @@ exit gates; it does not replace the inventory.
   recovery. It distinguished the exact Ask-mode hand glyph from the non-ask
   shield and added Browser/CDP, Electron, and three regional pixel gates
   without promoting Allow or other approval kinds.
-  The previous Review follow-up reached a real three-file card, wide/compact
-  Review workspace, all six scopes and toolbar controls, exact file tree and
-  stacked diffs, plus one Undo failure dialog. It promoted seventeen exact
-  Review assets and added Browser/CDP, Electron, integrated visual,
-  and 4.3339% product-panel gates for four inventory groups while keeping
-  successful Undo and unsampled content variants open.
+  The current Review follow-up reaches the real `+4 −4` three-file card,
+  two-file rename presentation, 419.59375/345.671875px wide/compact workspace,
+  all six scopes and toolbar controls, successful Undo → Reapply, and the
+  420×247.6875 skipped-file conflict. It promotes build-scoped Review assets
+  and adds Browser/CDP, Electron, eight integrated visuals, and four
+  2.9976%–4.6219% local-only product gates for the same four inventory groups
+  while keeping unsampled binary/merge-conflict and broader host variants open.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirmed that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up
@@ -889,9 +890,16 @@ without confusing package readiness with full product reconstruction.
    Environments route are also delivered without inventing a cloud working
    directory. Continue with populated environment creation/editing, repair
    variants, and real Remote connection lifecycles.
-7. **Review content variants**: current delete and rename/no-content evidence,
-   public rename/delete/binary/conflict replay, selection synchronization, and
-   Undo.
+7. **Review content variants — delivered for the sampled current card,
+   workspace, and Undo/Reapply family**: `26.820.60940` now covers a real
+   added/modified/deleted `+4 −4` group, marker-backed two-file rename,
+   wide/compact card and 419.59375/345.671875px Review workspace, scope/filter/
+   selection/layout controls, successful Undo → Reapply, and the current
+   420×247.6875 skipped-file conflict dialog. Browser/CDP, Electron, eight
+   reviewed internal frames, and four local-only product crop gates verify the
+   sampled family. Continue with real binary/merge-conflict content, larger
+   file sets, and additional host failure variants; retain their public replay
+   coverage without relabeling it as current-product runtime evidence.
 8. **Terminal session lifecycle — delivered for the current local-shell and
    background-process contracts**: current project-labelled multi-tab/close/picker/compact
    evidence, per-session transcript ownership, real running/completed

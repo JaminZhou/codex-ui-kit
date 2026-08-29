@@ -1432,11 +1432,11 @@ describe("protocol lifecycle reducer", () => {
       changes: [
         {
           kind: "modified",
-          path: ".research/current-review-probe/rename-only.txt",
+          path: "rename-source.txt",
         },
         {
           kind: "modified",
-          path: ".research/current-review-probe/renamed-only.txt",
+          path: "rename-destination.txt",
         },
       ],
       status: "applied",

@@ -125,14 +125,17 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
-- The previous 26.810 Review follow-up reached one real added/modified/deleted
-  three-file card, the six-scope Review workspace at 1180×820 and 720×680, and
-  one real Undo failure dialog. Seventeen exact Review SVGs, computed geometry,
-  Browser/CDP interactions, full Electron acceptance, an integrated reviewed
-  baseline, and a 4.3339% local-only product-panel gate replace the previous
-  build for the sampled file-card/side-panel/editor/multi-file family. The
-  captured Git apply error remains setup-specific evidence; successful Undo,
-  binary/conflict product states, and broader PR review variants remain open.
+- The current 26.820 Review follow-up reaches an exact `+4 −4`
+  added/modified/deleted card, the marker-backed two-file rename presentation,
+  successful Undo → Reapply, and an externally induced Undo conflict. The
+  Review workspace is 419.59375×820 wide and 345.671875×680 compact, with the
+  current 40/60 diff/files split and six-item scope menu. Browser/CDP and
+  Electron gate eight wide/compact lifecycle frames; eight reviewed internal
+  baselines pass. Local-only product crops pass at 2.9976%/3.0323% for the
+  file card, 4.6219% for the wide workspace, and 3.3747% for the compact rename
+  workspace. This supersedes 26.810 for the sampled
+  file-card/side-panel/editor/multi-file family while binary/merge-conflict
+  content, larger file sets, and additional host failures remain open.
 - The previous 26.810 command follow-up reached bounded success, exact `exit 7`, Stop,
   persistent stopped-command settlement, and same-thread recovery on
   `26.810.52044`.

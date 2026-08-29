@@ -340,7 +340,7 @@ try {
         { waitUntil: "networkidle0" },
       );
       await page.waitForSelector(
-        `.current-thread-pixel-fixture[data-visual-scene="${scenario.id}"]`,
+        `.current-thread-pixel-fixture[data-visual-scene="${scenario.fixtureId ?? scenario.id}"]`,
       );
       await page.evaluate(() => document.fonts.ready);
       if (scenario.warmViewport) {

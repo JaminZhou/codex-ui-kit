@@ -74,6 +74,15 @@ const currentReplayComposerContracts = [];
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (
+      scene.id.endsWith("-compact") &&
+      scene.surfaces?.includes("reviewPanel")
+    ) {
+      await page.waitForSelector(
+        ".codex-ui-app-shell[data-side-panel-open] .codex-ui-app-shell__side-panel .codex-ui-workspace-panel",
+      );
+      await page.waitForTimeout(700);
+    }
     if (scene.id.startsWith("current-sidebar-account-menu")) {
       const compact = scene.id.endsWith("compact");
       const menu = page.getByRole("menu", { name: "Account menu" });
@@ -9524,7 +9533,12 @@ for (const scene of selectedScenes) {
     }
     const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
     const minimumConversationViewportWidth =
-      expectedWindowWidth <= 720 ? 400 : 500;
+      expectedWindowWidth <= 720
+        ? 400
+        : scene.id === "current-review-files" ||
+            scene.id === "current-review-rename"
+          ? 480
+          : 500;
     if (
       contract.header.bottom > contract.viewport.bottom ||
       contract.composer.top < contract.header.bottom ||
@@ -9835,8 +9849,13 @@ for (const scene of selectedScenes) {
       }
     }
     const expectedSidebarMax =
-      scene.id === "markdown-table-actions-narrow"
+      scene.id === "markdown-table-actions-narrow" ||
+      ((scene.windowSize?.width ?? 1180) <= 720 &&
+        scene.id.startsWith("current-review-"))
         ? "368"
+        : scene.id.startsWith("current-review-") &&
+            scene.surfaces?.includes("reviewPanel")
+          ? "486"
         : scene.id === "terminal-current-background-list" ||
             scene.id === "terminal-current-background-open"
           ? "490"
@@ -9890,20 +9909,31 @@ for (const scene of selectedScenes) {
       throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
     }
     const expectedReviewWidth =
-      scene.id === "current-review-files" ? "382" : "370";
+      scene.id === "current-review-files" ||
+      scene.id === "current-review-rename"
+        ? "420"
+        : "370";
+    const compactReviewPanel =
+      scene.surfaces?.includes("reviewPanel") &&
+      (scene.windowSize?.width ?? 1180) <= 720;
+    const expectedReviewMax = scene.id.startsWith("current-review-")
+      ? "532"
+      : "554";
     if (
       scene.surfaces?.includes("reviewPanel") &&
-      (!contract.sidePanelResizer ||
-        contract.sidePanelResizer.cursor !== "col-resize" ||
-        Math.abs(contract.sidePanelResizer.rect.width - 16) > 0.5 ||
-        contract.sidePanelResizer.ariaMin !== "320" ||
-        contract.sidePanelResizer.ariaMax !== "554" ||
-        contract.sidePanelResizer.ariaNow !== expectedReviewWidth ||
-        Math.abs(
-          contract.sidePanelResizer.rect.left +
-            contract.sidePanelResizer.rect.width / 2 -
-            contract.namedSurfaces.reviewPanel.rect.left,
-        ) > 1)
+      (compactReviewPanel
+        ? contract.sidePanelResizer !== null
+        : !contract.sidePanelResizer ||
+          contract.sidePanelResizer.cursor !== "col-resize" ||
+          Math.abs(contract.sidePanelResizer.rect.width - 16) > 0.5 ||
+          contract.sidePanelResizer.ariaMin !== "320" ||
+          contract.sidePanelResizer.ariaMax !== expectedReviewMax ||
+          contract.sidePanelResizer.ariaNow !== expectedReviewWidth ||
+          Math.abs(
+            contract.sidePanelResizer.rect.left +
+              contract.sidePanelResizer.rect.width / 2 -
+              contract.namedSurfaces.reviewPanel.rect.left,
+          ) > 1)
     ) {
       throw new Error(
         `${scene.id}: Review resizer contract failed: ${JSON.stringify({
@@ -9912,7 +9942,7 @@ for (const scene of selectedScenes) {
         })}`,
       );
     }
-    if (scene.id === "current-review-undo-failed") {
+    if (scene.id.startsWith("current-review-undo-failed")) {
       const undoFailure = await page.evaluate(() => {
         const dialog = document.querySelector(
           '.codex-ui-file-revert-error-dialog [role="dialog"]',
@@ -9935,6 +9965,16 @@ for (const scene of selectedScenes) {
           rect: bounds
             ? { height: bounds.height, width: bounds.width }
             : null,
+          skippedFile:
+            dialog
+              ?.querySelector(".codex-ui-file-revert-error-dialog__file")
+              ?.textContent?.trim() ?? null,
+          skippedLabel:
+            dialog
+              ?.querySelector(
+                ".codex-ui-file-revert-error-dialog__skipped-label",
+              )
+              ?.textContent?.trim() ?? null,
           title:
             dialog
               ?.querySelector(".codex-ui-dialog__title")
@@ -9944,12 +9984,14 @@ for (const scene of selectedScenes) {
       if (
         undoFailure.activeText !== "Close" ||
         undoFailure.description !==
-          "Git apply error: error: patch with only garbage at line 4" ||
+          "There were issues reverting some files" ||
         undoFailure.fileGroupCount !== 1 ||
         undoFailure.panelOpen ||
-        undoFailure.title !== "Failed to revert changes" ||
+        undoFailure.skippedFile !== "rename-destination.txt" ||
+        undoFailure.skippedLabel !== "Skipped (1)" ||
+        undoFailure.title !== "No changes reverted" ||
         Math.abs((undoFailure.rect?.width ?? 0) - 420) > 1 ||
-        Math.abs((undoFailure.rect?.height ?? 0) - 190.56) > 1
+        Math.abs((undoFailure.rect?.height ?? 0) - 247.6875) > 1
       ) {
         throw new Error(
           `${scene.id}: Undo failure dialog contract failed: ${JSON.stringify(undoFailure)}`,
@@ -11937,7 +11979,7 @@ for (const scene of selectedScenes) {
       !scene.id.includes("approval-current-26-820-file-deny-pending") &&
       scene.id !== "approval-current-26-820-file-options-compact" &&
       scene.id !== "approval-current-26-820-file-allow-pending-compact" &&
-      scene.id !== "current-review-undo-failed" &&
+      !scene.id.startsWith("current-review-undo-failed") &&
       !scene.id.startsWith("attachment-current-preview")
     ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
@@ -12031,12 +12073,11 @@ const {
   page: currentReviewInteractionPage,
 } = await launchScene(currentReviewInteractionScene, { capture: false });
 try {
-  const sourcePath = ".research/current-review-probe/rename-only.txt";
-  const destinationPath =
-    ".research/current-review-probe/renamed-only.txt";
+  const sourcePath = "rename-source.txt";
+  const destinationPath = "rename-destination.txt";
   const destinationSelection = currentReviewInteractionPage.getByRole(
-    "button",
-    { name: `Select review for ${destinationPath}` },
+    "treeitem",
+    { name: `Select ${destinationPath}` },
   );
   await destinationSelection.focus();
   await destinationSelection.press("Enter");
@@ -12045,15 +12086,15 @@ try {
       destinationSelected:
         document
           .querySelector(
-            `.codex-ui-file-review__file[aria-label="Review file ${destinationPath}"]`,
+            `.codex-ui-file-review-workspace__tree [role="treeitem"][aria-label="Select ${destinationPath}"]`,
           )
-          ?.getAttribute("data-selected") === "true",
+          ?.hasAttribute("data-selected") ?? false,
       markerLineCount: [...document.querySelectorAll(".codex-ui-file-diff__line")]
         .filter((element) =>
           element.textContent?.includes("__CODEX_TEMP_RENAME_MARKER__"),
         ).length,
       sourceDiffCount: document.querySelectorAll(
-        `.codex-ui-file-diff[aria-label="Review diff for ${sourcePath}"]`,
+        `.codex-ui-file-review-workspace__diff[data-review-workspace-path="${sourcePath}"]`,
       ).length,
     }),
     { destinationPath, sourcePath },
@@ -12069,7 +12110,7 @@ try {
   }
 
   await currentReviewInteractionPage
-    .getByRole("button", { exact: true, name: "Close review" })
+    .getByRole("button", { exact: true, name: "Close tab" })
     .click();
   await currentReviewInteractionPage.waitForSelector(
     ".codex-ui-app-shell:not([data-side-panel-open])",
@@ -12080,15 +12121,11 @@ try {
   await reopen.focus();
   await reopen.press("Enter");
   await currentReviewInteractionPage.waitForSelector(
-    `.codex-ui-file-review__file[data-selected][aria-label="Review file ${destinationPath}"]`,
+    `.codex-ui-file-review-workspace__tree [role="treeitem"][data-selected][aria-label="Select ${destinationPath}"]`,
   );
   await currentReviewInteractionPage
     .getByRole("button", { exact: true, name: "Undo" })
     .click();
-  await currentReviewInteractionPage.waitForSelector(
-    '[data-testid="file-change-group"]',
-    { state: "detached" },
-  );
   await currentReviewInteractionPage.waitForSelector(
     ".codex-ui-app-shell:not([data-side-panel-open])",
   );
@@ -12099,11 +12136,34 @@ try {
     panelOpen: document
       .querySelector(".codex-ui-app-shell")
       ?.hasAttribute("data-side-panel-open"),
+    reapplyCount: [...document.querySelectorAll("button")].filter(
+      (button) => button.textContent?.trim().startsWith("Reapply"),
+    ).length,
   }));
-  if (settled.fileGroupCount !== 0 || settled.panelOpen !== false) {
+  if (
+    settled.fileGroupCount !== 1 ||
+    settled.panelOpen !== false ||
+    settled.reapplyCount !== 1
+  ) {
     throw new Error(
       `Current Review Undo settlement failed: ${JSON.stringify(settled)}`,
     );
+  }
+  await currentReviewInteractionPage
+    .getByRole("button", { exact: false, name: /^Reapply/ })
+    .click();
+  await currentReviewInteractionPage
+    .getByRole("button", { exact: false, name: /^Undo/ })
+    .click();
+  const failureDialog = currentReviewInteractionPage.getByRole("dialog", {
+    name: "No changes reverted",
+  });
+  await failureDialog.waitFor();
+  if (
+    (await failureDialog.getByText("Skipped (1)").count()) !== 1 ||
+    (await failureDialog.getByText(destinationPath, { exact: true }).count()) !== 1
+  ) {
+    throw new Error("Current Review conflict failure did not identify its skipped file.");
   }
   await writeFile(
     join(artifactDirectory, "current-review-rename-interaction.json"),
@@ -12162,11 +12222,11 @@ try {
     initial.fileTreeCount !== 3 ||
     initial.layout !== "unified" ||
     !initial.visible ||
-    Math.abs((initial.panel?.width ?? 0) - 382.4375) > 1 ||
+    Math.abs((initial.panel?.width ?? 0) - 419.59375) > 1 ||
     Math.abs((initial.header?.height ?? 0) - 46) > 1 ||
     Math.abs((initial.toolbar?.height ?? 0) - 40) > 1 ||
     Math.abs((initial.filter?.height ?? 0) - 18) > 1 ||
-    Math.abs((initial.filter?.width ?? 0) - 182) > 1 ||
+    Math.abs((initial.filter?.width ?? 0) - 203) > 1 ||
     initial.visibleHeaderPathCount !== 0
   ) {
     throw new Error(
@@ -12174,8 +12234,7 @@ try {
     );
   }
 
-  const requestedReviewPath =
-    "research/current-review-26-810-probe/alpha.txt";
+  const requestedReviewPath = "alpha.txt";
   await currentReviewFilesPage
     .getByRole("button", { exact: true, name: "Close tab" })
     .click();
@@ -12341,7 +12400,7 @@ try {
   });
   if (
     splitDiff.splitDiffCount !== 3 ||
-    splitDiff.paneCount !== 12 ||
+    splitDiff.paneCount !== 14 ||
     splitDiff.before !== "alpha baseline" ||
     splitDiff.after !== "alpha updated"
   ) {
@@ -12423,33 +12482,42 @@ try {
   }
 
   await currentReviewFilesPage
-    .getByRole("button", { exact: true, name: "Undo" })
+    .getByRole("button", { exact: false, name: /^Undo/ })
     .click();
-  const dialog = currentReviewFilesPage.getByRole("dialog", {
-    name: "Failed to revert changes",
-  });
-  await dialog.waitFor();
-  const failure = {
-    description: await dialog
-      .getByText("Git apply error: error: patch with only garbage at line 4")
-      .innerText(),
+  const reverted = {
     fileGroupCount: await currentReviewFilesPage
       .locator('[data-testid="file-change-group"]')
       .count(),
     panelOpen: await currentReviewFilesPage
       .locator(".codex-ui-app-shell")
       .evaluate((element) => element.hasAttribute("data-side-panel-open")),
+    reapplyCount: await currentReviewFilesPage
+      .getByRole("button", { exact: false, name: /^Reapply/ })
+      .count(),
   };
-  if (failure.fileGroupCount !== 1 || !failure.panelOpen) {
+  if (
+    reverted.fileGroupCount !== 1 ||
+    reverted.panelOpen ||
+    reverted.reapplyCount !== 1
+  ) {
     throw new Error(
-      `Current Review Undo failure lost state: ${JSON.stringify(failure)}`,
+      `Current Review Undo settlement lost state: ${JSON.stringify(reverted)}`,
     );
   }
-  await dialog.getByRole("button", { exact: true, name: "Close" }).click();
+  await currentReviewFilesPage
+    .getByRole("button", { exact: false, name: /^Reapply/ })
+    .click();
+  if (
+    (await currentReviewFilesPage
+      .getByRole("button", { exact: false, name: /^Undo/ })
+      .count()) !== 1
+  ) {
+    throw new Error("Current Review Reapply did not restore the Undo action.");
+  }
 
   await writeFile(
     join(artifactDirectory, "current-review-files-interaction.json"),
-    `${JSON.stringify({ compact, failure, initial }, null, 2)}\n`,
+    `${JSON.stringify({ compact, initial, reverted }, null, 2)}\n`,
   );
 } finally {
   await currentReviewFilesApp.close();

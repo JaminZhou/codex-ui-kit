@@ -1044,27 +1044,29 @@ if (reviewOnly) {
     theme: baselineContext?.theme,
     viewport: baselineContext?.viewport,
   });
+  const expectedReviewIdentity = {
+    appAsarSha256:
+      "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+    appVersion: "26.820.60940",
+    buildNumber: "7119",
+    theme: "dark",
+    viewport: { height: 820, width: 1180 },
+  };
   if (
     capture.captureMode !== "review-workspace" ||
     capture.baselineContext?.interactionState !==
       "open-current-review-workspace" ||
     canonicalize(sameIdentity(capture)) !==
-      canonicalize({
-        appAsarSha256: manifest.baseline.appAsarSha256,
-        appVersion: manifest.baseline.appVersion,
-        buildNumber: manifest.baseline.buildNumber,
-        theme: manifest.baseline.theme,
-        viewport: manifest.baseline.viewport,
-      }) ||
+      canonicalize(expectedReviewIdentity) ||
     canonicalize(observation?.fileNames) !==
-      canonicalize(["added.txt", "alpha.txt", "obsolete.txt"]) ||
-    observation?.copyPathCount !== 4 ||
-    observation?.fileTextIconCount !== 4 ||
-    observation?.openInCount !== 4 ||
-    observation?.toggleFileDiffCount !== 4 ||
+      canonicalize(["rename-destination.txt", "rename-source.txt"]) ||
+    observation?.copyPathCount !== 2 ||
+    observation?.fileTextIconCount !== 2 ||
+    observation?.openInCount !== 2 ||
+    observation?.toggleFileDiffCount !== 2 ||
     observation?.filter?.placeholder !== "Filter files…" ||
-    Math.abs((observation?.filter?.rect?.width ?? 0) - 181.86) > 0.15 ||
-    Math.abs((observation?.panel?.rect?.width ?? 0) - 382.44) > 0.15 ||
+    Math.abs((observation?.filter?.rect?.width ?? 0) - 203) > 0.15 ||
+    Math.abs((observation?.panel?.rect?.width ?? 0) - 419.59) > 0.15 ||
     Math.abs((observation?.panel?.rect?.height ?? 0) - 820) > 0.1 ||
     observation?.splitDiffLabel !== "Switch to split diff" ||
     canonicalize(observation?.toolbarLabels) !==
@@ -1084,9 +1086,9 @@ if (reviewOnly) {
     );
   }
   const expectedCandidateCounts = new Map([
-    ["review-copy-path", 4],
-    ["review-file-toggle", 4],
-    ["review-open-in", 4],
+    ["review-copy-path", 2],
+    ["review-file-toggle", 2],
+    ["review-open-in", 2],
   ]);
   const promotedById = new Map();
   for (const id of targetIds) {
@@ -1112,14 +1114,21 @@ if (reviewOnly) {
     const selectedGroup = [...groups.values()].sort(
       (left, right) => right.length - left.length,
     )[0];
-    const minimumMatching = id === "review-file-toggle" ? 3 : expectedCount;
+    const minimumMatching = expectedCount;
     if (!selectedGroup || selectedGroup.length < minimumMatching) {
       throw new Error(`${id} current Review geometry is not deterministic.`);
     }
     const selected = selectedGroup[0];
     const existing = manifest.icons.find((icon) => icon.id === id);
+    const sameComponentFingerprint =
+      canonicalize(
+        sameIdentity({
+          baselineContext: existing?.baselineContext ?? manifest.baseline,
+        }),
+      ) === canonicalize(expectedReviewIdentity);
     if (
       existing &&
+      sameComponentFingerprint &&
       (existing.region !== spec.region ||
         existing.viewBox !== selected.viewBox ||
         canonicalize(existing.rootAttributes) !==
@@ -1128,16 +1137,20 @@ if (reviewOnly) {
       throw new Error(`${id} root geometry or region changed.`);
     }
     const promoted = {
+      baselineContext: {
+        ...capture.baselineContext,
+        capturedAt: "2026-08-29",
+      },
       id,
       ownerAriaLabel: spec.ownerAriaLabel,
       ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
-      primitives: existing
+      primitives: existing && sameComponentFingerprint
         ? promotePrimitives(existing, selected)
         : selected.primitives,
       region: spec.region,
       renderSize: selected.renderSize,
       rootAttributes: selected.rootAttributes,
-      rootComputedStyle: existing
+      rootComputedStyle: existing && sameComponentFingerprint
         ? promoteComputedStyle(existing.rootComputedStyle, selected.rootComputedStyle)
         : selected.rootComputedStyle,
       sourceClassName: selected.sourceClassName,
@@ -1147,7 +1160,7 @@ if (reviewOnly) {
     promoted.sha256 = createHash("sha256")
       .update(
         canonicalize({
-          baselineContext: manifest.baseline,
+          baselineContext: promoted.baselineContext,
           primitives: promoted.primitives,
           renderSize: promoted.renderSize,
           rootAttributes: promoted.rootAttributes,
@@ -1163,6 +1176,10 @@ if (reviewOnly) {
   manifest.icons = [...promotionSpecs.keys()].map(
     (id) => promotedById.get(id) ?? existingById.get(id),
   );
+  manifest.reviewBaseline = {
+    ...capture.baselineContext,
+    capturedAt: "2026-08-29",
+  };
   manifest.reviewObservation = observation;
   const output = `${JSON.stringify(manifest, null, 2)}\n`;
   if (write) {

@@ -1017,11 +1017,12 @@ try {
         );
         const targetRegion = region(bounds);
         if (
+          (reviewOnly &&
+            !svg.closest(
+              'aside[data-app-shell-focus-area="right-panel"]',
+            )) ||
           !owner ||
           !targetRegion ||
-          (reviewOnly &&
-            targetRegion === "review-panel" &&
-            !svg.closest('aside[data-app-shell-focus-area="right-panel"]')) ||
           (targetRegion === "composer"
             ? !isActuallyVisible(svg)
             : getComputedStyle(svg).visibility !== "visible") ||
@@ -1340,11 +1341,14 @@ try {
         ).length;
       reviewObservation = {
         copyPathCount: countLabel("Copy path"),
-        fileNames: ["added.txt", "alpha.txt", "obsolete.txt"].filter((name) =>
-          [...panel.querySelectorAll("*")].some(
-            (element) =>
-              element.children.length === 0 && element.textContent?.trim() === name,
-          ),
+        fileNames: ["rename-destination.txt", "rename-source.txt"].filter(
+          (name) =>
+            [...panel.querySelectorAll("*")].some(
+              (element) =>
+                element.children.length === 0 &&
+                element.textContent?.trim() === name &&
+                isReviewVisible(element),
+            ),
         ),
         fileTextIconCount: visibleFileUses.length,
         filter: {

@@ -84,12 +84,13 @@ const replayPrimitive = (primitive) => ({
   tag: primitive.tag,
 });
 
-const replayIcon = (icon) => ({
+const replayIcon = (icon, sourceBaseline) => ({
   id: icon.id,
   primitives: icon.primitives.map(replayPrimitive),
   renderSize: icon.renderSize,
   rootAttributes: icon.rootAttributes,
   rootComputedStyle: replayStyle(icon.rootComputedStyle),
+  sourceBaseline: icon.baselineContext ?? sourceBaseline,
   sourceSha256: icon.sha256,
   viewBox: icon.viewBox,
 });
@@ -109,7 +110,7 @@ export function createCurrentThreadVisualAssetSubset(manifest) {
     sourceBaseline: manifest.baseline,
     sourceManifest: "research/visual-assets.json",
     icons: currentThreadVisualAssetIds.map((id) =>
-      replayIcon(iconsById.get(id)),
+      replayIcon(iconsById.get(id), manifest.baseline),
     ),
   };
 }

@@ -1964,11 +1964,34 @@ export const visualScenes = [
     surfaces: ["fileChange", "reviewPanel"],
   },
   {
+    changeKinds: ["modified", "modified"],
+    diffCount: 2,
+    fileCount: 2,
+    frame: "review-open",
+    id: "current-review-rename-compact",
+    layoutMode: "narrow",
+    maxPixelRatio: 0.01,
+    scenario: "current-review-rename",
+    sidebarState: "hidden",
+    surfaces: ["fileChange", "reviewPanel"],
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "review-card",
     id: "current-review-file-card",
     maxPixelRatio: 0.01,
     scenario: "current-review-files",
     surfaces: ["fileChange"],
+  },
+  {
+    frame: "review-card",
+    id: "current-review-file-card-compact",
+    layoutMode: "narrow",
+    maxPixelRatio: 0.01,
+    scenario: "current-review-files",
+    sidebarState: "hidden",
+    surfaces: ["fileChange"],
+    windowSize: { height: 680, width: 720 },
   },
   {
     changeKinds: ["added", "modified", "deleted"],
@@ -1981,11 +2004,34 @@ export const visualScenes = [
     surfaces: ["fileChange", "reviewPanel"],
   },
   {
+    changeKinds: ["added", "modified", "deleted"],
+    diffCount: 3,
+    fileCount: 3,
+    frame: "review-open",
+    id: "current-review-files-compact",
+    layoutMode: "narrow",
+    maxPixelRatio: 0.01,
+    scenario: "current-review-files",
+    sidebarState: "hidden",
+    surfaces: ["fileChange", "reviewPanel"],
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "undo-failed",
     id: "current-review-undo-failed",
     maxPixelRatio: 0.01,
-    scenario: "current-review-files",
+    scenario: "current-review-rename",
     surfaces: ["fileChange"],
+  },
+  {
+    frame: "undo-failed",
+    id: "current-review-undo-failed-compact",
+    layoutMode: "narrow",
+    maxPixelRatio: 0.01,
+    scenario: "current-review-rename",
+    sidebarState: "hidden",
+    surfaces: ["fileChange"],
+    windowSize: { height: 680, width: 720 },
   },
   {
     changeKinds: ["renamed", "deleted", "modified", "modified"],
@@ -2158,6 +2204,7 @@ export async function launchScene(
   } = {},
 ) {
   const resolvedWindowSize = windowSize ?? scene.windowSize;
+  const resolvedLayoutMode = layoutMode ?? scene.layoutMode;
   const resolvedTheme = theme ?? scene.theme ?? "dark";
   const app = await electron.launch({
     args: ["."],
@@ -2169,7 +2216,9 @@ export async function launchScene(
       CODEX_DEMO_CURRENT_SIDEBAR: scene.currentSidebar ? "1" : "0",
       CODEX_DEMO_FRAME: scene.frame,
       CODEX_DEMO_HEADLESS: "1",
-      ...(layoutMode ? { CODEX_DEMO_LAYOUT: layoutMode } : {}),
+      ...(resolvedLayoutMode
+        ? { CODEX_DEMO_LAYOUT: resolvedLayoutMode }
+        : {}),
       ...(nativeThemeSource
         ? { CODEX_DEMO_NATIVE_THEME_SOURCE: nativeThemeSource }
         : {}),
@@ -2197,6 +2246,19 @@ export async function launchScene(
   await page.waitForSelector(
     `.demo-root[data-scenario="${scene.scenario}"][data-frame="${scene.frame}"]`,
   );
+  if (
+    resolvedLayoutMode === "narrow" &&
+    scene.frame === "review-open" &&
+    (scene.scenario === "current-review-files" ||
+      scene.scenario === "current-review-rename")
+  ) {
+    await page.waitForTimeout(800);
+    await page
+      .getByRole("button", { exact: true, name: "Review" })
+      .last()
+      .evaluate((button) => button.click());
+    await page.waitForTimeout(700);
+  }
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
