@@ -18,6 +18,7 @@ describe("ConversationThreadShell", () => {
   it("composes header, scrollable timeline, and overlay composer regions", () => {
     const { container } = render(
       <ConversationThreadShell
+        aboveComposer={<span>Step 1 / 3</span>}
         composer={
           <AgentComposer
             layout="multiline"
@@ -38,6 +39,13 @@ describe("ConversationThreadShell", () => {
     expect(
       container.querySelector(".codex-ui-conversation-thread-shell"),
     ).toBeTruthy();
+    expect(
+      container
+        .querySelector(
+          ".codex-ui-conversation-thread-shell__above-composer",
+        )
+        ?.textContent,
+    ).toBe("Step 1 / 3");
     expect(
       container
         .querySelector(".codex-ui-conversation-thread-shell__header")

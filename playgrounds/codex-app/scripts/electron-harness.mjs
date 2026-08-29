@@ -386,6 +386,27 @@ export const visualScenes = [
     sidebarState: "hidden",
   },
   {
+    frame: "conversation-plan-current-26-825",
+    id: "conversation-plan-current-26-825",
+    maxPixelRatio: 0.0225,
+    scenario: "current-plan-26-825",
+    sidebarState: "hidden",
+  },
+  {
+    frame: "conversation-plan-current-26-825-open",
+    id: "conversation-plan-current-26-825-open",
+    maxPixelRatio: 0.0225,
+    scenario: "current-plan-26-825",
+    sidebarState: "hidden",
+  },
+  {
+    frame: "conversation-plan-current-26-825-completed",
+    id: "conversation-plan-current-26-825-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "current-plan-26-825",
+    sidebarState: "hidden",
+  },
+  {
     frame: "composer-multiline",
     id: "composer-multiline",
     maxPixelRatio: 0.0225,

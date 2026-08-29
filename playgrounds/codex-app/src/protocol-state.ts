@@ -243,6 +243,11 @@ export interface DemoSystemError {
   turnId: string | null;
 }
 
+export interface DemoTurnPlanStep {
+  status: "completed" | "in_progress" | "pending";
+  step: string;
+}
+
 function subagentName(agentPath: string | null, id: string) {
   const candidate = agentPath?.split("/").filter(Boolean).at(-1) ?? id;
   if (!candidate || candidate === "root") return null;
@@ -283,6 +288,9 @@ export interface DemoProtocolState {
   lastMethod: string | null;
   mcpToolCalls: DemoMcpToolCall[];
   messages: DemoMessage[];
+  plan: DemoTurnPlanStep[];
+  planExplanation: string | null;
+  planTurnId: string | null;
   retrying: boolean;
   status: DemoTurnStatus;
   streamErrors: DemoStreamError[];
@@ -315,6 +323,9 @@ export const initialProtocolState: DemoProtocolState = {
   lastMethod: null,
   mcpToolCalls: [],
   messages: [],
+  plan: [],
+  planExplanation: null,
+  planTurnId: null,
   retrying: false,
   status: "idle",
   streamErrors: [],
@@ -675,6 +686,23 @@ function mcpToolCallStatus(value: unknown): DemoMcpToolCall["status"] {
   if (value === "failed") return "failed";
   if (value === "inProgress") return "running";
   return "pending";
+}
+
+function turnPlanStepStatus(
+  value: unknown,
+): DemoTurnPlanStep["status"] | null {
+  if (value === "completed" || value === "pending") return value;
+  return value === "inProgress" ? "in_progress" : null;
+}
+
+function turnPlanSteps(value: unknown): DemoTurnPlanStep[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (!isRecord(entry)) return [];
+    const step = asString(entry.step);
+    const status = turnPlanStepStatus(entry.status);
+    return step && status ? [{ status, step }] : [];
+  });
 }
 
 function webSearchActionFrom(value: unknown): {
@@ -1292,10 +1320,26 @@ export function reduceProtocolNotification(
       currentTurnId: asString(turn.id),
       compaction: "idle",
       error: null,
+      plan: [],
+      planExplanation: null,
+      planTurnId: null,
       retrying: false,
       status: "running",
       threadId: asString(params.threadId) ?? state.threadId,
       turnDurationMs: null,
+    };
+  }
+
+  if (notification.method === "turn/plan/updated") {
+    const turnId = asString(params.turnId) ?? state.currentTurnId;
+    if (!turnId || turnId !== state.currentTurnId) {
+      return next;
+    }
+    return {
+      ...next,
+      plan: turnPlanSteps(params.plan),
+      planExplanation: asString(params.explanation),
+      planTurnId: turnId,
     };
   }
 
@@ -2021,6 +2065,9 @@ export function reduceProtocolNotification(
           ? recordTurnInterruption(finalizedMessages, turnId, durationMs)
           : finalizedMessages,
       retrying: false,
+      plan: [],
+      planExplanation: null,
+      planTurnId: null,
       status,
       turnDurationMs: durationMs,
       turnDurationsMs:

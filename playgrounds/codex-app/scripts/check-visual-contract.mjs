@@ -286,6 +286,12 @@ const currentThinking26825ReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentPlan26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_PLAN_26_825_REFERENCE;
+const currentPlan26825ReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildContextCompactionReference =
   process.env.CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE;
 const currentBuildContextCompactionReferenceSize = {
@@ -887,6 +893,7 @@ for (const scene of selectedScenes) {
   let currentCommandFailureBounds;
   let currentCommandInterruptionBounds;
   let currentThinking26825Bounds;
+  let currentPlan26825Bounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -1084,6 +1091,34 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
+    }
+    if (scene.id === "conversation-plan-current-26-825-open") {
+      currentPlan26825Bounds = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                bottom: Math.round(value.bottom),
+                height: Math.round(value.height),
+                left: value.left,
+                top: Math.round(value.top),
+                width: value.width,
+              }
+            : null;
+        };
+        return {
+          tooltip: rect(
+            document.querySelector(
+              ".codex-ui-composer-plan-progress__tooltip",
+            ),
+          ),
+          trigger: rect(
+            document.querySelector(
+              ".codex-ui-composer-plan-progress__trigger",
+            ),
+          ),
+        };
+      });
     }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
@@ -1523,6 +1558,86 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current 26.825 Thinking foreground pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "conversation-plan-current-26-825-open" &&
+    currentPlan26825Reference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentPlan26825Reference),
+    );
+    if (
+      reference.width !== currentPlan26825ReferenceSize.width ||
+      reference.height !== currentPlan26825ReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height ||
+      !currentPlan26825Bounds?.tooltip ||
+      !currentPlan26825Bounds.trigger ||
+      currentPlan26825Bounds.tooltip.top !== 456 ||
+      currentPlan26825Bounds.tooltip.bottom !== 656 ||
+      currentPlan26825Bounds.tooltip.height !== 200 ||
+      Math.abs(currentPlan26825Bounds.tooltip.width - 95.578125) > 0.1 ||
+      currentPlan26825Bounds.trigger.top !== 660 ||
+      currentPlan26825Bounds.trigger.height !== 38 ||
+      Math.abs(currentPlan26825Bounds.trigger.width - 106.671875) > 0.1
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Plan comparison requires exact 1180x820 frames, a 95.578125x200 tooltip, and a 106.671875x38 trigger: ${JSON.stringify({ actual: { height: actual.height, width: actual.width }, bounds: currentPlan26825Bounds, reference: { height: reference.height, width: reference.width } })}`,
+      );
+    }
+    const crop = { height: 255, width: 130 };
+    const referenceCrop = cropPng(
+      reference,
+      686,
+      450,
+      crop.width,
+      crop.height,
+    );
+    const actualCenter =
+      currentPlan26825Bounds.trigger.left +
+      currentPlan26825Bounds.trigger.width / 2;
+    const actualCrop = cropPng(
+      actual,
+      Math.round(actualCenter - crop.width / 2),
+      currentPlan26825Bounds.tooltip.top - 6,
+      crop.width,
+      crop.height,
+    );
+    const comparison = comparePng(
+      foregroundMaskPng(referenceCrop, 12),
+      foregroundMaskPng(actualCrop, 12),
+      0,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceCrop),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualCrop),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PLAN_26_825_MAX_DIFF_RATIO",
+      0.045,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 Plan foreground pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 Plan foreground pixel ratio ${comparison.ratio}`,
     );
   }
 

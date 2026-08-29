@@ -40,8 +40,14 @@ exit gates; it does not replace the inventory.
   38.5%-foreground base and 75%-foreground sweep; and confirms 60%-foreground
   collapsed/expanded `Worked for` plus `Ran …` rows. Browser/CDP, Electron, a
   reviewed 1180×820 baseline, and a 0.6% tight current-product foreground
-  comparison gate the pre-answer state. Plan writing/completion and the rest of
-  reasoning remain P0 work rather than being promoted by this narrow sample.
+  comparison gate the pre-answer state. A second current-build follow-up now
+  gates Plan writing/completion: 3/5/8/10-step probes establish the Composer-
+  dock ownership, `Step n / total` progress, variable-height tooltip list, and
+  removal after every step completes. Browser/CDP and Electron cover active,
+  expanded, progress, all-complete, and settled states; three reviewed
+  baselines and a 2.8869% foreground product comparison cover the 1180×820
+  composition. Free-form reasoning and unsampled reasoning variants remain P0
+  work, so the combined inventory group stays partial.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
@@ -864,6 +870,11 @@ without confusing package readiness with full product reconstruction.
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
    resources, multiline/long-input geometry, active Goal/Plan modes, and the
    sampled long-thread navigation/windowing contract are also delivered. The
+   current Plan-writing follow-up additionally locks schema-valid
+   `turn/plan/updated` ownership, `Step n / total`, the variable-height tooltip,
+   progress, completion removal, and Worked/final-answer ordering across CDP,
+   Electron, reviewed pixels, and a local-only current-product crop. Broader
+   reasoning remains partial. The
    previous `26.820.60940` refresh replaces the old runtime anchor with the
    sampled four-item/48px rail gates, 30-message responsive composition,
    11/9/8 mounted-turn windows, message materialization, stale-current-marker

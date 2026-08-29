@@ -68,7 +68,11 @@ observation from a previous build remains historical evidence.
   [`26.825.31414.md`](26.825.31414.md). A follow-up re-observes the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
-  current-product `Thinking` comparison passes at 0.6%. Broader reasoning/plan,
+  current-product `Thinking` comparison passes at 0.6%. A further no-tool
+  Plan probe covers 3/5/8/10 steps, the Composer-dock `Step n / total` chip,
+  variable-height tooltip, progress, all-complete removal, and settled answer.
+  CDP/Electron gate the lifecycle and its tight local-only eight-step product
+  comparison passes at 2.8869%. Broader reasoning,
   account/settings, other feature-state,
   and exact visual-asset captures remain previous-build evidence until
   recaptured.

@@ -19,6 +19,66 @@ import {
 import { replayScenarios } from "../src/replay";
 
 describe("protocol lifecycle reducer", () => {
+  it("tracks the current Plan updates only for the active turn", () => {
+    const scenario = replayScenarios["current-plan-26-825"];
+    const active = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["conversation-plan-current-26-825"],
+      ),
+    );
+    const progressed = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["conversation-plan-current-26-825-progress"],
+      ),
+    );
+    const allComplete = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["conversation-plan-current-26-825-all-complete"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(active.status).toBe("running");
+    expect(active.planTurnId).toBe("turn-current-plan-26-825");
+    expect(active.plan).toEqual([
+      { status: "in_progress", step: "确认目标" },
+      { status: "pending", step: "确认范围" },
+      { status: "pending", step: "识别约束" },
+      { status: "pending", step: "排列步骤" },
+      { status: "pending", step: "检查状态" },
+      { status: "pending", step: "验证顺序" },
+      { status: "pending", step: "总结观察" },
+      { status: "pending", step: "报告完成" },
+    ]);
+    expect(progressed.plan[4]).toEqual({
+      status: "in_progress",
+      step: "检查状态",
+    });
+    expect(progressed.planExplanation).toBe(
+      "前四步已完成，继续核对状态。",
+    );
+    expect(
+      allComplete.plan.every(({ status }) => status === "completed"),
+    ).toBe(true);
+    expect(completed.status).toBe("completed");
+    expect(completed.plan).toEqual([]);
+    expect(completed.planTurnId).toBeNull();
+
+    const lateUpdate = reduceProtocolNotification(completed, {
+      method: "turn/plan/updated",
+      params: {
+        explanation: null,
+        plan: [{ status: "inProgress", step: "Late step" }],
+        threadId: "thread-current-plan-26-825",
+        turnId: "turn-current-plan-26-825",
+      },
+    });
+    expect(lateUpdate.plan).toEqual([]);
+  });
+
   it("replays the current fixed basic turn to a clean completion", () => {
     const scenario = replayScenarios["current-basic-message"];
     const completed = reduceProtocolTrace(scenario.events);

@@ -30,6 +30,7 @@ import {
   ComposerDock,
   ComposerModeIndicator,
   ComposerPermissionMenu,
+  ComposerPlanProgress,
   ComposerResourcePicker,
   ConversationContextBar,
   ConversationProjectListbox,
@@ -2694,6 +2695,8 @@ export function App() {
     mode === "replay" && scenarioId === "markdown-current-26-820-media";
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
+  const isCurrentPlan26825Replay =
+    mode === "replay" && scenarioId === "current-plan-26-825";
   const isCurrentReviewFilesReplay =
     mode === "replay" && scenarioId === "current-review-files";
   const isCurrentReviewRenameReplay =
@@ -4686,6 +4689,7 @@ export function App() {
     mode === "live"
       ? isTurnActive(liveState.status)
       : (isConversationLifecycle && replayComposerRunning) ||
+        (isCurrentPlan26825Replay && state.status === "running") ||
         (isCurrentTransportRecoveryReplay && isTurnActive(state.status)) ||
         ((isCurrentCommandInterruptionReplay ||
           isCurrentCommand26820Replay ||
@@ -4797,6 +4801,7 @@ export function App() {
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
+      isCurrentPlan26825Replay ||
       isCurrentMarkdown26818Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
@@ -5178,6 +5183,7 @@ export function App() {
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
+      isCurrentPlan26825Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
@@ -5656,6 +5662,18 @@ export function App() {
   ) : (
     composerSurface
   );
+  const composerPlanProgress =
+    state.status === "running" &&
+    state.planTurnId === state.currentTurnId &&
+    state.plan.length > 0 ? (
+      <ComposerPlanProgress
+        defaultOpen={
+          activeFrame === "conversation-plan-current-26-825-open"
+        }
+        key={activeFrame}
+        steps={state.plan}
+      />
+    ) : null;
   const currentPendingApproval = isCurrentApprovalReplay
     ? state.approvals.find(({ decision }) => decision === "pending")
     : undefined;
@@ -8688,6 +8706,25 @@ export function App() {
       }
       return (
         <Fragment key={`message:${message.id}`}>
+          {isCurrentPlan26825Replay &&
+          message.id === "assistant-current-plan-26-825" ? (
+            <ActivityTimeline
+              className="demo-current-plan-26-825__duration"
+              data-testid="current-plan-duration"
+              summary={
+                <TurnDuration
+                  durationMs={
+                    state.status === "running"
+                      ? 7_000
+                      : ((message.turnId
+                            ? state.turnDurationsMs[message.turnId]
+                            : undefined) ?? 32_000)
+                  }
+                  status={state.status === "running" ? "working" : "worked"}
+                />
+              }
+            />
+          ) : null}
           <AgentMessage
             actions={
               mode === "replay" &&
@@ -10949,6 +10986,7 @@ export function App() {
         ) : (
           <>
             <ConversationThreadShell
+              aboveComposer={composerPlanProgress}
               composer={composer}
               floatingControl={floatingControl}
               header={header}
@@ -10987,6 +11025,20 @@ export function App() {
 
                 {currentWindowedContent}
                 {currentWindowedFrame ? null : timelineContent}
+
+                {isCurrentPlan26825Replay &&
+                state.status === "running" &&
+                !state.messages.some(
+                  ({ id }) => id === "assistant-current-plan-26-825",
+                ) ? (
+                  <ActivityTimeline
+                    className="demo-current-plan-26-825__duration"
+                    data-testid="current-plan-duration"
+                    summary={
+                      <TurnDuration durationMs={7_000} status="working" />
+                    }
+                  />
+                ) : null}
 
                 {isCurrentCommandInterruptionReplay &&
                 activeFrame === "command-interruption-stopping" ? (

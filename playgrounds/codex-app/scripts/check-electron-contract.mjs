@@ -10591,6 +10591,239 @@ try {
   await currentThinkingApp.close();
 }
 
+const currentPlanScene = {
+  frame: "conversation-plan-current-26-825",
+  id: "electron-conversation-plan-current-26-825",
+  scenario: "current-plan-26-825",
+  sidebarState: "hidden",
+};
+const { app: currentPlanApp, page: currentPlanPage } =
+  await launchScene(currentPlanScene, { capture: false });
+try {
+  const trigger = currentPlanPage.getByRole("button", {
+    exact: true,
+    name: "Step 1 / 8. Show plan",
+  });
+  await trigger.waitFor({ state: "visible" });
+  const nativeWindow = await currentPlanApp.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows()[0];
+    return window
+      ? {
+          destroyed: window.isDestroyed(),
+          size: window.getContentSize(),
+          visible: window.isVisible(),
+        }
+      : null;
+  });
+  const active = await currentPlanPage.evaluate(() => {
+    const rect = (element) => {
+      const bounds = element?.getBoundingClientRect();
+      return bounds
+        ? {
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null;
+    };
+    const summary = document.querySelector(
+      ".codex-ui-composer-plan-progress__summary",
+    );
+    const summaryStyle = summary ? getComputedStyle(summary) : null;
+    return {
+      aboveComposer: rect(
+        document.querySelector(
+          ".codex-ui-conversation-thread-shell__above-composer",
+        ),
+      ),
+      composer: rect(document.querySelector(".codex-ui-composer")),
+      duration: document
+        .querySelector('[data-testid="current-plan-duration"]')
+        ?.textContent?.trim(),
+      label: summary?.textContent?.trim(),
+      ring: rect(
+        document.querySelector(
+          ".codex-ui-composer-plan-progress__summary-ring",
+        ),
+      ),
+      status: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+      stopButton: Boolean(
+        document.querySelector('button[aria-label="Stop"]'),
+      ),
+      summaryStyle: summaryStyle
+        ? {
+            color: summaryStyle.color,
+            fontSize: summaryStyle.fontSize,
+            lineHeight: summaryStyle.lineHeight,
+          }
+        : null,
+      trigger: rect(
+        document.querySelector(
+          ".codex-ui-composer-plan-progress__trigger",
+        ),
+      ),
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    !nativeWindow ||
+    nativeWindow.destroyed ||
+    JSON.stringify(nativeWindow.size) !== JSON.stringify([1180, 820]) ||
+    !active.aboveComposer ||
+    Math.abs(active.aboveComposer.height - 32) > 0.1 ||
+    Math.abs(active.aboveComposer.width - 736) > 0.1 ||
+    !active.composer ||
+    Math.abs(active.composer.top - 706) > 0.1 ||
+    active.duration !== "Working for 7s" ||
+    active.label !== "Step 1 / 8" ||
+    !active.ring ||
+    Math.abs(active.ring.height - 12) > 0.1 ||
+    Math.abs(active.ring.width - 12) > 0.1 ||
+    active.status !== "running" ||
+    !active.stopButton ||
+    !active.summaryStyle?.color.includes("0.65") ||
+    active.summaryStyle.fontSize !== "14px" ||
+    active.summaryStyle.lineHeight !== "21px" ||
+    !active.trigger ||
+    Math.abs(active.trigger.height - 38) > 0.1 ||
+    Math.abs(active.trigger.top - 660) > 0.1 ||
+    Math.abs(active.trigger.width - 106.671875) > 0.1 ||
+    JSON.stringify(active.viewport) !==
+      JSON.stringify({ height: 820, width: 1180 })
+  ) {
+    throw new Error(
+      `Electron current 26.825 Plan active contract failed: ${JSON.stringify({ active, nativeWindow })}`,
+    );
+  }
+  await trigger.hover();
+  const tooltip = currentPlanPage.getByRole("tooltip");
+  await tooltip.waitFor({ state: "visible" });
+  const expanded = await tooltip.evaluate((element) => {
+    const rect = (target) => {
+      const bounds = target?.getBoundingClientRect();
+      return bounds
+        ? {
+            bottom: bounds.bottom,
+            height: bounds.height,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null;
+    };
+    const steps = Array.from(
+      element.querySelectorAll(
+        ".codex-ui-composer-plan-progress__step",
+      ),
+    );
+    return {
+      labels: steps.map((step) =>
+        step
+          .querySelector(
+            ".codex-ui-composer-plan-progress__step-text",
+          )
+          ?.textContent?.trim(),
+      ),
+      statusRings: steps.map((step) =>
+        rect(
+          step.querySelector(
+            ".codex-ui-composer-plan-progress__step-status",
+          ),
+        ),
+      ),
+      stepRects: steps.map(rect),
+      tooltip: rect(element),
+    };
+  });
+  if (
+    expanded.labels.length !== 8 ||
+    expanded.labels[0] !== "确认目标" ||
+    expanded.labels.at(-1) !== "报告完成" ||
+    expanded.statusRings.some(
+      (rect) =>
+        !rect ||
+        Math.abs(rect.height - 16) > 0.1 ||
+        Math.abs(rect.width - 16) > 0.1,
+    ) ||
+    expanded.stepRects.some(
+      (rect, index) =>
+        !rect ||
+        Math.abs(rect.height - 16) > 0.1 ||
+        (index > 0 &&
+          Math.abs(rect.top - expanded.stepRects[index - 1].top - 24) > 0.1),
+    ) ||
+    !expanded.tooltip ||
+    Math.abs(expanded.tooltip.bottom - 656) > 0.1 ||
+    Math.abs(expanded.tooltip.height - 200) > 0.1 ||
+    Math.abs(expanded.tooltip.width - 95.578125) > 0.1
+  ) {
+    throw new Error(
+      `Electron current 26.825 Plan tooltip contract failed: ${JSON.stringify(expanded)}`,
+    );
+  }
+} finally {
+  await currentPlanApp.close();
+}
+
+for (const [frame, expected] of [
+  [
+    "conversation-plan-current-26-825-progress",
+    { duration: "Working for 7s", label: "Step 5 / 8" },
+  ],
+  [
+    "conversation-plan-current-26-825-all-complete",
+    { duration: "Working for 7s", label: null },
+  ],
+  [
+    "conversation-plan-current-26-825-completed",
+    { duration: "Worked for 32s", label: null },
+  ],
+]) {
+  const { app, page } = await launchScene(
+    {
+      frame,
+      id: `electron-${frame}`,
+      scenario: "current-plan-26-825",
+      sidebarState: "hidden",
+    },
+    { capture: false },
+  );
+  try {
+    const lifecycle = await page.evaluate(() => ({
+      duration: document
+        .querySelector('[data-testid="current-plan-duration"]')
+        ?.textContent?.trim(),
+      label:
+        document
+          .querySelector(
+            ".codex-ui-composer-plan-progress__summary-text",
+          )
+          ?.textContent?.trim() ?? null,
+      present: Boolean(
+        document.querySelector(".codex-ui-composer-plan-progress"),
+      ),
+      status: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+    }));
+    if (
+      lifecycle.duration !== expected.duration ||
+      lifecycle.label !== expected.label ||
+      lifecycle.present !== (expected.label !== null) ||
+      lifecycle.status !==
+        (frame.endsWith("completed") ? "completed" : "running")
+    ) {
+      throw new Error(
+        `Electron current 26.825 Plan ${frame} lifecycle failed: ${JSON.stringify(lifecycle)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const conversationLifecycleScene = {
   frame: "conversation-thread-ready",
   id: "electron-conversation-lifecycle",

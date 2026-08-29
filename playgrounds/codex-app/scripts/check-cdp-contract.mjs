@@ -43,6 +43,7 @@ const currentReplayComposerScenarios = new Set([
   "context-summary",
   "current-basic-message",
   "current-mixed-tool-thread",
+  "current-plan-26-825",
   "current-review-files",
   "current-review-rename",
   "interruption",
@@ -3001,6 +3002,7 @@ for (const scene of selectedScenes) {
                 name:
                   scene.scenario.startsWith("mcp-") ||
                   scene.scenario.startsWith("command-current-26-820-") ||
+                  scene.scenario === "current-plan-26-825" ||
                   scene.scenario === "current-basic-message"
                     ? "composer-permission"
                     : "composer-permission-ask",
@@ -15392,6 +15394,332 @@ try {
   );
 } finally {
   await currentThinkingApp.close();
+}
+
+const currentPlanScene = {
+  frame: "conversation-plan-current-26-825",
+  id: "conversation-plan-current-26-825-contract",
+  scenario: "current-plan-26-825",
+  sidebarState: "hidden",
+};
+const { app: currentPlanApp, page: currentPlanPage } =
+  await launchScene(currentPlanScene, { capture: false });
+try {
+  const trigger = currentPlanPage.getByRole("button", {
+    exact: true,
+    name: "Step 1 / 8. Show plan",
+  });
+  await trigger.waitFor({ state: "visible" });
+  const active = await currentPlanPage.evaluate(() => {
+    const rect = (element) => {
+      const bounds = element?.getBoundingClientRect();
+      return bounds
+        ? {
+            bottom: bounds.bottom,
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null;
+    };
+    const summary = document.querySelector(
+      ".codex-ui-composer-plan-progress__summary",
+    );
+    const summaryStyle = summary ? getComputedStyle(summary) : null;
+    const circles = Array.from(
+      document.querySelectorAll(
+        ".codex-ui-composer-plan-progress__summary-ring circle",
+      ),
+    );
+    return {
+      aboveComposer: rect(
+        document.querySelector(
+          ".codex-ui-conversation-thread-shell__above-composer",
+        ),
+      ),
+      composer: rect(document.querySelector(".codex-ui-composer")),
+      duration: document
+        .querySelector('[data-testid="current-plan-duration"]')
+        ?.textContent?.trim(),
+      expanded: document
+        .querySelector(".codex-ui-composer-plan-progress__trigger")
+        ?.getAttribute("aria-expanded"),
+      ring: rect(
+        document.querySelector(
+          ".codex-ui-composer-plan-progress__summary-ring",
+        ),
+      ),
+      ringCircles: circles.map((circle) => ({
+        cx: circle.getAttribute("cx"),
+        cy: circle.getAttribute("cy"),
+        pathLength: circle.getAttribute("pathLength"),
+        r: circle.getAttribute("r"),
+      })),
+      status: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+      stopButton: Boolean(
+        document.querySelector('button[aria-label="Stop"]'),
+      ),
+      summary: summary?.textContent?.trim(),
+      summaryStyle: summaryStyle
+        ? {
+            color: summaryStyle.color,
+            fontSize: summaryStyle.fontSize,
+            fontWeight: summaryStyle.fontWeight,
+            gap: summaryStyle.gap,
+            lineHeight: summaryStyle.lineHeight,
+          }
+        : null,
+      tooltipCount: document.querySelectorAll(
+        ".codex-ui-composer-plan-progress__tooltip",
+      ).length,
+      trigger: rect(
+        document.querySelector(
+          ".codex-ui-composer-plan-progress__trigger",
+        ),
+      ),
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    !active.aboveComposer ||
+    Math.abs(active.aboveComposer.height - 32) > 0.1 ||
+    Math.abs(active.aboveComposer.width - 736) > 0.1 ||
+    !active.composer ||
+    Math.abs(active.composer.top - 706) > 0.1 ||
+    active.duration !== "Working for 7s" ||
+    active.expanded !== "false" ||
+    !active.ring ||
+    Math.abs(active.ring.height - 12) > 0.1 ||
+    Math.abs(active.ring.width - 12) > 0.1 ||
+    JSON.stringify(active.ringCircles) !==
+      JSON.stringify([
+        { cx: "6", cy: "6", pathLength: "100", r: "5" },
+        { cx: "6", cy: "6", pathLength: "100", r: "5" },
+      ]) ||
+    active.status !== "running" ||
+    !active.stopButton ||
+    active.summary !== "Step 1 / 8" ||
+    !active.summaryStyle?.color.includes("0.65") ||
+    active.summaryStyle.fontSize !== "14px" ||
+    active.summaryStyle.fontWeight !== "400" ||
+    active.summaryStyle.gap !== "6px" ||
+    active.summaryStyle.lineHeight !== "21px" ||
+    active.tooltipCount !== 0 ||
+    !active.trigger ||
+    Math.abs(active.trigger.height - 38) > 0.1 ||
+    Math.abs(active.trigger.top - 660) > 0.1 ||
+    Math.abs(active.trigger.width - 106.671875) > 0.1 ||
+    JSON.stringify(active.viewport) !==
+      JSON.stringify({ height: 820, width: 1180 })
+  ) {
+    throw new Error(
+      `Current 26.825 Plan active contract failed: ${JSON.stringify(active)}`,
+    );
+  }
+
+  await trigger.hover();
+  await currentPlanPage.waitForSelector(
+    ".codex-ui-composer-plan-progress__tooltip",
+  );
+  const expanded = await currentPlanPage.evaluate(() => {
+    const rect = (element) => {
+      const bounds = element?.getBoundingClientRect();
+      return bounds
+        ? {
+            bottom: bounds.bottom,
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null;
+    };
+    const tooltip = document.querySelector(
+      ".codex-ui-composer-plan-progress__tooltip",
+    );
+    const tooltipStyle = tooltip ? getComputedStyle(tooltip) : null;
+    const steps = Array.from(
+      document.querySelectorAll(
+        ".codex-ui-composer-plan-progress__step",
+      ),
+    );
+    const stepStyle = steps[0] ? getComputedStyle(steps[0]) : null;
+    return {
+      activeStep: steps.findIndex(
+        (step) => step.getAttribute("aria-current") === "step",
+      ),
+      labels: steps.map((step) =>
+        step
+          .querySelector(
+            ".codex-ui-composer-plan-progress__step-text",
+          )
+          ?.textContent?.trim(),
+      ),
+      role: tooltip?.getAttribute("role"),
+      statusRings: steps.map((step) => ({
+        rect: rect(
+          step.querySelector(
+            ".codex-ui-composer-plan-progress__step-status",
+          ),
+        ),
+        status: step.getAttribute("data-status"),
+      })),
+      stepRects: steps.map(rect),
+      stepStyle: stepStyle
+        ? {
+            color: stepStyle.color,
+            fontSize: stepStyle.fontSize,
+            fontWeight: stepStyle.fontWeight,
+            gap: stepStyle.gap,
+            lineHeight: stepStyle.lineHeight,
+          }
+        : null,
+      style: tooltipStyle
+        ? {
+            borderRadius: tooltipStyle.borderRadius,
+            boxShadow: tooltipStyle.boxShadow,
+          }
+        : null,
+      tooltip: rect(tooltip),
+    };
+  });
+  if (
+    expanded.activeStep !== 0 ||
+    JSON.stringify(expanded.labels) !==
+      JSON.stringify([
+        "确认目标",
+        "确认范围",
+        "识别约束",
+        "排列步骤",
+        "检查状态",
+        "验证顺序",
+        "总结观察",
+        "报告完成",
+      ]) ||
+    expanded.role !== "tooltip" ||
+    expanded.statusRings.some(
+      ({ rect }) =>
+        !rect ||
+        Math.abs(rect.height - 16) > 0.1 ||
+        Math.abs(rect.width - 16) > 0.1,
+    ) ||
+    expanded.statusRings[0]?.status !== "in_progress" ||
+    expanded.statusRings.slice(1).some(({ status }) => status !== "pending") ||
+    expanded.stepRects.some(
+      (rect, index) =>
+        !rect ||
+        Math.abs(rect.height - 16) > 0.1 ||
+        (index > 0 &&
+          Math.abs(rect.top - expanded.stepRects[index - 1].top - 24) > 0.1),
+    ) ||
+    !expanded.stepStyle?.color.includes("0.65") ||
+    expanded.stepStyle.fontSize !== "14px" ||
+    expanded.stepStyle.fontWeight !== "400" ||
+    expanded.stepStyle.gap !== "8px" ||
+    expanded.stepStyle.lineHeight !== "16px" ||
+    expanded.style?.borderRadius !== "15px" ||
+    !expanded.style.boxShadow.includes("0.5px") ||
+    !expanded.tooltip ||
+    Math.abs(expanded.tooltip.bottom - 656) > 0.1 ||
+    Math.abs(expanded.tooltip.height - 200) > 0.1 ||
+    Math.abs(expanded.tooltip.width - 95.578125) > 0.1
+  ) {
+    throw new Error(
+      `Current 26.825 Plan tooltip contract failed: ${JSON.stringify(expanded)}`,
+    );
+  }
+  await trigger.focus();
+  await currentPlanPage.keyboard.press("Escape");
+  await currentPlanPage.waitForSelector(
+    ".codex-ui-composer-plan-progress__tooltip",
+    { state: "detached" },
+  );
+  await writeFile(
+    join(artifactDirectory, "conversation-plan-current-26-825.json"),
+    `${JSON.stringify({ active, expanded }, null, 2)}\n`,
+  );
+} finally {
+  await currentPlanApp.close();
+}
+
+for (const [frame, expectation] of [
+  [
+    "conversation-plan-current-26-825-progress",
+    {
+      duration: "Working for 7s",
+      label: "Step 5 / 8",
+      present: true,
+      status: "running",
+    },
+  ],
+  [
+    "conversation-plan-current-26-825-all-complete",
+    {
+      duration: "Working for 7s",
+      label: null,
+      present: false,
+      status: "running",
+    },
+  ],
+  [
+    "conversation-plan-current-26-825-completed",
+    {
+      duration: "Worked for 32s",
+      label: null,
+      present: false,
+      status: "completed",
+    },
+  ],
+]) {
+  const { app, page } = await launchScene(
+    {
+      frame,
+      id: `${frame}-contract`,
+      scenario: "current-plan-26-825",
+      sidebarState: "hidden",
+    },
+    { capture: false },
+  );
+  try {
+    const lifecycle = await page.evaluate(() => ({
+      duration: document
+        .querySelector('[data-testid="current-plan-duration"]')
+        ?.textContent?.trim(),
+      finalText: document.body.textContent?.includes("PLAN EIGHT DONE") ?? false,
+      label:
+        document
+          .querySelector(
+            ".codex-ui-composer-plan-progress__summary-text",
+          )
+          ?.textContent?.trim() ?? null,
+      present: Boolean(
+        document.querySelector(".codex-ui-composer-plan-progress"),
+      ),
+      status: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+      stopButton: Boolean(
+        document.querySelector('button[aria-label="Stop"]'),
+      ),
+    }));
+    if (
+      lifecycle.duration !== expectation.duration ||
+      lifecycle.label !== expectation.label ||
+      lifecycle.present !== expectation.present ||
+      lifecycle.status !== expectation.status ||
+      lifecycle.stopButton !== (expectation.status === "running") ||
+      (expectation.status === "completed" && !lifecycle.finalText)
+    ) {
+      throw new Error(
+        `Current 26.825 Plan ${frame} lifecycle failed: ${JSON.stringify(lifecycle)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
 }
 
 const conversationLifecycleScene = {

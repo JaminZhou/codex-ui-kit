@@ -19,6 +19,7 @@ import {
 
 export interface ConversationThreadShellProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  aboveComposer?: ReactNode;
   children: ReactNode;
   composer: ReactNode;
   floatingControl?: ReactNode;
@@ -37,6 +38,7 @@ export interface ConversationThreadShellProps
 }
 
 export function ConversationThreadShell({
+  aboveComposer,
   children,
   className,
   composer,
@@ -212,6 +214,11 @@ export function ConversationThreadShell({
           className="codex-ui-conversation-thread-shell__composer-dock"
           ref={composerDockRef}
         >
+          {aboveComposer ? (
+            <div className="codex-ui-conversation-thread-shell__above-composer">
+              {aboveComposer}
+            </div>
+          ) : null}
           <div className="codex-ui-conversation-thread-shell__composer">
             {composer}
           </div>
