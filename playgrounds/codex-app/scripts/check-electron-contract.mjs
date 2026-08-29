@@ -10824,6 +10824,187 @@ for (const [frame, expected] of [
   }
 }
 
+for (const browserSurface of [false, true]) {
+  const frame = browserSurface
+    ? "conversation-browser-current-26-825-open"
+    : "conversation-search-current-26-825-open";
+  const { app, page } = await launchScene(
+    {
+      currentSidebar: true,
+      frame,
+      id: `electron-${frame}`,
+      scenario: browserSurface
+        ? "current-browser-26-825"
+        : "current-search-26-825",
+      windowSize: { height: 820, width: 1180 },
+    },
+    { capture: false },
+  );
+  try {
+    const nativeWindow = await app.evaluate(({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      return window
+        ? {
+            destroyed: window.isDestroyed(),
+            size: window.getContentSize(),
+          }
+        : null;
+    });
+    const contract = await page.evaluate((withBrowser) => {
+      const rect = (element) => {
+        const bounds = element?.getBoundingClientRect();
+        return bounds
+          ? {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            }
+          : null;
+      };
+      const activity = document.querySelector(
+        withBrowser
+          ? ".demo-current-browser-26-825-timeline .codex-ui-browser-activity"
+          : ".demo-current-search-26-825-timeline .codex-ui-search-activity",
+      );
+      const browser = document.querySelector(
+        '[data-testid="current-browser-workspace"]',
+      );
+      return {
+        activityOpen:
+          activity
+            ?.querySelector(".codex-ui-activity__disclosure")
+            ?.hasAttribute("open") ?? false,
+        activitySummary:
+          activity
+            ?.querySelector(".codex-ui-activity__summary")
+            ?.textContent?.trim() ?? null,
+        browser: browser
+          ? {
+              content: rect(
+                browser.querySelector(
+                  ".codex-ui-browser-workspace__content",
+                ),
+              ),
+              rect: rect(browser),
+              tabs: rect(
+                browser.querySelector(
+                  ".codex-ui-browser-workspace__tabs",
+                ),
+              ),
+              toolbar: rect(
+                browser.querySelector(
+                  ".codex-ui-browser-workspace__toolbar",
+                ),
+              ),
+              toolbarLabels: Array.from(
+                browser.querySelectorAll(
+                  ".codex-ui-browser-workspace__toolbar button",
+                ),
+                (button) => button.getAttribute("aria-label"),
+              ),
+            }
+          : null,
+        composerCount: document.querySelectorAll(
+          ".codex-ui-conversation-thread-shell__composer .codex-ui-composer",
+        ).length,
+        details: Array.from(
+          activity?.querySelectorAll(
+            withBrowser
+              ? ".codex-ui-browser-activity__steps li"
+              : ".codex-ui-search-activity__entries li",
+          ) ?? [],
+          (entry) => entry.textContent?.trim(),
+        ),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        timelineExpanded:
+          activity?.closest(".codex-ui-activity-timeline")?.hasAttribute(
+            "data-expanded",
+          ) ?? false,
+      };
+    }, browserSurface);
+    const expectedDetails = browserSurface
+      ? [
+          "Read Control In App Browser skill",
+          "连接 Browser",
+          "打开页面并查找 desktop",
+        ]
+      : [
+          "Searched the web for Codex app desktop | openai.com",
+          "Searched the web for 'desktop'",
+        ];
+    const expectedToolbarLabels = [
+      "Back",
+      "Next",
+      "Reload",
+      "Site information",
+      "Site tools",
+      "Open in external browser",
+      "Annotate",
+      "Browser options",
+    ];
+    if (
+      !nativeWindow ||
+      nativeWindow.destroyed ||
+      JSON.stringify(nativeWindow.size) !== JSON.stringify([1180, 820]) ||
+      !contract.activityOpen ||
+      !contract.timelineExpanded ||
+      contract.composerCount !== 1 ||
+      contract.horizontalOverflow > 1 ||
+      JSON.stringify(contract.details) !== JSON.stringify(expectedDetails) ||
+      contract.activitySummary !==
+        (browserSurface
+          ? "Used the browser, loaded a tool"
+          : "Searched the web") ||
+      (browserSurface &&
+        (!contract.browser ||
+          Math.abs(contract.browser.rect.width - 418.59375) > 0.1 ||
+          Math.abs(contract.browser.tabs.height - 46) > 0.1 ||
+          Math.abs(contract.browser.toolbar.height - 40) > 0.1 ||
+          Math.abs(contract.browser.content.top - 86) > 0.1 ||
+          JSON.stringify(contract.browser.toolbarLabels) !==
+            JSON.stringify(expectedToolbarLabels))) ||
+      (!browserSurface && contract.browser !== null)
+    ) {
+      throw new Error(
+        `Electron current 26.825 search/Browser contract failed: ${JSON.stringify({ browserSurface, contract, nativeWindow })}`,
+      );
+    }
+    const disclosureSelector = browserSurface
+        ? ".demo-current-browser-26-825-timeline .codex-ui-browser-activity summary"
+        : ".demo-current-search-26-825-timeline .codex-ui-search-activity summary";
+    const disclosure = page.locator(disclosureSelector);
+    await disclosure.click();
+    await page.waitForFunction(
+      ({ expected, selector }) =>
+        document.querySelector(selector)?.getAttribute("aria-expanded") ===
+        expected,
+      { expected: "false", selector: disclosureSelector },
+    );
+    if ((await disclosure.getAttribute("aria-expanded")) !== "false") {
+      throw new Error(
+        `Electron current 26.825 ${browserSurface ? "Browser" : "Search"} disclosure did not collapse.`,
+      );
+    }
+    await disclosure.click();
+    await page.waitForFunction(
+      ({ expected, selector }) =>
+        document.querySelector(selector)?.getAttribute("aria-expanded") ===
+        expected,
+      { expected: "true", selector: disclosureSelector },
+    );
+    if ((await disclosure.getAttribute("aria-expanded")) !== "true") {
+      throw new Error(
+        `Electron current 26.825 ${browserSurface ? "Browser" : "Search"} disclosure did not reopen.`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const conversationLifecycleScene = {
   frame: "conversation-thread-ready",
   id: "electron-conversation-lifecycle",

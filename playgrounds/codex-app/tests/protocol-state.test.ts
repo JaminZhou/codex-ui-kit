@@ -19,6 +19,42 @@ import {
 import { replayScenarios } from "../src/replay";
 
 describe("protocol lifecycle reducer", () => {
+  it("replays current 26.825 search and Browser tool evidence", () => {
+    const searchScenario = replayScenarios["current-search-26-825"];
+    const search = reduceProtocolTrace(searchScenario.events);
+    expect(searchScenario.frames).toEqual({
+      "conversation-search-current-26-825": 8,
+      "conversation-search-current-26-825-open": 10,
+      "conversation-search-current-26-825-worked-open": 9,
+    });
+    expect(search.webSearches).toEqual([
+      expect.objectContaining({
+        query: "Codex app desktop",
+        status: "completed",
+      }),
+      expect.objectContaining({ query: "'desktop'", status: "completed" }),
+    ]);
+
+    const browserScenario = replayScenarios["current-browser-26-825"];
+    const browser = reduceProtocolTrace(browserScenario.events);
+    expect(browserScenario.frames).toEqual({
+      "conversation-browser-current-26-825": 8,
+      "conversation-browser-current-26-825-open": 10,
+      "conversation-browser-current-26-825-worked-open": 9,
+    });
+    expect(browser.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        browserUse: false,
+        readOnlyHint: true,
+      }),
+      expect.objectContaining({
+        browserUrl: "https://openai.com/codex/",
+        browserUse: true,
+        readOnlyHint: true,
+      }),
+    ]);
+  });
+
   it("tracks the current Plan updates only for the active turn", () => {
     const scenario = replayScenarios["current-plan-26-825"];
     const active = reduceProtocolTrace(

@@ -10,6 +10,7 @@ export type BrowserActivityStepKind =
 export interface BrowserActivityStep {
   completed?: boolean;
   id: string;
+  icon?: ReactNode;
   kind?: BrowserActivityStepKind;
   label: ReactNode;
 }
@@ -20,6 +21,7 @@ export interface BrowserActivityProps
   completedLabel?: ReactNode;
   defaultOpen?: boolean;
   failedLabel?: ReactNode;
+  indicator?: ReactNode;
   onOpenChange?: (open: boolean) => void;
   onStepOpen?: (step: BrowserActivityStep) => void;
   open?: boolean;
@@ -85,6 +87,7 @@ export function BrowserActivity({
   completedLabel = "Used the browser",
   defaultOpen = false,
   failedLabel = "Browser use failed",
+  indicator,
   onOpenChange,
   onStepOpen,
   open,
@@ -105,7 +108,7 @@ export function BrowserActivity({
         {steps.map((step) => {
           const content = (
             <>
-              <StepIcon kind={step.kind ?? "navigation"} />
+              {step.icon ?? <StepIcon kind={step.kind ?? "navigation"} />}
               <span>{step.label}</span>
             </>
           );
@@ -129,7 +132,7 @@ export function BrowserActivity({
     <AgentActivity
       className={classes}
       defaultOpen={defaultOpen}
-      indicator={<BrowserIcon />}
+      indicator={indicator ?? <BrowserIcon />}
       kind="tool"
       onOpenChange={onOpenChange}
       open={open}

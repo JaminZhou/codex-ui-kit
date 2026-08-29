@@ -8,8 +8,10 @@ import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.js
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import currentBasicMessageTrace from "../fixtures/traces/current-basic-message.jsonl?raw";
+import currentBrowser26825Trace from "../fixtures/traces/current-browser-26-825.jsonl?raw";
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentPlan26825Trace from "../fixtures/traces/current-plan-26-825.jsonl?raw";
+import currentSearch26825Trace from "../fixtures/traces/current-search-26-825.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
 import commandCurrent26820FailureTrace from "../fixtures/traces/command-current-26-820-failure.jsonl?raw";
@@ -70,8 +72,10 @@ export type ReplayScenarioId =
   | "compaction"
   | "context-summary"
   | "current-basic-message"
+  | "current-browser-26-825"
   | "current-mixed-tool-thread"
   | "current-plan-26-825"
+  | "current-search-26-825"
   | "current-review-rename"
   | "current-review-files"
   | "large-file-review"
@@ -273,11 +277,23 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "A current-style multi-turn composition of web search, Browser, MCP, command approval, file review, and subagent work backed by public protocol events.",
     currentMixedToolThreadTrace,
   ),
+  "current-browser-26-825": scenario(
+    "current-browser-26-825",
+    "查找 Codex 页面 desktop",
+    "The runtime-observed 26.825 Browser lifecycle groups read-only MCP activity in the thread and opens the one-tab in-app Browser workspace shell.",
+    currentBrowser26825Trace,
+  ),
   "current-plan-26-825": scenario(
     "current-plan-26-825",
     "创建八步只读探测计划",
     "The runtime-observed 26.825 Plan lifecycle anchors Step n / total above the Composer, exposes the full status list in a tooltip, and removes the surface after completion.",
     currentPlan26825Trace,
+  ),
+  "current-search-26-825": scenario(
+    "current-search-26-825",
+    "Search Codex desktop page",
+    "The runtime-observed 26.825 Web Search lifecycle groups two completed public search actions under one expandable thread activity.",
+    currentSearch26825Trace,
   ),
   "current-review-rename": scenario(
     "current-review-rename",

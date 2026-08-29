@@ -20,6 +20,7 @@ import {
   AutomaticApprovalReview,
   BranchCreationDialog,
   BrowserActivity,
+  BrowserWorkspacePanel,
   Button,
   CodeReviewSettingsPage,
   CommandExecution,
@@ -2401,6 +2402,10 @@ export function App() {
       initialSelection.frame === "mixed-review-open" ||
       initialSelection.frame === "current-mixed-review-open",
   );
+  const [browserPanelOpen, setBrowserPanelOpen] = useState(
+    initialSelection.scenarioId === "current-browser-26-825",
+  );
+  const [browserPanelWidth, setBrowserPanelWidth] = useState(419.59375);
   const [subagentPanelOpen, setSubagentPanelOpen] = useState(
     currentSubagentPanelFrame(initialSelection.frame),
   );
@@ -2689,6 +2694,8 @@ export function App() {
     mode === "replay" && scenarioId === "streaming-recovery";
   const isCurrentBasicMessageReplay =
     mode === "replay" && scenarioId === "current-basic-message";
+  const isCurrentBrowser26825Replay =
+    mode === "replay" && scenarioId === "current-browser-26-825";
   const isCurrentMarkdown26818Replay =
     mode === "replay" && scenarioId === "markdown-current-26-818";
   const isCurrentMarkdown26820MediaReplay =
@@ -2697,6 +2704,8 @@ export function App() {
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentPlan26825Replay =
     mode === "replay" && scenarioId === "current-plan-26-825";
+  const isCurrentSearch26825Replay =
+    mode === "replay" && scenarioId === "current-search-26-825";
   const isCurrentReviewFilesReplay =
     mode === "replay" && scenarioId === "current-review-files";
   const isCurrentReviewRenameReplay =
@@ -4801,7 +4810,9 @@ export function App() {
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
+      isCurrentBrowser26825Replay ||
       isCurrentPlan26825Replay ||
+      isCurrentSearch26825Replay ||
       isCurrentMarkdown26818Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
@@ -5183,7 +5194,9 @@ export function App() {
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isCurrentBasicMessageReplay ||
+      isCurrentBrowser26825Replay ||
       isCurrentPlan26825Replay ||
+      isCurrentSearch26825Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay);
   const showLifecycleComposer = isConversationLifecycle;
@@ -5436,7 +5449,9 @@ export function App() {
                   {currentHeaderReplay ||
                   showLifecycleComposer ||
                   isCurrentApprovalReplay
-                    ? selectedComposerPermission.label
+                    ? isCurrentBrowser26825Replay
+                      ? null
+                      : selectedComposerPermission.label
                     : "Approve for me"}
                 </button>
               }
@@ -7840,6 +7855,36 @@ export function App() {
       />
     )
   ) : null;
+  const browserWorkspacePanel = isCurrentBrowser26825Replay ? (
+    <BrowserWorkspacePanel
+      className="demo-current-browser-workspace"
+      data-testid="current-browser-workspace"
+      onCloseTab={() => setBrowserPanelOpen(false)}
+      tabs={[
+        {
+          active: true,
+          id: "codex-page",
+          title: (
+            <span className="demo-current-browser-workspace__tab-label">
+              <span aria-hidden="true">◉</span>
+              <span>
+                Codex in ChatGPT | AI Coding Agents for Software Engineering |
+                OpenAI
+              </span>
+            </span>
+          ),
+        },
+      ]}
+    >
+      <div
+        className="demo-current-browser-workspace__page"
+        data-source-owned="external-web-content"
+      >
+        <strong>External page content</strong>
+        <span>https://openai.com/codex/</span>
+      </div>
+    </BrowserWorkspacePanel>
+  ) : null;
   const subagentPanel = hasSubagentSurface ? (
     <WorkspacePanel
       activeTabId="subagents"
@@ -9008,10 +9053,23 @@ export function App() {
           id === "assistant-current-mixed-research-intro",
       );
       const active = turnSearches.some(({ status }) => status === "running");
+      const currentSearchTimelineOpen =
+        isCurrentSearch26825Replay &&
+        (activeFrame ===
+          "conversation-search-current-26-825-worked-open" ||
+          activeFrame === "conversation-search-current-26-825-open");
+      const currentSearchActivityOpen =
+        isCurrentSearch26825Replay &&
+        activeFrame === "conversation-search-current-26-825-open";
       const captureOpen =
         initialSelection.capture &&
         (activeFrame === "current-mixed-research-running" ||
-          activeFrame === "current-mixed-research-completed");
+          activeFrame === "current-mixed-research-completed" ||
+          currentSearchTimelineOpen);
+      const searchCaptureOpen =
+        captureOpen &&
+        (!isCurrentSearch26825Replay ||
+          activeFrame === "conversation-search-current-26-825-open");
       const searchEntries = searchActions.flatMap((search) =>
         search.results.map((result) => ({
           completed: search.status === "completed",
@@ -9035,7 +9093,12 @@ export function App() {
 
       return (
         <ActivityTimeline
-          className="demo-current-mixed-research-timeline"
+          className={
+            isCurrentSearch26825Replay
+              ? "demo-current-search-26-825-timeline"
+              : "demo-current-mixed-research-timeline"
+          }
+          defaultOpen={currentSearchTimelineOpen}
           key={`web-search:${webSearch.turnId}`}
           open={initialSelection.capture ? captureOpen : undefined}
           summary={
@@ -9059,8 +9122,9 @@ export function App() {
             <SearchActivity
               data-item-id={searchActions[0]?.id}
               entries={searchEntries}
+              defaultOpen={currentSearchActivityOpen}
               kind="web"
-              open={initialSelection.capture ? captureOpen : undefined}
+              open={initialSelection.capture ? searchCaptureOpen : undefined}
               query={searchActions.at(-1)?.query}
               status={
                 searchActions.some(({ status }) => status === "running")
@@ -9089,6 +9153,82 @@ export function App() {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
       const toolCall = calls[0];
+      if (
+        isCurrentBrowser26825Replay &&
+        calls.some(({ browserUse }) => browserUse)
+      ) {
+        const browserActivityOpen =
+          activeFrame === "conversation-browser-current-26-825-open";
+        const timelineOpen =
+          browserActivityOpen ||
+          activeFrame ===
+            "conversation-browser-current-26-825-worked-open";
+        const steps = [
+          {
+            completed: true,
+            icon: <CurrentBuildIcon name="thread-command-terminal" />,
+            id: "browser-current-26-825-skill",
+            kind: "instruction" as const,
+            label: "Read Control In App Browser skill",
+          },
+          ...calls.map((call, index) => {
+            const argumentsRecord =
+              typeof call.arguments === "object" &&
+              call.arguments !== null &&
+              !Array.isArray(call.arguments)
+                ? call.arguments
+                : {};
+            const title =
+              typeof argumentsRecord.title === "string"
+                ? argumentsRecord.title
+                : call.toolLabel;
+            return {
+              completed: call.status === "completed",
+              icon: (
+                <CurrentBuildIcon
+                  name={
+                    call.browserUse
+                      ? "thread-mcp-tool"
+                      : "thread-command-terminal"
+                  }
+                />
+              ),
+              id: call.id,
+              kind: (index === 0 ? "connection" : "navigation") as
+                | "connection"
+                | "navigation",
+              label: title,
+            };
+          }),
+        ];
+
+        return (
+          <ActivityTimeline
+            className="demo-current-browser-26-825-timeline"
+            defaultOpen={timelineOpen}
+            key={`browser-use:${toolCall.turnId}`}
+            open={initialSelection.capture ? timelineOpen : undefined}
+            summary={
+              <TurnDuration
+                durationMs={mcpToolCallGroupDurationMs(state, calls)}
+                status="worked"
+              />
+            }
+          >
+            <BrowserActivity
+              completedLabel="Used the browser, loaded a tool"
+              data-item-id={toolCall.id}
+              defaultOpen={browserActivityOpen}
+              indicator={<CurrentBuildIcon name="thread-mcp-tool" />}
+              open={
+                initialSelection.capture ? browserActivityOpen : undefined
+              }
+              status="completed"
+              steps={steps}
+            />
+          </ActivityTimeline>
+        );
+      }
       if (
         isCurrentMcp26820RecoveryReplay &&
         activeFrame === "mcp-current-26-820-recovery-failed" &&
@@ -10813,6 +10953,8 @@ export function App() {
         onSidePanelOpenChange={
           view === "pull-request"
             ? setPullRequestOpen
+            : isCurrentBrowser26825Replay
+              ? setBrowserPanelOpen
             : backgroundTerminalPanelSelected
               ? setBackgroundTerminalPanelOpen
             : subagentPanelSelected
@@ -10822,6 +10964,8 @@ export function App() {
         onSidePanelWidthChange={
           view === "pull-request"
             ? setPullRequestWidth
+            : isCurrentBrowser26825Replay
+              ? setBrowserPanelWidth
             : backgroundTerminalPanelSelected
               ? setBackgroundTerminalPanelWidth
             : subagentPanelSelected
@@ -10837,6 +10981,8 @@ export function App() {
         sidePanel={
           view === "pull-request"
             ? pullRequestPanel
+            : isCurrentBrowser26825Replay
+              ? browserWorkspacePanel
             : backgroundTerminalPanelSelected
               ? backgroundTerminalSidePanel
             : subagentPanelSelected
@@ -10849,6 +10995,8 @@ export function App() {
         sidePanelLabel={
           view === "pull-request"
             ? "Pull request details"
+            : isCurrentBrowser26825Replay
+              ? "Browser"
             : backgroundTerminalPanelSelected
               ? activeFrame === "terminal-current-background-open"
                 ? "Background terminal"
@@ -10860,6 +11008,8 @@ export function App() {
         sidePanelMinMainWidth={
           view === "pull-request"
             ? 390
+            : isCurrentBrowser26825Replay
+              ? 405.53125
             : backgroundTerminalPanelSelected
               ? 390
             : subagentPanelSelected
@@ -10871,6 +11021,8 @@ export function App() {
         sidePanelMinWidth={
           view === "pull-request"
             ? 322
+            : isCurrentBrowser26825Replay
+              ? 320
             : backgroundTerminalPanelSelected
               ? 300
             : subagentPanelSelected
@@ -10880,6 +11032,8 @@ export function App() {
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
+            : isCurrentBrowser26825Replay
+              ? browserPanelOpen
             : backgroundTerminalPanelSelected
               ? backgroundTerminalPanelOpen
             : subagentPanelSelected
@@ -10896,6 +11050,8 @@ export function App() {
         sidePanelWidth={
           view === "pull-request"
             ? pullRequestWidth
+            : isCurrentBrowser26825Replay
+              ? browserPanelWidth
             : backgroundTerminalPanelSelected
               ? backgroundTerminalPanelWidth
             : subagentPanelSelected
@@ -10903,7 +11059,13 @@ export function App() {
               : reviewPanelWidth
         }
         sidebar={sidebar}
-        sidebarWidth={currentHomeFrame ? 322.90625 : undefined}
+        sidebarWidth={
+          currentHomeFrame ||
+          isCurrentBrowser26825Replay ||
+          isCurrentSearch26825Replay
+            ? 322.90625
+            : undefined
+        }
         sidebarMinMainWidth={
           subagentPanelSelected
             ? 220

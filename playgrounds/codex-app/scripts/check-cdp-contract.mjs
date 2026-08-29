@@ -42,8 +42,10 @@ const currentReplayComposerScenarios = new Set([
   "compaction",
   "context-summary",
   "current-basic-message",
+  "current-browser-26-825",
   "current-mixed-tool-thread",
   "current-plan-26-825",
+  "current-search-26-825",
   "current-review-files",
   "current-review-rename",
   "interruption",
@@ -3003,6 +3005,8 @@ for (const scene of selectedScenes) {
                   scene.scenario.startsWith("mcp-") ||
                   scene.scenario.startsWith("command-current-26-820-") ||
                   scene.scenario === "current-plan-26-825" ||
+                  scene.scenario === "current-search-26-825" ||
+                  scene.scenario === "current-browser-26-825" ||
                   scene.scenario === "current-basic-message"
                     ? "composer-permission"
                     : "composer-permission-ask",
@@ -6253,6 +6257,8 @@ for (const scene of selectedScenes) {
         backgroundSummary: ".demo-background-terminal-summary",
         backgroundTerminal:
           '[data-testid="terminal-current-background-panel"]',
+        browserWorkspace:
+          '[data-testid="current-browser-workspace"]',
       };
       const namedSurfaces = Object.fromEntries(
         Object.entries(namedSurfaceSelectors).map(([name, selector]) => {
@@ -9545,6 +9551,8 @@ for (const scene of selectedScenes) {
     const minimumConversationViewportWidth =
       expectedWindowWidth <= 720
         ? 400
+        : scene.scenario === "current-browser-26-825"
+          ? 430
         : scene.id === "current-review-files" ||
             scene.id === "current-review-rename"
           ? 480
@@ -9573,6 +9581,11 @@ for (const scene of selectedScenes) {
     const currentSidebarCollectionScene = scene.id.startsWith(
       "current-sidebar-collection-",
     );
+    const expectedSidebarWidth =
+      scene.scenario === "current-search-26-825" ||
+      scene.scenario === "current-browser-26-825"
+        ? 322.90625
+        : 274;
     if (
       hiddenSidebarScene
         ? !contract.sidebar ||
@@ -9580,7 +9593,7 @@ for (const scene of selectedScenes) {
           Math.abs(contract.sidebar.navigation.rect.width) > 1
         : !contract.sidebar ||
           !contract.sidebar.titlebarInset ||
-          Math.abs(contract.sidebar.rect.width - 274) > 1 ||
+          Math.abs(contract.sidebar.rect.width - expectedSidebarWidth) > 1 ||
           Math.abs(
             contract.sidebar.rect.height - expectedViewportHeight,
           ) > 1 ||
@@ -9859,7 +9872,9 @@ for (const scene of selectedScenes) {
       }
     }
     const expectedSidebarMax =
-      scene.id === "markdown-table-actions-narrow" ||
+      scene.scenario === "current-browser-26-825"
+        ? "454"
+      : scene.id === "markdown-table-actions-narrow" ||
       ((scene.windowSize?.width ?? 1180) <= 720 &&
         scene.id.startsWith("current-review-"))
         ? "368"
@@ -9886,7 +9901,8 @@ for (const scene of selectedScenes) {
           Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
           contract.sidebarResizer.ariaMin !== "240" ||
           contract.sidebarResizer.ariaMax !== expectedSidebarMax ||
-          contract.sidebarResizer.ariaNow !== "274"
+          contract.sidebarResizer.ariaNow !==
+            String(Math.round(expectedSidebarWidth))
     ) {
       throw new Error(
         `${scene.id}: navigation resizer contract failed: ${JSON.stringify({
@@ -10013,11 +10029,204 @@ for (const scene of selectedScenes) {
       scene.id === "terminal-current-background-open";
     if (
       !scene.surfaces?.includes("reviewPanel") &&
+      !scene.surfaces?.includes("browserWorkspace") &&
       !backgroundSidePanelScene &&
       contract.sidePanelResizer
     ) {
       throw new Error(
         `${scene.id}: hidden Review panel retained its resize separator.`,
+      );
+    }
+    if (
+      scene.scenario === "current-search-26-825" ||
+      scene.scenario === "current-browser-26-825"
+    ) {
+      const currentSearchBrowser = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                bottom: value.bottom,
+                height: value.height,
+                left: value.left,
+                right: value.right,
+                top: value.top,
+                width: value.width,
+              }
+            : null;
+        };
+        const timeline = document.querySelector(
+          ".demo-current-search-26-825-timeline, .demo-current-browser-26-825-timeline",
+        );
+        const activity = timeline?.querySelector(
+          ".codex-ui-search-activity, .codex-ui-browser-activity",
+        );
+        const activityHeader = activity?.querySelector(
+          ".codex-ui-activity__header",
+        );
+        const activityStyle = activityHeader
+          ? getComputedStyle(activityHeader)
+          : null;
+        const browser = document.querySelector(
+          '[data-testid="current-browser-workspace"]',
+        );
+        return {
+          activity: activity
+            ? {
+                open:
+                  activity
+                    .querySelector(".codex-ui-activity__disclosure")
+                    ?.hasAttribute("open") ?? false,
+                rect: rect(activity),
+                style: activityStyle
+                  ? {
+                      fontSize: activityStyle.fontSize,
+                      fontWeight: activityStyle.fontWeight,
+                      lineHeight: activityStyle.lineHeight,
+                    }
+                  : null,
+                summary:
+                  activity
+                    .querySelector(".codex-ui-activity__summary")
+                    ?.textContent?.trim() ?? null,
+              }
+            : null,
+          browser: browser
+            ? {
+                content: rect(
+                  browser.querySelector(
+                    ".codex-ui-browser-workspace__content",
+                  ),
+                ),
+                externalContentBoundary:
+                  browser
+                    .querySelector("[data-source-owned]")
+                    ?.getAttribute("data-source-owned") ?? null,
+                rect: rect(browser),
+                tabTitle:
+                  browser.querySelector('[role="tab"]')?.textContent?.trim() ??
+                  null,
+                tabs: rect(
+                  browser.querySelector(
+                    ".codex-ui-browser-workspace__tabs",
+                  ),
+                ),
+                toolbar: rect(
+                  browser.querySelector(
+                    ".codex-ui-browser-workspace__toolbar",
+                  ),
+                ),
+                toolbarLabels: Array.from(
+                  browser.querySelectorAll(
+                    ".codex-ui-browser-workspace__toolbar button",
+                  ),
+                  (button) => button.getAttribute("aria-label"),
+                ),
+              }
+            : null,
+          entries: Array.from(
+            timeline?.querySelectorAll(
+              ".codex-ui-search-activity__entries li",
+            ) ?? [],
+            (entry) => entry.textContent?.trim(),
+          ),
+          steps: Array.from(
+            timeline?.querySelectorAll(
+              ".codex-ui-browser-activity__steps li",
+            ) ?? [],
+            (entry) => entry.textContent?.trim(),
+          ),
+          timelineExpanded: timeline?.hasAttribute("data-expanded") ?? false,
+          timelineSummary:
+            timeline
+              ?.querySelector(".codex-ui-activity-timeline__toggle")
+              ?.textContent?.trim() ?? null,
+        };
+      });
+      const activityOpen =
+        scene.id.endsWith("-open") &&
+        !scene.id.endsWith("-worked-open");
+      const timelineOpen =
+        activityOpen || scene.id.endsWith("-worked-open");
+      const expectedDuration =
+        scene.scenario === "current-search-26-825"
+          ? "Worked for 21s"
+          : "Worked for 56s";
+      if (
+        currentSearchBrowser.timelineExpanded !== timelineOpen ||
+        currentSearchBrowser.timelineSummary !== expectedDuration ||
+        (timelineOpen &&
+          (!currentSearchBrowser.activity ||
+            currentSearchBrowser.activity.open !== activityOpen ||
+            currentSearchBrowser.activity.style?.fontSize !== "14px" ||
+            currentSearchBrowser.activity.style?.lineHeight !== "21px" ||
+            currentSearchBrowser.activity.style?.fontWeight !== "400")) ||
+        (!timelineOpen && currentSearchBrowser.activity !== null)
+      ) {
+        throw new Error(
+          `${scene.id}: current search/Browser disclosure contract failed: ${JSON.stringify(currentSearchBrowser)}`,
+        );
+      }
+      if (
+        scene.scenario === "current-search-26-825" &&
+        timelineOpen &&
+        (currentSearchBrowser.activity?.summary !== "Searched the web" ||
+          JSON.stringify(currentSearchBrowser.entries) !==
+            JSON.stringify([
+              "Searched the web for Codex app desktop | openai.com",
+              "Searched the web for 'desktop'",
+            ]))
+      ) {
+        throw new Error(
+          `${scene.id}: current Web Search activity contract failed: ${JSON.stringify(currentSearchBrowser)}`,
+        );
+      }
+      if (scene.scenario === "current-browser-26-825") {
+        const expectedToolbarLabels = [
+          "Back",
+          "Next",
+          "Reload",
+          "Site information",
+          "Site tools",
+          "Open in external browser",
+          "Annotate",
+          "Browser options",
+        ];
+        if (
+          !currentSearchBrowser.browser ||
+          Math.abs(currentSearchBrowser.browser.rect.width - 418.59375) >
+            0.1 ||
+          Math.abs(currentSearchBrowser.browser.tabs.height - 46) > 0.1 ||
+          Math.abs(currentSearchBrowser.browser.toolbar.height - 40) > 0.1 ||
+          Math.abs(currentSearchBrowser.browser.content.top - 86) > 0.1 ||
+          currentSearchBrowser.browser.externalContentBoundary !==
+            "external-web-content" ||
+          !currentSearchBrowser.browser.tabTitle?.startsWith(
+            "◉Codex in ChatGPT | AI Coding Agents",
+          ) ||
+          JSON.stringify(currentSearchBrowser.browser.toolbarLabels) !==
+            JSON.stringify(expectedToolbarLabels) ||
+          (timelineOpen &&
+            (currentSearchBrowser.activity?.summary !==
+              "Used the browser, loaded a tool" ||
+              JSON.stringify(currentSearchBrowser.steps) !==
+                JSON.stringify([
+                  "Read Control In App Browser skill",
+                  "连接 Browser",
+                  "打开页面并查找 desktop",
+                ])))
+        ) {
+          throw new Error(
+            `${scene.id}: current Browser workspace contract failed: ${JSON.stringify(currentSearchBrowser)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}-current-search-browser.json`,
+        ),
+        `${JSON.stringify(currentSearchBrowser, null, 2)}\n`,
       );
     }
     if (scene.surfaces?.includes("bottomPanel")) {
