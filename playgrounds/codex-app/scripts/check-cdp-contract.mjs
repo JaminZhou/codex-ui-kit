@@ -6699,7 +6699,14 @@ for (const scene of selectedScenes) {
                   }
                 : null,
               text:
-                contextOptimization?.textContent
+                (
+                  contextOptimization?.querySelector(
+                    ".codex-ui-loading-shimmer",
+                  )?.firstChild?.textContent ??
+                  contextOptimization?.querySelector(
+                    ".codex-ui-thread-context-optimization__label",
+                  )?.textContent
+                )
                   ?.replace(/\s+/g, " ")
                   .trim() ?? null,
               textStyle: contextOptimization
@@ -8497,6 +8504,7 @@ for (const scene of selectedScenes) {
         "composer-queued",
         "composer-auto-continued",
         "composer-queue-paused",
+        "conversation-thinking-current-26-825",
         "thread-current-26-820-middle",
         "thread-current-26-820-compact-away",
       ].includes(scene.id);
@@ -12970,8 +12978,10 @@ try {
   const running = await contextCompactionPage.evaluate(() => ({
     label:
       document
-        .querySelector(".codex-ui-thread-context-optimization")
-        ?.textContent?.replace(/\s+/g, " ")
+        .querySelector(
+          ".codex-ui-thread-context-optimization .codex-ui-loading-shimmer",
+        )
+        ?.firstChild?.textContent?.replace(/\s+/g, " ")
         .trim() ?? null,
     stopCount: [...document.querySelectorAll("button")].filter(
       (button) => button.getAttribute("aria-label") === "Stop",
@@ -15277,6 +15287,111 @@ try {
   );
 } finally {
   await responsiveContinuityApp.close();
+}
+
+const currentThinkingScene = {
+  frame: "conversation-thinking-current-26-825",
+  id: "conversation-thinking-current-26-825-contract",
+  scenario: "conversation-lifecycle",
+  sidebarState: "hidden",
+};
+const {
+  app: currentThinkingApp,
+  page: currentThinkingPage,
+} = await launchScene(currentThinkingScene, { capture: false });
+try {
+  await currentThinkingPage.waitForSelector(
+    '.demo-root[data-frame="conversation-thinking-current-26-825"] .codex-ui-thread-thinking',
+  );
+  const currentThinking = await currentThinkingPage.evaluate(() => {
+    const root = document.querySelector(".demo-root");
+    const thinking = document.querySelector(".codex-ui-thread-thinking");
+    const composer = document.querySelector(
+      'textarea[aria-label="Message composer"]',
+    );
+    const shimmer = thinking.querySelector(".codex-ui-loading-shimmer");
+    const highlight = thinking.querySelector(
+      ".codex-ui-loading-shimmer__highlight",
+    );
+    if (!(thinking instanceof HTMLElement)) return null;
+    const bounds = thinking.getBoundingClientRect();
+    const style = getComputedStyle(thinking);
+    const shimmerBounds = shimmer?.getBoundingClientRect();
+    const shimmerStyle = shimmer ? getComputedStyle(shimmer) : null;
+    const highlightStyle = highlight ? getComputedStyle(highlight) : null;
+    return {
+      animationName: style.animationName,
+      ariaLive: thinking.getAttribute("aria-live"),
+      backgroundImage: style.backgroundImage,
+      color: style.color,
+      composerCount: document.querySelectorAll(
+        'textarea[aria-label="Message composer"]',
+      ).length,
+      fontFamily: style.fontFamily,
+      fontSize: style.fontSize,
+      fontWeight: style.fontWeight,
+      height: bounds.height,
+      horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+      label: thinking
+        .querySelector(".codex-ui-loading-shimmer")
+        ?.firstChild?.textContent?.trim(),
+      lineHeight: style.lineHeight,
+      role: thinking.getAttribute("role"),
+      shimmerCount: thinking.querySelectorAll(".codex-ui-loading-shimmer")
+        .length,
+      shimmerColor: shimmerStyle?.color,
+      shimmerDuplicateCount: thinking.querySelectorAll(
+        '.codex-ui-loading-shimmer__sweep[aria-hidden="true"] .codex-ui-loading-shimmer__highlight',
+      ).length,
+      shimmerHeight: shimmerBounds?.height,
+      shimmerHighlightColor: highlightStyle?.color,
+      shimmerWidth: shimmerBounds?.width,
+      status: root?.getAttribute("data-status"),
+      stopButton: Boolean(
+        document.querySelector('button[aria-label="Stop"]'),
+      ),
+      textareaDisabled:
+        composer instanceof HTMLTextAreaElement ? composer.disabled : null,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  const currentThinkingColor = currentThinking?.color ?? "";
+  if (
+    !currentThinking ||
+    currentThinking.animationName !== "none" ||
+    currentThinking.ariaLive !== "polite" ||
+    currentThinking.backgroundImage !== "none" ||
+    !currentThinkingColor.includes("0.75") ||
+    currentThinking.composerCount !== 1 ||
+    currentThinking.fontSize !== "14px" ||
+    currentThinking.fontWeight !== "400" ||
+    Math.abs(currentThinking.height - 21) > 0.1 ||
+    currentThinking.horizontalOverflow > 1 ||
+    currentThinking.label !== "Thinking" ||
+    currentThinking.lineHeight !== "21px" ||
+    currentThinking.role !== "status" ||
+    currentThinking.shimmerCount !== 1 ||
+    !currentThinking.shimmerColor?.includes("0.385") ||
+    currentThinking.shimmerDuplicateCount !== 1 ||
+    Math.abs((currentThinking.shimmerHeight ?? 0) - 21) > 0.1 ||
+    !currentThinking.shimmerHighlightColor?.includes("0.75") ||
+    Math.abs((currentThinking.shimmerWidth ?? 0) - 55.296875) > 0.1 ||
+    currentThinking.status !== "running" ||
+    !currentThinking.stopButton ||
+    currentThinking.textareaDisabled !== false ||
+    JSON.stringify(currentThinking.viewport) !==
+      JSON.stringify({ height: 820, width: 1180 })
+  ) {
+    throw new Error(
+      `Current 26.825 Thinking contract failed: ${JSON.stringify(currentThinking)}`,
+    );
+  }
+  await writeFile(
+    join(artifactDirectory, "conversation-thinking-current-26-825.json"),
+    `${JSON.stringify(currentThinking, null, 2)}\n`,
+  );
+} finally {
+  await currentThinkingApp.close();
 }
 
 const conversationLifecycleScene = {

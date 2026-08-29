@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AgentMessage,
@@ -20,6 +26,7 @@ import {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
@@ -240,12 +247,52 @@ describe("complete thread surfaces", () => {
       "Reconnecting to ChatGPT…",
     );
     rerender(<ThreadThinkingPlaceholder />);
-    expect(screen.getByRole("status").textContent).toBe("Thinking");
+    const thinking = screen.getByRole("status");
+    expect(
+      thinking.querySelector(".codex-ui-loading-shimmer")?.firstChild
+        ?.textContent,
+    ).toBe("Thinking");
+    expect(thinking.getAttribute("aria-live")).toBe("polite");
+    expect(
+      thinking.querySelectorAll(
+        '.codex-ui-loading-shimmer__sweep[aria-hidden="true"] .codex-ui-loading-shimmer__highlight',
+      ),
+    ).toHaveLength(1);
     rerender(<ThreadSkeleton lines={4} />);
     expect(screen.getByRole("status", { name: "Loading thread" })).toBeTruthy();
     expect(document.querySelectorAll(".codex-ui-thread-skeleton__line")).toHaveLength(4);
     rerender(<LoadingShimmer>Working</LoadingShimmer>);
-    expect(screen.getByText("Working").className).toContain("codex-ui-loading-shimmer");
+    expect(
+      document.querySelector(".codex-ui-loading-shimmer")?.firstChild
+        ?.textContent,
+    ).toBe("Working");
+  });
+
+  it("runs the current 600ms / 1s / 4s loading-text cadence", () => {
+    vi.useFakeTimers();
+    const { container } = render(<LoadingShimmer>Thinking</LoadingShimmer>);
+    const shimmer = container.querySelector(".codex-ui-loading-shimmer")!;
+
+    expect(
+      shimmer.querySelector(
+        '.codex-ui-loading-shimmer__sweep[aria-hidden="true"] .codex-ui-loading-shimmer__highlight',
+      )?.textContent,
+    ).toBe("Thinking");
+    expect(shimmer.classList.contains("codex-ui-loading-shimmer--active")).toBe(
+      false,
+    );
+    act(() => vi.advanceTimersByTime(600));
+    expect(shimmer.classList.contains("codex-ui-loading-shimmer--active")).toBe(
+      true,
+    );
+    act(() => vi.advanceTimersByTime(1_000));
+    expect(shimmer.classList.contains("codex-ui-loading-shimmer--active")).toBe(
+      false,
+    );
+    act(() => vi.advanceTimersByTime(2_400));
+    expect(shimmer.classList.contains("codex-ui-loading-shimmer--active")).toBe(
+      true,
+    );
   });
 
   it("covers manual, automatic, and Work context optimization states", () => {
@@ -255,7 +302,11 @@ describe("complete thread surfaces", () => {
     const state = container.querySelector(
       ".codex-ui-thread-context-optimization",
     )!;
-    expect(screen.getByRole("status").textContent).toBe("Compacting context");
+    expect(
+      screen
+        .getByRole("status")
+        .querySelector(".codex-ui-loading-shimmer")?.firstChild?.textContent,
+    ).toBe("Compacting context");
     expect(state.getAttribute("aria-busy")).toBe("true");
     expect(state.getAttribute("data-mode")).toBe("manual");
 
@@ -265,9 +316,11 @@ describe("complete thread surfaces", () => {
     expect(state.getAttribute("role")).toBeNull();
 
     rerender(<ThreadContextOptimization mode="work" status="running" />);
-    expect(screen.getByRole("status").textContent).toBe(
-      "Optimizing the conversation",
-    );
+    expect(
+      screen
+        .getByRole("status")
+        .querySelector(".codex-ui-loading-shimmer")?.firstChild?.textContent,
+    ).toBe("Optimizing the conversation");
 
     rerender(
       <ThreadContextOptimization
@@ -290,7 +343,11 @@ describe("complete thread surfaces", () => {
 
     rerender(<ThreadContextEvent status="running" />);
     expect(screen.getByText("Working")).toBeTruthy();
-    expect(screen.getByRole("status").textContent).toBe("Compacting context");
+    expect(
+      screen
+        .getByRole("status")
+        .querySelector(".codex-ui-loading-shimmer")?.firstChild?.textContent,
+    ).toBe("Compacting context");
 
     rerender(<ThreadContextEvent status="completed" />);
     expect(screen.queryByText("Working")).toBeNull();

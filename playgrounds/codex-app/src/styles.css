@@ -3179,6 +3179,10 @@ textarea {
   --codex-ui-user-message-max-width: 70%;
 }
 
+.demo-root[data-frame="conversation-thinking-current-26-825"] {
+  -webkit-font-smoothing: antialiased;
+}
+
 .demo-root[data-scenario^="command-current-26-820"],
 .demo-root[data-scenario^="command-current-26-820"]
   *:not(code):not(kbd):not(pre) {

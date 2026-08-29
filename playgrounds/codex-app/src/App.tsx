@@ -536,6 +536,7 @@ const conversationHostFrames = new Set([
   "composer-queued",
   "composer-resources-menu",
   "composer-running",
+  "conversation-thinking-current-26-825",
   "thread-scroll-away",
   "thread-windowed",
   "thread-current-26-820-middle",
@@ -609,6 +610,11 @@ function replayCountForSelection(
     return scenario.events.length;
   }
   if (!conversationHostFrames.has(frame)) return scenario.events.length;
+  if (
+    frame === "conversation-thinking-current-26-825"
+  ) {
+    return scenario.frames[frame] ?? scenario.events.length;
+  }
   if (
     frame === "composer-running" ||
     frame === "composer-queued" ||

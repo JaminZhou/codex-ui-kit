@@ -1,26 +1,86 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
 import {
   TurnDuration,
   type TurnDurationProps,
 } from "./TurnDuration.js";
 
 export interface LoadingShimmerProps extends HTMLAttributes<HTMLSpanElement> {
+  active?: boolean;
   children: ReactNode;
 }
 
 export function LoadingShimmer({
+  active = true,
   children,
   className,
   ...props
 }: LoadingShimmerProps) {
+  const shimmerRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (
+      !active ||
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    const shimmer = shimmerRef.current;
+    if (!shimmer) return;
+    let activeTimer: ReturnType<typeof setTimeout> | undefined;
+    const stopCadence = () => {
+      if (activeTimer !== undefined) {
+        clearTimeout(activeTimer);
+        activeTimer = undefined;
+      }
+    };
+    const startCadence = () => {
+      stopCadence();
+      shimmer.classList.remove("codex-ui-loading-shimmer--active");
+      shimmer.classList.add("codex-ui-loading-shimmer--active");
+      activeTimer = setTimeout(() => {
+        shimmer.classList.remove("codex-ui-loading-shimmer--active");
+        activeTimer = undefined;
+      }, 1_000);
+    };
+    const initialTimer = setTimeout(startCadence, 600);
+    const intervalTimer = setInterval(startCadence, 4_000);
+    return () => {
+      stopCadence();
+      clearTimeout(initialTimer);
+      clearInterval(intervalTimer);
+      shimmer.classList.remove("codex-ui-loading-shimmer--active");
+    };
+  }, [active]);
+
+  if (!active) {
+    return (
+      <span className={className} {...props}>
+        {children}
+      </span>
+    );
+  }
+
   return (
     <span
+      ref={shimmerRef}
       className={["codex-ui-loading-shimmer", className]
         .filter(Boolean)
         .join(" ")}
       {...props}
     >
       {children}
+      <span aria-hidden="true" className="codex-ui-loading-shimmer__sweep">
+        <span className="codex-ui-loading-shimmer__highlight">
+          {children}
+        </span>
+      </span>
     </span>
   );
 }
@@ -236,7 +296,9 @@ export function ThreadThinkingPlaceholder({
       role="status"
       {...props}
     >
-      <LoadingShimmer>{label}</LoadingShimmer>
+      <div className="codex-ui-thread-thinking__activity">
+        <LoadingShimmer>{label}</LoadingShimmer>
+      </div>
     </div>
   );
 }

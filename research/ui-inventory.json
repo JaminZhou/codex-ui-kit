@@ -205,7 +205,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:thinking-working-worked-activity",
-        "cdp:worked-activity-group-disclosure"
+        "cdp:worked-activity-group-disclosure",
+        "cdp-26.825.31414:real-no-tool-and-terminal-thinking-cadence-worked-for-disclosure-and-ran-row"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -232,7 +233,8 @@
         "cdp-26.810.52044:real-pwd-success-expanded-worked-for-and-terminal-glyph",
         "cdp-26.810.52044:real-exit-7-shell-stderr-stdout-and-persistent-stopped-command-row",
         "cdp-26.818.41509:real-exit-7-shell-current-stdout-stderr-terminal-glyph-and-unmasked-region",
-        "cdp-26.820.60940:real-twelve-second-command-success-exit-7-neutral-ran-row-and-stopped-background-terminal-row"
+        "cdp-26.820.60940:real-twelve-second-command-success-exit-7-neutral-ran-row-and-stopped-background-terminal-row",
+        "cdp-26.825.31414:real-safe-terminal-command-worked-for-collapsed-and-expanded-ran-row"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

@@ -280,6 +280,12 @@ const currentCommand26820CompactReferenceSize = {
   height: 680,
   width: 720,
 };
+const currentThinking26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_THINKING_26_825_REFERENCE;
+const currentThinking26825ReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildContextCompactionReference =
   process.env.CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE;
 const currentBuildContextCompactionReferenceSize = {
@@ -880,6 +886,7 @@ for (const scene of selectedScenes) {
   let currentBasicThreadBounds;
   let currentCommandFailureBounds;
   let currentCommandInterruptionBounds;
+  let currentThinking26825Bounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -1064,6 +1071,19 @@ for (const scene of selectedScenes) {
         top: 451,
         width: 736,
       };
+    }
+    if (scene.id === "conversation-thinking-current-26-825") {
+      currentThinking26825Bounds = await page
+        .locator(".codex-ui-thread-thinking .codex-ui-loading-shimmer__highlight")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (scene.id === "multi-file-review") {
       await page.evaluate(() => {
@@ -1433,6 +1453,76 @@ for (const scene of selectedScenes) {
   if (baseline.width !== actual.width || baseline.height !== actual.height) {
     throw new Error(
       `${scene.id}: image dimensions changed from ${baseline.width}x${baseline.height} to ${actual.width}x${actual.height}.`,
+    );
+  }
+
+  if (
+    scene.id === "conversation-thinking-current-26-825" &&
+    currentThinking26825Reference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentThinking26825Reference),
+    );
+    if (
+      reference.width !== currentThinking26825ReferenceSize.width ||
+      reference.height !== currentThinking26825ReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height ||
+      !currentThinking26825Bounds ||
+      currentThinking26825Bounds.left !== 222 ||
+      currentThinking26825Bounds.width !== 55 ||
+      currentThinking26825Bounds.height !== 21
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Thinking comparison requires exact 1180x820 frames and a 55x21 x=222 label: ${JSON.stringify({ actual: { height: actual.height, width: actual.width }, bounds: currentThinking26825Bounds, reference: { height: reference.height, width: reference.width } })}`,
+      );
+    }
+    const crop = {
+      height: 25,
+      left: 220,
+      width: 80,
+    };
+    const referenceCrop = cropPng(reference, crop.left, 234, crop.width, crop.height);
+    const actualCrop = cropPng(
+      actual,
+      crop.left,
+      currentThinking26825Bounds.top - 2,
+      crop.width,
+      crop.height,
+    );
+    const comparison = comparePng(
+      foregroundMaskPng(referenceCrop),
+      foregroundMaskPng(actualCrop),
+      0,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceCrop),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_THINKING_26_825_MAX_DIFF_RATIO",
+      0.04,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualCrop),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 Thinking foreground pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 Thinking foreground pixel ratio ${comparison.ratio}`,
     );
   }
 

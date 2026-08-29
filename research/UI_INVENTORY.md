@@ -65,8 +65,13 @@ observation from a previous build remains historical evidence.
   and content-dependent Projects Index. The sidebar is now 321.875px wide;
   the collapsed 600px Projects route remains 559px with 415/128 columns.
   `Sites` is absent from every sampled fixed-route stack. Details are in
-  [`26.825.31414.md`](26.825.31414.md). Account/settings, feature-state, and
-  exact visual-asset captures remain previous-build evidence until recaptured.
+  [`26.825.31414.md`](26.825.31414.md). A follow-up re-observes the 14/21px
+  cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
+  collapsed/expanded `Worked for` and `Ran …` command rows. The tight
+  current-product `Thinking` comparison passes at 0.6%. Broader reasoning/plan,
+  account/settings, other feature-state,
+  and exact visual-asset captures remain previous-build evidence until
+  recaptured.
 - A previous 26.820 route-continuity probe locks Projects → Back → Forward
   location restoration, x=88/120/152 titlebar controls, `opacity: 0.4`
   unavailable navigation, 720px pinned continuity, explicit Hide/Show, and
@@ -161,7 +166,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 11 have current-build runtime evidence, 63 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Current inventory: 89 surface groups; 13 have current-build runtime evidence, 61 have previous-build-only runtime evidence, 15 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
