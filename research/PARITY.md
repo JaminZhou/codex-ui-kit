@@ -6,7 +6,10 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.820.60940.md`](26.820.60940.md) for the current package fingerprint,
+- [`26.825.31414.md`](26.825.31414.md) for the current package fingerprint,
+  reproducible shell baseline, primary-route drift, Help menu, responsive
+  Composer shell, project-menu provider, and Projects Index;
+- [`26.820.60940.md`](26.820.60940.md) for the previous broader shell,
   reproducible global-shell baseline, Help menu, responsive Composer shell,
   route restoration, native project-menu provider, and Projects Index drift;
 - [`26.818.41509.md`](26.818.41509.md) for the previous New chat home,
@@ -48,15 +51,16 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.820.60940` (`7119`) probe revalidates the shell,
+- A scoped Codex Desktop `26.825.31414` (`7287`) probe revalidates the shell,
   responsive Composer, primary navigation, project-group lifecycle, Help menu,
-  account menu, route restoration, and Projects Index. Explicitly hiding the
+  route restoration, project-menu provider, and Projects Index. Explicitly hiding the
   720px sidebar now removes Back and Forward alongside the navigation, and the collapsed
-  Projects content is 559px with 415/128 columns. The project action menu still
-  uses the frozen Electron native context-menu bridge and a 221×187 native
-  window; all six fixed icon sources remain exact. Its 3.8449% unmasked
-  native-region gate remains explicitly scoped to 26.818 until recaptured.
-- The current 26.820 account-menu matrix supersedes the previous focus and
+  Projects content remains 559px with 415/128 columns. The sidebar is now
+  321.875px wide and `Sites` is absent from the sampled fixed-route stack. The
+  project action menu still uses the frozen Electron native context-menu
+  provider; its native window, exact icon sources, and pixel gate remain
+  previous-build evidence until recaptured.
+- The previous 26.820 account-menu matrix supersedes the previous focus and
   typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
   remains 306.90625×188.375px with six 28.5625px rows, five exact icons, one
   avatar, zero role separators, zero overflow, Escape dismissal, and trigger
@@ -73,7 +77,7 @@ The authoritative current-build inventory is:
   parity constant. The older follow-up locks its sampled ordinary `Needs
   input` and error rows plus `No chats` and the exact one-heading/four-row
   loading skeleton; a privacy-safe 140×29 live empty crop differs by 1.8227%.
-  The current 26.820 recapture supersedes waiting and long-list behavior: a
+  The previous 26.820 recapture supersedes waiting and long-list behavior: a
   real waiting-on-approval project task keeps the shared 16×16 spinner, while
   a five-row `Show more` control reveals all current rows and disappears with
   no `Show less`. Browser/CDP and Electron repeat the one-way reveal; local
@@ -125,7 +129,7 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
-- The current 26.820 Review follow-up reaches an exact `+4 −4`
+- The previous 26.820 Review follow-up reaches an exact `+4 −4`
   added/modified/deleted card, the marker-backed two-file rename presentation,
   successful Undo → Reapply, and an externally induced Undo conflict. The
   Review workspace is 419.59375×820 wide and 345.671875×680 compact, with the
@@ -357,7 +361,7 @@ The authoritative current-build inventory is:
   selection and restoration with synthetic content, while a masked regional
   gate compares only the rail and floating control at 0.59%. Host eviction
   policy outside this sampled state remains an open product boundary.
-- The current `26.820.60940` long-thread refresh uses one exact 30-prompt,
+- The previous `26.820.60940` long-thread refresh uses one exact 30-prompt,
   tool-free disposable thread. It supersedes the runtime anchor with the
   current four-item source minimum, 48px spatial gate, 36×10px compact rail,
   11-turn wide and nine-turn compact mounted windows, reverse-origin

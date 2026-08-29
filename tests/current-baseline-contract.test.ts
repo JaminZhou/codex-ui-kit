@@ -923,28 +923,28 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 282_402_769,
+        appAsarBytes: 284_029_139,
         appAsarSha256:
-          "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        appVersion: "26.820.60940",
-        buildNumber: "7119",
-        chromiumVersion: "151.0.7922.170",
+          "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
+        appVersion: "26.825.31414",
+        buildNumber: "7287",
+        chromiumVersion: "151.0.7922.174",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 282_402_769,
+          appAsarBytes: 284_029_139,
           appAsarSha256:
-            "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+            "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
           inode: "346397970",
         },
         beforeCapture: {
-          appAsarBytes: 282_402_769,
+          appAsarBytes: 284_029_139,
           appAsarSha256:
-            "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
+            "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
@@ -1252,7 +1252,7 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.820.60940");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.825.31414");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({
@@ -1490,7 +1490,7 @@ describe("current baseline capture contract", () => {
           ...record.states,
           mediumNewChat: {
             ...record.states.mediumNewChat,
-            routes: { ...record.states.mediumNewChat.routes, Sites: [] },
+            routes: { ...record.states.mediumNewChat.routes, Plugins: [] },
           },
         },
       }),
