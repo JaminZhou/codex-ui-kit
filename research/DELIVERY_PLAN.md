@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.31414` (`7287`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 16 groups have current-build runtime evidence, 59 have previous-build-only
+- 17 groups have current-build runtime evidence, 58 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.31414` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -61,6 +61,16 @@ exit gates; it does not replace the inventory.
   pixels remain source-owned and are excluded behind an explicit content
   boundary. Multi-tab, authentication, downloads, permission prompts, and
   page-owned states remain incomplete.
+  The current no-tool Markdown probe now promotes `thread.messages-markdown`.
+  It locks one 736/688×465.4375 completed response with 14/22.75px compact
+  typography, a 21/28px H1, 3.5px quote marker, 81.5px full-width table,
+  82px current-icon code block, public favicon link, literal inline math,
+  rendered KaTeX block math, and 28px-stepped response actions. Browser/CDP
+  and Electron repeat semantics, exact computed geometry, link/icon source,
+  copy, wrap, table focus, native bounds, and zero overflow. Two reviewed
+  baselines are committed; the unmasked 737×466 response-root comparison
+  passes at 1.3292% under 2%. Rich streaming mutation, citations, live media,
+  table/error, and plugin variants remain P0 work.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
@@ -100,7 +110,8 @@ exit gates; it does not replace the inventory.
   establishes one same-turn recovery, not a universal automatic-retry rule,
   and the replay-only in-progress Search frame is not promoted as a product
   pixel. A separate previous
-  26.818 no-tool task promoted `thread.messages-markdown`. It reaches heading,
+  26.818 no-tool task remains regression evidence for
+  `thread.messages-markdown`. It reaches heading,
   strong text, inline code, blockquote, list, a narrow table, and TypeScript
   code at 1180×820 and 720×680. The sampled external URL is source-owned and
   leaves plain visible text instead of an inline anchor. Browser/CDP and
@@ -965,8 +976,11 @@ without confusing package readiness with full product reconstruction.
     following, completion actions, and Electron scroll-away/return are now
     delivered independently. Very-large-table Copy/Expand/Preview is now also
     current-runtime-observed and delivered through public Browser/Electron/
-    pixel gates. Continue with plugin attachment variants, Markdown
-    images/math/citations and table/Markdown error variants, populated
+    pixel gates. The current 26.825 completed-Markdown composition now also
+    locks compact typography, a favicon link, current code assets, literal
+    inline math, rendered block math, and wide/compact response geometry.
+    Continue with plugin attachment variants, Markdown rich-stream mutation,
+    citations, live media emission, and table/Markdown error variants, populated
     artifact/source sections, real-product subagent
     recovery capture, real transport runtime reachability, and real global
     notification reachability. The independent transport state machine and

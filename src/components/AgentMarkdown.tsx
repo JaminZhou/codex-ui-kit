@@ -221,15 +221,19 @@ export interface CodeBlockProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "onCopy"> {
   children: string;
   codeHighlighter?: CodeHighlighter | false;
+  copiedAriaLabel?: string;
   copiedLabel?: ReactNode;
+  copyAriaLabel?: string;
   copyLabel?: ReactNode;
   copyable?: boolean;
   deferHighlightUntilVisible?: boolean;
   language?: string;
+  languageIcon?: ReactNode;
   label?: ReactNode;
   onCopy?: CodeCopyHandler;
   onWrapChange?: (wrap: boolean) => void;
   wrap?: boolean;
+  wrapIcon?: ReactNode;
   wrapToggleable?: boolean;
 }
 
@@ -470,15 +474,19 @@ export function CodeBlock({
   children,
   className,
   codeHighlighter,
+  copiedAriaLabel,
   copiedLabel = <CodeCopyIcon copied />,
+  copyAriaLabel,
   copyLabel = <CodeCopyIcon />,
   copyable = true,
   deferHighlightUntilVisible = true,
   language,
+  languageIcon,
   label,
   onCopy,
   onWrapChange,
   wrap = false,
+  wrapIcon = <CodeWrapIcon />,
   wrapToggleable = false,
   ...props
 }: CodeBlockProps) {
@@ -502,12 +510,10 @@ export function CodeBlock({
   const normalizedCode = children.replace(/\n$/, "");
   const resolvedLabel = label ?? language ?? "text";
   const accessibleCopyLabel = copied
-    ? typeof copiedLabel === "string"
-      ? copiedLabel
-      : "Copied"
-    : typeof copyLabel === "string"
-      ? copyLabel
-      : "Copy code";
+    ? copiedAriaLabel ??
+      (typeof copiedLabel === "string" ? copiedLabel : "Copied")
+    : copyAriaLabel ??
+      (typeof copyLabel === "string" ? copyLabel : "Copy code");
   const resolvedWrap = wrapToggleable ? wrapped : wrap;
   const highlightRequest = useRef({
     disposed: false,
@@ -684,7 +690,16 @@ export function CodeBlock({
       {...props}
     >
       <figcaption className="codex-ui-code-block__header">
-        <span className="codex-ui-code-block__language">{resolvedLabel}</span>
+        <span className="codex-ui-code-block__language">
+          {languageIcon ? (
+            <span className="codex-ui-code-block__language-icon">
+              {languageIcon}
+            </span>
+          ) : null}
+          <span className="codex-ui-code-block__language-label">
+            {resolvedLabel}
+          </span>
+        </span>
         {copyable || wrapToggleable ? (
           <span className="codex-ui-code-block__actions">
             {wrapToggleable ? (
@@ -697,7 +712,7 @@ export function CodeBlock({
                 onClick={handleWrapChange}
                 type="button"
               >
-                <CodeWrapIcon />
+                {wrapIcon}
               </button>
             ) : null}
             {copyable ? (
@@ -1085,10 +1100,20 @@ export interface AgentMarkdownProps
   allowWideTables?: boolean;
   children: string;
   codeHighlighter?: CodeHighlighter | false;
+  codeBlockCopiedAriaLabel?: string;
+  codeBlockCopiedLabel?: ReactNode;
+  codeBlockCopyAriaLabel?: string;
+  codeBlockCopyLabel?: ReactNode;
   codeBlockCopyable?: boolean;
+  codeBlockLanguageIcon?:
+    | ReactNode
+    | ((language: string | undefined) => ReactNode);
+  codeBlockLanguageLabels?: Readonly<Record<string, ReactNode>>;
   codeBlockWrap?: boolean;
+  codeBlockWrapIcon?: ReactNode;
   codeBlockWrapToggleable?: boolean;
   components?: Components;
+  density?: "compact" | "regular";
   imageLoadingLabel?: string;
   imagePreview?: boolean;
   imagePreviewLabel?: string;
@@ -1111,10 +1136,18 @@ export function AgentMarkdown({
   children,
   className,
   codeHighlighter,
+  codeBlockCopiedAriaLabel,
+  codeBlockCopiedLabel,
+  codeBlockCopyAriaLabel,
+  codeBlockCopyLabel,
   codeBlockCopyable = true,
+  codeBlockLanguageIcon,
+  codeBlockLanguageLabels,
   codeBlockWrap = false,
+  codeBlockWrapIcon,
   codeBlockWrapToggleable = false,
   components,
+  density = "regular",
   imageLoadingLabel = "Image loading",
   imagePreview = true,
   imagePreviewLabel = "Open image preview",
@@ -1223,10 +1256,21 @@ export function AgentMarkdown({
             return (
               <CodeBlock
                 codeHighlighter={codeHighlighter}
+                copiedAriaLabel={codeBlockCopiedAriaLabel}
+                copiedLabel={codeBlockCopiedLabel}
+                copyAriaLabel={codeBlockCopyAriaLabel}
+                copyLabel={codeBlockCopyLabel}
                 copyable={codeBlockCopyable}
                 language={language}
+                languageIcon={
+                  typeof codeBlockLanguageIcon === "function"
+                    ? codeBlockLanguageIcon(language)
+                    : codeBlockLanguageIcon
+                }
+                label={language ? codeBlockLanguageLabels?.[language] : undefined}
                 onCopy={handleCodeCopy}
                 wrap={codeBlockWrap}
+                wrapIcon={codeBlockWrapIcon}
                 wrapToggleable={codeBlockWrapToggleable}
               >
                 {value}
@@ -1321,7 +1365,14 @@ export function AgentMarkdown({
       allowWideMedia,
       allowWideTables,
       codeBlockCopyable,
+      codeBlockCopiedAriaLabel,
+      codeBlockCopiedLabel,
+      codeBlockCopyAriaLabel,
+      codeBlockCopyLabel,
+      codeBlockLanguageIcon,
+      codeBlockLanguageLabels,
       codeBlockWrap,
+      codeBlockWrapIcon,
       codeBlockWrapToggleable,
       codeHighlighter,
       components,
@@ -1361,6 +1412,7 @@ export function AgentMarkdown({
   return (
     <div
       className={classes}
+      data-density={density}
       data-streaming={streaming || undefined}
       {...props}
     >

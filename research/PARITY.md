@@ -70,6 +70,15 @@ The authoritative current-build inventory is:
   2.80% for Browser chrome. External page pixels and unsampled multi-tab,
   authentication, download, permission, history, and error states are not
   claimed.
+- A current no-tool Markdown follow-up reaches heading, strong text, compact
+  inline code, a public favicon link, quote, list, full-width table, current
+  TypeScript code block, literal inline math, rendered KaTeX block math, and
+  four response actions. The public `AgentMarkdown` compact density matches the
+  736/688×465.4375 roots and exposes host code-label/icon slots. Browser/CDP
+  and Electron lock exact computed geometry plus copy/wrap/focus behavior; two
+  reviewed baselines pass, and the unmasked 737×466 live response comparison
+  passes at 1.3292% under 2%. Rich streaming, citations, live media,
+  table/error, and plugin Markdown variants remain open.
 - The previous 26.820 account-menu matrix supersedes the previous focus and
   typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
   remains 306.90625×188.375px with six 28.5625px rows, five exact icons, one
@@ -503,6 +512,17 @@ frame. Its optional 906×820 `26.721.41059` comparison gates the assistant,
 fenced-code, and Composer regions at the strict 0.05 pixel threshold, while
 CDP separately locks semantic counts and computed geometry.
 
+The `26.825.31414` completed-Markdown refresh supersedes that old product
+composition for the sampled completed state. It replays a five-event fixed
+answer at 1180×820 and 720×680, adopts the measured 14/22.75px compact density,
+and matches heading, inline-code, favicon-link, quote/list, 81.5px table,
+82px current-icon code block, literal single-dollar source, rendered
+double-dollar KaTeX, and 28px-stepped response actions. Browser/CDP validates
+semantics, computed styles, exact geometry, icon/link source, MathML, and wrap;
+Electron repeats copy, wrap, table focus, native bounds, and zero overflow.
+Two reviewed internal baselines and a local-only unmasked 737×466 product
+response gate pass, the latter at 1.3292% under 2%.
+
 The unchanged `26.803.41515` fingerprint adds source-structural evidence for
 inline-Markdown in-progress ownership, the latest-turn follow state machine,
 and dedicated Table container/scroller plus Copy/Expand/Preview controls. A
@@ -517,8 +537,8 @@ and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
 and viewport preview. Browser/CDP now covers 156 frames; Electron repeats copy,
 horizontal wheel, open/close, focus restoration, and 720×680 action
 reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
-close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Images, math,
-citations/sources, table error variants, and plugin-specific Markdown remain
+close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Citations,
+live media emission, table error variants, and plugin-specific Markdown remain
 open. Plain-text streaming product reachability is now current on
 `26.803.61601`: one live 1180→720 resize proves reverse-origin follow,
 negative compact clipping, the exact Stop vector, and natural Send recovery in

@@ -98,6 +98,29 @@ Footnote reference.[^1]
     expect(html).not.toContain("data-footnotes");
   });
 
+  it("exposes compact density and host code-block presentation slots", () => {
+    const html = renderToStaticMarkup(
+      <AgentMarkdown
+        codeBlockCopyAriaLabel="Copy"
+        codeBlockCopyLabel={<svg data-current-copy-icon="true" />}
+        codeBlockLanguageIcon={() => <svg data-current-language-icon="true" />}
+        codeBlockLanguageLabels={{ ts: "TypeScript" }}
+        codeBlockWrapIcon={<svg data-current-wrap-icon="true" />}
+        codeBlockWrapToggleable
+        density="compact"
+      >
+        {"```ts\nconst ready = true;\n```"}
+      </AgentMarkdown>,
+    );
+
+    expect(html).toContain('data-density="compact"');
+    expect(html).toContain('data-current-language-icon="true"');
+    expect(html).toContain(">TypeScript</span>");
+    expect(html).toContain('data-current-wrap-icon="true"');
+    expect(html).toContain('aria-label="Copy"');
+    expect(html).toContain('data-current-copy-icon="true"');
+  });
+
   it("renders controlled Markdown image loading and unavailable fallbacks", () => {
     const html = renderToStaticMarkup(
       <AgentMarkdown

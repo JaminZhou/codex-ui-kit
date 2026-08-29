@@ -3080,6 +3080,70 @@ textarea {
   display: none;
 }
 
+.demo-root[data-scenario="markdown-current-26-825"] {
+  -webkit-font-smoothing: antialiased;
+}
+
+.demo-root[data-scenario="markdown-current-26-825"],
+.demo-root[data-scenario="markdown-current-26-825"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="markdown-current-26-825"]
+  .demo-turn-actions.demo-mcp-turn-actions {
+  gap: 2px;
+}
+
+.demo-root[data-scenario="markdown-current-26-825"]
+  .codex-ui-thread-viewport {
+  scrollbar-width: none;
+}
+
+.demo-root[data-scenario="markdown-current-26-825"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.codex-ui-markdown .demo-current-markdown-link {
+  color: rgb(86 133 209);
+  text-decoration: none;
+}
+
+.codex-ui-markdown .demo-current-markdown-link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.demo-current-markdown-link__mention {
+  color: rgb(86 133 209);
+  font-weight: 500;
+  padding-inline: 2px;
+}
+
+.demo-current-markdown-link__icon {
+  display: inline-block;
+  height: 22.75px;
+  margin-inline-end: 3px;
+  vertical-align: bottom;
+  width: 16px;
+}
+
+.demo-current-markdown-link__icon > img {
+  border-radius: 2.5px;
+  display: block;
+  height: 16px;
+  margin-top: 3.375px;
+  object-fit: contain;
+  width: 16px;
+}
+
+.demo-current-markdown-code-copy-icon {
+  fill: currentColor;
+  height: 20px;
+  width: 20px;
+}
+
 .demo-mcp-current-intro + .codex-ui-mcp-tool-call-group {
   margin-top: 16px;
   transform: translateY(-2px);
