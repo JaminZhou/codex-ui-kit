@@ -1134,6 +1134,46 @@ retained the exact profile path, and the profile plus raw JSON and screenshots
 moved recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-mcp-current.YFVFyG-20260810`.
 
+### 26.825.51511 MCP two-turn and Sources capture
+
+The current capture used exact main PID `56767`, loopback-only CDP port `9902`,
+and unique profile `/private/tmp/codex-ui-kit-current-mcp.4ct2le`. Preflight
+verified build `7377`, Chromium `151.0.7922.174`, the 284032150-byte ASAR and
+SHA-256
+`f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7`,
+the exact executable/profile ownership, and the 1180×820 main Renderer. The
+capture-only script never submitted prompts and selected the one disposable
+task through an exact title hash.
+
+The accepted task contains two completed OpenAI Developer Docs turns. The
+first performs Search → Fetch in 20 seconds and returns the fixed MCP
+documentation title and public URL. The second stays in the same thread,
+performs invalid-URL Fetch → Search → valid Fetch, and completes in 10
+seconds. The failed call remains a flat, noninteractive row inside the
+integration group; no historical error card or row disclosure is mounted.
+
+At 1180×820 the successful group starts at x=222/y=303 and recovery at
+x=222/y=501. At 720×680 recovery starts at x=16/y=338, its call labels start
+at x=38, and there is no horizontal overflow. The pinned 300×313 summary at
+x=864/y=59 combines Environment and Sources with 272×29 rows. Clearing the
+pinned toggle closes it, an outside click preserves that state, and the header
+control repins it.
+
+Independent Browser/CDP and Electron gates cover four deterministic frames,
+both expanded timelines and groups, summary close/repin, and native compact
+resize. Four reviewed internal baselines pass. Optional local-only product
+comparisons gate success at 2.6742% under 2.8%, recovery at 4.8070% under 5%,
+compact recovery at 3.8995% under 4.1%, and the pinned summary at 2.9276% under
+3.1%. Dynamic workspace counts and all product screenshots remain outside the
+repository.
+
+Cleanup archived only the exact disposable task, terminated validated main
+PID `56767` and exact-profile Crashpad handlers `56775`/`56780`, verified port
+`9902` and every exact-profile process were gone, and moved the profile plus
+raw captures recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-current-mcp.4ct2le-20260831`. The
+user-owned Codex PID `21152` remained running.
+
 ### 26.810.52044 MCP success, failure, and reconnect capture
 
 The refresh used exact main PID `15575`, loopback-only CDP port `9841`, and

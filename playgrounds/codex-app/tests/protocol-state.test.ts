@@ -731,6 +731,68 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.messages.at(-1)?.text).toContain("Recovery complete");
   });
 
+  it("replays the observed 26.825 MCP success and recovery turns", () => {
+    const scenario = replayScenarios["mcp-current-26-825-lifecycle"];
+    const success = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["mcp-current-26-825-success"],
+      ),
+    );
+    const recovered = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "mcp-current-26-825-recovery": 21,
+      "mcp-current-26-825-success": 10,
+    });
+    expect(success.mcpToolCalls.map(({ status, toolLabel }) => ({
+      status,
+      toolLabel,
+    }))).toEqual([
+      { status: "completed", toolLabel: "Search OpenAI docs" },
+      { status: "completed", toolLabel: "Fetch OpenAI doc" },
+    ]);
+    expect(recovered.mcpToolCalls.map(({ status, toolLabel, turnId }) => ({
+      status,
+      toolLabel,
+      turnId,
+    }))).toEqual([
+      {
+        status: "completed",
+        toolLabel: "Search OpenAI docs",
+        turnId: "turn-current-mcp-26-825-success",
+      },
+      {
+        status: "completed",
+        toolLabel: "Fetch OpenAI doc",
+        turnId: "turn-current-mcp-26-825-success",
+      },
+      {
+        status: "failed",
+        toolLabel: "Fetch OpenAI doc",
+        turnId: "turn-current-mcp-26-825-recovery",
+      },
+      {
+        status: "completed",
+        toolLabel: "Search OpenAI docs",
+        turnId: "turn-current-mcp-26-825-recovery",
+      },
+      {
+        status: "completed",
+        toolLabel: "Fetch OpenAI doc",
+        turnId: "turn-current-mcp-26-825-recovery",
+      },
+    ]);
+    expect(recovered.turnDurationsMs).toMatchObject({
+      "turn-current-mcp-26-825-recovery": 10_000,
+      "turn-current-mcp-26-825-success": 20_000,
+    });
+    expect(recovered.messages.at(-1)?.text).toBe(
+      "CURRENT MCP 26.825 RECOVERY — Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp",
+    );
+    expect(hasActiveTurnWork(recovered)).toBe(false);
+  });
+
   it("composes the current mixed web, MCP, approval, file, and subagent turns", () => {
     const scenario = replayScenarios["current-mixed-tool-thread"];
     const researchRunning = reduceProtocolTrace(

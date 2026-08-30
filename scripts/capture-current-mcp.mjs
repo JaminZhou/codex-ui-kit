@@ -17,9 +17,9 @@ const profilePath = process.env.CODEX_CURRENT_MCP_PROFILE;
 const requestedOutputDirectory = process.env.CODEX_CURRENT_MCP_OUTPUT_DIR;
 const taskTitleSha256 = process.env.CODEX_CURRENT_MCP_TASK_TITLE_SHA256;
 const successDuration =
-  process.env.CODEX_CURRENT_MCP_SUCCESS_DURATION ?? "Worked for 34s";
+  process.env.CODEX_CURRENT_MCP_SUCCESS_DURATION ?? "Worked for 20s";
 const recoveryDuration =
-  process.env.CODEX_CURRENT_MCP_RECOVERY_DURATION ?? "Worked for 17s";
+  process.env.CODEX_CURRENT_MCP_RECOVERY_DURATION ?? "Worked for 10s";
 const allowCapture = process.env.CODEX_CURRENT_MCP_ALLOW_CAPTURE === "1";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
@@ -213,12 +213,15 @@ try {
   initialSidebarVisible =
     (await page.getByRole("button", { name: "Hide sidebar" }).count()) === 1;
 
-  if (!initialSidebarVisible) {
+  if (
+    !initialSidebarVisible &&
+    (await page.locator("nav [data-thread-title]").count()) === 0
+  ) {
     const showSidebar = page.getByRole("button", { name: "Show sidebar" });
-    if ((await showSidebar.count()) !== 1) {
+    if ((await showSidebar.count()) === 0) {
       throw new Error("Could not expose the disposable MCP task list.");
     }
-    await showSidebar.click();
+    await showSidebar.first().click();
     await page.waitForTimeout(250);
   }
   const titleNodes = page.locator("nav [data-thread-title]");
@@ -443,14 +446,40 @@ try {
         checkOpacity: true,
         checkVisibilityCSS: true,
       });
-    const panel = [...document.querySelectorAll("div")].find(
-      (element) =>
-        visible(element) &&
-        element.textContent?.includes("Outputs") &&
-        element.textContent?.includes("openai-docs-mcp") &&
-        Math.abs(element.getBoundingClientRect().width - 300) < 1,
-    );
+    const panel = [...document.querySelectorAll("div")]
+      .filter(
+        (element) =>
+          visible(element) &&
+          element.textContent?.includes("Environment") &&
+          element.textContent?.includes("Sources") &&
+          element.textContent?.includes("openai-docs-mcp") &&
+          Math.abs(element.getBoundingClientRect().width - 300) < 1,
+      )
+      .sort(
+        (left, right) =>
+          left.getBoundingClientRect().height -
+          right.getBoundingClientRect().height,
+      )[0];
     const rect = panel?.getBoundingClientRect();
+    const rows = panel
+      ? [...panel.querySelectorAll("button")]
+          .filter(visible)
+          .map((element) => {
+            const value = element.getBoundingClientRect();
+            return {
+              label:
+                element.getAttribute("aria-label") ??
+                element.textContent?.replace(/\s+/g, " ").trim() ??
+                "",
+              rect: {
+                height: round(value.height),
+                left: round(value.left),
+                top: round(value.top),
+                width: round(value.width),
+              },
+            };
+          })
+      : [];
     return {
       panel: rect
         ? {
@@ -461,6 +490,7 @@ try {
           }
         : null,
       text: panel?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+      rows,
     };
   });
 

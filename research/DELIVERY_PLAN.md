@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 28 groups have current-build runtime evidence, 47 have previous-build-only
+- 32 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -181,7 +181,15 @@ exit gates; it does not replace the inventory.
   and 1.7707% for Sources under independent hard limits. The live capture
   establishes one same-turn recovery, not a universal automatic-retry rule,
   and the replay-only in-progress Search frame is not promoted as a product
-  pixel. A separate previous
+  pixel. The current 26.825 MCP refresh supersedes that sampled primary
+  anchor with one real same-thread two-turn task: 20-second Search → Fetch,
+  then 10-second invalid-URL Fetch → Search → valid Fetch. It also updates
+  Sources to the current 300×313 Environment + Sources summary and verifies
+  close/outside-click/repin behavior. Browser/CDP and Electron cover four
+  frames; local-only regions pass at 2.6742%, 4.8070%, 3.8995%, and 2.9276%
+  under independent 2.8%, 5%, 4.1%, and 3.1% limits. Authentication,
+  elicitation, MCP approvals, cancellation, same-transport reconnect, and
+  other integrations remain open. A separate previous
   26.818 no-tool task remains regression evidence for
   `thread.messages-markdown`. It reaches heading,
   strong text, inline code, blockquote, list, a narrow table, and TypeScript
