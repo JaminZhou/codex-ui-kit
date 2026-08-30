@@ -1251,6 +1251,191 @@ try {
   await sidebarThreadLifecycleApp.close();
 }
 
+for (const sidebarWorktreeLifecycleScene of [
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "electron-current-sidebar-worktree-lifecycle",
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "electron-current-sidebar-worktree-lifecycle-compact",
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const { app: worktreeApp, page: worktreePage } = await launchScene(
+    sidebarWorktreeLifecycleScene,
+    { capture: true },
+  );
+  try {
+    const lifecycle = await worktreePage.evaluate(() => {
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          right: value.right,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const fixtures = Array.from(
+        document.querySelectorAll(
+          "[data-sidebar-worktree-status-fixture^=current-worktree-]",
+        ),
+        (item) => {
+          const row = item.closest(".codex-ui-app-sidebar__item-row");
+          const branch = row?.querySelector(
+            ".codex-ui-app-sidebar__item-worktree-indicator",
+          );
+          const status = row?.querySelector(
+            ".codex-ui-app-sidebar__item-status",
+          );
+          const attention = status?.querySelector(
+            ".codex-ui-app-sidebar__item-status-attention",
+          );
+          const error = status?.querySelector(
+            ".codex-ui-app-sidebar__item-status-error",
+          );
+          const actions = row?.querySelector(
+            ".codex-ui-app-sidebar__item-actions",
+          );
+          const rowRect = rect(row);
+          const branchRect = rect(branch);
+          const statusRect = rect(status);
+          return {
+            actionLabels: Array.from(
+              actions?.querySelectorAll("button") ?? [],
+              (button) => button.getAttribute("aria-label"),
+            ),
+            attentionColor: attention
+              ? getComputedStyle(attention).backgroundColor
+              : null,
+            attentionRect: rect(attention),
+            branchRect,
+            branchRightInset:
+              rowRect && branchRect ? rowRect.right - branchRect.right : null,
+            errorColor: error ? getComputedStyle(error).color : null,
+            errorRect: rect(error),
+            fixture: item.getAttribute(
+              "data-sidebar-worktree-status-fixture",
+            ),
+            rowRect,
+            selected: row?.hasAttribute("data-selected") ?? false,
+            status: item.getAttribute("data-status"),
+            statusRect,
+            statusRightInset:
+              rowRect && statusRect ? rowRect.right - statusRect.right : null,
+            visualStatus: status?.getAttribute("data-visual-status") ?? null,
+            worktreeStatus: item.getAttribute("data-worktree-status"),
+          };
+        },
+      );
+      return {
+        fixtures,
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        mainRect: rect(document.querySelector(".codex-ui-app-shell__main")),
+        sidebarRect: rect(
+          document.querySelector(".codex-ui-app-shell__sidebar"),
+        ),
+      };
+    });
+    const [active, failed, recovered, restored] = lifecycle.fixtures;
+    const compact = sidebarWorktreeLifecycleScene.windowSize?.width === 720;
+    const sharedInvalid = lifecycle.fixtures.some(
+      (fixture) =>
+        fixture.rowRect?.height !== 30 ||
+        Math.abs(fixture.rowRect?.width - 305.875) > 0.1 ||
+        fixture.branchRect?.height !== 14 ||
+        fixture.branchRect?.width !== 14 ||
+        JSON.stringify(fixture.actionLabels) !==
+          JSON.stringify(["Pin chat", "Archive chat"]),
+    );
+    if (
+      lifecycle.horizontalOverflow !== 0 ||
+      Math.abs(lifecycle.sidebarRect?.width - 321.875) > 0.1 ||
+      (compact &&
+        (Math.abs(lifecycle.mainRect?.left - 321.875) > 0.1 ||
+          Math.abs(lifecycle.mainRect?.width - 398.125) > 0.1)) ||
+      sharedInvalid ||
+      active?.fixture !== "current-worktree-active" ||
+      active.worktreeStatus !== "setting-up" ||
+      active.status !== "loading" ||
+      active.visualStatus !== "loading" ||
+      !active.selected ||
+      active.branchRightInset !== 39 ||
+      active.statusRightInset !== 8 ||
+      failed?.fixture !== "current-worktree-failed" ||
+      failed.worktreeStatus !== "failed" ||
+      failed.status !== "error" ||
+      failed.visualStatus !== "error" ||
+      failed.branchRightInset !== 39 ||
+      failed.statusRightInset !== 8 ||
+      failed.errorRect?.height !== 16 ||
+      failed.errorRect?.width !== 16 ||
+      failed.errorColor !== "rgb(255, 103, 100)" ||
+      recovered?.fixture !== "current-worktree-recovered" ||
+      recovered.worktreeStatus !== "restored" ||
+      recovered.status !== "unread" ||
+      recovered.visualStatus !== "attention" ||
+      recovered.branchRightInset !== 39 ||
+      recovered.statusRightInset !== 8 ||
+      recovered.attentionRect?.height !== 8 ||
+      recovered.attentionRect?.width !== 8 ||
+      recovered.attentionColor !== "rgb(58, 131, 247)" ||
+      restored?.fixture !== "current-worktree-restored" ||
+      restored.worktreeStatus !== "restored" ||
+      restored.status !== "idle" ||
+      restored.visualStatus !== null ||
+      restored.branchRightInset !== 11 ||
+      restored.statusRect !== null
+    ) {
+      throw new Error(
+        `${sidebarWorktreeLifecycleScene.id}: Electron worktree lifecycle drifted: ${JSON.stringify(lifecycle)}`,
+      );
+    }
+
+    const activeRow = worktreePage
+      .locator(
+        '[data-sidebar-worktree-status-fixture="current-worktree-active"]',
+      )
+      .locator(
+        "xpath=ancestor::*[contains(@class, 'codex-ui-app-sidebar__item-row')]",
+      );
+    await activeRow.hover();
+    const hovered = await activeRow.evaluate((row) => ({
+      actions: getComputedStyle(
+        row.querySelector(".codex-ui-app-sidebar__item-actions"),
+      ).opacity,
+      branch: getComputedStyle(
+        row.querySelector(".codex-ui-app-sidebar__item-worktree-indicator"),
+      ).opacity,
+      status: getComputedStyle(
+        row.querySelector(".codex-ui-app-sidebar__item-status"),
+      ).opacity,
+    }));
+    if (
+      hovered.actions !== "1" ||
+      hovered.branch !== "0" ||
+      hovered.status !== "0"
+    ) {
+      throw new Error(
+        `${sidebarWorktreeLifecycleScene.id}: Electron worktree hover drifted: ${JSON.stringify(hovered)}`,
+      );
+    }
+  } finally {
+    await worktreeApp.close();
+  }
+}
+
 for (const collectionScene of [
   {
     currentSidebar: true,

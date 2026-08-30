@@ -460,6 +460,7 @@ function querySelection() {
     "collection-long-list",
     "status-lifecycle",
     "thread-lifecycle-current",
+    "worktree-lifecycle-current",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
     : null;
@@ -1918,6 +1919,13 @@ const currentSidebarProjects = [
   },
 ];
 
+const currentSidebarWorktreeTasks = [
+  "Run worktree activity check",
+  "Worktree init failed",
+  "Recovered worktree update",
+  "Restored worktree task",
+];
+
 function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
   const fixture = `${projectId}:${taskIndex}`;
   switch (fixture) {
@@ -1972,6 +1980,20 @@ function currentSidebarTaskStatusLabel(projectId: string, taskIndex: number) {
     unread: "Task has an unread update",
     waiting: "Needs input",
   }[status];
+}
+
+function currentSidebar26825WorktreeStatus(taskIndex: number) {
+  return ["setting-up", "failed", "restored", "restored"][
+    taskIndex
+  ] as AppSidebarWorktreeStatus;
+}
+
+function currentSidebar26825WorktreeItemStatus(taskIndex: number) {
+  return (["active", "idle", "unread", "idle"] as const)[taskIndex];
+}
+
+function currentSidebar26825WorktreeFixture(taskIndex: number) {
+  return ["active", "failed", "recovered", "restored"][taskIndex];
 }
 
 export function App() {
@@ -4036,6 +4058,8 @@ export function App() {
     !initialSelection.capture;
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current";
+  const currentSidebarWorktreeLifecycle =
+    initialSelection.sidebarState === "worktree-lifecycle-current";
   const currentHomeFrame = activeFrame?.startsWith("current-home-") ?? false;
   const workspacePersistenceFrame =
     view === "workspace" && currentWorkspacePersistenceFrame(activeFrame);
@@ -4050,7 +4074,15 @@ export function App() {
         : undefined,
   );
   const currentSidebarVisibleProjects =
-    initialSelection.sidebarState === "collection-empty"
+    currentSidebarWorktreeLifecycle
+      ? [
+          {
+            id: "codex-ui-kit",
+            label: "codex-ui-kit",
+            tasks: currentSidebarWorktreeTasks,
+          },
+        ]
+      : initialSelection.sidebarState === "collection-empty"
       ? [
           {
             id: "protocol-client",
@@ -4481,9 +4513,13 @@ export function App() {
         <>
       <AppSidebarSection
         collapsible
-        kind="pinned"
-        title="Pinned"
-        toggleLabel="Toggle pinned tasks"
+        kind={currentSidebarWorktreeLifecycle ? "projects" : "pinned"}
+        title={currentSidebarWorktreeLifecycle ? "Projects" : "Pinned"}
+        toggleLabel={
+          currentSidebarWorktreeLifecycle
+            ? "Toggle projects"
+            : "Toggle pinned tasks"
+        }
       >
         {currentSidebarComposition ? (
           currentSidebarThreadLifecycle ? (
@@ -4614,7 +4650,8 @@ export function App() {
               }
               status={
                 initialSelection.sidebarState === "status-lifecycle" ||
-                currentSidebarThreadLifecycle
+                currentSidebarThreadLifecycle ||
+                currentSidebarWorktreeLifecycle
                   ? "idle"
                   : project.selected &&
                       (hasActiveTurnWork(state) || isTurnActive(state.status))
@@ -4646,7 +4683,8 @@ export function App() {
               ) : [
                   ...project.tasks,
                   ...(workspacePersistedTaskAvailable &&
-                  project.id === "codex-ui-kit"
+                  project.id === "codex-ui-kit" &&
+                  !currentSidebarWorktreeLifecycle
                     ? ["Verify worktree persistence"]
                     : []),
                 ].map((task, index) => (
@@ -4658,13 +4696,21 @@ export function App() {
                       index === 0) ? undefined : (
                       <>
                         <button
-                          aria-label={`Pin task ${project.id}-${index + 1}`}
+                          aria-label={
+                            currentSidebarWorktreeLifecycle
+                              ? "Pin chat"
+                              : `Pin task ${project.id}-${index + 1}`
+                          }
                           type="button"
                         >
                           <SidebarGlyph name="pin-current" />
                         </button>
                         <button
-                          aria-label={`Archive task ${project.id}-${index + 1}`}
+                          aria-label={
+                            currentSidebarWorktreeLifecycle
+                              ? "Archive chat"
+                              : `Archive task ${project.id}-${index + 1}`
+                          }
                           type="button"
                         >
                           <SidebarGlyph name="archive-current" />
@@ -4672,17 +4718,25 @@ export function App() {
                       </>
                     )
                   }
-                  actionsLabel={`${project.id} task actions`}
+                  actionsLabel={
+                    currentSidebarWorktreeLifecycle
+                      ? "Chat actions"
+                      : `${project.id} task actions`
+                  }
                   data-sidebar-status-fixture={
-                    initialSelection.sidebarState === "status-lifecycle"
+                    currentSidebarWorktreeLifecycle
+                      ? `current-worktree-${currentSidebar26825WorktreeFixture(index)}`
+                      : initialSelection.sidebarState === "status-lifecycle"
                       ? `${project.id}:${index}`
                       : undefined
                   }
                   data-sidebar-worktree-status-fixture={
-                    initialSelection.sidebarState === "status-lifecycle" &&
-                    currentSidebarTaskWorktreeStatus(project.id, index)
-                      ? `${project.id}:${index}`
-                      : undefined
+                    currentSidebarWorktreeLifecycle
+                      ? `current-worktree-${currentSidebar26825WorktreeFixture(index)}`
+                      : initialSelection.sidebarState === "status-lifecycle" &&
+                          currentSidebarTaskWorktreeStatus(project.id, index)
+                        ? `${project.id}:${index}`
+                        : undefined
                   }
                   depth={1}
                   key={task}
@@ -4702,12 +4756,15 @@ export function App() {
                       : undefined
                   }
                   selected={
-                    workspacePersistenceFrame &&
-                    task === "Verify worktree persistence"
+                    (currentSidebarWorktreeLifecycle && index === 0) ||
+                    (workspacePersistenceFrame &&
+                      task === "Verify worktree persistence")
                   }
                   status={
                     task === "Verify worktree persistence"
                       ? "idle"
+                      : currentSidebarWorktreeLifecycle
+                        ? currentSidebar26825WorktreeItemStatus(index)
                       : initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatus(project.id, index)
                       : "idle"
@@ -4715,6 +4772,13 @@ export function App() {
                   statusLabel={
                     task === "Verify worktree persistence"
                       ? undefined
+                      : currentSidebarWorktreeLifecycle
+                        ? [
+                            "Worktree is being set up",
+                            "Worktree init failed",
+                            "Task has an unread update",
+                            undefined,
+                          ][index]
                       : initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskStatusLabel(project.id, index)
                       : undefined
@@ -4722,6 +4786,8 @@ export function App() {
                   worktreeStatus={
                     task === "Verify worktree persistence"
                       ? "restored"
+                      : currentSidebarWorktreeLifecycle
+                        ? currentSidebar26825WorktreeStatus(index)
                       : initialSelection.sidebarState === "status-lifecycle"
                       ? currentSidebarTaskWorktreeStatus(project.id, index)
                       : undefined
@@ -4775,6 +4841,7 @@ export function App() {
           </>
         )}
       </AppSidebarSection>
+      {currentSidebarWorktreeLifecycle ? null : (
       <AppSidebarSection
         actions={
           <span className="demo-sidebar-project-section-actions">
@@ -4828,6 +4895,7 @@ export function App() {
           protocol-client-with-an-intentionally-long-worktree-name
         </AppSidebarItem>
       </AppSidebarSection>
+      )}
       {projectCreationStatus === "error" &&
       projectCreationSource === "sidebar" ? (
         <p className="demo-sidebar-project-error" role="alert">
@@ -11297,6 +11365,7 @@ export function App() {
         sidebar={sidebar}
         sidebarWidth={
           currentSidebarThreadLifecycle ||
+          currentSidebarWorktreeLifecycle ||
           isCurrentRichMarkdownStreamingReplay
             ? 321.875
             : currentHomeFrame ||

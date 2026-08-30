@@ -75,7 +75,7 @@ Every deterministic scenario has one ID and produces four evidence layers:
    output lines, then collapses and reopens the card to prove reverse-tail
    restoration.
 4. **Pixels** — full-frame regression screenshots after the structural gates
-   pass. The 217 reviewed frames include four current Terminal recovery and
+   pass. The 281 reviewed frames include four current Terminal recovery and
    background-process regressions. Those four are independent replay baselines,
    not current-product screenshots: real CDP separately establishes child
    `exit 7`, ordinary shell close, and background side-panel opening, while
@@ -188,6 +188,14 @@ spinner, background-completed 8×8 `rgb(58, 131, 247)` unread dot, exact
 `Pin chat`/`Archive chat` controls, hover replacement, and the identical 720px
 compact boundary. Three reviewed frames make running, hover, and compact
 coverage visible instead of relying on offscreen DOM fixtures.
+The current `26.825.51511` worktree scene accepts separate 84×30 active,
+failed, and Retry-recovered tails. Browser/CDP and Electron require a
+305.875×30 row, 14×14 branch, exact spinner/error sources, 39px active/failed/
+recovered and 11px restored branch insets, `rgb(255, 103, 100)` error,
+`rgb(58, 131, 247)` unread, action replacement, and wide/720px containment.
+The current failed row must not have unread; unread appears only on the
+recovered row. Foreground comparisons pass at 3.7698%, 0%, and 0%, with
+spinner rotation covered independently by source and geometry assertions.
 For the current `26.818.41509` probe, the privacy-safe unmasked loading,
 failed-plus-unread, and restored tails differ by 2.0833%, 0.7540%, and 0.1786%.
 The same Browser/Electron slice requires the five-item Work in order with

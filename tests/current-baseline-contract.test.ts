@@ -1696,6 +1696,7 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain(
       'throw new Error("Could not resolve one visible New chat route.");',
     );
+    expect(captureSource).toContain("{ noDefaults: true }");
     expect(captureSource).toContain("homeMarkers.length === 1");
     expect(captureSource).toContain("composers.length > 0");
     expect(captureSource).toContain("const recordCandidateUrl = (url) => {");

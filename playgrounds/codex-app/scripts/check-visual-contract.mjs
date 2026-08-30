@@ -478,6 +478,12 @@ const currentSidebar26825UnreadStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_UNREAD_STATUS_REFERENCE;
 const currentSidebar26825TaskActionsReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_TASK_ACTIONS_REFERENCE;
+const currentSidebar26825WorktreeActiveReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_ACTIVE_REFERENCE;
+const currentSidebar26825WorktreeFailedReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_FAILED_REFERENCE;
+const currentSidebar26825WorktreeRecoveredReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_RECOVERED_REFERENCE;
 const currentBuildSidebarRecentsActionsReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE;
 const currentBuildSidebarWorktreeLoadingReference =
@@ -1025,6 +1031,32 @@ for (const scene of selectedScenes) {
           ["active", "unread"].map((fixture) => {
             const item = document.querySelector(
               `[data-sidebar-thread-lifecycle-fixture="${fixture}"]`,
+            );
+            const row = item?.closest(
+              ".codex-ui-app-sidebar__item-row",
+            );
+            const value = row?.getBoundingClientRect();
+            return [
+              fixture,
+              value
+                ? {
+                    height: Math.round(value.height),
+                    left: Math.round(value.left),
+                    top: Math.round(value.top),
+                    width: Math.round(value.width),
+                  }
+                : null,
+            ];
+          }),
+        ),
+      );
+    }
+    if (scene.id.startsWith("current-sidebar-worktree-lifecycle")) {
+      sidebarStatusBounds = await page.evaluate(() =>
+        Object.fromEntries(
+          ["active", "failed", "recovered", "restored"].map((fixture) => {
+            const item = document.querySelector(
+              `[data-sidebar-worktree-status-fixture="current-worktree-${fixture}"]`,
             );
             const row = item?.closest(
               ".codex-ui-app-sidebar__item-row",
@@ -3673,6 +3705,48 @@ for (const scene of selectedScenes) {
         referencePath: currentSidebar26825UnreadStatusReference,
         sceneId: scene.id,
         status: "unread",
+      });
+    }
+  }
+
+  if (scene.id === "current-sidebar-worktree-lifecycle") {
+    if (currentSidebar26825WorktreeActiveReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.active,
+        defaultMaximumRatio: 0.065,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_ACTIVE_MAX_DIFF_RATIO",
+        ownedWidth: 84,
+        referencePath: currentSidebar26825WorktreeActiveReference,
+        sceneId: scene.id,
+        status: "worktree-active",
+      });
+    }
+    if (currentSidebar26825WorktreeFailedReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.failed,
+        defaultMaximumRatio: 0.04,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_FAILED_MAX_DIFF_RATIO",
+        ownedWidth: 84,
+        referencePath: currentSidebar26825WorktreeFailedReference,
+        sceneId: scene.id,
+        status: "worktree-failed",
+      });
+    }
+    if (currentSidebar26825WorktreeRecoveredReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.recovered,
+        defaultMaximumRatio: 0.025,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_RECOVERED_MAX_DIFF_RATIO",
+        ownedWidth: 84,
+        referencePath: currentSidebar26825WorktreeRecoveredReference,
+        sceneId: scene.id,
+        status: "worktree-recovered",
       });
     }
   }

@@ -9,6 +9,13 @@ const currentSidebarErrorPathData = [
   "M10.6 6.2876C11.1292 6.28762 11.558 6.71732 11.558 7.24658C11.5578 7.77569 11.1291 8.20457 10.6 8.20459C10.0708 8.20459 9.64215 7.7757 9.64197 7.24658C9.64197 6.71731 10.0707 6.2876 10.6 6.2876Z",
   "M10.6 2.53955C14.9713 2.53955 18.515 6.08326 18.515 10.4546C18.515 14.8259 14.9713 18.3696 10.6 18.3696C6.22864 18.3696 2.68494 14.8259 2.68494 10.4546C2.68494 6.08326 6.22864 2.53955 10.6 2.53955ZM10.6 3.86963C6.96318 3.86963 4.01501 6.81779 4.01501 10.4546C4.01501 14.0914 6.96318 17.0396 10.6 17.0396C14.2368 17.0396 17.1849 14.0914 17.1849 10.4546C17.1849 6.81779 14.2368 3.86963 10.6 3.86963Z",
 ];
+const currentSidebarSpinnerPathData = [
+  "M18 12C18 8.68629 15.3137 6 12 6C8.68629 6 6 8.68629 6 12C6 15.3137 8.68629 18 12 18C15.3137 18 18 15.3137 18 12ZM20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z",
+  "M12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12H6C6 15.3137 8.68629 18 12 18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6V4Z",
+];
+const currentSidebarWorktreePathData = [
+  "M15.8 11.535c.367 0 .665.298.665.665v5a.665.665 0 0 1-.665.665h-5a.665.665 0 1 1 0-1.33h3.394l-3.565-3.564a.666.666 0 0 1 .942-.942l3.564 3.565V12.2c0-.367.298-.665.665-.665Zm0-9.4c.367 0 .665.298.665.665v5a.665.665 0 0 1-1.33 0V4.405l-5.128 5.128c-.323.324-.558.565-.842.74a2.668 2.668 0 0 1-.771.319c-.324.078-.662.073-1.12.073H1.93a.665.665 0 1 1 0-1.33h5.345c.52 0 .673-.005.809-.037.136-.033.266-.086.385-.16.12-.072.23-.177.598-.545l5.128-5.128H10.8a.665.665 0 0 1 0-1.33h5Z",
+];
 
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
@@ -7188,6 +7195,15 @@ for (const scene of selectedScenes) {
                 const status = row?.querySelector(
                   ".codex-ui-app-sidebar__item-status",
                 );
+                const attention = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-attention",
+                );
+                const spinner = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-spinner",
+                );
+                const error = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-error",
+                );
                 const branch = row?.querySelector(
                   ".codex-ui-app-sidebar__item-worktree-indicator",
                 );
@@ -7199,22 +7215,66 @@ for (const scene of selectedScenes) {
                 );
                 const rowBounds = row?.getBoundingClientRect();
                 const branchBounds = branch?.getBoundingClientRect();
+                const statusBounds = status?.getBoundingClientRect();
+                const actions = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-actions",
+                );
                 const describedBy = new Set(
                   item.getAttribute("aria-describedby")?.split(/\s+/) ?? [],
                 );
                 return {
+                  actionLabels: Array.from(
+                    actions?.querySelectorAll("button") ?? [],
+                    (button) => button.getAttribute("aria-label"),
+                  ),
+                  actionsOpacity: actions
+                    ? getComputedStyle(actions).opacity
+                    : null,
+                  attentionColor: attention
+                    ? getComputedStyle(attention).backgroundColor
+                    : null,
+                  attentionRect: attention ? rect(attention) : null,
                   branchRect: branch ? rect(branch) : null,
+                  branchPathData: Array.from(
+                    branch?.querySelectorAll("path") ?? [],
+                    (path) => path.getAttribute("d"),
+                  ),
                   branchRightInset:
                     rowBounds && branchBounds
                       ? rowBounds.right - branchBounds.right
                       : null,
+                  branchViewBox:
+                    branch?.querySelector("svg")?.getAttribute("viewBox") ??
+                    null,
+                  errorColor: error ? getComputedStyle(error).color : null,
+                  errorPathData: Array.from(
+                    error?.querySelectorAll("path") ?? [],
+                    (path) => path.getAttribute("d"),
+                  ),
+                  errorRect: error ? rect(error) : null,
+                  errorViewBox: error?.getAttribute("viewBox") ?? null,
                   fixture: item.getAttribute(
                     "data-sidebar-worktree-status-fixture",
                   ),
                   hasActions: row?.hasAttribute("data-has-actions") ?? false,
                   itemPaddingInlineEnd: getComputedStyle(item).paddingInlineEnd,
+                  rowRect: row ? rect(row) : null,
+                  selected: row?.hasAttribute("data-selected") ?? false,
                   status: item.getAttribute("data-status"),
                   statusLabel: status?.getAttribute("aria-label"),
+                  statusRect: status ? rect(status) : null,
+                  statusRightInset:
+                    rowBounds && statusBounds
+                      ? rowBounds.right - statusBounds.right
+                      : null,
+                  spinnerPathData: Array.from(
+                    spinner?.querySelectorAll("path") ?? [],
+                    (path) => path.getAttribute("d"),
+                  ),
+                  spinnerRect: spinner ? rect(spinner) : null,
+                  spinnerViewBox:
+                    spinner?.querySelector("svg")?.getAttribute("viewBox") ??
+                    null,
                   secondaryStatus:
                     secondaryStatus?.getAttribute("data-status") ?? null,
                   secondaryVisualStatus:
@@ -9688,7 +9748,8 @@ for (const scene of selectedScenes) {
     const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
     const minimumConversationViewportWidth =
       expectedWindowWidth <= 720
-        ? scene.id.startsWith("current-sidebar-thread-lifecycle")
+        ? scene.id.startsWith("current-sidebar-thread-lifecycle") ||
+          scene.id.startsWith("current-sidebar-worktree-lifecycle")
           ? 398
           : 400
         : scene.scenario === "current-browser-26-825"
@@ -9721,6 +9782,9 @@ for (const scene of selectedScenes) {
     const currentSidebarThreadLifecycleScene = scene.id.startsWith(
       "current-sidebar-thread-lifecycle",
     );
+    const currentSidebarWorktreeLifecycleScene = scene.id.startsWith(
+      "current-sidebar-worktree-lifecycle",
+    );
     const currentSidebarCollectionScene = scene.id.startsWith(
       "current-sidebar-collection-",
     );
@@ -9729,12 +9793,15 @@ for (const scene of selectedScenes) {
       scene.scenario === "current-browser-26-825" ||
       scene.scenario === "markdown-current-26-825" ||
       scene.scenario === "markdown-streaming-large" ||
-      currentSidebarThreadLifecycleScene
+      currentSidebarThreadLifecycleScene ||
+      currentSidebarWorktreeLifecycleScene
         ? scene.scenario === "markdown-streaming-large"
           ? 321.875
           : currentSidebarThreadLifecycleScene
             ? 321.875
-            : 322.90625
+            : currentSidebarWorktreeLifecycleScene
+              ? 321.875
+              : 322.90625
         : 274;
     if (
       hiddenSidebarScene
@@ -9761,6 +9828,7 @@ for (const scene of selectedScenes) {
           contract.sidebar.navigation.scrollHeight <
             contract.sidebar.navigation.clientHeight ||
           (!currentSidebarCollectionScene &&
+            !currentSidebarWorktreeLifecycleScene &&
             (contract.sidebar.projectToggleExpanded !== "false" ||
               contract.sidebar.actionToolbars <
                 (currentSidebarThreadLifecycleScene ? 6 : 8) ||
@@ -10005,6 +10073,115 @@ for (const scene of selectedScenes) {
       }
       await page.mouse.move(640, 100);
     }
+    if (currentSidebarWorktreeLifecycleScene) {
+      const [active, failed, recovered, restored] =
+        contract.sidebar.worktreeFixtures;
+      const expectedActions = JSON.stringify(["Pin chat", "Archive chat"]);
+      const sharedInvalid = [active, failed, recovered, restored].some(
+        (fixture) =>
+          !fixture ||
+          fixture.rowRect?.height !== 30 ||
+          Math.abs(fixture.rowRect?.width - 305.875) > 0.1 ||
+          fixture.branchRect?.height !== 14 ||
+          fixture.branchRect?.width !== 14 ||
+          fixture.branchViewBox !== "0 0 20 20" ||
+          JSON.stringify(fixture.branchPathData) !==
+            JSON.stringify(currentSidebarWorktreePathData) ||
+          JSON.stringify(fixture.actionLabels) !== expectedActions ||
+          fixture.actionsOpacity !== "0" ||
+          !fixture.hasActions,
+      );
+      const invalid =
+        sharedInvalid ||
+        active?.fixture !== "current-worktree-active" ||
+        active?.worktreeStatus !== "setting-up" ||
+        active?.status !== "loading" ||
+        active?.visualStatus !== "loading" ||
+        !active?.selected ||
+        active?.branchRightInset !== 39 ||
+        active?.statusRightInset !== 8 ||
+        active?.statusRect?.height !== 20 ||
+        active?.statusRect?.width !== 20 ||
+        active?.spinnerRect?.height !== 16 ||
+        active?.spinnerRect?.width !== 16 ||
+        active?.spinnerViewBox !== "0 0 24 24" ||
+        JSON.stringify(active?.spinnerPathData) !==
+          JSON.stringify(currentSidebarSpinnerPathData) ||
+        failed?.fixture !== "current-worktree-failed" ||
+        failed?.worktreeStatus !== "failed" ||
+        failed?.status !== "error" ||
+        failed?.visualStatus !== "error" ||
+        failed?.selected ||
+        failed?.secondaryStatus !== null ||
+        failed?.branchRightInset !== 39 ||
+        failed?.statusRightInset !== 8 ||
+        failed?.errorRect?.height !== 16 ||
+        failed?.errorRect?.width !== 16 ||
+        failed?.errorViewBox !== "0 0 21 21" ||
+        failed?.errorColor !== "rgb(255, 103, 100)" ||
+        JSON.stringify(failed?.errorPathData) !==
+          JSON.stringify(currentSidebarErrorPathData) ||
+        recovered?.fixture !== "current-worktree-recovered" ||
+        recovered?.worktreeStatus !== "restored" ||
+        recovered?.status !== "unread" ||
+        recovered?.visualStatus !== "attention" ||
+        recovered?.selected ||
+        recovered?.branchRightInset !== 39 ||
+        recovered?.statusRightInset !== 8 ||
+        recovered?.attentionRect?.height !== 8 ||
+        recovered?.attentionRect?.width !== 8 ||
+        recovered?.attentionColor !== "rgb(58, 131, 247)" ||
+        restored?.fixture !== "current-worktree-restored" ||
+        restored?.worktreeStatus !== "restored" ||
+        restored?.status !== "idle" ||
+        restored?.visualStatus !== undefined ||
+        restored?.selected ||
+        restored?.branchRightInset !== 11 ||
+        restored?.statusRect !== null ||
+        contract.sidebar.projectToggleExpanded !== "true" ||
+        contract.sidebar.statusCounts.active !== 0 ||
+        contract.sidebar.statusCounts.error !== 1 ||
+        contract.sidebar.statusCounts.loading !== 1 ||
+        contract.sidebar.statusCounts.unread !== 1 ||
+        contract.sidebar.statusCounts.queued !== 0;
+      if (invalid) {
+        throw new Error(
+          `${scene.id}: current worktree lifecycle contract failed: ${JSON.stringify(contract.sidebar)}`,
+        );
+      }
+      await page
+        .locator(
+          '[data-sidebar-worktree-status-fixture="current-worktree-active"]',
+        )
+        .hover();
+      const hovered = await page.evaluate(() => {
+        const item = document.querySelector(
+          '[data-sidebar-worktree-status-fixture="current-worktree-active"]',
+        );
+        const row = item?.closest(".codex-ui-app-sidebar__item-row");
+        const opacity = (selector) => {
+          const element = row?.querySelector(selector);
+          return element ? getComputedStyle(element).opacity : null;
+        };
+        return {
+          actions: opacity(".codex-ui-app-sidebar__item-actions"),
+          branch: opacity(
+            ".codex-ui-app-sidebar__item-worktree-indicator",
+          ),
+          status: opacity(".codex-ui-app-sidebar__item-status"),
+        };
+      });
+      if (
+        hovered.actions !== "1" ||
+        hovered.branch !== "0" ||
+        hovered.status !== "0"
+      ) {
+        throw new Error(
+          `${scene.id}: current worktree hover replacement failed: ${JSON.stringify(hovered)}`,
+        );
+      }
+      await page.mouse.move(640, 100);
+    }
     if (currentSidebarCollectionScene) {
       const collection = contract.sidebar.collection;
       if (!collection) {
@@ -10102,7 +10279,8 @@ for (const scene of selectedScenes) {
     const expectedSidebarMax =
       scene.scenario === "current-browser-26-825"
         ? "454"
-      : scene.id === "current-sidebar-thread-lifecycle-compact"
+      : scene.id === "current-sidebar-thread-lifecycle-compact" ||
+          scene.id === "current-sidebar-worktree-lifecycle-compact"
         ? "480"
       : scene.id === "markdown-table-actions-narrow" ||
       ((scene.windowSize?.width ?? 1180) <= 720 &&

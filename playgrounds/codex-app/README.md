@@ -789,6 +789,20 @@ product screenshots, profile data, task titles, and thread identifiers remain
 untracked. Waiting, error, worktree, pin/archive mutations, and longer history
 variants are not promoted by this slice.
 
+## Current 26.825 sidebar worktree lifecycle slice
+
+The current `26.825.51511` worktree follow-up adds four explicit project-task
+fixtures: selected setting-up, failed without unread, Retry-recovered unread,
+and restored idle. Both wide and 720×680 scenes retain the 321.875px sidebar
+and 305.875×30px rows. Browser/CDP and Electron lock the exact 14×14 branch,
+16×16 spinner/error SVG sources, 20×20 status rail, 39/11px branch insets,
+`#ff6764` error, `#3a83f7` unread, accessible labels, and hover replacement.
+
+The product behavior differs from the older 26.820 fixture: initialization
+failure alone has no unread dot. The recovered row becomes unread only after
+Retry succeeds and its response completes. Two reviewed visual baselines
+cover wide and compact composition; local product screenshots stay untracked.
+
 ## Current sidebar collection slice
 
 The current `26.818.41509` follow-up adds reusable
@@ -1388,6 +1402,21 @@ The status references may be 306×30 full rows or 28×30 trailing rails; the
 action reference is exactly 56×30. The checker compares owned foreground
 shapes while CDP independently locks row paint, typography, padding, exact
 color, names, dimensions, and hover replacement.
+
+The isolated 26.825 worktree lifecycle accepts privacy-safe 84×30 right-tail
+crops for setting-up, failed, and Retry-recovered rows:
+
+```bash
+CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_ACTIVE_REFERENCE=/absolute/path/to/current-26-825-worktree-active-84x30.png \
+CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_FAILED_REFERENCE=/absolute/path/to/current-26-825-worktree-failed-84x30.png \
+CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_RECOVERED_REFERENCE=/absolute/path/to/current-26-825-worktree-recovered-84x30.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-sidebar-worktree-lifecycle,current-sidebar-worktree-lifecycle-compact
+```
+
+The foreground-mask comparisons pass at 3.7698%, 0%, and 0%. CDP separately
+freezes state identity, exact SVG paths/viewBoxes, geometry, colors, labels,
+and actions so spinner rotation cannot weaken the structural gate.
 
 The follow-up `26.820.60940` edge probe supplies the current 140×29 empty crop and
 56×30 worktree loading/restored crops. Their foreground comparisons pass at

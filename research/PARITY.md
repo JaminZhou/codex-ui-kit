@@ -93,6 +93,16 @@ The authoritative current-build inventory is:
   unread shape comparisons at 2.9762%, 0.3571%, and 0% promote the sampled
   thread-history, item-action, and status inventory groups. Waiting, error,
   worktree, mutations, and longer history variants remain incomplete.
+- A second current sidebar lifecycle probe reaches one real disposable
+  worktree through setting-up, controlled initialization failure, Retry,
+  recovered unread, and restored-idle states. The current failed background
+  row intentionally has no unread marker; the blue unread dot appears only
+  after Retry succeeds and the recovered response completes. Browser/CDP and
+  Electron lock 305.875×30 rows, the exact 14×14 branch plus spinner/error
+  sources, `#ff6764`/`#3a83f7` paint, 39/11px branch insets, actions, and the
+  720px boundary. Local-only active/failed/recovered tail masks pass at
+  3.7698%, 0%, and 0%. Queued/creating and the full failure workspace remain
+  open, so implementation stays partial.
 - The previous 26.820 account-menu matrix supersedes the previous focus and
   typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
   remains 306.90625×188.375px with six 28.5625px rows, five exact icons, one

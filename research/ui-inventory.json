@@ -992,11 +992,12 @@
         "cdp-26.810.52044:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails",
         "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-unread-composition-retry-recovery-30px-row-14px-branch-20px-status-rails-and-unmasked-tail-pixels",
         "cdp-26.820.60940:disposable-real-worktree-success-loading-to-restored-30px-row-14px-branch-20px-spinner-rail-and-regional-pixels",
-        "cdp-26.820.60940:disposable-real-worktree-controlled-failure-foreground-read-background-unread-retry-recovery-and-zero-percent-regional-pixel"
+        "cdp-26.820.60940:disposable-real-worktree-controlled-failure-foreground-read-background-unread-retry-recovery-and-zero-percent-regional-pixel",
+        "cdp-26.825.51511:disposable-real-worktree-setting-up-failure-without-unread-retry-recovery-restored-305.875-by-30-rows-exact-svg-computed-styles-electron-and-3.7698-plus-zero-plus-zero-percent-shape-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
