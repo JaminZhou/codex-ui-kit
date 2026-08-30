@@ -1021,6 +1021,26 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("replays the current 26.825 uuidgen command without exposing output cards", () => {
+    const scenario = replayScenarios["command-current-26-825-success"];
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(completed.commands[0]).toMatchObject({
+      command: "/usr/bin/uuidgen",
+      durationMs: 100,
+      exitCode: 0,
+      output: "00000000-0000-4000-8000-000000000000\n",
+      status: "completed",
+    });
+    expect(completed.turnDurationsMs).toMatchObject({
+      "turn-command-current-26-825-success": 8_000,
+    });
+    expect(completed.messages.at(-1)).toMatchObject({
+      id: "assistant-command-current-26-825-success",
+      text: "00000000-0000-4000-8000-000000000000",
+    });
+  });
+
   it("replays the current 26.820 immediate and settled interruption durations", () => {
     const scenario = replayScenarios[
       "command-current-26-820-interruption"

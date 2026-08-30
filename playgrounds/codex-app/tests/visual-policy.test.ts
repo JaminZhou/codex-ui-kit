@@ -816,10 +816,10 @@ describe("lifecycle visual policy", () => {
       expect(contract).toContain(reference);
     }
     expect(cdpContract).toContain(
-      'scene.scenario.startsWith("command-current-26-820-")',
+      'scene.scenario.startsWith("command-current-26-8")',
     );
     expect(cdpContract).toContain(
-      "current 26.820 command evidence contract failed",
+      "current command evidence contract failed",
     );
     expect(electronContract).toContain(
       "currentCommand26820ElectronCases",
@@ -830,13 +830,44 @@ describe("lifecycle visual policy", () => {
     expect(appSource).toContain("isCurrentCommand26820Replay");
     expect(appSource).toContain("hideRawCommand");
     expect(appStyles).toContain(
-      '[data-scenario^="command-current-26-820"]',
+      '[data-scenario^="command-current-26-8"]',
     );
     expect(contract).toContain(
       "current 26.820 command success region pixel ratio",
     );
     expect(contract).toContain(
       "current 26.820 stopped-command region pixel ratio",
+    );
+  });
+
+  it("gates the runtime-observed 26.825 uuidgen command at wide and compact widths", () => {
+    for (const scene of [
+      "command-current-26-825-success-completed",
+      "command-current-26-825-success-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    expect(cdpContract).toContain(
+      'const current26825 = scene.scenario.includes("26-825")',
+    );
+    expect(electronContract).toContain(
+      'scenario: "command-current-26-825-success"',
+    );
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_WIDE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_ACTIVITY_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_COMPOSER_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_HEADER_MAX_DIFF_RATIO",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(contract).toContain(
+      "current 26.825 command ${name} pixel ratio",
+    );
+    expect(appSource).toContain("isCurrentCommand26825SuccessReplay");
+    expect(appSource).toContain(
+      'command.id.startsWith("command-current-26-8")',
     );
   });
 

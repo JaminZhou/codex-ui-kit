@@ -53,6 +53,7 @@ const currentReplayComposerScenarios = new Set([
   "command-current-26-820-failure",
   "command-current-26-820-interruption",
   "command-current-26-820-success",
+  "command-current-26-825-success",
   "command-failure-recovery",
   "compaction",
   "context-summary",
@@ -3823,7 +3824,7 @@ for (const scene of selectedScenes) {
                 height: 16,
                 name:
                   scene.scenario.startsWith("mcp-") ||
-                  scene.scenario.startsWith("command-current-26-820-") ||
+                  scene.scenario.startsWith("command-current-26-8") ||
                   scene.scenario === "current-plan-26-825" ||
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
@@ -7438,7 +7439,7 @@ for (const scene of selectedScenes) {
         : null;
       const commandExecution =
         document.querySelector(
-          '[data-item-id^="command-current-26-820-"]',
+          '[data-item-id^="command-current-26-8"]',
         ) ??
         document.querySelector('[data-item-id="command-interruption"]') ??
         document.querySelector('[data-item-id="command-failure-output"]') ??
@@ -12898,10 +12899,11 @@ for (const scene of selectedScenes) {
       }
     }
 
-    if (scene.scenario.startsWith("command-current-26-820-")) {
+    if (scene.scenario.startsWith("command-current-26-8")) {
       const commandOutput = contract.commandOutput;
       const compact = scene.id.endsWith("-compact");
       const running = scene.id.endsWith("-running");
+      const current26825 = scene.scenario.includes("26-825");
       const success = scene.scenario.endsWith("-success");
       const failure = scene.scenario.endsWith("-failure");
       const interruption = scene.scenario.endsWith("-interruption");
@@ -12918,7 +12920,7 @@ for (const scene of selectedScenes) {
           };
         };
         const execution = document.querySelector(
-          '[data-item-id^="command-current-26-820-"]',
+          '[data-item-id^="command-current-26-8"]',
         );
         const header = execution?.querySelector(
           ":scope > .codex-ui-activity__header",
@@ -12930,7 +12932,7 @@ for (const scene of selectedScenes) {
         return {
           assistantTexts: Array.from(
             document.querySelectorAll(
-              '[data-item-id^="assistant-command-current-26-820-"] .codex-ui-markdown',
+              '[data-item-id^="assistant-command-current-26-8"] .codex-ui-markdown',
             ),
             (element) => element.textContent?.trim(),
           ),
@@ -12974,7 +12976,9 @@ for (const scene of selectedScenes) {
         };
       });
       const expectedTitle = success
-        ? "Observe long-running shell command"
+        ? current26825
+          ? "运行 uuidgen 生成 UUID"
+          : "Observe long-running shell command"
         : failure
           ? "Observe command failure"
           : "监控 CURRENT 26.820 中断";
@@ -12996,8 +13000,12 @@ for (const scene of selectedScenes) {
           : null
         : success
           ? running
-            ? "Working for 9s"
-            : "Worked for 22s"
+            ? current26825
+              ? "Working for 4s"
+              : "Working for 9s"
+            : current26825
+              ? "Worked for 8s"
+              : "Worked for 22s"
           : "Worked for 12s";
       const expectedSummaryPrefix = interruption
         ? running
@@ -13060,7 +13068,9 @@ for (const scene of selectedScenes) {
             contract.interruption.rule?.style.marginTop !== "8px") ||
         (success && !running &&
           currentCommand.assistantTexts[0] !==
-            "CURRENT 26.820 LONG COMMAND OBSERVED") ||
+            (current26825
+              ? "00000000-0000-4000-8000-000000000000"
+              : "CURRENT 26.820 LONG COMMAND OBSERVED")) ||
         (failure &&
           (currentCommand.assistantTexts[0] !==
             "CURRENT 26.820 COMMAND FAILURE OBSERVED" ||
@@ -13074,10 +13084,10 @@ for (const scene of selectedScenes) {
             : currentCommand.assistantTexts.length !== 0))
       ) {
         throw new Error(
-          `${scene.id}: current 26.820 command evidence contract failed: ${JSON.stringify({ commandOutput, currentCommand, interruption: contract.interruption, rootStatus: contract.rootStatus })}`,
+          `${scene.id}: current command evidence contract failed: ${JSON.stringify({ commandOutput, currentCommand, interruption: contract.interruption, rootStatus: contract.rootStatus })}`,
         );
       }
-      contract.currentCommand26820 = currentCommand;
+      contract.currentCommandProduct = currentCommand;
     }
 
     if (

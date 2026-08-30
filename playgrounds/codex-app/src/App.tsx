@@ -2905,10 +2905,13 @@ export function App() {
   const isCurrentCommand26820InterruptionReplay =
     mode === "replay" &&
     scenarioId === "command-current-26-820-interruption";
+  const isCurrentCommand26825SuccessReplay =
+    mode === "replay" && scenarioId === "command-current-26-825-success";
   const isCurrentCommand26820Replay =
     isCurrentCommand26820SuccessReplay ||
     isCurrentCommand26820FailureReplay ||
-    isCurrentCommand26820InterruptionReplay;
+    isCurrentCommand26820InterruptionReplay ||
+    isCurrentCommand26825SuccessReplay;
   const isCurrentContextCompactionReplay =
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
@@ -9398,9 +9401,7 @@ export function App() {
                   message.id ===
                     "assistant-command-interruption-recovery") ||
                 (isCurrentCommand26820Replay &&
-                  message.id.startsWith(
-                    "assistant-command-current-26-820-",
-                  )) ||
+                  message.id.startsWith("assistant-command-current-26-8")) ||
                 (isCurrentSubagentReplay &&
                   message.id.startsWith("assistant-subagent-")) ||
                 (isCurrentMixedToolReplay &&
@@ -10339,7 +10340,7 @@ export function App() {
       }
       if (
         isCurrentCommand26820Replay &&
-        command.id.startsWith("command-current-26-820-")
+        command.id.startsWith("command-current-26-8")
       ) {
         const running =
           command.status === "running" && state.status === "running";
@@ -10385,9 +10386,11 @@ export function App() {
             <Fragment key={`command:${command.id}`}>{execution}</Fragment>
           );
         }
-        const turnDurationMs = isCurrentCommand26820SuccessReplay
-          ? 22_000
-          : 12_000;
+        const turnDurationMs = isCurrentCommand26825SuccessReplay
+          ? 8_000
+          : isCurrentCommand26820SuccessReplay
+            ? 22_000
+            : 12_000;
         return (
           <ActivityTimeline
             key={`command:${command.id}`}
@@ -10395,9 +10398,11 @@ export function App() {
             summary={
               <TurnDuration
                 durationMs={running
-                  ? isCurrentCommand26820SuccessReplay
-                    ? 9_000
-                    : 5_000
+                  ? isCurrentCommand26825SuccessReplay
+                    ? 4_000
+                    : isCurrentCommand26820SuccessReplay
+                      ? 9_000
+                      : 5_000
                   : turnDurationMs}
                 status={running ? "working" : "worked"}
               />
