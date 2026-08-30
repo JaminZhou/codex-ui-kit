@@ -1214,6 +1214,26 @@ CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE=/absolute/path/to/current
   --scenes=markdown-current-26-818,markdown-current-26-818-compact
 ```
 
+The current `26.825.51511` rich-stream gate accepts four untracked 1180×820
+full product frames. It compares only the owned empty-fence response, table,
+scroll-away long-response, and completed-tail regions; sidebar and Composer
+pixels stay outside the crops:
+
+```bash
+CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_FENCE_REFERENCE=/absolute/path/to/fence-running.png \
+CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_TABLE_REFERENCE=/absolute/path/to/table-running-visible.png \
+CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_LONG_REFERENCE=/absolute/path/to/long-running.png \
+CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_COMPLETE_REFERENCE=/absolute/path/to/completed.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=markdown-stream-fence,markdown-stream-table,markdown-stream-large,markdown-stream-complete
+```
+
+The sanitized ten-event trace also includes `markdown-stream-tail`; five
+reviewed internal baselines cover fence, table, latest-running, tail-running,
+and completed states. CDP checks six link/fence/table/20-heading/37-heading/
+completed checkpoints, while Electron verifies empty-fence text, exact code
+copy, table focus, reverse-origin scroll-away/return, and four final actions.
+
 The successful MCP gate uses the expanded 906×820 main-only reference:
 
 ```bash

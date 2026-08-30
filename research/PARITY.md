@@ -75,14 +75,14 @@ The authoritative current-build inventory is:
   2.80% for Browser chrome. External page pixels and unsampled multi-tab,
   authentication, download, permission, history, and error states are not
   claimed.
-- A current no-tool Markdown follow-up reaches heading, strong text, compact
-  inline code, a public favicon link, quote, list, full-width table, current
-  TypeScript code block, literal inline math, rendered KaTeX block math, and
-  four response actions. The public `AgentMarkdown` compact density matches the
-  736/688×465.4375 roots and exposes host code-label/icon slots. Browser/CDP
-  and Electron lock exact computed geometry plus copy/wrap/focus behavior; two
-  reviewed baselines pass, and the unmasked 737×466 live response comparison
-  passes at 1.3292% under 2%. Rich streaming, citations, live media,
+- A current no-tool rich Markdown stream reaches link-only output, an open
+  empty TypeScript card, task rows, filled code, a seven-column table, 36 H2
+  sections, running tail, Stop, and completion. The public `AgentMarkdown`
+  compact density locks 14/22.75px body, 17.5/24.5px H2s, 14px round task
+  controls, and the 122.75px table while eliminating an empty-fence
+  `undefined` leak. Six Browser/CDP checkpoints, Electron code/table/scroll
+  interaction, five reviewed baselines, and four local product regions pass;
+  the latter differ by 1.72–4.77% under 8%. Citations, live media,
   table/error, and plugin Markdown variants remain open.
 - The previous 26.820 account-menu matrix supersedes the previous focus and
   typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
@@ -517,25 +517,21 @@ frame. Its optional 906×820 `26.721.41059` comparison gates the assistant,
 fenced-code, and Composer regions at the strict 0.05 pixel threshold, while
 CDP separately locks semantic counts and computed geometry.
 
-The `26.825.31414` completed-Markdown refresh supersedes that old product
-composition for the sampled completed state. It replays a five-event fixed
-answer at 1180×820 and 720×680, adopts the measured 14/22.75px compact density,
-and matches heading, inline-code, favicon-link, quote/list, 81.5px table,
-82px current-icon code block, literal single-dollar source, rendered
-double-dollar KaTeX, and 28px-stepped response actions. Browser/CDP validates
-semantics, computed styles, exact geometry, icon/link source, MathML, and wrap;
-Electron repeats copy, wrap, table focus, native bounds, and zero overflow.
-Two reviewed internal baselines and a local-only unmasked 737×466 product
-response gate pass, the latter at 1.3292% under 2%.
+The `26.825.51511` rich-stream refresh supersedes that old product composition
+for the sampled mutation lifecycle. Its sanitized ten-event replay covers
+link, empty fence, code/table, 20-heading, 37-heading, and completed states.
+Browser/CDP validates semantics, exact styles and geometry, reverse-origin
+follow, and zero overflow. Electron repeats code copy, table focus, real
+scroll-away/return, native bounds, and Stop-to-actions settlement. Five
+reviewed internal baselines pass; optional local-only fence, table, long, and
+completed regions differ by 2.4398%, 4.7698%, 2.7219%, and 1.7196% under 8%.
 
 The unchanged `26.803.41515` fingerprint adds source-structural evidence for
 inline-Markdown in-progress ownership, the latest-turn follow state machine,
 and dedicated Table container/scroller plus Copy/Expand/Preview controls. A
-separate nine-event replay now mutates an incomplete link and code fence over
-four public message deltas, then completes nested/task lists, a multi-column
-table, and a twelve-section answer. Browser/CDP gates five checkpoints;
-Electron verifies code copy plus user scroll-away/return; and four reviewed
-internal baselines cover the fence, table, running tail, and completed tail.
+The current replay now uses the exact sanitized 36-section stream and six
+checkpoints; the older twelve-section synthetic mutation remains historical
+regression evidence rather than the current product anchor.
 An isolated 18-column runtime follow-up then reaches Copy, Expand, and Table
 preview on the same build. `AgentMarkdown` copies exact raw Markdown plus HTML,
 and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
@@ -547,9 +543,8 @@ live media emission, table error variants, and plugin-specific Markdown remain
 open. Plain-text streaming product reachability is now current on
 `26.803.61601`: one live 1180→720 resize proves reverse-origin follow,
 negative compact clipping, the exact Stop vector, and natural Send recovery in
-Browser/CDP with external wide/compact regional pixels. Markdown mutation
-streaming remains independently versioned until the same current build reaches
-those richer deltas.
+Browser/CDP with external wide/compact regional pixels. Rich Markdown mutation
+streaming is now independently current on `26.825.51511`.
 
 The `26.727.40816` MCP recovery adds four further frames for failure, retry,
 completion, and a mixed follow-up turn. Its optional 906×820 comparison gates

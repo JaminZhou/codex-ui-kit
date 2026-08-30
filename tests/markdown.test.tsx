@@ -216,6 +216,13 @@ Footnote reference.[^1]
     );
     expect(html).toContain('data-streaming="true"');
     expect(html).toContain('data-language="ts"');
+
+    const emptyFenceHtml = renderToStaticMarkup(
+      <AgentMarkdown streaming>{"```ts\n"}</AgentMarkdown>,
+    );
+    expect(emptyFenceHtml).toContain('data-language="ts"');
+    expect(emptyFenceHtml).toContain('data-markdown-copy-text=""');
+    expect(emptyFenceHtml).not.toContain("undefined");
   });
 
   it("supports protocol-neutral component overrides", () => {

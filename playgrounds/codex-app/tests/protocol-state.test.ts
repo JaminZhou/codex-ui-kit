@@ -421,6 +421,9 @@ describe("protocol lifecycle reducer", () => {
     const largeState = reduceProtocolTrace(
       scenario.events.slice(0, scenario.frames["markdown-stream-large"]),
     );
+    const tailState = reduceProtocolTrace(
+      scenario.events.slice(0, scenario.frames["markdown-stream-tail"]),
+    );
     const completedState = reduceProtocolTrace(scenario.events);
     const message = (state: typeof linkState) =>
       state.messages.find(
@@ -428,19 +431,24 @@ describe("protocol lifecycle reducer", () => {
       );
 
     expect(message(linkState)?.text).toBe(
-      "# Streaming Markdown stress\n\nThe [current link](https://exa",
+      "# Current 26.825 rich Markdown stream\n\nThis paragraph contains **strong text**, `inline code`, and a [public Codex link](https://openai.com/codex/).",
     );
-    expect(message(fenceState)?.text).toContain(
-      'const chunks = ["link", "list", "code"];',
-    );
+    expect(message(fenceState)?.text).toContain("- [x] Verify rendered chunks");
+    expect(message(fenceState)?.text).toMatch(/```ts\n$/);
     expect(message(fenceState)?.status).toBe("running");
+    expect(message(tableState)?.text).toContain(
+      'const chunks = ["link", "code", "table"];',
+    );
     expect(message(tableState)?.text).toContain(
       "| Width A | Width B | Width C |",
     );
-    expect(message(largeState)?.text).toContain("## Section 12");
-    expect(message(largeState)?.text).toContain("End of streamed response.");
+    expect(message(largeState)?.text).toContain("## Section 19");
+    expect(message(largeState)?.text).not.toContain("## Section 20");
+    expect(message(tailState)?.text).toContain("## Section 36");
+    expect(message(tailState)?.text).toContain("CURRENT RICH STREAM DONE");
+    expect(message(tailState)?.status).toBe("running");
     expect(message(completedState)?.status).toBe("completed");
-    expect(message(completedState)?.text).toBe(message(largeState)?.text);
+    expect(message(completedState)?.text).toBe(message(tailState)?.text);
     expect(completedState.status).toBe("completed");
     expect(scenario.frames["markdown-stream-complete"]).toBe(
       scenario.events.length,

@@ -2873,6 +2873,7 @@ for (const currentMarkdownMediaScene of [
 const markdownStreamingScene = {
   frame: "markdown-stream-complete",
   id: "electron-markdown-streaming-large",
+  currentSidebar: true,
   scenario: "markdown-streaming-large",
 };
 const {
@@ -2909,7 +2910,9 @@ try {
   await tableScroll.scrollIntoViewIfNeeded();
   await tableScroll.focus();
 
-  const copy = streamingMessage.getByRole("button", { name: "Copy code" });
+  const copy = streamingMessage
+    .locator(".codex-ui-code-block")
+    .getByRole("button", { exact: true, name: "Copy" });
   await copy.click();
   await streamingMessage.getByRole("button", { name: "Copied" }).waitFor();
   const markdownViewport = markdownStreamingPage.locator(
@@ -2925,9 +2928,8 @@ try {
     );
     return (
       viewport instanceof HTMLElement &&
-      Math.abs(
-        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop,
-      ) <= 1
+      viewport.getAttribute("data-latest-origin") === "start" &&
+      Math.abs(viewport.scrollTop) <= 1
     );
   });
   await markdownScrollToBottom.waitFor({ state: "hidden" });
@@ -2948,21 +2950,22 @@ try {
       '[data-item-id="assistant-markdown-streaming-large"] .codex-ui-markdown__table-scroll',
     );
     return {
-      actionCount: document.querySelectorAll(
-        '[aria-label="Markdown response actions"] button',
-      ).length,
+      actionCount:
+        document.querySelectorAll(
+          '[data-item-id="assistant-markdown-streaming-large"] .demo-mcp-turn-actions > button',
+        ).length,
       copiedText: window.__codexMarkdownStreamingCopiedText,
-      distanceFromBottom: viewport
-        ? viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop
-        : null,
+      distanceFromLatest: viewport ? Math.abs(viewport.scrollTop) : null,
+      latestOrigin: viewport?.getAttribute("data-latest-origin"),
       tableFocused: document.activeElement === table,
     };
   });
   if (
     awayState.actionCount !== 4 ||
     awayState.copiedText !==
-      'const chunks = ["link", "list", "code"];\nconsole.log(chunks.join(" -> "));' ||
-    (awayState.distanceFromBottom ?? 0) <= 100 ||
+      'const chunks = ["link", "code", "table"];\nconsole.log(chunks.join(" -> "));' ||
+    awayState.latestOrigin !== "start" ||
+    (awayState.distanceFromLatest ?? 0) <= 100 ||
     !awayState.tableFocused
   ) {
     throw new Error(
@@ -2977,9 +2980,8 @@ try {
     );
     return (
       viewport instanceof HTMLElement &&
-      Math.abs(
-        viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop,
-      ) <= 1
+      viewport.getAttribute("data-latest-origin") === "start" &&
+      Math.abs(viewport.scrollTop) <= 1
     );
   });
 } finally {

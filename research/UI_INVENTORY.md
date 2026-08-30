@@ -65,8 +65,9 @@ observation from a previous build remains historical evidence.
   and content-dependent Projects Index. The sidebar is now 321.875px wide;
   the collapsed 600px Projects route remains 559px with 415/128 columns.
   `Sites` is absent from every sampled fixed-route stack. Details are in
-  [`26.825.51511.md`](26.825.51511.md). The following activity, Plan,
-  Search/Browser, long-thread, and Markdown follow-ups remain 26.825.31414
+  [`26.825.51511.md`](26.825.51511.md). The rich Markdown streaming follow-up
+  is current on 26.825.51511; activity, Plan, Search/Browser, and long-thread
+  follow-ups remain 26.825.31414
   regression evidence. That previous activity follow-up re-observes the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
@@ -183,7 +184,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 11 have current-build runtime evidence, 64 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
+Current inventory: 89 surface groups; 12 have current-build runtime evidence, 63 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 11 groups and Electron verification covers 11.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1616,29 +1617,25 @@ restoration, and zero overflow. Two reviewed replay rasters are committed; a
 current-product media raster remains unclaimed because the live replies did
 not emit raw image media.
 
-The current `26.825.31414` follow-up re-observes the completed Markdown group
-against the installed product. Its isolated no-tool reply adds a real public
-external link and favicon to the heading, strong text, inline code, quote,
-list, two-column table, TypeScript fence, block equation, and literal inline
-equation. Browser/CDP and Electron verify the 736/688px wide and compact roots,
-14/22.75px typography, table alignment, exact code-language and action icons,
-word-wrap and Copy behavior, four response actions, KaTeX/MathML semantics,
-external-link behavior, and zero overflow. The unmasked current-product
-response-root comparison passes at `0.013291909550957657` under its independent
-0.02 limit. This advances the sampled group to current evidence; it does not
-claim current reachability for rich streaming, citations, live media, renderer
-errors, or plugin-provided Markdown variants.
+The current `26.825.51511` follow-up re-observes rich Markdown mutation against
+the installed product. One real no-tool task reaches link-only output, an open
+empty TypeScript card, two task rows, filled code, a seven-column table, 36 H2
+sections, running tail, and completion. It locks the 736px root, 14/22.75px
+body, 21/28px H1, 17.5/24.5px H2, 14px round task controls, 122.75px table,
+reverse-origin follow, explicit scroll-away, Stop removal, and four response
+actions. The empty-fence capture exposed and fixed a public `undefined` text
+leak. Browser/CDP covers six checkpoints; Electron repeats code copy, table
+focus, scroll-away/return, native bounds, and completion. Five reviewed
+baselines and four local-only product regions pass at 2.4398%, 4.7698%,
+2.7219%, and 1.7196% under 8%. This advances the group to current evidence; it
+does not claim citations, live media, renderer/table errors, or plugin-provided
+Markdown variants.
 
-Read-only inspection of the unchanged `26.803.41515` ASAR fingerprint adds
-current source-structural evidence for `inline-markdown`, the in-progress
-boundary, the latest-turn follow controller and its 24px tolerance, and the
-table container/scroller/actions structure. An independent nine-event replay
-now streams four deltas through an incomplete link, open fenced code, nested
-and task lists, a readable multi-column table, and twelve long sections before
-completion. Browser/CDP checks five checkpoints; Electron independently
-verifies exact code copy, table focus, real wheel-driven scroll-away, and
-return to latest; four reviewed internal pixel baselines cover the streamed
-fence, table, long running tail, and completed tail.
+Read-only structural inspection continues to support `inline-markdown`, the
+in-progress boundary, the latest-turn follow controller and table container/
+scroller/actions ownership. The refreshed ten-event replay uses the exact
+sanitized 26.825.51511 content and six checkpoints rather than promoting the
+older twelve-section synthetic stream.
 
 A later isolated current-build task reaches an 18-column table's Copy, Expand,
 and viewport preview path. The public five-event replay contributes to the
@@ -1646,6 +1643,6 @@ and viewport preview path. The public five-event replay contributes to the
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%
-under 4% and 1% ceilings. Streaming product reachability, citations/sources,
-plugin variants, table error variants, live media emission, and broader
-Markdown error reachability remain open.
+under 4% and 1% ceilings. Rich streaming product reachability is now current;
+citations/sources, plugin variants, table error variants, live media emission,
+and broader Markdown error reachability remain open.

@@ -43,10 +43,18 @@ describe("Markdown visual contract", () => {
     expect(styles).toContain('.codex-ui-markdown[data-density="compact"]');
     expect(styles).toContain("line-height: 1.421875rem");
     expect(styles).toContain("font-size: 1.3125rem");
+    expect(styles).toContain("font-size: 1.09375rem");
+    expect(styles).toContain("line-height: 1.53125rem");
     expect(styles).toContain("border-radius: 1.25rem");
     expect(styles).toContain("height: 3rem");
     expect(styles).toContain("font-size: 0.75rem");
     expect(styles).toContain("inset-inline-end: -2rem");
+    expect(styles).toContain(
+      "padding: 0.546875rem 1.3125rem 0.546875rem 0",
+    );
+    expect(styles).toMatch(
+      /tbody\s+tr:last-child\s+td \{\s+padding-bottom: 1\.3125rem;/,
+    );
   });
 
   it("keeps links identifiable and lets custom copy labels size to content", () => {

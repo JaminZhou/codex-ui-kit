@@ -1248,7 +1248,7 @@ export function AgentMarkdown({
           node: _node,
           ...codeProps
         }) {
-          const value = String(codeChildren);
+          const value = codeChildren == null ? "" : String(codeChildren);
           const language = /language-([^\s]+)/.exec(codeClassName ?? "")?.[1];
           const isBlock = Boolean(language) || value.endsWith("\n");
 

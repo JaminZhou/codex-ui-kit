@@ -3122,27 +3122,45 @@ textarea {
   display: none;
 }
 
-.demo-root[data-scenario="markdown-current-26-825"] {
+.demo-root:is(
+    [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-streaming-large"]
+  ) {
   -webkit-font-smoothing: antialiased;
 }
 
-.demo-root[data-scenario="markdown-current-26-825"],
-.demo-root[data-scenario="markdown-current-26-825"]
+.demo-root:is(
+    [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-streaming-large"]
+  ),
+.demo-root:is(
+    [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-streaming-large"]
+  )
   *:not(code):not(kbd):not(pre) {
   font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
 }
 
-.demo-root[data-scenario="markdown-current-26-825"]
+.demo-root:is(
+    [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-streaming-large"]
+  )
   .demo-turn-actions.demo-mcp-turn-actions {
   gap: 2px;
 }
 
-.demo-root[data-scenario="markdown-current-26-825"]
+.demo-root:is(
+    [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-streaming-large"]
+  )
   .codex-ui-thread-viewport {
   scrollbar-width: none;
 }
 
-.demo-root[data-scenario="markdown-current-26-825"]
+.demo-root:is(
+    [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-streaming-large"]
+  )
   .codex-ui-thread-viewport::-webkit-scrollbar {
   display: none;
 }
@@ -3178,6 +3196,36 @@ textarea {
   margin-top: 3.375px;
   object-fit: contain;
   width: 16px;
+}
+
+.demo-current-markdown-task {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgb(255 255 255 / 0.082);
+  border-radius: 50%;
+  color: rgb(255 255 255 / 0.72);
+  display: inline-flex;
+  flex: 0 0 14px;
+  height: 14px;
+  justify-content: center;
+  margin: 4.375px 0 0;
+  padding: 0;
+  width: 14px;
+}
+
+.demo-current-markdown-task[aria-checked="true"] {
+  background: rgb(45 45 45 / 0.96);
+}
+
+.demo-current-markdown-task > svg {
+  fill: none;
+  height: 12px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+  width: 12px;
 }
 
 .demo-current-markdown-code-copy-icon {
