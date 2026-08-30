@@ -184,7 +184,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 12 have current-build runtime evidence, 63 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 11 groups and Electron verification covers 11.
+Current inventory: 89 surface groups; 15 have current-build runtime evidence, 60 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -379,10 +379,24 @@ project-navigation and mutation/status rows remain `partial_legacy` because
 these narrower observations do not prove every state they own; full Settings
 routes remain separately owned Stage 4 surfaces.
 
+The current `26.825.51511` ordinary thread follow-up reaches one selected
+running task, one background-completed unread task, ordinary idle rows, and
+the shared hover actions in an isolated profile. Both 1180×820 and 720×680
+retain the 321.875px sidebar and 305.875×30px rows with
+`5px 5px 5px 8px` padding and 13/18.5714px weight-400 type. The running row
+uses the exact two-path 16×16 spinner; the completed unread row uses an 8×8
+`#3a83f7` info-solid dot. Hover exposes exact `Pin chat`/`Archive chat`
+19×20px controls with an 8px gap and hides the status rail. Browser/CDP,
+Electron, three reviewed wide/hover/compact frames, and local-only shape gates
+at 2.9762%, 0.3571%, and 0% promote `app.sidebar-thread-history`,
+`app.sidebar-item-actions`, and `app.sidebar-status-indicators` for this
+sampled lifecycle. Waiting, error, worktree, mutations, and longer history
+remain partial or previous-build evidence.
+
 The ordinary task-status follow-up reached one real active thread and one
 background-completed unread thread on `26.803.61601`. It locked the 20×20
 trailing rail, exact 16×16 active spinner geometry, and centered 8×8 unread dot
-using the computed `rgb(131, 195, 255)` link color. A queued follow-up does not
+using the current `rgb(58, 131, 247)` info-solid color. A queued follow-up does not
 replace the active spinner, so ordinary thread presentation is classified as
 `active | waiting | unread | idle`. The previous `26.810.52044` refresh
 superseded the primary worktree anchor with a real disposable create, controlled

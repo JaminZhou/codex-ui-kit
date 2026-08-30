@@ -885,7 +885,7 @@ export function assertCurrentSidebarRowsRecord(record) {
     !withinTolerance(unread?.dotRect?.height, 8) ||
     !withinTolerance(unread?.dotRect?.top, 11) ||
     !withinTolerance(unread?.dotRect?.rightInset, 14) ||
-    unread?.dotStyle?.backgroundColor !== "rgb(131, 195, 255)" ||
+    unread?.dotStyle?.backgroundColor !== "rgb(58, 131, 247)" ||
     unread?.dotStyle?.borderRadius !== "9999px"
   ) {
     throw new Error(

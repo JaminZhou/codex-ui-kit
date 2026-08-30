@@ -84,6 +84,15 @@ The authoritative current-build inventory is:
   interaction, five reviewed baselines, and four local product regions pass;
   the latter differ by 1.72–4.77% under 8%. Citations, live media,
   table/error, and plugin Markdown variants remain open.
+- A current `26.825.51511` sidebar follow-up reaches one selected running task
+  and one naturally completed background-unread task in an isolated profile.
+  It keeps the sidebar at 321.875px at both 1180 and 720, locks the
+  305.875×30px row, 13/18.5714px weight-400 type, exact spinner, 8×8
+  `#3a83f7` unread dot, and `Pin chat`/`Archive chat` hover replacement.
+  Browser/CDP, Electron, three reviewed frames, and local-only action/active/
+  unread shape comparisons at 2.9762%, 0.3571%, and 0% promote the sampled
+  thread-history, item-action, and status inventory groups. Waiting, error,
+  worktree, mutations, and longer history variants remain incomplete.
 - The previous 26.820 account-menu matrix supersedes the previous focus and
   typography boundary at Dark/Light × 1180×820/720×680. The portalled surface
   remains 306.90625×188.375px with six 28.5625px rows, five exact icons, one

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 12 groups have current-build runtime evidence, 63 have previous-build-only
+- 15 groups have current-build runtime evidence, 60 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -78,6 +78,15 @@ exit gates; it does not replace the inventory.
   reviewed baselines are committed; four local-only product regions pass at
   2.4398%, 4.7698%, 2.7219%, and 1.7196% under 8%. Citations, live media,
   table/Markdown errors, and plugin variants remain P0 work.
+  A second current `26.825.51511` sidebar follow-up promotes
+  `app.sidebar-thread-history`, `app.sidebar-item-actions`, and
+  `app.sidebar-status-indicators` for the sampled ordinary lifecycle. It locks
+  the persistent 321.875px width at 1180 and 720, 305.875×30px rows,
+  selected-running spinner, background-completed `#3a83f7` unread dot, exact
+  Pin/Archive hover replacement, and 13/18.5714px row typography. Browser/CDP,
+  Electron, three reviewed baselines, and local-only 2.9762%/0.3571%/0%
+  shape comparisons cover wide, hover, and compact states. Waiting, error,
+  worktree, mutation, and longer history variants remain incomplete.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a

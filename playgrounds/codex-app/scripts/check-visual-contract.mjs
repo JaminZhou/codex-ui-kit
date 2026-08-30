@@ -472,6 +472,12 @@ const currentBuildSidebarUnreadStatusReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_UNREAD_STATUS_REFERENCE;
 const currentBuildSidebarTaskActionsReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_TASK_ACTIONS_REFERENCE;
+const currentSidebar26825ActiveStatusReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_ACTIVE_STATUS_REFERENCE;
+const currentSidebar26825UnreadStatusReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_UNREAD_STATUS_REFERENCE;
+const currentSidebar26825TaskActionsReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_TASK_ACTIONS_REFERENCE;
 const currentBuildSidebarRecentsActionsReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE;
 const currentBuildSidebarWorktreeLoadingReference =
@@ -699,16 +705,22 @@ async function compareCurrentBuildSidebarStatus({
     { blue: 24, green: 24, red: 24 },
   );
   if (
-    (reference.width !== 259 && reference.width !== ownedWidth) ||
+    (reference.width !== 259 &&
+      reference.width !== 306 &&
+      reference.width !== ownedWidth) ||
     reference.height !== 30
   ) {
     throw new Error(
       `${sceneId}: ${status} status reference must be exactly 259x30 or ${ownedWidth}x30, received ${reference.width}x${reference.height}.`,
     );
   }
-  if (!actualBounds || actualBounds.width !== 258 || actualBounds.height !== 30) {
+  if (
+    !actualBounds ||
+    ![258, 306].includes(actualBounds.width) ||
+    actualBounds.height !== 30
+  ) {
     throw new Error(
-      `${sceneId}: ${status} status row must be exactly 258x30: ${JSON.stringify(actualBounds)}.`,
+      `${sceneId}: ${status} status row must be exactly 258x30 or 306x30: ${JSON.stringify(actualBounds)}.`,
     );
   }
   const actualRow = cropPng(
@@ -770,7 +782,9 @@ async function compareCurrentBuildSidebarStatus({
 async function compareCurrentBuildSidebarActions({
   actualPath,
   defaultMaximumRatio,
+  foregroundOnly = false,
   maximumRatioName,
+  ownedWidth = 72,
   referencePath,
   sceneId,
   variant,
@@ -785,16 +799,22 @@ async function compareCurrentBuildSidebarActions({
     red: 24,
   });
   if (
-    reference.width !== 72 ||
+    reference.width !== ownedWidth ||
     reference.height !== 30 ||
-    actual.width !== 72 ||
+    actual.width !== ownedWidth ||
     actual.height !== 30
   ) {
     throw new Error(
-      `${sceneId}: ${variant} action crops must both be exactly 72x30.`,
+      `${sceneId}: ${variant} action crops must both be exactly ${ownedWidth}x30.`,
     );
   }
-  const comparison = comparePng(reference, actual);
+  const comparison = foregroundOnly
+    ? comparePng(
+        foregroundMaskPng(reference),
+        foregroundMaskPng(actual),
+        0,
+      )
+    : comparePng(reference, actual);
   const maximumRatio = environmentRatio(
     maximumRatioName,
     defaultMaximumRatio,
@@ -986,6 +1006,32 @@ for (const scene of selectedScenes) {
             const value = row?.getBoundingClientRect();
             return [
               status,
+              value
+                ? {
+                    height: Math.round(value.height),
+                    left: Math.round(value.left),
+                    top: Math.round(value.top),
+                    width: Math.round(value.width),
+                  }
+                : null,
+            ];
+          }),
+        ),
+      );
+    }
+    if (scene.id.startsWith("current-sidebar-thread-lifecycle")) {
+      sidebarStatusBounds = await page.evaluate(() =>
+        Object.fromEntries(
+          ["active", "unread"].map((fixture) => {
+            const item = document.querySelector(
+              `[data-sidebar-thread-lifecycle-fixture="${fixture}"]`,
+            );
+            const row = item?.closest(
+              ".codex-ui-app-sidebar__item-row",
+            );
+            const value = row?.getBoundingClientRect();
+            return [
+              fixture,
               value
                 ? {
                     height: Math.round(value.height),
@@ -1484,6 +1530,13 @@ for (const scene of selectedScenes) {
         )
         .hover();
     }
+    if (scene.id === "current-sidebar-thread-lifecycle-hover") {
+      await page
+        .locator('[data-sidebar-thread-lifecycle-fixture="active"]')
+        .locator("..")
+        .hover();
+      await page.waitForTimeout(150);
+    }
     if (scene.scenario === "markdown-streaming-large") {
       currentMarkdownStreamingBounds = await page.evaluate(() => {
         const root = document.querySelector(
@@ -1540,6 +1593,41 @@ for (const scene of selectedScenes) {
           height: 30,
           width: 72,
           x: bounds.x + bounds.width - 72,
+          y: bounds.y,
+        },
+        path: sidebarTaskActionsActualPath,
+        type: "png",
+      });
+    }
+    if (
+      scene.id === "current-sidebar-thread-lifecycle" &&
+      currentSidebar26825TaskActionsReference
+    ) {
+      const row = page
+        .locator('[data-sidebar-thread-lifecycle-fixture="active"]')
+        .locator("..");
+      await row.hover();
+      await page.waitForTimeout(150);
+      const bounds = await row.boundingBox();
+      if (
+        !bounds ||
+        bounds.height !== 30 ||
+        Math.abs(bounds.width - 305.875) > 0.1
+      ) {
+        throw new Error(
+          `${scene.id}: current task action row must be exactly 305.875x30.`,
+        );
+      }
+      sidebarTaskActionsActualPath = join(
+        artifactDirectory,
+        `${scene.id}.task-actions.current-build.png`,
+      );
+      await page.screenshot({
+        animations: "disabled",
+        clip: {
+          height: 30,
+          width: 56,
+          x: bounds.x + bounds.width - 56,
           y: bounds.y,
         },
         path: sidebarTaskActionsActualPath,
@@ -3542,6 +3630,49 @@ for (const scene of selectedScenes) {
         referencePath: currentBuildSidebarWorktreeRestoredReference,
         sceneId: scene.id,
         status: "worktree-restored",
+      });
+    }
+  }
+
+  if (scene.id === "current-sidebar-thread-lifecycle") {
+    if (
+      currentSidebar26825TaskActionsReference &&
+      sidebarTaskActionsActualPath
+    ) {
+      await compareCurrentBuildSidebarActions({
+        actualPath: sidebarTaskActionsActualPath,
+        defaultMaximumRatio: 0.035,
+        foregroundOnly: true,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_TASK_ACTIONS_MAX_DIFF_RATIO",
+        ownedWidth: 56,
+        referencePath: currentSidebar26825TaskActionsReference,
+        sceneId: scene.id,
+        variant: "task-actions",
+      });
+    }
+    if (currentSidebar26825ActiveStatusReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.active,
+        defaultMaximumRatio: 0.035,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_ACTIVE_STATUS_MAX_DIFF_RATIO",
+        referencePath: currentSidebar26825ActiveStatusReference,
+        sceneId: scene.id,
+        status: "active",
+      });
+    }
+    if (currentSidebar26825UnreadStatusReference) {
+      await compareCurrentBuildSidebarStatus({
+        actual,
+        actualBounds: sidebarStatusBounds?.unread,
+        defaultMaximumRatio: 0.02,
+        maximumRatioName:
+          "CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_UNREAD_STATUS_MAX_DIFF_RATIO",
+        referencePath: currentSidebar26825UnreadStatusReference,
+        sceneId: scene.id,
+        status: "unread",
       });
     }
   }

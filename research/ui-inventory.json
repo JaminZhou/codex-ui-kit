@@ -923,11 +923,12 @@
         "cdp-26.820.60940:privacy-safe-content-dependent-project-and-recents-local-history-with-shared-30px-rows",
         "cdp-26.820.60940:live-five-row-show-more-one-way-eleven-row-expansion-no-show-less-and-browser-electron-twelve-row-replay",
         "cdp-26.820.60940:live-no-chats-306.90625-by-29-row-exact-computed-style-and-2.4138-percent-regional-pixel",
-        "cdp-26.820.60940:disposable-background-worktree-failed-plus-unread-30px-row-three-track-geometry-and-zero-percent-regional-pixel"
+        "cdp-26.820.60940:disposable-background-worktree-failed-plus-unread-30px-row-three-track-geometry-and-zero-percent-regional-pixel",
+        "cdp-26.825.51511:isolated-safe-thread-running-completed-background-unread-wide-and-compact-321.875-sidebar-browser-electron-and-reviewed-baselines"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -943,11 +944,12 @@
         "cdp-26.803.61601:project-more-new-chat-six-project-task-and-six-recents-pin-archive-action-rows-with-current-icons",
         "cdp-26.810.52044:project-more-new-chat-and-recents-pin-archive-current-icons",
         "cdp-26.818.41509:project-task-and-recents-pin-archive-19x20-gap8-hover-replacement-and-unmasked-action-pixels",
-        "cdp-26.820.60940:project-active-and-recents-idle-pin-archive-19x20-gap8-current-icons-browser-electron-and-regional-pixels"
+        "cdp-26.820.60940:project-active-and-recents-idle-pin-archive-19x20-gap8-current-icons-browser-electron-and-regional-pixels",
+        "cdp-26.825.51511:thread-pin-chat-archive-chat-19x20-gap8-hover-replaces-status-browser-electron-reviewed-hover-and-2.9762-percent-shape-pixel"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -969,11 +971,12 @@
         "cdp-26.818.41509:real-active-complete-unread-30px-row-20px-rail-16px-spinner-8px-dot-and-unmasked-status-pixels",
         "cdp-26.818.41509:current-needs-input-pill-ordinary-16px-error-browser-electron-and-reviewed-status-pixels",
         "cdp-26.820.60940:real-active-and-unread-30px-row-20px-rail-16px-spinner-8px-dot-browser-electron-and-subpixel-aware-regional-pixels",
-        "cdp-26.820.60940:disposable-real-waiting-on-approval-project-row-shared-16px-spinner-browser-electron-and-2.7381-percent-regional-pixel"
+        "cdp-26.820.60940:disposable-real-waiting-on-approval-project-row-shared-16px-spinner-browser-electron-and-2.7381-percent-regional-pixel",
+        "cdp-26.825.51511:selected-running-and-background-completed-unread-305.875-by-30-row-20px-rail-16px-spinner-8px-info-solid-dot-browser-electron-and-0.3571-plus-zero-percent-shape-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

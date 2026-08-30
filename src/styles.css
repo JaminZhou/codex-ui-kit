@@ -3331,12 +3331,16 @@
   cursor: pointer;
   display: flex;
   font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 400;
   gap: calc(var(--codex-ui-spacing) * 2);
-  grid-column: 1;
+  grid-column: 1 / -1;
   grid-row: 1;
+  line-height: 1.1607142857rem;
   min-height: 1.875rem;
   min-width: 0;
-  padding: 0.3125rem calc(var(--codex-ui-spacing) * 2);
+  padding-block: 0.3125rem;
+  padding-inline: calc(var(--codex-ui-spacing) * 2) 0.3125rem;
   position: relative;
   text-align: start;
   width: 100%;
@@ -3431,8 +3435,8 @@
 
 .codex-ui-app-sidebar__item-label {
   font-size: 0.8125rem;
-  font-weight: 445;
-  line-height: 1.1607rem;
+  font-weight: 400;
+  line-height: 1.1607142857rem;
 }
 
 .codex-ui-app-sidebar__item-description {

@@ -387,7 +387,7 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --codex-ui-app-sidebar-attention: #83c3ff;
+  --codex-ui-app-sidebar-attention: #3a83f7;
   --codex-ui-conversation-thread-background: #171717;
   --codex-ui-conversation-thread-composer-background: oklab(
     0.297161 0.0000135154 0.00000594556 / 0.864706
@@ -516,7 +516,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --codex-ui-app-sidebar-attention: #83c3ff;
+    --codex-ui-app-sidebar-attention: #3a83f7;
     --codex-ui-conversation-thread-background: #171717;
     --codex-ui-conversation-thread-composer-background: oklab(
       0.297161 0.0000135154 0.00000594556 / 0.864706
