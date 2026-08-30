@@ -1154,6 +1154,25 @@ CODEX_UI_KIT_CURRENT_VOICE_26_825_COMPACT_REFERENCE=/absolute/path/to/voice-comp
   --scenes=workspace-keyboard-shortcuts,workspace-keyboard-shortcuts-search,workspace-keyboard-shortcuts-compact,workspace-voice-settings,workspace-voice-settings-microphone-menu,workspace-voice-settings-picker,workspace-voice-settings-compact
 ```
 
+The current `26.825.51511` Usage & billing gates accept four full-window
+Usage references plus Personal, Business, and compact embedded-plan
+references. Usage masks only x=0…321, where the native translucent Settings
+rail blends with host content; all app-owned content and all plan frames remain
+measured. Account balances, reset times, localized currency, checkout URLs,
+and product screenshots stay local-only.
+
+```bash
+CODEX_UI_KIT_CURRENT_USAGE_26_825_REFERENCE=/absolute/path/to/usage-wide.png \
+CODEX_UI_KIT_CURRENT_USAGE_26_825_BOTTOM_REFERENCE=/absolute/path/to/usage-wide-bottom.png \
+CODEX_UI_KIT_CURRENT_USAGE_26_825_COMPACT_REFERENCE=/absolute/path/to/usage-compact.png \
+CODEX_UI_KIT_CURRENT_USAGE_26_825_COMPACT_BOTTOM_REFERENCE=/absolute/path/to/usage-compact-bottom.png \
+CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_PERSONAL_REFERENCE=/absolute/path/to/plans-personal-wide.png \
+CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_BUSINESS_REFERENCE=/absolute/path/to/plans-business-wide.png \
+CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_COMPACT_REFERENCE=/absolute/path/to/plans-personal-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-usage-settings,workspace-usage-settings-bottom,workspace-usage-settings-compact,workspace-usage-settings-compact-bottom,workspace-plan-settings-personal,workspace-plan-settings-business,workspace-plan-settings-compact
+```
+
 The current Hooks gates accept unmodified 1180×820 and 720×680 full-window
 references. No masks are applied, so navigation, typography, wrapping, the
 runtime-captured reload icon, empty card, and all remaining pixels are

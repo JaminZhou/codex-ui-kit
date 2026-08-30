@@ -61,6 +61,7 @@ import {
   NewConversationPromptGrid,
   NewConversationStart,
   PersonalizationSettingsPage,
+  PlanSelectionPage,
   PullRequestCheckList,
   PullRequestCommentComposer,
   PullRequestList,
@@ -100,6 +101,7 @@ import {
   ThreadVirtualizedPlaceholder,
   ToolCallCard,
   TurnDuration,
+  UsageSettingsPage,
   WorktreeSettingsPage,
   WorkingDirectoryNotice,
   WorktreeSetupStatus,
@@ -120,6 +122,7 @@ import {
   type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
   type PersonalizationSettingsValue,
+  type PlanSelectionCard,
   type QueuedPrompt,
   type SubagentItem,
   type WorktreeSetupPhase,
@@ -184,6 +187,11 @@ import {
 import { branchStateAfterSuccessfulCreation } from "./workspace-branch-state";
 import { trimBranchInputAsciiWhitespace } from "../../../src/internal/branchName";
 import { currentKeyboardShortcuts } from "./current-keyboard-shortcuts";
+import {
+  currentBusinessPlanCards,
+  currentPersonalPlanCards,
+  currentUsageLimitGroups,
+} from "./current-usage-settings";
 import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
@@ -2207,6 +2215,8 @@ export function App() {
     | "hooks-settings"
     | "keyboard-shortcuts-settings"
     | "personalization-settings"
+    | "plan-settings"
+    | "usage-settings"
     | "voice-settings"
     | "worktree-settings"
   >(
@@ -2237,6 +2247,12 @@ export function App() {
           initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
         ? "keyboard-shortcuts-settings"
       : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-plan-settings")
+        ? "plan-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-usage-settings")
+        ? "usage-settings"
+      : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-voice-settings")
         ? "voice-settings"
       : initialSelection.view === "workspace" &&
@@ -2246,7 +2262,10 @@ export function App() {
   );
   const [settingsQuery, setSettingsQuery] = useState("");
   const [selectedSettingsId, setSelectedSettingsId] = useState(
-    initialSelection.frame?.startsWith("workspace-personalization-settings")
+    initialSelection.frame?.startsWith("workspace-plan-settings") ||
+      initialSelection.frame?.startsWith("workspace-usage-settings")
+      ? "usage-billing"
+      : initialSelection.frame?.startsWith("workspace-personalization-settings")
       ? "personalization"
       : initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
         ? "keyboard-shortcuts"
@@ -2393,6 +2412,19 @@ export function App() {
     initialSelection.frame === "workspace-voice-settings-picker",
   );
   const [voiceSettingsAction, setVoiceSettingsAction] = useState("");
+  const [usageSettingsAction, setUsageSettingsAction] = useState("");
+  const [planAudience, setPlanAudience] = useState<"business" | "personal">(
+    initialSelection.frame === "workspace-plan-settings-business"
+      ? "business"
+      : "personal",
+  );
+  const [planMultiplier, setPlanMultiplier] = useState<"20x" | "5x">(
+    "20x",
+  );
+  const [businessBilling, setBusinessBilling] = useState<
+    "annual" | "monthly"
+  >("annual");
+  const [planSelectionAction, setPlanSelectionAction] = useState("");
   const [worktreeSettings, setWorktreeSettings] =
     useState<WorktreeSettingsValue>({
       autoDelete: true,
@@ -2689,6 +2721,7 @@ export function App() {
   const [liveStartPending, setLiveStartPending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(
     () =>
+      !initialSelection.frame?.startsWith("workspace-plan-settings") &&
       initialSelection.sidebarState !== "hidden" &&
       ((initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
@@ -6659,6 +6692,14 @@ export function App() {
         ? activeFrame?.startsWith("workspace-keyboard-shortcuts")
           ? activeFrame
           : "workspace-keyboard-shortcuts"
+      : workspacePage === "usage-settings"
+        ? activeFrame?.startsWith("workspace-usage-settings")
+          ? activeFrame
+          : "workspace-usage-settings"
+      : workspacePage === "plan-settings"
+        ? activeFrame?.startsWith("workspace-plan-settings")
+          ? activeFrame
+          : "workspace-plan-settings-personal"
       : workspacePage === "voice-settings"
         ? activeFrame?.startsWith("workspace-voice-settings")
           ? activeFrame
@@ -6734,6 +6775,7 @@ export function App() {
         "hooks-settings",
         "keyboard-shortcuts-settings",
         "personalization-settings",
+        "usage-settings",
         "voice-settings",
         "worktree-settings",
       ].includes(
@@ -6766,6 +6808,21 @@ export function App() {
     if (
       workspacePage !== "keyboard-shortcuts-settings" ||
       !activeFrame?.startsWith("workspace-keyboard-shortcuts")
+    ) {
+      return;
+    }
+    const scrollOwner = document.querySelector<HTMLElement>(
+      ".codex-ui-settings-shell__main",
+    );
+    if (!scrollOwner) return;
+    scrollOwner.scrollTop = activeFrame.endsWith("-bottom")
+      ? scrollOwner.scrollHeight
+      : 0;
+  }, [activeFrame, workspacePage]);
+  useEffect(() => {
+    if (
+      workspacePage !== "usage-settings" ||
+      !activeFrame?.startsWith("workspace-usage-settings")
     ) {
       return;
     }
@@ -8092,6 +8149,7 @@ export function App() {
           itemId !== "hooks" &&
           itemId !== "keyboard-shortcuts" &&
           itemId !== "personalization" &&
+          itemId !== "usage-billing" &&
           itemId !== "voice" &&
           itemId !== "worktrees"
         ) {
@@ -8117,6 +8175,8 @@ export function App() {
                 ? "personalization-settings"
               : itemId === "keyboard-shortcuts"
                 ? "keyboard-shortcuts-settings"
+              : itemId === "usage-billing"
+                ? "usage-settings"
               : itemId === "voice"
                 ? "voice-settings"
               : itemId === "hooks"
@@ -8134,6 +8194,8 @@ export function App() {
                 ? "workspace-personalization-settings"
               : itemId === "keyboard-shortcuts"
                 ? "workspace-keyboard-shortcuts"
+              : itemId === "usage-billing"
+                ? "workspace-usage-settings"
               : itemId === "voice"
                 ? "workspace-voice-settings"
               : itemId === "hooks"
@@ -8373,6 +8435,43 @@ export function App() {
             {keyboardShortcutAction}
           </span>
         </>
+      ) : workspacePage === "usage-settings" ? (
+        <>
+          <UsageSettingsPage
+            billingSettingsHref="https://chatgpt.com/#settings"
+            cancelPlanContent={
+              <p>
+                Your subscription is managed through your Apple account.
+                You&apos;ll need to{" "}
+                <a href="https://support.apple.com/billing">cancel via iOS</a>
+              </p>
+            }
+            credits={{
+              balance: "$0",
+              giftLabel: "Buy credits for someone else",
+              promotionLabel: "Up to 30% off",
+            }}
+            data-evidence="runtime-observed"
+            limitGroups={currentUsageLimitGroups}
+            onBuyCredits={() =>
+              setUsageSettingsAction("Buy credits checkout requested")
+            }
+            onGiftCredits={() =>
+              setUsageSettingsAction("Gift credits checkout requested")
+            }
+            onViewPlans={() => {
+              setPlanAudience("personal");
+              setPlanSelectionAction("");
+              setSidebarOpen(false);
+              setWorkspacePage("plan-settings");
+              setActiveFrame("workspace-plan-settings-personal");
+            }}
+            plan={{ label: "Pro plan", price: "$100/mo" }}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {usageSettingsAction}
+          </span>
+        </>
       ) : workspacePage === "voice-settings" ? (
         <>
           <VoiceSettingsPage
@@ -8426,8 +8525,50 @@ export function App() {
       )}
     </SettingsShell>
   );
+  const workspacePlanSettingsRoute = (
+    <PlanSelectionPage
+      audience={planAudience}
+      backIcon={<CurrentBuildIcon name="window-chrome-back" />}
+      businessCards={currentBusinessPlanCards(
+        planMultiplier,
+        businessBilling,
+      )}
+      data-action={planSelectionAction || undefined}
+      data-evidence="runtime-observed-host-webview"
+      onAudienceChange={(audience) => {
+        setPlanAudience(audience);
+        setActiveFrame(
+          audience === "business"
+            ? "workspace-plan-settings-business"
+            : "workspace-plan-settings-personal",
+        );
+      }}
+      onBack={() => {
+        setSidebarOpen(true);
+        setWorkspacePage("conversation");
+        setActiveFrame("workspace-ready");
+      }}
+      onCardAction={(card) =>
+        setPlanSelectionAction(`${card.title} plan action requested`)
+      }
+      onSelectorChange={(card: PlanSelectionCard, value) => {
+        if (card.id === "pro" && (value === "5x" || value === "20x")) {
+          setPlanMultiplier(value);
+        }
+        if (
+          card.id === "business" &&
+          (value === "annual" || value === "monthly")
+        ) {
+          setBusinessBilling(value);
+        }
+      }}
+      personalCards={currentPersonalPlanCards(planMultiplier)}
+    />
+  );
   const workspaceRoute =
-    workspacePage === "environments"
+    workspacePage === "plan-settings"
+      ? workspacePlanSettingsRoute
+      : workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
       : workspacePage === "git-settings" ||
           workspacePage === "hooks-settings" ||
@@ -8436,6 +8577,7 @@ export function App() {
           workspacePage === "general-settings" ||
           workspacePage === "keyboard-shortcuts-settings" ||
           workspacePage === "personalization-settings" ||
+          workspacePage === "usage-settings" ||
           workspacePage === "voice-settings" ||
           workspacePage === "worktree-settings"
         ? workspaceSettingsRoute
@@ -8450,6 +8592,8 @@ export function App() {
     workspacePage === "general-settings" ||
     workspacePage === "keyboard-shortcuts-settings" ||
     workspacePage === "personalization-settings" ||
+    workspacePage === "plan-settings" ||
+    workspacePage === "usage-settings" ||
     workspacePage === "voice-settings" ||
     workspacePage === "git-settings" ||
     workspacePage === "hooks-settings" ||

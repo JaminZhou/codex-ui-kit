@@ -279,6 +279,15 @@ All privileged behavior remains host-owned. The components never auto-approve co
   and shortcut-capture state. Hosts own persistence, file opening, license
   presentation, global shortcut registration, and notification delivery;
   observed playground values are fixtures rather than declared defaults.
+- `UsageSettingsPage`: controlled plan, credits, usage-limit meters, reset,
+  and cancellation presentation with independent host callbacks for View
+  plans, Buy credits, and Gift credits. Hosts own account data, billing,
+  checkout, gifting, and cancellation effects.
+- `PlanSelectionPage`: full-height Personal/Business plan composition with
+  controlled audience, 5x/20x or annual/monthly per-card selectors,
+  responsive cards, a host-owned Back transition, supplied pricing/features,
+  and host-owned plan actions. It does not load an embedded webview or perform
+  a purchase.
 
 ## Workspace and pull-request workflow
 

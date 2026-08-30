@@ -15632,7 +15632,15 @@ try {
   await voiceSettingsApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
-  await voiceSettingsPage.waitForFunction(() => innerWidth === 720);
+  await voiceSettingsPage.waitForFunction(() => {
+    const root = document.querySelector(".codex-ui-voice-settings");
+    return (
+      innerWidth === 720 &&
+      innerHeight === 680 &&
+      Math.abs((root?.getBoundingClientRect().width ?? Infinity) - 358.125) <=
+        1
+    );
+  });
   const compactVoice = await voiceSettingsPage.evaluate(() => {
     const root = document.querySelector(".codex-ui-voice-settings");
     const owner = document.querySelector(".codex-ui-settings-shell__main");
@@ -15658,6 +15666,159 @@ try {
   }
 } finally {
   await voiceSettingsApp.close();
+}
+
+const usageSettingsScene = {
+  frame: "workspace-usage-settings",
+  id: "electron-usage-settings",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: usageSettingsApp, page: usageSettingsPage } =
+  await launchScene(usageSettingsScene, { capture: false });
+try {
+  const usageMain = usageSettingsPage.locator(
+    ".codex-ui-settings-shell__main",
+  );
+  await usageMain
+    .getByRole("heading", { level: 1, name: "Usage & billing", exact: true })
+    .waitFor();
+  const meters = usageMain.getByRole("progressbar");
+  if (
+    (await meters.count()) !== 3 ||
+    JSON.stringify(await meters.evaluateAll((items) =>
+      items.map((item) => item.getAttribute("aria-valuenow")),
+    )) !== JSON.stringify(["28", "100", "100"])
+  ) {
+    throw new Error("Electron Usage limits are incomplete.");
+  }
+  await usageMain.getByRole("button", { name: "Buy credits" }).click();
+  if (
+    (await usageSettingsPage
+      .locator(".demo-settings-action-status")
+      .textContent()) !== "Buy credits checkout requested"
+  ) {
+    throw new Error("Electron Usage checkout callback was not host-owned.");
+  }
+  await usageMain.getByRole("button", { name: "Gift credits" }).click();
+  if (
+    (await usageSettingsPage
+      .locator(".demo-settings-action-status")
+      .textContent()) !== "Gift credits checkout requested"
+  ) {
+    throw new Error("Electron gift-credit callback was not host-owned.");
+  }
+
+  await usageSettingsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await usageSettingsPage.waitForFunction(() => {
+    const root = document.querySelector(".codex-ui-usage-settings");
+    return (
+      innerWidth === 720 &&
+      innerHeight === 680 &&
+      Math.abs((root?.getBoundingClientRect().width ?? Infinity) - 358.125) <=
+        1
+    );
+  });
+  const compactUsage = await usageSettingsPage.evaluate(() => {
+    const root = document.querySelector(".codex-ui-usage-settings");
+    const owner = document.querySelector(".codex-ui-settings-shell__main");
+    return {
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rootWidth: root?.getBoundingClientRect().width,
+      scrollHeight: owner?.scrollHeight,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    compactUsage.viewport.width !== 720 ||
+    compactUsage.viewport.height !== 680 ||
+    Math.abs((compactUsage.rootWidth ?? Infinity) - 358.125) > 1 ||
+    (compactUsage.scrollHeight ?? 0) <= compactUsage.viewport.height ||
+    compactUsage.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron compact Usage contract failed: ${JSON.stringify(compactUsage)}`,
+    );
+  }
+
+  await usageMain.getByRole("button", { name: "View plans" }).click();
+  const planRoute = usageSettingsPage.locator(".codex-ui-plan-selection");
+  await planRoute
+    .getByRole("heading", { name: "Choose your plan", exact: true })
+    .waitFor();
+  await planRoute.getByRole("radio", { name: "Business" }).click();
+  await planRoute.getByRole("radio", { name: "5x" }).click();
+  if (
+    (await planRoute.locator(".codex-ui-plan-selection__card").count()) !== 2 ||
+    (await planRoute
+      .locator('[data-plan-id="pro"] .codex-ui-plan-selection__price-line b')
+      .first()
+      .textContent()) !== "$100"
+  ) {
+    throw new Error("Electron plan audience or multiplier was not controlled.");
+  }
+  await planRoute.getByRole("button", { name: "Back to ChatGPT" }).click();
+  await usageSettingsPage
+    .getByText(/What should we build/)
+    .first()
+    .waitFor();
+} finally {
+  await usageSettingsApp.close();
+}
+
+const planSettingsScene = {
+  frame: "workspace-plan-settings-business",
+  id: "electron-plan-settings-business",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const { app: planSettingsApp, page: planSettingsPage } =
+  await launchScene(planSettingsScene, { capture: false });
+try {
+  const planRoute = planSettingsPage.locator(".codex-ui-plan-selection");
+  await planRoute
+    .getByRole("heading", { name: "Choose your plan", exact: true })
+    .waitFor();
+  const widePlan = await planRoute.evaluate((root) => {
+    const topbar = root.querySelector(".codex-ui-plan-selection__topbar");
+    const cards = root.querySelectorAll(".codex-ui-plan-selection__card");
+    return {
+      audience: root.classList.contains("codex-ui-plan-selection--business"),
+      cardCount: cards.length,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rootHeight: root.getBoundingClientRect().height,
+      rootWidth: root.getBoundingClientRect().width,
+      topbarHeight: topbar?.getBoundingClientRect().height,
+    };
+  });
+  if (
+    !widePlan.audience ||
+    widePlan.cardCount !== 2 ||
+    Math.abs(widePlan.rootWidth - 1180) > 1 ||
+    Math.abs(widePlan.rootHeight - 820) > 1 ||
+    Math.abs((widePlan.topbarHeight ?? Infinity) - 46) > 1 ||
+    widePlan.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron wide plan route failed: ${JSON.stringify(widePlan)}`,
+    );
+  }
+  await planRoute.getByRole("radio", { name: "Monthly" }).click();
+  if (
+    (await planRoute.getByRole("radio", { name: "Monthly" }).getAttribute(
+      "aria-checked",
+    )) !== "true"
+  ) {
+    throw new Error("Electron Business billing cycle was not controlled.");
+  }
+} finally {
+  await planSettingsApp.close();
 }
 
 const codeReviewSettingsScene = {
@@ -16939,5 +17100,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and Personalization plus package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818, 26.820, and 26.825 MCP success/failure/recovery/Sources interactions, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Usage and embedded plan selection, Hooks, and Personalization plus package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818, 26.820, and 26.825 MCP success/failure/recovery/Sources interactions, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

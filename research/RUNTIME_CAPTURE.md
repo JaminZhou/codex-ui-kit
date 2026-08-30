@@ -2049,6 +2049,33 @@ and zero horizontal overflow; Electron repeats controlled interactions and the
 wide→compact transition. Product screenshots and the disposable profile stay
 local-only.
 
+## Current `26.825.51511` Usage & billing and plan sample
+
+Use a loopback-only isolated profile, open Settings → Usage & billing, and
+record fixed labels, roles, card/meter geometry, computed styles, and
+wide/compact top/bottom scroll ownership. Account balances, exact reset times,
+checkout identifiers, and profile data are dynamic or private and must not be
+committed. `Buy credits`, `Gift credits`, and plan purchase actions are not
+activated; the replay verifies only host-owned callbacks.
+
+The accepted Usage sample covers 1180×820 and 720×680. It requires the
+321.875px Settings rail, 768px and 358.125px content columns, Your plan,
+Credits balance, General and Spark usage-limit cards, three 96×8 meters,
+Usage limit resets, Cancel plan, reachable lower content, and zero document
+overflow. `View plans` opens a separate embedded webview with a 46px host
+topbar. The plan sample covers Personal and Business, the 5x/20x and
+annual/monthly selectors, two columns at 1180px, and the observed Pro-first
+single-column order at 720px. The embedded page may localize currency and
+billing copy, so the public fixture owns layout and controlled data rather
+than copying account-specific values.
+
+CDP gates seven deterministic Usage/plan frames and controlled transitions;
+Electron repeats meter state, host callbacks, audience/selector changes,
+wide→compact geometry, and return to the app. Seven reviewed replay baselines
+are committed. Optional current-product comparison accepts four Usage frames
+with only the translucent native Settings rail masked and three unmasked plan
+frames. Product screenshots and the disposable profile remain local-only.
+
 ## Promotion rule
 
 After a capture:

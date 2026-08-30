@@ -490,6 +490,20 @@ const currentBuildVoiceSettingsPickerReference =
   process.env.CODEX_UI_KIT_CURRENT_VOICE_26_825_PICKER_REFERENCE;
 const currentBuildVoiceSettingsCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_VOICE_26_825_COMPACT_REFERENCE;
+const currentBuildUsageSettingsReference =
+  process.env.CODEX_UI_KIT_CURRENT_USAGE_26_825_REFERENCE;
+const currentBuildUsageSettingsBottomReference =
+  process.env.CODEX_UI_KIT_CURRENT_USAGE_26_825_BOTTOM_REFERENCE;
+const currentBuildUsageSettingsCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_USAGE_26_825_COMPACT_REFERENCE;
+const currentBuildUsageSettingsCompactBottomReference =
+  process.env.CODEX_UI_KIT_CURRENT_USAGE_26_825_COMPACT_BOTTOM_REFERENCE;
+const currentBuildPlanSettingsPersonalReference =
+  process.env.CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_PERSONAL_REFERENCE;
+const currentBuildPlanSettingsBusinessReference =
+  process.env.CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_BUSINESS_REFERENCE;
+const currentBuildPlanSettingsCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_COMPACT_REFERENCE;
 const currentBuildWorktreeSettingsReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETTINGS_REFERENCE;
 const currentBuildHooksSettingsReference =
@@ -3909,6 +3923,115 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_CURRENT_VOICE_26_825_COMPACT_MAX_DIFF_RATIO",
       referencePath: currentBuildVoiceSettingsCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-usage-settings" &&
+    currentBuildUsageSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.045,
+      masks: [
+        // The native Settings rail is translucent over host content. The
+        // public page owns the stable 768px Usage content to its right.
+        { height: 820, left: 0, top: 0, width: 322 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_USAGE_26_825_MAX_DIFF_RATIO",
+      referencePath: currentBuildUsageSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-usage-settings-bottom" &&
+    currentBuildUsageSettingsBottomReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.055,
+      masks: [{ height: 820, left: 0, top: 0, width: 322 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_USAGE_26_825_BOTTOM_MAX_DIFF_RATIO",
+      referencePath: currentBuildUsageSettingsBottomReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-usage-settings-compact" &&
+    currentBuildUsageSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.05,
+      masks: [{ height: 680, left: 0, top: 0, width: 322 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_USAGE_26_825_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildUsageSettingsCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-usage-settings-compact-bottom" &&
+    currentBuildUsageSettingsCompactBottomReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.05,
+      masks: [{ height: 680, left: 0, top: 0, width: 322 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_USAGE_26_825_COMPACT_BOTTOM_MAX_DIFF_RATIO",
+      referencePath: currentBuildUsageSettingsCompactBottomReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-plan-settings-personal" &&
+    currentBuildPlanSettingsPersonalReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.035,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_PERSONAL_MAX_DIFF_RATIO",
+      referencePath: currentBuildPlanSettingsPersonalReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-plan-settings-business" &&
+    currentBuildPlanSettingsBusinessReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.065,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_BUSINESS_MAX_DIFF_RATIO",
+      referencePath: currentBuildPlanSettingsBusinessReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-plan-settings-compact" &&
+    currentBuildPlanSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.07,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_PLAN_SETTINGS_26_825_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildPlanSettingsCompactReference,
       sceneId: scene.id,
     });
   }

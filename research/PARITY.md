@@ -720,6 +720,21 @@ wide/search/compact and 3.2773%/3.6313%/3.3589%/6.4479% for Voice
 wide/microphone/picker/compact. The picker masks only host-supplied voice
 artwork; no product screenshot or profile is committed.
 
+Usage & billing is now independently current on `26.825.51511`. The controlled
+public page covers plan and credits cards, three limit meters, reset and
+cancellation sections, plus 768px wide and 358.125px compact top/bottom
+reachability. `View plans` remains a host transition into a separate embedded
+surface; the public plan page covers Personal/Business, 5x/20x,
+annual/monthly, the two-column wide layout, and the Pro-first 720px stack.
+Checkout, gifting, account billing, and purchase effects remain host-owned
+callbacks. CDP and Electron gate semantics, interaction, scrolling, and zero
+horizontal overflow; seven reviewed replay baselines gate regressions.
+Local-only product ratios are 4.3294%/5.2131%/4.8748%/4.8752% for Usage
+wide/bottom/compact/compact-bottom and 3.0856%/6.2140%/6.4669% for plan
+Personal/Business/compact. Usage masks only the translucent 321.875px native
+Settings rail; all plan frames are unmasked. No product screenshot, checkout
+URL, account value, or disposable profile is committed.
+
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
 thread scenario must not be generalized to unobserved routes or states.
