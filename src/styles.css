@@ -12980,6 +12980,12 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   margin: 0.875rem 0 0.4375rem;
 }
 
+.codex-ui-markdown[data-density="compact"] h2 {
+  font-size: 1.09375rem;
+  line-height: 1.53125rem;
+  margin: 0.875rem 0 0.21875rem;
+}
+
 .codex-ui-markdown[data-density="compact"] p {
   margin: 0.4375rem 0 0.21875rem;
 }
@@ -13069,7 +13075,7 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 }
 
 .codex-ui-markdown[data-density="compact"] td {
-  padding: 0.546875rem 1.3125rem 1.3125rem 0;
+  padding: 0.546875rem 1.3125rem 0.546875rem 0;
 }
 
 .codex-ui-markdown[data-density="compact"] td:last-child {

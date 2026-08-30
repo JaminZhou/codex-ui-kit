@@ -72,6 +72,14 @@ const currentMarkdown26818CompactReference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE;
 const currentMarkdown26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_REFERENCE;
+const currentMarkdownStreamFenceReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_FENCE_REFERENCE;
+const currentMarkdownStreamTableReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_TABLE_REFERENCE;
+const currentMarkdownStreamLongReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_LONG_REFERENCE;
+const currentMarkdownStreamCompleteReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_COMPLETE_REFERENCE;
 const currentBuildMarkdownTablePreviewReference =
   process.env.CODEX_UI_KIT_MARKDOWN_TABLE_PREVIEW_REFERENCE;
 const currentBuildMarkdownTablePreviewReferenceSize = {
@@ -905,6 +913,7 @@ for (const scene of selectedScenes) {
   let currentThinking26825Bounds;
   let currentPlan26825Bounds;
   let currentSearchBrowser26825Bounds;
+  let currentMarkdownStreamingBounds;
 
   try {
     if (scene.id === "workspace-ready") {
@@ -1475,6 +1484,32 @@ for (const scene of selectedScenes) {
         )
         .hover();
     }
+    if (scene.scenario === "markdown-streaming-large") {
+      currentMarkdownStreamingBounds = await page.evaluate(() => {
+        const root = document.querySelector(
+          '[data-item-id="assistant-markdown-streaming-large"] .codex-ui-markdown',
+        );
+        const table = root?.querySelector("table");
+        const section29 = Array.from(root?.querySelectorAll("h2") ?? []).find(
+          (heading) => heading.textContent?.trim() === "Section 29",
+        );
+        const bounds = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        };
+        return {
+          root: bounds(root),
+          section29: bounds(section29),
+          table: bounds(table),
+        };
+      });
+    }
     await page.screenshot({
       animations: "disabled",
       path: actualPath,
@@ -1563,6 +1598,102 @@ for (const scene of selectedScenes) {
   if (baseline.width !== actual.width || baseline.height !== actual.height) {
     throw new Error(
       `${scene.id}: image dimensions changed from ${baseline.width}x${baseline.height} to ${actual.width}x${actual.height}.`,
+    );
+  }
+
+  const currentMarkdownStreamingReference = {
+    "markdown-stream-fence": currentMarkdownStreamFenceReference,
+    "markdown-stream-table": currentMarkdownStreamTableReference,
+    "markdown-stream-large": currentMarkdownStreamLongReference,
+    "markdown-stream-complete": currentMarkdownStreamCompleteReference,
+  }[scene.id];
+  if (currentMarkdownStreamingReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentMarkdownStreamingReference),
+    );
+    if (
+      reference.width !== 1180 ||
+      reference.height !== 820 ||
+      actual.width !== 1180 ||
+      actual.height !== 820 ||
+      !currentMarkdownStreamingBounds
+    ) {
+      throw new Error(
+        `${scene.id}: current rich Markdown comparison requires exact 1180x820 frames and measured response bounds.`,
+      );
+    }
+    const regions = {
+      "markdown-stream-fence": {
+        actual: currentMarkdownStreamingBounds.root,
+        reference: { height: 187, left: 383, top: 595, width: 736 },
+      },
+      "markdown-stream-table": {
+        actual: currentMarkdownStreamingBounds.table,
+        reference: { height: 123, left: 383, top: 470, width: 736 },
+      },
+      "markdown-stream-large": {
+        actual: currentMarkdownStreamingBounds.root
+          ? { ...currentMarkdownStreamingBounds.root, height: 480 }
+          : null,
+        reference: { height: 480, left: 383, top: 222, width: 736 },
+      },
+      "markdown-stream-complete": {
+        actual: currentMarkdownStreamingBounds.section29
+          ? { ...currentMarkdownStreamingBounds.section29, height: 620 }
+          : null,
+        reference: { height: 620, left: 383, top: 67, width: 736 },
+      },
+    };
+    const region = regions[scene.id];
+    if (
+      !region?.actual ||
+      region.actual.width !== region.reference.width ||
+      region.actual.height !== region.reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current rich Markdown region geometry drifted: ${JSON.stringify(region)}.`,
+      );
+    }
+    const referenceRegion = cropPng(
+      reference,
+      region.reference.left,
+      region.reference.top,
+      region.reference.width,
+      region.reference.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.actual.left,
+      region.actual.top,
+      region.actual.width,
+      region.actual.height,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.12);
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_MAX_DIFF_RATIO",
+      0.08,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current rich Markdown pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current rich Markdown pixel ratio ${comparison.ratio}`,
     );
   }
 

@@ -9660,8 +9660,11 @@ for (const scene of selectedScenes) {
     const expectedSidebarWidth =
       scene.scenario === "current-search-26-825" ||
       scene.scenario === "current-browser-26-825" ||
-      scene.scenario === "markdown-current-26-825"
-        ? 322.90625
+      scene.scenario === "markdown-current-26-825" ||
+      scene.scenario === "markdown-streaming-large"
+        ? scene.scenario === "markdown-streaming-large"
+          ? 321.875
+          : 322.90625
         : 274;
     if (
       hiddenSidebarScene
@@ -13899,6 +13902,7 @@ const markdownStreamingScenes = [
   { frame: "markdown-stream-fence" },
   { frame: "markdown-stream-table" },
   { frame: "markdown-stream-large" },
+  { frame: "markdown-stream-tail" },
   { frame: "markdown-stream-complete" },
 ];
 const markdownStreamingContracts = [];
@@ -13906,6 +13910,7 @@ for (const { frame } of markdownStreamingScenes) {
   const markdownStreamingScene = {
     frame,
     id: `cdp-${frame}`,
+    currentSidebar: true,
     scenario: "markdown-streaming-large",
   };
   const {
@@ -13937,9 +13942,9 @@ for (const { frame } of markdownStreamingScenes) {
         };
       };
       return {
-        actionCount: document.querySelectorAll(
-          '[aria-label="Markdown response actions"] button',
-        ).length,
+        actionCount:
+          message?.querySelectorAll(".demo-mcp-turn-actions > button")
+            .length ?? 0,
         code: root
           ?.querySelector(".codex-ui-code-block__body code")
           ?.textContent?.trim(),
@@ -13953,6 +13958,12 @@ for (const { frame } of markdownStreamingScenes) {
         linkTarget: root?.querySelector("a")?.getAttribute("target"),
         messageStatus: message?.getAttribute("data-status"),
         root: rect(root),
+        rootStyle: root
+          ? {
+              fontSize: getComputedStyle(root).fontSize,
+              lineHeight: getComputedStyle(root).lineHeight,
+            }
+          : null,
         streaming: root?.getAttribute("data-streaming"),
         table: rect(root?.querySelector("table")),
         tableScroll: tableScroll
@@ -13964,12 +13975,14 @@ for (const { frame } of markdownStreamingScenes) {
             }
           : null,
         taskCount:
-          root?.querySelectorAll('.task-list-item input[type="checkbox"]')
+          root?.querySelectorAll('.task-list-item [role="checkbox"]')
             .length ?? 0,
         text: root?.textContent?.replace(/\s+/g, " ").trim(),
         viewport: viewport
           ? {
               clientHeight: viewport.clientHeight,
+              following: viewport.getAttribute("data-following"),
+              latestOrigin: viewport.getAttribute("data-latest-origin"),
               scrollHeight: viewport.scrollHeight,
               scrollTop: viewport.scrollTop,
             }
@@ -13981,11 +13994,13 @@ for (const { frame } of markdownStreamingScenes) {
     const isComplete = frame === "markdown-stream-complete";
     const isAtBottom =
       contract.viewport &&
-      Math.abs(
-        contract.viewport.scrollHeight -
-          contract.viewport.clientHeight -
-          contract.viewport.scrollTop,
-      ) <= 1;
+      (contract.viewport.latestOrigin === "start"
+        ? Math.abs(contract.viewport.scrollTop) <= 1
+        : Math.abs(
+            contract.viewport.scrollHeight -
+              contract.viewport.clientHeight -
+              contract.viewport.scrollTop,
+          ) <= 1);
     if (
       !contract.root ||
       contract.frame !== frame ||
@@ -13993,22 +14008,35 @@ for (const { frame } of markdownStreamingScenes) {
       contract.streaming !== (isComplete ? null : "true") ||
       contract.actionCount !== (isComplete ? 4 : 0) ||
       contract.root.width < 700 ||
+      contract.rootStyle?.fontSize !== "14px" ||
+      Math.abs(
+        Number.parseFloat(contract.rootStyle?.lineHeight ?? "0") - 22.75,
+      ) > 0.01 ||
+      contract.viewport?.latestOrigin !== "start" ||
+      contract.viewport?.following !== "true" ||
       !isAtBottom ||
       (frame === "markdown-stream-link" &&
-        (!contract.href?.startsWith("https://exa") ||
+        (contract.href !== "https://openai.com/codex/" ||
           contract.linkTarget !== "_blank")) ||
       (frame === "markdown-stream-fence" &&
         (contract.codeBlockCount !== 1 ||
-          !contract.code?.includes('const chunks = ["link", "list", "code"];') ||
+          contract.code !== "" ||
           contract.taskCount !== 2)) ||
       (frame === "markdown-stream-table" &&
         (!contract.table ||
           !contract.tableScroll ||
+          !contract.code?.includes(
+            'const chunks = ["link", "code", "table"];',
+          ) ||
           contract.tableScroll.overflowX !== "auto" ||
           contract.tableScroll.clientWidth < contract.root.width)) ||
-      ((frame === "markdown-stream-large" || isComplete) &&
-        (contract.headingCount !== 13 ||
-          !contract.text?.endsWith("End of streamed response.") ||
+      (frame === "markdown-stream-large" &&
+        (contract.headingCount !== 20 ||
+          !contract.text?.endsWith("Short lines align normally.") ||
+          contract.root.height <= (contract.viewport?.clientHeight ?? 0))) ||
+      ((frame === "markdown-stream-tail" || isComplete) &&
+        (contract.headingCount !== 37 ||
+          !contract.text?.endsWith("CURRENT RICH STREAM DONE") ||
           contract.root.height <= (contract.viewport?.clientHeight ?? 0)))
     ) {
       throw new Error(

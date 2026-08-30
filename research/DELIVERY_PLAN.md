@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 11 groups have current-build runtime evidence, 64 have previous-build-only
+- 12 groups have current-build runtime evidence, 63 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -65,17 +65,19 @@ exit gates; it does not replace the inventory.
   pixels remain source-owned and are excluded behind an explicit content
   boundary. Multi-tab, authentication, downloads, permission prompts, and
   page-owned states remain incomplete.
-  The previous 26.825.31414 no-tool Markdown probe promotes
+  The current 26.825.51511 rich-stream follow-up promotes
   `thread.messages-markdown`.
-  It locks one 736/688×465.4375 completed response with 14/22.75px compact
-  typography, a 21/28px H1, 3.5px quote marker, 81.5px full-width table,
-  82px current-icon code block, public favicon link, literal inline math,
-  rendered KaTeX block math, and 28px-stepped response actions. Browser/CDP
-  and Electron repeat semantics, exact computed geometry, link/icon source,
-  copy, wrap, table focus, native bounds, and zero overflow. Two reviewed
-  baselines are committed; the unmasked 737×466 response-root comparison
-  passes at 1.3292% under 2%. Rich streaming mutation, citations, live media,
-  table/error, and plugin variants remain P0 work.
+  One real no-tool task reaches the link-only delta, an open empty TypeScript
+  card, two task rows, a filled code block, a seven-column table, 36 streamed
+  H2 sections, the running tail, and natural completion. It locks reverse-
+  origin follow and scroll-away, 14/22.75px root typography, 17.5/24.5px H2s,
+  14px round task controls, a 122.75px table, Stop-to-four-action settlement,
+  and the empty-fence boundary that previously rendered `undefined`.
+  Browser/CDP and Electron cover the six deterministic checkpoints, code copy,
+  table focus, user scroll-away/return, native bounds, and zero overflow. Five
+  reviewed baselines are committed; four local-only product regions pass at
+  2.4398%, 4.7698%, 2.7219%, and 1.7196% under 8%. Citations, live media,
+  table/Markdown errors, and plugin variants remain P0 work.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
@@ -621,14 +623,15 @@ Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
 
-The previous-build Markdown composition was refreshed on `26.818.41509` with one
-real no-tool response. The wide and compact replays independently lock heading,
-strong and inline-code semantics, blockquote/list spacing, the sampled
-full-content-width narrow table, TypeScript code block and word-wrap toggle,
-and source-owned URL presentation. Streaming Markdown mutation, very wide
-table actions, and their
-error variants retain separately versioned evidence and remain open for fresh
-current-build reachability.
+The Markdown composition is now refreshed on `26.825.51511` with a real rich
+stream. Six replay checkpoints independently lock link-only output, an open
+empty fence, task rows, the filled code/table state, 20- and 37-heading long
+states, and completion. Reverse-origin follow, explicit scroll-away/return,
+code copy, table focus, current response actions, exact computed styles, five
+reviewed baselines, and four local-only product regions pass Browser/CDP,
+Electron, and pixel gates. Very-wide-table actions remain independently
+versioned current runtime evidence; citations, live media emission, and
+table/Markdown error variants remain open.
 
 The previous-build completed conversation core was refreshed on `26.818.41509` with
 one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,
@@ -984,8 +987,11 @@ without confusing package readiness with full product reconstruction.
     pixel gates. The current 26.825 completed-Markdown composition now also
     locks compact typography, a favicon link, current code assets, literal
     inline math, rendered block math, and wide/compact response geometry.
-    Continue with plugin attachment variants, Markdown rich-stream mutation,
-    citations, live media emission, and table/Markdown error variants, populated
+    The current 26.825.51511 rich-stream mutation is now delivered through
+    link, empty-fence, task-list, code/table, long-tail, Stop, completion,
+    reverse-origin scroll, Electron, and product-region pixel gates. Continue
+    with plugin attachment variants, citations, live media emission, and
+    table/Markdown error variants, populated
     artifact/source sections, real-product subagent
     recovery capture, real transport runtime reachability, and real global
     notification reachability. The independent transport state machine and

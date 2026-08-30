@@ -371,8 +371,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "markdown-streaming-large": scenario(
     "markdown-streaming-large",
-    "Stream a large Markdown response",
-    "Protocol deltas mutate an incomplete link and code fence before a multi-column table and twelve-section response exercise long-content scrolling.",
+    "Stream the current rich Markdown response",
+    "Current 26.825 protocol deltas mount a link, task list, empty-to-filled code card, seven-column table, and thirty-six-section response before completion.",
     markdownStreamingLargeTrace,
   ),
   "mcp-current-success": scenario(

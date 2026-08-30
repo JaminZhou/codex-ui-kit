@@ -1435,10 +1435,38 @@ function CurrentMarkdownExternalLink({
   );
 }
 
+function CurrentMarkdownTaskCheckbox({
+  checked,
+}: {
+  checked?: boolean;
+  node?: unknown;
+  type?: string;
+}) {
+  return (
+    <button
+      aria-checked={checked ?? false}
+      aria-label={checked ? "Completed task" : "Incomplete task"}
+      className="demo-current-markdown-task"
+      disabled
+      role="checkbox"
+      type="button"
+    >
+      {checked ? (
+        <svg aria-hidden="true" viewBox="0 0 14 14">
+          <path d="M3.2 7.1 5.6 9.4 10.7 4.4" />
+        </svg>
+      ) : null}
+    </button>
+  );
+}
+
 const currentMarkdownCodeCopyLabel = <CurrentMarkdownCodeCopyIcon />;
 const currentMarkdownCodeLanguageIcon = <CurrentMarkdownCodeLanguageIcon />;
 const currentMarkdownCodeWrapIcon = <CurrentMarkdownCodeWrapIcon />;
-const currentMarkdownComponents = { a: CurrentMarkdownExternalLink };
+const currentMarkdownComponents = {
+  a: CurrentMarkdownExternalLink,
+  input: CurrentMarkdownTaskCheckbox,
+};
 const currentMarkdownLanguageLabels = { ts: "TypeScript" };
 
 const pullRequestFiles = [
@@ -2781,6 +2809,10 @@ export function App() {
     mode === "replay" && scenarioId === "markdown-current-26-820-media";
   const isCurrentMarkdown26825Replay =
     mode === "replay" && scenarioId === "markdown-current-26-825";
+  const isCurrentRichMarkdownStreamingReplay =
+    mode === "replay" && scenarioId === "markdown-streaming-large";
+  const usesCurrentMarkdown26825Presentation =
+    isCurrentMarkdown26825Replay || isCurrentRichMarkdownStreamingReplay;
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentPlan26825Replay =
@@ -3879,6 +3911,13 @@ export function App() {
     isCurrentMcp26820Replay ||
     isCurrentCommand26820Replay;
   const currentWindowedFrame = legacyWindowedFrame || current26820LongFrame;
+  const reverseOriginThread =
+    currentWindowedFrame ||
+    isCurrentLongCommandReplay ||
+    isCurrentCommandFailureReplay ||
+    isCurrentCommandInterruptionReplay ||
+    isCurrentCommand26820Replay ||
+    isCurrentRichMarkdownStreamingReplay;
   const windowedHistorySize = current26820LongFrame
     ? current26820LongHistorySize
     : currentWindowedHistorySize;
@@ -3898,9 +3937,9 @@ export function App() {
     }
     viewport.scrollTo({
       behavior: "smooth",
-      top: currentWindowedFrame ? 0 : viewport.scrollHeight,
+      top: reverseOriginThread ? 0 : viewport.scrollHeight,
     });
-  }, [currentWindowedFrame, windowedHistorySize]);
+  }, [currentWindowedFrame, reverseOriginThread, windowedHistorySize]);
 
   useLayoutEffect(() => {
     if (scenarioSelectionVersion === 0) return;
@@ -8959,13 +8998,14 @@ export function App() {
                 isCurrentMarkdown26818Replay ||
                 isCurrentMarkdown26820MediaReplay ||
                 isCurrentMarkdown26825Replay ||
+                isCurrentRichMarkdownStreamingReplay ||
                 isCurrentSubagentReplay ? (
                   <McpResponseActions
                     copyLabel={
                       isCurrentBasicMessageReplay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
-                      isCurrentMarkdown26825Replay
+                      usesCurrentMarkdown26825Presentation
                         ? "Copy"
                         : undefined
                     }
@@ -8973,7 +9013,7 @@ export function App() {
                       isCurrentBasicMessageReplay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
-                      isCurrentMarkdown26825Replay
+                      usesCurrentMarkdown26825Presentation
                         ? null
                         : message.id === "assistant-workflow" ||
                       message.id ===
@@ -8992,7 +9032,7 @@ export function App() {
                       !isCurrentBasicMessageReplay &&
                       !isCurrentMarkdown26818Replay &&
                       !isCurrentMarkdown26820MediaReplay &&
-                      !isCurrentMarkdown26825Replay
+                      !usesCurrentMarkdown26825Presentation
                     }
                   />
                 ) : (
@@ -9085,20 +9125,20 @@ export function App() {
                   allowWideMedia={isCurrentMarkdown26820MediaReplay}
                   allowWideTables={scenarioId === "markdown-table-actions"}
                   codeBlockCopyAriaLabel={
-                    isCurrentMarkdown26825Replay ? "Copy" : undefined
+                    usesCurrentMarkdown26825Presentation ? "Copy" : undefined
                   }
                   codeBlockCopyLabel={
-                    isCurrentMarkdown26825Replay
+                    usesCurrentMarkdown26825Presentation
                       ? currentMarkdownCodeCopyLabel
                       : undefined
                   }
                   codeBlockLanguageIcon={
-                    isCurrentMarkdown26825Replay
+                    usesCurrentMarkdown26825Presentation
                       ? currentMarkdownCodeLanguageIcon
                       : undefined
                   }
                   codeBlockLanguageLabels={
-                    isCurrentMarkdown26825Replay
+                    usesCurrentMarkdown26825Presentation
                       ? currentMarkdownLanguageLabels
                       : undefined
                   }
@@ -9108,15 +9148,16 @@ export function App() {
                       : undefined
                   }
                   codeBlockWrapToggleable={
-                    isCurrentMarkdown26818Replay || isCurrentMarkdown26825Replay
+                    isCurrentMarkdown26818Replay ||
+                    usesCurrentMarkdown26825Presentation
                   }
                   components={
-                    isCurrentMarkdown26825Replay
+                    usesCurrentMarkdown26825Presentation
                       ? currentMarkdownComponents
                       : undefined
                   }
                   density={
-                    isCurrentMarkdown26825Replay ? "compact" : "regular"
+                    usesCurrentMarkdown26825Presentation ? "compact" : "regular"
                   }
                   imageSourceResolver={
                     isCurrentMarkdown26820MediaReplay
@@ -11201,7 +11242,9 @@ export function App() {
         }
         sidebar={sidebar}
         sidebarWidth={
-          currentHomeFrame ||
+          isCurrentRichMarkdownStreamingReplay
+            ? 321.875
+            : currentHomeFrame ||
           isCurrentBrowser26825Replay ||
           isCurrentSearch26825Replay ||
           isCurrentMarkdown26825Replay
@@ -11303,14 +11346,7 @@ export function App() {
                   activeFrame !== "thread-windowed" &&
                   !current26820LongFrame,
                 followKey: state.eventCount,
-                latestOrigin:
-                  currentWindowedFrame ||
-                  isCurrentLongCommandReplay ||
-                  isCurrentCommandFailureReplay ||
-                  isCurrentCommandInterruptionReplay ||
-                  isCurrentCommand26820Replay
-                    ? "start"
-                    : "end",
+                latestOrigin: reverseOriginThread ? "start" : "end",
                 onFollowingChange: setThreadFollowing,
               }}
               viewportRef={threadViewportRef}

@@ -589,6 +589,32 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates current rich Markdown streaming mutation regions", () => {
+    for (const scene of [
+      "markdown-stream-fence",
+      "markdown-stream-table",
+      "markdown-stream-large",
+      "markdown-stream-tail",
+      "markdown-stream-complete",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_FENCE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_TABLE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_LONG_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_COMPLETE_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(contract).toContain("current rich Markdown pixel ratio");
+    expect(cdpContract).toContain("streaming Markdown contract failed");
+    expect(electronContract).toContain(
+      'id: "electron-markdown-streaming-large"',
+    );
+    expect(appSource).toContain("isCurrentRichMarkdownStreamingReplay");
+  });
+
   it("gates the current long-thread navigation and return control", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_LONG_THREAD_REFERENCE",

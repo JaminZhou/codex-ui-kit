@@ -1591,14 +1591,26 @@ tolerance. The current table implementation also exposes its container,
 horizontal scroller, wrapper, cells, copy action, and optional
 expand-to-preview action.
 
-The independent playground adds a schema-valid nine-event trace with four
-public deltas. Five Browser/CDP checkpoints cover an incomplete link, open
-fenced code, nested and task lists, a readable multi-column table, twelve long
-sections, completion actions, and bottom-follow behavior inside the 151-frame
-matrix. Electron independently checks exact code copy, table focus, real
-wheel-driven scroll-away, the floating return control, and return to latest.
-Four reviewed internal baselines cover the streamed fence, table, long running
-tail, and completed tail.
+The `26.825.51511` isolated no-tool follow-up replaces that synthetic runtime
+anchor with one real rich stream. Mutation sampling reaches a public link, an
+open empty TypeScript card, two disabled round task controls, filled code, a
+seven-column table, 20- and 37-heading milestones, the final marker exactly
+once, Stop during work, and four response actions after completion. The
+Renderer keeps a 736px root at 14/22.75px, renders H2 at 17.5/24.5px with
+14/3.5px margins, and produces a 122.75px completed table. Reverse-origin
+latest is `scrollTop=0`; an explicit negative scroll preserves the viewed
+content while chunks arrive and return-to-latest restores zero.
+
+The refreshed schema-valid ten-event trace replays six deterministic
+checkpoints. Browser/CDP gates semantics, computed styles, empty-fence text,
+20/37 heading counts, final marker, follow state, and zero overflow. Electron
+checks exact code copy, table focus, real scroll-away/return, native bounds,
+and Stop-to-actions settlement. Five reviewed internal baselines cover fence,
+table, latest-running, tail-running, and completed states. Local-only full
+product frames gate four owned regions at 2.4398%, 4.7698%, 2.7219%, and
+1.7196% under an 8% ceiling; private sidebar content is outside every crop.
+The open-fence gate exposed and fixed a public component defect that rendered
+missing code children as the literal string `undefined`.
 
 A later isolated 1180×820 task runtime-reached the current 18-column table.
 CDP records its 1665.86×323 table, 802/1714px visible/scroll width, 49px header,
