@@ -1439,6 +1439,248 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-usage-settings")) {
+      const bottom = scene.id.endsWith("-bottom");
+      if (bottom) {
+        await page.waitForFunction(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return owner instanceof HTMLElement && owner.scrollTop > 0;
+        });
+      }
+      const usage = await page.evaluate(() => {
+        const toRect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".codex-ui-usage-settings");
+        const scrollOwner = document.querySelector(
+          ".codex-ui-settings-shell__main",
+        );
+        return {
+          actionLabels: Array.from(
+            document.querySelectorAll(".codex-ui-usage-settings__action"),
+            (button) => button.textContent?.trim(),
+          ),
+          cardCount: document.querySelectorAll(
+            ".codex-ui-usage-settings__card",
+          ).length,
+          heading: toRect(
+            document.querySelector(".codex-ui-usage-settings h1"),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          meters: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-usage-settings [role="progressbar"]',
+            ),
+            (meter) => ({
+              label: meter.getAttribute("aria-label"),
+              rect: toRect(meter),
+              value: meter.getAttribute("aria-valuenow"),
+            }),
+          ),
+          root: toRect(root),
+          scrollOwner:
+            scrollOwner instanceof HTMLElement
+              ? {
+                  clientHeight: scrollOwner.clientHeight,
+                  scrollHeight: scrollOwner.scrollHeight,
+                  scrollTop: scrollOwner.scrollTop,
+                }
+              : null,
+          sectionHeadings: Array.from(
+            document.querySelectorAll(".codex-ui-usage-settings__section h2"),
+            (heading) => heading.textContent?.trim(),
+          ),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const expectedWidth = compact ? 358.125 : 768;
+      if (
+        usage.horizontalOverflow > 1 ||
+        usage.selected !== "Usage & billing" ||
+        Math.abs(usage.root?.width - expectedWidth) > 1 ||
+        (!bottom && Math.abs(usage.heading?.top - 66) > 1) ||
+        usage.cardCount !== 5 ||
+        JSON.stringify(usage.actionLabels) !==
+          JSON.stringify(["View plans", "Buy credits", "Gift credits"]) ||
+        JSON.stringify(usage.meters.map(({ value }) => value)) !==
+          JSON.stringify(["28", "100", "100"]) ||
+        usage.meters.some(
+          ({ rect }) =>
+            Math.abs(rect?.width - 96) > 1 ||
+            Math.abs(rect?.height - 8) > 1,
+        ) ||
+        usage.sectionHeadings.at(-1) !== "Cancel plan" ||
+        (!bottom && usage.scrollOwner?.scrollTop !== 0) ||
+        (bottom && usage.scrollOwner?.scrollTop <= 0)
+      ) {
+        throw new Error(
+          `${scene.id}: current Usage settings contract failed: ${JSON.stringify(usage)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-usage-settings") {
+        await page.getByRole("button", { name: "Buy credits" }).click();
+        const buy = await page.locator(".demo-settings-action-status").textContent();
+        await page.getByRole("button", { name: "Gift credits" }).click();
+        const gift = await page.locator(".demo-settings-action-status").textContent();
+        await page.getByRole("button", { name: "View plans" }).click();
+        await page.getByRole("heading", { name: "Choose your plan" }).waitFor();
+        interaction = {
+          buy: buy?.trim(),
+          gift: gift?.trim(),
+          planRoute: await page.locator(".codex-ui-plan-selection").count(),
+        };
+        if (
+          interaction.buy !== "Buy credits checkout requested" ||
+          interaction.gift !== "Gift credits checkout requested" ||
+          interaction.planRoute !== 1
+        ) {
+          throw new Error(
+            `${scene.id}: Usage settings interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, usage }, null, 2)}\n`,
+      );
+      continue;
+    }
+    if (scene.id.startsWith("workspace-plan-settings")) {
+      await page.getByRole("heading", { name: "Choose your plan" }).waitFor();
+      const plans = await page.evaluate(() => {
+        const toRect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".codex-ui-plan-selection");
+        const scrollOwner = document.querySelector(
+          ".codex-ui-plan-selection__scroll",
+        );
+        return {
+          actionLabels: Array.from(
+            document.querySelectorAll(".codex-ui-plan-selection__action"),
+            (button) => button.textContent?.trim(),
+          ),
+          audience: root?.classList.contains(
+            "codex-ui-plan-selection--business",
+          )
+            ? "business"
+            : "personal",
+          cards: Array.from(
+            document.querySelectorAll(".codex-ui-plan-selection__card"),
+            (card) => ({
+              id: card.getAttribute("data-plan-id"),
+              rect: toRect(card),
+            }),
+          ),
+          heading: toRect(
+            document.querySelector(".codex-ui-plan-selection__content > h2"),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          root: toRect(root),
+          scrollOwner:
+            scrollOwner instanceof HTMLElement
+              ? {
+                  clientHeight: scrollOwner.clientHeight,
+                  scrollHeight: scrollOwner.scrollHeight,
+                  scrollTop: scrollOwner.scrollTop,
+                }
+              : null,
+          segment: toRect(
+            document.querySelector(".codex-ui-plan-selection__audience"),
+          ),
+          topbar: toRect(
+            document.querySelector(".codex-ui-plan-selection__topbar"),
+          ),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const business = scene.id.endsWith("-business");
+      const compact = scene.windowSize?.width === 720;
+      const compactPro = plans.cards.find(({ id }) => id === "pro");
+      const compactGo = plans.cards.find(({ id }) => id === "go");
+      if (
+        plans.horizontalOverflow > 1 ||
+        plans.audience !== (business ? "business" : "personal") ||
+        Math.abs(plans.root?.width - (compact ? 720 : 1180)) > 1 ||
+        Math.abs(plans.root?.height - (compact ? 680 : 820)) > 1 ||
+        Math.abs(plans.topbar?.height - 46) > 1 ||
+        Math.abs(plans.segment?.width - 352) > 1 ||
+        plans.cards.length !== (business ? 2 : 3) ||
+        plans.actionLabels.length !== (business ? 2 : 3) ||
+        (!compact && plans.cards.some(({ rect }) => rect?.width < 370)) ||
+        (compact &&
+          (plans.cards.some(
+            ({ rect }) => Math.abs((rect?.width ?? Infinity) - 386) > 1,
+          ) ||
+            Math.abs((compactPro?.rect?.top ?? Infinity) - 176) > 1 ||
+            (compactPro?.rect?.top ?? Infinity) >=
+              (compactGo?.rect?.top ?? -Infinity)))
+      ) {
+        throw new Error(
+          `${scene.id}: current plan selection contract failed: ${JSON.stringify(plans)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-plan-settings-personal") {
+        await page.getByRole("radio", { name: "Business" }).click();
+        const businessCards = await page.locator(
+          ".codex-ui-plan-selection__card",
+        ).count();
+        await page.getByRole("radio", { name: "5x" }).click();
+        const proPrice = await page
+          .locator('[data-plan-id="pro"] .codex-ui-plan-selection__price-line b')
+          .first()
+          .textContent();
+        await page.getByRole("radio", { name: "Personal" }).click();
+        const personalCards = await page.locator(
+          ".codex-ui-plan-selection__card",
+        ).count();
+        interaction = {
+          businessCards,
+          personalCards,
+          proPrice: proPrice?.trim(),
+        };
+        if (
+          interaction.businessCards !== 2 ||
+          interaction.personalCards !== 3 ||
+          interaction.proPrice !== "$100"
+        ) {
+          throw new Error(
+            `${scene.id}: plan selection interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, plans }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-general-settings")) {
       if (scene.id.endsWith("-bottom") || scene.id.includes("-hotkey")) {
         await page.waitForFunction(() => {

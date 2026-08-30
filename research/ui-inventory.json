@@ -1675,11 +1675,23 @@
       "id": "settings.usage-subscription",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["usage-settings", "upgrade-plan-dialog", "subscription-update-plan"],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "packageEvidence": [
+        "usage-settings",
+        "upgrade-plan-dialog",
+        "subscription-update-plan",
+        "browser:workspace-usage-and-plan-settings",
+        "electron:usage-and-embedded-plan-settings",
+        "pixel:current-usage-and-plan-settings"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:usage-billing-wide-compact-top-bottom-plan-credits-and-three-limit-meters",
+        "cdp-26.825.51511:view-plans-personal-business-and-compact-embedded-webview",
+        "cdp-26.825.51511:usage-and-plan-computed-geometry-interaction-and-local-only-pixels"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p2"
     },
     {

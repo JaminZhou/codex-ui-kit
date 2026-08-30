@@ -256,8 +256,9 @@ textarea {
   box-shadow: none;
 }
 
-.demo-root:is(
+  .demo-root:is(
     [data-frame^="workspace-keyboard-shortcuts"],
+    [data-frame^="workspace-usage-settings"],
     [data-frame^="workspace-voice-settings"]
   )
   .codex-ui-app-shell__layout {
@@ -267,6 +268,7 @@ textarea {
 
 .demo-root:is(
     [data-frame^="workspace-keyboard-shortcuts"],
+    [data-frame^="workspace-usage-settings"],
     [data-frame^="workspace-voice-settings"]
   )
   :is(.codex-ui-app-shell__sidebar, .codex-ui-app-shell__sidebar-resizer) {
@@ -275,6 +277,7 @@ textarea {
 
 .demo-root:is(
     [data-frame^="workspace-keyboard-shortcuts"],
+    [data-frame^="workspace-usage-settings"],
     [data-frame^="workspace-voice-settings"]
   )
   .codex-ui-app-shell__main {

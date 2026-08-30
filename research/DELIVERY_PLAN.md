@@ -14,8 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 90 surface groups: 59 P0, 21 P1, and 10 P2.
-- 35 groups have current-build runtime evidence, 43 have previous-build-only
-  runtime evidence, and 12 have not been sampled.
+- 36 groups have current-build runtime evidence, 43 have previous-build-only
+  runtime evidence, and 11 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
@@ -1093,7 +1093,11 @@ without confusing package readiness with full product reconstruction.
     and the current narrow-column behavior; the second gates microphone and
     nine-voice selection, screen context, hotkeys, dictionary, recordings,
     wide/compact scrolling, and host-supplied voice artwork boundaries. Usage
-    and remaining integration routes stay open.
+    & billing and its embedded Personal/Business plan surface are now a third
+    delivered slice: plan/credits/reset cards, three meters, 5x/20x and
+    annual/monthly selectors, host-owned checkout callbacks, wide/compact
+    scrolling, CDP, Electron, and current-product pixel gates. Real purchase,
+    gifting, billing-provider, and remaining integration routes stay open.
 12. **Full-app validation and global convergence**: replay/live App Server
     attribution, dark/light and wide/compact matrices, current-build regional
     pixels, public contract freeze, compatibility matrix, and release

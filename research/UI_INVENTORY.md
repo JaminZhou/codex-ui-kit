@@ -198,7 +198,18 @@ reviewed replay baselines, and seven local-only full-window product comparisons
 now gate those two groups. The host supplies Voice artwork; only that artwork
 region is masked in the picker comparison.
 
-Current inventory: 90 surface groups; 35 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 30 groups and Electron verification covers 30.
+The same current build now independently promotes Usage & billing and its
+embedded View plans route. The Usage shell records the plan and credits cards,
+three limit meters, reset/cancellation sections, 768px and 358.125px columns,
+and top/bottom reachability. The host-owned plan surface records Personal and
+Business, 5x/20x and annual/monthly selectors, the two-column wide layout, and
+the 720px Pro-first stack. Checkout, gifting, external billing, and purchase
+effects remain callbacks owned by the host. CDP, Electron, seven reviewed
+replay baselines, and seven local-only current-product comparisons gate the
+slice. The Usage comparisons exclude only the translucent 321.875px native
+Settings rail; plan comparisons are unmasked full-window frames.
+
+Current inventory: 90 surface groups; 36 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 31 groups and Electron verification covers 31.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -246,7 +257,8 @@ transitions must add or split IDs.
 
 ### P2: confirm scope before implementing
 
-- Quick/hotkey windows, voice and dictation, subscription surfaces.
+- Quick/hotkey windows and remaining subscription purchase/provider
+  lifecycles.
 - Remote/mobile controls and OAuth flows.
 - App-generation, device, pet, and avatar candidates that may be packaged but
   not part of the intended Codex reproduction scope.
@@ -785,8 +797,8 @@ wide/compact geometry, bottom scrolling, and zero horizontal overflow;
 Electron renders the same four states and native 720×680 resize. Four reviewed
 internal frames pass. Local-only ownership-masked comparisons differ by
 5.4469% wide, 4.5811% with the menu open, and 7.4199% compact under independent
-5.5%/5.5%/8% ceilings. Keyboard, Voice, Usage, and other Settings routes remain
-independently open.
+5.5%/5.5%/8% ceilings. Keyboard, Voice, and Usage are now independently
+delivered; other Settings routes remain open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one
