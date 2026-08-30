@@ -10,6 +10,10 @@ import {
 } from "./visual-asset-sidebar-contract.mjs";
 
 const manifestUrl = new URL("../research/visual-assets.json", import.meta.url);
+const currentProjectMenuManifestUrl = new URL(
+  "../research/current-project-menu-assets.json",
+  import.meta.url,
+);
 const rasterManifestUrl = new URL(
   "../research/visual-raster-assets.json",
   import.meta.url,
@@ -43,6 +47,7 @@ const updaterScriptUrl = new URL(
 
 const [
   manifestText,
+  currentProjectMenuManifestText,
   rasterManifestText,
   packageText,
   iconSource,
@@ -55,6 +60,7 @@ const [
 ] =
   await Promise.all([
     readFile(manifestUrl, "utf8"),
+    readFile(currentProjectMenuManifestUrl, "utf8"),
     readFile(rasterManifestUrl, "utf8"),
     readFile(packageUrl, "utf8"),
     readFile(playgroundIconUrl, "utf8"),
@@ -66,6 +72,7 @@ const [
     readFile(updaterScriptUrl, "utf8"),
   ]);
 const manifest = JSON.parse(manifestText);
+const currentProjectMenuManifest = JSON.parse(currentProjectMenuManifestText);
 const rasterManifest = JSON.parse(rasterManifestText);
 const packageJson = JSON.parse(packageText);
 function canonicalize(value) {
@@ -293,7 +300,12 @@ for (const icon of manifest.icons ?? []) {
     appSource.includes('name={`settings-${id}` as CurrentBuildIconName}') &&
     (icon.id !== "settings-account-external" ||
       appSource.includes('name="settings-account-external"'));
+  const providerOnly = currentProjectMenuManifest.icons.some(
+    (candidate) =>
+      candidate.id === icon.id && candidate.renderStatus === "provider_only",
+  );
   if (
+    !providerOnly &&
     !appSource.includes(`name="${icon.id}"`) &&
     !demoSource.includes(`name="${icon.id}"`) &&
     !renderedBySettingsNavigation

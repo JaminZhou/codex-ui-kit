@@ -923,28 +923,28 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 284_029_139,
+        appAsarBytes: 284_032_150,
         appAsarSha256:
-          "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
-        appVersion: "26.825.31414",
-        buildNumber: "7287",
+          "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        appVersion: "26.825.51511",
+        buildNumber: "7377",
         chromiumVersion: "151.0.7922.174",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 284_029_139,
+          appAsarBytes: 284_032_150,
           appAsarSha256:
-            "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
+            "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
           inode: "346397970",
         },
         beforeCapture: {
-          appAsarBytes: 284_029_139,
+          appAsarBytes: 284_032_150,
           appAsarSha256:
-            "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
+            "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
@@ -1011,6 +1011,26 @@ describe("current baseline capture contract", () => {
               id: "project-actions-separator",
               messageId: null,
               type: "separator",
+            },
+            {
+              defaultMessage: "Section",
+              enabled: true,
+              hasIcon: true,
+              hasOnSelect: false,
+              id: "move-to-custom-section",
+              messageId: "sidebarCustomSections.projectSectionMenu",
+              submenu: [
+                {
+                  defaultMessage: "New section…",
+                  enabled: true,
+                  hasIcon: false,
+                  hasOnSelect: true,
+                  id: "new-custom-section",
+                  messageId: "sidebarCustomSections.newSection",
+                  type: "item",
+                },
+              ],
+              type: "item",
             },
             {
               defaultMessage: "Reveal in Finder",
@@ -1236,7 +1256,7 @@ describe("current baseline capture contract", () => {
           projectMenu: {
             ...persistedRecord.sidebarLifecycle.projectMenu,
             items: [
-              ...persistedRecord.sidebarLifecycle.projectMenu.items.slice(0, 6),
+              ...persistedRecord.sidebarLifecycle.projectMenu.items.slice(0, 7),
               {
                 defaultMessage: "Mark all as read",
                 enabled: true,
@@ -1246,13 +1266,13 @@ describe("current baseline capture contract", () => {
                 messageId: "sidebarElectron.markProjectThreadsRead",
                 type: "item",
               },
-              ...persistedRecord.sidebarLifecycle.projectMenu.items.slice(6),
+              ...persistedRecord.sidebarLifecycle.projectMenu.items.slice(7),
             ],
           },
         },
       }),
     ).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.825.31414");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.825.51511");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({

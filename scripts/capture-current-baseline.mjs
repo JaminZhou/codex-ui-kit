@@ -681,6 +681,17 @@ try {
             item.type === "separator" ? false : typeof item.onSelect === "function",
           id: item.id ?? null,
           messageId: item.message?.id ?? null,
+          submenu: Array.isArray(item.submenu)
+            ? item.submenu.map((submenuItem) => ({
+                defaultMessage: submenuItem.message?.defaultMessage ?? null,
+                enabled: submenuItem.enabled !== false,
+                hasIcon: Boolean(submenuItem.icon),
+                hasOnSelect: typeof submenuItem.onSelect === "function",
+                id: submenuItem.id ?? null,
+                messageId: submenuItem.message?.id ?? null,
+                type: submenuItem.type ?? "item",
+              }))
+            : null,
           type: item.type ?? "item",
         })),
         renderMode: "electron-native-context-menu",
@@ -1245,19 +1256,23 @@ try {
     const candidate = await inspectNativeProjectMenu(candidateTrigger);
     const ids = candidate.items.map((item) => item.id);
     if (
+      ids.includes("move-to-custom-section") &&
       ids.includes("reveal-project-folder") &&
       !ids.includes("mark-project-threads-read")
     ) {
       projectMenuObservation = candidate;
       break;
     }
-    if (ids.includes("reveal-project-folder")) {
+    if (
+      ids.includes("move-to-custom-section") &&
+      ids.includes("reveal-project-folder")
+    ) {
       projectMenuObservation ??= candidate;
     }
   }
   if (!projectMenuObservation) {
     throw new Error(
-      "A representative current project menu with Reveal in Finder was not available.",
+      "A representative current project-menu provider with Section and Reveal in Finder was not available.",
     );
   }
   sidebarLifecycle.projectMenu = projectMenuObservation;

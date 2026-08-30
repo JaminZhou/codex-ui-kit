@@ -11,19 +11,23 @@ exit gates; it does not replace the inventory.
 ## Current position
 
 - The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.825.31414` (`7287`). Unsampled earlier-build surfaces remain
+  Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 17 groups have current-build runtime evidence, 58 have previous-build-only
+- 11 groups have current-build runtime evidence, 64 have previous-build-only
   runtime evidence, and 14 have not been sampled.
-- The scoped `26.825.31414` refresh revalidates the global shell, responsive
+- The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
-  provider, Help menu, route restoration, and Projects Index. It locks the
+  provider plus rendered Section submenu, Help menu, route restoration, and
+  Projects Index. It locks the
   321.875px sidebar, the existing 559px/415px compact Projects layout, and the
-  removal of `Sites` from the sampled fixed-route stack. Conversation content,
+  continued absence of `Sites` from the sampled fixed-route stack. The native
+  project menu is now 252×187 and its one-row `New section…` submenu is
+  118×34; provider-only `Reveal in Finder` is explicitly separated from the
+  six visible AppKit actions. Conversation content,
   account/settings, lifecycle variants, exact visual assets, and the following
   26.820 slices remain previous-build evidence until re-observed.
-  The current 30-turn long-thread slice additionally promotes
+  The previous 26.825.31414 30-turn long-thread slice additionally promotes
   `thread.shell`, `thread.messages-basic`, `thread.virtualized-timeline`, and
   `thread.message-navigation`: the 1180×820 frame mounts 11 turns, exposes the
   30-button compact rail, materializes message 15 while retaining the sampled
@@ -32,7 +36,7 @@ exit gates; it does not replace the inventory.
   `scrollTop = -900`, and restores latest through the 32×32px control. CDP,
   Electron, reviewed baselines, and local-only product references gate the
   current responsive boundary under a 1% structural pixel limit.
-  The current activity follow-up additionally re-observes
+  The previous 26.825.31414 activity follow-up additionally re-observes
   `thread.activity-reasoning-plan` and `thread.command-execution` for one
   no-tool turn and two safe terminal turns. It replaces the continuous
   gradient with the installed 600ms-delay, 1s/48-step, 4s-period cadenced
@@ -40,7 +44,7 @@ exit gates; it does not replace the inventory.
   38.5%-foreground base and 75%-foreground sweep; and confirms 60%-foreground
   collapsed/expanded `Worked for` plus `Ran …` rows. Browser/CDP, Electron, a
   reviewed 1180×820 baseline, and a 0.6% tight current-product foreground
-  comparison gate the pre-answer state. A second current-build follow-up now
+  comparison gate the pre-answer state. A second 26.825.31414 follow-up
   gates Plan writing/completion: 3/5/8/10-step probes establish the Composer-
   dock ownership, `Step n / total` progress, variable-height tooltip list, and
   removal after every step completes. Browser/CDP and Electron cover active,
@@ -48,7 +52,7 @@ exit gates; it does not replace the inventory.
   baselines and a 2.8869% foreground product comparison cover the 1180×820
   composition. Free-form reasoning and unsampled reasoning variants remain P0
   work, so the combined inventory group stays partial.
-  A further read-only current-build probe now promotes
+  A further read-only 26.825.31414 probe promotes
   `thread.search-tool-events`, `thread.browser-tool-events`, and
   `workspace.browser`. Web Search preserves the two-level `Worked for 21s` →
   `Searched the web` disclosure and two 14/21px result rows. Browser presents
@@ -61,7 +65,8 @@ exit gates; it does not replace the inventory.
   pixels remain source-owned and are excluded behind an explicit content
   boundary. Multi-tab, authentication, downloads, permission prompts, and
   page-owned states remain incomplete.
-  The current no-tool Markdown probe now promotes `thread.messages-markdown`.
+  The previous 26.825.31414 no-tool Markdown probe promotes
+  `thread.messages-markdown`.
   It locks one 736/688×465.4375 completed response with 14/22.75px compact
   typography, a 21/28px H1, 3.5px quote marker, 81.5px full-width table,
   82px current-icon code block, public favicon link, literal inline math,
@@ -490,7 +495,7 @@ new parity claims:
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
 - retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.825.31414`;
+  surfaces re-observed on `26.825.51511`;
 - update inventory evidence prefixes and the current build note.
 
 Exit: the current build has a reproducible CDP capture recipe and no

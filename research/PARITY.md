@@ -6,9 +6,11 @@ not establish full conversation, workspace, application, or product coverage.
 
 The authoritative current-build inventory is:
 
-- [`26.825.31414.md`](26.825.31414.md) for the current package fingerprint,
-  reproducible shell baseline, primary-route drift, Help menu, responsive
-  Composer shell, project-menu provider, and Projects Index;
+- [`26.825.51511.md`](26.825.51511.md) for the current package fingerprint,
+  reproducible shell baseline, responsive Composer, Help menu, Projects Index,
+  and the project-menu provider/rendered Section-submenu boundary;
+- [`26.825.31414.md`](26.825.31414.md) for the previous shell, activity, Plan,
+  Search/Browser, long-thread, Markdown, and Projects evidence;
 - [`26.820.60940.md`](26.820.60940.md) for the previous broader shell,
   reproducible global-shell baseline, Help menu, responsive Composer shell,
   route restoration, native project-menu provider, and Projects Index drift;
@@ -51,16 +53,19 @@ The authoritative current-build inventory is:
 - The Electron playground validates the current package in a desktop
   BrowserWindow; it does not prove parity with unobserved product routes,
   panels, state transitions, or window types.
-- A scoped Codex Desktop `26.825.31414` (`7287`) probe revalidates the shell,
+- A scoped Codex Desktop `26.825.51511` (`7377`) probe revalidates the shell,
   responsive Composer, primary navigation, project-group lifecycle, Help menu,
   route restoration, project-menu provider, and Projects Index. Explicitly hiding the
   720px sidebar now removes Back and Forward alongside the navigation, and the collapsed
   Projects content remains 559px with 415/128 columns. The sidebar is now
   321.875px wide and `Sites` is absent from the sampled fixed-route stack. The
   project action menu still uses the frozen Electron native context-menu
-  provider; its native window, exact icon sources, and pixel gate remain
-  previous-build evidence until recaptured.
-- A current read-only Search/Browser follow-up reaches real Web Search and the
+  provider. The provider now includes Section and Reveal, while the sampled
+  AppKit render filters Reveal and presents a 252×187 six-action main menu plus
+  a 118×34 `New section…` submenu. Browser/CDP, Electron, exact 16×16 Section
+  source, reviewed baselines, and local-only 3.8155%/6.9542% regional pixel
+  comparisons gate the split boundary.
+- A previous 26.825.31414 read-only Search/Browser follow-up reaches real Web Search and the
   in-app Browser without project-file access. It locks `Worked for 21s` →
   `Searched the web`, the current generic MCP-backed `Used the browser, loaded
   a tool` group, and the 419.59375px one-tab Browser workspace with 46px/40px

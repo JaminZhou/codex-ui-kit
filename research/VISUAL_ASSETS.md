@@ -7,8 +7,10 @@ geometry otherwise create permanent noise that can hide regressions.
 [`visual-assets.json`](visual-assets.json) is the machine-checked broad manifest
 for 115 exact visual primitives observed on Codex Desktop `26.810.52044`.
 [`current-project-menu-assets.json`](current-project-menu-assets.json) is the
-narrow current-build `26.818.41509` manifest for the six native project-menu
-icons re-observed after that menu moved out of the Renderer DOM.
+narrow current-build `26.825.51511` manifest for seven project-menu provider
+icons, including the newly observed 16×16 Section source. The sampled native
+composition uses six of them because its Electron/AppKit layer filters the
+provider-only Reveal row in this context.
 Each entry records the application/build fingerprint, the de-identified CDP
 owner evidence, viewBox, rendered size, source root class, resolved root SVG
 style, per-primitive resolved style, root attributes, primitive geometry, and

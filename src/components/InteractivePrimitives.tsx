@@ -1050,6 +1050,10 @@ export interface MenuSubmenuProps {
   disabled?: boolean;
   label: ReactNode;
   startIcon?: ReactNode;
+  submenuClassName?: string;
+  submenuLabel?: string;
+  submenuStyle?: CSSProperties;
+  submenuWidth?: OverlayWidth;
 }
 
 export function MenuSubmenu({
@@ -1057,6 +1061,10 @@ export function MenuSubmenu({
   disabled = false,
   label,
   startIcon,
+  submenuClassName,
+  submenuLabel,
+  submenuStyle,
+  submenuWidth = "menu",
 }: MenuSubmenuProps) {
   const id = useId();
   const ownerIds = useContext(OverlayOwnerContext);
@@ -1141,9 +1149,18 @@ export function MenuSubmenu({
       <FloatingSurface
         align="start"
         anchorRef={anchorRef}
-        className="codex-ui-popover codex-ui-menu codex-ui-menu__submenu"
+        className={[
+          "codex-ui-popover codex-ui-menu codex-ui-menu__submenu",
+          submenuClassName,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         contentRef={contentRef}
         id={id}
+        label={
+          submenuLabel ??
+          (typeof label === "string" ? `${label} submenu` : undefined)
+        }
         onKeyDown={(event) => {
           if (event.key === "ArrowLeft" || event.key === "Escape") {
             event.preventDefault();
@@ -1158,7 +1175,8 @@ export function MenuSubmenu({
         role="menu"
         side="right"
         sideOffset={4}
-        width="menu"
+        style={submenuStyle}
+        width={submenuWidth}
       >
         <div
           onPointerEnter={clearCloseTimer}

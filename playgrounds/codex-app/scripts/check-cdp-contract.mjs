@@ -14786,7 +14786,9 @@ try {
       ),
       labels: Array.from(
         menu.querySelectorAll('[role="menuitem"]'),
-        (item) => item.textContent?.trim(),
+        (item) =>
+          item.querySelector(".codex-ui-menu-item__copy")?.textContent?.trim() ??
+          item.textContent?.trim(),
       ),
       rect: { height: bounds.height, width: bounds.width },
       separatorCount: menu.querySelectorAll('[role="separator"]').length,
@@ -14806,6 +14808,58 @@ try {
       },
     };
   });
+  const sectionMenuTrigger = projectMenu.getByRole("menuitem", {
+    name: "Section",
+  });
+  await sectionMenuTrigger.focus();
+  await sectionMenuTrigger.press("ArrowRight");
+  const sectionMenu = sidebarPage.getByRole("menu", {
+    name: "Section submenu",
+  });
+  await sectionMenu.waitFor({ state: "visible" });
+  await sidebarPage.waitForFunction(
+    () => document.activeElement?.textContent?.trim() === "New section…",
+  );
+  const sectionMenuContract = await sectionMenu.evaluate((menu) => {
+    const bounds = menu.getBoundingClientRect();
+    const item = menu.querySelector('[role="menuitem"]');
+    const itemBounds = item?.getBoundingClientRect();
+    const style = getComputedStyle(menu);
+    const itemStyle = item ? getComputedStyle(item) : null;
+    return {
+      focusLabel: document.activeElement?.textContent?.trim(),
+      itemCount: menu.querySelectorAll('[role="menuitem"]').length,
+      itemRect: itemBounds
+        ? {
+            height: itemBounds.height,
+            left: itemBounds.left - bounds.left,
+            top: itemBounds.top - bounds.top,
+            width: itemBounds.width,
+          }
+        : null,
+      labels: Array.from(
+        menu.querySelectorAll('[role="menuitem"]'),
+        (candidate) => candidate.textContent?.trim(),
+      ),
+      rect: { height: bounds.height, width: bounds.width },
+      style: {
+        backgroundColor: style.backgroundColor,
+        borderRadius: style.borderRadius,
+        borderTopColor: style.borderTopColor,
+        borderTopWidth: style.borderTopWidth,
+        fontSize: itemStyle?.fontSize,
+        fontWeight: itemStyle?.fontWeight,
+        padding: style.padding,
+      },
+    };
+  });
+  await sectionMenu.getByRole("menuitem", { name: "New section…" }).press(
+    "ArrowLeft",
+  );
+  await sectionMenu.waitFor({ state: "hidden" });
+  const sectionFocusReturned = await sectionMenuTrigger.evaluate(
+    (element) => document.activeElement === element,
+  );
   await sidebarPage.keyboard.press("Escape");
   await projectMenu.waitFor({ state: "hidden" });
   await sidebarPage.waitForFunction(
@@ -14821,22 +14875,23 @@ try {
     projectMenuContract.separatorCount !== 3 ||
     projectMenuContract.focusRole !== "menuitem" ||
     !projectMenuContract.focusReturned ||
-    Math.abs(projectMenuContract.rect.width - 221) > 1 ||
+    !sectionFocusReturned ||
+    Math.abs(projectMenuContract.rect.width - 252) > 1 ||
     Math.abs(projectMenuContract.rect.height - 187) > 1 ||
     JSON.stringify(projectMenuContract.itemRects) !==
       JSON.stringify([
-        { height: 25, left: 5, top: 5, width: 211 },
-        { height: 25, left: 5, top: 30, width: 211 },
-        { height: 25, left: 5, top: 64, width: 211 },
-        { height: 25, left: 5, top: 89, width: 211 },
-        { height: 25, left: 5, top: 123, width: 211 },
-        { height: 25, left: 5, top: 157, width: 211 },
+        { height: 25, left: 5, top: 5, width: 242 },
+        { height: 25, left: 5, top: 30, width: 242 },
+        { height: 25, left: 5, top: 64, width: 242 },
+        { height: 25, left: 5, top: 89, width: 242 },
+        { height: 25, left: 5, top: 123, width: 242 },
+        { height: 25, left: 5, top: 157, width: 242 },
       ]) ||
     JSON.stringify(projectMenuContract.separatorRects) !==
       JSON.stringify([
-        { height: 1, left: 16, top: 58, width: 189 },
-        { height: 1, left: 16, top: 117, width: 189 },
-        { height: 1, left: 16, top: 152, width: 189 },
+        { height: 1, left: 16, top: 58, width: 220 },
+        { height: 1, left: 16, top: 117, width: 220 },
+        { height: 1, left: 16, top: 152, width: 220 },
       ]) ||
     JSON.stringify(projectMenuContract.style) !==
       JSON.stringify({
@@ -14853,7 +14908,7 @@ try {
       JSON.stringify([
         "Unpin",
         "Edit",
-        "Reveal in Finder",
+        "Section",
         "Create permanent worktree",
         "Archive chats",
         "Remove project",
@@ -14862,14 +14917,37 @@ try {
       JSON.stringify([
         "sidebar-project-menu-unpin",
         "sidebar-project-menu-edit",
-        "sidebar-project-menu-reveal",
+        "sidebar-project-menu-section",
         "sidebar-project-menu-worktree",
         "sidebar-project-menu-archive",
         "sidebar-project-menu-remove",
       ])
   ) {
     throw new Error(
-      `sidebar-current: project menu contract failed: ${JSON.stringify(projectMenuContract)}`,
+      `sidebar-current: project menu contract failed: ${JSON.stringify({ projectMenuContract, sectionFocusReturned, sectionMenuContract })}`,
+    );
+  }
+  if (
+    sectionMenuContract.itemCount !== 1 ||
+    JSON.stringify(sectionMenuContract.labels) !== JSON.stringify(["New section…"]) ||
+    Math.abs(sectionMenuContract.rect.width - 118) > 1 ||
+    Math.abs(sectionMenuContract.rect.height - 34) > 1 ||
+    JSON.stringify(sectionMenuContract.itemRect) !==
+      JSON.stringify({ height: 24, left: 5, top: 5, width: 108 }) ||
+    sectionMenuContract.focusLabel !== "New section…" ||
+    JSON.stringify(sectionMenuContract.style) !==
+      JSON.stringify({
+        backgroundColor: "rgb(31, 31, 31)",
+        borderRadius: "8px",
+        borderTopColor: "rgb(105, 105, 105)",
+        borderTopWidth: "1px",
+        fontSize: "13px",
+        fontWeight: "400",
+        padding: "4px",
+      })
+  ) {
+    throw new Error(
+      `sidebar-current: Section submenu contract failed: ${JSON.stringify(sectionMenuContract)}`,
     );
   }
   const unreadProjectMenuTrigger = sidebarPage.getByRole("button", {
@@ -14886,7 +14964,9 @@ try {
     return {
       labels: Array.from(
         menu.querySelectorAll('[role="menuitem"]'),
-        (item) => item.textContent?.trim(),
+        (item) =>
+          item.querySelector(".codex-ui-menu-item__copy")?.textContent?.trim() ??
+          item.textContent?.trim(),
       ),
       rect: { height: bounds.height, width: bounds.width },
       separatorCount: menu.querySelectorAll('[role="separator"]').length,
@@ -14897,14 +14977,14 @@ try {
       JSON.stringify([
         "Unpin",
         "Edit",
-        "Reveal in Finder",
+        "Section",
         "Create permanent worktree",
         "Mark all as read",
         "Archive chats",
         "Remove project",
       ]) ||
     unreadProjectMenuContract.separatorCount !== 3 ||
-    Math.abs(unreadProjectMenuContract.rect.width - 221) > 1 ||
+    Math.abs(unreadProjectMenuContract.rect.width - 252) > 1 ||
     Math.abs(unreadProjectMenuContract.rect.height - 212) > 1 ||
     !(await unreadProjectMenu
       .getByRole("menuitem", { name: "Mark all as read" })
