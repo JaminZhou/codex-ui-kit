@@ -1,0 +1,3 @@
+alpha baseline
+line retained
+line to remove
