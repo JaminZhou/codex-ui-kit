@@ -1436,6 +1436,163 @@ for (const sidebarWorktreeLifecycleScene of [
   }
 }
 
+for (const worktreeSetupScene of [
+  {
+    currentSidebar: true,
+    frame: "current-worktree-setup-failed-collapsed",
+    id: "electron-current-worktree-setup-failed-collapsed",
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-worktree-setup-creating",
+    id: "electron-current-worktree-setup-creating",
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-worktree-setup-created",
+    id: "electron-current-worktree-setup-created",
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+  },
+  {
+    currentSidebar: true,
+    frame: "current-worktree-setup-failed",
+    id: "electron-current-worktree-setup-failed-compact",
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const { app: setupApp, page: setupPage } = await launchScene(
+    worktreeSetupScene,
+    { capture: true },
+  );
+  try {
+    const setup = await setupPage
+      .locator(".codex-ui-worktree-setup")
+      .evaluate((root) => {
+        const bounds = root.getBoundingClientRect();
+        const card = root.querySelector(
+          ".codex-ui-worktree-setup__card",
+        );
+        const cardBounds = card?.getBoundingClientRect();
+        return {
+          actions: Array.from(
+            root.querySelectorAll(".codex-ui-worktree-setup__action"),
+            (button) => button.textContent?.trim(),
+          ),
+          ariaBusy: root.getAttribute("aria-busy"),
+          cardHeight: cardBounds?.height ?? null,
+          cardWidth: cardBounds?.width ?? null,
+          phase: root.getAttribute("data-phase"),
+          role: root.getAttribute("role"),
+          rootHeight: bounds.height,
+          rootWidth: bounds.width,
+          stepStatuses: Array.from(
+            root.querySelectorAll(
+              ".codex-ui-worktree-setup__steps > li",
+            ),
+            (step) => step.getAttribute("data-status"),
+          ),
+        };
+      });
+    const compact = worktreeSetupScene.windowSize?.width === 720;
+    const expectedPhase = worktreeSetupScene.frame.endsWith("-created")
+      ? "created"
+      : worktreeSetupScene.frame.endsWith("-creating")
+        ? "creating"
+        : "failed";
+    const collapsed = worktreeSetupScene.frame.endsWith("-collapsed");
+    if (
+      setup.phase !== expectedPhase ||
+      setup.role !== (expectedPhase === "failed" ? "alert" : "status") ||
+      setup.ariaBusy !== (expectedPhase === "creating" ? "true" : null) ||
+      Math.abs(setup.rootWidth - (compact ? 366.125 : 736)) > 0.1 ||
+      setup.rootHeight !==
+        (expectedPhase === "created"
+          ? 50
+          : collapsed || expectedPhase === "creating"
+            ? 141
+            : 276.5) ||
+      setup.cardHeight !==
+        (expectedPhase === "created"
+          ? null
+          : collapsed || expectedPhase === "creating"
+            ? 112
+            : 247.5) ||
+      (setup.cardWidth !== null &&
+        Math.abs(setup.cardWidth - (compact ? 366.125 : 736)) > 0.1) ||
+      JSON.stringify(setup.actions) !==
+        JSON.stringify(
+          expectedPhase === "failed"
+            ? ["Edit environment", "Retry"]
+            : expectedPhase === "creating"
+              ? ["Work locally", "Cancel"]
+              : [],
+        )
+    ) {
+      throw new Error(
+        `${worktreeSetupScene.id}: Electron worktree setup drifted: ${JSON.stringify(setup)}`,
+      );
+    }
+
+    if (worktreeSetupScene.frame.endsWith("-collapsed")) {
+      await setupPage.getByRole("button", { name: "More details" }).click();
+      await setupPage.waitForFunction(
+        () =>
+          document
+            .querySelector(".codex-ui-worktree-setup")
+            ?.getAttribute("data-expanded") === "true",
+      );
+      await setupPage.getByRole("button", { name: "Less details" }).click();
+      await setupPage.getByRole("button", { name: "Retry" }).click();
+      await setupPage.waitForSelector(
+        '.codex-ui-worktree-setup[data-phase="creating"]',
+      );
+      await setupPage.waitForSelector(
+        '.codex-ui-worktree-setup[data-phase="created"]',
+      );
+    }
+
+    if (worktreeSetupScene.frame.endsWith("-creating")) {
+      await setupPage.getByRole("button", { name: "Cancel" }).click();
+      await setupPage.waitForSelector(
+        '.codex-ui-worktree-setup[data-phase="failed"][data-expanded="true"]',
+      );
+    }
+
+    if (compact) {
+      await setupPage
+        .getByRole("button", { name: "Edit environment" })
+        .click();
+      await setupPage.getByText("Local environments unavailable").waitFor();
+      const destination = await setupPage.evaluate(() => ({
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        unavailableCount: Array.from(
+          document.querySelectorAll("h1, h2, h3, p"),
+          (element) => element.textContent?.trim(),
+        ).filter((text) => text === "Local environments unavailable").length,
+      }));
+      if (
+        destination.horizontalOverflow !== 0 ||
+        destination.unavailableCount !== 1
+      ) {
+        throw new Error(
+          `${worktreeSetupScene.id}: Edit environment route failed: ${JSON.stringify(destination)}`,
+        );
+      }
+    }
+  } finally {
+    await setupApp.close();
+  }
+}
+
 for (const collectionScene of [
   {
     currentSidebar: true,

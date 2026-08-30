@@ -484,6 +484,8 @@ const currentSidebar26825WorktreeFailedReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_FAILED_REFERENCE;
 const currentSidebar26825WorktreeRecoveredReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_WORKTREE_RECOVERED_REFERENCE;
+const currentWorktreeSetupFailureReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETUP_FAILURE_REFERENCE;
 const currentBuildSidebarRecentsActionsReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_RECENTS_ACTIONS_REFERENCE;
 const currentBuildSidebarWorktreeLoadingReference =
@@ -3749,6 +3751,63 @@ for (const scene of selectedScenes) {
         status: "worktree-recovered",
       });
     }
+  }
+
+  if (
+    scene.id === "current-worktree-setup-failed" &&
+    currentWorktreeSetupFailureReference
+  ) {
+    const referenceFull = flattenPng(
+      PNG.sync.read(await readFile(currentWorktreeSetupFailureReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (referenceFull.width !== 1180 || referenceFull.height !== 820) {
+      throw new Error(
+        `${scene.id}: current worktree setup reference must be exactly 1180x820, received ${referenceFull.width}x${referenceFull.height}.`,
+      );
+    }
+    if (actual.width !== 1180 || actual.height !== 820) {
+      throw new Error(
+        `${scene.id}: current worktree setup comparison requires an 1180x820 frame.`,
+      );
+    }
+    const reference = maskPng(
+      foregroundMaskPng(cropPng(referenceFull, 383, 190, 736, 277)),
+      [{ height: 106, left: 12, top: 171, width: 710 }],
+    );
+    const actualRegion = maskPng(
+      foregroundMaskPng(cropPng(actual, 383, 190, 736, 277)),
+      [{ height: 106, left: 12, top: 171, width: 710 }],
+    );
+    const comparison = comparePng(reference, actualRegion, 0);
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${scene.id}.failure-card.current-build.png`,
+      ),
+      PNG.sync.write(actualRegion),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.failure-card.current-build.diff.png`,
+        ),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETUP_FAILURE_MAX_DIFF_RATIO",
+      0.065,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current worktree setup foreground pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current worktree setup foreground pixel ratio ${comparison.ratio}`,
+    );
   }
 
   if (

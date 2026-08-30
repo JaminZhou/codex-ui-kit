@@ -5393,3 +5393,7 @@ textarea {
   color: var(--codex-ui-text-tertiary);
   font-size: var(--codex-ui-font-size-sm);
 }
+
+.demo-current-worktree-setup {
+  margin-top: 0;
+}
