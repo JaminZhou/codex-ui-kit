@@ -1590,6 +1590,266 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-worktree-settings")) {
+      await page
+        .getByRole("heading", { level: 1, name: "Worktrees", exact: true })
+        .waitFor();
+      const worktrees = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const rects = (selector) =>
+          Array.from(document.querySelectorAll(selector), (element) => {
+            const value = element.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          });
+        const style = (selector) => {
+          const element = document.querySelector(selector);
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            borderRadius: value.borderRadius,
+            color: value.color,
+          };
+        };
+        const rootInput = document.querySelector(
+          'input[aria-label="Worktree root"]',
+        );
+        const limitInput = document.querySelector(
+          'input[aria-label="Auto-delete limit"]',
+        );
+        return {
+          cards: rects(".codex-ui-worktree-settings__entry"),
+          conversationText: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-worktree-settings__conversations li, .codex-ui-worktree-settings__conversations > p",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          empty: document
+            .querySelector(".codex-ui-worktree-settings__empty")
+            ?.textContent?.trim(),
+          heading: rect(".codex-ui-worktree-settings > h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          iconNames: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-settings-shell__navigation [data-current-build-icon]",
+            ),
+            (icon) => icon.getAttribute("data-current-build-icon"),
+          ),
+          inputs: {
+            limit: limitInput instanceof HTMLInputElement ? limitInput.value : null,
+            limitRect: rect('input[aria-label="Auto-delete limit"]'),
+            root: rootInput instanceof HTMLInputElement ? rootInput.value : null,
+            rootPlaceholder:
+              rootInput instanceof HTMLInputElement ? rootInput.placeholder : null,
+            rootRect: rect('input[aria-label="Worktree root"]'),
+          },
+          mainCount: document.querySelectorAll('main, [role="main"]').length,
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          navigationCount: document.querySelectorAll(
+            'nav[aria-label="Settings"]',
+          ).length,
+          outerRegionCount: document.querySelectorAll(
+            '[role="region"][aria-label="Settings route"]',
+          ).length,
+          preferenceRows: rects(
+            ".codex-ui-worktree-settings__preference-row",
+          ),
+          preferences: rect(".codex-ui-worktree-settings__preferences"),
+          projectHeaders: rects(
+            ".codex-ui-worktree-settings__project > header",
+          ),
+          projectLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-worktree-settings__project > header > span",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-worktree-settings [role="switch"]',
+            ),
+            (control) => ({
+              label: control.getAttribute("aria-label"),
+              value: control.getAttribute("aria-checked"),
+            }),
+          ),
+          theme: document.querySelector(".demo-root")?.getAttribute("data-theme"),
+          viewport: { height: innerHeight, width: innerWidth },
+          visualStyles: {
+            card: style(".codex-ui-worktree-settings__entry"),
+            heading: style(".codex-ui-worktree-settings > h1"),
+            preferences: style(".codex-ui-worktree-settings__preferences"),
+            shell: style(".codex-ui-settings-shell"),
+          },
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const empty = scene.id === "workspace-worktree-settings-empty";
+      const expectedWidth = compact ? 358.125 : 768;
+      const expectedSwitches = [
+        ["Always fetch upstream before creating worktrees", "false"],
+        ["Automatically delete old worktrees", "true"],
+      ];
+      if (
+        worktrees.horizontalOverflow > 1 ||
+        worktrees.navigationCount !== 1 ||
+        worktrees.mainCount !== 1 ||
+        worktrees.outerRegionCount !== 1 ||
+        worktrees.selected !== "Worktrees" ||
+        worktrees.navigation?.width !== 321.875 ||
+        worktrees.navigation?.top !== 46 ||
+        worktrees.navigation?.height !== worktrees.viewport.height - 46 ||
+        worktrees.heading?.top !== 66 ||
+        Math.abs(worktrees.heading?.width - expectedWidth) > 1 ||
+        Math.abs(worktrees.preferences?.width - expectedWidth) > 1 ||
+        worktrees.preferenceRows.length !== 4 ||
+        worktrees.inputs.root !== "" ||
+        worktrees.inputs.rootPlaceholder !== "/Users/demo/.codex/worktrees" ||
+        worktrees.inputs.limit !== "15" ||
+        worktrees.inputs.rootRect?.width !== 288 ||
+        worktrees.inputs.rootRect?.height !== 36 ||
+        worktrees.inputs.limitRect?.width !== 96 ||
+        worktrees.inputs.limitRect?.height !== 28 ||
+        JSON.stringify(worktrees.switchStates.map(({ label, value }) => [label, value])) !==
+          JSON.stringify(expectedSwitches) ||
+        !worktrees.iconNames.includes("settings-worktrees") ||
+        (empty
+          ? worktrees.cards.length !== 0 ||
+            worktrees.projectHeaders.length !== 0 ||
+            worktrees.empty !== "No managed worktrees."
+          : worktrees.cards.length !== 1 ||
+            worktrees.projectHeaders.length !== 1 ||
+            Math.abs(worktrees.cards[0].width - expectedWidth) > 1 ||
+            worktrees.projectLabels[0] !== "/Users/demo/Developer/codex-ui-kit") ||
+        (scene.id === "workspace-worktree-settings-conversations"
+          ? worktrees.conversationText[0] !== "Continue current-build UI parity"
+          : !empty &&
+            worktrees.conversationText[0] !==
+              "No conversations linked to this worktree.")
+      ) {
+        throw new Error(
+          `${scene.id}: current Worktrees Settings contract failed: ${JSON.stringify(worktrees)}`,
+        );
+      }
+      if (
+        scene.id === "workspace-worktree-settings-light" &&
+        (worktrees.theme !== "light" ||
+          worktrees.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
+          worktrees.visualStyles.preferences?.backgroundColor === "rgb(35, 35, 35)" ||
+          worktrees.visualStyles.heading?.color !== "rgb(26, 28, 31)")
+      ) {
+        throw new Error(
+          `${scene.id}: light Worktrees Settings paint failed: ${JSON.stringify(worktrees.visualStyles)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-worktree-settings") {
+        await page
+          .getByRole("switch", {
+            name: "Always fetch upstream before creating worktrees",
+          })
+          .click();
+        await page
+          .getByRole("textbox", { name: "Worktree root" })
+          .fill("/tmp/current-worktrees");
+        await page
+          .getByRole("spinbutton", { name: "Auto-delete limit" })
+          .fill("21");
+        await page
+          .getByRole("button", { name: "New chat in this worktree" })
+          .click();
+        const newChatStatus = await page
+          .locator(".demo-settings-action-status")
+          .textContent();
+        await page.getByRole("button", { name: "Refresh" }).click();
+        await page.waitForFunction(
+          () =>
+            document
+              .querySelector(".demo-settings-action-status")
+              ?.textContent?.trim() === "Managed worktrees refreshed",
+        );
+        await page.getByRole("button", { name: "Delete" }).click();
+        interaction = await page.evaluate((newChatStatusValue) => ({
+          cardCount: document.querySelectorAll(
+            ".codex-ui-worktree-settings__entry",
+          ).length,
+          fetchUpstream: document
+            .querySelector(
+              '[role="switch"][aria-label="Always fetch upstream before creating worktrees"]',
+            )
+            ?.getAttribute("aria-checked"),
+          limit: document.querySelector(
+            'input[aria-label="Auto-delete limit"]',
+          )?.value,
+          newChatStatus: newChatStatusValue,
+          root: document.querySelector('input[aria-label="Worktree root"]')
+            ?.value,
+          status: document
+            .querySelector(".demo-settings-action-status")
+            ?.textContent?.trim(),
+        }), newChatStatus);
+        if (
+          interaction.cardCount !== 0 ||
+          interaction.fetchUpstream !== "true" ||
+          interaction.limit !== "21" ||
+          interaction.newChatStatus?.trim() !==
+            "New chat requested in managed worktree" ||
+          interaction.root !== "/tmp/current-worktrees" ||
+          interaction.status !== "Managed worktree deleted"
+        ) {
+          throw new Error(
+            `${scene.id}: Worktrees Settings interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      if (scene.id === "workspace-worktree-settings-missing-refresh") {
+        await page.getByRole("button", { name: "Refresh" }).click();
+        await page.waitForFunction(
+          () =>
+            document.querySelectorAll(
+              ".codex-ui-worktree-settings__entry",
+            ).length === 0 &&
+            document
+              .querySelector(".demo-settings-action-status")
+              ?.textContent?.trim() === "Missing worktree removed",
+        );
+        interaction = {
+          cardCount: await page
+            .locator(".codex-ui-worktree-settings__entry")
+            .count(),
+          status: await page
+            .locator(".demo-settings-action-status")
+            .textContent(),
+        };
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, worktrees }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-hooks-settings")) {
       await page
         .getByRole("heading", { level: 1, name: "Hooks", exact: true })

@@ -110,6 +110,20 @@ exit gates; it does not replace the inventory.
   720px widths. Five reviewed baselines pass, while a local-only product crop
   passes at 5.2082% foreground difference under 6.5%. Retention, permanent,
   missing-directory, and other worktree variants remain partial.
+  A fifth current `26.825.51511` follow-up closes the sampled managed-worktree
+  Settings gap. It locks the four preferences, project grouping, Refresh,
+  immediate Delete, New chat, conversation linkage, and the observed rule that
+  Refresh removes a missing directory instead of presenting a repair card.
+  The centered 768px route uses a 321.875px Settings rail, a 768×276.31px
+  preference card, 46px project header, and 768×124.58px managed card; the
+  720×680 frame preserves the fixed controls and zero document overflow.
+  Browser/CDP covers six wide/compact/light/empty/conversation/missing-refresh
+  frames, Electron repeats controlled state and route persistence, and six
+  reviewed baselines pass. The local-only same-build owned-route comparison is
+  4.5984% under 5%. Product Delete removed the exact disposable worktree and
+  Git registration without a confirmation dialog. Native `Create permanent
+  worktree` remains menu-observed but deliberately unactivated, so permanent
+  creation and broader retention/pruning lifecycles keep the group partial.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a

@@ -149,6 +149,8 @@
 .codex-ui-branch-creation-dialog *,
 .codex-ui-settings-shell,
 .codex-ui-settings-shell *,
+.codex-ui-worktree-settings,
+.codex-ui-worktree-settings *,
 .codex-ui-git-settings,
 .codex-ui-git-settings *,
 .codex-ui-hooks-settings,
@@ -214,6 +216,10 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+}
+
+.codex-ui-settings-shell:has(.codex-ui-worktree-settings) {
+  --codex-ui-settings-sidebar-width: 20.1171875rem;
 }
 
 .codex-ui-settings-shell__navigation {
@@ -467,7 +473,7 @@
   display: flex;
   gap: 1rem;
   justify-content: space-between;
-  min-height: 3.75rem;
+  min-height: 3.78515625rem;
   padding: 0.75rem 1rem;
 }
 
@@ -1985,10 +1991,328 @@
   outline-offset: 1px;
 }
 
+.codex-ui-worktree-settings {
+  color: var(--codex-ui-text);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--codex-ui-font-sans-default);
+  margin: 0 auto;
+  max-width: 48rem;
+  min-width: 20rem;
+  padding: 1.25rem 0 1.3125rem;
+  width: calc(100% - 2.5rem);
+}
+
+.codex-ui-worktree-settings > h1 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.8rem;
+  margin: 0 0 2rem;
+}
+
+.codex-ui-worktree-settings__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.codex-ui-worktree-settings__preferences,
+.codex-ui-worktree-settings__entry,
+.codex-ui-worktree-settings__empty {
+  background: light-dark(
+    var(--codex-ui-background-elevated-secondary-opaque),
+    #232323
+  );
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.082));
+  border-radius: 1.25rem;
+}
+
+.codex-ui-worktree-settings__preferences {
+  overflow: hidden;
+}
+
+.codex-ui-worktree-settings__preference-row {
+  align-items: center;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  min-height: 3.75rem;
+  padding: 0.75rem 1rem;
+  position: relative;
+}
+
+.codex-ui-worktree-settings__preference-row:first-child,
+.codex-ui-worktree-settings__preference-row:last-child {
+  min-height: 4.78515625rem;
+}
+
+.codex-ui-worktree-settings__preference-row:not(:last-child)::after {
+  background: light-dark(var(--codex-ui-border), rgb(255 255 255 / 0.082));
+  bottom: 0;
+  content: "";
+  height: 0.5px;
+  inset-inline: 1rem;
+  position: absolute;
+}
+
+.codex-ui-worktree-settings__preference-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.codex-ui-worktree-settings__preference-copy > span,
+.codex-ui-worktree-settings__entry h2,
+.codex-ui-worktree-settings__project > header > span {
+  color: var(--codex-ui-text);
+  font-size: 0.8125rem;
+  font-weight: var(--codex-ui-font-weight-shell);
+  line-height: 1.160714rem;
+}
+
+.codex-ui-worktree-settings__preference-copy > p,
+.codex-ui-worktree-settings__entry p,
+.codex-ui-worktree-settings__conversations h3,
+.codex-ui-worktree-settings__conversations li {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  margin: 0;
+}
+
+.codex-ui-worktree-settings__preference-control {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+}
+
+.codex-ui-worktree-settings__preference-control > input {
+  background: light-dark(
+    var(--codex-ui-background-editor-opaque),
+    rgb(45 45 45 / 0.96)
+  );
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.157));
+  border-radius: 0.625rem;
+  color: var(--codex-ui-text);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.160714rem;
+  min-width: 0;
+  padding: 0 0.625rem;
+  width: 18rem;
+}
+
+.codex-ui-worktree-settings__preference-control > input[type="text"] {
+  height: 2.25rem;
+}
+
+.codex-ui-worktree-settings__preference-control > input[type="number"] {
+  height: 1.75rem;
+  padding-inline: 0.5rem;
+  width: 6rem;
+}
+
+.codex-ui-worktree-settings__switch {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  height: 1.25rem;
+  padding: 0;
+  width: 2rem;
+}
+
+.codex-ui-worktree-settings__switch > span {
+  background: light-dark(rgb(0 0 0 / 0.18), rgb(255 255 255 / 0.1));
+  border-radius: var(--codex-ui-radius-full);
+  display: block;
+  height: 1.25rem;
+  padding: 0.125rem;
+  transition: background 120ms ease;
+  width: 2rem;
+}
+
+.codex-ui-worktree-settings__switch > span > span {
+  background: #fff;
+  border-radius: var(--codex-ui-radius-full);
+  display: block;
+  height: 1rem;
+  transform: translateX(0);
+  transition: transform 120ms ease;
+  width: 1rem;
+}
+
+.codex-ui-worktree-settings__switch[aria-checked="true"] > span {
+  background: rgb(58 131 247);
+}
+
+.codex-ui-worktree-settings__switch[aria-checked="true"] > span > span {
+  transform: translateX(0.75rem);
+}
+
+.codex-ui-worktree-settings__project {
+  display: flex;
+  flex-direction: column;
+}
+
+.codex-ui-worktree-settings__project > header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-height: 2.875rem;
+  padding-bottom: 0.375rem;
+}
+
+.codex-ui-worktree-settings__project > header > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-worktree-settings__refresh,
+.codex-ui-worktree-settings__entry-actions > button {
+  align-items: center;
+  border: 0;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  justify-content: center;
+}
+
+.codex-ui-worktree-settings__refresh {
+  background: transparent;
+  border-radius: 0.5rem;
+  flex: 0 0 auto;
+  height: 1.75rem;
+  padding: 0.25rem;
+  width: 1.75rem;
+}
+
+.codex-ui-worktree-settings__entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.codex-ui-worktree-settings__entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 7.78515625rem;
+  padding: 0.75rem;
+}
+
+.codex-ui-worktree-settings__entry-top {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  min-height: 3.41015625rem;
+}
+
+.codex-ui-worktree-settings__entry-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.codex-ui-worktree-settings__entry h2,
+.codex-ui-worktree-settings__conversations h3 {
+  font-weight: var(--codex-ui-font-weight-shell);
+  margin: 0;
+}
+
+.codex-ui-worktree-settings__path {
+  margin-top: 0.25rem !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-worktree-settings__entry-actions > button:first-child {
+  flex: 0 0 12.6142578125rem;
+  width: 12.6142578125rem;
+}
+
+.codex-ui-worktree-settings__entry-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
+.codex-ui-worktree-settings__entry-actions > button {
+  background: light-dark(
+    var(--codex-ui-background-button-secondary),
+    rgb(255 255 255 / 0.05)
+  );
+  border-radius: 0.78125rem;
+  font-size: 0.8125rem;
+  gap: 0.25rem;
+  height: 1.75rem;
+  line-height: 1.125rem;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+.codex-ui-worktree-settings__entry-actions svg {
+  fill: currentColor;
+  height: 1rem;
+  width: 1rem;
+}
+
+.codex-ui-worktree-settings__entry-actions > .codex-ui-worktree-settings__delete {
+  background: light-dark(rgb(210 20 20 / 0.1), rgb(255 103 100 / 0.1));
+  color: light-dark(rgb(190 20 20), rgb(255 103 100));
+  flex: 0 0 3.7373046875rem;
+  width: 3.7373046875rem;
+}
+
+.codex-ui-worktree-settings__conversations {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 2.25rem;
+}
+
+.codex-ui-worktree-settings__conversations ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.codex-ui-worktree-settings__empty {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.160714rem;
+  padding: 1rem;
+}
+
+.codex-ui-worktree-settings button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.codex-ui-worktree-settings button:focus-visible,
+.codex-ui-worktree-settings input:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
 @media (max-width: 50rem) {
   .codex-ui-git-settings,
   .codex-ui-appearance-settings,
   .codex-ui-general-settings {
+    margin-inline-start: 1.25rem;
+    width: calc(100% - 2.5rem);
+  }
+
+  .codex-ui-worktree-settings {
     margin-inline-start: 1.25rem;
     width: calc(100% - 2.5rem);
   }

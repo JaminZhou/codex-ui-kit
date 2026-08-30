@@ -8977,6 +8977,140 @@ try {
     throw new Error("Electron Settings route switching lost Appearance controlled state.");
   }
   await gitSettingsNavigation
+    .getByRole("button", { name: "Worktrees", exact: true })
+    .click();
+  const worktreeSettingsMain = codingWorkspacePage.getByRole("main");
+  await worktreeSettingsMain
+    .getByRole("heading", { level: 1, name: "Worktrees", exact: true })
+    .waitFor();
+  const worktreeSettingsGeometry = await worktreeSettingsMain.evaluate((main) => {
+    const rect = (selector) => {
+      const element = main.querySelector(selector);
+      const value = element?.getBoundingClientRect();
+      return value
+        ? {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          }
+        : null;
+    };
+    return {
+      card: rect(".codex-ui-worktree-settings__entry"),
+      evidence: main
+        .querySelector(".codex-ui-worktree-settings")
+        ?.getAttribute("data-evidence"),
+      heading: rect(".codex-ui-worktree-settings > h1"),
+      preferences: rect(".codex-ui-worktree-settings__preferences"),
+      preferenceRows: main.querySelectorAll(
+        ".codex-ui-worktree-settings__preference-row",
+      ).length,
+      projectHeader: rect(".codex-ui-worktree-settings__project > header"),
+    };
+  });
+  if (
+    (await gitSettingsNavigation
+      .getByRole("button", { name: "Worktrees", exact: true })
+      .getAttribute("aria-current")) !== "page" ||
+    worktreeSettingsGeometry.evidence !== "runtime-observed" ||
+    worktreeSettingsGeometry.heading?.top !== 66 ||
+    worktreeSettingsGeometry.heading?.width !== 768 ||
+    Math.abs((worktreeSettingsGeometry.preferences?.height ?? 0) - 276.3125) >
+      0.1 ||
+    worktreeSettingsGeometry.preferences?.width !== 768 ||
+    worktreeSettingsGeometry.preferenceRows !== 4 ||
+    worktreeSettingsGeometry.projectHeader?.height !== 46 ||
+    worktreeSettingsGeometry.card?.width !== 768 ||
+    Math.abs((worktreeSettingsGeometry.card?.height ?? 0) - 124.578125) > 0.1
+  ) {
+    throw new Error(
+      `Electron Worktrees Settings route is incomplete: ${JSON.stringify(worktreeSettingsGeometry)}.`,
+    );
+  }
+  await worktreeSettingsMain
+    .getByRole("switch", {
+      name: "Always fetch upstream before creating worktrees",
+    })
+    .click();
+  await worktreeSettingsMain
+    .getByRole("textbox", { name: "Worktree root" })
+    .fill("/tmp/electron-worktrees");
+  await worktreeSettingsMain
+    .getByRole("spinbutton", { name: "Auto-delete limit" })
+    .fill("21");
+  await worktreeSettingsMain
+    .getByRole("button", { name: "New chat in this worktree" })
+    .click();
+  if (
+    (await codingWorkspacePage
+      .locator(".demo-settings-action-status")
+      .textContent()) !== "New chat requested in managed worktree"
+  ) {
+    throw new Error("Electron Worktrees Settings did not route new-chat action.");
+  }
+  await worktreeSettingsMain.getByRole("button", { name: "Refresh" }).click();
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document.querySelector(".demo-settings-action-status")?.textContent ===
+      "Managed worktrees refreshed",
+  );
+  await worktreeSettingsMain.getByRole("button", { name: "Delete" }).click();
+  const worktreeSettingsInteraction = await worktreeSettingsMain.evaluate(
+    (main) => ({
+      cardCount: main.querySelectorAll(".codex-ui-worktree-settings__entry")
+        .length,
+      fetchUpstream: main
+        .querySelector(
+          '[role="switch"][aria-label="Always fetch upstream before creating worktrees"]',
+        )
+        ?.getAttribute("aria-checked"),
+      limit: main.querySelector('input[aria-label="Auto-delete limit"]')?.value,
+      root: main.querySelector('input[aria-label="Worktree root"]')?.value,
+      status: document
+        .querySelector(".demo-settings-action-status")
+        ?.textContent?.trim(),
+    }),
+  );
+  if (
+    worktreeSettingsInteraction.cardCount !== 0 ||
+    worktreeSettingsInteraction.fetchUpstream !== "true" ||
+    worktreeSettingsInteraction.limit !== "21" ||
+    worktreeSettingsInteraction.root !== "/tmp/electron-worktrees" ||
+    worktreeSettingsInteraction.status !== "Managed worktree deleted"
+  ) {
+    throw new Error(
+      `Electron Worktrees Settings controls did not update controlled state: ${JSON.stringify(worktreeSettingsInteraction)}.`,
+    );
+  }
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Git", exact: true })
+    .click();
+  await gitSettingsMain.getByRole("heading", { name: "Git", exact: true }).waitFor();
+  await gitSettingsNavigation
+    .getByRole("button", { name: "Worktrees", exact: true })
+    .click();
+  await worktreeSettingsMain
+    .getByRole("heading", { level: 1, name: "Worktrees", exact: true })
+    .waitFor();
+  if (
+    (await worktreeSettingsMain
+      .getByRole("switch", {
+        name: "Always fetch upstream before creating worktrees",
+      })
+      .getAttribute("aria-checked")) !== "true" ||
+    (await worktreeSettingsMain
+      .getByRole("textbox", { name: "Worktree root" })
+      .inputValue()) !== "/tmp/electron-worktrees" ||
+    (await worktreeSettingsMain
+      .locator(".codex-ui-worktree-settings__entry")
+      .count()) !== 0
+  ) {
+    throw new Error(
+      "Electron Settings route switching lost Worktrees controlled state.",
+    );
+  }
+  await gitSettingsNavigation
     .getByRole("button", { name: "Back to app" })
     .click();
   await codingWorkspacePage.waitForSelector(

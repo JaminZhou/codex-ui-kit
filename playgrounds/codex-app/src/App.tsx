@@ -98,6 +98,7 @@ import {
   ThreadVirtualizedPlaceholder,
   ToolCallCard,
   TurnDuration,
+  WorktreeSettingsPage,
   WorkingDirectoryNotice,
   WorktreeSetupStatus,
   WorkspacePanel,
@@ -112,9 +113,11 @@ import {
   type GeneralSettingsValue,
   type GitSettingsValue,
   type HookSettingsEntry,
+  type ManagedWorktreeEntry,
   type QueuedPrompt,
   type SubagentItem,
   type WorktreeSetupPhase,
+  type WorktreeSettingsValue,
   type WorktreeSetupStep,
 } from "codex-ui-kit";
 import {
@@ -356,6 +359,23 @@ const configuredHookSettingsEntries: readonly HookSettingsEntry[] = [
     trusted: true,
   },
 ];
+
+const currentWorktreeSettingsEntry: ManagedWorktreeEntry = {
+  id: "managed-a1b2",
+  projectPath: "/Users/demo/Developer/codex-ui-kit",
+  projectTextValue: "/Users/demo/Developer/codex-ui-kit",
+  worktreePath: "/Users/demo/.codex/worktrees/a1b2/codex-ui-kit",
+};
+
+const currentWorktreeSettingsConversationEntry: ManagedWorktreeEntry = {
+  ...currentWorktreeSettingsEntry,
+  conversations: [
+    {
+      id: "worktree-settings-conversation",
+      label: "Continue current-build UI parity",
+    },
+  ],
+};
 
 function DemoVsCodeIcon() {
   return (
@@ -2143,6 +2163,7 @@ export function App() {
     | "general-settings"
     | "git-settings"
     | "hooks-settings"
+    | "worktree-settings"
   >(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-environments-unavailable"
@@ -2155,6 +2176,9 @@ export function App() {
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-hooks-settings")
         ? "hooks-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-worktree-settings")
+        ? "worktree-settings"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-code-review-settings")
         ? "code-review-settings"
@@ -2174,6 +2198,8 @@ export function App() {
         ? "appearance"
         : initialSelection.frame?.startsWith("workspace-hooks-settings")
           ? "hooks"
+        : initialSelection.frame?.startsWith("workspace-worktree-settings")
+          ? "worktrees"
         : initialSelection.frame?.startsWith("workspace-code-review-settings")
           ? "code-review"
         : "git",
@@ -2252,6 +2278,25 @@ export function App() {
     }
   }, [workspacePage]);
   const [generalSettingsAction, setGeneralSettingsAction] = useState("");
+  const [worktreeSettings, setWorktreeSettings] =
+    useState<WorktreeSettingsValue>({
+      autoDelete: true,
+      autoDeleteLimit: 15,
+      fetchUpstream: false,
+      root: "",
+    });
+  const [managedWorktreeEntries, setManagedWorktreeEntries] = useState<
+    readonly ManagedWorktreeEntry[]
+  >(() =>
+    initialSelection.frame === "workspace-worktree-settings-empty"
+      ? []
+      : initialSelection.frame === "workspace-worktree-settings-conversations"
+        ? [currentWorktreeSettingsConversationEntry]
+        : [currentWorktreeSettingsEntry],
+  );
+  const [worktreeSettingsRefreshing, setWorktreeSettingsRefreshing] =
+    useState(false);
+  const [worktreeSettingsAction, setWorktreeSettingsAction] = useState("");
   const [hookSettingsEntries, setHookSettingsEntries] = useState<
     readonly HookSettingsEntry[]
   >(() =>
@@ -6350,6 +6395,10 @@ export function App() {
         ? activeFrame?.startsWith("workspace-hooks-settings")
           ? activeFrame
           : "workspace-hooks-settings"
+      : workspacePage === "worktree-settings"
+        ? activeFrame?.startsWith("workspace-worktree-settings")
+          ? activeFrame
+          : "workspace-worktree-settings"
       : workspacePage === "code-review-settings"
         ? activeFrame?.startsWith("workspace-code-review-settings")
           ? activeFrame
@@ -6411,6 +6460,7 @@ export function App() {
         "general-settings",
         "git-settings",
         "hooks-settings",
+        "worktree-settings",
       ].includes(
         workspacePage,
       ) ||
@@ -7717,7 +7767,8 @@ export function App() {
           itemId !== "appearance" &&
           itemId !== "general" &&
           itemId !== "git" &&
-          itemId !== "hooks"
+          itemId !== "hooks" &&
+          itemId !== "worktrees"
         ) {
           return;
         }
@@ -7729,6 +7780,8 @@ export function App() {
               ? "general-settings"
               : itemId === "hooks"
                 ? "hooks-settings"
+              : itemId === "worktrees"
+                ? "worktree-settings"
               : "git-settings",
         );
         setActiveFrame(
@@ -7738,6 +7791,8 @@ export function App() {
               ? "workspace-general-settings"
               : itemId === "hooks"
                 ? "workspace-hooks-settings"
+              : itemId === "worktrees"
+                ? "workspace-worktree-settings"
               : "workspace-git-settings",
         );
       }}
@@ -7794,6 +7849,44 @@ export function App() {
           />
           <span aria-live="polite" className="demo-settings-action-status">
             {hooksSettingsAction}
+          </span>
+        </>
+      ) : workspacePage === "worktree-settings" ? (
+        <>
+          <WorktreeSettingsPage
+            data-evidence="runtime-observed"
+            entries={managedWorktreeEntries}
+            onChange={setWorktreeSettings}
+            onDelete={(entry) => {
+              setManagedWorktreeEntries((entries) =>
+                entries.filter((candidate) => candidate.id !== entry.id),
+              );
+              setWorktreeSettingsAction("Managed worktree deleted");
+            }}
+            onNewChat={() =>
+              setWorktreeSettingsAction("New chat requested in managed worktree")
+            }
+            onRefresh={() => {
+              setWorktreeSettingsAction("");
+              setWorktreeSettingsRefreshing(true);
+              window.setTimeout(() => {
+                if (
+                  activeFrame === "workspace-worktree-settings-missing-refresh"
+                ) {
+                  setManagedWorktreeEntries([]);
+                  setWorktreeSettingsAction("Missing worktree removed");
+                } else {
+                  setWorktreeSettingsAction("Managed worktrees refreshed");
+                }
+                setWorktreeSettingsRefreshing(false);
+              }, 180);
+            }}
+            refreshing={worktreeSettingsRefreshing}
+            rootPlaceholder="/Users/demo/.codex/worktrees"
+            value={worktreeSettings}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {worktreeSettingsAction}
           </span>
         </>
       ) : workspacePage === "code-review-settings" ? (
@@ -7879,7 +7972,8 @@ export function App() {
           workspacePage === "hooks-settings" ||
           workspacePage === "code-review-settings" ||
           workspacePage === "appearance-settings" ||
-          workspacePage === "general-settings"
+          workspacePage === "general-settings" ||
+          workspacePage === "worktree-settings"
         ? workspaceSettingsRoute
       : projectIndexChatRoute
         ? projectIndexChatRoute
@@ -7891,7 +7985,8 @@ export function App() {
     workspacePage === "code-review-settings" ||
     workspacePage === "general-settings" ||
     workspacePage === "git-settings" ||
-    workspacePage === "hooks-settings";
+    workspacePage === "hooks-settings" ||
+    workspacePage === "worktree-settings";
 
   const projectIndexStatus =
     activeFrame === "projects-index-loading"

@@ -1467,7 +1467,8 @@
         "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-retry-recovery",
         "cdp-26.820.60940:disposable-real-worktree-selected-context-loading-restored-success-and-exact-cleanup",
         "cdp-26.820.60940:disposable-regular-file-worktrees-blocker-real-retry-one-child-worktree-and-exact-cleanup",
-        "cdp-26.825.51511:real-worktree-setup-failure-expanded-collapsed-edit-environment-retry-creating-created-and-exact-cleanup"
+        "cdp-26.825.51511:real-worktree-setup-failure-expanded-collapsed-edit-environment-retry-creating-created-and-exact-cleanup",
+        "cdp-26.825.51511:worktrees-settings-preferences-managed-card-refresh-missing-removal-immediate-delete-wide-compact-and-exact-cleanup"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",

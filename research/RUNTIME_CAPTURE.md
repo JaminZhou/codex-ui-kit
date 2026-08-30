@@ -163,6 +163,37 @@ The comparison crops the 736×277 owned workspace region, masks only the
 content-dependent log text, and applies an independent 6.5% foreground limit.
 The sampled reference passes at 5.2082%.
 
+#### Current Worktrees Settings sample
+
+The same installed fingerprint was sampled in a fresh isolated profile on
+loopback port `9898` with a disposable repository and one exact temporary
+managed worktree. The user-owned Codex process was not navigated or resized.
+
+At 1180×820 the Settings rail is 321.875px and the main route centers a 768px
+column. The four-row preference card is 768×276.31px; its rows measure
+76.58/60.58/60.58/76.58px. The text input is 288×36px, switches are 32×20px,
+and the numeric input is 96×28px. A project header is 46px and its managed
+worktree card is 768×124.58px with Refresh, New chat, Delete, and Conversations
+ownership. At 720×680 the route retains fixed controls and zero document-level
+horizontal overflow instead of substituting a redesigned compact composition.
+
+The behavior probe moved the exact temporary worktree directory aside and
+activated Refresh. Its entry disappeared rather than becoming a repair card;
+restoring the directory and refreshing restored the entry. Product Delete then
+removed the exact directory and Git worktree registration without a
+confirmation dialog. The public replay models this through host callbacks:
+six wide/light/compact/empty/conversation/missing-refresh Browser/CDP frames,
+Electron state persistence, and six reviewed baselines pass. A local-only
+same-build 768×548 owned-route comparison, masking only content-dependent
+paths, passes at 4.5984% under 5%.
+
+The exact isolated process was stopped, its listener closed, and its profile
+and repository moved recoverably to Trash after the product had already
+removed the managed child. Native `Create permanent worktree` remained visible
+in current menu evidence but was not activated because the available native
+automation path was unavailable. This sample therefore does not claim
+permanent creation or timed pruning behavior.
+
 ### Previous `26.825.31414` global-shell baseline
 
 The previously installed build was `26.825.31414` (`7287`) with Chromium
