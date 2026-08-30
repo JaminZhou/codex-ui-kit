@@ -99,6 +99,7 @@ import {
   ToolCallCard,
   TurnDuration,
   WorkingDirectoryNotice,
+  WorktreeSetupStatus,
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
@@ -113,6 +114,8 @@ import {
   type HookSettingsEntry,
   type QueuedPrompt,
   type SubagentItem,
+  type WorktreeSetupPhase,
+  type WorktreeSetupStep,
 } from "codex-ui-kit";
 import {
   CurrentBuildIcon,
@@ -1926,6 +1929,24 @@ const currentSidebarWorktreeTasks = [
   "Restored worktree task",
 ];
 
+const currentWorktreeSetupFailureLog = `[info] Starting worktree creation
+Preparing worktree (detached HEAD COMMIT)
+fatal: could not create leading directories of '.git/worktrees/PROJECT': Not a directory
+[stderr] git worktree add failed: Preparing worktree (detached HEAD COMMIT)
+fatal: could not create leading directories of '.git/worktrees/PROJECT': Not a directory`;
+
+function initialCurrentWorktreeSetupPhase(
+  frame: string | null,
+): WorktreeSetupPhase {
+  if (frame === "current-worktree-setup-created") return "created";
+  if (frame === "current-worktree-setup-creating") return "creating";
+  return "failed";
+}
+
+function currentWorktreeSetupFrame(frame: string | null) {
+  return frame?.startsWith("current-worktree-setup-") ?? false;
+}
+
 function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
   const fixture = `${projectId}:${taskIndex}`;
   switch (fixture) {
@@ -2485,6 +2506,22 @@ export function App() {
       !current26820LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  const [currentWorktreeSetupPhase, setCurrentWorktreeSetupPhase] =
+    useState<WorktreeSetupPhase>(() =>
+      initialCurrentWorktreeSetupPhase(initialSelection.frame),
+    );
+  const [currentWorktreeSetupStage, setCurrentWorktreeSetupStage] = useState<
+    "checkout" | "prepare"
+  >(
+    initialSelection.frame === "current-worktree-setup-creating"
+      ? "checkout"
+      : "prepare",
+  );
+  const [currentWorktreeSetupExpanded, setCurrentWorktreeSetupExpanded] =
+    useState(
+      initialSelection.frame === "current-worktree-setup-failed",
+    );
+  const currentWorktreeSetupTimersRef = useRef<number[]>([]);
   const [scenarioSelectionVersion, setScenarioSelectionVersion] =
     useState(0);
   const [windowedSelectedMessageIndex, setWindowedSelectedMessageIndex] =
@@ -2870,6 +2907,34 @@ export function App() {
     (scenarioId === "mcp-current-recovery" ||
       scenarioId === "mcp-current-26-818-recovery" ||
       scenarioId === "mcp-current-26-820-recovery");
+
+  const clearCurrentWorktreeSetupTimers = useCallback(() => {
+    currentWorktreeSetupTimersRef.current.forEach((timer) =>
+      window.clearTimeout(timer),
+    );
+    currentWorktreeSetupTimersRef.current = [];
+  }, []);
+
+  const retryCurrentWorktreeSetup = useCallback(() => {
+    clearCurrentWorktreeSetupTimers();
+    setCurrentWorktreeSetupExpanded(false);
+    setCurrentWorktreeSetupStage("prepare");
+    setCurrentWorktreeSetupPhase("creating");
+    currentWorktreeSetupTimersRef.current = [
+      window.setTimeout(() => {
+        setCurrentWorktreeSetupStage("checkout");
+      }, 50),
+      window.setTimeout(() => {
+        setCurrentWorktreeSetupPhase("created");
+        currentWorktreeSetupTimersRef.current = [];
+      }, 180),
+    ];
+  }, [clearCurrentWorktreeSetupTimers]);
+
+  useEffect(
+    () => () => clearCurrentWorktreeSetupTimers(),
+    [clearCurrentWorktreeSetupTimers],
+  );
 
   useEffect(() => {
     setReviewPanelWidth(isCurrentReview26820Replay ? 419.59375 : 370);
@@ -4060,6 +4125,52 @@ export function App() {
     initialSelection.sidebarState === "thread-lifecycle-current";
   const currentSidebarWorktreeLifecycle =
     initialSelection.sidebarState === "worktree-lifecycle-current";
+  const currentWorktreeSetup = currentWorktreeSetupFrame(activeFrame);
+  const currentWorktreeSetupSelectedSidebarIndex =
+    currentWorktreeSetupPhase === "failed"
+      ? 1
+      : currentWorktreeSetupPhase === "created"
+        ? 2
+        : 0;
+  const currentWorktreeSetupSteps: readonly WorktreeSetupStep[] =
+    currentWorktreeSetupPhase === "failed"
+      ? [
+          {
+            id: "preparing-workspace",
+            label: "Preparing workspace",
+            status: "completed",
+          },
+          {
+            id: "checking-out-files",
+            label: "Checking out files",
+            status: "failed",
+          },
+        ]
+      : currentWorktreeSetupStage === "checkout"
+        ? [
+            {
+              id: "preparing-workspace",
+              label: "Preparing workspace",
+              status: "completed",
+            },
+            {
+              id: "checking-out-files",
+              label: "Checking out files",
+              status: "in-progress",
+            },
+          ]
+        : [
+            {
+              id: "preparing-workspace",
+              label: "Preparing workspace",
+              status: "in-progress",
+            },
+            {
+              id: "checking-out-files",
+              label: "Checking out files",
+              status: "pending",
+            },
+          ];
   const currentHomeFrame = activeFrame?.startsWith("current-home-") ?? false;
   const workspacePersistenceFrame =
     view === "workspace" && currentWorkspacePersistenceFrame(activeFrame);
@@ -4756,7 +4867,11 @@ export function App() {
                       : undefined
                   }
                   selected={
-                    (currentSidebarWorktreeLifecycle && index === 0) ||
+                    (currentSidebarWorktreeLifecycle &&
+                      index ===
+                        (currentWorktreeSetup
+                          ? currentWorktreeSetupSelectedSidebarIndex
+                          : 0)) ||
                     (workspacePersistenceFrame &&
                       task === "Verify worktree persistence")
                   }
@@ -11488,7 +11603,73 @@ export function App() {
                 ) : null}
 
                 {currentWindowedContent}
-                {currentWindowedFrame ? null : timelineContent}
+                {currentWorktreeSetup ? (
+                  <>
+                    <AgentMessage role="user">
+                      Reply with exactly WORKTREE CARD FAILURE PROBE. Do not use
+                      tools or inspect files.
+                    </AgentMessage>
+                    <WorktreeSetupStatus
+                      cancelAction={
+                        currentWorktreeSetupPhase === "creating"
+                          ? {
+                              label: "Cancel",
+                              onClick: () => {
+                                clearCurrentWorktreeSetupTimers();
+                                setCurrentWorktreeSetupPhase("failed");
+                                setCurrentWorktreeSetupExpanded(true);
+                              },
+                            }
+                          : undefined
+                      }
+                      className="demo-current-worktree-setup"
+                      data-current-worktree-setup-fixture={
+                        currentWorktreeSetupPhase
+                      }
+                      details={currentWorktreeSetupFailureLog}
+                      editEnvironmentAction={
+                        currentWorktreeSetupPhase === "failed"
+                          ? {
+                              label: "Edit environment",
+                              onClick: () => {
+                                setMode("replay");
+                                setView("workspace");
+                                setWorkspacePage("environments");
+                                setActiveFrame(
+                                  "workspace-environments-unavailable",
+                                );
+                              },
+                            }
+                          : undefined
+                      }
+                      expanded={currentWorktreeSetupExpanded}
+                      onExpandedChange={setCurrentWorktreeSetupExpanded}
+                      phase={currentWorktreeSetupPhase}
+                      retryAction={
+                        currentWorktreeSetupPhase === "failed"
+                          ? {
+                              label: "Retry",
+                              onClick: retryCurrentWorktreeSetup,
+                            }
+                          : undefined
+                      }
+                      steps={currentWorktreeSetupSteps}
+                      workLocallyAction={
+                        currentWorktreeSetupPhase === "creating"
+                          ? {
+                              label: "Work locally",
+                              onClick: () => {
+                                clearCurrentWorktreeSetupTimers();
+                                setCurrentWorktreeSetupPhase("created");
+                              },
+                            }
+                          : undefined
+                      }
+                    />
+                  </>
+                ) : currentWindowedFrame ? null : (
+                  timelineContent
+                )}
 
                 {isCurrentPlan26825Replay &&
                 state.status === "running" &&

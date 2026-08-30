@@ -184,7 +184,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 16 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 15 groups and Electron verification covers 15.
+Current inventory: 89 surface groups; 17 have current-build runtime evidence, 58 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 16 groups and Electron verification covers 16.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -393,20 +393,37 @@ at 2.9762%, 0.3571%, and 0% promote `app.sidebar-thread-history`,
 sampled lifecycle. Waiting, error, worktree, mutations, and longer history
 remain partial or previous-build evidence.
 
-The current `26.825.51511` worktree follow-up uses an isolated profile and a
+The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
-and restored idle. It supersedes the old failed-plus-unread assumption for
-this fingerprint: failure alone shows branch plus red error and no unread;
-the blue unread dot appears only after Retry succeeds and the response
-completes. Browser/CDP and Electron lock the 305.875×30 row, exact 14×14
+and restored idle. Its selected/read failure sample shows branch plus red
+error without unread. A later background failure shows the same branch/error
+with a simultaneous blue unread dot, establishing notification/read state as
+an independent track rather than a universal failure rule. Browser/CDP and
+Electron lock the 305.875×30 row, exact 14×14
 branch, 16×16 spinner/error glyphs and source paths, `#ff6764` error,
 `#3a83f7` unread, 39/11px branch insets, exact actions, and wide/compact
 containment. Two reviewed frames and local-only active/failed/recovered
 84×30 masks pass at 3.7698%, 0%, and 0%. This promotes
 `app.sidebar-worktree-status-indicators` to current Browser/Electron evidence
-for the sampled lifecycle; queued/creating variants and the broader failure
-workspace remain partial.
+for the sampled lifecycle.
+
+The adjacent current-build workspace follow-up reaches the real
+`Worktree setup failed` card, its `More details`/`Less details` disclosure,
+sanitized failure log, `Edit environment`, and Retry. It then observes the
+two-stage `Creating a worktree` transition and the terminal `Worktree
+created`/`Starting a task` handoff. The 1180×820 card is 736×247.5px expanded
+and 736×112px collapsed; the two 21px stage rows use an 8px gap, the log is
+710×123.5px, and the card owns 15px/12px radius/inset geometry. The 720×680
+frame retains a 366.125px root with no horizontal overflow. Browser/CDP locks
+the computed geometry, colors, exact observed branch/success/failure paths,
+disclosure, and Retry state machine. Electron repeats Retry, Cancel, and the
+Edit-environment route. Five reviewed baselines pass, and the local-only
+failure-card foreground comparison is 5.2082% under 6.5%. This promotes
+`workspace.worktrees` to current Browser/Electron evidence for the sampled
+failure/recovery workspace. Settings retention, permanent worktrees, missing
+directory variants, and other unsampled worktree paths keep the broader
+implementation `partial`.
 
 The ordinary task-status follow-up reached one real active thread and one
 background-completed unread thread on `26.803.61601`. It locked the 20×20

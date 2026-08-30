@@ -1457,7 +1457,7 @@
       "id": "workspace.worktrees",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["worktrees-settings-page", "stable-worktree-status-dialog", "worktree-setup-auto-fix"],
+      "packageEvidence": ["worktrees-settings-page", "stable-worktree-status-dialog", "worktree-setup-auto-fix", "worktree-setup-status"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:worktree-settings-empty-state-and-retention-controls",
@@ -1466,11 +1466,12 @@
         "cdp-26.803.61601:missing-working-directory-model-only-turn-session-latched-warning-and-restart-recovery",
         "cdp-26.818.41509:disposable-real-worktree-create-controlled-failure-retry-recovery",
         "cdp-26.820.60940:disposable-real-worktree-selected-context-loading-restored-success-and-exact-cleanup",
-        "cdp-26.820.60940:disposable-regular-file-worktrees-blocker-real-retry-one-child-worktree-and-exact-cleanup"
+        "cdp-26.820.60940:disposable-regular-file-worktrees-blocker-real-retry-one-child-worktree-and-exact-cleanup",
+        "cdp-26.825.51511:real-worktree-setup-failure-expanded-collapsed-edit-environment-retry-creating-created-and-exact-cleanup"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

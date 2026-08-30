@@ -16,6 +16,14 @@ const currentSidebarSpinnerPathData = [
 const currentSidebarWorktreePathData = [
   "M15.8 11.535c.367 0 .665.298.665.665v5a.665.665 0 0 1-.665.665h-5a.665.665 0 1 1 0-1.33h3.394l-3.565-3.564a.666.666 0 0 1 .942-.942l3.564 3.565V12.2c0-.367.298-.665.665-.665Zm0-9.4c.367 0 .665.298.665.665v5a.665.665 0 0 1-1.33 0V4.405l-5.128 5.128c-.323.324-.558.565-.842.74a2.668 2.668 0 0 1-.771.319c-.324.078-.662.073-1.12.073H1.93a.665.665 0 1 1 0-1.33h5.345c.52 0 .673-.005.809-.037.136-.033.266-.086.385-.16.12-.072.23-.177.598-.545l5.128-5.128H10.8a.665.665 0 0 1 0-1.33h5Z",
 ];
+const currentWorktreeSetupCompletedPathData = [
+  "M12.1599 7.63617C12.3713 7.33596 12.7863 7.26372 13.0866 7.47504C13.3867 7.68642 13.4589 8.10153 13.2477 8.40179L9.28876 14.0268C9.17264 14.1917 8.98808 14.2954 8.7868 14.308C8.61044 14.319 8.43764 14.2592 8.30634 14.144L8.25262 14.0912L6.16962 11.7993L6.08954 11.6918C5.93136 11.4259 5.97666 11.0761 6.21454 10.8598C6.45225 10.6439 6.80379 10.6326 7.05341 10.8149L7.15399 10.9047L8.67841 12.5815L12.1599 7.63617Z",
+  "M9.99506 2.81226C14.3664 2.81226 17.9101 6.35596 17.9101 10.7273C17.9101 15.0986 14.3664 18.6423 9.99506 18.6423C5.62372 18.6423 2.08002 15.0986 2.08002 10.7273C2.08002 6.35596 5.62372 2.81226 9.99506 2.81226ZM9.99506 4.14233C6.35826 4.14233 3.4101 7.0905 3.4101 10.7273C3.4101 14.3641 6.35826 17.3123 9.99506 17.3123C13.6319 17.3123 16.58 14.3641 16.58 10.7273C16.58 7.0905 13.6319 4.14233 9.99506 4.14233Z",
+];
+const currentWorktreeSetupFailedPathData = [
+  "M7.231 7.231a.665.665 0 0 1 .94 0L10 9.06l1.828-1.829.104-.085a.666.666 0 0 1 .921.922l-.084.104L10.94 10l1.829 1.828a.665.665 0 0 1-.94.94L10 10.94l-1.828 1.83a.665.665 0 0 1-.94-.94L9.06 10 7.23 8.172a.665.665 0 0 1 0-.94Z",
+  "M10 2.085a7.915 7.915 0 1 1 0 15.83 7.915 7.915 0 0 1 0-15.83Zm0 1.33a6.585 6.585 0 1 0 0 13.17 6.585 6.585 0 0 0 0-13.17Z",
+];
 
 const artifactDirectory = join(process.cwd(), "artifacts", "cdp");
 await mkdir(artifactDirectory, { recursive: true });
@@ -93,6 +101,177 @@ for (const scene of selectedScenes) {
         ".codex-ui-app-shell[data-side-panel-open] .codex-ui-app-shell__side-panel .codex-ui-workspace-panel",
       );
       await page.waitForTimeout(700);
+    }
+    if (scene.id.startsWith("current-worktree-setup-")) {
+      const setup = await page
+        .locator(".codex-ui-worktree-setup")
+        .evaluate((root) => {
+          const rect = (target) => {
+            if (!(target instanceof Element)) return null;
+            const bounds = target.getBoundingClientRect();
+            return {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            };
+          };
+          const card = root.querySelector(
+            ".codex-ui-worktree-setup__card",
+          );
+          const cardStyle = card ? getComputedStyle(card) : null;
+          const details = root.querySelector(
+            ".codex-ui-worktree-setup__details",
+          );
+          return {
+            actionLabels: Array.from(
+              root.querySelectorAll(".codex-ui-worktree-setup__action"),
+              (button) => button.textContent?.trim(),
+            ),
+            ariaBusy: root.getAttribute("aria-busy"),
+            branchPaths: Array.from(
+              root.querySelectorAll(
+                ".codex-ui-worktree-setup__heading-icon path",
+              ),
+              (path) => path.getAttribute("d"),
+            ),
+            card: rect(card),
+            cardStyle: cardStyle
+              ? {
+                  borderRadius: cardStyle.borderRadius,
+                  gap: cardStyle.gap,
+                  padding: cardStyle.padding,
+                }
+              : null,
+            createdDescription: root.querySelector(
+              ".codex-ui-worktree-setup__created-copy p",
+            )?.textContent,
+            details: rect(details),
+            detailsHidden: details?.hasAttribute("hidden") ?? null,
+            expanded: root.getAttribute("data-expanded"),
+            heading: rect(
+              root.querySelector(".codex-ui-worktree-setup__heading"),
+            ),
+            headingText: root
+              .querySelector(".codex-ui-worktree-setup__heading")
+              ?.textContent?.trim(),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            phase: root.getAttribute("data-phase"),
+            role: root.getAttribute("role"),
+            root: rect(root),
+            steps: Array.from(
+              root.querySelectorAll(
+                ".codex-ui-worktree-setup__steps > li",
+              ),
+              (step) => {
+                const style = getComputedStyle(step);
+                return {
+                  color: style.color,
+                  iconPaths: Array.from(
+                    step.querySelectorAll("path"),
+                    (path) => path.getAttribute("d"),
+                  ),
+                  rect: rect(step),
+                  status: step.getAttribute("data-status"),
+                  text: step.textContent?.trim(),
+                  viewBox: step
+                    .querySelector("svg")
+                    ?.getAttribute("viewBox"),
+                };
+              },
+            ),
+            toggle: rect(
+              root.querySelector(
+                ".codex-ui-worktree-setup__details-toggle",
+              ),
+            ),
+            toggleExpanded: root
+              .querySelector(
+                ".codex-ui-worktree-setup__details-toggle",
+              )
+              ?.getAttribute("aria-expanded"),
+          };
+        });
+      const compact = scene.id.endsWith("-compact");
+      const collapsed = scene.id.endsWith("-collapsed");
+      const expectedPhase = scene.id.endsWith("-created")
+        ? "created"
+        : scene.id.endsWith("-creating")
+          ? "creating"
+          : "failed";
+      const expectedRootWidth = compact ? 366.125 : 736;
+      const expectedRootHeight =
+        expectedPhase === "created" ? 50 : collapsed || expectedPhase === "creating" ? 141 : 276.5;
+      const expectedActions =
+        expectedPhase === "failed"
+          ? ["Edit environment", "Retry"]
+          : expectedPhase === "creating"
+            ? ["Work locally", "Cancel"]
+            : [];
+      const expectedStepStatuses =
+        expectedPhase === "failed"
+          ? ["completed", "failed"]
+          : expectedPhase === "creating"
+            ? ["completed", "in-progress"]
+            : [];
+      if (
+        setup.phase !== expectedPhase ||
+        setup.role !== (expectedPhase === "failed" ? "alert" : "status") ||
+        setup.ariaBusy !== (expectedPhase === "creating" ? "true" : null) ||
+        setup.horizontalOverflow !== 0 ||
+        Math.abs(setup.root?.width - expectedRootWidth) > 0.1 ||
+        Math.abs(setup.root?.height - expectedRootHeight) > 0.1 ||
+        setup.heading?.height !== 21 ||
+        JSON.stringify(setup.branchPaths) !==
+          JSON.stringify(currentSidebarWorktreePathData) ||
+        JSON.stringify(setup.actionLabels) !==
+          JSON.stringify(expectedActions) ||
+        JSON.stringify(setup.steps.map(({ status }) => status)) !==
+          JSON.stringify(expectedStepStatuses) ||
+        setup.steps.some(
+          (step) =>
+            step.rect?.height !== 21 ||
+            (step.status === "completed" &&
+              (step.color !== "rgb(44, 103, 197)" ||
+                step.viewBox !== "0 0 20 21" ||
+                JSON.stringify(step.iconPaths) !==
+                  JSON.stringify(currentWorktreeSetupCompletedPathData))) ||
+            (step.status === "failed" &&
+              (step.color !== "rgb(255, 103, 100)" ||
+                step.viewBox !== "0 0 20 20" ||
+                JSON.stringify(step.iconPaths) !==
+                  JSON.stringify(currentWorktreeSetupFailedPathData))) ||
+            (step.status === "in-progress" &&
+              (step.color !== "rgb(58, 131, 247)" ||
+                step.viewBox !== "0 0 24 24" ||
+                step.iconPaths.length !== 2)),
+        ) ||
+        (expectedPhase === "created"
+          ? setup.card !== null ||
+            setup.createdDescription !== "Starting a task" ||
+            setup.headingText !== "Worktree created"
+          : setup.card?.height !==
+                (collapsed || expectedPhase === "creating" ? 112 : 247.5) ||
+            Math.abs(setup.card?.width - expectedRootWidth) > 0.1 ||
+            setup.cardStyle?.borderRadius !== "15px" ||
+            setup.cardStyle?.gap !== "12px" ||
+            setup.cardStyle?.padding !== "12px" ||
+            setup.toggle?.height !== 21 ||
+            setup.toggleExpanded !==
+              (collapsed || expectedPhase === "creating" ? "false" : "true") ||
+            setup.expanded !==
+              (collapsed || expectedPhase === "creating" ? null : "true") ||
+            (collapsed || expectedPhase === "creating"
+              ? setup.details?.height !== 0 || setup.detailsHidden !== true
+              : setup.details?.height !== 123.5 ||
+                setup.detailsHidden !== false))
+      ) {
+        throw new Error(
+          `${scene.id}: current worktree setup contract failed: ${JSON.stringify(setup)}`,
+        );
+      }
     }
     if (scene.id.startsWith("current-sidebar-account-menu")) {
       const compact = scene.id.endsWith("compact");
@@ -9749,7 +9928,8 @@ for (const scene of selectedScenes) {
     const minimumConversationViewportWidth =
       expectedWindowWidth <= 720
         ? scene.id.startsWith("current-sidebar-thread-lifecycle") ||
-          scene.id.startsWith("current-sidebar-worktree-lifecycle")
+          scene.id.startsWith("current-sidebar-worktree-lifecycle") ||
+          scene.id.startsWith("current-worktree-setup-")
           ? 398
           : 400
         : scene.scenario === "current-browser-26-825"
@@ -9782,9 +9962,9 @@ for (const scene of selectedScenes) {
     const currentSidebarThreadLifecycleScene = scene.id.startsWith(
       "current-sidebar-thread-lifecycle",
     );
-    const currentSidebarWorktreeLifecycleScene = scene.id.startsWith(
-      "current-sidebar-worktree-lifecycle",
-    );
+    const currentSidebarWorktreeLifecycleScene =
+      scene.id.startsWith("current-sidebar-worktree-lifecycle") ||
+      scene.id.startsWith("current-worktree-setup-");
     const currentSidebarCollectionScene = scene.id.startsWith(
       "current-sidebar-collection-",
     );
@@ -10076,6 +10256,15 @@ for (const scene of selectedScenes) {
     if (currentSidebarWorktreeLifecycleScene) {
       const [active, failed, recovered, restored] =
         contract.sidebar.worktreeFixtures;
+      const expectedSelectedFixture = scene.id.startsWith(
+        "current-worktree-setup-",
+      )
+        ? scene.id.endsWith("-creating")
+          ? "current-worktree-active"
+          : scene.id.endsWith("-created")
+            ? "current-worktree-recovered"
+            : "current-worktree-failed"
+        : "current-worktree-active";
       const expectedActions = JSON.stringify(["Pin chat", "Archive chat"]);
       const sharedInvalid = [active, failed, recovered, restored].some(
         (fixture) =>
@@ -10097,7 +10286,8 @@ for (const scene of selectedScenes) {
         active?.worktreeStatus !== "setting-up" ||
         active?.status !== "loading" ||
         active?.visualStatus !== "loading" ||
-        !active?.selected ||
+        active?.selected !==
+          (expectedSelectedFixture === "current-worktree-active") ||
         active?.branchRightInset !== 39 ||
         active?.statusRightInset !== 8 ||
         active?.statusRect?.height !== 20 ||
@@ -10111,7 +10301,8 @@ for (const scene of selectedScenes) {
         failed?.worktreeStatus !== "failed" ||
         failed?.status !== "error" ||
         failed?.visualStatus !== "error" ||
-        failed?.selected ||
+        failed?.selected !==
+          (expectedSelectedFixture === "current-worktree-failed") ||
         failed?.secondaryStatus !== null ||
         failed?.branchRightInset !== 39 ||
         failed?.statusRightInset !== 8 ||
@@ -10125,7 +10316,8 @@ for (const scene of selectedScenes) {
         recovered?.worktreeStatus !== "restored" ||
         recovered?.status !== "unread" ||
         recovered?.visualStatus !== "attention" ||
-        recovered?.selected ||
+        recovered?.selected !==
+          (expectedSelectedFixture === "current-worktree-recovered") ||
         recovered?.branchRightInset !== 39 ||
         recovered?.statusRightInset !== 8 ||
         recovered?.attentionRect?.height !== 8 ||
@@ -10135,7 +10327,8 @@ for (const scene of selectedScenes) {
         restored?.worktreeStatus !== "restored" ||
         restored?.status !== "idle" ||
         restored?.visualStatus !== undefined ||
-        restored?.selected ||
+        restored?.selected !==
+          (expectedSelectedFixture === "current-worktree-restored") ||
         restored?.branchRightInset !== 11 ||
         restored?.statusRect !== null ||
         contract.sidebar.projectToggleExpanded !== "true" ||
@@ -10280,7 +10473,8 @@ for (const scene of selectedScenes) {
       scene.scenario === "current-browser-26-825"
         ? "454"
       : scene.id === "current-sidebar-thread-lifecycle-compact" ||
-          scene.id === "current-sidebar-worktree-lifecycle-compact"
+          scene.id === "current-sidebar-worktree-lifecycle-compact" ||
+          scene.id === "current-worktree-setup-failed-compact"
         ? "480"
       : scene.id === "markdown-table-actions-narrow" ||
       ((scene.windowSize?.width ?? 1180) <= 720 &&
@@ -12874,6 +13068,88 @@ for (const scene of selectedScenes) {
           )}`,
         );
       }
+    }
+
+    if (scene.id === "current-worktree-setup-failed-collapsed") {
+      const detailsToggle = page.getByRole("button", {
+        name: "More details",
+      });
+      await detailsToggle.click();
+      const expandedDetails = await page
+        .locator(".codex-ui-worktree-setup")
+        .evaluate((root) => ({
+          expanded: root.getAttribute("data-expanded"),
+          height: root
+            .querySelector(".codex-ui-worktree-setup__details")
+            ?.getBoundingClientRect().height,
+          toggle: root
+            .querySelector(
+              ".codex-ui-worktree-setup__details-toggle",
+            )
+            ?.textContent?.trim(),
+        }));
+      if (
+        expandedDetails.expanded !== "true" ||
+        expandedDetails.height !== 123.5 ||
+        expandedDetails.toggle !== "Less details"
+      ) {
+        throw new Error(
+          `${scene.id}: details expansion failed: ${JSON.stringify(expandedDetails)}`,
+        );
+      }
+      await page.getByRole("button", { name: "Less details" }).click();
+      await page.getByRole("button", { name: "Retry" }).click();
+      await page.waitForSelector(
+        '.codex-ui-worktree-setup[data-phase="creating"]',
+      );
+      const creating = await page
+        .locator(".codex-ui-worktree-setup")
+        .evaluate((root) => ({
+          ariaBusy: root.getAttribute("aria-busy"),
+          buttons: Array.from(
+            root.querySelectorAll(".codex-ui-worktree-setup__action"),
+            (button) => button.textContent?.trim(),
+          ),
+          heading: root
+            .querySelector(".codex-ui-worktree-setup__heading")
+            ?.textContent?.trim(),
+          phase: root.getAttribute("data-phase"),
+        }));
+      await page.waitForSelector(
+        '.codex-ui-worktree-setup[data-phase="created"]',
+      );
+      const created = await page
+        .locator(".codex-ui-worktree-setup")
+        .evaluate((root) => ({
+          cardCount: root.querySelectorAll(
+            ".codex-ui-worktree-setup__card",
+          ).length,
+          heading: root
+            .querySelector(".codex-ui-worktree-setup__heading")
+            ?.textContent?.trim(),
+          phase: root.getAttribute("data-phase"),
+          text: root.textContent?.trim(),
+        }));
+      if (
+        creating.phase !== "creating" ||
+        creating.ariaBusy !== "true" ||
+        creating.heading !== "Creating a worktree" ||
+        JSON.stringify(creating.buttons) !==
+          JSON.stringify(["Work locally", "Cancel"]) ||
+        created.phase !== "created" ||
+        created.heading !== "Worktree created" ||
+        created.cardCount !== 0 ||
+        !created.text?.includes("Starting a task")
+      ) {
+        throw new Error(
+          `${scene.id}: Retry transition failed: ${JSON.stringify({ creating, created })}`,
+        );
+      }
+      contract.worktreeSetupInteraction = {
+        created,
+        creating,
+        expandedDetails,
+      };
     }
 
     await writeFile(

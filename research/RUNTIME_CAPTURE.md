@@ -135,6 +135,34 @@ rows from the visible 252×187 six-action menu, then measures the 118×34
 `New section…` submenu. The capture records no private labels or screenshots.
 See [`26.825.51511.md`](26.825.51511.md).
 
+#### Current worktree failure workspace
+
+The later current-build capture uses a separate disposable repository and
+isolated PID on loopback port `9898`. A regular-file `.git/worktrees` blocker
+reaches the real expanded/collapsed `Worktree setup failed` card. Moving the
+blocker aside and selecting Retry reaches both creating stages, the created
+handoff, and a naturally completed response. The exact tasks are archived,
+the exact child worktrees are removed, the isolated process is terminated,
+and its profile/repository are moved to recoverable Trash. The user-owned
+Codex PID remains untouched.
+
+The public replay commits no product screenshot, profile, repository, task
+identifier, commit hash, or raw log. CDP gates the observed 736×247.5/112px
+card geometry, 710×123.5px log, computed typography/colors, exact observed
+status SVG paths, disclosure semantics, and Retry transition. Electron repeats
+Retry, Cancel, Edit-environment routing, native window bounds, and 720px
+containment. A local-only product check can be repeated with:
+
+```sh
+CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETUP_FAILURE_REFERENCE=/absolute/path/to/current-worktree-failure-1180.png \
+pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-worktree-setup-failed
+```
+
+The comparison crops the 736×277 owned workspace region, masks only the
+content-dependent log text, and applies an independent 6.5% foreground limit.
+The sampled reference passes at 5.2082%.
+
 ### Previous `26.825.31414` global-shell baseline
 
 The previously installed build was `26.825.31414` (`7287`) with Chromium

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 16 groups have current-build runtime evidence, 59 have previous-build-only
+- 17 groups have current-build runtime evidence, 58 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -91,14 +91,25 @@ exit gates; it does not replace the inventory.
   `app.sidebar-worktree-status-indicators` for one real disposable worktree
   lifecycle. It reaches selected setting-up, controlled initialization
   failure, successful Retry, background-completed unread, and restored-idle
-  states. Unlike 26.820, the current failed background row has no unread dot;
-  unread appears only after Retry succeeds and a response completes. CDP and
+  states. Its selected/read failure sample has no unread dot; a later
+  background failure has error and unread together, proving that notification
+  state is independent from worktree failure. CDP and
   Electron lock the 305.875×30 row, 14×14 branch, exact spinner/error SVGs,
   `#ff6764` error and `#3a83f7` unread colors, 39/11px branch insets, hover
   replacement, and the 720px boundary. Two reviewed frames and local-only
   3.7698%/0%/0% shape comparisons cover active, failed, and recovered rails.
-  Queued/creating variants and the broader workspace failure card remain
-  incomplete.
+  Queued/creating sidebar variants remain incomplete.
+  A fourth current `26.825.51511` worktree follow-up promotes
+  `workspace.worktrees` for the sampled setup workspace. One real controlled
+  failure exposes expanded/collapsed details, the sanitized log, Edit
+  environment, and Retry; removing the blocker then reaches Preparing,
+  Checking out files, Worktree created, and Starting a task. Browser/CDP locks
+  the 736×247.5 expanded and 736×112 collapsed cards, 710×123.5 log, 21px
+  stages, exact observed status paths/colors, and the Retry transition.
+  Electron repeats Retry, Cancel, and Edit-environment routing at wide and
+  720px widths. Five reviewed baselines pass, while a local-only product crop
+  passes at 5.2082% foreground difference under 6.5%. Retention, permanent,
+  missing-directory, and other worktree variants remain partial.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a

@@ -153,6 +153,7 @@ export const publicRuntimeExports = [
   "WorkspaceSelection",
   "WorktreeList",
   "WorktreePicker",
+  "WorktreeSetupStatus",
   "fileDiffToText",
   "formatCommandDuration",
   "formatTurnDuration",
