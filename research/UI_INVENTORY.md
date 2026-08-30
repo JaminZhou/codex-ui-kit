@@ -188,7 +188,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 23 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 22 groups and Electron verification covers 22.
+Current inventory: 89 surface groups; 24 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 23 groups and Electron verification covers 23.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1576,6 +1576,17 @@ response actions, and Composer state. Electron repeats both lifecycles at
 promotes `thread.command-execution`, `thread.command-failure-recovery`, and
 `thread.interruption-stop` on the current build; other command kinds,
 truncation variants, and process-management surfaces retain separate gates.
+
+The current `26.825.51511` command anchor now independently re-observes one
+successful `/usr/bin/uuidgen` execution. Its unpredictable UUID proves the
+terminal call occurred; the public trace substitutes a same-length sanitized
+value. Browser/CDP and Electron gate `Worked for 8s`, the expanded
+`Ran /usr/bin/uuidgen` row, hidden protocol output, four response actions,
+Stop removal, Send recovery, native wide/720 resize, and zero overflow. Two
+reviewed baselines pass. Local-only activity, Composer, and header comparisons
+pass at 1.9196%–6.5485% under independent 2.3%/1.2%/7% ceilings. This promotes
+only `thread.command-execution`; failure, interruption, background-process,
+and direct Terminal-tab lifecycles remain previous-build P0 evidence.
 
 A fourth `26.730.61309` disposable task entered `/compact` only after an exact
 no-tool baseline response. The current menu exposed `Compact this chat's

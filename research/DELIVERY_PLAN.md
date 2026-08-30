@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 23 groups have current-build runtime evidence, 52 have previous-build-only
+- 24 groups have current-build runtime evidence, 51 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -137,6 +137,16 @@ exit gates; it does not replace the inventory.
   response actions, all five Composer hit targets, and independent header,
   thread, and Composer product comparisons. The prior 26.818 fixed-message
   task remains regression coverage with its 0.4320% unmasked crop.
+  The current command anchor additionally promotes
+  `thread.command-execution` for one real `/usr/bin/uuidgen` success. The
+  unpredictable result proves terminal execution; the replay keeps only a
+  same-length sanitized UUID. Browser/CDP and Electron cover the expanded
+  `Worked for 8s` → `Ran /usr/bin/uuidgen` composition, hidden raw protocol
+  output, response actions, Send recovery, and the 1180/720 native boundary.
+  Two reviewed baselines and six local-only activity/Composer/header regions
+  pass under independent 2.3%/1.2%/7% limits. Failure, interruption,
+  background-process, and direct Terminal-tab paths remain previous-build
+  work.
   The previous 26.820 command tasks promote `thread.command-execution`,
   `thread.command-failure-recovery`, and `thread.interruption-stop`. They reach
   one 12-second success, one exit-code-7 stdout/stderr command followed by an

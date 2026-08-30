@@ -245,7 +245,13 @@
       "id": "thread.command-execution",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["run-command-animation"],
+      "packageEvidence": [
+        "run-command-animation",
+        "replay:current-26.825-uuidgen-command-completion",
+        "browser-cdp:current-26.825-worked-for-expanded-ran-row-wide-and-compact",
+        "electron:current-26.825-native-command-row-and-composer-recovery",
+        "pixel:current-26.825-wide-compact-activity-header-and-composer-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:collapsed-and-expanded-read-only-command",
@@ -262,11 +268,12 @@
         "cdp-26.810.52044:real-exit-7-shell-stderr-stdout-and-persistent-stopped-command-row",
         "cdp-26.818.41509:real-exit-7-shell-current-stdout-stderr-terminal-glyph-and-unmasked-region",
         "cdp-26.820.60940:real-twelve-second-command-success-exit-7-neutral-ran-row-and-stopped-background-terminal-row",
-        "cdp-26.825.31414:real-safe-terminal-command-worked-for-collapsed-and-expanded-ran-row"
+        "cdp-26.825.31414:real-safe-terminal-command-worked-for-collapsed-and-expanded-ran-row",
+        "cdp-26.825.51511:real-uuidgen-worked-for-8s-expanded-ran-row-dynamic-result-send-recovery-wide-compact-and-regional-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

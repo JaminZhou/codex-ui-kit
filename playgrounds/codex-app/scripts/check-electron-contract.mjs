@@ -11167,6 +11167,15 @@ for (const responsiveCase of currentCommandResponsiveCases) {
 
 const currentCommand26820ElectronCases = [
   {
+    assistantTexts: ["00000000-0000-4000-8000-000000000000"],
+    commandStatus: "completed",
+    frame: "command-current-26-825-success-completed",
+    interruption: null,
+    scenario: "command-current-26-825-success",
+    timelineLabel: "Worked for 8s",
+    title: "运行 uuidgen 生成 UUID",
+  },
+  {
     assistantTexts: ["CURRENT 26.820 LONG COMMAND OBSERVED"],
     commandStatus: "completed",
     frame: "command-current-26-820-success-completed",
@@ -11242,7 +11251,7 @@ for (const currentCase of currentCommand26820ElectronCases) {
             : null;
         };
         const command = document.querySelector(
-          '[data-item-id^="command-current-26-820-"]',
+          '[data-item-id^="command-current-26-8"]',
         );
         const commandHeader = command?.querySelector(
           ":scope > .codex-ui-activity__header",
@@ -11250,7 +11259,7 @@ for (const currentCase of currentCommand26820ElectronCases) {
         return {
           assistantTexts: Array.from(
             document.querySelectorAll(
-              '[data-item-id^="assistant-command-current-26-820-"] .codex-ui-markdown',
+              '[data-item-id^="assistant-command-current-26-8"] .codex-ui-markdown',
             ),
             (element) => element.textContent?.trim(),
           ),

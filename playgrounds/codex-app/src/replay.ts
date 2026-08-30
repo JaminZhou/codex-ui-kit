@@ -18,6 +18,7 @@ import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jso
 import commandCurrent26820FailureTrace from "../fixtures/traces/command-current-26-820-failure.jsonl?raw";
 import commandCurrent26820InterruptionTrace from "../fixtures/traces/command-current-26-820-interruption.jsonl?raw";
 import commandCurrent26820SuccessTrace from "../fixtures/traces/command-current-26-820-success.jsonl?raw";
+import commandCurrent26825SuccessTrace from "../fixtures/traces/command-current-26-825-success.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
 import conversationLifecycleTrace from "../fixtures/traces/conversation-lifecycle.jsonl?raw";
 import backgroundTerminalTrace from "../fixtures/traces/background-terminal.jsonl?raw";
@@ -62,6 +63,7 @@ export type ReplayScenarioId =
   | "command-current-26-820-failure"
   | "command-current-26-820-interruption"
   | "command-current-26-820-success"
+  | "command-current-26-825-success"
   | "command-failure-recovery"
   | "conversation-lifecycle"
   | "streaming-recovery"
@@ -220,6 +222,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "监控 CURRENT 26.820 中断",
     "The runtime-observed 26.820 product moves from a running terminal row through an immediate zero-second stop to a settled sixteen-second stop and same-thread recovery.",
     commandCurrent26820InterruptionTrace,
+  ),
+  "command-current-26-825-success": scenario(
+    "command-current-26-825-success",
+    "运行 uuidgen 生成 UUID",
+    "The runtime-observed 26.825 product keeps a successful terminal command as a regular-weight, noninteractive Ran row inside the expandable activity timeline and restores the settled Composer without rendering protocol output.",
+    commandCurrent26825SuccessTrace,
   ),
   "terminal-lifecycle": scenario(
     "terminal-lifecycle",

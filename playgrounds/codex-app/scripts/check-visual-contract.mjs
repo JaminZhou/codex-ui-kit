@@ -112,6 +112,12 @@ const currentBasic26825References = {
   "current-basic-26-825-wide":
     process.env.CODEX_UI_KIT_CURRENT_BASIC_26_825_WIDE_REFERENCE,
 };
+const currentCommand26825References = {
+  "command-current-26-825-success-compact":
+    process.env.CODEX_UI_KIT_CURRENT_COMMAND_26_825_COMPACT_REFERENCE,
+  "command-current-26-825-success-completed":
+    process.env.CODEX_UI_KIT_CURRENT_COMMAND_26_825_WIDE_REFERENCE,
+};
 const currentMcpSuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
 const currentMcpSuccessReferenceSize = {
@@ -783,6 +789,85 @@ async function compareCurrentBasic26825({
     }
     console.log(
       `${sceneId}: current 26.825 ${name} pixel ratio ${comparison.ratio}`,
+    );
+  }
+}
+
+async function compareCurrentCommand26825({
+  actual,
+  referencePath,
+  regions,
+  sceneId,
+}) {
+  const reference = PNG.sync.read(await readFile(referencePath));
+  if (
+    reference.width !== actual.width ||
+    reference.height !== actual.height
+  ) {
+    throw new Error(
+      `${sceneId}: current 26.825 command reference must match the ${actual.width}x${actual.height} scene, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  const maximumRatios = {
+    activity: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_ACTIVITY_MAX_DIFF_RATIO",
+      0.023,
+    ),
+    composer: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_COMPOSER_MAX_DIFF_RATIO",
+      0.012,
+    ),
+    header: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_COMMAND_26_825_HEADER_MAX_DIFF_RATIO",
+      0.07,
+    ),
+  };
+  for (const [name, region] of Object.entries(regions)) {
+    const referenceRegion = cropPng(
+      reference,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.1);
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.${name}.current-product.png`,
+      ),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.${name}.current-build.png`,
+      ),
+      PNG.sync.write(actualRegion),
+    );
+    const diffPath = join(
+      artifactDirectory,
+      `${sceneId}.${name}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(diffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(diffPath, { force: true });
+    }
+    if (comparison.ratio > maximumRatios[name]) {
+      throw new Error(
+        `${sceneId}: current 26.825 command ${name} pixel ratio ${comparison.ratio} exceeds ${maximumRatios[name]}.`,
+      );
+    }
+    console.log(
+      `${sceneId}: current 26.825 command ${name} pixel ratio ${comparison.ratio}`,
     );
   }
 }
@@ -2468,6 +2553,28 @@ for (const scene of selectedScenes) {
     await compareCurrentBasic26825({
       actual,
       referencePath: currentBasic26825Reference,
+      regions,
+      sceneId: scene.id,
+    });
+  }
+
+  const currentCommand26825Reference =
+    currentCommand26825References[scene.id];
+  if (currentCommand26825Reference) {
+    const regions = scene.id.endsWith("-compact")
+      ? {
+          activity: { height: 145, left: 16, top: 205, width: 688 },
+          composer: { height: 120, left: 16, top: 560, width: 688 },
+          header: { height: 47, left: 0, top: 0, width: 720 },
+        }
+      : {
+          activity: { height: 145, left: 222, top: 205, width: 736 },
+          composer: { height: 120, left: 222, top: 700, width: 736 },
+          header: { height: 47, left: 0, top: 0, width: 1180 },
+        };
+    await compareCurrentCommand26825({
+      actual,
+      referencePath: currentCommand26825Reference,
       regions,
       sceneId: scene.id,
     });
