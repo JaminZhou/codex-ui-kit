@@ -696,6 +696,16 @@ the crash Reload copy. CDP computed geometry and Electron interaction remain
 the semantic gates, so an internal zero-diff baseline is never presented as a
 current-product pixel ratio.
 
+The current `26.825.51511` Personalization route is now independently
+runtime-observed. Its controlled package surface covers Custom instructions,
+Memory controls, destructive-action delegation, warning copy, and the two-item
+Personality menu without persisting captured product values. Browser/CDP and
+Electron gate wide/compact/menu/bottom states, exact control geometry, dirty
+restore, keyboard selection, Escape focus return, vertical scroll ownership,
+and zero horizontal overflow. Local-only wide/menu/compact comparisons pass at
+5.4469%, 4.5811%, and 7.4199% under 5.5%/5.5%/8% ceilings. Other Settings
+routes are not promoted by this result.
+
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
 thread scenario must not be generalized to unobserved routes or states.

@@ -905,6 +905,231 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-personalization-settings")) {
+      const bottom = scene.id.endsWith("-bottom");
+      const menuFrame = scene.id.endsWith("-menu");
+      if (bottom) {
+        await page.waitForFunction(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return owner instanceof HTMLElement && owner.scrollTop > 0;
+        });
+      }
+      if (menuFrame) {
+        await page.getByRole("menu", { name: "Personality" }).waitFor();
+      }
+      const personalization = await page.evaluate(() => {
+        const toRect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(
+          ".codex-ui-personalization-settings",
+        );
+        const scrollOwner = document.querySelector(
+          ".codex-ui-settings-shell__main",
+        );
+        const save = document.querySelector(
+          ".codex-ui-personalization-settings__save",
+        );
+        const trigger = document.querySelector(
+          ".codex-ui-personalization-settings__personality-trigger",
+        );
+        return {
+          card: toRect(
+            document.querySelector(".codex-ui-personalization-settings__card"),
+          ),
+          heading: toRect(
+            document.querySelector(
+              ".codex-ui-personalization-settings > h1",
+            ),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          menu: toRect(
+            document.querySelector(
+              ".codex-ui-personalization-settings__personality-menu",
+            ),
+          ),
+          menuItems: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-personalization-settings__personality-option",
+            ),
+            (item) => ({
+              checked: item.getAttribute("aria-checked"),
+              label: item.textContent?.trim(),
+              rect: toRect(item),
+            }),
+          ),
+          navigation: toRect(
+            document.querySelector(".codex-ui-settings-shell__navigation"),
+          ),
+          personality: toRect(
+            document.querySelector(
+              ".codex-ui-personalization-settings__personality",
+            ),
+          ),
+          root: toRect(root),
+          rowCount: document.querySelectorAll(
+            ".codex-ui-personalization-settings__row",
+          ).length,
+          saveDisabled: save?.hasAttribute("disabled"),
+          scrollOwner:
+            scrollOwner instanceof HTMLElement
+              ? {
+                  clientHeight: scrollOwner.clientHeight,
+                  rect: toRect(scrollOwner),
+                  scrollHeight: scrollOwner.scrollHeight,
+                  scrollTop: scrollOwner.scrollTop,
+                }
+              : null,
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-personalization-settings [role="switch"]',
+            ),
+            (control) => ({
+              checked: control.getAttribute("aria-checked"),
+              label: control.getAttribute("aria-label"),
+              rect: toRect(control),
+            }),
+          ),
+          textarea: toRect(
+            document.querySelector(
+              ".codex-ui-personalization-settings__custom textarea",
+            ),
+          ),
+          trigger: {
+            expanded: trigger?.getAttribute("aria-expanded"),
+            label: trigger?.textContent?.trim(),
+            rect: toRect(trigger),
+          },
+          viewport: { height: innerHeight, width: innerWidth },
+          warning: toRect(
+            document.querySelector(
+              ".codex-ui-personalization-settings__warning",
+            ),
+          ),
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const expectedWidth = compact ? 358.125 : 768;
+      const expectedSwitches = [
+        ["Enable local memories", "true"],
+        ["Allow local memory generation from tool-assisted chats", "true"],
+      ];
+      if (
+        personalization.horizontalOverflow > 1 ||
+        personalization.selected !== "Personalization" ||
+        personalization.navigation?.width !== 321.875 ||
+        personalization.navigation?.top !== 46 ||
+        Math.abs(personalization.root?.width - expectedWidth) > 1 ||
+        (!bottom && personalization.heading?.top !== 66) ||
+        personalization.rowCount !== 3 ||
+        Math.abs(personalization.card?.width - expectedWidth) > 1 ||
+        Math.abs(personalization.textarea?.width - expectedWidth) > 1 ||
+        Math.abs(personalization.textarea?.height - 147.9375) > 1 ||
+        personalization.saveDisabled !== true ||
+        JSON.stringify(
+          personalization.switchStates.map(({ checked, label }) => [
+            label,
+            checked,
+          ]),
+        ) !== JSON.stringify(expectedSwitches) ||
+        personalization.switchStates.some(
+          ({ rect }) =>
+            Math.abs(rect?.width - 32) > 1 ||
+            Math.abs(rect?.height - 20) > 1,
+        ) ||
+        personalization.trigger.label !== "Friendly⌄" ||
+        personalization.trigger.expanded !== String(menuFrame) ||
+        (!bottom && personalization.scrollOwner?.scrollTop !== 0) ||
+        (bottom && personalization.scrollOwner?.scrollTop <= 0) ||
+        (menuFrame &&
+          (Math.abs(personalization.menu?.width - 268) > 1 ||
+            Math.abs(personalization.menu?.height - 105.125) > 2 ||
+            JSON.stringify(
+              personalization.menuItems.map(({ checked, label }) => [
+                label,
+                checked,
+              ]),
+            ) !==
+              JSON.stringify([
+                ["FriendlyWarm, collaborative, and helpful✓", "true"],
+                ["PragmaticConcise, task-focused, and direct", "false"],
+              ])))
+      ) {
+        throw new Error(
+          `${scene.id}: current Personalization Settings contract failed: ${JSON.stringify(personalization)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-personalization-settings") {
+        const textarea = page.getByRole("textbox", {
+          name: "Custom instructions",
+        });
+        const original = await textarea.inputValue();
+        await textarea.fill(`${original} `);
+        const dirty = await page
+          .getByRole("button", { name: "Save" })
+          .isEnabled();
+        await textarea.fill(original);
+        const restored = await page
+          .getByRole("button", { name: "Save" })
+          .isDisabled();
+        const trigger = page.getByRole("button", { name: "Personality" });
+        await trigger.click();
+        const pragmatic = page.getByRole("menuitemradio", {
+          name: /Pragmatic/,
+        });
+        await pragmatic.focus();
+        await pragmatic.click();
+        const selected = await trigger.textContent();
+        await trigger.click();
+        await page.getByRole("menuitemradio", { name: /Pragmatic/ }).press(
+          "Escape",
+        );
+        await page.waitForFunction(
+          () =>
+            document.activeElement?.getAttribute("aria-label") ===
+            "Personality",
+        );
+        interaction = {
+          dirty,
+          focusReturned: await trigger.evaluate(
+            (element) => document.activeElement === element,
+          ),
+          restored,
+          selected: selected?.trim(),
+        };
+        if (
+          !interaction.dirty ||
+          !interaction.restored ||
+          interaction.selected !== "Pragmatic⌄" ||
+          !interaction.focusReturned
+        ) {
+          throw new Error(
+            `${scene.id}: Personalization interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, personalization }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-general-settings")) {
       if (scene.id.endsWith("-bottom") || scene.id.includes("-hotkey")) {
         await page.waitForFunction(() => {

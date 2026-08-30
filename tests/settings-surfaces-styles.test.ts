@@ -95,10 +95,31 @@ describe("settings visual contract", () => {
       /\.codex-ui-general-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,
     );
     expect(styles).toMatch(
-      /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings \{[\s\S]*?width: calc\(100% - 2\.5rem\);/,
+      /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings,[\s\S]*?\{[\s\S]*?width: calc\(100% - 2\.5rem\);/,
     );
     expect(styles).toMatch(
       /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-general-settings__hotkey-capture \{[\s\S]*?align-items: flex-end;[\s\S]*?flex-direction: column;/,
+    );
+  });
+
+  it("locks the current Personalization editor, memory card, and menu geometry", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-personalization-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 1\.25rem 0 1\.3125rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-personalization-settings__custom textarea \{[\s\S]*?border-radius: 0\.625rem;[\s\S]*?height: 9\.24609375rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-personalization-settings__card,[\s\S]*?\.codex-ui-personalization-settings__personality \{[\s\S]*?border-radius: 0\.9375rem;[\s\S]*?overflow: hidden;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-personalization-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-personalization-settings__personality-menu \{[\s\S]*?border-radius: 1\.25rem;[\s\S]*?min-width: 16\.75rem;/,
+    );
+    expect(styles).toMatch(
+      /@media \(max-width: 50rem\)[\s\S]*?\.codex-ui-personalization-settings \{[\s\S]*?width: calc\(100% - 2\.5rem\);/,
     );
   });
 

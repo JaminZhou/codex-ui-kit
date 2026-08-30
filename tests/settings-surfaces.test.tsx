@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -9,12 +15,14 @@ import {
   GeneralSettingsPage,
   GitSettingsPage,
   HooksSettingsPage,
+  PersonalizationSettingsPage,
   SettingsShell,
   type AppearanceSettingsValue,
   type CodeReviewSettingsValue,
   type GeneralSettingsValue,
   type GitSettingsValue,
   type HookSettingsEntry,
+  type PersonalizationSettingsValue,
 } from "../src";
 
 afterEach(cleanup);
@@ -180,6 +188,45 @@ function GeneralFixture({
       onChangeProjectlessTaskFolder={onChangeProjectlessTaskFolder}
       onOpenSourceLicenses={onOpenSourceLicenses}
       onStartHotkeyCapture={() => setHotkeyCaptureActive(true)}
+      value={value}
+    />
+  );
+}
+
+const initialPersonalizationValue: PersonalizationSettingsValue = {
+  customInstructions: "Keep responses concise.",
+  localMemories: true,
+  personality: "friendly",
+  toolAssistedMemoryGeneration: true,
+};
+
+function PersonalizationFixture({
+  onDeleteLocalMemories = () => undefined,
+  onSaveCustomInstructions = () => undefined,
+}: {
+  onDeleteLocalMemories?: () => void;
+  onSaveCustomInstructions?: () => void;
+} = {}) {
+  const [value, setValue] = useState(initialPersonalizationValue);
+  const [savedCustomInstructions, setSavedCustomInstructions] = useState(
+    initialPersonalizationValue.customInstructions,
+  );
+  const [personalityMenuOpen, setPersonalityMenuOpen] = useState(false);
+
+  return (
+    <PersonalizationSettingsPage
+      customInstructionsDirty={
+        value.customInstructions !== savedCustomInstructions
+      }
+      learnMoreHref="https://help.openai.com/"
+      onChange={setValue}
+      onDeleteLocalMemories={onDeleteLocalMemories}
+      onPersonalityMenuOpenChange={setPersonalityMenuOpen}
+      onSaveCustomInstructions={() => {
+        setSavedCustomInstructions(value.customInstructions);
+        onSaveCustomInstructions();
+      }}
+      personalityMenuOpen={personalityMenuOpen}
       value={value}
     />
   );
@@ -993,5 +1040,86 @@ describe("settings surfaces", () => {
     });
     expect(hotkeyEdit.textContent).toContain("⌘ ⇧ K");
     expect(document.activeElement).toBe(hotkeyEdit);
+  });
+
+  it("models the current Personalization fields as controlled inputs", () => {
+    const onDeleteLocalMemories = vi.fn();
+    const onSaveCustomInstructions = vi.fn();
+    render(
+      <PersonalizationFixture
+        onDeleteLocalMemories={onDeleteLocalMemories}
+        onSaveCustomInstructions={onSaveCustomInstructions}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Personalization" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Configure how local memories are collected, retained, and consolidated on this computer.",
+        { exact: false },
+      ),
+    ).toBeTruthy();
+
+    const customInstructions = screen.getByRole("textbox", {
+      name: "Custom instructions",
+    });
+    const save = screen.getByRole("button", { name: "Save" });
+    expect(save.hasAttribute("disabled")).toBe(true);
+    fireEvent.change(customInstructions, {
+      target: { value: "Keep responses concise and verify the result." },
+    });
+    expect(save.hasAttribute("disabled")).toBe(false);
+    fireEvent.click(save);
+    expect(onSaveCustomInstructions).toHaveBeenCalledOnce();
+    expect(save.hasAttribute("disabled")).toBe(true);
+
+    const localMemories = screen.getByRole("switch", {
+      name: "Enable local memories",
+    });
+    const toolAssisted = screen.getByRole("switch", {
+      name: "Allow local memory generation from tool-assisted chats",
+    });
+    expect(localMemories.getAttribute("aria-checked")).toBe("true");
+    expect(toolAssisted.getAttribute("aria-checked")).toBe("true");
+    fireEvent.click(localMemories);
+    fireEvent.click(toolAssisted);
+    expect(localMemories.getAttribute("aria-checked")).toBe("false");
+    expect(toolAssisted.getAttribute("aria-checked")).toBe("false");
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+    expect(onDeleteLocalMemories).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the Personalization personality menu selected and focus-safe", async () => {
+    render(<PersonalizationFixture />);
+
+    const trigger = screen.getByRole("button", { name: "Personality" });
+    expect(trigger.textContent).toContain("Friendly");
+    fireEvent.click(trigger);
+
+    const friendly = screen.getByRole("menuitemradio", {
+      name: /Friendly/,
+    });
+    const pragmatic = screen.getByRole("menuitemradio", {
+      name: /Pragmatic/,
+    });
+    expect(friendly.getAttribute("aria-checked")).toBe("true");
+    expect(pragmatic.getAttribute("aria-checked")).toBe("false");
+
+    friendly.focus();
+    fireEvent.keyDown(friendly, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(pragmatic);
+    fireEvent.click(pragmatic);
+    expect(trigger.textContent).toContain("Pragmatic");
+
+    fireEvent.click(trigger);
+    fireEvent.keyDown(
+      screen.getByRole("menuitemradio", { name: /Friendly/ }),
+      { key: "Escape" },
+    );
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+    expect(screen.queryByRole("menu")).toBeNull();
   });
 });

@@ -84,6 +84,7 @@ export const publicRuntimeExports = [
   "MessageAttachment",
   "NewConversationPromptGrid",
   "NewConversationStart",
+  "PersonalizationSettingsPage",
   "Popover",
   "ProjectConversationPage",
   "ProjectIndex",

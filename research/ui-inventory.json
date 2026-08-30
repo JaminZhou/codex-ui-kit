@@ -1610,11 +1610,22 @@
       "id": "settings.personalization",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["personalization-settings"],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "packageEvidence": [
+        "personalization-settings",
+        "browser-cdp:current-personalization-wide-compact-controls-menu-and-scroll",
+        "electron:current-personalization-wide-compact-controls-menu-and-scroll",
+        "pixel:reviewed-current-personalization-settings-baselines"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:personalization-custom-instructions-memory-and-personality",
+        "cdp-26.825.51511:personalization-1180x820-and-720x680-geometry-zero-overflow-and-bottom-scroll",
+        "cdp-26.825.51511:personalization-controlled-save-switch-delete-menu-and-focus-lifecycle",
+        "cdp-26.825.51511:personalization-wide-menu-and-compact-local-only-pixel-comparisons"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

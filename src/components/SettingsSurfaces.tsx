@@ -2787,3 +2787,258 @@ export function GeneralSettingsPage({
     </article>
   );
 }
+
+export type PersonalizationPersonality = "friendly" | "pragmatic";
+
+export interface PersonalizationSettingsValue {
+  customInstructions: string;
+  localMemories: boolean;
+  personality: PersonalizationPersonality;
+  toolAssistedMemoryGeneration: boolean;
+}
+
+export interface PersonalizationSettingsPageProps
+  extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
+  customInstructionsDirty?: boolean;
+  learnMoreHref?: string;
+  onChange: (value: PersonalizationSettingsValue) => void;
+  onDeleteLocalMemories?: () => void;
+  onSaveCustomInstructions?: () => void;
+  onPersonalityMenuOpenChange?: (open: boolean) => void;
+  personalityMenuOpen?: boolean;
+  value: PersonalizationSettingsValue;
+}
+
+const personalizationOptions: readonly {
+  description: string;
+  label: string;
+  value: PersonalizationPersonality;
+}[] = [
+  {
+    description: "Warm, collaborative, and helpful",
+    label: "Friendly",
+    value: "friendly",
+  },
+  {
+    description: "Concise, task-focused, and direct",
+    label: "Pragmatic",
+    value: "pragmatic",
+  },
+];
+
+function PersonalizationSwitch({
+  checked,
+  label,
+  onChange,
+}: {
+  checked: boolean;
+  label: string;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <button
+      aria-checked={checked}
+      aria-label={label}
+      className="codex-ui-personalization-settings__switch"
+      onClick={() => onChange(!checked)}
+      role="switch"
+      type="button"
+    >
+      <span aria-hidden="true" />
+    </button>
+  );
+}
+
+function PersonalizationRow({
+  children,
+  description,
+  label,
+}: {
+  children: ReactNode;
+  description: ReactNode;
+  label: ReactNode;
+}) {
+  return (
+    <div className="codex-ui-personalization-settings__row">
+      <div className="codex-ui-personalization-settings__row-copy">
+        <span>{label}</span>
+        <p>{description}</p>
+      </div>
+      <div className="codex-ui-personalization-settings__row-control">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function PersonalizationSettingsPage({
+  className,
+  customInstructionsDirty = false,
+  learnMoreHref,
+  onChange,
+  onDeleteLocalMemories,
+  onPersonalityMenuOpenChange,
+  onSaveCustomInstructions,
+  personalityMenuOpen,
+  value,
+  ...props
+}: PersonalizationSettingsPageProps) {
+  const personalityDescriptionId = useId();
+  const selectedPersonality =
+    personalizationOptions.find((option) => option.value === value.personality) ??
+    personalizationOptions[0];
+  const update = <K extends keyof PersonalizationSettingsValue>(
+    key: K,
+    nextValue: PersonalizationSettingsValue[K],
+  ) => onChange({ ...value, [key]: nextValue });
+  const learnMore = learnMoreHref ? (
+    <>
+      {" "}
+      <a href={learnMoreHref}>Learn more</a>
+    </>
+  ) : null;
+
+  return (
+    <article
+      {...props}
+      className={["codex-ui-personalization-settings", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <h1>Personalization</h1>
+
+      <section className="codex-ui-personalization-settings__custom">
+        <header>
+          <div>
+            <h2>Custom instructions</h2>
+            <p>
+              Give ChatGPT extra instructions and context for all chats on this
+              host.{learnMore}
+            </p>
+          </div>
+          <button
+            className="codex-ui-personalization-settings__save"
+            disabled={!customInstructionsDirty || !onSaveCustomInstructions}
+            onClick={onSaveCustomInstructions}
+            type="button"
+          >
+            Save
+          </button>
+        </header>
+        <textarea
+          aria-label="Custom instructions"
+          onChange={(event) =>
+            update("customInstructions", event.currentTarget.value)
+          }
+          value={value.customInstructions}
+        />
+      </section>
+
+      <section className="codex-ui-personalization-settings__memory">
+        <header>
+          <h2>Memory</h2>
+          <p>
+            Configure how local memories are collected, retained, and
+            consolidated on this computer.{learnMore}
+          </p>
+        </header>
+        <div className="codex-ui-personalization-settings__card">
+          <PersonalizationRow
+            description="Create memories from chats on this computer and use them to personalize future chats on this computer"
+            label="Enable local memories"
+          >
+            <PersonalizationSwitch
+              checked={value.localMemories}
+              label="Enable local memories"
+              onChange={(localMemories) =>
+                update("localMemories", localMemories)
+              }
+            />
+          </PersonalizationRow>
+          <PersonalizationRow
+            description="Generate memories from chats that used MCP tools or web search"
+            label="Allow local memory generation from tool-assisted chats"
+          >
+            <PersonalizationSwitch
+              checked={value.toolAssistedMemoryGeneration}
+              label="Allow local memory generation from tool-assisted chats"
+              onChange={(toolAssistedMemoryGeneration) =>
+                update(
+                  "toolAssistedMemoryGeneration",
+                  toolAssistedMemoryGeneration,
+                )
+              }
+            />
+          </PersonalizationRow>
+          <PersonalizationRow
+            description="Delete all memories stored locally on this computer"
+            label="Delete local memories"
+          >
+            <button
+              className="codex-ui-personalization-settings__delete"
+              disabled={!onDeleteLocalMemories}
+              onClick={onDeleteLocalMemories}
+              type="button"
+            >
+              Delete
+            </button>
+          </PersonalizationRow>
+        </div>
+      </section>
+
+      <div className="codex-ui-personalization-settings__warning" role="note">
+        <span aria-hidden="true">!</span>
+        <p>
+          Personality settings are not supported by every model. Codex&apos;s
+          tone can be customized in Custom instructions.
+        </p>
+      </div>
+
+      <div className="codex-ui-personalization-settings__personality">
+        <div className="codex-ui-personalization-settings__row-copy">
+          <span>Personality</span>
+          <p id={personalityDescriptionId}>
+            Choose a default tone for ChatGPT responses
+          </p>
+        </div>
+        <Menu
+          align="end"
+          className="codex-ui-personalization-settings__personality-menu"
+          label="Personality"
+          onOpenChange={onPersonalityMenuOpenChange}
+          open={personalityMenuOpen}
+          side="bottom"
+          sideOffset={4}
+          trigger={
+            <button
+              aria-describedby={personalityDescriptionId}
+              aria-label="Personality"
+              className="codex-ui-personalization-settings__personality-trigger"
+              type="button"
+            >
+              <span>{selectedPersonality.label}</span>
+              <span aria-hidden="true">⌄</span>
+            </button>
+          }
+          width="auto"
+        >
+          {personalizationOptions.map((option) => (
+            <MenuItem
+              aria-checked={option.value === value.personality}
+              className="codex-ui-personalization-settings__personality-option"
+              endIcon={
+                option.value === value.personality ? <span>✓</span> : undefined
+              }
+              key={option.value}
+              onSelect={() => update("personality", option.value)}
+              role="menuitemradio"
+              subText={option.description}
+            >
+              {option.label}
+            </MenuItem>
+          ))}
+        </Menu>
+      </div>
+    </article>
+  );
+}

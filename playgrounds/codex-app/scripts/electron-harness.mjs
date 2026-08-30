@@ -224,6 +224,36 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-personalization-settings",
+    id: "workspace-personalization-settings",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-personalization-settings-menu",
+    id: "workspace-personalization-settings-menu",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-personalization-settings-compact",
+    id: "workspace-personalization-settings-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-personalization-settings-compact-bottom",
+    id: "workspace-personalization-settings-compact-bottom",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-worktree-settings",
     id: "workspace-worktree-settings",
     maxPixelRatio: 0.01,
@@ -2812,6 +2842,16 @@ export async function launchScene(
       .evaluate((element, scrollTop) => {
         element.scrollTop = scrollTop;
       }, scene.panelScrollTop);
+  }
+  if (capture && scene.id === "workspace-personalization-settings-menu") {
+    await page.keyboard.press("Escape");
+    const personality = page.getByRole("button", { name: "Personality" });
+    await personality.click();
+    await page.getByRole("menu", { name: "Personality" }).waitFor();
+    await page.evaluate(() => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) active.blur();
+    });
   }
   return { app, page };
 }

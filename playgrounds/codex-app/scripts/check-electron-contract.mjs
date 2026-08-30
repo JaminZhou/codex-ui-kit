@@ -15397,6 +15397,88 @@ try {
   await hooksConfiguredApp.close();
 }
 
+const personalizationSettingsScene = {
+  frame: "workspace-personalization-settings",
+  id: "electron-personalization-settings",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: personalizationSettingsApp,
+  page: personalizationSettingsPage,
+} = await launchScene(personalizationSettingsScene, { capture: false });
+try {
+  const personalizationMain = personalizationSettingsPage.getByRole("main");
+  await personalizationMain
+    .getByRole("heading", { level: 1, name: "Personalization", exact: true })
+    .waitFor();
+  const instructions = personalizationMain.getByRole("textbox", {
+    name: "Custom instructions",
+  });
+  const save = personalizationMain.getByRole("button", { name: "Save" });
+  const originalInstructions = await instructions.inputValue();
+  await instructions.fill(`${originalInstructions} `);
+  if (!(await save.isEnabled())) {
+    throw new Error("Electron Personalization dirty state did not enable Save.");
+  }
+  await instructions.fill(originalInstructions);
+  if (!(await save.isDisabled())) {
+    throw new Error("Electron Personalization restore did not disable Save.");
+  }
+
+  const personality = personalizationMain.getByRole("button", {
+    name: "Personality",
+  });
+  await personality.click();
+  await personalizationSettingsPage
+    .getByRole("menuitemradio", { name: /Pragmatic/ })
+    .click();
+  if (!(await personality.textContent())?.includes("Pragmatic")) {
+    throw new Error("Electron Personalization selection was not controlled.");
+  }
+  await personality.click();
+  await personalizationSettingsPage
+    .getByRole("menuitemradio", { name: /Pragmatic/ })
+    .press("Escape");
+  await personalizationSettingsPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Personality",
+  );
+
+  await personalizationSettingsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await personalizationSettingsPage.waitForFunction(() => innerWidth === 720);
+  const compactContract = await personalizationSettingsPage.evaluate(() => {
+    const root = document.querySelector(
+      ".codex-ui-personalization-settings",
+    );
+    const owner = document.querySelector(
+      ".codex-ui-settings-shell__main",
+    );
+    return {
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rootWidth: root?.getBoundingClientRect().width,
+      scrollHeight: owner?.scrollHeight,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    compactContract.viewport.width !== 720 ||
+    compactContract.viewport.height !== 680 ||
+    Math.abs((compactContract.rootWidth ?? Infinity) - 358.125) > 1 ||
+    (compactContract.scrollHeight ?? 0) <= compactContract.viewport.height ||
+    compactContract.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron compact Personalization contract failed: ${JSON.stringify(compactContract)}`,
+    );
+  }
+} finally {
+  await personalizationSettingsApp.close();
+}
+
 const codeReviewSettingsScene = {
   frame: "workspace-code-review-settings",
   id: "electron-code-review-settings",
@@ -16676,5 +16758,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818, 26.820, and 26.825 MCP success/failure/recovery/Sources interactions, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Hooks and Personalization plus package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818, 26.820, and 26.825 MCP success/failure/recovery/Sources interactions, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );
