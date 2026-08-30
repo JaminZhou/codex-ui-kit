@@ -425,6 +425,24 @@ failure/recovery workspace. Settings retention, permanent worktrees, missing
 directory variants, and other unsampled worktree paths keep the broader
 implementation `partial`.
 
+The adjacent `26.825.51511` Worktrees Settings follow-up reaches the four
+current preferences, one real disposable managed-worktree card, project-level
+Refresh, New chat, conversation linkage, and product-owned Delete. Moving the
+exact disposable directory aside and refreshing removes its card; restoring
+the path and refreshing restores the card. Product Delete then removes the
+same worktree from both disk and Git registration immediately, without a
+confirmation dialog. This is reconciliation behavior, not a missing-directory
+repair surface. At 1180×820 the route uses the current 321.875px Settings rail,
+768px content column, 276.31px preference card, 46px project header, and
+124.58px managed card. The 720×680 route keeps fixed-size controls and has no
+document-level horizontal overflow. Browser/CDP covers six deterministic
+wide, compact, light, empty, conversation, and missing-refresh frames;
+Electron repeats preference/action state and route persistence. Six reviewed
+baselines pass, and the local-only owned-route product comparison is 4.5984%
+under 5%. Native `Create permanent worktree` remains current-menu evidence but
+was not activated, so permanent creation, timed pruning, and broader retention
+lifecycles keep `workspace.worktrees` implementation `partial`.
+
 The ordinary task-status follow-up reached one real active thread and one
 background-completed unread thread on `26.803.61601`. It locked the 20×20
 trailing rail, exact 16×16 active spinner geometry, and centered 8×8 unread dot

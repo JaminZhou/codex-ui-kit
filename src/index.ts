@@ -43,4 +43,5 @@ export * from "./components/PullRequestSurfaces.js";
 export * from "./components/ProjectConversationRouting.js";
 export * from "./components/TerminalPanel.js";
 export * from "./components/WorktreeSetupStatus.js";
+export * from "./components/WorktreeSettingsPage.js";
 export * from "./types.js";

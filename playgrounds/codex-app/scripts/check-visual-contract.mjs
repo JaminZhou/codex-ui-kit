@@ -430,6 +430,8 @@ const currentBuildGeneralSettingsHotkeyReference =
   process.env.CODEX_UI_KIT_GENERAL_SETTINGS_HOTKEY_REFERENCE;
 const currentBuildGeneralSettingsBottomReference =
   process.env.CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_REFERENCE;
+const currentBuildWorktreeSettingsReference =
+  process.env.CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETTINGS_REFERENCE;
 const currentBuildHooksSettingsReference =
   process.env.CODEX_UI_KIT_HOOKS_SETTINGS_REFERENCE;
 const currentBuildHooksSettingsCompactReference =
@@ -3387,6 +3389,25 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_MAX_DIFF_RATIO",
       referencePath: currentBuildGeneralSettingsBottomReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-worktree-settings" &&
+    currentBuildWorktreeSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual: cropPng(actual, 367, 66, 768, 548),
+      defaultMaximumRatio: 0.05,
+      masks: [
+        { height: 24, left: 0, top: 376, width: 700 },
+        { height: 18, left: 12, top: 460, width: 470 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETTINGS_MAX_DIFF_RATIO",
+      referenceCrop: { height: 548, left: 367, top: 66, width: 768 },
+      referencePath: currentBuildWorktreeSettingsReference,
       sceneId: scene.id,
     });
   }
