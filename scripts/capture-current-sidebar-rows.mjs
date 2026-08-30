@@ -364,7 +364,7 @@ try {
         return (
           Math.abs(rect.width - 8) <= 0.1 &&
           Math.abs(rect.height - 8) <= 0.1 &&
-          style.backgroundColor === "rgb(131, 195, 255)"
+          style.backgroundColor === "rgb(58, 131, 247)"
         );
       });
       return {
@@ -529,7 +529,7 @@ try {
         return (
           Math.abs(bounds.width - 8) <= 0.1 &&
           Math.abs(bounds.height - 8) <= 0.1 &&
-          getComputedStyle(span).backgroundColor === "rgb(131, 195, 255)"
+          getComputedStyle(span).backgroundColor === "rgb(58, 131, 247)"
         );
       });
       let rail = dot?.parentElement;
@@ -749,7 +749,7 @@ try {
         return (
           Math.abs(bounds.width - 8) <= 0.1 &&
           Math.abs(bounds.height - 8) <= 0.1 &&
-          getComputedStyle(span).backgroundColor === "rgb(131, 195, 255)"
+          getComputedStyle(span).backgroundColor === "rgb(58, 131, 247)"
         );
       });
       return (
@@ -781,7 +781,7 @@ try {
         return (
           Math.abs(bounds.width - 8) <= 0.1 &&
           Math.abs(bounds.height - 8) <= 0.1 &&
-          getComputedStyle(span).backgroundColor === "rgb(131, 195, 255)"
+          getComputedStyle(span).backgroundColor === "rgb(58, 131, 247)"
         );
       });
       return (

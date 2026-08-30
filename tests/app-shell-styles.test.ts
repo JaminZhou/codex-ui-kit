@@ -94,6 +94,7 @@ describe("application shell visual contract", () => {
 
   it("locks the current-build sidebar regions and row geometry", () => {
     expect(tokens).toContain("--codex-ui-app-sidebar-width: 17.125rem");
+    expect(tokens).toContain("--codex-ui-app-sidebar-attention: #3a83f7");
     expect(styles).toContain(
       ".codex-ui-app-sidebar[data-titlebar-inset]",
     );
@@ -101,6 +102,12 @@ describe("application shell visual contract", () => {
     expect(styles).toContain("min-height: 4.375rem");
     expect(styles).toContain("min-height: 1.875rem");
     expect(styles).toContain("border-radius: 0.78125rem");
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item \{[\s\S]*?font-size: 0\.8125rem;[\s\S]*?font-weight: 400;[\s\S]*?grid-column: 1 \/ -1;[\s\S]*?line-height: 1\.1607142857rem;[\s\S]*?padding-block: 0\.3125rem;[\s\S]*?padding-inline: calc\(var\(--codex-ui-spacing\) \* 2\) 0\.3125rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__item-label \{[\s\S]*?font-size: 0\.8125rem;[\s\S]*?font-weight: 400;[\s\S]*?line-height: 1\.1607142857rem;/,
+    );
     expect(styles).toContain(
       "background: color-mix(\n    in srgb,\n    var(--codex-ui-text-foreground) 8%",
     );

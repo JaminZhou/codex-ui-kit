@@ -751,7 +751,7 @@ The thirty-ninth slice reaches ordinary sidebar task status on Codex Desktop
 
 - one real active task and one background-completed unread task establish the
   20×20 trailing rail, exact 16×16 spinner, centered 8×8 unread dot, and
-  computed `rgb(131, 195, 255)` color;
+  current computed `rgb(58, 131, 247)` color;
 - queuing a follow-up preserves the active spinner, while read-only package
   structure separates pending-worktree loading/error phases from ordinary
   active/waiting/unread state;
@@ -766,6 +766,28 @@ The thirty-ninth slice reaches ordinary sidebar task status on Codex Desktop
 Pending-worktree phases remain previous-build-only until runtime-reached on
 this fingerprint. Product screenshots, profiles, and raw application data
 remain untracked.
+
+## Current 26.825 sidebar thread lifecycle slice
+
+The current `26.825.51511` follow-up isolates the ordinary thread lifecycle
+from the broader synthetic worktree/error matrix:
+
+- one selected running row, one naturally completed background-unread row,
+  four idle rows, and explicit wide/hover/compact visual scenes;
+- a fixed 321.875px sidebar at 1180 and 720, 305.875×30px rows,
+  `5px 5px 5px 8px` padding, 12.5px radius, and 13/18.5714px weight-400 type;
+- the exact 16×16 two-path spinner, 8×8 `#3a83f7` unread dot, and status-to-
+  actions replacement;
+- exact `Pin chat` and `Archive chat` names, 19×20 controls, 16×16 SVGs, 8px
+  gap, and 8px trailing inset;
+- Browser/CDP and Electron computed-style/interaction gates plus three
+  reviewed visual baselines.
+
+With local-only current-product references, the 56×30 action-shape crop passes
+at 2.9762%, the 28×30 active rail at 0.3571%, and the unread rail at 0%. Raw
+product screenshots, profile data, task titles, and thread identifiers remain
+untracked. Waiting, error, worktree, pin/archive mutations, and longer history
+variants are not promoted by this slice.
 
 ## Current sidebar collection slice
 
@@ -1349,6 +1371,23 @@ observed ratios are 1.9048%, 3.5714%, 3.3796%, and 3.1944% respectively. The
 unread default ceiling is 4% to cover the measured 306.90625px product row's
 fractional dot rasterization; the CDP and Electron contracts still require the
 exact 20×20 rail, centered 8×8 dot, color, action geometry, and SVG paths.
+
+The isolated `26.825.51511` ordinary-thread refresh uses its own variables so
+the wider current row cannot be confused with previous-build project/worktree
+fixtures:
+
+```bash
+CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_ACTIVE_STATUS_REFERENCE=/absolute/path/to/current-26-825-active-row.png \
+CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_UNREAD_STATUS_REFERENCE=/absolute/path/to/current-26-825-unread-row.png \
+CODEX_UI_KIT_CURRENT_26_825_SIDEBAR_TASK_ACTIONS_REFERENCE=/absolute/path/to/current-26-825-task-actions-56x30.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-sidebar-thread-lifecycle
+```
+
+The status references may be 306×30 full rows or 28×30 trailing rails; the
+action reference is exactly 56×30. The checker compares owned foreground
+shapes while CDP independently locks row paint, typography, padding, exact
+color, names, dimensions, and hover replacement.
 
 The follow-up `26.820.60940` edge probe supplies the current 140×29 empty crop and
 56×30 worktree loading/restored crops. Their foreground comparisons pass at

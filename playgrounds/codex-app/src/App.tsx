@@ -459,6 +459,7 @@ function querySelection() {
     "collection-loading",
     "collection-long-list",
     "status-lifecycle",
+    "thread-lifecycle-current",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
     : null;
@@ -4033,6 +4034,8 @@ export function App() {
     initialSelection.currentSidebar ||
     initialSelection.frame?.startsWith("sidebar-current") ||
     !initialSelection.capture;
+  const currentSidebarThreadLifecycle =
+    initialSelection.sidebarState === "thread-lifecycle-current";
   const currentHomeFrame = activeFrame?.startsWith("current-home-") ?? false;
   const workspacePersistenceFrame =
     view === "workspace" && currentWorkspacePersistenceFrame(activeFrame);
@@ -4062,13 +4065,21 @@ export function App() {
         currentSidebarComposition ? (
           <>
             <button
-              aria-label={`Pin recent task ${item.id}`}
+              aria-label={
+                currentSidebarThreadLifecycle
+                  ? "Pin chat"
+                  : `Pin recent task ${item.id}`
+              }
               type="button"
             >
               <SidebarGlyph name="pin-current" />
             </button>
             <button
-              aria-label={`Archive recent task ${item.id}`}
+              aria-label={
+                currentSidebarThreadLifecycle
+                  ? "Archive chat"
+                  : `Archive recent task ${item.id}`
+              }
               type="button"
             >
               <SidebarGlyph name="archive-current" />
@@ -4083,7 +4094,29 @@ export function App() {
           </button>
         )
       }
-      actionsLabel={`Sidebar task actions for ${item.label}`}
+      actionsLabel={
+        currentSidebarThreadLifecycle
+          ? "Chat actions"
+          : `Sidebar task actions for ${item.label}`
+      }
+      data-sidebar-status-fixture={
+        currentSidebarThreadLifecycle
+          ? index === 0
+            ? "current-thread-active"
+            : index === 1
+              ? "current-thread-unread"
+              : undefined
+          : undefined
+      }
+      data-sidebar-thread-lifecycle-fixture={
+        currentSidebarThreadLifecycle
+          ? index === 0
+            ? "active"
+            : index === 1
+              ? "unread"
+              : "idle"
+          : undefined
+      }
       key={item.id}
       leading={
         currentSidebarComposition ? undefined : (
@@ -4092,13 +4125,21 @@ export function App() {
       }
       onClick={() => selectScenario(item.id)}
       selected={
-        !currentSidebarComposition &&
-        view === "conversation" &&
-        mode === "replay" &&
-        scenarioId === item.id
+        currentSidebarThreadLifecycle
+          ? index === 0
+          : !currentSidebarComposition &&
+            view === "conversation" &&
+            mode === "replay" &&
+            scenarioId === item.id
       }
       status={
-        currentSidebarComposition
+        currentSidebarThreadLifecycle
+          ? index === 0
+            ? "active"
+            : index === 1
+              ? "unread"
+              : "idle"
+          : currentSidebarComposition
           ? "idle"
           : index === 1
             ? "queued"
@@ -4109,7 +4150,13 @@ export function App() {
                 : "idle"
       }
       statusLabel={
-        currentSidebarComposition
+        currentSidebarThreadLifecycle
+          ? index === 0
+            ? "Chat is running"
+            : index === 1
+              ? "Chat has an unread update"
+              : undefined
+          : currentSidebarComposition
           ? undefined
           : index === 1
             ? "Task queued"
@@ -4439,7 +4486,10 @@ export function App() {
         toggleLabel="Toggle pinned tasks"
       >
         {currentSidebarComposition ? (
-          currentSidebarVisibleProjects.map((project) => (
+          currentSidebarThreadLifecycle ? (
+            sidebarRecentItems
+          ) : (
+            currentSidebarVisibleProjects.map((project) => (
             <AppSidebarProjectGroup
               actions={
                 <>
@@ -4563,7 +4613,8 @@ export function App() {
                 mode === "replay"
               }
               status={
-                initialSelection.sidebarState === "status-lifecycle"
+                initialSelection.sidebarState === "status-lifecycle" ||
+                currentSidebarThreadLifecycle
                   ? "idle"
                   : project.selected &&
                       (hasActiveTurnWork(state) || isTurnActive(state.status))
@@ -4680,7 +4731,8 @@ export function App() {
                 </AppSidebarItem>
                 ))}
             </AppSidebarProjectGroup>
-          ))
+            ))
+          )
         ) : (
           <>
             <AppSidebarItem
@@ -4788,16 +4840,18 @@ export function App() {
         title="Recents"
         toggleLabel="Toggle recent tasks"
       >
-        {initialSelection.sidebarState === "collection-long-list" ? (
-          <AppSidebarCollection
-            data-sidebar-collection-fixture="long-list"
-            maxItems={5}
-          >
-            {sidebarRecentItems}
-          </AppSidebarCollection>
-        ) : (
-          sidebarRecentItems
-        )}
+        {currentSidebarThreadLifecycle
+          ? null
+          : initialSelection.sidebarState === "collection-long-list"
+            ? (
+                <AppSidebarCollection
+                  data-sidebar-collection-fixture="long-list"
+                  maxItems={5}
+                >
+                  {sidebarRecentItems}
+                </AppSidebarCollection>
+              )
+            : sidebarRecentItems}
       </AppSidebarSection>
       <AppSidebarSection title="Connection">
         <AppSidebarItem
@@ -11242,14 +11296,15 @@ export function App() {
         }
         sidebar={sidebar}
         sidebarWidth={
+          currentSidebarThreadLifecycle ||
           isCurrentRichMarkdownStreamingReplay
             ? 321.875
             : currentHomeFrame ||
-          isCurrentBrowser26825Replay ||
-          isCurrentSearch26825Replay ||
-          isCurrentMarkdown26825Replay
-            ? 322.90625
-            : undefined
+                isCurrentBrowser26825Replay ||
+                isCurrentSearch26825Replay ||
+                isCurrentMarkdown26825Replay
+              ? 322.90625
+              : undefined
         }
         sidebarMinMainWidth={
           subagentPanelSelected

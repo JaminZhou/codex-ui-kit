@@ -391,7 +391,7 @@ const sidebarRowsRecord = () => ({
         width: 8,
       },
       dotStyle: {
-        backgroundColor: "rgb(131, 195, 255)",
+        backgroundColor: "rgb(58, 131, 247)",
         borderRadius: "9999px",
       },
       railRect: {

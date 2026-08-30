@@ -928,7 +928,7 @@ try {
         (fixture.visualStatus === "attention" &&
           (fixture.attentionRect?.width !== 8 ||
             fixture.attentionRect?.height !== 8 ||
-            fixture.attentionColor !== "rgb(131, 195, 255)")) ||
+            fixture.attentionColor !== "rgb(58, 131, 247)")) ||
         (fixture.visualStatus === "error" &&
           (fixture.errorRect?.width !== 16 ||
             fixture.errorRect?.height !== 16 ||
@@ -945,7 +945,7 @@ try {
             fixture.secondaryRightInset !== 8 ||
             fixture.secondaryAttentionRect?.width !== 8 ||
             fixture.secondaryAttentionRect?.height !== 8 ||
-            fixture.secondaryAttentionColor !== "rgb(131, 195, 255)")),
+            fixture.secondaryAttentionColor !== "rgb(58, 131, 247)")),
     )
   ) {
     throw new Error(
@@ -1096,6 +1096,159 @@ try {
   }
 } finally {
   await sidebarStatusApp.close();
+}
+
+const sidebarThreadLifecycleScene = {
+  currentSidebar: true,
+  frame: "sidebar-current",
+  id: "electron-current-sidebar-thread-lifecycle",
+  scenario: "streaming-recovery",
+  sidebarState: "thread-lifecycle-current",
+};
+const {
+  app: sidebarThreadLifecycleApp,
+  page: sidebarThreadLifecyclePage,
+} = await launchScene(sidebarThreadLifecycleScene, { capture: false });
+
+try {
+  const lifecycle = await sidebarThreadLifecyclePage.evaluate(() => {
+    const rect = (element) => {
+      if (!(element instanceof Element)) return null;
+      const value = element.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        right: value.right,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    const fixtures = Array.from(
+      document.querySelectorAll(
+        "[data-sidebar-thread-lifecycle-fixture]",
+      ),
+      (item) => {
+        const row = item.closest(".codex-ui-app-sidebar__item-row");
+        const status = row?.querySelector(
+          ".codex-ui-app-sidebar__item-status",
+        );
+        const attention = status?.querySelector(
+          ".codex-ui-app-sidebar__item-status-attention",
+        );
+        const actions = row?.querySelector(
+          ".codex-ui-app-sidebar__item-actions",
+        );
+        const style = getComputedStyle(item);
+        return {
+          actionLabels: Array.from(
+            actions?.querySelectorAll("button") ?? [],
+            (button) => button.getAttribute("aria-label"),
+          ),
+          actionRects: Array.from(
+            actions?.querySelectorAll("button") ?? [],
+            (button) => rect(button),
+          ),
+          actionsOpacity: actions ? getComputedStyle(actions).opacity : null,
+          attentionColor: attention
+            ? getComputedStyle(attention).backgroundColor
+            : null,
+          attentionRect: rect(attention),
+          fixture: item.getAttribute(
+            "data-sidebar-thread-lifecycle-fixture",
+          ),
+          itemRect: rect(item),
+          itemStyle: {
+            borderRadius: style.borderRadius,
+            fontFamily: style.fontFamily,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            lineHeight: style.lineHeight,
+            padding: style.padding,
+          },
+          rowRect: rect(row),
+          selected: row?.hasAttribute("data-selected") ?? false,
+          status: status?.getAttribute("data-status") ?? "idle",
+          statusRect: rect(status),
+          visualStatus: status?.getAttribute("data-visual-status") ?? null,
+        };
+      },
+    );
+    return {
+      fixtures,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      sidebarRect: rect(
+        document.querySelector(".codex-ui-app-shell__sidebar"),
+      ),
+    };
+  });
+  const [active, unread, ...idle] = lifecycle.fixtures;
+  if (
+    lifecycle.horizontalOverflow !== 0 ||
+    Math.abs(lifecycle.sidebarRect?.width - 321.875) > 0.1 ||
+    !active ||
+    !unread ||
+    active.fixture !== "active" ||
+    active.status !== "active" ||
+    active.visualStatus !== "loading" ||
+    !active.selected ||
+    active.actionsOpacity !== "0" ||
+    active.rowRect?.height !== 30 ||
+    Math.abs(active.rowRect?.width - 305.875) > 0.1 ||
+    active.itemRect?.height !== 30 ||
+    active.itemStyle.borderRadius !== "12.5px" ||
+    active.itemStyle.fontSize !== "13px" ||
+    active.itemStyle.fontWeight !== "400" ||
+    active.itemStyle.lineHeight !== "18.5714px" ||
+    active.itemStyle.padding !== "5px 5px 5px 8px" ||
+    active.statusRect?.height !== 20 ||
+    active.statusRect?.width !== 20 ||
+    JSON.stringify(active.actionLabels) !==
+      JSON.stringify(["Pin chat", "Archive chat"]) ||
+    active.actionRects.some(
+      (button) => button?.height !== 20 || button?.width !== 19,
+    ) ||
+    unread.fixture !== "unread" ||
+    unread.status !== "unread" ||
+    unread.visualStatus !== "attention" ||
+    unread.selected ||
+    unread.attentionColor !== "rgb(58, 131, 247)" ||
+    unread.attentionRect?.height !== 8 ||
+    unread.attentionRect?.width !== 8 ||
+    idle.some(
+      (fixture) =>
+        fixture.fixture !== "idle" ||
+        fixture.status !== "idle" ||
+        fixture.visualStatus !== null,
+    )
+  ) {
+    throw new Error(
+      `Electron current sidebar thread lifecycle failed: ${JSON.stringify(lifecycle)}`,
+    );
+  }
+
+  const activeRow = sidebarThreadLifecyclePage
+    .locator('[data-sidebar-thread-lifecycle-fixture="active"]')
+    .locator(
+      "xpath=ancestor::*[contains(@class, 'codex-ui-app-sidebar__item-row')]",
+    );
+  await activeRow.hover();
+  const hovered = await activeRow.evaluate((row) => ({
+    actions: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-actions"),
+    ).opacity,
+    status: getComputedStyle(
+      row.querySelector(".codex-ui-app-sidebar__item-status"),
+    ).opacity,
+  }));
+  if (hovered.actions !== "1" || hovered.status !== "0") {
+    throw new Error(
+      `Electron current sidebar thread hover failed: ${JSON.stringify(hovered)}`,
+    );
+  }
+} finally {
+  await sidebarThreadLifecycleApp.close();
 }
 
 for (const collectionScene of [

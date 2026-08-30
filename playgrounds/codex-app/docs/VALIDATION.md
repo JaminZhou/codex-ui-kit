@@ -177,9 +177,17 @@ final 28px ordinary rail, 56px loading/restored region, or 84px failed unread
 region and compares foreground masks so selected/hover row paint does not
 overwhelm glyph geometry. Current CDP requires the 20×20 rails, 8px ordinary
 right inset, exact 16×16 spinner paths, centered 8×8 dot, and computed
-`rgb(131, 195, 255)` unread color. A failed unread worktree additionally keeps
+`rgb(58, 131, 247)` unread color. A failed unread worktree additionally keeps
 the 14×14 branch at 67px, red error rail at 36px, and blue unread rail at 8px;
 Electron verifies that trailing actions replace all three tracks.
+The separate current `26.825.51511` ordinary-thread scene uses a 321.875px
+sidebar and accepts 306×30 full rows or privacy-safe 28×30 status tails plus a
+56×30 action tail. Its Browser/CDP and Electron gates require the 305.875×30
+row, `5px 5px 5px 8px` padding, 13/18.5714px weight-400 type, selected active
+spinner, background-completed 8×8 `rgb(58, 131, 247)` unread dot, exact
+`Pin chat`/`Archive chat` controls, hover replacement, and the identical 720px
+compact boundary. Three reviewed frames make running, hover, and compact
+coverage visible instead of relying on offscreen DOM fixtures.
 For the current `26.818.41509` probe, the privacy-safe unmasked loading,
 failed-plus-unread, and restored tails differ by 2.0833%, 0.7540%, and 0.1786%.
 The same Browser/Electron slice requires the five-item Work in order with
@@ -196,7 +204,7 @@ active-row actions, 3.1944% for Recents idle-row actions, 1.9048% for active,
 and 3.5714% for unread. The unread foreground-mask ceiling is 4% because the
 measured 306.90625px product row places the exact 8×8 dot on a fractional
 raster origin; CDP and Electron continue to freeze its 20×20 rail, 14px dot
-right inset, and `rgb(131, 195, 255)` paint.
+right inset, and `rgb(58, 131, 247)` paint.
 The current collection slice keeps the ordinary error glyph and the
 one-heading/four-row loading skeleton as explicit 26.818 runtime/package
 evidence. On 26.820, semantic waiting uses the shared spinner, five-to-twelve

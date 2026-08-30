@@ -7115,6 +7115,68 @@ for (const scene of selectedScenes) {
                 };
               },
             ),
+            threadLifecycleFixtures: Array.from(
+              sidebar.querySelectorAll(
+                "[data-sidebar-thread-lifecycle-fixture]",
+              ),
+              (item) => {
+                const row = item.closest(
+                  ".codex-ui-app-sidebar__item-row",
+                );
+                const status = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-status",
+                );
+                const attention = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-attention",
+                );
+                const spinner = status?.querySelector(
+                  ".codex-ui-app-sidebar__item-status-spinner",
+                );
+                const actions = row?.querySelector(
+                  ".codex-ui-app-sidebar__item-actions",
+                );
+                return {
+                  actionLabels: Array.from(
+                    actions?.querySelectorAll("button") ?? [],
+                    (button) => button.getAttribute("aria-label"),
+                  ),
+                  actionRects: Array.from(
+                    actions?.querySelectorAll("button") ?? [],
+                    (button) => rect(button),
+                  ),
+                  actionsOpacity: actions
+                    ? getComputedStyle(actions).opacity
+                    : null,
+                  attentionColor: attention
+                    ? getComputedStyle(attention).backgroundColor
+                    : null,
+                  attentionRect: attention ? rect(attention) : null,
+                  fixture: item.getAttribute(
+                    "data-sidebar-thread-lifecycle-fixture",
+                  ),
+                  itemRect: rect(item),
+                  itemStyle: {
+                    backgroundColor: getComputedStyle(item).backgroundColor,
+                    borderRadius: getComputedStyle(item).borderRadius,
+                    fontFamily: getComputedStyle(item).fontFamily,
+                    fontSize: getComputedStyle(item).fontSize,
+                    fontWeight: getComputedStyle(item).fontWeight,
+                    lineHeight: getComputedStyle(item).lineHeight,
+                    padding: getComputedStyle(item).padding,
+                  },
+                  rowRect: row ? rect(row) : null,
+                  selected: row?.hasAttribute("data-selected") ?? false,
+                  spinnerPathData: Array.from(
+                    spinner?.querySelectorAll("path") ?? [],
+                    (path) => path.getAttribute("d"),
+                  ),
+                  status: status?.getAttribute("data-status") ?? "idle",
+                  statusRect: status ? rect(status) : null,
+                  visualStatus:
+                    status?.getAttribute("data-visual-status") ?? null,
+                };
+              },
+            ),
             worktreeFixtures: Array.from(
               sidebar.querySelectorAll(
                 "[data-sidebar-worktree-status-fixture]",
@@ -9626,7 +9688,9 @@ for (const scene of selectedScenes) {
     const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
     const minimumConversationViewportWidth =
       expectedWindowWidth <= 720
-        ? 400
+        ? scene.id.startsWith("current-sidebar-thread-lifecycle")
+          ? 398
+          : 400
         : scene.scenario === "current-browser-26-825"
           ? 430
         : scene.id === "current-review-files" ||
@@ -9654,6 +9718,9 @@ for (const scene of selectedScenes) {
       scene.id === "current-sidebar-recents";
     const currentSidebarStatusScene =
       scene.id === "current-sidebar-status-lifecycle";
+    const currentSidebarThreadLifecycleScene = scene.id.startsWith(
+      "current-sidebar-thread-lifecycle",
+    );
     const currentSidebarCollectionScene = scene.id.startsWith(
       "current-sidebar-collection-",
     );
@@ -9661,10 +9728,13 @@ for (const scene of selectedScenes) {
       scene.scenario === "current-search-26-825" ||
       scene.scenario === "current-browser-26-825" ||
       scene.scenario === "markdown-current-26-825" ||
-      scene.scenario === "markdown-streaming-large"
+      scene.scenario === "markdown-streaming-large" ||
+      currentSidebarThreadLifecycleScene
         ? scene.scenario === "markdown-streaming-large"
           ? 321.875
-          : 322.90625
+          : currentSidebarThreadLifecycleScene
+            ? 321.875
+            : 322.90625
         : 274;
     if (
       hiddenSidebarScene
@@ -9692,7 +9762,8 @@ for (const scene of selectedScenes) {
             contract.sidebar.navigation.clientHeight ||
           (!currentSidebarCollectionScene &&
             (contract.sidebar.projectToggleExpanded !== "false" ||
-              contract.sidebar.actionToolbars < 8 ||
+              contract.sidebar.actionToolbars <
+                (currentSidebarThreadLifecycleScene ? 6 : 8) ||
               contract.sidebar.statusCounts.error !==
                 (currentSidebarStatusScene
                   ? 2
@@ -9768,7 +9839,7 @@ for (const scene of selectedScenes) {
           (fixture.visualStatus === "attention" &&
             (fixture.attentionRect?.width !== 8 ||
               fixture.attentionRect?.height !== 8 ||
-              fixture.attentionColor !== "rgb(131, 195, 255)")) ||
+              fixture.attentionColor !== "rgb(58, 131, 247)")) ||
           (fixture.visualStatus === "error" &&
             (fixture.errorRect?.width !== 16 ||
               fixture.errorRect?.height !== 16 ||
@@ -9786,7 +9857,7 @@ for (const scene of selectedScenes) {
               fixture.secondaryRightInset !== 8 ||
               fixture.secondaryAttentionRect?.width !== 8 ||
               fixture.secondaryAttentionRect?.height !== 8 ||
-              fixture.secondaryAttentionColor !== "rgb(131, 195, 255)")),
+              fixture.secondaryAttentionColor !== "rgb(58, 131, 247)")),
       );
       const worktreeGeometryInvalid =
         contract.sidebar.worktreeFixtures.some(
@@ -9856,6 +9927,83 @@ for (const scene of selectedScenes) {
           `${scene.id}: RTL worktree status geometry failed: ${JSON.stringify(rtlWorktreeGeometry)}`,
         );
       }
+    }
+    if (currentSidebarThreadLifecycleScene) {
+      const [active, unread, ...idle] =
+        contract.sidebar.threadLifecycleFixtures;
+      const geometryInvalid =
+        !active ||
+        !unread ||
+        active.fixture !== "active" ||
+        active.status !== "active" ||
+        active.visualStatus !== "loading" ||
+        !active.selected ||
+        active.actionsOpacity !== "0" ||
+        active.rowRect?.height !== 30 ||
+        Math.abs(active.rowRect?.width - 305.875) > 0.1 ||
+        active.itemRect?.height !== 30 ||
+        Math.abs(active.itemRect?.width - 305.875) > 0.1 ||
+        active.itemStyle.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+        active.itemStyle.borderRadius !== "12.5px" ||
+        active.itemStyle.fontSize !== "13px" ||
+        active.itemStyle.fontWeight !== "400" ||
+        active.itemStyle.lineHeight !== "18.5714px" ||
+        active.itemStyle.padding !== "5px 5px 5px 8px" ||
+        active.statusRect?.height !== 20 ||
+        active.statusRect?.width !== 20 ||
+        active.spinnerPathData.length !== 2 ||
+        JSON.stringify(active.actionLabels) !==
+          JSON.stringify(["Pin chat", "Archive chat"]) ||
+        active.actionRects.some(
+          (rect) => rect.height !== 20 || rect.width !== 19,
+        ) ||
+        unread.fixture !== "unread" ||
+        unread.status !== "unread" ||
+        unread.visualStatus !== "attention" ||
+        unread.selected ||
+        unread.actionsOpacity !== "0" ||
+        unread.attentionColor !== "rgb(58, 131, 247)" ||
+        unread.attentionRect?.height !== 8 ||
+        unread.attentionRect?.width !== 8 ||
+        idle.some(
+          (fixture) =>
+            fixture.fixture !== "idle" ||
+            fixture.status !== "idle" ||
+            fixture.visualStatus !== null,
+        );
+      if (geometryInvalid) {
+        throw new Error(
+          `${scene.id}: current thread lifecycle contract failed: ${JSON.stringify(contract.sidebar.threadLifecycleFixtures)}`,
+        );
+      }
+      await page
+        .locator('[data-sidebar-thread-lifecycle-fixture="active"]')
+        .hover();
+      const hovered = await page.evaluate(() => {
+        const item = document.querySelector(
+          '[data-sidebar-thread-lifecycle-fixture="active"]',
+        );
+        const row = item?.closest(".codex-ui-app-sidebar__item-row");
+        const actions = row?.querySelector(
+          ".codex-ui-app-sidebar__item-actions",
+        );
+        const status = row?.querySelector(
+          ".codex-ui-app-sidebar__item-status",
+        );
+        return {
+          actionsOpacity: actions ? getComputedStyle(actions).opacity : null,
+          statusOpacity: status ? getComputedStyle(status).opacity : null,
+        };
+      });
+      if (
+        hovered.actionsOpacity !== "1" ||
+        hovered.statusOpacity !== "0"
+      ) {
+        throw new Error(
+          `${scene.id}: current thread hover replacement failed: ${JSON.stringify(hovered)}`,
+        );
+      }
+      await page.mouse.move(640, 100);
     }
     if (currentSidebarCollectionScene) {
       const collection = contract.sidebar.collection;
@@ -9954,6 +10102,8 @@ for (const scene of selectedScenes) {
     const expectedSidebarMax =
       scene.scenario === "current-browser-26-825"
         ? "454"
+      : scene.id === "current-sidebar-thread-lifecycle-compact"
+        ? "480"
       : scene.id === "markdown-table-actions-narrow" ||
       ((scene.windowSize?.width ?? 1180) <= 720 &&
         scene.id.startsWith("current-review-"))
@@ -15353,10 +15503,10 @@ try {
         .querySelector(".codex-ui-app-sidebar-footer__account")
         ?.getAttribute("aria-haspopup"),
       actionCount: activeToolbar?.querySelectorAll("button").length,
-      actionsReserved:
+      actionsOverlayItem:
         actionItemRect !== undefined &&
         actionToolbarRect !== undefined &&
-        actionItemRect.right <= actionToolbarRect.left + 0.5,
+        actionItemRect.right > actionToolbarRect.left + 0.5,
       currentPages: Array.from(
         document.querySelectorAll(
           ".codex-ui-app-sidebar [aria-current=\"page\"]",
@@ -15419,7 +15569,7 @@ try {
     compact.footer.height < 100 ||
     !compact.footerInFlow ||
     compact.actionCount !== 3 ||
-    !compact.actionsReserved ||
+    !compact.actionsOverlayItem ||
     compact.accountPopup !== "menu" ||
     JSON.stringify(compact.currentPages) !==
       JSON.stringify(["codex-ui-kit"]) ||
