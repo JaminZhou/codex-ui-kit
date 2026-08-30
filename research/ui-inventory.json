@@ -1629,14 +1629,46 @@
       "priority": "p1"
     },
     {
-      "id": "settings.keyboard-voice-dictation",
+      "id": "settings.keyboard-shortcuts",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["keyboard-shortcuts-settings", "voice-settings", "global-dictation-page"],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "packageEvidence": [
+        "keyboard-shortcuts-settings",
+        "browser-cdp:current-keyboard-shortcuts-wide-compact-search-edit-and-scroll",
+        "electron:current-keyboard-shortcuts-wide-compact-search-edit-and-scroll",
+        "pixel:reviewed-current-keyboard-shortcuts-baselines"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:keyboard-shortcuts-129-visible-rows-search-and-shortcut-capture",
+        "cdp-26.825.51511:keyboard-shortcuts-1180x820-and-720x680-current-responsive-geometry",
+        "cdp-26.825.51511:keyboard-shortcuts-wide-search-and-compact-local-only-pixel-comparisons"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p2"
+    },
+    {
+      "id": "settings.voice-dictation",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": [
+        "voice-settings",
+        "global-dictation-page",
+        "browser-cdp:current-voice-dictation-wide-compact-menu-picker-and-scroll",
+        "electron:current-voice-dictation-wide-compact-menu-picker-and-hotkey-lifecycle",
+        "pixel:reviewed-current-voice-dictation-baselines"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:voice-microphone-voice-chat-screen-context-and-dictation-controls",
+        "cdp-26.825.51511:voice-picker-nine-options-and-microphone-menu",
+        "cdp-26.825.51511:voice-1180x820-and-720x680-geometry-zero-overflow-and-local-only-pixels"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p2"
     },
     {

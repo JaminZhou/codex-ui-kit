@@ -15479,6 +15479,187 @@ try {
   await personalizationSettingsApp.close();
 }
 
+const keyboardShortcutsSettingsScene = {
+  frame: "workspace-keyboard-shortcuts",
+  id: "electron-keyboard-shortcuts-settings",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: keyboardShortcutsSettingsApp,
+  page: keyboardShortcutsSettingsPage,
+} = await launchScene(keyboardShortcutsSettingsScene, { capture: false });
+try {
+  const keyboardMain = keyboardShortcutsSettingsPage.getByRole("main");
+  await keyboardMain
+    .getByRole("heading", {
+      level: 1,
+      name: "Keyboard shortcuts",
+      exact: true,
+    })
+    .waitFor();
+  const search = keyboardMain.getByRole("textbox", {
+    name: "Search shortcuts",
+  });
+  await search.fill("dictation");
+  if (
+    (await keyboardMain.locator(".codex-ui-keyboard-shortcuts__row").count()) !==
+    3
+  ) {
+    throw new Error("Electron Keyboard shortcuts search did not return 3 rows.");
+  }
+  await keyboardMain
+    .getByRole("button", { name: "Clear shortcut search" })
+    .click();
+  await keyboardMain
+    .getByRole("button", { name: "Change shortcut for New chat" })
+    .first()
+    .click();
+  await keyboardMain
+    .getByRole("textbox", { name: "Shortcut capture for New chat" })
+    .press("Meta+Shift+K");
+  if (
+    (await keyboardMain
+      .locator('[data-shortcut-id="new-chat-start-a-new-chat"] kbd')
+      .first()
+      .textContent()) !== "⇧⌘K"
+  ) {
+    throw new Error("Electron Keyboard shortcut capture was not controlled.");
+  }
+
+  await keyboardShortcutsSettingsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await keyboardShortcutsSettingsPage.waitForFunction(() => innerWidth === 720);
+  const compactKeyboard = await keyboardShortcutsSettingsPage.evaluate(() => {
+    const root = document.querySelector(".codex-ui-keyboard-shortcuts");
+    const copy = document.querySelector(".codex-ui-keyboard-shortcuts__copy");
+    const bindings = document.querySelector(
+      ".codex-ui-keyboard-shortcuts__bindings",
+    );
+    return {
+      bindingsWidth: bindings?.getBoundingClientRect().width,
+      copyWidth: copy?.getBoundingClientRect().width,
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rootWidth: root?.getBoundingClientRect().width,
+      rowCount: document.querySelectorAll(
+        ".codex-ui-keyboard-shortcuts__row",
+      ).length,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    compactKeyboard.viewport.width !== 720 ||
+    compactKeyboard.viewport.height !== 680 ||
+    compactKeyboard.rowCount !== 129 ||
+    Math.abs((compactKeyboard.rootWidth ?? Infinity) - 358.125) > 1 ||
+    Math.abs(compactKeyboard.copyWidth ?? Infinity) > 1 ||
+    Math.abs((compactKeyboard.bindingsWidth ?? Infinity) - 324.125) > 1 ||
+    compactKeyboard.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron compact Keyboard shortcuts contract failed: ${JSON.stringify(compactKeyboard)}`,
+    );
+  }
+} finally {
+  await keyboardShortcutsSettingsApp.close();
+}
+
+const voiceSettingsScene = {
+  frame: "workspace-voice-settings",
+  id: "electron-voice-settings",
+  scenario: "workspace-workflow",
+  view: "workspace",
+};
+const {
+  app: voiceSettingsApp,
+  page: voiceSettingsPage,
+} = await launchScene(voiceSettingsScene, { capture: false });
+try {
+  const voiceMain = voiceSettingsPage.getByRole("main");
+  await voiceMain
+    .getByRole("heading", { level: 1, name: "Voice", exact: true })
+    .waitFor();
+  const microphone = voiceMain.getByRole("button", { name: "Microphone" });
+  await microphone.click();
+  await voiceSettingsPage
+    .getByRole("menuitem", { name: /MacBook Pro Microphone/ })
+    .click();
+  if (!(await microphone.textContent())?.includes("MacBook Pro Microphone")) {
+    throw new Error("Electron Voice microphone selection was not controlled.");
+  }
+
+  const voiceTrigger = voiceMain.getByRole("button", { name: "Sol" });
+  await voiceTrigger.click();
+  const picker = voiceSettingsPage.getByRole("dialog", {
+    name: "Choose a voice",
+  });
+  if (
+    (await picker.getByRole("radio").count()) !== 9 ||
+    Math.abs((await picker.boundingBox())?.width - 520) > 1
+  ) {
+    throw new Error("Electron Voice picker options or geometry drifted.");
+  }
+  await picker.getByRole("radio", { name: /Cove/ }).click();
+  await picker.getByRole("button", { name: "Done" }).click();
+  if (!(await voiceMain.getByRole("button", { name: "Cove" }).isVisible())) {
+    throw new Error("Electron Voice selection was not committed.");
+  }
+
+  await voiceMain
+    .getByRole("button", {
+      name: "Set shortcut for Toggle dictation hotkey",
+    })
+    .click();
+  await voiceMain
+    .getByRole("textbox", {
+      name: "Shortcut capture for Toggle dictation hotkey",
+    })
+    .press("Meta+D");
+  const keepVisible = voiceMain.getByRole("switch", {
+    name: "Keep the dictation bar visible",
+  });
+  if (!(await keepVisible.isEnabled())) {
+    throw new Error("Electron Voice dictation hotkey did not enable its switch.");
+  }
+  await keepVisible.click();
+  if ((await keepVisible.getAttribute("aria-checked")) !== "true") {
+    throw new Error("Electron Voice dictation switch was not controlled.");
+  }
+
+  await voiceSettingsApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await voiceSettingsPage.waitForFunction(() => innerWidth === 720);
+  const compactVoice = await voiceSettingsPage.evaluate(() => {
+    const root = document.querySelector(".codex-ui-voice-settings");
+    const owner = document.querySelector(".codex-ui-settings-shell__main");
+    return {
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rootWidth: root?.getBoundingClientRect().width,
+      scrollHeight: owner?.scrollHeight,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    compactVoice.viewport.width !== 720 ||
+    compactVoice.viewport.height !== 680 ||
+    Math.abs((compactVoice.rootWidth ?? Infinity) - 358.125) > 1 ||
+    (compactVoice.scrollHeight ?? 0) <= compactVoice.viewport.height ||
+    compactVoice.horizontalOverflow > 1
+  ) {
+    throw new Error(
+      `Electron compact Voice contract failed: ${JSON.stringify(compactVoice)}`,
+    );
+  }
+} finally {
+  await voiceSettingsApp.close();
+}
+
 const codeReviewSettingsScene = {
   frame: "workspace-code-review-settings",
   id: "electron-code-review-settings",

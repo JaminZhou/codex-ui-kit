@@ -47,6 +47,7 @@ import {
   HooksSettingsPage,
   IconButton,
   ImagePreviewDialog,
+  KeyboardShortcutsPage,
   LocalEnvironmentDialog,
   Menu,
   MenuItem,
@@ -102,6 +103,7 @@ import {
   WorktreeSettingsPage,
   WorkingDirectoryNotice,
   WorktreeSetupStatus,
+  VoiceSettingsPage,
   WorkspacePanel,
   type TerminalEntry,
   type AppRouteOutletStatus,
@@ -114,6 +116,8 @@ import {
   type GeneralSettingsValue,
   type GitSettingsValue,
   type HookSettingsEntry,
+  type KeyboardShortcutCaptureTarget,
+  type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
   type PersonalizationSettingsValue,
   type QueuedPrompt,
@@ -121,6 +125,8 @@ import {
   type WorktreeSetupPhase,
   type WorktreeSettingsValue,
   type WorktreeSetupStep,
+  type VoiceSettingsHotkeyId,
+  type VoiceSettingsValue,
 } from "codex-ui-kit";
 import {
   CurrentBuildIcon,
@@ -177,6 +183,7 @@ import {
 } from "./workspace-replay";
 import { branchStateAfterSuccessfulCreation } from "./workspace-branch-state";
 import { trimBranchInputAsciiWhitespace } from "../../../src/internal/branchName";
+import { currentKeyboardShortcuts } from "./current-keyboard-shortcuts";
 import {
   hasMcpToolCallGroupForTurn,
   mcpToolCallGroupDurationMs,
@@ -391,6 +398,21 @@ function DemoVsCodeIcon() {
         d="m4.2 8 2.4-2.2L11.8 3v10L6.6 10.2 4.2 8Zm2.4 0 3.3 2V6L6.6 8Z"
         fill="#fff"
       />
+    </svg>
+  );
+}
+
+function DemoShortcutClearIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      fill="currentColor"
+      height="20"
+      viewBox="0 0 20 20"
+      width="20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M10.6299 1.33496C12.0335 1.33496 13.2695 2.25996 13.666 3.60645L13.8809 4.33496H17L17.1338 4.34863C17.4369 4.41057 17.665 4.67858 17.665 5C17.665 5.32142 17.4369 5.58943 17.1338 5.65137L17 5.66504H16.6543L15.8574 14.9912C15.7177 16.629 14.3478 17.8877 12.7041 17.8877H7.2959C5.75502 17.8877 4.45439 16.7815 4.18262 15.2939L4.14258 14.9912L3.34668 5.66504H3C2.63273 5.66504 2.33496 5.36727 2.33496 5C2.33496 4.63273 2.63273 4.33496 3 4.33496H6.11914L6.33398 3.60645L6.41797 3.3584C6.88565 2.14747 8.05427 1.33496 9.37012 1.33496H10.6299ZM5.46777 14.8779L5.49121 15.0537C5.64881 15.9161 6.40256 16.5576 7.2959 16.5576H12.7041C13.6571 16.5576 14.4512 15.8275 14.5322 14.8779L15.3193 5.66504H4.68164L5.46777 14.8779ZM7.66797 12.8271V8.66016C7.66797 8.29299 7.96588 7.99528 8.33301 7.99512C8.70028 7.99512 8.99805 8.29289 8.99805 8.66016V12.8271C8.99779 13.1942 8.70012 13.4912 8.33301 13.4912C7.96604 13.491 7.66823 13.1941 7.66797 12.8271ZM11.002 12.8271V8.66016C11.002 8.29289 11.2997 7.99512 11.667 7.99512C12.0341 7.9953 12.332 8.293 12.332 8.66016V12.8271C12.3318 13.1941 12.0339 13.491 11.667 13.4912C11.2999 13.4912 11.0022 13.1942 11.002 12.8271ZM9.37012 2.66504C8.60726 2.66504 7.92938 3.13589 7.6582 3.83789L7.60938 3.98145L7.50586 4.33496H12.4941L12.3906 3.98145C12.1607 3.20084 11.4437 2.66504 10.6299 2.66504H9.37012Z" />
     </svg>
   );
 }
@@ -2183,7 +2205,9 @@ export function App() {
     | "general-settings"
     | "git-settings"
     | "hooks-settings"
+    | "keyboard-shortcuts-settings"
     | "personalization-settings"
+    | "voice-settings"
     | "worktree-settings"
   >(
     initialSelection.view === "workspace" &&
@@ -2210,6 +2234,12 @@ export function App() {
           initialSelection.frame?.startsWith("workspace-personalization-settings")
         ? "personalization-settings"
       : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
+        ? "keyboard-shortcuts-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-voice-settings")
+        ? "voice-settings"
+      : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-appearance-settings")
         ? "appearance-settings"
       : "conversation",
@@ -2218,6 +2248,10 @@ export function App() {
   const [selectedSettingsId, setSelectedSettingsId] = useState(
     initialSelection.frame?.startsWith("workspace-personalization-settings")
       ? "personalization"
+      : initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
+        ? "keyboard-shortcuts"
+      : initialSelection.frame?.startsWith("workspace-voice-settings")
+        ? "voice"
       : initialSelection.frame?.startsWith("workspace-general-settings")
       ? "general"
       : initialSelection.frame?.startsWith("workspace-appearance-settings")
@@ -2321,6 +2355,44 @@ export function App() {
   );
   const [personalizationSettingsAction, setPersonalizationSettingsAction] =
     useState("");
+  const [keyboardShortcuts, setKeyboardShortcuts] = useState<
+    readonly KeyboardShortcutEntry[]
+  >(currentKeyboardShortcuts);
+  const [keyboardShortcutQuery, setKeyboardShortcutQuery] = useState(
+    initialSelection.frame === "workspace-keyboard-shortcuts-search"
+      ? "dictation"
+      : "",
+  );
+  const [keyboardShortcutCaptureTarget, setKeyboardShortcutCaptureTarget] =
+    useState<KeyboardShortcutCaptureTarget | null>(
+      initialSelection.frame === "workspace-keyboard-shortcuts-edit"
+        ? { entryId: "new-chat-start-a-new-chat", shortcutIndex: 0 }
+        : null,
+    );
+  const [keyboardShortcutAction, setKeyboardShortcutAction] = useState("");
+  const [voiceSettings, setVoiceSettings] = useState<VoiceSettingsValue>({
+    dictionaryEntries: [""],
+    holdToDictateHotkey: null,
+    keepDictationBarVisible: false,
+    microphoneId: "system-default",
+    screenContext: true,
+    toggleDictationHotkey: null,
+    voiceChatHotkey: null,
+    voiceId: "sol",
+  });
+  const [voiceCapturingHotkey, setVoiceCapturingHotkey] =
+    useState<VoiceSettingsHotkeyId | null>(
+      initialSelection.frame === "workspace-voice-settings-hotkey"
+        ? "holdToDictate"
+        : null,
+    );
+  const [voiceMicrophoneMenuOpen, setVoiceMicrophoneMenuOpen] = useState(
+    initialSelection.frame === "workspace-voice-settings-microphone-menu",
+  );
+  const [voicePickerOpen, setVoicePickerOpen] = useState(
+    initialSelection.frame === "workspace-voice-settings-picker",
+  );
+  const [voiceSettingsAction, setVoiceSettingsAction] = useState("");
   const [worktreeSettings, setWorktreeSettings] =
     useState<WorktreeSettingsValue>({
       autoDelete: true,
@@ -6583,6 +6655,14 @@ export function App() {
         ? activeFrame?.startsWith("workspace-personalization-settings")
           ? activeFrame
           : "workspace-personalization-settings"
+      : workspacePage === "keyboard-shortcuts-settings"
+        ? activeFrame?.startsWith("workspace-keyboard-shortcuts")
+          ? activeFrame
+          : "workspace-keyboard-shortcuts"
+      : workspacePage === "voice-settings"
+        ? activeFrame?.startsWith("workspace-voice-settings")
+          ? activeFrame
+          : "workspace-voice-settings"
       : workspacePage === "hooks-settings"
         ? activeFrame?.startsWith("workspace-hooks-settings")
           ? activeFrame
@@ -6652,7 +6732,9 @@ export function App() {
         "general-settings",
         "git-settings",
         "hooks-settings",
+        "keyboard-shortcuts-settings",
         "personalization-settings",
+        "voice-settings",
         "worktree-settings",
       ].includes(
         workspacePage,
@@ -6669,6 +6751,36 @@ export function App() {
     if (
       workspacePage !== "personalization-settings" ||
       !activeFrame?.startsWith("workspace-personalization-settings")
+    ) {
+      return;
+    }
+    const scrollOwner = document.querySelector<HTMLElement>(
+      ".codex-ui-settings-shell__main",
+    );
+    if (!scrollOwner) return;
+    scrollOwner.scrollTop = activeFrame.endsWith("-bottom")
+      ? scrollOwner.scrollHeight
+      : 0;
+  }, [activeFrame, workspacePage]);
+  useEffect(() => {
+    if (
+      workspacePage !== "keyboard-shortcuts-settings" ||
+      !activeFrame?.startsWith("workspace-keyboard-shortcuts")
+    ) {
+      return;
+    }
+    const scrollOwner = document.querySelector<HTMLElement>(
+      ".codex-ui-settings-shell__main",
+    );
+    if (!scrollOwner) return;
+    scrollOwner.scrollTop = activeFrame.endsWith("-bottom")
+      ? scrollOwner.scrollHeight
+      : 0;
+  }, [activeFrame, workspacePage]);
+  useEffect(() => {
+    if (
+      workspacePage !== "voice-settings" ||
+      !activeFrame?.startsWith("workspace-voice-settings")
     ) {
       return;
     }
@@ -7978,13 +8090,24 @@ export function App() {
           itemId !== "general" &&
           itemId !== "git" &&
           itemId !== "hooks" &&
+          itemId !== "keyboard-shortcuts" &&
           itemId !== "personalization" &&
+          itemId !== "voice" &&
           itemId !== "worktrees"
         ) {
           return;
         }
         setSelectedSettingsId(itemId);
         if (itemId !== "personalization") setPersonalizationMenuOpen(false);
+        if (itemId !== "voice") {
+          setVoiceMicrophoneMenuOpen(false);
+          setVoicePickerOpen(false);
+          setVoiceCapturingHotkey(null);
+        }
+        if (itemId !== "keyboard-shortcuts") {
+          setKeyboardShortcutCaptureTarget(null);
+          setKeyboardShortcutQuery("");
+        }
         setWorkspacePage(
           itemId === "appearance"
             ? "appearance-settings"
@@ -7992,6 +8115,10 @@ export function App() {
               ? "general-settings"
               : itemId === "personalization"
                 ? "personalization-settings"
+              : itemId === "keyboard-shortcuts"
+                ? "keyboard-shortcuts-settings"
+              : itemId === "voice"
+                ? "voice-settings"
               : itemId === "hooks"
                 ? "hooks-settings"
               : itemId === "worktrees"
@@ -8005,6 +8132,10 @@ export function App() {
               ? "workspace-general-settings"
               : itemId === "personalization"
                 ? "workspace-personalization-settings"
+              : itemId === "keyboard-shortcuts"
+                ? "workspace-keyboard-shortcuts"
+              : itemId === "voice"
+                ? "workspace-voice-settings"
               : itemId === "hooks"
                 ? "workspace-hooks-settings"
               : itemId === "worktrees"
@@ -8193,6 +8324,88 @@ export function App() {
             {personalizationSettingsAction}
           </span>
         </>
+      ) : workspacePage === "keyboard-shortcuts-settings" ? (
+        <>
+          <KeyboardShortcutsPage
+            captureTarget={keyboardShortcutCaptureTarget}
+            clearIcon={<DemoShortcutClearIcon />}
+            data-evidence="runtime-observed"
+            editIcon={<CurrentBuildIcon name="sidebar-project-menu-edit" />}
+            entries={keyboardShortcuts}
+            keystrokeSearchIcon={
+              <CurrentBuildIcon name="settings-keyboard-shortcuts" />
+            }
+            onCaptureTargetChange={setKeyboardShortcutCaptureTarget}
+            onQueryChange={setKeyboardShortcutQuery}
+            onSearchByKeystrokes={() =>
+              setKeyboardShortcutAction("Keystroke search requested")
+            }
+            onShortcutChange={(entry, shortcutIndex, shortcut) => {
+              setKeyboardShortcuts((entries) =>
+                entries.map((candidate) => {
+                  if (candidate.id !== entry.id) return candidate;
+                  const shortcuts = [...candidate.shortcuts];
+                  shortcuts[shortcutIndex] = shortcut;
+                  return { ...candidate, shortcuts };
+                }),
+              );
+              setKeyboardShortcutAction(`${entry.name} shortcut updated`);
+            }}
+            onShortcutClear={(entry, shortcutIndex) => {
+              setKeyboardShortcuts((entries) =>
+                entries.map((candidate) =>
+                  candidate.id === entry.id
+                    ? {
+                        ...candidate,
+                        shortcuts: candidate.shortcuts.filter(
+                          (_, index) => index !== shortcutIndex,
+                        ),
+                      }
+                    : candidate,
+                ),
+              );
+              setKeyboardShortcutAction(`${entry.name} shortcut cleared`);
+            }}
+            query={keyboardShortcutQuery}
+            searchIcon={<CurrentBuildIcon name="settings-search" />}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {keyboardShortcutAction}
+          </span>
+        </>
+      ) : workspacePage === "voice-settings" ? (
+        <>
+          <VoiceSettingsPage
+            addIcon={<span>+</span>}
+            capturingHotkey={voiceCapturingHotkey}
+            closeIcon={<CurrentBuildIcon name="review-close" />}
+            data-evidence="runtime-observed"
+            editIcon={<CurrentBuildIcon name="sidebar-project-menu-edit" />}
+            microphoneMenuOpen={voiceMicrophoneMenuOpen}
+            microphoneOptions={[
+              { id: "system-default", label: "System default" },
+              {
+                id: "built-in",
+                label: "MacBook Pro Microphone (Built-in)",
+              },
+            ]}
+            nextIcon={<CurrentBuildIcon name="window-chrome-forward" />}
+            onChange={setVoiceSettings}
+            onHotkeyCaptureChange={setVoiceCapturingHotkey}
+            onMicrophoneMenuOpenChange={setVoiceMicrophoneMenuOpen}
+            onPlayVoicePreview={(voice) =>
+              setVoiceSettingsAction(`${voice.label} preview requested`)
+            }
+            onVoicePickerOpenChange={setVoicePickerOpen}
+            previousIcon={<CurrentBuildIcon name="window-chrome-back" />}
+            removeIcon={<DemoShortcutClearIcon />}
+            value={voiceSettings}
+            voicePickerOpen={voicePickerOpen}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {voiceSettingsAction}
+          </span>
+        </>
       ) : (
         <GitSettingsPage
           commitInstructionsDirty={
@@ -8221,7 +8434,9 @@ export function App() {
           workspacePage === "code-review-settings" ||
           workspacePage === "appearance-settings" ||
           workspacePage === "general-settings" ||
+          workspacePage === "keyboard-shortcuts-settings" ||
           workspacePage === "personalization-settings" ||
+          workspacePage === "voice-settings" ||
           workspacePage === "worktree-settings"
         ? workspaceSettingsRoute
       : projectIndexChatRoute
@@ -8233,7 +8448,9 @@ export function App() {
     workspacePage === "appearance-settings" ||
     workspacePage === "code-review-settings" ||
     workspacePage === "general-settings" ||
+    workspacePage === "keyboard-shortcuts-settings" ||
     workspacePage === "personalization-settings" ||
+    workspacePage === "voice-settings" ||
     workspacePage === "git-settings" ||
     workspacePage === "hooks-settings" ||
     workspacePage === "worktree-settings";

@@ -1137,6 +1137,23 @@ CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_COMPACT_REFERENCE=/absolute/path/to/
   --scenes=workspace-personalization-settings,workspace-personalization-settings-menu,workspace-personalization-settings-compact,workspace-personalization-settings-compact-bottom
 ```
 
+The current `26.825.51511` Keyboard shortcuts and Voice gates accept
+unmodified full-window wide, search/menu, picker, and compact references. The
+Voice picker masks only its 144×144 host-supplied artwork region; all remaining
+navigation, copy, controls, cards, wrapping, and scroll geometry stay measured.
+
+```bash
+CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_REFERENCE=/absolute/path/to/keyboard-wide.png \
+CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_SEARCH_REFERENCE=/absolute/path/to/keyboard-search.png \
+CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_COMPACT_REFERENCE=/absolute/path/to/keyboard-compact-top.png \
+CODEX_UI_KIT_CURRENT_VOICE_26_825_REFERENCE=/absolute/path/to/voice-wide.png \
+CODEX_UI_KIT_CURRENT_VOICE_26_825_MICROPHONE_REFERENCE=/absolute/path/to/microphone-menu.png \
+CODEX_UI_KIT_CURRENT_VOICE_26_825_PICKER_REFERENCE=/absolute/path/to/voice-picker.png \
+CODEX_UI_KIT_CURRENT_VOICE_26_825_COMPACT_REFERENCE=/absolute/path/to/voice-compact-top.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-keyboard-shortcuts,workspace-keyboard-shortcuts-search,workspace-keyboard-shortcuts-compact,workspace-voice-settings,workspace-voice-settings-microphone-menu,workspace-voice-settings-picker,workspace-voice-settings-compact
+```
+
 The current Hooks gates accept unmodified 1180×820 and 720×680 full-window
 references. No masks are applied, so navigation, typography, wrapping, the
 runtime-captured reload icon, empty card, and all remaining pixels are

@@ -1130,6 +1130,315 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-keyboard-shortcuts")) {
+      const bottom = scene.id.endsWith("-bottom");
+      const editFrame = scene.id.endsWith("-edit");
+      const searchFrame = scene.id.endsWith("-search");
+      if (bottom) {
+        await page.waitForFunction(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return owner instanceof HTMLElement && owner.scrollTop > 0;
+        });
+      }
+      if (editFrame) {
+        await page
+          .getByRole("textbox", { name: "Shortcut capture for New chat" })
+          .waitFor();
+      }
+      const keyboard = await page.evaluate(() => {
+        const toRect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".codex-ui-keyboard-shortcuts");
+        const scrollOwner = document.querySelector(
+          ".codex-ui-settings-shell__main",
+        );
+        const firstRow = document.querySelector(
+          ".codex-ui-keyboard-shortcuts__row",
+        );
+        return {
+          binding: toRect(
+            firstRow?.querySelector(".codex-ui-keyboard-shortcuts__bindings"),
+          ),
+          capture: toRect(
+            document.querySelector(".codex-ui-keyboard-shortcuts__capture"),
+          ),
+          card: toRect(
+            document.querySelector(".codex-ui-keyboard-shortcuts__card"),
+          ),
+          clearPath: document
+            .querySelector(".codex-ui-keyboard-shortcuts__clear path")
+            ?.getAttribute("d"),
+          copy: toRect(
+            firstRow?.querySelector(".codex-ui-keyboard-shortcuts__copy"),
+          ),
+          heading: toRect(
+            document.querySelector(".codex-ui-keyboard-shortcuts > h1"),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          query:
+            document.querySelector(".codex-ui-keyboard-shortcuts__search input")
+              ?.value ?? null,
+          root: toRect(root),
+          rowCount: document.querySelectorAll(
+            ".codex-ui-keyboard-shortcuts__row",
+          ).length,
+          scrollOwner:
+            scrollOwner instanceof HTMLElement
+              ? {
+                  clientHeight: scrollOwner.clientHeight,
+                  scrollHeight: scrollOwner.scrollHeight,
+                  scrollTop: scrollOwner.scrollTop,
+                }
+              : null,
+          search: toRect(
+            document.querySelector(".codex-ui-keyboard-shortcuts__search"),
+          ),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const expectedWidth = compact ? 358.125 : 768;
+      if (
+        keyboard.horizontalOverflow > 1 ||
+        keyboard.selected !== "Keyboard shortcuts" ||
+        Math.abs(keyboard.root?.width - expectedWidth) > 1 ||
+        Math.abs(keyboard.card?.width - expectedWidth) > 1 ||
+        (!bottom && Math.abs(keyboard.heading?.top - 66) > 1) ||
+        (!bottom && Math.abs(keyboard.search?.top - 147.796875) > 1) ||
+        (bottom && Math.abs(keyboard.search?.top - 66) > 1) ||
+        keyboard.rowCount !== (searchFrame ? 3 : 129) ||
+        keyboard.query !== (searchFrame ? "dictation" : "") ||
+        (editFrame &&
+          (Math.abs(keyboard.capture?.width - 144) > 1 ||
+            Math.abs(keyboard.capture?.height - 28) > 1)) ||
+        (compact &&
+          (Math.abs(keyboard.copy?.width) > 1 ||
+            Math.abs(keyboard.binding?.width - 324.125) > 1)) ||
+        (!compact && Math.abs(keyboard.binding?.width - 384) > 1) ||
+        (!bottom && keyboard.scrollOwner?.scrollTop !== 0) ||
+        (bottom && keyboard.scrollOwner?.scrollTop <= 0) ||
+        (keyboard.clearPath &&
+          !keyboard.clearPath.startsWith("M10.6299 1.33496"))
+      ) {
+        throw new Error(
+          `${scene.id}: current Keyboard shortcuts contract failed: ${JSON.stringify(keyboard)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-keyboard-shortcuts") {
+        const search = page.getByRole("textbox", { name: "Search shortcuts" });
+        await search.fill("dictation");
+        const filtered = await page.locator(
+          ".codex-ui-keyboard-shortcuts__row",
+        ).count();
+        await page.getByRole("button", { name: "Clear shortcut search" }).click();
+        await page
+          .getByRole("button", { name: "Change shortcut for New chat" })
+          .first()
+          .click();
+        const capture = page.getByRole("textbox", {
+          name: "Shortcut capture for New chat",
+        });
+        await capture.press("Meta+Shift+K");
+        const changed = await page
+          .locator('[data-shortcut-id="new-chat-start-a-new-chat"] kbd')
+          .first()
+          .textContent();
+        interaction = { changed, filtered };
+        if (interaction.filtered !== 3 || interaction.changed !== "⇧⌘K") {
+          throw new Error(
+            `${scene.id}: Keyboard shortcuts interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, keyboard }, null, 2)}\n`,
+      );
+      continue;
+    }
+    if (scene.id.startsWith("workspace-voice-settings")) {
+      const bottom = scene.id.endsWith("-bottom");
+      const menuFrame = scene.id.endsWith("-microphone-menu");
+      const pickerFrame = scene.id.endsWith("-picker");
+      if (bottom) {
+        await page.waitForFunction(() => {
+          const owner = document.querySelector(".codex-ui-settings-shell__main");
+          return owner instanceof HTMLElement && owner.scrollTop > 0;
+        });
+      }
+      if (menuFrame) await page.getByRole("menu", { name: "Microphone" }).waitFor();
+      if (pickerFrame) {
+        await page.getByRole("dialog", { name: "Choose a voice" }).waitFor();
+      }
+      const voice = await page.evaluate(() => {
+        const toRect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".codex-ui-voice-settings");
+        const scrollOwner = document.querySelector(
+          ".codex-ui-settings-shell__main",
+        );
+        return {
+          artwork: toRect(
+            document.querySelector(".codex-ui-voice-picker__artwork"),
+          ),
+          cardCount: document.querySelectorAll(
+            ".codex-ui-voice-settings__card",
+          ).length,
+          heading: toRect(
+            document.querySelector(".codex-ui-voice-settings > h1"),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          menu: toRect(
+            document.querySelector(".codex-ui-voice-settings__microphone-menu"),
+          ),
+          menuItems: document.querySelectorAll(
+            '.codex-ui-voice-settings__microphone-menu [role="menuitem"]',
+          ).length,
+          picker: toRect(
+            document.querySelector(
+              ".codex-ui-voice-picker .codex-ui-dialog__surface",
+            ),
+          ),
+          radioCount: document.querySelectorAll(
+            '.codex-ui-voice-picker [role="radio"]',
+          ).length,
+          root: toRect(root),
+          rowCount: document.querySelectorAll(
+            ".codex-ui-voice-settings__row",
+          ).length,
+          scrollOwner:
+            scrollOwner instanceof HTMLElement
+              ? {
+                  clientHeight: scrollOwner.clientHeight,
+                  scrollHeight: scrollOwner.scrollHeight,
+                  scrollTop: scrollOwner.scrollTop,
+                }
+              : null,
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switches: Array.from(
+            document.querySelectorAll('.codex-ui-voice-settings [role="switch"]'),
+            (control) => ({
+              checked: control.getAttribute("aria-checked"),
+              disabled: control.hasAttribute("disabled"),
+              label: control.getAttribute("aria-label"),
+              rect: toRect(control),
+            }),
+          ),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const expectedWidth = compact ? 358.125 : 768;
+      if (
+        voice.horizontalOverflow > 1 ||
+        voice.selected !== "Voice" ||
+        Math.abs(voice.root?.width - expectedWidth) > 1 ||
+        (!bottom && Math.abs(voice.heading?.top - 66) > 1) ||
+        voice.cardCount !== 5 ||
+        voice.rowCount !== 7 ||
+        voice.switches.length !== 2 ||
+        voice.switches.some(
+          ({ rect }) =>
+            Math.abs(rect?.width - 32) > 1 || Math.abs(rect?.height - 20) > 1,
+        ) ||
+        voice.switches[0]?.checked !== "true" ||
+        voice.switches[1]?.disabled !== true ||
+        (!bottom && voice.scrollOwner?.scrollTop !== 0) ||
+        (bottom && voice.scrollOwner?.scrollTop <= 0) ||
+        (menuFrame &&
+          (voice.menuItems !== 2 ||
+            Math.abs(voice.menu?.width - 240) > 1 ||
+            Math.abs(voice.menu?.height - 74.125) > 2)) ||
+        (pickerFrame &&
+          (voice.radioCount !== 9 ||
+            Math.abs(voice.picker?.width - 520) > 1 ||
+            Math.abs(voice.picker?.height - 387.75) > 2 ||
+            Math.abs(voice.artwork?.width - 144) > 1 ||
+            Math.abs(voice.artwork?.height - 144) > 1))
+      ) {
+        throw new Error(
+          `${scene.id}: current Voice Settings contract failed: ${JSON.stringify(voice)}`,
+        );
+      }
+
+      let interaction = null;
+      if (scene.id === "workspace-voice-settings") {
+        const microphone = page.getByRole("button", { name: "Microphone" });
+        await microphone.click();
+        await page
+          .getByRole("menuitem", { name: /MacBook Pro Microphone/ })
+          .click();
+        await page.getByRole("button", { name: "Sol" }).click();
+        await page.getByRole("radio", { name: /Cove/ }).click();
+        await page.getByRole("button", { name: "Done" }).click();
+        const selectedVoice = await page
+          .getByRole("button", { name: "Cove" })
+          .textContent();
+        await page
+          .getByRole("button", {
+            name: "Set shortcut for Toggle dictation hotkey",
+          })
+          .click();
+        await page
+          .getByRole("textbox", {
+            name: "Shortcut capture for Toggle dictation hotkey",
+          })
+          .press("Meta+D");
+        const keepVisible = page.getByRole("switch", {
+          name: "Keep the dictation bar visible",
+        });
+        const enabled = await keepVisible.isEnabled();
+        await keepVisible.click();
+        interaction = {
+          enabled,
+          keepVisible: await keepVisible.getAttribute("aria-checked"),
+          microphone: (await microphone.textContent())?.trim(),
+          selectedVoice: selectedVoice?.trim(),
+        };
+        if (
+          !interaction.enabled ||
+          interaction.keepVisible !== "true" ||
+          interaction.microphone !== "MacBook Pro Microphone (Built-in)⌄" ||
+          interaction.selectedVoice !== "Cove"
+        ) {
+          throw new Error(
+            `${scene.id}: Voice Settings interaction failed: ${JSON.stringify(interaction)}`,
+          );
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ interaction, voice }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-general-settings")) {
       if (scene.id.endsWith("-bottom") || scene.id.includes("-hotkey")) {
         await page.waitForFunction(() => {
