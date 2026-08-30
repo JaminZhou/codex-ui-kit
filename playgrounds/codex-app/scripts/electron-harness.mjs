@@ -715,6 +715,14 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-project-section-submenu",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "project-menu",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-help-menu",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
@@ -2378,6 +2386,17 @@ export async function launchScene(
       .evaluate((element) => {
         element.scrollIntoView({ block: "end", inline: "nearest" });
       });
+  }
+  if (capture && scene.id === "current-sidebar-project-section-submenu") {
+    const section = page.getByRole("menuitem", { name: "Section" });
+    await section.focus();
+    await section.press("ArrowRight");
+    await page
+      .getByRole("menu", { name: "Section submenu" })
+      .waitFor({ state: "visible" });
+    await page.waitForFunction(
+      () => document.activeElement?.textContent?.trim() === "New section…",
+    );
   }
   if (capture && scene.id === "command-output-expanded") {
     await page

@@ -471,7 +471,12 @@ describe("menus and selects", () => {
   it("keeps a parent menu open while interacting with its portalled submenu", async () => {
     render(
       <Menu defaultOpen trigger={<button type="button">View</button>}>
-        <MenuSubmenu label="Theme">
+        <MenuSubmenu
+          label="Theme"
+          submenuClassName="theme-submenu"
+          submenuStyle={{ width: 118 }}
+          submenuWidth="auto"
+        >
           <MenuItem keepOpen>System</MenuItem>
           <MenuItem keepOpen>Dark</MenuItem>
         </MenuSubmenu>
@@ -481,6 +486,10 @@ describe("menus and selects", () => {
     const submenuTrigger = screen.getByRole("menuitem", { name: "Theme" });
     fireEvent.click(submenuTrigger);
     await waitFor(() => expect(screen.getAllByRole("menu")).toHaveLength(2));
+    const submenu = screen.getByRole("menu", { name: "Theme submenu" });
+    expect(submenu.classList.contains("theme-submenu")).toBe(true);
+    expect(submenu.getAttribute("data-width")).toBe("auto");
+    expect(submenu.style.width).toBe("118px");
     const dark = screen.getByRole("menuitem", { name: "Dark" });
     fireEvent.pointerDown(dark);
     expect(screen.getAllByRole("menu")).toHaveLength(2);

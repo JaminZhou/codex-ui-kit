@@ -788,19 +788,24 @@ older 140×29 empty crop remains 26.818 evidence at 1.8227%.
 
 ## Current native project-menu slice
 
-The current project-menu slice follows the menu's move from Renderer DOM to
-the frozen Electron context-menu bridge on Codex Desktop `26.818.41509`:
+The current project-menu slice follows the frozen Electron context-menu bridge
+on Codex Desktop `26.825.51511`:
 
-- the sampled provider exposes six fixed actions and three separators in a
-  221×187 native window, with Mark all as read conditional on unread activity;
-- six re-observed SVG sources live in the narrow
-  `research/current-project-menu-assets.json` manifest; the current pencil and
-  folder supersede their previous-build shapes;
-- Browser/CDP and Electron gate exact labels, order, row/separator geometry,
-  computed styles, focus return, and the deterministic unread variant;
-- the local-only native crop compares the full 221×187 region without masks
-  at 3.8449% changed pixels under a 5% hard limit. Exact SVG hashes and geometry
-  are gated independently from AppKit/CoreText versus Chromium antialiasing.
+- the sampled provider exposes Section and Reveal, but the final AppKit layer
+  filters Reveal in this context and renders six fixed actions plus three
+  separators in a 252×187 native window;
+- Section opens a 118×34 submenu whose no-custom-section state contains only
+  `New section…`; Mark all as read remains conditional on unread activity;
+- seven provider SVG sources live in the narrow
+  `research/current-project-menu-assets.json` manifest, including the exact
+  current 16×16 Section source;
+- Browser/CDP and Electron gate labels, order, row/separator geometry,
+  ArrowRight/ArrowLeft/Escape, first-item focus, focus return, and the
+  deterministic unread variant;
+- local-only unmasked comparisons pass at 3.8155% for the main menu and
+  6.9542% for the text-dominant submenu. Exact SVG hashes, sampled colors, and
+  geometry are gated independently from AppKit/CoreText versus Chromium
+  antialiasing.
 
 The sampled current project had no unread activity, so the current native
 Mark all as read icon remains unpromoted even though its conditional lifecycle

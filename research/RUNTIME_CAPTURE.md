@@ -121,16 +121,27 @@ they are not labeled current runtime observation or external product-pixel
 parity. A future disposable real task can promote each path only after its
 trigger, exact target, cleanup, and non-sensitive capture boundary are safe.
 
-### Current `26.825.31414` global-shell baseline
+### Current `26.825.51511` global-shell baseline
 
-The current installed build is `26.825.31414` (`7287`) with Chromium
-`151.0.7922.174`, a 284029139-byte `app.asar`, and SHA-256
-`8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255`.
-One isolated second process on loopback port `9895` repeats structural main
+The current installed build is `26.825.51511` (`7377`) with Chromium
+`151.0.7922.174`, a 284032150-byte `app.asar`, and SHA-256
+`f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7`.
+One isolated second process on loopback port `9897` repeats structural main
 Renderer selection, the New chat 1180/820/721/720 matrix, sidebar lifecycle,
 Help menu, Pull requests round trip, and Projects Index. The fixed route stack
-now omits `Sites`, while the persisted sidebar width is 321.875px. The capture
-records no private labels or screenshots. See
+continues to omit `Sites`, while the persisted sidebar width is 321.875px. A
+separate native observation distinguishes the provider's Section and Reveal
+rows from the visible 252×187 six-action menu, then measures the 118×34
+`New section…` submenu. The capture records no private labels or screenshots.
+See [`26.825.51511.md`](26.825.51511.md).
+
+### Previous `26.825.31414` global-shell baseline
+
+The previously installed build was `26.825.31414` (`7287`) with Chromium
+`151.0.7922.174`, a 284029139-byte `app.asar`, and SHA-256
+`8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255`.
+Its shell, activity, Plan, Search/Browser, long-thread, and Markdown captures
+remain previous-build regression evidence. See
 [`26.825.31414.md`](26.825.31414.md).
 
 ### Previous `26.820.60940` global-shell baseline

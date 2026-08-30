@@ -53,6 +53,7 @@ import {
   MenuLinkItem,
   MenuSectionLabel,
   MenuSeparator,
+  MenuSubmenu,
   McpToolCallGroup,
   McpToolIcon,
   MessageAttachment,
@@ -4427,7 +4428,7 @@ export function App() {
                       )
                         ? 212
                         : 187,
-                      width: 221,
+                      width: 252,
                     }}
                     trigger={
                       <button
@@ -4455,14 +4456,17 @@ export function App() {
                       Edit
                     </MenuItem>
                     <MenuSeparator />
-                    <MenuItem
-                      className="demo-current-sidebar-project-menu__item--reveal"
+                    <MenuSubmenu
+                      label="Section"
                       startIcon={
-                        <CurrentBuildIcon name="sidebar-project-menu-reveal" />
+                        <CurrentBuildIcon name="sidebar-project-menu-section" />
                       }
+                      submenuClassName="demo-current-sidebar-project-section-submenu"
+                      submenuStyle={{ height: 34, width: 118 }}
+                      submenuWidth="auto"
                     >
-                      Reveal in Finder
-                    </MenuItem>
+                      <MenuItem keepOpen>New section…</MenuItem>
+                    </MenuSubmenu>
                     <MenuItem
                       startIcon={
                         <CurrentBuildIcon name="sidebar-project-menu-worktree" />

@@ -189,6 +189,7 @@ describe("lifecycle visual policy", () => {
     for (const reference of [
       "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_SUBMENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_REFERENCE",
       "CODEX_UI_KIT_CURRENT_SIDEBAR_ACCOUNT_MENU_LIGHT_REFERENCE",
@@ -209,6 +210,7 @@ describe("lifecycle visual policy", () => {
     for (const scene of [
       "current-sidebar-project-collapsed",
       "current-sidebar-project-menu",
+      "current-sidebar-project-section-submenu",
       "current-sidebar-help-menu",
       "current-sidebar-account-menu",
       "current-sidebar-account-menu-light",

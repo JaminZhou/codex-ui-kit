@@ -440,6 +440,8 @@ const currentBuildSidebarProjectCollapsedReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_COLLAPSED_REFERENCE;
 const currentBuildSidebarProjectMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_MENU_REFERENCE;
+const currentBuildSidebarProjectSubmenuReference =
+  process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_SUBMENU_REFERENCE;
 const currentBuildSidebarHelpMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_HELP_MENU_REFERENCE;
 const currentBuildSidebarAccountMenuReference =
@@ -881,6 +883,8 @@ for (const scene of selectedScenes) {
   let sidebarRecentsActionsActualPath;
   let sidebarMenuBounds;
   let sidebarMenuItemBounds;
+  let sidebarProjectSubmenuBounds;
+  let sidebarProjectSubmenuItemBounds;
   let sidebarRecentsBounds;
   let workspaceCurrentIconBounds;
   let workspaceEnvironmentMenuBounds;
@@ -1014,10 +1018,14 @@ for (const scene of selectedScenes) {
     }
     if (
       scene.id === "current-sidebar-project-menu" ||
+      scene.id === "current-sidebar-project-section-submenu" ||
       scene.id === "current-sidebar-help-menu" ||
       scene.id.startsWith("current-sidebar-account-menu")
     ) {
-      const menu = page.locator('[role="menu"]');
+      const menu =
+        scene.id === "current-sidebar-project-section-submenu"
+          ? page.getByRole("menu", { name: "session-browser project menu" })
+          : page.locator('[role="menu"]');
       sidebarMenuBounds = await menu.evaluate((element) => {
         const value = element.getBoundingClientRect();
         return {
@@ -1044,10 +1052,40 @@ for (const scene of selectedScenes) {
             };
           });
         });
-      await page.evaluate(() => {
-        const active = document.activeElement;
-        if (active instanceof HTMLElement) active.blur();
-      });
+      if (scene.id === "current-sidebar-project-section-submenu") {
+        const submenu = page.getByRole("menu", { name: "Section submenu" });
+        sidebarProjectSubmenuBounds = await submenu.evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+        sidebarProjectSubmenuItemBounds = await submenu
+          .locator('[role="menuitem"]')
+          .evaluateAll((elements) => {
+            const menuBounds = elements[0]
+              ?.closest('[role="menu"]')
+              ?.getBoundingClientRect();
+            if (!menuBounds) return [];
+            return elements.map((element) => {
+              const value = element.getBoundingClientRect();
+              return {
+                height: Math.round(value.height),
+                left: Math.round(value.left - menuBounds.left),
+                top: Math.round(value.top - menuBounds.top),
+                width: Math.round(value.width),
+              };
+            });
+          });
+      } else {
+        await page.evaluate(() => {
+          const active = document.activeElement;
+          if (active instanceof HTMLElement) active.blur();
+        });
+      }
     }
     if (scene.id === "current-sidebar-project-collapsed") {
       await page
@@ -3554,7 +3592,8 @@ for (const scene of selectedScenes) {
   }
 
   if (
-    scene.id === "current-sidebar-project-menu" &&
+    (scene.id === "current-sidebar-project-menu" ||
+      scene.id === "current-sidebar-project-section-submenu") &&
     currentBuildSidebarProjectMenuReference
   ) {
     if (sidebarMenuItemBounds?.length !== 6) {
@@ -3577,11 +3616,41 @@ for (const scene of selectedScenes) {
         height: 187,
         left: 0,
         top: 0,
-        width: 221,
+        width: 252,
       },
       referencePath: currentBuildSidebarProjectMenuReference,
-      referenceSize: { height: 187, width: 221 },
+      referenceSize: { height: 187, width: 252 },
       sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "current-sidebar-project-section-submenu" &&
+    currentBuildSidebarProjectSubmenuReference
+  ) {
+    if (
+      sidebarProjectSubmenuItemBounds?.length !== 1 ||
+      JSON.stringify(sidebarProjectSubmenuItemBounds[0]) !==
+        JSON.stringify({ height: 24, left: 5, top: 5, width: 108 })
+    ) {
+      throw new Error(
+        `${scene.id}: unexpected Section submenu item geometry ${JSON.stringify(sidebarProjectSubmenuItemBounds)}.`,
+      );
+    }
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: sidebarProjectSubmenuBounds,
+      // The 118x34 AppKit/CoreText region is text-dominant. Exact geometry,
+      // sampled colors, focus, and source assets are gated separately; 7%
+      // preserves the reviewed cross-renderer raster boundary.
+      defaultMaximumRatio: 0.07,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_SIDEBAR_PROJECT_SUBMENU_MAX_DIFF_RATIO",
+      referenceCrop: { height: 34, left: 0, top: 0, width: 118 },
+      referencePath: currentBuildSidebarProjectSubmenuReference,
+      referenceSize: { height: 34, width: 118 },
+      sceneId: `${scene.id}-submenu`,
     });
   }
 

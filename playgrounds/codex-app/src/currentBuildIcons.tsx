@@ -74,6 +74,7 @@ export type CurrentBuildIconName =
   | "sidebar-project-menu-mark-read"
   | "sidebar-project-menu-remove"
   | "sidebar-project-menu-reveal"
+  | "sidebar-project-menu-section"
   | "sidebar-project-menu-unpin"
   | "sidebar-project-menu-worktree"
   | "sidebar-scheduled"

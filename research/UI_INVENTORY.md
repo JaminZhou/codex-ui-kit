@@ -45,10 +45,10 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.825.31414` (`7287`)
-- Package and scoped shell lifecycle sampled on 2026-08-29
+- Codex Desktop `26.825.51511` (`7377`)
+- Package and scoped shell lifecycle sampled on 2026-08-30
 - `app.asar` SHA-256:
-  `8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255`
+  `f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
@@ -65,7 +65,9 @@ observation from a previous build remains historical evidence.
   and content-dependent Projects Index. The sidebar is now 321.875px wide;
   the collapsed 600px Projects route remains 559px with 415/128 columns.
   `Sites` is absent from every sampled fixed-route stack. Details are in
-  [`26.825.31414.md`](26.825.31414.md). A follow-up re-observes the 14/21px
+  [`26.825.51511.md`](26.825.51511.md). The following activity, Plan,
+  Search/Browser, long-thread, and Markdown follow-ups remain 26.825.31414
+  regression evidence. That previous activity follow-up re-observes the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
   current-product `Thinking` comparison passes at 0.6%. A further no-tool
@@ -111,10 +113,12 @@ observation from a previous build remains historical evidence.
   Dark 0.5% and Light 0.6% limits; product screenshots remain local-only.
 - The project action menu remains on the frozen
   `electronBridge.showContextMenu` path. The independent replica now locks the
-  current six-action/three-separator provider, 221×187 geometry, six exact
-  current SVG sources, conditional unread variant, and focus lifecycle. The
-  six sources were reverified unchanged on 26.820; the 3.8449% unmasked
-  native-region comparison remains 26.818 evidence.
+  current provider separately from the rendered AppKit composition. The
+  provider contains Section and Reveal; the sampled native layer filters
+  Reveal and renders six actions in a 252×187 window. Section opens the one-row
+  118×34 `New section…` submenu. The exact 16×16 Section source, conditional
+  unread variant, ArrowRight/ArrowLeft/Escape lifecycle, two reviewed frames,
+  and local-only 3.8155%/6.9542% unmasked region comparisons are current.
 - The previous 26.818 fixed-message task revalidates the sampled completed
   conversation shell. It locks the 768px thread and 736×98 Composer at
   1180×820, compact containment at 820×680, 14/22px message typography, the
@@ -179,7 +183,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 17 have current-build runtime evidence, 58 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
+Current inventory: 89 surface groups; 11 have current-build runtime evidence, 64 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 10 groups and Electron verification covers 10.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

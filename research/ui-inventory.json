@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "baseline": {
-    "appVersion": "26.825.31414",
-    "buildNumber": "7287",
-    "sampledAt": "2026-08-29",
-    "reverifiedAt": "2026-08-29",
-    "appAsarSha256": "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "sampledAt": "2026-08-30",
+    "reverifiedAt": "2026-08-30",
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
       "cdp": "26.715.72359",
@@ -19,7 +19,8 @@
       "cdp-26.810.52044": "26.810.52044",
       "cdp-26.818.41509": "26.818.41509",
       "cdp-26.820.60940": "26.820.60940",
-      "cdp-26.825.31414": "26.825.31414"
+      "cdp-26.825.31414": "26.825.31414",
+      "cdp-26.825.51511": "26.825.51511"
     }
   },
   "surfaces": [
@@ -37,7 +38,8 @@
         "cdp-26.810.52044:new-chat-wide-medium-721-720-visible-sidebar-destination",
         "cdp-26.818.41509:new-chat-current-home-dark-light-wide-compact-exact-destination",
         "cdp-26.820.60940:new-chat-wide-medium-721-720-route-marker-and-responsive-destination",
-        "cdp-26.825.31414:new-chat-wide-medium-721-720-current-route-marker-and-responsive-destination"
+        "cdp-26.825.31414:new-chat-wide-medium-721-720-current-route-marker-and-responsive-destination",
+        "cdp-26.825.51511:new-chat-wide-medium-721-720-current-route-marker-and-responsive-destination"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -198,8 +200,8 @@
         "cdp-26.825.31414:real-heading-strong-inline-code-favicon-link-quote-list-full-width-table-current-code-assets-literal-inline-math-rendered-block-math-and-four-response-actions"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -314,8 +316,8 @@
         "cdp-26.825.31414:real-two-query-web-search-worked-for-collapsed-expanded-and-result-rows"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -336,8 +338,8 @@
         "cdp-26.825.31414:real-read-only-browser-mcp-group-three-steps-and-workspace-panel"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p0"
     },
     {
@@ -637,7 +639,8 @@
         "cdp-26.810.52044:new-chat-wide-medium-721-720-editor-and-two-voice-control-matrix",
         "cdp-26.818.41509:new-chat-wide-medium-721-720-editor-and-two-voice-control-matrix",
         "cdp-26.820.60940:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix",
-        "cdp-26.825.31414:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix"
+        "cdp-26.825.31414:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix",
+        "cdp-26.825.51511:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -799,7 +802,8 @@
         "cdp-26.818.41509:wide-medium-721-720-visible-before-explicit-hide-show-zero-overflow",
         "cdp-26.818.41509:persisted-322.90625-sidebar-current-home-dark-light-wide-compact-zero-overflow",
         "cdp-26.820.60940:wide-medium-721-720-visible-before-explicit-hide-show-322.90625-persistence-zero-overflow",
-        "cdp-26.825.31414:wide-medium-721-720-visible-before-explicit-hide-show-321.875-persistence-zero-overflow"
+        "cdp-26.825.31414:wide-medium-721-720-visible-before-explicit-hide-show-321.875-persistence-zero-overflow",
+        "cdp-26.825.51511:wide-medium-721-720-visible-before-explicit-hide-show-321.875-persistence-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -825,7 +829,8 @@
         "cdp-26.818.41509:new-chat-pull-requests-sites-scheduled-plugins-and-route-current",
         "cdp-26.820.60940:new-chat-pull-requests-sites-scheduled-plugins-and-route-restoration",
         "cdp-26.820.60940:projects-back-forward-restoration-and-unified-source-fixed-route-drift",
-        "cdp-26.825.31414:new-chat-pull-requests-scheduled-plugins-sites-absent-and-route-restoration"
+        "cdp-26.825.31414:new-chat-pull-requests-scheduled-plugins-sites-absent-and-route-restoration",
+        "cdp-26.825.51511:new-chat-pull-requests-scheduled-plugins-sites-absent-and-route-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -846,7 +851,8 @@
         "cdp-26.810.52044:six-project-groups-expanded-with-current-task-bands",
         "cdp-26.818.41509:six-project-groups-expanded-project-row-baseline",
         "cdp-26.820.60940:content-dependent-project-groups-30px-row-and-owned-scroll-baseline",
-        "cdp-26.825.31414:content-dependent-project-groups-30px-row-and-owned-scroll-baseline"
+        "cdp-26.825.31414:content-dependent-project-groups-30px-row-and-owned-scroll-baseline",
+        "cdp-26.825.51511:content-dependent-project-groups-30px-row-and-owned-scroll-baseline"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -865,7 +871,8 @@
         "cdp-26.810.52044:six-project-groups-pointer-enter-space-and-720-visible-explicit-hide-show-restoration",
         "cdp-26.818.41509:six-project-groups-30px-rows-pointer-enter-space-and-720-visible-explicit-hide-show-restoration",
         "cdp-26.820.60940:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration",
-        "cdp-26.825.31414:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration"
+        "cdp-26.825.31414:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration",
+        "cdp-26.825.51511:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -885,7 +892,8 @@
         "cdp-26.810.52044:project-actions-menu-six-items-plus-conditional-mark-all-as-read-exact-icons",
         "cdp-26.818.41509:electron-native-project-menu-six-actions-three-separators-react-provider-221x187-quartz-window-current-six-icon-sources-and-unmasked-3.8449-percent-region",
         "cdp-26.820.60940:electron-native-project-menu-six-actions-three-separators-frozen-provider-221x187-quartz-window-and-six-unchanged-exact-icon-sources",
-        "cdp-26.825.31414:electron-native-project-menu-six-actions-three-separators-and-frozen-provider"
+        "cdp-26.825.31414:electron-native-project-menu-six-actions-three-separators-and-frozen-provider",
+        "cdp-26.825.51511:electron-native-project-menu-section-submenu-provider-and-visible-252x187-plus-118x34-native-windows"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1021,7 +1029,8 @@
         "cdp-26.810.52044:help-menu-whats-new-eight-items-320x272.06-nine-current-icons-and-escape-return",
         "cdp-26.818.41509:help-menu-eight-items-320x272.06-dom-menu-and-escape-return",
         "cdp-26.820.60940:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return",
-        "cdp-26.825.31414:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return"
+        "cdp-26.825.31414:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return",
+        "cdp-26.825.51511:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1043,7 +1052,8 @@
         "cdp-26.818.41509:visible-titlebar-sidebar-back-forward-28px-controls",
         "cdp-26.820.60940:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
         "cdp-26.820.60940:projects-back-forward-x88-120-152-opacity-0.4-720-hide-show-and-selected-chat-restoration",
-        "cdp-26.825.31414:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome"
+        "cdp-26.825.31414:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
+        "cdp-26.825.51511:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1079,7 +1089,8 @@
         "cdp-26.810.52044:compact-visible-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.818.41509:compact-visible-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.820.60940:compact-visible-pull-requests-to-new-chat-in-session-restoration",
-        "cdp-26.825.31414:compact-visible-pull-requests-to-new-chat-in-session-restoration"
+        "cdp-26.825.31414:compact-visible-pull-requests-to-new-chat-in-session-restoration",
+        "cdp-26.825.51511:compact-visible-pull-requests-to-new-chat-in-session-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1130,7 +1141,8 @@
         "cdp-26.818.41509:projects-index-fourteen-row-wide-sort-empty-focus-explicitly-collapsed-compact",
         "cdp-26.820.60940:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact",
         "cdp-26.820.60940:projects-location-key-back-forward-1180-720-hide-show-and-selected-chat-restoration",
-        "cdp-26.825.31414:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact"
+        "cdp-26.825.31414:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact",
+        "cdp-26.825.51511:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1382,8 +1394,8 @@
         "cdp-26.825.31414:real-one-tab-419.59375-browser-workspace-with-46px-tabs-40px-toolbar-and-external-content-boundary"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {

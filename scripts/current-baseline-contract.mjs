@@ -11,11 +11,11 @@ export const currentBaselineViewports = Object.freeze({
 });
 
 export const currentBaselineFingerprint = Object.freeze({
-  appAsarBytes: 284_029_139,
+  appAsarBytes: 284_032_150,
   appAsarSha256:
-    "8dc2bc705d5ba49f0e427b21c14b6549c29fcd3ef540e75d6dad386d78f2d255",
-  appVersion: "26.825.31414",
-  buildNumber: "7287",
+    "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+  appVersion: "26.825.51511",
+  buildNumber: "7377",
   chromiumVersion: "151.0.7922.174",
 });
 
@@ -308,22 +308,31 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     (item) => item.id === "mark-project-threads-read",
   );
   const expectedProjectMenuItems = [
-    ["unpin-project", "sidebarElectron.unpinProjectShort", "Unpin", "item"],
-    ["edit-project", "sidebarElectron.editProjectShort", "Edit", "item"],
-    ["project-actions-separator", null, null, "separator"],
+    ["unpin-project", "sidebarElectron.unpinProjectShort", "Unpin", "item", true],
+    ["edit-project", "sidebarElectron.editProjectShort", "Edit", "item", true],
+    ["project-actions-separator", null, null, "separator", false],
+    [
+      "move-to-custom-section",
+      "sidebarCustomSections.projectSectionMenu",
+      "Section",
+      "item",
+      false,
+    ],
     [
       "reveal-project-folder",
       "sidebarElectron.openWorkspaceRootInFinder",
       "Reveal in Finder",
       "item",
+      true,
     ],
     [
       "create-permanent-worktree",
       "sidebarElectron.createStableWorktree",
       "Create permanent worktree",
       "item",
+      true,
     ],
-    ["project-chat-actions-separator", null, null, "separator"],
+    ["project-chat-actions-separator", null, null, "separator", false],
     ...(markReadItem
       ? [
           [
@@ -331,6 +340,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
             "sidebarElectron.markProjectThreadsRead",
             "Mark all as read",
             "item",
+            true,
           ],
         ]
       : []),
@@ -339,19 +349,21 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
       "sidebarElectron.archiveProjectThreads",
       "Archive chats",
       "item",
+      true,
     ],
-    ["project-remove-separator", null, null, "separator"],
+    ["project-remove-separator", null, null, "separator", false],
     [
       "remove-project",
       "sidebarElectron.removeProject.menuItem.local",
       "Remove project",
       "item",
+      true,
     ],
   ];
   const projectMenuItemsMatch =
     projectMenu?.items?.length === expectedProjectMenuItems.length &&
     projectMenu.items.every((item, index) => {
-      const [id, messageId, defaultMessage, type] =
+      const [id, messageId, defaultMessage, type, hasOnSelect] =
         expectedProjectMenuItems[index];
       const isSeparator = type === "separator";
       return (
@@ -361,7 +373,21 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
         item.type === type &&
         item.enabled === true &&
         item.hasIcon === !isSeparator &&
-        item.hasOnSelect === !isSeparator
+        item.hasOnSelect === hasOnSelect &&
+        (id === "move-to-custom-section"
+          ? JSON.stringify(item.submenu) ===
+            JSON.stringify([
+              {
+                defaultMessage: "New section…",
+                enabled: true,
+                hasIcon: false,
+                hasOnSelect: true,
+                id: "new-custom-section",
+                messageId: "sidebarCustomSections.newSection",
+                type: "item",
+              },
+            ])
+          : item.submenu == null)
       );
     });
   if (
