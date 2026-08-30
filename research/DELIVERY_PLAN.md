@@ -14,8 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 32 groups have current-build runtime evidence, 43 have previous-build-only
-  runtime evidence, and 14 have not been sampled.
+- 33 groups have current-build runtime evidence, 43 have previous-build-only
+  runtime evidence, and 13 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
@@ -1084,7 +1084,11 @@ without confusing package readiness with full product reconstruction.
     waiting/failure/interruption/streaming/pagination matrix is delivered.
 11. **P1 resources and integrations**: Browser/artifact/document previews,
     environments, remote connections, Settings, MCP, plugins, skills, and
-    automations, each with one end-to-end vertical slice.
+    automations, each with one end-to-end vertical slice. The current
+    `settings.personalization` slice is delivered for Custom instructions,
+    Memory controls, warning, Personality menu, wide/compact/bottom geometry,
+    Browser/CDP, Electron, and local-only current-product pixels; Keyboard,
+    Voice, Usage, and remaining integration routes stay open.
 12. **Full-app validation and global convergence**: replay/live App Server
     attribution, dark/light and wide/compact matrices, current-build regional
     pixels, public contract freeze, compatibility matrix, and release

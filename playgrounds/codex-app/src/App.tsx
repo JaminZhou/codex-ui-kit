@@ -59,6 +59,7 @@ import {
   MessageAttachment,
   NewConversationPromptGrid,
   NewConversationStart,
+  PersonalizationSettingsPage,
   PullRequestCheckList,
   PullRequestCommentComposer,
   PullRequestList,
@@ -114,6 +115,7 @@ import {
   type GitSettingsValue,
   type HookSettingsEntry,
   type ManagedWorktreeEntry,
+  type PersonalizationSettingsValue,
   type QueuedPrompt,
   type SubagentItem,
   type WorktreeSetupPhase,
@@ -2048,6 +2050,13 @@ function currentSidebar26825WorktreeFixture(taskIndex: number) {
   return ["active", "failed", "recovered", "restored"][taskIndex];
 }
 
+const initialPersonalizationSettings: PersonalizationSettingsValue = {
+  customInstructions: "Keep responses concise and include verification steps.",
+  localMemories: true,
+  personality: "friendly",
+  toolAssistedMemoryGeneration: true,
+};
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
@@ -2174,6 +2183,7 @@ export function App() {
     | "general-settings"
     | "git-settings"
     | "hooks-settings"
+    | "personalization-settings"
     | "worktree-settings"
   >(
     initialSelection.view === "workspace" &&
@@ -2197,13 +2207,18 @@ export function App() {
           initialSelection.frame?.startsWith("workspace-general-settings")
         ? "general-settings"
       : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-personalization-settings")
+        ? "personalization-settings"
+      : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-appearance-settings")
         ? "appearance-settings"
       : "conversation",
   );
   const [settingsQuery, setSettingsQuery] = useState("");
   const [selectedSettingsId, setSelectedSettingsId] = useState(
-    initialSelection.frame?.startsWith("workspace-general-settings")
+    initialSelection.frame?.startsWith("workspace-personalization-settings")
+      ? "personalization"
+      : initialSelection.frame?.startsWith("workspace-general-settings")
       ? "general"
       : initialSelection.frame?.startsWith("workspace-appearance-settings")
         ? "appearance"
@@ -2296,6 +2311,16 @@ export function App() {
     }
   }, [workspacePage]);
   const [generalSettingsAction, setGeneralSettingsAction] = useState("");
+  const [personalizationSettings, setPersonalizationSettings] =
+    useState<PersonalizationSettingsValue>(initialPersonalizationSettings);
+  const [savedCustomInstructions, setSavedCustomInstructions] = useState(
+    initialPersonalizationSettings.customInstructions,
+  );
+  const [personalizationMenuOpen, setPersonalizationMenuOpen] = useState(
+    initialSelection.frame === "workspace-personalization-settings-menu",
+  );
+  const [personalizationSettingsAction, setPersonalizationSettingsAction] =
+    useState("");
   const [worktreeSettings, setWorktreeSettings] =
     useState<WorktreeSettingsValue>({
       autoDelete: true,
@@ -6554,6 +6579,10 @@ export function App() {
         ? activeFrame?.startsWith("workspace-general-settings")
           ? activeFrame
           : "workspace-general-settings"
+      : workspacePage === "personalization-settings"
+        ? activeFrame?.startsWith("workspace-personalization-settings")
+          ? activeFrame
+          : "workspace-personalization-settings"
       : workspacePage === "hooks-settings"
         ? activeFrame?.startsWith("workspace-hooks-settings")
           ? activeFrame
@@ -6623,6 +6652,7 @@ export function App() {
         "general-settings",
         "git-settings",
         "hooks-settings",
+        "personalization-settings",
         "worktree-settings",
       ].includes(
         workspacePage,
@@ -6635,6 +6665,21 @@ export function App() {
     });
     return () => window.clearTimeout(timer);
   }, [settingsRouteFocusPending, workspacePage]);
+  useEffect(() => {
+    if (
+      workspacePage !== "personalization-settings" ||
+      !activeFrame?.startsWith("workspace-personalization-settings")
+    ) {
+      return;
+    }
+    const scrollOwner = document.querySelector<HTMLElement>(
+      ".codex-ui-settings-shell__main",
+    );
+    if (!scrollOwner) return;
+    scrollOwner.scrollTop = activeFrame.endsWith("-bottom")
+      ? scrollOwner.scrollHeight
+      : 0;
+  }, [activeFrame, workspacePage]);
   useEffect(() => {
     if (
       workspacePage !== "appearance-settings" ||
@@ -7933,16 +7978,20 @@ export function App() {
           itemId !== "general" &&
           itemId !== "git" &&
           itemId !== "hooks" &&
+          itemId !== "personalization" &&
           itemId !== "worktrees"
         ) {
           return;
         }
         setSelectedSettingsId(itemId);
+        if (itemId !== "personalization") setPersonalizationMenuOpen(false);
         setWorkspacePage(
           itemId === "appearance"
             ? "appearance-settings"
             : itemId === "general"
               ? "general-settings"
+              : itemId === "personalization"
+                ? "personalization-settings"
               : itemId === "hooks"
                 ? "hooks-settings"
               : itemId === "worktrees"
@@ -7954,6 +8003,8 @@ export function App() {
             ? "workspace-appearance-settings"
             : itemId === "general"
               ? "workspace-general-settings"
+              : itemId === "personalization"
+                ? "workspace-personalization-settings"
               : itemId === "hooks"
                 ? "workspace-hooks-settings"
               : itemId === "worktrees"
@@ -8113,6 +8164,35 @@ export function App() {
             {generalSettingsAction}
           </span>
         </>
+      ) : workspacePage === "personalization-settings" ? (
+        <>
+          <PersonalizationSettingsPage
+            customInstructionsDirty={
+              personalizationSettings.customInstructions !==
+              savedCustomInstructions
+            }
+            data-evidence="runtime-observed"
+            learnMoreHref="https://help.openai.com/"
+            onChange={setPersonalizationSettings}
+            onDeleteLocalMemories={() =>
+              setPersonalizationSettingsAction(
+                "Delete local memories requested",
+              )
+            }
+            onPersonalityMenuOpenChange={setPersonalizationMenuOpen}
+            onSaveCustomInstructions={() => {
+              setSavedCustomInstructions(
+                personalizationSettings.customInstructions,
+              );
+              setPersonalizationSettingsAction("Custom instructions saved");
+            }}
+            personalityMenuOpen={personalizationMenuOpen}
+            value={personalizationSettings}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {personalizationSettingsAction}
+          </span>
+        </>
       ) : (
         <GitSettingsPage
           commitInstructionsDirty={
@@ -8141,6 +8221,7 @@ export function App() {
           workspacePage === "code-review-settings" ||
           workspacePage === "appearance-settings" ||
           workspacePage === "general-settings" ||
+          workspacePage === "personalization-settings" ||
           workspacePage === "worktree-settings"
         ? workspaceSettingsRoute
       : projectIndexChatRoute
@@ -8152,6 +8233,7 @@ export function App() {
     workspacePage === "appearance-settings" ||
     workspacePage === "code-review-settings" ||
     workspacePage === "general-settings" ||
+    workspacePage === "personalization-settings" ||
     workspacePage === "git-settings" ||
     workspacePage === "hooks-settings" ||
     workspacePage === "worktree-settings";

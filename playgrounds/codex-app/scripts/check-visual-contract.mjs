@@ -470,6 +470,12 @@ const currentBuildGeneralSettingsHotkeyReference =
   process.env.CODEX_UI_KIT_GENERAL_SETTINGS_HOTKEY_REFERENCE;
 const currentBuildGeneralSettingsBottomReference =
   process.env.CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_REFERENCE;
+const currentBuildPersonalizationSettingsReference =
+  process.env.CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_REFERENCE;
+const currentBuildPersonalizationSettingsMenuReference =
+  process.env.CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_MENU_REFERENCE;
+const currentBuildPersonalizationSettingsCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_COMPACT_REFERENCE;
 const currentBuildWorktreeSettingsReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETTINGS_REFERENCE;
 const currentBuildHooksSettingsReference =
@@ -3739,6 +3745,52 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_MAX_DIFF_RATIO",
       referencePath: currentBuildGeneralSettingsBottomReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-personalization-settings" &&
+    currentBuildPersonalizationSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual: cropPng(actual, 367, 66, 768, 692),
+      defaultMaximumRatio: 0.055,
+      masks: [{ height: 150, left: 0, top: 117, width: 768 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_MAX_DIFF_RATIO",
+      referenceCrop: { height: 692, left: 0, top: 0, width: 768 },
+      referencePath: currentBuildPersonalizationSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-personalization-settings-menu" &&
+    currentBuildPersonalizationSettingsMenuReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.055,
+      masks: [{ height: 150, left: 367, top: 183, width: 768 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_MENU_MAX_DIFF_RATIO",
+      referencePath: currentBuildPersonalizationSettingsMenuReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-personalization-settings-compact" &&
+    currentBuildPersonalizationSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual: cropPng(actual, 342, 46, 358, 634),
+      defaultMaximumRatio: 0.08,
+      masks: [{ height: 150, left: 0, top: 155, width: 358 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildPersonalizationSettingsCompactReference,
       sceneId: scene.id,
     });
   }

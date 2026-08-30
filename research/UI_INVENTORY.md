@@ -188,7 +188,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 32 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
+Current inventory: 89 surface groups; 33 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 13 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 28 groups and Electron verification covers 28.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -763,6 +763,20 @@ credit use. Eight reviewed frames bring the matrix to 188. Local-only,
 unmasked full-frame Hooks comparisons pass at 1.7651% wide and 1.8064% at
 720px; the exact reload icon raises the provenance manifest to 78. All
 remaining Settings pages stay independently open.
+
+The current `26.825.51511` Personalization follow-up reaches the complete
+visible route without persisting any product setting. It records the 768px
+wide and 358.125px compact content columns, 147.94px Custom instructions
+editor, two enabled 32×20 memory switches, Delete action, warning, and the
+268×105.13 Friendly/Pragmatic menu. The public controlled component keeps
+save, deletion, persistence, and host memory ownership outside the package.
+Browser/CDP verifies dirty/restore, menu selection and Escape focus return,
+wide/compact geometry, bottom scrolling, and zero horizontal overflow;
+Electron renders the same four states and native 720×680 resize. Four reviewed
+internal frames pass. Local-only ownership-masked comparisons differ by
+5.4469% wide, 4.5811% with the menu open, and 7.4199% compact under independent
+5.5%/5.5%/8% ceilings. Keyboard, Voice, Usage, and other Settings routes remain
+independently open.
 
 The current-thread slice adds `ConversationThreadShell`, which composes the
 existing header, scroll-following timeline, messages, and Composer into one

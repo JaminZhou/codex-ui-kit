@@ -2008,6 +2008,23 @@ port is closed, and move the exact profile recoverably to Trash.
 - Long thread, long path, long title, long unbroken text, empty output, and
   localized-copy stress cases.
 
+## Current `26.825.51511` Personalization Settings sample
+
+Use a loopback-only isolated profile, select the main Renderer by URL plus
+Settings shell landmarks, and open Personalization without changing stored
+state. Record only fixed labels, roles, geometry, computed styles, viewport and
+scroll ownership. Mask the entire Custom instructions editor in screenshots;
+do not retain its value, click Save or Delete, toggle Memory, or select another
+product Personality.
+
+The accepted sample covers 1180×820 and 720×680 top/bottom layouts plus the
+open Personality menu. It requires a 768px wide column, 147.94px editor, three
+Memory rows, two 32×20 switches, a 268×105.13 two-item radio menu, reachable
+lower content, and zero horizontal overflow. The independent replay may use
+sanitized instructions and safe callbacks to verify dirty/restore, switch,
+Delete delegation, selection, keyboard movement, Escape dismissal, and focus
+return. Product screenshots and profile data stay local-only.
+
 ## Promotion rule
 
 After a capture:

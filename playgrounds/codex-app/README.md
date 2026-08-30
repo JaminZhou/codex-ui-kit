@@ -1122,6 +1122,21 @@ CODEX_UI_KIT_GENERAL_SETTINGS_BOTTOM_REFERENCE=/absolute/path/to/general-bottom.
   --scenes=workspace-general-settings,workspace-general-settings-compact,workspace-general-settings-hotkey,workspace-general-settings-bottom
 ```
 
+The current `26.825.51511` Personalization gates accept a 769×692 content
+capture, one 1180×820 menu capture, and a 358×634 compact content capture.
+The Custom instructions editor is masked in both product and replay images;
+fixed copy, cards, controls, menu, wrapping, and remaining geometry stay in the
+measured ratio. The compact-bottom scene remains an independent reviewed
+replay and CDP scroll contract.
+
+```bash
+CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_REFERENCE=/absolute/path/to/personalization-wide.png \
+CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_MENU_REFERENCE=/absolute/path/to/personalization-menu-wide.png \
+CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_COMPACT_REFERENCE=/absolute/path/to/personalization-compact-top.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-personalization-settings,workspace-personalization-settings-menu,workspace-personalization-settings-compact,workspace-personalization-settings-compact-bottom
+```
+
 The current Hooks gates accept unmodified 1180×820 and 720×680 full-window
 references. No masks are applied, so navigation, typography, wrapping, the
 runtime-captured reload icon, empty card, and all remaining pixels are
