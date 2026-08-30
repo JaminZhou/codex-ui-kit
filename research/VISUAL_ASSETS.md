@@ -5,7 +5,9 @@ surface has a known source. Approximate icons, fallback fonts, and inferred
 geometry otherwise create permanent noise that can hide regressions.
 
 [`visual-assets.json`](visual-assets.json) is the machine-checked broad manifest
-for 115 exact visual primitives observed on Codex Desktop `26.810.52044`.
+for 120 exact visual primitives. Its broad resting-state baseline remains Codex
+Desktop `26.810.52044`, while independently fingerprinted current slices include
+the `26.825.51511` Review card-files and Undo glyphs.
 [`current-project-menu-assets.json`](current-project-menu-assets.json) is the
 narrow current-build `26.825.51511` manifest for seven project-menu provider
 icons, including the newly observed 16×16 Section source. The sampled native
@@ -238,9 +240,11 @@ sanitizer covers the de-identified font-style samples and all promoted icon styl
 attributes, class names, view boxes, and render sizes before capture output.
 Process/profile setup and exact-PID cleanup remain explicit operator steps.
 
-The latest committed exact-asset manifest fingerprints the previous Codex
-Desktop `26.810.52044` (`6662`) build and
-contains 95 runtime-observed exact icons. It covered the visible
+The latest committed exact-asset manifest retains a broad fingerprint for the
+previous Codex Desktop `26.810.52044` (`6662`) build and contains 120
+runtime-observed exact icons. Current slice metadata is fingerprinted
+independently; the Review slice is `26.825.51511` (`7377`) and contributes the
+24×24 card-files plus 14×14 Undo glyphs. The broad baseline covered the visible
 sidebar/menu/window-chrome/Composer/environment surfaces, including neutral
 and attention Activity, the new footer Voice action, the conditional Mark all
 as read action, and the widened Help menu's leading changelog plus trailing

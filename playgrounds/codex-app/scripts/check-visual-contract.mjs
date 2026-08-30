@@ -118,6 +118,16 @@ const currentCommand26825References = {
   "command-current-26-825-success-completed":
     process.env.CODEX_UI_KIT_CURRENT_COMMAND_26_825_WIDE_REFERENCE,
 };
+const currentReview26825References = {
+  "current-review-26-825-file-card":
+    process.env.CODEX_UI_KIT_CURRENT_REVIEW_26_825_CARD_WIDE_REFERENCE,
+  "current-review-26-825-file-card-compact":
+    process.env.CODEX_UI_KIT_CURRENT_REVIEW_26_825_CARD_COMPACT_REFERENCE,
+  "current-review-26-825-files":
+    process.env.CODEX_UI_KIT_CURRENT_REVIEW_26_825_WORKSPACE_WIDE_REFERENCE,
+  "current-review-26-825-files-compact":
+    process.env.CODEX_UI_KIT_CURRENT_REVIEW_26_825_WORKSPACE_COMPACT_REFERENCE,
+};
 const currentMcpSuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
 const currentMcpSuccessReferenceSize = {
@@ -868,6 +878,75 @@ async function compareCurrentCommand26825({
     }
     console.log(
       `${sceneId}: current 26.825 command ${name} pixel ratio ${comparison.ratio}`,
+    );
+  }
+}
+
+async function compareCurrentReview26825({
+  actual,
+  referencePath,
+  regions,
+  sceneId,
+}) {
+  const reference = PNG.sync.read(await readFile(referencePath));
+  if (
+    reference.width !== actual.width ||
+    reference.height !== actual.height
+  ) {
+    throw new Error(
+      `${sceneId}: current 26.825 Review reference must match the ${actual.width}x${actual.height} scene, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  const maximumRatios = {
+    card: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_CARD_MAX_DIFF_RATIO",
+      0.066,
+    ),
+    panel: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_PANEL_MAX_DIFF_RATIO",
+      0.03,
+    ),
+  };
+  for (const [name, region] of Object.entries(regions)) {
+    const referenceRegion = cropPng(
+      reference,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.1);
+    await writeFile(
+      join(artifactDirectory, `${sceneId}.${name}.current-product.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${sceneId}.${name}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    const diffPath = join(
+      artifactDirectory,
+      `${sceneId}.${name}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(diffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(diffPath, { force: true });
+    }
+    if (comparison.ratio > maximumRatios[name]) {
+      throw new Error(
+        `${sceneId}: current 26.825 Review ${name} pixel ratio ${comparison.ratio} exceeds ${maximumRatios[name]}.`,
+      );
+    }
+    console.log(
+      `${sceneId}: current 26.825 Review ${name} pixel ratio ${comparison.ratio}`,
     );
   }
 }
@@ -2575,6 +2654,32 @@ for (const scene of selectedScenes) {
     await compareCurrentCommand26825({
       actual,
       referencePath: currentCommand26825Reference,
+      regions,
+      sceneId: scene.id,
+    });
+  }
+
+  const currentReview26825Reference =
+    currentReview26825References[scene.id];
+  if (currentReview26825Reference) {
+    const regions = {
+      "current-review-26-825-file-card": {
+        card: { height: 178, left: 222, top: 358, width: 737 },
+      },
+      "current-review-26-825-file-card-compact": {
+        card: { height: 177, left: 16, top: 313, width: 688 },
+      },
+      "current-review-26-825-files": {
+        card: { height: 177, left: 16, top: 404, width: 556 },
+        panel: { height: 820, left: 588, top: 0, width: 592 },
+      },
+      "current-review-26-825-files-compact": {
+        panel: { height: 680, left: 375, top: 0, width: 345 },
+      },
+    }[scene.id];
+    await compareCurrentReview26825({
+      actual,
+      referencePath: currentReview26825Reference,
       regions,
       sceneId: scene.id,
     });

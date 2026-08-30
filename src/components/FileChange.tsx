@@ -958,6 +958,7 @@ export type FileReviewWorkspaceIcons = Partial<
 
 export interface FileReviewWorkspaceProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  defaultCollapsedPaths?: readonly string[];
   defaultFilesVisible?: boolean;
   defaultScope?: FileReviewWorkspaceScope;
   defaultSplit?: boolean;
@@ -1048,6 +1049,7 @@ function moveReviewPopupFocus(
 
 export function FileReviewWorkspace({
   className,
+  defaultCollapsedPaths = [],
   defaultFilesVisible = true,
   defaultScope = "Last Turn",
   defaultSplit = false,
@@ -1076,7 +1078,7 @@ export function FileReviewWorkspace({
     files[0]?.path ?? null,
   );
   const [collapsedPaths, setCollapsedPaths] = useState<Set<string>>(
-    () => new Set(),
+    () => new Set(defaultCollapsedPaths),
   );
   const scopeButtonRef = useRef<HTMLButtonElement>(null);
   const scopeMenuRef = useRef<HTMLSpanElement>(null);

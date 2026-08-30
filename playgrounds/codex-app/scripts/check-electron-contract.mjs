@@ -6435,6 +6435,188 @@ try {
   await compactTerminalApp.close();
 }
 
+const currentReview26825ElectronCases = [
+  {
+    frame: "current-review-26-825-file-card",
+    id: "electron-current-review-26-825-file-card",
+    panelOpen: false,
+    scenario: "current-review-26-825-files",
+    windowSize: { height: 820, width: 1_180 },
+  },
+  {
+    frame: "current-review-26-825-file-card",
+    id: "electron-current-review-26-825-file-card-compact",
+    panelOpen: false,
+    scenario: "current-review-26-825-files",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "current-review-26-825-open",
+    id: "electron-current-review-26-825-files",
+    panelOpen: true,
+    scenario: "current-review-26-825-files",
+    windowSize: { height: 820, width: 1_180 },
+  },
+  {
+    frame: "current-review-26-825-open",
+    id: "electron-current-review-26-825-files-compact",
+    panelOpen: true,
+    scenario: "current-review-26-825-files",
+    windowSize: { height: 680, width: 720 },
+  },
+];
+
+for (const reviewCase of currentReview26825ElectronCases) {
+  const { app: reviewApp, page: reviewPage } = await launchScene(
+    {
+      ...reviewCase,
+      layoutMode: reviewCase.windowSize.width === 720 ? "narrow" : "wide",
+      sidebarState: "hidden",
+      surfaces: reviewCase.panelOpen
+        ? ["fileChange", "reviewPanel"]
+        : ["fileChange"],
+    },
+    { capture: false },
+  );
+  try {
+    await reviewPage.waitForSelector(
+      '[data-item-id="file-current-review-26-825-files"]',
+    );
+    if (reviewCase.panelOpen) {
+      await reviewPage
+        .getByRole("button", { exact: true, name: "Review" })
+        .last()
+        .click();
+      await reviewPage.waitForSelector(
+        '.codex-ui-app-shell[data-side-panel-open] [data-testid="current-review-workspace"]',
+      );
+    }
+    const nativeBounds = await reviewApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const currentReview = await reviewPage.evaluate(() => {
+      const rect = (element) => {
+        const value = element?.getBoundingClientRect();
+        return value
+          ? {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            }
+          : null;
+      };
+      const group = document.querySelector(
+        '[data-item-id="file-current-review-26-825-files"]',
+      );
+      const workspace = document.querySelector(
+        '[data-testid="current-review-workspace"]',
+      );
+      return {
+        actionNames: [...document.querySelectorAll(
+          ".demo-current-review-26-825-actions button",
+        )].map(
+          (button) =>
+            button.getAttribute("aria-label") ?? button.textContent?.trim(),
+        ),
+        card: rect(group),
+        cardFiles: [...(
+          group?.querySelectorAll(".codex-ui-file-change-group__file") ?? []
+        )].map((element) => element.textContent?.replace(/\s+/g, "").trim()),
+        cardIconCount:
+          group?.querySelectorAll(
+            '[data-current-build-icon="review-card-files"]',
+          ).length ?? 0,
+        composer: rect(document.querySelector(".codex-ui-composer")),
+        description:
+          group
+            ?.querySelector(".codex-ui-file-change-group__description")
+            ?.textContent?.replace(/\s+/g, "") ?? null,
+        diffCount:
+          workspace?.querySelectorAll(".codex-ui-file-review-workspace__diff")
+            .length ?? 0,
+        filter: rect(
+          workspace?.querySelector(
+            ".codex-ui-file-review-workspace__filter input",
+          ),
+        ),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        panel: rect(document.querySelector(".codex-ui-app-shell__side-panel")),
+        panelOpen:
+          document
+            .querySelector(".codex-ui-app-shell")
+            ?.hasAttribute("data-side-panel-open") ?? false,
+        rootText: document.body.textContent?.replace(/\s+/g, " ").trim(),
+        treeFiles: [...(
+          workspace?.querySelectorAll(
+            '.codex-ui-file-review-workspace__tree [role="treeitem"]',
+          ) ?? []
+        )].map((element) => element.textContent?.replace(/\s+/g, " ").trim()),
+        undoIconCount:
+          group?.querySelectorAll('[data-current-build-icon="review-undo"]')
+            .length ?? 0,
+      };
+    });
+    const compact = reviewCase.windowSize.width === 720;
+    const expectedCard = compact
+      ? { left: 16, top: 313.5, width: 688 }
+      : reviewCase.panelOpen
+        ? { left: 16, top: 404, width: 555.171875 }
+        : { left: 222, top: 358.5, width: 736 };
+    const expectedPanelWidth = compact ? 345.671875 : 591.828125;
+    if (
+      nativeBounds?.width !== reviewCase.windowSize.width ||
+      nativeBounds?.height !== reviewCase.windowSize.height ||
+      currentReview.horizontalOverflow !== 0 ||
+      currentReview.panelOpen !== reviewCase.panelOpen ||
+      Math.abs((currentReview.card?.height ?? 0) - 173.5) > 1 ||
+      Math.abs((currentReview.card?.left ?? 0) - expectedCard.left) > 1 ||
+      Math.abs((currentReview.card?.top ?? 0) - expectedCard.top) > 1 ||
+      Math.abs((currentReview.card?.width ?? 0) - expectedCard.width) > 1 ||
+      JSON.stringify(currentReview.cardFiles) !==
+        JSON.stringify([
+          "research/current-review-26-825-probe/alpha.txt+3−3",
+          "research/current-review-26-825-probe/obsolete.txt+0−2",
+          "research/current-review-26-825-probe/added.txt+2−0",
+        ]) ||
+      currentReview.cardIconCount !== 1 ||
+      currentReview.undoIconCount !== 1 ||
+      currentReview.description !==
+        (reviewCase.panelOpen ? "Reviewchanges↗" : "+5−5") ||
+      JSON.stringify(currentReview.actionNames) !==
+        JSON.stringify([
+          "Copy",
+          "Good response",
+          "Bad response",
+          "Fork chat from here",
+        ]) ||
+      !currentReview.rootText?.includes("Worked for 20s") ||
+      !currentReview.rootText?.includes("Full access") ||
+      (reviewCase.panelOpen
+        ? currentReview.diffCount !== 4 ||
+          currentReview.treeFiles.length !== 4 ||
+          currentReview.treeFiles.filter((file) => file?.includes("alpha.txt"))
+            .length !== 2 ||
+          Math.abs(
+            (currentReview.panel?.width ?? 0) - expectedPanelWidth,
+          ) > 1 ||
+          Math.abs(
+            (currentReview.filter?.width ?? 0) -
+              (compact ? 159.796875 : 203),
+          ) > 1
+        : currentReview.diffCount !== 4)
+    ) {
+      throw new Error(
+        `${reviewCase.id}: Electron current 26.825 Review contract drifted: ${JSON.stringify({ nativeBounds, currentReview })}`,
+      );
+    }
+  } finally {
+    await reviewApp.close();
+  }
+}
+
 const currentReviewScene = {
   frame: "review-open",
   id: "electron-current-review-rename",

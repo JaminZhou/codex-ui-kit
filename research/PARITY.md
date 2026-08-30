@@ -172,6 +172,15 @@ The authoritative current-build inventory is:
   the session-latched warning only after another app restart. Browser/CDP,
   Electron, and a 3.2572% local-only notice crop gate that observed boundary.
   Broader unsampled inventory still keeps global pixel parity ineligible.
+- The current 26.825 Review anchor reaches a real `+5 −5` three-row card whose
+  protocol retains four raw diffs because one path is deleted and re-added.
+  It locks 736/688×173.5px wide/compact cards and
+  591.828125×820/344.671875×680 Review panels, exact card-files and Undo SVGs,
+  initial single-diff expansion, duplicate-path preservation, and settled
+  Send/Stop behavior. Four CDP/Electron frames and reviewed baselines pass;
+  local-only card crops are 4.2901%–6.4586% and panel crops are
+  1.9445%–2.5733% under separate limits. Binary/conflict, larger-set, and
+  broader Undo/failure variants remain open.
 - The previous 26.820 Review follow-up reaches an exact `+4 −4`
   added/modified/deleted card, the marker-backed two-file rename presentation,
   successful Undo → Reapply, and an externally induced Undo conflict. The

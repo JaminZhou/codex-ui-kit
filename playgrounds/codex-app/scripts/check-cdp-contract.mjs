@@ -65,6 +65,7 @@ const currentReplayComposerScenarios = new Set([
   "current-search-26-825",
   "markdown-current-26-825",
   "current-review-files",
+  "current-review-26-825-files",
   "current-review-rename",
   "interruption",
   "long-command-output",
@@ -3828,6 +3829,7 @@ for (const scene of selectedScenes) {
                   scene.scenario === "current-plan-26-825" ||
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
+                  scene.scenario === "current-review-26-825-files" ||
                   scene.scenario === "markdown-current-26-825" ||
                   scene.scenario === "current-basic-message" ||
                   scene.scenario === "current-basic-message-26-825"
@@ -10573,7 +10575,8 @@ for (const scene of selectedScenes) {
         : scene.scenario === "current-browser-26-825"
           ? 430
         : scene.id === "current-review-files" ||
-            scene.id === "current-review-rename"
+            scene.id === "current-review-rename" ||
+            scene.scenario === "current-review-26-825-files"
           ? 480
           : 500;
     if (
@@ -11179,16 +11182,21 @@ for (const scene of selectedScenes) {
       throw new Error(`${scene.id}: Review panel split geometry is invalid.`);
     }
     const expectedReviewWidth =
-      scene.id === "current-review-files" ||
-      scene.id === "current-review-rename"
-        ? "420"
-        : "370";
+      scene.scenario === "current-review-26-825-files"
+        ? "593"
+        : scene.id === "current-review-files" ||
+            scene.id === "current-review-rename"
+          ? "420"
+          : "370";
     const compactReviewPanel =
       scene.surfaces?.includes("reviewPanel") &&
       (scene.windowSize?.width ?? 1180) <= 720;
-    const expectedReviewMax = scene.id.startsWith("current-review-")
-      ? "532"
-      : "554";
+    const expectedReviewMax =
+      scene.scenario === "current-review-26-825-files"
+        ? "806"
+        : scene.id.startsWith("current-review-")
+          ? "532"
+          : "554";
     if (
       scene.surfaces?.includes("reviewPanel") &&
       (compactReviewPanel
@@ -11211,6 +11219,111 @@ for (const scene of selectedScenes) {
           resizer: contract.sidePanelResizer,
         })}`,
       );
+    }
+    if (scene.scenario === "current-review-26-825-files") {
+      const currentReview26825 = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                height: value.height,
+                left: value.left,
+                top: value.top,
+                width: value.width,
+              }
+            : null;
+        };
+        const group = document.querySelector(
+          '[data-item-id="file-current-review-26-825-files"]',
+        );
+        const workspace = document.querySelector(
+          '[data-testid="current-review-workspace"]',
+        );
+        return {
+          actionNames: [...document.querySelectorAll(
+            ".demo-current-review-26-825-actions button",
+          )].map(
+            (button) =>
+              button.getAttribute("aria-label") ?? button.textContent?.trim(),
+          ),
+          card: rect(group),
+          cardFileCount:
+            group?.querySelectorAll(".codex-ui-file-change-group__file")
+              .length ?? 0,
+          cardFiles: [...(
+            group?.querySelectorAll(".codex-ui-file-change-group__file") ?? []
+          )].map((element) => element.textContent?.replace(/\s+/g, "").trim()),
+          cardIconCount:
+            group?.querySelectorAll(
+              '[data-current-build-icon="review-card-files"]',
+            ).length ?? 0,
+          description:
+            group
+              ?.querySelector(".codex-ui-file-change-group__description")
+              ?.textContent?.replace(/\s+/g, "") ?? null,
+          diffCount:
+            workspace?.querySelectorAll(
+              ".codex-ui-file-review-workspace__diff",
+            ).length ?? 0,
+          panel: rect(document.querySelector(".codex-ui-app-shell__side-panel")),
+          rootText: document.body.textContent?.replace(/\s+/g, " ").trim(),
+          treeFiles: [...(
+            workspace?.querySelectorAll(
+              '.codex-ui-file-review-workspace__tree [role="treeitem"]',
+            ) ?? []
+          )].map((element) => element.textContent?.replace(/\s+/g, " ").trim()),
+          undoIconCount:
+            group?.querySelectorAll(
+              '[data-current-build-icon="review-undo"]',
+            ).length ?? 0,
+          viewportOverflow: document.body.scrollWidth - innerWidth,
+        };
+      });
+      const compactCurrentReview =
+        (scene.windowSize?.width ?? 1_180) <= 720;
+      const panelExpected = compactCurrentReview ? 344.671875 : 591.828125;
+      if (
+        Math.abs((currentReview26825.card?.height ?? 0) - 173.5) > 1 ||
+        currentReview26825.cardFileCount !== 3 ||
+        JSON.stringify(currentReview26825.cardFiles) !==
+          JSON.stringify([
+            "research/current-review-26-825-probe/alpha.txt+3−3",
+            "research/current-review-26-825-probe/obsolete.txt+0−2",
+            "research/current-review-26-825-probe/added.txt+2−0",
+          ]) ||
+        currentReview26825.cardIconCount !== 1 ||
+        currentReview26825.description !==
+          (scene.surfaces?.includes("reviewPanel")
+            ? "Reviewchanges↗"
+            : "+5−5") ||
+        currentReview26825.undoIconCount !== 1 ||
+        JSON.stringify(currentReview26825.actionNames) !==
+          JSON.stringify([
+            "Copy",
+            "Good response",
+            "Bad response",
+            "Fork chat from here",
+          ]) ||
+        !currentReview26825.rootText?.includes("Worked for 20s") ||
+        !currentReview26825.rootText?.includes("Full access") ||
+        currentReview26825.viewportOverflow > 1 ||
+        (scene.surfaces?.includes("reviewPanel")
+          ? currentReview26825.diffCount !== 4 ||
+            currentReview26825.treeFiles.length !== 4 ||
+            currentReview26825.treeFiles.filter((file) =>
+              file?.includes("alpha.txt"),
+            ).length !== 2 ||
+            Math.abs(
+              (currentReview26825.panel?.width ?? 0) - panelExpected,
+            ) > 1
+          : (currentReview26825.panel?.width ?? 0) > 1 &&
+            (currentReview26825.panel?.left ?? 0) <
+              (scene.windowSize?.width ?? 1_180))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 Review evidence contract failed: ${JSON.stringify(currentReview26825)}`,
+        );
+      }
     }
     if (scene.id.startsWith("current-review-undo-failed")) {
       const undoFailure = await page.evaluate(() => {
@@ -11751,11 +11864,19 @@ for (const scene of selectedScenes) {
     if (
       scene.surfaces?.includes("reviewPanel") &&
       (contract.workflow.fileGroupCount !== 1 ||
-        contract.workflow.fileRowCount !== (scene.fileCount ?? 2) ||
+        contract.workflow.fileRowCount !==
+          (scene.scenario === "current-review-26-825-files"
+            ? 3
+            : (scene.fileCount ?? 2)) ||
         contract.review.fileCount !== (scene.fileCount ?? 2) ||
-        contract.review.contentLabels.length !== (scene.fileCount ?? 2) ||
+        contract.review.contentLabels.length !==
+          (scene.scenario === "current-review-26-825-files"
+            ? 1
+            : (scene.fileCount ?? 2)) ||
         contract.review.diffLabels.length !==
-          (scene.diffCount ?? scene.fileCount ?? 2) ||
+          (scene.scenario === "current-review-26-825-files"
+            ? 1
+            : (scene.diffCount ?? scene.fileCount ?? 2)) ||
         (scene.noticeKinds !== undefined &&
           JSON.stringify(contract.review.noticeKinds) !==
             JSON.stringify(scene.noticeKinds)) ||
