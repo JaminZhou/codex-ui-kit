@@ -15,6 +15,7 @@ import currentPlan26825Trace from "../fixtures/traces/current-plan-26-825.jsonl?
 import currentSearch26825Trace from "../fixtures/traces/current-search-26-825.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
+import currentReview26825FilesTrace from "../fixtures/traces/current-review-26-825-files.jsonl?raw";
 import commandCurrent26820FailureTrace from "../fixtures/traces/command-current-26-820-failure.jsonl?raw";
 import commandCurrent26820InterruptionTrace from "../fixtures/traces/command-current-26-820-interruption.jsonl?raw";
 import commandCurrent26820SuccessTrace from "../fixtures/traces/command-current-26-820-success.jsonl?raw";
@@ -83,6 +84,7 @@ export type ReplayScenarioId =
   | "current-search-26-825"
   | "current-review-rename"
   | "current-review-files"
+  | "current-review-26-825-files"
   | "large-file-review"
   | "long-command-output"
   | "markdown"
@@ -318,6 +320,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Update current Review probe files",
     "The current 26.820 Review workspace covers added, modified, and deleted files, toolbar and file-tree interactions, compact overlay behavior, and the observed latest-turn selection boundary.",
     currentReviewFilesTrace,
+  ),
+  "current-review-26-825-files": scenario(
+    "current-review-26-825-files",
+    "Update review probe files",
+    "Replays the current 26.825 three-file delete/recreate Review anchor.",
+    currentReview26825FilesTrace,
   ),
   "multi-file-review": scenario(
     "multi-file-review",

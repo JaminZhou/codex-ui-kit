@@ -4921,6 +4921,187 @@ textarea {
   padding-inline: 0.65625rem;
 }
 
+.demo-root[data-scenario="current-review-26-825-files"] {
+  -webkit-font-smoothing: antialiased;
+  --codex-ui-font-openai-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --codex-ui-conversation-thread-composer-scroll-clearance: 0.65625rem;
+  --codex-ui-conversation-thread-user-turn-gap: 2.125rem;
+  --codex-ui-user-message-compact-max-width: 70%;
+  --codex-ui-user-message-max-width: 70%;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"],
+.demo-root[data-scenario="current-review-26-825-files"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-app-shell__side-panel {
+  --codex-ui-workspace-panel-header-height: 2.875rem;
+  --codex-ui-workspace-panel-tab-max-width: 9.75rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  background: rgba(50, 50, 50, 0.85);
+  border-radius: 22px;
+  font-weight: 400;
+  line-height: 22.75px;
+  margin-inline-end: 0;
+  max-width: 70%;
+  padding: 10px 16px;
+  white-space: pre-wrap;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-agent-message[data-role="assistant"]
+  .codex-ui-agent-message__content,
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-turn-duration {
+  font-weight: 400;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group {
+  background: rgb(31 31 31);
+  border: 0;
+  border-radius: 0.78125rem;
+  box-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.157);
+  max-width: 46rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__summary,
+.demo-root[data-scenario="current-review-26-825-files"]
+  .demo-file-actions
+  button {
+  color: rgb(218 218 218);
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__files {
+  background: rgb(25 25 25);
+  border-top-color: rgb(50 50 50);
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__file
+  + .codex-ui-file-change-group__file {
+  border-top: 0;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__header {
+  min-height: 4.03125rem;
+  padding: 0.75rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__indicator {
+  background: rgb(21 21 21);
+  border-radius: 0.625rem;
+  color: rgb(166 166 166);
+  flex-basis: 2.5rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__indicator
+  svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__summary,
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__description,
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__file {
+  font-size: 0.875rem;
+  font-weight: 445;
+  line-height: 1.125rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change-group__file {
+  color: rgb(200 200 200);
+  min-height: 2.25rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change__stats
+  [data-dot] {
+  display: none;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .codex-ui-file-change__stats {
+  gap: 0.125rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .demo-file-actions {
+  gap: 1.125rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .demo-file-actions
+  button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0.625rem;
+  display: inline-flex;
+  font-size: 0.875rem;
+  font-weight: 445;
+  gap: 0.25rem;
+  height: 1.75rem;
+  line-height: 1.125rem;
+  padding: 0 0.75rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .demo-file-actions
+  button:first-child {
+  padding-inline: 0;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .demo-file-actions
+  button:last-child {
+  background: rgb(255 255 255 / 0.03);
+  border: 1px solid rgb(255 255 255 / 0.082);
+  padding-inline: 0.65625rem;
+}
+
+.demo-root[data-scenario="current-review-26-825-files"]
+  .demo-file-actions
+  svg {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.demo-current-review-26-825-actions {
+  margin-top: 0.25rem;
+}
+
+.demo-current-review-26-825-actions button {
+  align-items: center;
+  display: inline-flex;
+  height: 1.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.demo-current-review-26-825-actions svg {
+  height: 1rem;
+  width: 1rem;
+}
+
 .demo-pr-index {
   background: #101010;
   color: rgba(255, 255, 255, 0.92);

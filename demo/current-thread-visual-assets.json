@@ -640,19 +640,136 @@
         "width": "14px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "5763c749d18a89e48091b000dc4dfcd56129f956b7c77fc52f752e71516393eb",
+      "sourceSha256": "fe7c5ea9fdee1493c8725aa69d089ee2a37d61099c82f95e2c68b51fc43bd4ba",
       "viewBox": "0 0 21 21"
+    },
+    {
+      "id": "review-card-files",
+      "primitives": [
+        {
+          "attributes": {
+            "d": "M12.084 12.668a.666.666 0 0 1 0 1.33H7.917a.665.665 0 1 1 0-1.33h4.167ZM10 5.585c.367 0 .665.298.665.665v1.418h1.419a.666.666 0 0 1 0 1.33h-1.419v1.419a.666.666 0 0 1-1.33 0V8.998H7.917a.665.665 0 0 1 0-1.33h1.418V6.25c0-.367.298-.665.665-.665Z"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "color(srgb 1 1 1 / 0.65)",
+            "display": "inline",
+            "fill": "color(srgb 1 1 1 / 0.65)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        },
+        {
+          "attributes": {
+            "clip-rule": "evenodd",
+            "d": "M12.667 2.668c.689 0 1.246 0 1.696.036.458.038.865.117 1.242.309a3.163 3.163 0 0 1 1.382 1.383c.192.377.272.783.309 1.24.037.45.036 1.008.036 1.697v5.333c0 .689 0 1.246-.036 1.696-.037.458-.117.865-.309 1.242a3.166 3.166 0 0 1-1.382 1.382c-.377.192-.784.271-1.242.309-.45.037-1.007.036-1.696.036H7.334c-.689 0-1.246 0-1.696-.036-.458-.038-.864-.117-1.24-.309a3.166 3.166 0 0 1-1.384-1.383c-.192-.376-.271-.783-.309-1.24-.037-.45-.036-1.008-.036-1.697V7.333c0-.689 0-1.246.036-1.696.038-.458.117-.864.309-1.24a3.17 3.17 0 0 1 1.383-1.384c.377-.192.783-.272 1.24-.309.45-.037 1.008-.036 1.697-.036h5.333Zm-5.333 1.33c-.71 0-1.204.001-1.588.032-.375.03-.587.088-.745.168A1.836 1.836 0 0 0 4.199 5c-.08.158-.137.37-.168.745C4 6.13 4 6.622 4 7.333v5.333c0 .71.001 1.204.032 1.588.03.375.088.587.168.745.176.345.457.627.802.803.158.08.37.137.745.168.384.031.877.031 1.588.031h5.333c.71 0 1.204 0 1.588-.031.375-.031.587-.088.745-.168a1.84 1.84 0 0 0 .803-.803c.08-.158.137-.37.168-.745.031-.383.031-.877.031-1.588V7.333c0-.71 0-1.204-.031-1.588-.031-.375-.088-.587-.168-.745A1.838 1.838 0 0 0 15 4.198c-.158-.08-.37-.137-.745-.168-.384-.031-.877-.032-1.588-.032H7.334Z",
+            "fill-rule": "evenodd"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "color(srgb 1 1 1 / 0.65)",
+            "display": "inline",
+            "fill": "color(srgb 1 1 1 / 0.65)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        }
+      ],
+      "renderSize": {
+        "height": 24,
+        "width": 24
+      },
+      "rootAttributes": {
+        "fill": "currentColor",
+        "height": "20",
+        "width": "20"
+      },
+      "rootComputedStyle": {
+        "clip-path": "none",
+        "color": "color(srgb 1 1 1 / 0.65)",
+        "display": "block",
+        "fill": "color(srgb 1 1 1 / 0.65)",
+        "fill-opacity": "1",
+        "filter": "none",
+        "height": "24px",
+        "opacity": "1",
+        "paint-order": "normal",
+        "shape-rendering": "auto",
+        "stroke": "none",
+        "stroke-dasharray": "none",
+        "stroke-dashoffset": "0px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        "stroke-miterlimit": "4",
+        "stroke-opacity": "1",
+        "stroke-width": "1px",
+        "transform": "none",
+        "transform-origin": "12px 12px",
+        "vector-effect": "none",
+        "visibility": "visible",
+        "width": "24px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-31"
+      },
+      "sourceSha256": "0b8a9ee46b7139fce01c0fc5036f7f0208ed8c259f36b08754b72973b395350c",
+      "viewBox": "0 0 20 20"
     },
     {
       "id": "review-collapse-all",
@@ -901,18 +1018,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "cfc2c631807319b511d67546c9443ed02e21cdc58da3167b7a63a913898dd44e",
+      "sourceSha256": "6581fe10c8194ed3428ed96b0bc933c5d300079d7de6cfb4467dab42deadbeac",
       "viewBox": "0 0 24 24"
     },
     {
@@ -925,9 +1042,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -957,9 +1074,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -989,9 +1106,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -1026,7 +1143,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(223, 223, 223)",
+        "color": "rgb(255, 255, 255)",
         "display": "block",
         "fill": "none",
         "fill-opacity": "1",
@@ -1050,18 +1167,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "f696d89da3a1c41920f4ddd91437ec21da9b7953af2a529d989aaf7907301db9",
+      "sourceSha256": "72071cfa075337091f25e1e2f63e6bcd8867795c3053beb535344d03e1d9886e",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1135,18 +1252,18 @@
         "width": "14px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "910b2a8e7219189afb098c9a125269833a86fb1d8d26d3a76a7ec990fa7e17fc",
+      "sourceSha256": "dce1e3ad7ad8943066d0d5e6210056854fc376e7129bdfef04ff0a679202aee6",
       "viewBox": "0 0 21 21"
     },
     {
@@ -1220,18 +1337,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "254ccf49d79f195abe4dd0e59c68766438b9c052726b90ecc3eddb49b3c9b0bc",
+      "sourceSha256": "a4f8780c853e0796c3319ac861817d9d225fadb240f5b79b4c7be75599e1bef2",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1336,18 +1453,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "0c8decd01f7dc110d083104cce0ece09d5e1870455ff1cef6d821bde189c8750",
+      "sourceSha256": "da158df202320d2f0e9082f958d70afab0e38502b2a9be0545c2ba89a78bd168",
       "viewBox": "0 0 16 16"
     },
     {
@@ -1421,18 +1538,18 @@
         "width": "14px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "20b09298c3cb9a7c598633c280022c85ac3d5749a9d03a74c98b7fb75d76ba7f",
+      "sourceSha256": "bdfa2dfe3fa8ea73c53d281ea356ae69ce71648395098b9e8f36d05bd60551bf",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1444,9 +1561,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -1481,9 +1598,9 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(223, 223, 223)",
+        "color": "rgb(255, 255, 255)",
         "display": "block",
-        "fill": "rgb(223, 223, 223)",
+        "fill": "rgb(255, 255, 255)",
         "fill-opacity": "1",
         "filter": "none",
         "height": "18px",
@@ -1505,18 +1622,18 @@
         "width": "18px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "cf7ff083eb80595a80e8da5379d9b2a9a7825869274316c39b6f5916db230db8",
+      "sourceSha256": "1c8c624d69c5e94d2363a51992495b5793f1749d3de41a988ae9bcb1cce15fad",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1620,18 +1737,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "fa7f542e0715e5af6940082f52576df79bb837239e68d7cb6bdd98defe700eb0",
+      "sourceSha256": "f35ca067a75e8599bfafc6aa4283ecc4ad0f98484255b685352f62f43bada3d8",
       "viewBox": "0 0 20 20"
     },
     {
@@ -1707,18 +1824,18 @@
         "width": "14px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "5559603a549865a2b1e3de5eee6eefe998a8fd726756a608aa8cb11f50c5230c",
+      "sourceSha256": "c42b1781295ef4c3ad84cfbdeb76208a487079619596040d60d7af6d8bcccbba",
       "viewBox": "0 0 20 21"
     },
     {
@@ -1792,18 +1909,18 @@
         "width": "14px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "1746f427d21f256f8bef92aaefe82549ee128024b1c8ec4a04af8b885050a36e",
+      "sourceSha256": "0209458460abc6e8fdfaf490f986d8a82bf7695d7b6ba84103a15314d1b4cb37",
       "viewBox": "0 0 21 21"
     },
     {
@@ -1877,18 +1994,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "6a642224d25c2755a3c81753e1055682873e3890285d9e79b54b31d366ecd140",
+      "sourceSha256": "f68c042ae92a22f49c51a0216abf8b676e020b2b5fb8916139b8e2727d05e36b",
       "viewBox": "0 0 20 20"
     },
     {
@@ -2026,18 +2143,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "21e712f67321d73dff01a0a8d841454b946a33d938cec7ed382a6fd2afedcad5",
+      "sourceSha256": "c6d47bc69e4436bfb48a61fb96285a83608c75889328882de9a09fefca2c2d90",
       "viewBox": "0 0 21 21"
     },
     {
@@ -2050,9 +2167,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -2086,7 +2203,7 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(223, 223, 223)",
+        "color": "rgb(255, 255, 255)",
         "display": "block",
         "fill": "rgb(0, 0, 0)",
         "fill-opacity": "1",
@@ -2110,18 +2227,18 @@
         "width": "12px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "beb7d3de1f130d5458b855452849e0455b937f918afc33214d1dfe473bc3a0fb",
+      "sourceSha256": "a8483882ca701ad8dab267cf31fb15387a6a3ccd420e312f15e5f0b5bb648929",
       "viewBox": "0 0 12 12"
     },
     {
@@ -2197,18 +2314,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "312895730f7a8ef585ec0125c52f2d776e2a0df72a77ceca3a72f1ecc20c51f1",
+      "sourceSha256": "93a0c395f5bcde7e59080ba53b4e035d0b6de77aecc4b283aa50f7da5bd204c4",
       "viewBox": "0 0 16 16"
     },
     {
@@ -2353,18 +2470,18 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "ad7bd4c220f7a21458b1497aa6773e7fbe7091813f8ee7ff56d3f41be29d72ee",
+      "sourceSha256": "c2ef849d5b6ffdcbb60c18e7105091b84b15022366ee51075d3a260bd5988ad6",
       "viewBox": "0 0 24 24"
     },
     {
@@ -2376,9 +2493,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -2409,9 +2526,9 @@
           },
           "computedStyle": {
             "clip-path": "none",
-            "color": "rgb(223, 223, 223)",
+            "color": "rgb(255, 255, 255)",
             "display": "inline",
-            "fill": "rgb(223, 223, 223)",
+            "fill": "rgb(255, 255, 255)",
             "fill-opacity": "1",
             "filter": "none",
             "height": "auto",
@@ -2446,9 +2563,9 @@
       },
       "rootComputedStyle": {
         "clip-path": "none",
-        "color": "rgb(223, 223, 223)",
+        "color": "rgb(255, 255, 255)",
         "display": "block",
-        "fill": "rgb(223, 223, 223)",
+        "fill": "rgb(255, 255, 255)",
         "fill-opacity": "1",
         "filter": "none",
         "height": "16px",
@@ -2470,18 +2587,103 @@
         "width": "16px"
       },
       "sourceBaseline": {
-        "appAsarSha256": "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-        "appVersion": "26.820.60940",
-        "buildNumber": "7119",
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
         "interactionState": "open-current-review-workspace",
         "theme": "dark",
         "viewport": {
           "height": 820,
           "width": 1180
         },
-        "capturedAt": "2026-08-29"
+        "capturedAt": "2026-08-31"
       },
-      "sourceSha256": "5e702654a95cbdc861726ffccd2266a913100404bebcb88d77c4532b2b57ce5a",
+      "sourceSha256": "bf169093f825617e166c6678c4370ab84c11e1f5aaf2c3f8430bf5cfabcd7d7a",
+      "viewBox": "0 0 20 20"
+    },
+    {
+      "id": "review-undo",
+      "primitives": [
+        {
+          "attributes": {
+            "d": "M15.998 10.833C15.9978 8.439 14.0571 6.49805 11.663 6.49805H4.9355L7.13374 8.69629L7.2187 8.80078C7.38911 9.05884 7.36084 9.40947 7.13374 9.63672C6.90652 9.86394 6.55592 9.89207 6.2978 9.72168L6.19331 9.63672L2.85932 6.30371C2.5999 6.04411 2.60001 5.62295 2.85932 5.36328L6.19331 2.0293C6.45298 1.76998 6.87414 1.76987 7.13374 2.0293C7.39344 2.289 7.39344 2.711 7.13374 2.9707L4.93647 5.16797H11.663C14.7916 5.16797 17.3279 7.70446 17.3281 10.833C17.3281 13.9617 14.7917 16.498 11.663 16.498H8.33003C7.96276 16.498 7.66499 16.2003 7.66499 15.833C7.66516 15.4659 7.96287 15.168 8.33003 15.168H11.663C14.0572 15.168 15.998 13.2272 15.998 10.833Z",
+            "fill": "currentColor"
+          },
+          "computedStyle": {
+            "clip-path": "none",
+            "color": "rgb(255, 255, 255)",
+            "display": "inline",
+            "fill": "rgb(255, 255, 255)",
+            "fill-opacity": "1",
+            "filter": "none",
+            "height": "auto",
+            "opacity": "1",
+            "paint-order": "normal",
+            "shape-rendering": "auto",
+            "stroke": "none",
+            "stroke-dasharray": "none",
+            "stroke-dashoffset": "0px",
+            "stroke-linecap": "butt",
+            "stroke-linejoin": "miter",
+            "stroke-miterlimit": "4",
+            "stroke-opacity": "1",
+            "stroke-width": "1px",
+            "transform": "none",
+            "transform-origin": "0px 0px",
+            "vector-effect": "none",
+            "visibility": "visible",
+            "width": "auto"
+          },
+          "tag": "path"
+        }
+      ],
+      "renderSize": {
+        "height": 14,
+        "width": 14
+      },
+      "rootAttributes": {
+        "fill": "none",
+        "height": "20",
+        "width": "20"
+      },
+      "rootComputedStyle": {
+        "clip-path": "none",
+        "color": "rgb(255, 255, 255)",
+        "display": "block",
+        "fill": "none",
+        "fill-opacity": "1",
+        "filter": "none",
+        "height": "14px",
+        "opacity": "1",
+        "paint-order": "normal",
+        "shape-rendering": "auto",
+        "stroke": "none",
+        "stroke-dasharray": "none",
+        "stroke-dashoffset": "0px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        "stroke-miterlimit": "4",
+        "stroke-opacity": "1",
+        "stroke-width": "1px",
+        "transform": "none",
+        "transform-origin": "7px 7px",
+        "vector-effect": "none",
+        "visibility": "visible",
+        "width": "14px"
+      },
+      "sourceBaseline": {
+        "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        "appVersion": "26.825.51511",
+        "buildNumber": "7377",
+        "interactionState": "open-current-review-workspace",
+        "theme": "dark",
+        "viewport": {
+          "height": 820,
+          "width": 1180
+        },
+        "capturedAt": "2026-08-31"
+      },
+      "sourceSha256": "242abf1ae5bb611bf6d6a1d5f9caff8c7f21c7d21a0a8829e8000f6c0bf1af0e",
       "viewBox": "0 0 20 20"
     },
     {

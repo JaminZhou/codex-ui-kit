@@ -871,6 +871,48 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the runtime-observed 26.825 Review card and workspace at wide and compact widths", () => {
+    for (const scene of [
+      "current-review-26-825-file-card",
+      "current-review-26-825-file-card-compact",
+      "current-review-26-825-files",
+      "current-review-26-825-files-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    expect(cdpContract).toContain(
+      'scene.scenario === "current-review-26-825-files"',
+    );
+    expect(cdpContract).toContain(
+      "current 26.825 Review evidence contract failed",
+    );
+    expect(electronContract).toContain(
+      "currentReview26825ElectronCases",
+    );
+    expect(electronContract).toContain(
+      "Electron current 26.825 Review contract drifted",
+    );
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_CARD_WIDE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_CARD_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_WORKSPACE_WIDE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_WORKSPACE_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_CARD_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_REVIEW_26_825_PANEL_MAX_DIFF_RATIO",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(contract).toContain(
+      "current 26.825 Review ${name} pixel ratio",
+    );
+    expect(appSource).toContain("isCurrentReview26825FilesReplay");
+    expect(appSource).toContain('name="review-card-files"');
+    expect(appSource).toContain('name="review-undo"');
+    expect(appStyles).toContain(
+      '[data-scenario="current-review-26-825-files"]',
+    );
+  });
+
   it("gates the current manual context-compaction running frame", () => {
     expect(contract).toContain(
       "CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE",

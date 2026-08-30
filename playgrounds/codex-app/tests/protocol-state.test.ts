@@ -1605,6 +1605,44 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("preserves the current 26.825 Review raw delete/add replacement evidence", () => {
+    const scenario = replayScenarios["current-review-26-825-files"];
+    const state = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "current-review-26-825-file-card": 7,
+      "current-review-26-825-open": 8,
+    });
+    expect(state.fileChanges).toHaveLength(1);
+    expect(state.fileChanges[0]).toMatchObject({
+      changes: [
+        {
+          kind: "added",
+          path: "research/current-review-26-825-probe/added.txt",
+        },
+        {
+          kind: "deleted",
+          path: "research/current-review-26-825-probe/alpha.txt",
+        },
+        {
+          kind: "added",
+          path: "research/current-review-26-825-probe/alpha.txt",
+        },
+        {
+          kind: "deleted",
+          path: "research/current-review-26-825-probe/obsolete.txt",
+        },
+      ],
+      status: "applied",
+    });
+    expect(state.messages.at(-1)?.text).toBe(
+      "CURRENT REVIEW 26.825 COMPLETE.",
+    );
+    expect(state.turnDurationsMs).toEqual({
+      "turn-current-review-26-825-files": 20_000,
+    });
+  });
+
   it("keeps terminal interaction attached to the matching process", () => {
     const scenario = replayScenarios["background-terminal"];
     const terminalOpen = reduceProtocolTrace(

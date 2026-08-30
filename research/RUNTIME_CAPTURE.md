@@ -1880,6 +1880,23 @@ After capture, archive the exact disposable task, terminate only the exact
 isolated process tree, verify its port is closed, and move the exact temporary
 profile recoverably to Trash.
 
+## Current `26.825.51511` Review card/workspace anchor
+
+The capture-only `capture:current-review-26-825` flow requires an already
+completed disposable task in a loopback-only isolated process. It resolves the
+task by SHA-256 of its title, never submits a prompt, records wide and compact
+closed-card/open-workspace screenshots locally, verifies the installed
+fingerprint before and after capture, and stores only geometry, fixed labels,
+action counts, and SVG hashes in its local record.
+
+The sampled task has three aggregate card paths but four raw Review entries:
+`added.txt`, deleted `alpha.txt`, added `alpha.txt`, and `obsolete.txt`. The
+capture requires the duplicate raw path, `Worked for 20s`, restored Send,
+absent Stop, and zero horizontal overflow. Screenshots, task ids, profiles,
+and real disposable contents remain local-only. After acceptance, archive only
+the exact synthetic task, terminate only the isolated owner, verify its CDP
+port is closed, and move the exact profile recoverably to Trash.
+
 ## Required flow matrix
 
 ### 1. Application entry and navigation

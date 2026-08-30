@@ -2623,7 +2623,8 @@ export function App() {
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
       initialSelection.frame === "mixed-review-open" ||
-      initialSelection.frame === "current-mixed-review-open",
+      initialSelection.frame === "current-mixed-review-open" ||
+      initialSelection.frame === "current-review-26-825-open",
   );
   const [browserPanelOpen, setBrowserPanelOpen] = useState(
     initialSelection.scenarioId === "current-browser-26-825",
@@ -2723,10 +2724,12 @@ export function App() {
     useState<ReviewSelection | null>(null);
   const [reviewSelectionKey, setReviewSelectionKey] = useState(0);
   const [reviewPanelWidth, setReviewPanelWidth] = useState(
-    initialSelection.scenarioId === "current-review-files" ||
-      initialSelection.scenarioId === "current-review-rename"
-      ? 419.59375
-      : 370,
+    initialSelection.scenarioId === "current-review-26-825-files"
+      ? 592.828125
+      : initialSelection.scenarioId === "current-review-files" ||
+          initialSelection.scenarioId === "current-review-rename"
+        ? 419.59375
+        : 370,
   );
   const [fileRevertErrorOpen, setFileRevertErrorOpen] = useState(
     initialSelection.frame === "undo-failed",
@@ -2946,8 +2949,12 @@ export function App() {
     mode === "replay" && scenarioId === "current-review-files";
   const isCurrentReviewRenameReplay =
     mode === "replay" && scenarioId === "current-review-rename";
+  const isCurrentReview26825FilesReplay =
+    mode === "replay" && scenarioId === "current-review-26-825-files";
   const isCurrentReview26820Replay =
     isCurrentReviewFilesReplay || isCurrentReviewRenameReplay;
+  const isCurrentReviewProductReplay =
+    isCurrentReview26820Replay || isCurrentReview26825FilesReplay;
   const isCurrentMcp26818SuccessReplay =
     mode === "replay" && scenarioId === "mcp-current-26-818-success";
   const isCurrentMcp26818RecoveryReplay =
@@ -3000,8 +3007,14 @@ export function App() {
   );
 
   useEffect(() => {
-    setReviewPanelWidth(isCurrentReview26820Replay ? 419.59375 : 370);
-  }, [isCurrentReview26820Replay]);
+    setReviewPanelWidth(
+      isCurrentReview26825FilesReplay
+        ? 592.828125
+        : isCurrentReview26820Replay
+          ? 419.59375
+          : 370,
+    );
+  }, [isCurrentReview26820Replay, isCurrentReview26825FilesReplay]);
   const isCurrentMcpReplay =
     mode === "replay" &&
     (scenarioId === "current-mixed-tool-thread" ||
@@ -5259,7 +5272,8 @@ export function App() {
       isCurrentSubagentReplay ||
       current26820LongFrame ||
       scenarioId === "current-review-rename" ||
-      isCurrentReviewFilesReplay);
+      isCurrentReviewFilesReplay ||
+      isCurrentReview26825FilesReplay);
   const usesCurrentAskPermission =
     isCurrentApprovalReplay ||
     isCurrentAutomaticReviewReplay ||
@@ -5671,6 +5685,7 @@ export function App() {
     (scenarioId === "multi-file-review" ||
       scenarioId === "current-review-rename" ||
       scenarioId === "current-review-files" ||
+      scenarioId === "current-review-26-825-files" ||
       scenarioId === "mixed-file-review" ||
       scenarioId === "markdown" ||
       isCurrentMarkdown26818Replay ||
@@ -8258,7 +8273,8 @@ export function App() {
                   lines:
                     change.kind === "added" ||
                     scenarioId === "current-review-rename" ||
-                    scenarioId === "current-review-files"
+                    scenarioId === "current-review-files" ||
+                    scenarioId === "current-review-26-825-files"
                       ? content.lines.filter(({ kind }) => kind !== "hunk")
                       : content.lines,
                 }
@@ -8276,7 +8292,7 @@ export function App() {
     { additions: 0, deletions: 0 },
   );
   const reviewPanel = reviewFileChange ? (
-    isCurrentReview26820Replay ? (
+    isCurrentReviewProductReplay ? (
       <WorkspacePanel
         actions={
           <>
@@ -8310,6 +8326,14 @@ export function App() {
             content: (
               <FileReviewWorkspace
                 data-testid="current-review-workspace"
+                defaultCollapsedPaths={
+                  isCurrentReview26825FilesReplay
+                    ? [
+                        "research/current-review-26-825-probe/alpha.txt",
+                        "research/current-review-26-825-probe/obsolete.txt",
+                      ]
+                    : undefined
+                }
                 files={reviewFiles}
                 icons={{
                   collapseAll: <CurrentBuildIcon name="review-collapse-all" />,
@@ -8333,7 +8357,11 @@ export function App() {
                     path: file.path,
                   });
                 }}
-                rootLabel="codex-ui-kit-review-26-820"
+                rootLabel={
+                  isCurrentReview26825FilesReplay
+                    ? "research/current-review-26-825-probe"
+                    : "codex-ui-kit-review-26-820"
+                }
                 selectionKey={reviewSelectionKey}
                 selectedPath={resolvedReview?.selectedPath}
               />
@@ -9637,6 +9665,12 @@ export function App() {
             <ActivityTimeline
               summary={<TurnDuration durationMs={52_000} status="worked" />}
             />
+          ) : mode === "replay" &&
+            scenarioId === "current-review-26-825-files" &&
+            message.id === "user-current-review-26-825-files" ? (
+            <ActivityTimeline
+              summary={<TurnDuration durationMs={20_000} status="worked" />}
+            />
           ) : null}
         </Fragment>
       );
@@ -10687,19 +10721,44 @@ export function App() {
         </div>
       );
     }
-    const changes = fileChange.changes.map((change) => {
-      const stats = changeStats(change);
-      return {
-        additions: stats.additions,
-        change: change.kind,
-        deletions: stats.deletions,
-        path: change.path,
-        previousPath: change.previousPath,
-      };
-    });
+    const changes = isCurrentReview26825FilesReplay
+      ? [
+          {
+            additions: 3,
+            change: "modified" as const,
+            deletions: 3,
+            path: "research/current-review-26-825-probe/alpha.txt",
+          },
+          {
+            additions: 0,
+            change: "deleted" as const,
+            deletions: 2,
+            path: "research/current-review-26-825-probe/obsolete.txt",
+          },
+          {
+            additions: 2,
+            change: "added" as const,
+            deletions: 0,
+            path: "research/current-review-26-825-probe/added.txt",
+          },
+        ]
+      : fileChange.changes.map((change) => {
+          const stats = changeStats(change);
+          return {
+            additions: stats.additions,
+            change: change.kind,
+            deletions: stats.deletions,
+            path: change.path,
+            previousPath: change.previousPath,
+          };
+        });
     const currentReviewReverted = revertedCurrentReviewIds.has(fileChange.id);
-    const indicator = isCurrentReview26820Replay ? (
-      <CurrentBuildIcon name="review-file-text" />
+    const indicator = isCurrentReviewProductReplay ? (
+      isCurrentReview26825FilesReplay ? (
+        <CurrentBuildIcon name="review-card-files" />
+      ) : (
+        <CurrentBuildIcon name="review-file-text" />
+      )
     ) : (
       <svg
         aria-hidden="true"
@@ -10716,7 +10775,7 @@ export function App() {
           {mode === "replay" ? (
             <button
               onClick={() => {
-                if (isCurrentReview26820Replay) {
+                if (isCurrentReviewProductReplay) {
                   if (currentReviewReverted) {
                     setRevertedCurrentReviewIds((current) => {
                       const next = new Set(current);
@@ -10752,7 +10811,11 @@ export function App() {
               type="button"
             >
               {currentReviewReverted ? "Reapply" : "Undo"}{" "}
-              <span aria-hidden="true">↶</span>
+              {isCurrentReview26825FilesReplay ? (
+                <CurrentBuildIcon name="review-undo" />
+              ) : (
+                <span aria-hidden="true">↶</span>
+              )}
             </button>
           ) : null}
           <button
@@ -10776,11 +10839,19 @@ export function App() {
           data-item-id={fileChange.id}
           data-testid="file-change-group"
           description={
-            isCurrentReview26820Replay ? (
-              <span className="demo-current-review-card-stats">
-                <span data-stat="additions">+{reviewTotals.additions}</span>
-                <span data-stat="deletions">−{reviewTotals.deletions}</span>
-              </span>
+            isCurrentReviewProductReplay ? (
+              isCurrentReview26825FilesReplay &&
+              reviewOpen &&
+              resolvedReview?.fileChangeId === fileChange.id ? (
+                <span className="demo-current-review-card-link">
+                  Review changes <span aria-hidden="true">↗</span>
+                </span>
+              ) : (
+                <span className="demo-current-review-card-stats">
+                  <span data-stat="additions">+{reviewTotals.additions}</span>
+                  <span data-stat="deletions">−{reviewTotals.deletions}</span>
+                </span>
+              )
             ) : undefined
           }
           detail={detail}
@@ -10797,34 +10868,61 @@ export function App() {
         />
         {mode === "replay" &&
         (fileChange.id === "file-multi-file" ||
-          fileChange.id === "file-current-review-rename") ? (
+          fileChange.id === "file-current-review-rename" ||
+          fileChange.id === "file-current-review-26-825-files") ? (
           <div
             aria-label="Turn actions"
-            className="demo-turn-actions"
+            className={
+              isCurrentReview26825FilesReplay
+                ? "demo-turn-actions demo-current-review-26-825-actions"
+                : "demo-turn-actions"
+            }
             role="toolbar"
           >
-            <button aria-label="Copy response" type="button">
-              ▣
-            </button>
-            <button aria-label="Good response" type="button">
-              ♡
-            </button>
-            <button aria-label="Bad response" type="button">
-              ♢
-            </button>
-            <button aria-label="Share response" type="button">
-              ↗
-            </button>
+            {isCurrentReview26825FilesReplay ? (
+              <>
+                <button aria-label="Copy" type="button">
+                  <CurrentBuildIcon name="thread-assistant-copy" />
+                </button>
+                <button aria-label="Good response" type="button">
+                  <CurrentBuildIcon name="thread-assistant-good" />
+                </button>
+                <button aria-label="Bad response" type="button">
+                  <CurrentBuildIcon name="thread-assistant-bad" />
+                </button>
+                <button aria-label="Fork chat from here" type="button">
+                  <CurrentBuildIcon name="thread-assistant-fork" />
+                </button>
+              </>
+            ) : (
+              <>
+                <button aria-label="Copy response" type="button">
+                  ▣
+                </button>
+                <button aria-label="Good response" type="button">
+                  ♡
+                </button>
+                <button aria-label="Bad response" type="button">
+                  ♢
+                </button>
+                <button aria-label="Share response" type="button">
+                  ↗
+                </button>
+              </>
+            )}
             <time
               dateTime={
-                fileChange.id === "file-current-review-rename"
+                fileChange.id === "file-current-review-rename" ||
+                fileChange.id === "file-current-review-26-825-files"
                   ? "00:55"
                   : "14:39"
               }
             >
-              {fileChange.id === "file-current-review-rename"
-                ? "12:55 AM"
-                : "2:39 PM"}
+              {fileChange.id === "file-current-review-26-825-files"
+                ? "11:59 PM"
+                : fileChange.id === "file-current-review-rename"
+                  ? "12:55 AM"
+                  : "2:39 PM"}
             </time>
           </div>
         ) : null}
@@ -11627,7 +11725,7 @@ export function App() {
               ? 390
             : subagentPanelSelected
               ? 220
-              : isCurrentReview26820Replay
+              : isCurrentReviewProductReplay
                 ? 374.328125
                 : undefined
         }

@@ -534,13 +534,15 @@ for (const id of [
   "thread-mcp-tool",
   "thread-activity-chevron",
   "thread-reconnecting",
+  "review-card-files",
+  "review-undo",
 ]) {
   if (!ids.has(id) || remaining.includes(id)) {
     throw new Error(`${id} must be promoted from current-build runtime evidence`);
   }
 }
 if (
-  manifest.icons.length !== 118 ||
+  manifest.icons.length !== 120 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8 ||
@@ -553,31 +555,31 @@ if (
   manifest.projectPickerObservation?.listbox?.rect?.height !== 142.81 ||
   manifest.projectPickerObservation?.listbox?.rect?.width !== 252 ||
   manifest.reviewBaseline?.appAsarSha256 !==
-    "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9" ||
-  manifest.reviewBaseline?.appVersion !== "26.820.60940" ||
-  manifest.reviewBaseline?.buildNumber !== "7119" ||
-  manifest.reviewBaseline?.capturedAt !== "2026-08-29" ||
+    "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7" ||
+  manifest.reviewBaseline?.appVersion !== "26.825.51511" ||
+  manifest.reviewBaseline?.buildNumber !== "7377" ||
+  manifest.reviewBaseline?.capturedAt !== "2026-08-31" ||
   manifest.reviewBaseline?.interactionState !==
     "open-current-review-workspace" ||
   manifest.reviewBaseline?.theme !== "dark" ||
   manifest.reviewBaseline?.viewport?.width !== 1180 ||
   manifest.reviewBaseline?.viewport?.height !== 820 ||
   canonicalize(manifest.reviewObservation?.fileNames) !==
-    canonicalize(["rename-destination.txt", "rename-source.txt"]) ||
-  manifest.reviewObservation?.copyPathCount !== 2 ||
-  manifest.reviewObservation?.fileTextIconCount !== 2 ||
-  manifest.reviewObservation?.openInCount !== 2 ||
-  manifest.reviewObservation?.toggleFileDiffCount !== 2 ||
+    canonicalize(["added.txt", "alpha.txt", "obsolete.txt"]) ||
+  manifest.reviewObservation?.copyPathCount !== 4 ||
+  manifest.reviewObservation?.fileTextIconCount !== 4 ||
+  manifest.reviewObservation?.openInCount !== 4 ||
+  manifest.reviewObservation?.toggleFileDiffCount !== 4 ||
   manifest.reviewObservation?.filter?.placeholder !== "Filter files…" ||
   Math.abs((manifest.reviewObservation?.filter?.rect?.width ?? 0) - 203) >
     0.15 ||
-  Math.abs((manifest.reviewObservation?.panel?.rect?.width ?? 0) - 419.59) >
+  Math.abs((manifest.reviewObservation?.panel?.rect?.width ?? 0) - 591.83) >
     0.15 ||
   manifest.reviewObservation?.panel?.rect?.height !== 820 ||
   manifest.reviewObservation?.splitDiffLabel !== "Switch to split diff"
 ) {
   throw new Error(
-    "current visual asset capture must retain 118 promoted icons plus the Composer, Project picker, and Review observations",
+    "current visual asset capture must retain 120 promoted icons plus the Composer, Project picker, and Review observations",
   );
 }
 const currentBasicThreadIconIds = [

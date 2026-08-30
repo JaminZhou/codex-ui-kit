@@ -717,6 +717,27 @@ describe("FileReviewWorkspace", () => {
     expect(screen.queryByRole("complementary", { name: "Changed files" })).toBeNull();
   });
 
+  it("supports a product-observed initial collapsed-path set", () => {
+    render(
+      <FileReviewWorkspace
+        defaultCollapsedPaths={["probe/alpha.txt", "probe/obsolete.txt"]}
+        files={files}
+      />,
+    );
+
+    expect(
+      screen.getByRole("list", { name: "Review diff for probe/added.txt" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("list", { name: "Review diff for probe/alpha.txt" }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("list", {
+        name: "Review diff for probe/obsolete.txt",
+      }),
+    ).toBeNull();
+  });
+
   it("exposes all changed files through the jump listbox", async () => {
     render(<FileReviewWorkspace files={files} />);
 

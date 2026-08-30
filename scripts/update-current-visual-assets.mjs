@@ -774,6 +774,18 @@ const promotionSpecs = new Map([
   ],
   ...[
     ["review-tab", null, "current Review tab glyph selected by exact tab text"],
+    [
+      "review-card-files",
+      null,
+      "current edited-files card glyph selected structurally from the exact three-file Review card",
+      "conversation",
+    ],
+    [
+      "review-undo",
+      null,
+      "current Review card Undo glyph selected by its exact visible action text",
+      "conversation",
+    ],
     ["review-close", "Close Review tab", null],
     ["review-open-tab", "Open side panel tab", null],
     ["review-expand", "Expand panel", null],
@@ -798,12 +810,12 @@ const promotionSpecs = new Map([
       null,
       "current visible Review text-file use resolved against its exact runtime SVG symbol",
     ],
-  ].map(([id, ownerAriaLabel, ownerEvidence]) => [
+  ].map(([id, ownerAriaLabel, ownerEvidence, region = "review-panel"]) => [
     id,
     {
       ownerAriaLabel,
       ...(ownerEvidence ? { ownerEvidence } : {}),
-      region: "review-panel",
+      region,
       semanticId: id,
     },
   ]),
@@ -1052,6 +1064,8 @@ capture.icons.forEach((icon, index) =>
 if (reviewOnly) {
   const targetIds = [
     "review-tab",
+    "review-card-files",
+    "review-undo",
     "review-close",
     "review-open-tab",
     "review-expand",
@@ -1083,9 +1097,9 @@ if (reviewOnly) {
   });
   const expectedReviewIdentity = {
     appAsarSha256:
-      "c964aebbf9a6a0f70799d01215c611d8ef6ee63f816b3d57beccddd47a811fd9",
-    appVersion: "26.820.60940",
-    buildNumber: "7119",
+      "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    appVersion: "26.825.51511",
+    buildNumber: "7377",
     theme: "dark",
     viewport: { height: 820, width: 1180 },
   };
@@ -1096,14 +1110,14 @@ if (reviewOnly) {
     canonicalize(sameIdentity(capture)) !==
       canonicalize(expectedReviewIdentity) ||
     canonicalize(observation?.fileNames) !==
-      canonicalize(["rename-destination.txt", "rename-source.txt"]) ||
-    observation?.copyPathCount !== 2 ||
-    observation?.fileTextIconCount !== 2 ||
-    observation?.openInCount !== 2 ||
-    observation?.toggleFileDiffCount !== 2 ||
+      canonicalize(["added.txt", "alpha.txt", "obsolete.txt"]) ||
+    observation?.copyPathCount !== 4 ||
+    observation?.fileTextIconCount !== 4 ||
+    observation?.openInCount !== 4 ||
+    observation?.toggleFileDiffCount !== 4 ||
     observation?.filter?.placeholder !== "Filter files…" ||
     Math.abs((observation?.filter?.rect?.width ?? 0) - 203) > 0.15 ||
-    Math.abs((observation?.panel?.rect?.width ?? 0) - 419.59) > 0.15 ||
+    Math.abs((observation?.panel?.rect?.width ?? 0) - 591.83) > 0.15 ||
     Math.abs((observation?.panel?.rect?.height ?? 0) - 820) > 0.1 ||
     observation?.splitDiffLabel !== "Switch to split diff" ||
     canonicalize(observation?.toolbarLabels) !==
@@ -1123,9 +1137,12 @@ if (reviewOnly) {
     );
   }
   const expectedCandidateCounts = new Map([
-    ["review-copy-path", 2],
-    ["review-file-toggle", 2],
-    ["review-open-in", 2],
+    ["review-copy-path", 4],
+    ["review-file-toggle", 4],
+    ["review-open-in", 4],
+  ]);
+  const minimumMatchingCandidateCounts = new Map([
+    ["review-file-toggle", 3],
   ]);
   const promotedById = new Map();
   for (const id of targetIds) {
@@ -1151,7 +1168,8 @@ if (reviewOnly) {
     const selectedGroup = [...groups.values()].sort(
       (left, right) => right.length - left.length,
     )[0];
-    const minimumMatching = expectedCount;
+    const minimumMatching =
+      minimumMatchingCandidateCounts.get(id) ?? expectedCount;
     if (!selectedGroup || selectedGroup.length < minimumMatching) {
       throw new Error(`${id} current Review geometry is not deterministic.`);
     }
@@ -1176,7 +1194,7 @@ if (reviewOnly) {
     const promoted = {
       baselineContext: {
         ...capture.baselineContext,
-        capturedAt: "2026-08-29",
+        capturedAt: "2026-08-31",
       },
       id,
       ownerAriaLabel: spec.ownerAriaLabel,
@@ -1215,7 +1233,7 @@ if (reviewOnly) {
   );
   manifest.reviewBaseline = {
     ...capture.baselineContext,
-    capturedAt: "2026-08-29",
+    capturedAt: "2026-08-31",
   };
   manifest.reviewObservation = observation;
   const output = `${JSON.stringify(manifest, null, 2)}\n`;

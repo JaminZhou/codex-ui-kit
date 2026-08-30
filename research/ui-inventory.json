@@ -303,7 +303,10 @@
         "message-square-diff",
         "browser-cdp:current-review-file-and-rename-card-undo-reapply-conflict",
         "electron:current-review-file-and-rename-card-wide-compact",
-        "pixel:current-review-file-card-wide-compact"
+        "pixel:current-review-file-card-wide-compact",
+        "browser-cdp:current-26-825-review-card-and-raw-four-diff-workspace",
+        "electron:current-26-825-review-card-workspace-wide-compact",
+        "pixel:current-26-825-review-card-workspace-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -315,11 +318,12 @@
         "cdp-26.730.61309:real-delete-card-last-turn-review",
         "cdp-26.730.61309:real-marker-backed-two-file-rename-review",
         "cdp-26.810.52044:real-three-file-card-added-modified-deleted-undo-review-and-undo-failure",
-        "cdp-26.820.60940:real-three-file-plus4-minus4-and-two-file-rename-cards-undo-reapply-conflict"
+        "cdp-26.820.60940:real-three-file-plus4-minus4-and-two-file-rename-cards-undo-reapply-conflict",
+        "cdp-26.825.51511:real-three-path-card-plus5-minus5-four-raw-diff-review-wide-compact"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1257,7 +1261,10 @@
         "inspection-panel",
         "browser-cdp:current-review-resizable-wide-and-compact-overlay",
         "electron:current-review-side-panel-wide-compact",
-        "pixel:current-review-workspace-wide-compact"
+        "pixel:current-review-workspace-wide-compact",
+        "browser-cdp:current-26-825-review-591.828125-wide-344.671875-compact",
+        "electron:current-26-825-review-panel-wide-compact",
+        "pixel:current-26-825-review-panel-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1270,11 +1277,12 @@
         "cdp-26.727.40816:public-pr-nonmodal-side-panel-1180-960-820-720",
         "cdp-26.730.61309:real-last-turn-review-370px-side-region",
         "cdp-26.810.52044:real-review-workspace-382.4375px-wide-336.19px-compact-and-resizable-panel",
-        "cdp-26.820.60940:real-review-workspace-419.59375px-wide-and-345.671875px-compact-overlay"
+        "cdp-26.820.60940:real-review-workspace-419.59375px-wide-and-345.671875px-compact-overlay",
+        "cdp-26.825.51511:real-review-workspace-591.828125px-wide-and-344.671875px-compact-overlay"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1287,7 +1295,10 @@
         "file-diff",
         "browser-cdp:current-review-stacked-diff-and-selection",
         "electron:current-review-stacked-diff-wide-compact",
-        "pixel:current-review-workspace-wide-compact"
+        "pixel:current-review-workspace-wide-compact",
+        "browser-cdp:current-26-825-four-raw-add-delete-diffs",
+        "electron:current-26-825-four-raw-add-delete-diffs",
+        "pixel:current-26-825-review-panel-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1299,11 +1310,12 @@
         "cdp-26.727.40816:public-pr-code-successful-multi-file-diffs-and-display-controls",
         "cdp-26.730.61309:real-delete-diff-and-marker-backed-rename-diffs",
         "cdp-26.810.52044:real-added-modified-deleted-stacked-diffs-filter-tree-and-split-controls",
-        "cdp-26.820.60940:real-added-modified-deleted-and-marker-backed-rename-stacked-diffs"
+        "cdp-26.820.60940:real-added-modified-deleted-and-marker-backed-rename-stacked-diffs",
+        "cdp-26.825.51511:real-added-deleted-added-deleted-four-diff-stack-with-duplicate-alpha-path"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1316,7 +1328,10 @@
         "message-square-diff",
         "browser-cdp:current-review-multi-file-controls-undo-reapply-conflict",
         "electron:current-review-multi-file-wide-compact",
-        "pixel:current-review-file-card-and-workspace-wide-compact"
+        "pixel:current-review-file-card-and-workspace-wide-compact",
+        "browser-cdp:current-26-825-three-card-rows-four-raw-diffs",
+        "electron:current-26-825-three-card-rows-four-raw-diffs",
+        "pixel:current-26-825-review-card-and-workspace-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1327,11 +1342,12 @@
         "cdp-26.727.40816:public-pr-code-scroll-height-81492-multi-file-content",
         "cdp-26.730.61309:real-marker-backed-two-file-rename-selection-and-undo-replay",
         "cdp-26.810.52044:real-three-file-review-scope-filter-collapse-jump-layout-files-and-undo-failure",
-        "cdp-26.820.60940:real-three-file-filter-scope-selection-layout-and-two-file-undo-reapply-conflict"
+        "cdp-26.820.60940:real-three-file-filter-scope-selection-layout-and-two-file-undo-reapply-conflict",
+        "cdp-26.825.51511:real-three-card-rows-four-raw-diffs-with-duplicate-alpha-path"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

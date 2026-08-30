@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 24 groups have current-build runtime evidence, 51 have previous-build-only
+- 28 groups have current-build runtime evidence, 47 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -260,13 +260,20 @@ exit gates; it does not replace the inventory.
   recovery. It distinguished the exact Ask-mode hand glyph from the non-ask
   shield and added Browser/CDP, Electron, and three regional pixel gates
   without promoting Allow or other approval kinds.
-  The current Review follow-up reaches the real `+4 −4` three-file card,
+  The previous Review follow-up reaches the real `+4 −4` three-file card,
   two-file rename presentation, 419.59375/345.671875px wide/compact workspace,
   all six scopes and toolbar controls, successful Undo → Reapply, and the
   420×247.6875 skipped-file conflict. It promotes build-scoped Review assets
   and adds Browser/CDP, Electron, eight integrated visuals, and four
   2.9976%–4.6219% local-only product gates for the same four inventory groups
   while keeping unsampled binary/merge-conflict and broader host variants open.
+  The current `26.825.51511` anchor now supersedes that sampled ordinary edit
+  path with a `+5 −5` three-row card backed by four raw add/delete diffs,
+  591.828125/344.671875px wide/compact Review panels, exact card/Undo assets,
+  four CDP and Electron frames, four reviewed baselines, and independent
+  card/panel product gates. The duplicate raw `alpha.txt` delete/add entries
+  remain intentionally distinct in the workspace while the card aggregates
+  them into one modified row.
   Earlier hover/footer slices promoted More, Pin,
   Archive, and Help, confirmed that Settings is absent from the sampled footer
   and that sampled project-task rows have no leading glyph. The Recents follow-up

@@ -188,7 +188,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 24 have current-build runtime evidence, 51 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 23 groups and Electron verification covers 23.
+Current inventory: 89 surface groups; 28 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1069,6 +1069,28 @@ limits. This keeps `thread.file-change-diff`,
 `workspace.multi-file-review` current-build Browser/Electron verified.
 Implementation remains partial for unsampled binary/merge-conflict content,
 larger file sets, and additional host failure variants.
+
+The current `26.825.51511` Review anchor supersedes that runtime boundary for
+the sampled ordinary file-edit path. One isolated `apply_patch` task renders a
+736×173.5px wide card and 688×173.5px compact card with three aggregate rows
+and `+5 −5`; the underlying protocol keeps four raw diffs because `alpha.txt`
+is represented as delete plus add. Opening Review changes the card subtitle to
+`Review changes ↗`, expands only the added file initially, and mounts the four
+raw diff/tree entries in a 591.828125×820 wide panel or 344.671875×680 compact
+overlay. The current card-files and Undo SVGs are exact same-build captures.
+
+Browser/CDP gates four wide/compact card and workspace frames, including the
+three aggregate paths, duplicate raw `alpha.txt`, four response actions,
+`Worked for 20s`, Send/Stop settlement, and zero horizontal overflow. Electron
+repeats the same native-window geometry and content contract. Four reviewed
+internal baselines pass. Local-only product crops pass at 4.2901% and 4.9780%
+for the wide/compact closed card, 6.4586% for the narrower open card, and
+1.9445%/2.5733% for the wide/compact Review panel under independent 6.6% and
+3% limits. This refreshes `thread.file-change-diff`,
+`workspace.side-panel-shell`, `workspace.editor-diff`, and
+`workspace.multi-file-review` on the current build while retaining partial
+implementation status for unsampled binary/conflict, larger-set, and broader
+Undo/failure variants.
 
 The refreshed Pull request lifecycle keeps the controlled, resizable workspace
 panel but follows the `26.727.40816` non-modal overlay geometry. The

@@ -8,6 +8,7 @@ import {
   sanitizeVisualAssetIcon,
   sanitizeVisualScalarRecord,
 } from "./visual-asset-contract.mjs";
+import { selectCurrentMainCandidate } from "./current-baseline-contract.mjs";
 
 const port = Number(process.env.CODEX_VISUAL_ASSET_CDP_PORT);
 const expectedProfile = process.env.CODEX_VISUAL_ASSET_PROFILE;
@@ -221,6 +222,7 @@ const semanticLabels = new Map([
   ["Switch to split diff", "review-split-diff"],
   ["Switch to unified diff", "review-split-diff"],
   ["Toggle file diff", "review-file-toggle"],
+  ["Undo", "review-undo"],
   ["Send", "composer-send"],
   ["Scheduled", "sidebar-scheduled"],
   ["Settings", "sidebar-settings"],
@@ -246,20 +248,35 @@ try {
         page.url().startsWith("app://-/index.html?"),
     );
   const ranked = await Promise.all(
-    candidates.map(async (page) => ({
-      area: await page.evaluate(() => window.innerWidth * window.innerHeight),
-      hasPrimaryNavigation: await page.evaluate(() =>
-        Boolean(document.querySelector("nav")),
-      ),
-      page,
-    })),
+    candidates.map(async (page, index) => {
+      const structure = await page.evaluate(() => {
+        const visible = (element) =>
+          element instanceof HTMLElement &&
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          });
+        return {
+          area: innerWidth * innerHeight,
+          landmarks: {
+            main: document.querySelectorAll("main").length,
+            nav: document.querySelectorAll("nav").length,
+            sidebarTrigger: document.querySelectorAll(
+              '[aria-label="Hide sidebar"], [aria-label="Show sidebar"]',
+            ).length,
+            textbox: document.querySelectorAll(
+              'textarea, [contenteditable="true"], [role="textbox"]',
+            ).length,
+          },
+          visibleControls: [...document.querySelectorAll("button, a")].filter(
+            visible,
+          ).length,
+        };
+      });
+      return { index, page, url: page.url(), ...structure };
+    }),
   );
-  ranked.sort(
-    (left, right) =>
-      Number(right.hasPrimaryNavigation) -
-        Number(left.hasPrimaryNavigation) || right.area - left.area,
-  );
-  const main = ranked[0]?.page;
+  const main = selectCurrentMainCandidate(ranked)?.page;
   if (!main) throw new Error("Main Codex Renderer target not found.");
 
   const focusSession = await main.context().newCDPSession(main);
@@ -267,15 +284,19 @@ try {
     enabled: true,
   });
   await main.bringToFront();
-  await main.waitForFunction(() => document.hasFocus(), undefined, {
-    timeout: 15_000,
-  });
+  if (!reviewOnly) {
+    await main.waitForFunction(() => document.hasFocus(), undefined, {
+      timeout: 15_000,
+    });
+  }
   await main.setViewportSize({ height: 820, width: 1180 });
   await main.waitForFunction(
-    () =>
-      Boolean(document.querySelector("nav")) &&
+    (allowWithoutNavigation) =>
+      Boolean(
+        document.querySelector(allowWithoutNavigation ? "main" : "nav"),
+      ) &&
       document.querySelectorAll("svg").length > 0,
-    undefined,
+    reviewOnly,
     { timeout: 15_000 },
   );
   if (
@@ -339,10 +360,10 @@ try {
     });
   }
   await main.waitForFunction(
-    () =>
+    (allowWithoutNavigation) =>
       Boolean(document.querySelector("main")) &&
-      Boolean(document.querySelector("nav")),
-    undefined,
+      (allowWithoutNavigation || Boolean(document.querySelector("nav"))),
+    reviewOnly,
     { timeout: 15_000 },
   );
   const initialRunLocationTrigger = main.locator(
@@ -365,6 +386,25 @@ try {
   await main.evaluate(async () => {
     await document.fonts.ready;
   });
+  if (
+    reviewOnly &&
+    (await main.locator('aside[data-app-shell-focus-area="right-panel"]:visible')
+      .count()) === 0
+  ) {
+    const reviewButtons = main.locator("button:visible");
+    const reviewIndices = await reviewButtons.evaluateAll((buttons) =>
+      buttons.flatMap((button, index) =>
+        button.textContent?.trim() === "Review" ? [index] : [],
+      ),
+    );
+    if (reviewIndices.length !== 1) {
+      throw new Error("Could not reopen the exact current Review panel.");
+    }
+    await reviewButtons.nth(reviewIndices[0]).click();
+    await main
+      .locator('aside[data-app-shell-focus-area="right-panel"]:visible')
+      .waitFor({ timeout: 15_000 });
+  }
   if (
     (threadOnly || mcpOnly) &&
     (await main.locator(".group\\/activity-header:visible").count()) === 0
@@ -616,7 +656,7 @@ try {
         (left, right) =>
           right.width * right.height - left.width * left.height,
       )[0];
-    if (!navigationBounds && !threadOnly && !mcpOnly) {
+    if (!navigationBounds && !threadOnly && !mcpOnly && !reviewOnly) {
       throw new Error("Current visual capture requires one visible navigation.");
     }
     const navigationRight = navigationBounds?.right ?? 0;
@@ -1365,6 +1405,62 @@ try {
       });
       expandedFileSvg.remove();
 
+      const reviewCardTitle = [...document.querySelectorAll("span")].find(
+        (element) =>
+          element.children.length === 0 &&
+          element.textContent?.trim() === "Edited 3 files" &&
+          isReviewVisible(element),
+      );
+      let reviewCard = reviewCardTitle?.parentElement ?? null;
+      while (
+        reviewCard &&
+        ![...reviewCard.querySelectorAll("button")].some(
+          (button) => button.textContent?.trim() === "Undo",
+        )
+      ) {
+        reviewCard = reviewCard.parentElement;
+      }
+      const reviewCardIcon = reviewCard
+        ? [...reviewCard.querySelectorAll("svg")].find((svg) => {
+            const bounds = svg.getBoundingClientRect();
+            return (
+              isReviewVisible(svg) &&
+              svg.getAttribute("viewBox") === "0 0 20 20" &&
+              Math.abs(bounds.width - 24) <= 0.1 &&
+              Math.abs(bounds.height - 24) <= 0.1
+            );
+          })
+        : null;
+      if (!(reviewCardIcon instanceof SVGElement)) {
+        throw new Error(
+          "Current Review capture requires the visible edited-files card icon.",
+        );
+      }
+      icons.push(
+        captureSemanticSvg(
+          reviewCardIcon,
+          "review-card-files",
+          "conversation",
+        ),
+      );
+      const reviewUndoButton = reviewCard
+        ? [...reviewCard.querySelectorAll("button")].find(
+            (button) => button.textContent?.trim() === "Undo",
+          )
+        : null;
+      const reviewUndoIcon = reviewUndoButton?.querySelector("svg") ?? null;
+      if (
+        !(reviewUndoIcon instanceof SVGElement) ||
+        !isReviewVisible(reviewUndoIcon)
+      ) {
+        throw new Error(
+          "Current Review capture requires the visible Undo action icon.",
+        );
+      }
+      icons.push(
+        captureSemanticSvg(reviewUndoIcon, "review-undo", "conversation"),
+      );
+
       const visibleButtons = [...panel.querySelectorAll("button")].filter(
         isReviewVisible,
       );
@@ -1377,15 +1473,18 @@ try {
         ).length;
       reviewObservation = {
         copyPathCount: countLabel("Copy path"),
-        fileNames: ["rename-destination.txt", "rename-source.txt"].filter(
-          (name) =>
-            [...panel.querySelectorAll("*")].some(
-              (element) =>
-                element.children.length === 0 &&
-                element.textContent?.trim() === name &&
-                isReviewVisible(element),
-            ),
-        ),
+        fileNames: [
+          ...new Set(
+            [...panel.querySelectorAll("*")]
+              .filter(
+                (element) =>
+                  element.children.length === 0 &&
+                  /^[^/]+\.txt$/.test(element.textContent?.trim() ?? "") &&
+                  isReviewVisible(element),
+              )
+              .map((element) => element.textContent.trim()),
+          ),
+        ].sort(),
         fileTextIconCount: visibleFileUses.length,
         filter: {
           placeholder: filter.placeholder,
