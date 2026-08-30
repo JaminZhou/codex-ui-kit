@@ -14,19 +14,26 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 17 groups have current-build runtime evidence, 58 have previous-build-only
+- 23 groups have current-build runtime evidence, 52 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
   Projects Index. It locks the
   321.875px sidebar, the existing 559px/415px compact Projects layout, and the
-  continued absence of `Sites` from the sampled fixed-route stack. The native
+  current Explore entry, and the continued absence of `Sites` from the sampled
+  fixed-route stack. The native
   project menu is now 252×187 and its one-row `New section…` submenu is
   118×34; provider-only `Reveal in Finder` is explicitly separated from the
-  six visible AppKit actions. Conversation content,
-  account/settings, lifecycle variants, exact visual assets, and the following
-  26.820 slices remain previous-build evidence until re-observed.
+  six visible AppKit actions. The same-build Account/Settings follow-up now
+  verifies the six-item 305.875×188.375px Account menu across Dark/Light and
+  wide/compact states, the 321.875px Settings rail with twenty-two visible
+  navigation rows, General, and Appearance while restoring System. The
+  completed basic-message follow-up now verifies the header, exact no-period
+  answer, four response actions, five Composer controls, and the 721→720
+  responsive transition through CDP, Electron, three reviewed baselines, and
+  nine ownership-scoped product pixel regions. Other lifecycle variants and
+  the following 26.820 slices remain previous-build evidence until re-observed.
   The previous 26.825.31414 30-turn long-thread slice additionally promotes
   `thread.shell`, `thread.messages-basic`, `thread.virtualized-timeline`, and
   `thread.message-navigation`: the 1180×820 frame mounts 11 turns, exposes the
@@ -124,10 +131,12 @@ exit gates; it does not replace the inventory.
   Git registration without a confirmation dialog. Native `Create permanent
   worktree` remains menu-observed but deliberately unactivated, so permanent
   creation and broader retention/pruning lifecycles keep the group partial.
-  The previous fixed-message task promotes `thread.shell` and
-  `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
-  containment, four response actions, all five Composer hit targets, and a
-  no-mask 768×774 product comparison at 0.4320% changed pixels.
+  The current fixed-message task promotes `thread.shell` and
+  `thread.messages-basic` on 26.825.51511: exact 1180×820, 721×680, and
+  720×680 geometry, the separate project/title header composition, four exact
+  response actions, all five Composer hit targets, and independent header,
+  thread, and Composer product comparisons. The prior 26.818 fixed-message
+  task remains regression coverage with its 0.4320% unmasked crop.
   The previous 26.820 command tasks promote `thread.command-execution`,
   `thread.command-failure-recovery`, and `thread.interruption-stop`. They reach
   one 12-second success, one exit-code-7 stdout/stderr command followed by an

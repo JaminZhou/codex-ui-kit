@@ -361,6 +361,7 @@ const promotionSpecs = new Map([
       "titlebar",
     ],
     ["thread-header-actions", "Chat actions", null, "titlebar"],
+    ["thread-header-share", "Share", null, "titlebar"],
     [
       "thread-header-open-in-chevron",
       "Secondary action",
@@ -524,6 +525,15 @@ const promotionSpecs = new Map([
       ownerEvidence: "primary sidebar row labelled Sites",
       region: "sidebar-primary",
       semanticId: "sidebar-sites",
+    },
+  ],
+  [
+    "sidebar-explore",
+    {
+      ownerAriaLabel: null,
+      ownerEvidence: "primary sidebar row labelled Explore",
+      region: "sidebar-primary",
+      semanticId: "sidebar-explore",
     },
   ],
   [
@@ -905,6 +915,7 @@ if (supplementalThreadCapture) {
   const supplementalIds = new Set([
     "thread-header-project",
     "thread-header-actions",
+    "thread-header-share",
     "thread-header-open-in-chevron",
     "thread-header-summary",
     "thread-header-bottom-panel",
@@ -1422,10 +1433,12 @@ if (mcpOnly) {
 }
 if (threadOnly) {
   const targetIds = [
+    "sidebar-explore",
+    "window-chrome-sidebar",
     "composer-send",
     "thread-header-project",
     "thread-header-actions",
-    "thread-header-open-in-chevron",
+    "thread-header-share",
     "thread-header-summary",
     "thread-header-bottom-panel",
     "thread-header-side-panel",
@@ -1433,7 +1446,6 @@ if (threadOnly) {
     "thread-assistant-good",
     "thread-assistant-bad",
     "thread-assistant-fork",
-    "thread-command-terminal",
   ];
   if (capture.captureMode !== "completed-thread") {
     throw new Error("Targeted current-thread capture mode was not proven.");
@@ -1443,46 +1455,39 @@ if (threadOnly) {
       "Targeted current-thread capture must prove the removed header New chat control remains absent.",
     );
   }
-  const rasterAssets = capture.rasterAssets;
-  if (
-    !Array.isArray(rasterAssets) ||
-    rasterAssets.length !== 1 ||
-    rasterAssets[0]?.id !== "thread-header-editor-vscode" ||
-    rasterAssets[0]?.mimeType !== "image/png" ||
-    rasterAssets[0]?.sourceUrl !== "app://-/apps/vscode.png" ||
-    rasterAssets[0]?.status !== "runtime-observed" ||
-    rasterAssets[0]?.naturalSize?.height !== 64 ||
-    rasterAssets[0]?.naturalSize?.width !== 64 ||
-    rasterAssets[0]?.renderSize?.height !== 16 ||
-    rasterAssets[0]?.renderSize?.width !== 16 ||
-    rasterAssets[0]?.byteLength !== 2804 ||
-    rasterAssets[0]?.sha256 !==
-      "5ff492ba38828c649ad3f2e8ce78e02d9cbdd1200009dd046992cfbde6897a24"
-  ) {
-    throw new Error("Targeted current-thread raster asset changed unexpectedly.");
+  if (!Array.isArray(capture.rasterAssets) || capture.rasterAssets.length !== 0) {
+    throw new Error(
+      "Targeted current basic-thread capture must not claim an editor raster asset.",
+    );
   }
   const currentFingerprint = {
     appAsarSha256: capture.baselineContext?.appAsarSha256,
     appVersion: capture.baselineContext?.appVersion,
     buildNumber: capture.baselineContext?.buildNumber,
   };
-  const manifestFingerprint = {
-    appAsarSha256: manifest.baseline.appAsarSha256,
-    appVersion: manifest.baseline.appVersion,
-    buildNumber: manifest.baseline.buildNumber,
+  const expectedCurrentFingerprint = {
+    appAsarSha256:
+      "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    appVersion: "26.825.51511",
+    buildNumber: "7377",
   };
   if (
-    canonicalize(currentFingerprint) !== canonicalize(manifestFingerprint) ||
+    canonicalize(currentFingerprint) !==
+      canonicalize(expectedCurrentFingerprint) ||
     capture.baselineContext?.interactionState !==
-      manifest.baseline.interactionState ||
+      "completed-current-basic-thread" ||
     capture.baselineContext?.theme !== manifest.baseline.theme ||
     canonicalize(capture.baselineContext?.viewport) !==
       canonicalize(manifest.baseline.viewport)
   ) {
     throw new Error(
-      "Targeted current-thread capture must match the exact tracked app fingerprint, interaction state, theme, and viewport.",
+      "Targeted current basic-thread capture must match the exact current app fingerprint, interaction state, theme, and viewport.",
     );
   }
+  const threadBaseline = {
+    ...capture.baselineContext,
+    capturedAt: "2026-08-30",
+  };
   const promotedById = new Map();
   for (const id of targetIds) {
     const spec = promotionSpecs.get(id);
@@ -1498,26 +1503,24 @@ if (threadOnly) {
       );
     }
     const existing = manifest.icons.find((icon) => icon.id === id);
-    if (
+    const sameRootGeometry =
       existing &&
-      (existing.region !== spec.region ||
-        existing.viewBox !== observed[0].viewBox ||
-        canonicalize(existing.rootAttributes) !==
-          canonicalize(observed[0].rootAttributes))
-    ) {
-      throw new Error(`${id} root geometry or region changed.`);
-    }
+      existing.region === spec.region &&
+      existing.viewBox === observed[0].viewBox &&
+      canonicalize(existing.rootAttributes) ===
+        canonicalize(observed[0].rootAttributes);
     const promoted = {
+      baselineContext: threadBaseline,
       id,
       ownerAriaLabel: spec.ownerAriaLabel,
       ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
-      primitives: existing
+      primitives: sameRootGeometry
         ? promotePrimitives(existing, observed[0])
         : observed[0].primitives,
       region: spec.region,
       renderSize: observed[0].renderSize,
       rootAttributes: observed[0].rootAttributes,
-      rootComputedStyle: existing
+      rootComputedStyle: sameRootGeometry
         ? promoteComputedStyle(
             existing.rootComputedStyle,
             observed[0].rootComputedStyle,
@@ -1530,7 +1533,7 @@ if (threadOnly) {
     promoted.sha256 = createHash("sha256")
       .update(
         canonicalize({
-          baselineContext: manifest.baseline,
+          baselineContext: threadBaseline,
           primitives: promoted.primitives,
           renderSize: promoted.renderSize,
           rootAttributes: promoted.rootAttributes,
@@ -1546,28 +1549,14 @@ if (threadOnly) {
   manifest.icons = [...promotionSpecs.keys()].map(
     (id) => promotedById.get(id) ?? existingById.get(id),
   );
+  manifest.threadBaseline = threadBaseline;
+  manifest.threadObservation = capture.threadObservation;
   const output = `${JSON.stringify(manifest, null, 2)}\n`;
-  const rasterOutput = `${JSON.stringify(
-    {
-      assets: rasterAssets,
-      baseline: manifest.baseline,
-      policy: {
-        distribution:
-          "exploratory playground only; excluded from the published npm package",
-        ownership: "Microsoft Visual Studio Code trademark asset",
-        runtimeSource: "Codex Desktop titlebar integration image",
-      },
-      schemaVersion: 1,
-    },
-    null,
-    2,
-  )}\n`;
   if (write) {
     writeManifestAndCurrentThreadSubset(
       output,
-      `Updated ${manifestPath} with current-thread assets`,
+      `Updated ${manifestPath} with current basic-thread assets`,
     );
-    writeFileSync(rasterManifestPath, rasterOutput);
   } else {
     await writeOutput(output);
   }

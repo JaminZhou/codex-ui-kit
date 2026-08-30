@@ -104,6 +104,14 @@ const currentBasicThreadReferenceSize = {
   height: 774,
   width: 768,
 };
+const currentBasic26825References = {
+  "current-basic-26-825-boundary-open":
+    process.env.CODEX_UI_KIT_CURRENT_BASIC_26_825_BOUNDARY_REFERENCE,
+  "current-basic-26-825-compact":
+    process.env.CODEX_UI_KIT_CURRENT_BASIC_26_825_COMPACT_REFERENCE,
+  "current-basic-26-825-wide":
+    process.env.CODEX_UI_KIT_CURRENT_BASIC_26_825_WIDE_REFERENCE,
+};
 const currentMcpSuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
 const currentMcpSuccessReferenceSize = {
@@ -698,6 +706,85 @@ async function compareCurrentBuildOverlay({
   console.log(
     `${sceneId}: current-build overlay pixel ratio ${comparison.ratio}`,
   );
+}
+
+async function compareCurrentBasic26825({
+  actual,
+  referencePath,
+  regions,
+  sceneId,
+}) {
+  const reference = PNG.sync.read(await readFile(referencePath));
+  if (
+    reference.width !== actual.width ||
+    reference.height !== actual.height
+  ) {
+    throw new Error(
+      `${sceneId}: current 26.825 basic-thread reference must match the ${actual.width}x${actual.height} scene, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  const maximumRatios = {
+    composer: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_COMPOSER_MAX_DIFF_RATIO",
+      0.01,
+    ),
+    header: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_HEADER_MAX_DIFF_RATIO",
+      0.07,
+    ),
+    thread: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_THREAD_MAX_DIFF_RATIO",
+      0.006,
+    ),
+  };
+  for (const [name, region] of Object.entries(regions)) {
+    const referenceRegion = cropPng(
+      reference,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.1);
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.${name}.current-product.png`,
+      ),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(
+        artifactDirectory,
+        `${sceneId}.${name}.current-build.png`,
+      ),
+      PNG.sync.write(actualRegion),
+    );
+    const diffPath = join(
+      artifactDirectory,
+      `${sceneId}.${name}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(diffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(diffPath, { force: true });
+    }
+    if (comparison.ratio > maximumRatios[name]) {
+      throw new Error(
+        `${sceneId}: current 26.825 ${name} pixel ratio ${comparison.ratio} exceeds ${maximumRatios[name]}.`,
+      );
+    }
+    console.log(
+      `${sceneId}: current 26.825 ${name} pixel ratio ${comparison.ratio}`,
+    );
+  }
 }
 
 async function compareCurrentBuildSidebarStatus({
@@ -2354,6 +2441,34 @@ for (const scene of selectedScenes) {
       },
       referencePath: currentBasicThreadReference,
       referenceSize: currentBasicThreadReferenceSize,
+      sceneId: scene.id,
+    });
+  }
+
+  const currentBasic26825Reference =
+    currentBasic26825References[scene.id];
+  if (currentBasic26825Reference) {
+    const regions = {
+      "current-basic-26-825-boundary-open": {
+        composer: { height: 98, left: 339, top: 566, width: 366 },
+        header: { height: 47, left: 322, top: 0, width: 399 },
+        thread: { height: 168, left: 339, top: 75, width: 366 },
+      },
+      "current-basic-26-825-compact": {
+        composer: { height: 98, left: 17, top: 566, width: 687 },
+        header: { height: 47, left: 0, top: 0, width: 720 },
+        thread: { height: 150, left: 17, top: 75, width: 687 },
+      },
+      "current-basic-26-825-wide": {
+        composer: { height: 98, left: 383, top: 706, width: 737 },
+        header: { height: 47, left: 322, top: 0, width: 858 },
+        thread: { height: 150, left: 383, top: 75, width: 737 },
+      },
+    }[scene.id];
+    await compareCurrentBasic26825({
+      actual,
+      referencePath: currentBasic26825Reference,
+      regions,
       sceneId: scene.id,
     });
   }

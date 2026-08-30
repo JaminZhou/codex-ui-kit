@@ -15429,6 +15429,359 @@ try {
   await currentBasicThreadApp.close();
 }
 
+const currentBasic26825ElectronScenes = [
+  {
+    currentSidebar: true,
+    expected: {
+      action: { left: 379.4375, top: 193.5 },
+      assistant: { left: 383.4375, top: 167.75, width: 736 },
+      body: { left: 322.875, top: 47, width: 857.125 },
+      composer: { left: 383.4375, top: 706, width: 736 },
+      composerButtons: [
+        { left: 391.4375, width: 28 },
+        { left: 424.4375, width: 105.0625 },
+        { left: 900.078125, width: 147.359375 },
+        { left: 1047.4375, width: 28 },
+        { left: 1083.4375, width: 28 },
+      ],
+      editor: { left: 395.4375, top: 720, width: 712 },
+      header: { action: 623.3125, share: 994.734375, title: 357.875 },
+      main: { left: 321.875, width: 858.125 },
+      sidebar: { left: 0, width: 321.875 },
+      sidebarLabel: "Hide sidebar",
+      user: { left: 383.4375, top: 79, width: 736 },
+      userContent: { left: 784.78125, width: 334.65625 },
+      viewport: { height: 820, width: 1180 },
+    },
+    frame: "current-basic-26-825-completed",
+    id: "electron-current-basic-26-825-wide",
+    scenario: "current-basic-message-26-825",
+    theme: "dark",
+  },
+  {
+    currentSidebar: true,
+    expected: {
+      action: { left: 334.875, top: 216.25 },
+      assistant: { left: 338.875, top: 190.5, width: 366.125 },
+      body: { left: 322.875, top: 47, width: 398.125 },
+      composer: { left: 338.875, top: 566, width: 366.125 },
+      composerButtons: [
+        { left: 346.875, width: 28 },
+        { left: 379.875, width: 34 },
+        { left: 485.640625, width: 147.359375 },
+        { left: 633, width: 28 },
+        { left: 669, width: 28 },
+      ],
+      editor: { left: 350.875, top: 580, width: 342.125 },
+      header: { action: 505.015625, share: 535.734375, title: 357.875 },
+      main: { left: 321.875, width: 399.125 },
+      sidebar: { left: 0, width: 321.875 },
+      sidebarLabel: "Hide sidebar",
+      user: { left: 338.875, top: 79, width: 366.125 },
+      userContent: { left: 448.71875, width: 256.28125 },
+      viewport: { height: 680, width: 721 },
+    },
+    frame: "current-basic-26-825-completed",
+    id: "electron-current-basic-26-825-boundary-open",
+    scenario: "current-basic-message-26-825",
+    theme: "dark",
+    windowSize: { height: 680, width: 721 },
+  },
+  {
+    currentSidebar: true,
+    expected: {
+      action: { left: 13, top: 193.5 },
+      assistant: { left: 17, top: 167.75, width: 687 },
+      body: { left: 1, top: 47, width: 719 },
+      composer: { left: 17, top: 566, width: 687 },
+      composerButtons: [
+        { left: 25, width: 28 },
+        { left: 58, width: 105.0625 },
+        { left: 484.640625, width: 147.359375 },
+        { left: 632, width: 28 },
+        { left: 668, width: 28 },
+      ],
+      editor: { left: 29, top: 580, width: 663 },
+      header: { action: 459.9375, share: 534.734375, title: 194.5 },
+      main: { left: 0, width: 720 },
+      sidebar: { left: -321.875, width: 321.875 },
+      sidebarLabel: "Show sidebar",
+      user: { left: 17, top: 79, width: 687 },
+      userContent: { left: 369.34375, width: 334.65625 },
+      viewport: { height: 680, width: 720 },
+    },
+    frame: "current-basic-26-825-completed",
+    id: "electron-current-basic-26-825-compact",
+    layoutMode: "narrow",
+    scenario: "current-basic-message-26-825",
+    sidebarState: "hidden",
+    theme: "dark",
+    windowSize: { height: 680, width: 720 },
+  },
+];
+
+for (const scene of currentBasic26825ElectronScenes) {
+  const { expected, ...launchableScene } = scene;
+  const { app, page } = await launchScene(launchableScene, {
+    capture: false,
+  });
+  try {
+    const nativeBounds = await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const basicThread = await page.evaluate(() => {
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const root = document.querySelector(".demo-root");
+      const user = document.querySelector(
+        '[data-item-id="user-current-basic-26-825"]',
+      );
+      const userContent = user?.querySelector(
+        ".codex-ui-agent-message__content",
+      );
+      const assistant = document.querySelector(
+        '[data-item-id="assistant-current-basic-26-825"]',
+      );
+      const assistantContent = assistant?.querySelector(
+        ".codex-ui-agent-message__content",
+      );
+      const actionStrip = assistant?.querySelector(
+        ".demo-mcp-turn-actions",
+      );
+      const composer = document.querySelector(".codex-ui-composer");
+      const header = document.querySelector(
+        ".demo-current-basic-26-825-header",
+      );
+      return {
+        actionButtons: Array.from(
+          actionStrip?.querySelectorAll("button") ?? [],
+          (button) => ({
+            icon: button
+              .querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon"),
+            label: button.getAttribute("aria-label"),
+            rect: rect(button),
+          }),
+        ),
+        actionStrip: rect(actionStrip),
+        assistant: rect(assistant),
+        assistantText: assistantContent?.textContent?.trim(),
+        body: rect(
+          document.querySelector(
+            ".codex-ui-conversation-thread-shell__body",
+          ),
+        ),
+        composer: rect(composer),
+        composerButtons: Array.from(
+          composer?.querySelectorAll("button") ?? [],
+          (button) => ({
+            icon: button
+              .querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon"),
+            label: button.getAttribute("aria-label"),
+            rect: rect(button),
+          }),
+        ),
+        editor: rect(
+          composer?.querySelector("textarea, [contenteditable='true']"),
+        ),
+        frame: root?.getAttribute("data-frame"),
+        headerButtons: Array.from(
+          header?.querySelectorAll("button") ?? [],
+          (button) => ({
+            icon: button
+              .querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon"),
+            label: button.getAttribute("aria-label"),
+            rect: rect(button),
+          }),
+        ),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        main: rect(document.querySelector(".codex-ui-app-shell__main")),
+        projectIcon: rect(
+          header?.querySelector(
+            '[data-current-build-icon="thread-header-project"]',
+          ),
+        ),
+        scenario: root?.getAttribute("data-scenario"),
+        sidebar: rect(
+          document.querySelector(".codex-ui-app-shell__sidebar"),
+        ),
+        status: root?.getAttribute("data-status"),
+        user: rect(user),
+        userContent: rect(userContent),
+        userText: userContent?.textContent?.trim(),
+        viewport: { height: innerHeight, width: innerWidth },
+      };
+    });
+    const close = (actual, target, tolerance = 0.1) =>
+      Math.abs((actual ?? Number.POSITIVE_INFINITY) - target) <= tolerance;
+    const expectedActionLabels = [
+      "Copy",
+      "Good response",
+      "Bad response",
+      "Fork chat from here",
+    ];
+    const expectedActionIcons = [
+      "thread-assistant-copy",
+      "thread-assistant-good",
+      "thread-assistant-bad",
+      "thread-assistant-fork",
+    ];
+    const expectedComposerLabels = [
+      "Add files and more",
+      "Change permissions",
+      null,
+      "Dictate",
+      "Send",
+    ];
+    const expectedComposerIcons = [
+      "composer-add-files",
+      "composer-permission",
+      "composer-model-chevron",
+      "composer-dictate",
+      undefined,
+    ];
+    const expectedHeaderLabels = [
+      expected.sidebarLabel,
+      null,
+      "Chat actions",
+      "Share",
+      "Toggle summary",
+      "Toggle bottom panel",
+      "Toggle side panel",
+    ];
+    const expectedHeaderIcons = [
+      "window-chrome-sidebar",
+      undefined,
+      "thread-header-actions",
+      "thread-header-share",
+      "thread-header-summary",
+      "thread-header-bottom-panel",
+      "thread-header-side-panel",
+    ];
+    if (
+      nativeBounds?.width !== expected.viewport.width ||
+      nativeBounds?.height !== expected.viewport.height ||
+      basicThread.viewport.width !== expected.viewport.width ||
+      basicThread.viewport.height !== expected.viewport.height ||
+      basicThread.frame !== "current-basic-26-825-completed" ||
+      basicThread.scenario !== "current-basic-message-26-825" ||
+      basicThread.status !== "completed" ||
+      basicThread.horizontalOverflow > 1 ||
+      basicThread.userText !==
+        "Reply with exactly CURRENT BASIC MESSAGE." ||
+      basicThread.assistantText !== "CURRENT BASIC MESSAGE" ||
+      !close(basicThread.sidebar?.left, expected.sidebar.left) ||
+      !close(basicThread.sidebar?.width, expected.sidebar.width) ||
+      !close(basicThread.main?.left, expected.main.left) ||
+      !close(basicThread.main?.width, expected.main.width) ||
+      !close(basicThread.body?.left, expected.body.left) ||
+      !close(basicThread.body?.top, expected.body.top) ||
+      !close(basicThread.body?.width, expected.body.width) ||
+      !close(basicThread.user?.left, expected.user.left) ||
+      !close(basicThread.user?.top, expected.user.top) ||
+      !close(basicThread.user?.width, expected.user.width) ||
+      !close(basicThread.userContent?.left, expected.userContent.left) ||
+      !close(basicThread.userContent?.width, expected.userContent.width) ||
+      !close(basicThread.assistant?.left, expected.assistant.left) ||
+      !close(basicThread.assistant?.top, expected.assistant.top) ||
+      !close(basicThread.assistant?.width, expected.assistant.width) ||
+      !close(basicThread.actionStrip?.left, expected.action.left) ||
+      !close(basicThread.actionStrip?.top, expected.action.top) ||
+      basicThread.actionStrip?.width !== 110 ||
+      basicThread.actionStrip?.height !== 26 ||
+      JSON.stringify(basicThread.actionButtons.map(({ label }) => label)) !==
+        JSON.stringify(expectedActionLabels) ||
+      JSON.stringify(basicThread.actionButtons.map(({ icon }) => icon)) !==
+        JSON.stringify(expectedActionIcons) ||
+      basicThread.actionButtons.some(
+        ({ rect }, index) =>
+          !close(rect?.left, expected.action.left + index * 28) ||
+          !close(rect?.top, expected.action.top) ||
+          rect?.width !== 26 ||
+          rect?.height !== 26,
+      ) ||
+      !close(basicThread.composer?.left, expected.composer.left) ||
+      !close(basicThread.composer?.top, expected.composer.top) ||
+      !close(basicThread.composer?.width, expected.composer.width) ||
+      basicThread.composer?.height !== 98 ||
+      !close(basicThread.editor?.left, expected.editor.left) ||
+      !close(basicThread.editor?.top, expected.editor.top) ||
+      !close(basicThread.editor?.width, expected.editor.width) ||
+      basicThread.editor?.height !== 44 ||
+      JSON.stringify(basicThread.composerButtons.map(({ label }) => label)) !==
+        JSON.stringify(expectedComposerLabels) ||
+      JSON.stringify(basicThread.composerButtons.map(({ icon }) => icon)) !==
+        JSON.stringify(expectedComposerIcons) ||
+      basicThread.composerButtons.some(
+        ({ rect }, index) =>
+          !close(rect?.left, expected.composerButtons[index].left) ||
+          !close(rect?.top, expected.composer.top + 62) ||
+          !close(rect?.width, expected.composerButtons[index].width) ||
+          rect?.height !== 28,
+      ) ||
+      JSON.stringify(basicThread.headerButtons.map(({ label }) => label)) !==
+        JSON.stringify(expectedHeaderLabels) ||
+      JSON.stringify(basicThread.headerButtons.map(({ icon }) => icon)) !==
+        JSON.stringify(expectedHeaderIcons) ||
+      !close(basicThread.projectIcon?.left, expected.header.title - 22) ||
+      !close(basicThread.projectIcon?.top, 15) ||
+      basicThread.projectIcon?.width !== 16 ||
+      basicThread.projectIcon?.height !== 16 ||
+      !close(basicThread.headerButtons[0]?.rect?.left, 88) ||
+      !close(basicThread.headerButtons[0]?.rect?.top, 9) ||
+      !close(
+        basicThread.headerButtons[1]?.rect?.left,
+        expected.header.title,
+      ) ||
+      !close(basicThread.headerButtons[1]?.rect?.top, 11) ||
+      !close(
+        basicThread.headerButtons[2]?.rect?.left,
+        expected.header.action,
+      ) ||
+      !close(basicThread.headerButtons[2]?.rect?.top, 9) ||
+      !close(
+        basicThread.headerButtons[3]?.rect?.left,
+        expected.header.share,
+      ) ||
+      basicThread.headerButtons.slice(4).some(
+        ({ rect }, index) =>
+          !close(
+            rect?.left,
+            expected.header.share + 81.265625 + index * 34,
+          ),
+      )
+    ) {
+      throw new Error(
+        `${scene.id} contract failed: ${JSON.stringify({ basicThread, nativeBounds })}`,
+      );
+    }
+    await page
+      .getByRole("button", { name: "Fork chat from here" })
+      .focus();
+    if (
+      (await page.evaluate(() =>
+        document.activeElement?.getAttribute("aria-label"),
+      )) !== "Fork chat from here"
+    ) {
+      throw new Error(`${scene.id} actions lost keyboard focus.`);
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const appServerCrashScene = {
   frame: "app-server-crashed",
   id: "electron-app-server-crashed",

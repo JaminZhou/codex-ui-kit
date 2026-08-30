@@ -523,10 +523,67 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("defaultMaximumRatio: 0.005");
     expect(contract).toContain("masks: []");
     expect(appSource).toContain(
-      "isCurrentBasicMessageReplay ||\n                      isCurrentMarkdown26818Replay",
+      "isAnyCurrentBasicMessageReplay ||\n                isCurrentMarkdown26818Replay",
     );
     expect(appSource).toContain(
-      "!isCurrentBasicMessageReplay &&\n                      !isCurrentMarkdown26818Replay",
+      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentMarkdown26818Replay",
+    );
+  });
+
+  it("gates the current 26.825 basic thread across its responsive boundary", () => {
+    for (const sceneId of [
+      "current-basic-26-825-wide",
+      "current-basic-26-825-boundary-open",
+      "current-basic-26-825-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${sceneId}"`);
+      expect(cdpContract).toContain(`"${sceneId}"`);
+    }
+    for (const sceneId of [
+      "electron-current-basic-26-825-wide",
+      "electron-current-basic-26-825-boundary-open",
+      "electron-current-basic-26-825-compact",
+    ]) {
+      expect(electronContract).toContain(`id: "${sceneId}"`);
+    }
+    expect(electronHarness).toContain(
+      'scenario: "current-basic-message-26-825"',
+    );
+    expect(electronHarness).toContain(
+      "windowSize: { height: 680, width: 721 }",
+    );
+    expect(electronHarness).toContain(
+      "windowSize: { height: 680, width: 720 }",
+    );
+    expect(cdpContract).toContain(
+      'basicThread.assistantText !== "CURRENT BASIC MESSAGE"',
+    );
+    expect(cdpContract).toContain(
+      'sidebarLabel: "Show sidebar"',
+    );
+    expect(electronContract).toContain(
+      'basicThread.assistantText !== "CURRENT BASIC MESSAGE"',
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_WIDE_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_BOUNDARY_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_COMPACT_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_THREAD_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_COMPOSER_MAX_DIFF_RATIO",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_BASIC_26_825_HEADER_MAX_DIFF_RATIO",
+    );
+    expect(appSource).toContain(
+      "isCurrentBasicMessageReplay || isCurrentBasic26825Replay",
     );
   });
 
