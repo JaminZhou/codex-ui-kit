@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 15 groups have current-build runtime evidence, 60 have previous-build-only
+- 16 groups have current-build runtime evidence, 59 have previous-build-only
   runtime evidence, and 14 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -87,6 +87,18 @@ exit gates; it does not replace the inventory.
   Electron, three reviewed baselines, and local-only 2.9762%/0.3571%/0%
   shape comparisons cover wide, hover, and compact states. Waiting, error,
   worktree, mutation, and longer history variants remain incomplete.
+  A third current `26.825.51511` sidebar follow-up promotes
+  `app.sidebar-worktree-status-indicators` for one real disposable worktree
+  lifecycle. It reaches selected setting-up, controlled initialization
+  failure, successful Retry, background-completed unread, and restored-idle
+  states. Unlike 26.820, the current failed background row has no unread dot;
+  unread appears only after Retry succeeds and a response completes. CDP and
+  Electron lock the 305.875×30 row, 14×14 branch, exact spinner/error SVGs,
+  `#ff6764` error and `#3a83f7` unread colors, 39/11px branch insets, hover
+  replacement, and the 720px boundary. Two reviewed frames and local-only
+  3.7698%/0%/0% shape comparisons cover active, failed, and recovered rails.
+  Queued/creating variants and the broader workspace failure card remain
+  incomplete.
   The previous fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.818: exact 1180×820 geometry, 820×680 compact
   containment, four response actions, all five Composer hit targets, and a
@@ -542,7 +554,12 @@ slot. It is split into:
   failed-plus-unread composition, Retry recovery, and restored success. The
   current 84×30 failure tail has 0% foreground-mask difference while the
   existing Browser/CDP and Electron contracts keep exact geometry, paths,
-  color, animation, and action replacement;
+  color, animation, and action replacement. The current 26.825 slice
+  supersedes the sampled sidebar lifecycle with selected setting-up,
+  failure-without-unread, Retry recovery, restored-plus-unread, and idle
+  restored states. It passes active/failed/recovered 84×30 shape comparisons
+  at 3.7698%/0%/0%; queued/creating and the broader failure workspace remain
+  open;
 - `app.sidebar-footer-account-settings`: account, settings, update/status, and
   footer overflow behavior. The 26.820 Dark/Light × wide/compact account menu
   is current Browser/Electron verified with menu-surface focus, weight 400,

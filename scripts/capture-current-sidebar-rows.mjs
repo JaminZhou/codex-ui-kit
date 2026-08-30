@@ -294,7 +294,10 @@ const inspectCandidate = async (page, index) => {
   return { index, page, url: page.url(), ...structure };
 };
 
-const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`);
+const browser = await chromium.connectOverCDP(
+  `http://127.0.0.1:${port}`,
+  { noDefaults: true },
+);
 let page;
 let captureError = null;
 let cleanupError = null;

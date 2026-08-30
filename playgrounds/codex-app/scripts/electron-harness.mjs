@@ -699,6 +699,23 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-worktree-lifecycle",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-worktree-lifecycle-compact",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-collection-empty",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",

@@ -184,7 +184,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 15 have current-build runtime evidence, 60 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 14 groups and Electron verification covers 14.
+Current inventory: 89 surface groups; 16 have current-build runtime evidence, 59 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 15 groups and Electron verification covers 15.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -392,6 +392,21 @@ at 2.9762%, 0.3571%, and 0% promote `app.sidebar-thread-history`,
 `app.sidebar-item-actions`, and `app.sidebar-status-indicators` for this
 sampled lifecycle. Waiting, error, worktree, mutations, and longer history
 remain partial or previous-build evidence.
+
+The current `26.825.51511` worktree follow-up uses an isolated profile and a
+disposable repository to reach one real setting-up row, a controlled
+initialization failure, successful Retry, a recovered background-unread row,
+and restored idle. It supersedes the old failed-plus-unread assumption for
+this fingerprint: failure alone shows branch plus red error and no unread;
+the blue unread dot appears only after Retry succeeds and the response
+completes. Browser/CDP and Electron lock the 305.875×30 row, exact 14×14
+branch, 16×16 spinner/error glyphs and source paths, `#ff6764` error,
+`#3a83f7` unread, 39/11px branch insets, exact actions, and wide/compact
+containment. Two reviewed frames and local-only active/failed/recovered
+84×30 masks pass at 3.7698%, 0%, and 0%. This promotes
+`app.sidebar-worktree-status-indicators` to current Browser/Electron evidence
+for the sampled lifecycle; queued/creating variants and the broader failure
+workspace remain partial.
 
 The ordinary task-status follow-up reached one real active thread and one
 background-completed unread thread on `26.803.61601`. It locked the 20×20
