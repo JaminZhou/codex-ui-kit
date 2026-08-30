@@ -7286,7 +7286,7 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
     const expectedColor =
       accountMenuScene.theme === "light"
         ? "rgb(26, 28, 31)"
-        : "rgb(223, 223, 223)";
+        : "rgb(255, 255, 255)";
     const near = (actual, expected, tolerance = 0.15) =>
       typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
     if (
@@ -7301,7 +7301,7 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
       !near(contract.sidebarRect?.width, 322.90625) ||
       !near(contract.menuRect?.left, 9) ||
       !near(contract.menuRect?.top, expectedTop) ||
-      !near(contract.menuRect?.width, 306.90625) ||
+      !near(contract.menuRect?.width, 305.875) ||
       !near(contract.menuRect?.height, 188.375) ||
       !near(contract.triggerRect?.left, 8) ||
       contract.triggerRect?.width < 150 ||
@@ -7319,7 +7319,7 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
         ]) ||
       contract.menuStyle.backgroundColor !== expectedBackground ||
       contract.menuStyle.color !== expectedColor ||
-      contract.menuStyle.borderRadius !== "15px" ||
+      contract.menuStyle.borderRadius !== "20px" ||
       !contract.menuStyle.boxShadow.includes(
         accountMenuScene.theme === "light"
           ? "rgba(26, 28, 31, 0.08)"
@@ -7330,13 +7330,13 @@ for (const accountMenuScene of currentAccountMenuElectronScenes) {
         (rect, index) =>
           !near(rect?.left, 13) ||
           !near(rect?.top, expectedItemTops[index]) ||
-          !near(rect?.width, 298.90625) ||
+          !near(rect?.width, 297.875) ||
           !near(rect?.height, 28.5625),
       ) ||
       contract.itemStyles.some(
         (style) =>
           style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
-          style.borderRadius !== "12.5px" ||
+          style.borderRadius !== "15px" ||
           style.fontSize !== "13px" ||
           style.fontWeight !== "400" ||
           style.lineHeight !== "18.5714px" ||
@@ -8218,7 +8218,7 @@ try {
   const gitSettingsMain = codingWorkspacePage.getByRole("main");
   await gitSettingsNavigation.waitFor({ state: "visible" });
   if (
-    (await gitSettingsNavigation.getByRole("button").count()) !== 22 ||
+    (await gitSettingsNavigation.getByRole("button").count()) !== 23 ||
     (await codingWorkspacePage.locator('main, [role="main"]').count()) !== 1 ||
     (await codingWorkspacePage
       .locator('[role="region"][aria-label="Settings route"]')
@@ -8230,7 +8230,7 @@ try {
       .count()) !== 0 ||
     (await codingWorkspacePage
       .locator("[data-current-build-icon^=settings-]")
-      .count()) !== 24
+      .count()) !== 25
   ) {
     throw new Error("Electron Set prefix did not open the complete Git Settings route.");
   }
@@ -8388,6 +8388,9 @@ try {
     appearanceGeometry.themePreviews.some(
       ({ height, width }) => Math.abs(height - 175) > 1 || width !== 248,
     ) ||
+    (await appearanceSettingsMain
+      .locator(".codex-ui-appearance-settings__menu-trigger")
+      .count()) !== 10 ||
     (await appearanceSettingsMain.getByRole("switch").count()) !== 4 ||
     (await appearanceSettingsMain.getByRole("slider").count()) !== 2 ||
     (await appearanceSettingsMain.getByRole("spinbutton").count()) !== 2
@@ -8396,6 +8399,46 @@ try {
       `Electron Appearance Settings route is incomplete: ${JSON.stringify(appearanceGeometry)}.`,
     );
   }
+  const appearanceEditorMenus = await appearanceSettingsMain
+    .locator(".codex-ui-appearance-settings__menu-trigger")
+    .evaluateAll((controls) =>
+      controls.map((control) => ({
+        disabled: control.disabled,
+        label: control.getAttribute("aria-label"),
+        text: control.textContent?.trim(),
+      })),
+    );
+  if (
+    JSON.stringify(appearanceEditorMenus) !==
+    JSON.stringify([
+      { disabled: false, label: "Light accent color", text: "Default⌄" },
+      { disabled: false, label: "Light UI font", text: "System default⌄" },
+      { disabled: true, label: "Light UI font style", text: "Regular⌄" },
+      { disabled: false, label: "Light code font", text: "System default⌄" },
+      { disabled: true, label: "Light code font style", text: "Regular⌄" },
+      { disabled: false, label: "Dark accent color", text: "Default⌄" },
+      { disabled: false, label: "Dark UI font", text: "System default⌄" },
+      { disabled: true, label: "Dark UI font style", text: "Regular⌄" },
+      { disabled: false, label: "Dark code font", text: "System default⌄" },
+      { disabled: true, label: "Dark code font style", text: "Regular⌄" },
+    ])
+  ) {
+    throw new Error(
+      `Electron Appearance editor controls drifted: ${JSON.stringify(appearanceEditorMenus)}.`,
+    );
+  }
+  await appearanceSettingsMain
+    .getByRole("button", { name: "Light accent color" })
+    .click();
+  const appearanceAccentOptions = codingWorkspacePage.getByRole("menuitem");
+  if (
+    (await appearanceAccentOptions.count()) !== 9 ||
+    (await appearanceAccentOptions.first().textContent())?.trim() !== "Default" ||
+    (await appearanceAccentOptions.last().textContent())?.trim() !== "Custom"
+  ) {
+    throw new Error("Electron Appearance accent menu is incomplete.");
+  }
+  await appearanceAccentOptions.filter({ hasText: "Blue" }).click();
   await appearanceSettingsMain
     .locator('label:has(input[aria-label="Dark"])')
     .click();
@@ -8453,6 +8496,9 @@ try {
     .getByRole("switch", { name: "Font smoothing" })
     .click();
   const appearanceInteraction = await appearanceSettingsMain.evaluate((main) => ({
+    accent: main
+      .querySelector('button[aria-label="Light accent color"]')
+      ?.textContent?.trim(),
     codeTheme: main
       .querySelector('button[aria-label="Light code theme"]')
       ?.textContent?.trim(),
@@ -8483,6 +8529,7 @@ try {
     ),
   }));
   if (
+    appearanceInteraction.accent !== "Blue⌄" ||
     !appearanceInteraction.codeTheme?.includes("GitHub") ||
     appearanceInteraction.darkTheme !== true ||
     appearanceInteraction.dockIcon !== true ||
@@ -8531,9 +8578,9 @@ try {
       .getAttribute("aria-current")) !== "page" ||
     generalGeometry.heading?.top !== 66 ||
     generalGeometry.heading?.width !== 768 ||
-    generalGeometry.cards.length !== 5 ||
+    generalGeometry.cards.length !== 6 ||
     generalGeometry.cards.some(({ width }) => width !== 768) ||
-    generalGeometry.rowCount !== 21 ||
+    generalGeometry.rowCount !== 22 ||
     JSON.stringify(generalGeometry.sectionHeadings) !==
       JSON.stringify([
         "Permissions",
@@ -8541,6 +8588,7 @@ try {
         "Composer",
         "Popout Window",
         "Notifications",
+        "Toys",
       ]) ||
     (await generalSettingsMain.getByRole("switch").count()) !== 12 ||
     (await generalSettingsMain
@@ -8577,10 +8625,14 @@ try {
     });
   const generalMenuFocus = {};
   const generalMenuStates = {};
-  const autoReviewSwitch = generalSettingsMain.getByRole("switch", {
-    name: "Show Auto-review in the composer",
+  const plainTextComposerSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Plain text composer",
   });
-  await autoReviewSwitch.click();
+  await plainTextComposerSwitch.click();
+  const confettiCannonSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Confetti cannon",
+  });
+  await confettiCannonSwitch.click();
   await generalSettingsMain
     .getByRole("button", { name: "Default file open destination" })
     .click();
@@ -8806,8 +8858,11 @@ try {
       "Open source licenses requested",
   );
   const generalInteraction = await generalSettingsMain.evaluate((main, focus) => ({
-    autoReview: main
-      .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
+    confettiCannon: main
+      .querySelector('[role="switch"][aria-label="Confetti cannon"]')
+      ?.getAttribute("aria-checked"),
+    plainTextComposer: main
+      .querySelector('[role="switch"][aria-label="Plain text composer"]')
       ?.getAttribute("aria-checked"),
     completionNotifications: main
       .querySelector('button[aria-label="Turn completion notifications"]')
@@ -8856,7 +8911,8 @@ try {
     describedValues: generalDescribedValues,
   });
   if (
-    generalInteraction.autoReview !== "false" ||
+    generalInteraction.confettiCannon !== "true" ||
+    generalInteraction.plainTextComposer !== "true" ||
     generalInteraction.completionNotifications !== "Always⌄" ||
     generalInteraction.contextUsage !== "true" ||
     !generalInteraction.fileDestination?.includes("Xcode") ||
@@ -8958,8 +9014,8 @@ try {
   }
   if (
     (await generalSettingsMain
-      .getByRole("switch", { name: "Show Auto-review in the composer" })
-      .getAttribute("aria-checked")) !== "false" ||
+      .getByRole("switch", { name: "Plain text composer" })
+      .getAttribute("aria-checked")) !== "true" ||
     (await generalSettingsMain
       .getByRole("button", { name: "Right", exact: true })
       .getAttribute("aria-pressed")) !== "true"

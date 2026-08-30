@@ -2220,27 +2220,31 @@ export function App() {
     useState<AppearanceSettingsValue>({
       codeFontSize: 12,
       dark: {
-        accent: "#339CFF",
+        accent: "Default",
         background: "#181818",
-        codeFont: 'ui-monospace, "SFMono-Regular"',
+        codeFont: "System default",
+        codeFontStyle: "Regular",
         codeTheme: "Codex",
         contrast: 60,
         foreground: "#FFFFFF",
         translucentSidebar: true,
-        uiFont: "-apple-system, BlinkMacSystemFont",
+        uiFont: "System default",
+        uiFontStyle: "Regular",
       },
       diffMarkers: "color",
       dockIcon: "codex",
       fontSmoothing: true,
       light: {
-        accent: "#339CFF",
+        accent: "Default",
         background: "#FFFFFF",
-        codeFont: 'ui-monospace, "SFMono-Regular"',
+        codeFont: "System default",
+        codeFontStyle: "Regular",
         codeTheme: "Codex",
         contrast: 45,
         foreground: "#1A1C1F",
         translucentSidebar: true,
-        uiFont: "-apple-system, BlinkMacSystemFont",
+        uiFont: "System default",
+        uiFontStyle: "Regular",
       },
       reduceMotion: "system",
       theme: "system",
@@ -2252,15 +2256,18 @@ export function App() {
     ambientSuggestions: true,
     autoReview: true,
     bottomPanel: true,
+    confettiCannon: false,
     defaultFileOpenDestination: "vscode",
     followUpBehavior: "queue",
     fullAccess: true,
     language: "auto",
     permissionNotifications: true,
+    plainTextComposer: false,
     pluginsEnabled: true,
     popoutHotkey: null,
     popoutStandaloneChat: false,
     preventSleepWhileRunning: false,
+    projectlessTaskFolder: "/Users/demo/Documents/Codex",
     questionNotifications: true,
     sendShortcut: "enter",
     showContextWindowUsage: false,
@@ -4379,7 +4386,7 @@ export function App() {
               sideOffset={currentHomeFrame ? 7.125 : 7.5}
               style={{
                 width: currentHomeFrame
-                  ? 306.90625
+                  ? 305.875
                   : "calc(var(--codex-ui-app-sidebar-width) - 1rem)",
               }}
               trigger={trigger}
@@ -7688,6 +7695,8 @@ export function App() {
       id: "integrations",
       label: "Integrations",
       items: [
+        ["computer-use", "Computer use", "Computer use"],
+        ["computer-history", "Computer history"],
         ["appshots", "Appshots"],
         ["plugins", "Plugins"],
         [
@@ -7695,7 +7704,6 @@ export function App() {
           "Browser",
           "Allow ChatGPT to use full Chrome DevTools Protocol (CDP) access in connected Browser Use sessions.",
         ],
-        ["computer-use", "Computer use", "Computer use"],
       ],
     },
     {
@@ -7730,9 +7738,6 @@ export function App() {
           <CurrentBuildIcon
             name={`settings-${id}` as CurrentBuildIconName}
           />
-          {id === "account" ? (
-            <CurrentBuildIcon name="settings-account-external" />
-          ) : null}
         </span>
       ),
       id,
@@ -7746,6 +7751,10 @@ export function App() {
               : undefined,
       label,
       resultLabel,
+      trailingIcon:
+        id === "account" ? (
+          <CurrentBuildIcon name="settings-account-external" />
+        ) : undefined,
     })),
   }));
   const workspaceSettingsRoute = (
@@ -7935,6 +7944,9 @@ export function App() {
             hotkeyCaptureActive={generalHotkeyCaptureActive}
             onCancelHotkeyCapture={() => setGeneralHotkeyCaptureActive(false)}
             onChange={setGeneralSettings}
+            onChangeProjectlessTaskFolder={() =>
+              setGeneralSettingsAction("Projectless task folder change requested")
+            }
             onOpenSourceLicenses={() =>
               setGeneralSettingsAction("Open source licenses requested")
             }

@@ -1495,7 +1495,7 @@ textarea {
   box-shadow:
     0 0 0 0.5px rgba(255, 255, 255, 0.082),
     0 8px 16px -4px rgba(0, 0, 0, 0.12);
-  color: rgb(223 223 223);
+  color: rgb(255 255 255);
   padding: 4px;
   margin-inline-start: 1px;
 }
@@ -1635,10 +1635,12 @@ textarea {
 }
 
 .demo-current-sidebar-account-menu {
+  border-radius: 20px;
   gap: 0;
 }
 
 .demo-current-sidebar-account-menu .codex-ui-menu-item {
+  border-radius: 15px;
   font-weight: 400;
 }
 
@@ -5359,13 +5361,6 @@ textarea {
   height: 100%;
   position: relative;
   width: 100%;
-}
-
-.demo-settings-navigation-icon-stack > svg + svg {
-  height: 0.6875rem !important;
-  inset-inline-end: -0.1875rem;
-  position: absolute;
-  width: 0.6875rem !important;
 }
 
 .demo-current-browser-workspace__tab-label {

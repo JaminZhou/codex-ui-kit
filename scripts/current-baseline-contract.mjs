@@ -614,7 +614,7 @@ export function assertCurrentAccountMenuRecord(record) {
         ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
         : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
     const expectedColor =
-      theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)";
+      theme === "light" ? "rgb(26, 28, 31)" : "rgb(255, 255, 255)";
     const svgGeometry = state?.svgGeometry?.map((icons) =>
       icons.map((icon) => ({
         shapeSha256: sanitizedShapeSha256(icon?.shapes),
@@ -636,11 +636,11 @@ export function assertCurrentAccountMenuRecord(record) {
       JSON.stringify(state.labels) !== JSON.stringify(expectedLabels) ||
       !withinTolerance(state.sidebarRect?.left, 0) ||
       !withinTolerance(state.sidebarRect?.top, 46) ||
-      !withinTolerance(state.sidebarRect?.width, 322.90625) ||
+      !withinTolerance(state.sidebarRect?.width, 321.875) ||
       !withinTolerance(state.sidebarRect?.height, compact ? 634 : 774) ||
       !withinTolerance(state.menuRect?.left, 9) ||
       !withinTolerance(state.menuRect?.top, expectedTop) ||
-      !withinTolerance(state.menuRect?.width, 306.90625) ||
+      !withinTolerance(state.menuRect?.width, 305.875) ||
       !withinTolerance(state.menuRect?.height, 188.375) ||
       !withinTolerance(state.triggerRect?.left, 8) ||
       !withinTolerance(state.triggerRect?.top, compact ? 642.5 : 782.5) ||
@@ -652,7 +652,7 @@ export function assertCurrentAccountMenuRecord(record) {
       !Number.isInteger(state.triggerTextLength) ||
       state.triggerTextLength < 1 ||
       state.menuStyle?.backgroundColor !== expectedBackground ||
-      state.menuStyle?.borderRadius !== "15px" ||
+      state.menuStyle?.borderRadius !== "20px" ||
       state.menuStyle?.color !== expectedColor ||
       !state.menuStyle?.boxShadow?.includes(
         theme === "light"
@@ -664,14 +664,14 @@ export function assertCurrentAccountMenuRecord(record) {
         (rect, index) =>
           !withinTolerance(rect?.left, 13) ||
           !withinTolerance(rect?.top, expectedItemTops[index]) ||
-          !withinTolerance(rect?.width, 298.90625) ||
+          !withinTolerance(rect?.width, 297.875) ||
           !withinTolerance(rect?.height, 28.5625),
       ) ||
       state.itemStyles?.length !== 6 ||
       state.itemStyles.some(
         (style) =>
           style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
-          style.borderRadius !== "12.5px" ||
+          style.borderRadius !== "15px" ||
           style.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
           style.fontSize !== "13px" ||

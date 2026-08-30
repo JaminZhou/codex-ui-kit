@@ -122,6 +122,7 @@ export type CurrentBuildIconName =
   | "settings-plugins"
   | "settings-browser"
   | "settings-computer-use"
+  | "settings-computer-history"
   | "settings-hooks"
   | "settings-hooks-reload"
   | "settings-connections"
