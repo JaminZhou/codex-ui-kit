@@ -89,7 +89,7 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
   ];
   const itemStyle = {
     backgroundColor: "rgba(0, 0, 0, 0)",
-    borderRadius: "12.5px",
+    borderRadius: "15px",
     fontFamily: '-apple-system, "system-ui", "Segoe UI", sans-serif',
     fontSize: "13px",
     fontWeight: "400",
@@ -108,7 +108,7 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
       height: 28.5625,
       left: 13,
       top,
-      width: 298.90625,
+      width: 297.875,
     })),
     itemStyles: Array.from({ length: 6 }, () => ({ ...itemStyle })),
     labels: [
@@ -123,26 +123,26 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
       height: 188.375,
       left: 9,
       top: menuTop,
-      width: 306.90625,
+      width: 305.875,
     },
     menuStyle: {
       backgroundColor:
         theme === "light"
           ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
           : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)",
-      borderRadius: "15px",
+      borderRadius: "20px",
       boxShadow:
         theme === "light"
           ? "rgba(26, 28, 31, 0.08) 0px 0px 0px 0.5px"
           : "rgba(255, 255, 255, 0.082) 0px 0px 0px 0.5px",
-      color: theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)",
+      color: theme === "light" ? "rgb(26, 28, 31)" : "rgb(255, 255, 255)",
     },
     separatorCount: 0,
     sidebarRect: {
       height: compact ? 634 : 774,
       left: 0,
       top: 46,
-      width: 322.90625,
+      width: 321.875,
     },
     svgGeometry: accountMenuSvgGeometry.map((icons) =>
       icons.map((icon) => ({
@@ -155,7 +155,7 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
       height: 29,
       left: 8,
       top: compact ? 642.5 : 782.5,
-      width: 187.5625,
+      width: 186.53125,
     },
     triggerTextLength: 9,
     viewport: compact

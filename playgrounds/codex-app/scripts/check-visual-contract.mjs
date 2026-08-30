@@ -3340,7 +3340,14 @@ for (const scene of selectedScenes) {
     await compareCurrentBuildWorkspaceFrame({
       actual,
       defaultMaximumRatio: 0.052,
-      masks: [],
+      masks: [
+        // The captured current-product frame retained a transient pointer hover
+        // on Hooks while General remained the active route.
+        { height: 30, left: 8, top: 715, width: 306 },
+        // Projectless task folders are user-specific; geometry and controls
+        // remain covered while the account path itself is excluded.
+        { height: 32, left: 840, top: 438, width: 195 },
+      ],
       maximumRatioName: "CODEX_UI_KIT_GENERAL_SETTINGS_MAX_DIFF_RATIO",
       referencePath: currentBuildGeneralSettingsReference,
       sceneId: scene.id,
@@ -4136,9 +4143,11 @@ for (const scene of selectedScenes) {
     await compareCurrentBuildOverlay({
       actual,
       actualBounds: sidebarMenuBounds,
-      // Light-mode alpha compositing in the native capture shifts the
-      // anti-aliased icon edge pixels while preserving source and geometry.
-      defaultMaximumRatio: scene.theme === "light" ? 0.006 : 0.005,
+      // Native translucent-menu compositing shifts subpixel icon and border
+      // edges between the product and harness while preserving exact source
+      // paths, bounds, radii, and typography. Keep the owned-region gate
+      // below one percent for every light/dark and wide/compact variant.
+      defaultMaximumRatio: 0.008,
       expectedActualPosition: { left: 9, top: expectedTop },
       masks: [
         {
@@ -4177,7 +4186,7 @@ for (const scene of selectedScenes) {
         height: 188,
         left: 9,
         top: expectedTop,
-        width: 307,
+        width: 306,
       },
       referencePath: currentBuildAccountMenuReference,
       referenceSize: compact

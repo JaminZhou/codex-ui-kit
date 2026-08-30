@@ -369,7 +369,7 @@ for (const scene of selectedScenes) {
           ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
           : "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)";
       const expectedColor =
-        scene.theme === "light" ? "rgb(26, 28, 31)" : "rgb(223, 223, 223)";
+        scene.theme === "light" ? "rgb(26, 28, 31)" : "rgb(255, 255, 255)";
       const near = (actual, expected, tolerance = 0.15) =>
         typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
       if (
@@ -382,7 +382,7 @@ for (const scene of selectedScenes) {
         !near(accountMenuContract.sidebarRect?.width, 322.90625) ||
         !near(accountMenuContract.menuRect?.left, 9) ||
         !near(accountMenuContract.menuRect?.top, expectedTop) ||
-        !near(accountMenuContract.menuRect?.width, 306.90625) ||
+        !near(accountMenuContract.menuRect?.width, 305.875) ||
         !near(accountMenuContract.menuRect?.height, 188.375) ||
         !near(accountMenuContract.triggerRect?.left, 8) ||
         accountMenuContract.triggerRect?.width < 150 ||
@@ -413,7 +413,7 @@ for (const scene of selectedScenes) {
           ]) ||
         accountMenuContract.menuStyle.backgroundColor !== expectedBackground ||
         accountMenuContract.menuStyle.color !== expectedColor ||
-        accountMenuContract.menuStyle.borderRadius !== "15px" ||
+        accountMenuContract.menuStyle.borderRadius !== "20px" ||
         !accountMenuContract.menuStyle.boxShadow.includes(
           scene.theme === "light"
             ? "rgba(26, 28, 31, 0.08)"
@@ -424,13 +424,13 @@ for (const scene of selectedScenes) {
           (rect, index) =>
             !near(rect?.left, 13) ||
             !near(rect?.top, expectedItemTops[index]) ||
-            !near(rect?.width, 298.90625) ||
+            !near(rect?.width, 297.875) ||
             !near(rect?.height, 28.5625),
         ) ||
         accountMenuContract.itemStyles.some(
           (style) =>
             style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
-            style.borderRadius !== "12.5px" ||
+            style.borderRadius !== "15px" ||
             style.fontSize !== "13px" ||
             style.fontWeight !== "400" ||
             style.lineHeight !== "18.5714px" ||
@@ -775,21 +775,21 @@ for (const scene of selectedScenes) {
         settings.mainCount !== 1 ||
         settings.outerRegionCount !== 1 ||
         settings.selected !== "Git" ||
-        settings.navigation?.width !== 322.90625 ||
+        settings.navigation?.width !== 321.875 ||
         settings.navigation?.top !== 46 ||
         settings.navigation?.height !== settings.viewport.height - 46 ||
-        settings.searchbox?.width !== 258.90625 ||
+        settings.searchbox?.width !== 261.875 ||
         settings.searchbox?.height !== 18 ||
         settings.heading?.top !== 66 ||
-        Math.abs(settings.heading?.width - (compact ? 357.09375 : 768)) > 1 ||
+        Math.abs(settings.heading?.width - (compact ? 358.125 : 768)) > 1 ||
         settings.branchPrefix?.width !== 224 ||
         settings.branchPrefix?.height !== 35 ||
-        settings.card?.width !== (compact ? 357.09375 : 768) ||
+        settings.card?.width !== (compact ? 358.125 : 768) ||
         settings.switchStates.length !== 2 ||
         settings.switchStates[0]?.value !== "false" ||
         settings.switchStates[1]?.value !== "true" ||
         settings.textareaCount !== 2 ||
-        settings.iconNames.length !== 24 ||
+        settings.iconNames.length !== 25 ||
         !settings.iconNames.includes("settings-back") ||
         !settings.iconNames.includes("settings-search") ||
         !settings.iconNames.includes("settings-git")
@@ -1052,20 +1052,20 @@ for (const scene of selectedScenes) {
       const bottom = scene.id === "workspace-general-settings-bottom";
       const hotkey = scene.id.includes("-hotkey");
       const scrolled = bottom || hotkey;
-      const expectedWidth = compact ? 357.09375 : 768;
+      const expectedWidth = compact ? 358.125 : 768;
       const expectedSwitches = [
         ["Default permissions are always shown", "true", true],
-        ["Show Auto-review in the composer", "true", false],
         ["Show Full access in the composer", "true", false],
         ["Show ChatGPT in the menu bar", "true", false],
         ["Bottom panel", "true", false],
         ["Prevent sleep while running", "false", false],
-        ["Enable ambient suggestions", "true", false],
         ["Toggle plugins", "true", false],
+        ["Plain text composer", "false", false],
         ["Show context window usage in the composer", "false", false],
         ["Default Popout Window to standalone chat", "false", false],
         ["Enable permission notifications", "true", false],
         ["Enable question notifications", "true", false],
+        ["Confetti cannon", "false", false],
       ];
       if (
         general.horizontalOverflow > 1 ||
@@ -1073,19 +1073,19 @@ for (const scene of selectedScenes) {
         general.mainCount !== 1 ||
         general.outerRegionCount !== 1 ||
         general.selected !== "General" ||
-        general.navigation?.width !== 322.90625 ||
+        general.navigation?.width !== 321.875 ||
         general.navigation?.top !== 46 ||
         general.navigation?.height !== general.viewport.height - 46 ||
         general.scrollOwner?.rect.top !== 46 ||
         general.scrollOwner?.rect.height !== general.viewport.height - 46 ||
-        general.scrollOwner?.rect.left !== 322.90625 ||
-        general.iconNames.length !== 24 ||
+        general.scrollOwner?.rect.left !== 321.875 ||
+        general.iconNames.length !== 25 ||
         !general.iconNames.includes("settings-general") ||
         (!scrolled && general.heading?.top !== 66) ||
         Math.abs(general.heading?.width - expectedWidth) > 1 ||
-        general.cards.length !== 5 ||
+        general.cards.length !== 6 ||
         general.cards.some(({ width }) => Math.abs(width - expectedWidth) > 1) ||
-        general.rowCount !== 21 ||
+        general.rowCount !== 22 ||
         JSON.stringify(general.sectionHeadings) !==
           JSON.stringify([
             "Permissions",
@@ -1093,6 +1093,7 @@ for (const scene of selectedScenes) {
             "Composer",
             "Popout Window",
             "Notifications",
+            "Toys",
           ]) ||
         JSON.stringify(general.menuLabels) !==
           JSON.stringify([
@@ -1170,7 +1171,10 @@ for (const scene of selectedScenes) {
         const menuFocus = {};
         const menuStates = {};
         await page
-          .getByRole("switch", { name: "Show Auto-review in the composer" })
+          .getByRole("switch", { name: "Plain text composer" })
+          .click();
+        await page
+          .getByRole("switch", { name: "Confetti cannon" })
           .click();
         await page
           .getByRole("button", { name: "Default file open destination" })
@@ -1386,14 +1390,17 @@ for (const scene of selectedScenes) {
             describedValues,
             speedOptions,
           }) => ({
-            autoReview: document
-              .querySelector('[role="switch"][aria-label="Show Auto-review in the composer"]')
+            confettiCannon: document
+              .querySelector('[role="switch"][aria-label="Confetti cannon"]')
               ?.getAttribute("aria-checked"),
             completionNotifications: document
               .querySelector('button[aria-label="Turn completion notifications"]')
               ?.textContent?.trim(),
             contextUsage: document
               .querySelector('[role="switch"][aria-label="Show context window usage in the composer"]')
+              ?.getAttribute("aria-checked"),
+            plainTextComposer: document
+              .querySelector('[role="switch"][aria-label="Plain text composer"]')
               ?.getAttribute("aria-checked"),
             fileDestination: document
               .querySelector('button[aria-label="Default file open destination"]')
@@ -1477,9 +1484,10 @@ for (const scene of selectedScenes) {
           };
         });
         if (
-          interaction.autoReview !== "false" ||
+          interaction.confettiCannon !== "true" ||
           interaction.completionNotifications !== "Always⌄" ||
           interaction.contextUsage !== "true" ||
+          interaction.plainTextComposer !== "true" ||
           !interaction.fileDestination?.includes("Xcode") ||
           interaction.fileDestinations.length !== 7 ||
           interaction.followUp !== "true" ||
@@ -1924,9 +1932,9 @@ for (const scene of selectedScenes) {
       const configured = scene.id === "workspace-hooks-settings-configured";
       const loading = scene.id === "workspace-hooks-settings-loading";
       const error = scene.id === "workspace-hooks-settings-error";
-      const expectedWidth = compact ? 357.09375 : 768;
-      const expectedHeadingWidth = compact ? 315.09375 : 726;
-      const expectedLeft = compact ? 342.90625 : 367.453125;
+      const expectedWidth = compact ? 358.125 : 768;
+      const expectedHeadingWidth = compact ? 316.125 : 726;
+      const expectedLeft = compact ? 341.875 : 366.9375;
       if (
         hooks.evidence !== "runtime-observed" ||
         hooks.status !== (loading ? "loading" : error ? "error" : "ready") ||
@@ -1936,7 +1944,7 @@ for (const scene of selectedScenes) {
         hooks.reload?.top !== 66 ||
         hooks.reload?.height !== 26 ||
         hooks.reload?.width !== 26 ||
-        hooks.navigation?.width !== 322.90625 ||
+        hooks.navigation?.width !== 321.875 ||
         hooks.selected !== "Hooks" ||
         hooks.horizontalOverflow > 1 ||
         hooks.learnMoreHref !== "https://developers.openai.com/codex/hooks" ||
@@ -2093,8 +2101,8 @@ for (const scene of selectedScenes) {
         };
       });
       const compact = scene.id.endsWith("-compact");
-      const expectedWidth = compact ? 357.09375 : 768;
-      const expectedLeft = compact ? 342.90625 : 367.453125;
+      const expectedWidth = compact ? 358.125 : 768;
+      const expectedLeft = compact ? 341.875 : 366.9375;
       if (
         codeReview.evidence !== "package-observed" ||
         codeReview.navigationCodeReviewCount !== 0 ||
@@ -2226,6 +2234,17 @@ for (const scene of selectedScenes) {
             codex: checked("Use Codex Dock icon"),
           },
           editorCards: rects(".codex-ui-appearance-settings__editor"),
+          editorMenuControls: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-appearance-settings__menu-trigger",
+            ),
+            (control) => ({
+              disabled:
+                control instanceof HTMLButtonElement ? control.disabled : null,
+              label: control.getAttribute("aria-label"),
+              text: control.textContent?.trim(),
+            }),
+          ),
           heading: rect(".codex-ui-appearance-settings > h1"),
           horizontalOverflow:
             document.documentElement.scrollWidth -
@@ -2308,21 +2327,21 @@ for (const scene of selectedScenes) {
       });
       const compact = scene.id === "workspace-appearance-settings-compact";
       const preferences = scene.id.endsWith("-preferences");
-      const expectedWidth = compact ? 357.09375 : 768;
-      const expectedPreviewWidth = compact ? 111.03125 : 248;
+      const expectedWidth = compact ? 358.125 : 768;
+      const expectedPreviewWidth = compact ? 111.375 : 248;
       if (
         appearance.horizontalOverflow > 1 ||
         appearance.navigationCount !== 1 ||
         appearance.mainCount !== 1 ||
         appearance.outerRegionCount !== 1 ||
         appearance.selected !== "Appearance" ||
-        appearance.navigation?.width !== 322.90625 ||
+        appearance.navigation?.width !== 321.875 ||
         appearance.navigation?.top !== 46 ||
         appearance.navigation?.height !== appearance.viewport.height - 46 ||
         appearance.scrollOwner?.rect.top !== 46 ||
         appearance.scrollOwner?.rect.height !== appearance.viewport.height - 46 ||
-        appearance.scrollOwner?.rect.left !== 322.90625 ||
-        appearance.iconNames.length !== 24 ||
+        appearance.scrollOwner?.rect.left !== 321.875 ||
+        appearance.iconNames.length !== 25 ||
         !appearance.iconNames.includes("settings-appearance") ||
         appearance.themePreviews.length !== 3 ||
         appearance.themePreviews.some(
@@ -2334,6 +2353,19 @@ for (const scene of selectedScenes) {
         ) ||
         appearance.preview?.width !== expectedWidth ||
         appearance.preview?.height !== 110 ||
+        JSON.stringify(appearance.editorMenuControls) !==
+          JSON.stringify([
+            { disabled: false, label: "Light accent color", text: "Default⌄" },
+            { disabled: false, label: "Light UI font", text: "System default⌄" },
+            { disabled: true, label: "Light UI font style", text: "Regular⌄" },
+            { disabled: false, label: "Light code font", text: "System default⌄" },
+            { disabled: true, label: "Light code font style", text: "Regular⌄" },
+            { disabled: false, label: "Dark accent color", text: "Default⌄" },
+            { disabled: false, label: "Dark UI font", text: "System default⌄" },
+            { disabled: true, label: "Dark UI font style", text: "Regular⌄" },
+            { disabled: false, label: "Dark code font", text: "System default⌄" },
+            { disabled: true, label: "Dark code font style", text: "Regular⌄" },
+          ]) ||
         appearance.theme.system !== true ||
         appearance.theme.light !== false ||
         appearance.theme.dark !== false ||
@@ -2394,6 +2426,9 @@ for (const scene of selectedScenes) {
         for (let step = 0; step < 6; step += 1) {
           await lightContrast.press("ArrowRight");
         }
+        await page.getByRole("button", { name: "Light accent color" }).click();
+        const accentOptions = await page.getByRole("menuitem").allTextContents();
+        await page.getByRole("menuitem", { name: "Blue", exact: true }).click();
         await page.getByRole("button", { name: "Light code theme" }).click();
         const codeThemes = (await page.getByRole("menuitem").allTextContents()).map(
           (label) => label.replace(/^Aa/, ""),
@@ -2421,6 +2456,9 @@ for (const scene of selectedScenes) {
         await colorMarkers.press("ArrowRight");
         await page.getByRole("switch", { name: "Font smoothing" }).click();
         interaction = await page.evaluate((codeThemes) => ({
+          accent: document
+            .querySelector('button[aria-label="Light accent color"]')
+            ?.textContent?.trim(),
           codeTheme: document
             .querySelector('button[aria-label="Light code theme"]')
             ?.textContent?.trim(),
@@ -2456,7 +2494,12 @@ for (const scene of selectedScenes) {
             (input) => Number(input.value),
           ),
         }), codeThemes);
+        interaction.accentOptions = accentOptions;
         if (
+          interaction.accent !== "Blue⌄" ||
+          interaction.accentOptions.length !== 9 ||
+          interaction.accentOptions[0] !== "Default" ||
+          interaction.accentOptions[8] !== "Custom" ||
           interaction.codeThemes.length !== 16 ||
           interaction.codeThemes[0] !== "Absolutely" ||
           interaction.codeThemes[15] !== "Xcode" ||

@@ -16,7 +16,12 @@ const mcpOnly = process.env.CODEX_VISUAL_ASSET_MCP_ONLY === "1";
 const projectPickerOnly =
   process.env.CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY === "1";
 const reviewOnly = process.env.CODEX_VISUAL_ASSET_REVIEW_ONLY === "1";
-if ([threadOnly, mcpOnly, projectPickerOnly, reviewOnly].filter(Boolean).length > 1) {
+const settingsOnly = process.env.CODEX_VISUAL_ASSET_SETTINGS_ONLY === "1";
+if (
+  [threadOnly, mcpOnly, projectPickerOnly, reviewOnly, settingsOnly].filter(
+    Boolean,
+  ).length > 1
+) {
   throw new Error("Current visual asset capture modes are mutually exclusive.");
 }
 const appBundle = "/Applications/ChatGPT.app";
@@ -58,6 +63,8 @@ const baselineContext = {
       ? "open-current-project-picker"
       : reviewOnly
         ? "open-current-review-workspace"
+        : settingsOnly
+          ? "open-current-settings-navigation"
     : "resting-and-open-sidebar-menus",
   theme: "dark",
   viewport: { height: 820, width: 1180 },
@@ -237,13 +244,24 @@ try {
   const ranked = await Promise.all(
     candidates.map(async (page) => ({
       area: await page.evaluate(() => window.innerWidth * window.innerHeight),
+      hasPrimaryNavigation: await page.evaluate(() =>
+        Boolean(document.querySelector("nav")),
+      ),
       page,
     })),
   );
-  ranked.sort((left, right) => right.area - left.area);
+  ranked.sort(
+    (left, right) =>
+      Number(right.hasPrimaryNavigation) -
+        Number(left.hasPrimaryNavigation) || right.area - left.area,
+  );
   const main = ranked[0]?.page;
   if (!main) throw new Error("Main Codex Renderer target not found.");
 
+  const focusSession = await main.context().newCDPSession(main);
+  await focusSession.send("Emulation.setFocusEmulationEnabled", {
+    enabled: true,
+  });
   await main.bringToFront();
   await main.waitForFunction(() => document.hasFocus(), undefined, {
     timeout: 15_000,
@@ -1736,10 +1754,79 @@ try {
     semanticLabelEntries: [...semanticLabels],
     threadOnly,
   });
+  if (settingsOnly) {
+    const profileTrigger = main.locator(
+      'button[aria-label="Open profile menu"]:visible',
+    );
+    if ((await profileTrigger.count()) !== 1) {
+      throw new Error("Expected one current profile menu trigger.");
+    }
+    await profileTrigger.click();
+    const profileMenu = main.locator('[role="menu"]:visible');
+    await profileMenu.waitFor();
+    const settingsItem = profileMenu
+      .getByRole("menuitem")
+      .filter({ hasText: "Settings" });
+    if ((await settingsItem.count()) !== 1) {
+      throw new Error("Expected one Settings item in the current profile menu.");
+    }
+    await settingsItem.click();
+    await main.getByRole("navigation", { name: "Settings" }).waitFor();
+    const settingsNavigationItems = [
+      { id: "settings-general", label: "General" },
+      { id: "settings-import", label: "Import" },
+      { id: "settings-profile", label: "Profile" },
+      { id: "settings-appearance", label: "Appearance" },
+      { id: "settings-voice", label: "Voice" },
+      { id: "settings-configuration", label: "Configuration" },
+      { id: "settings-personalization", label: "Personalization" },
+      { id: "settings-pets", label: "Pets" },
+      { id: "settings-keyboard-shortcuts", label: "Keyboard shortcuts" },
+      { id: "settings-usage-billing", label: "Usage & billing" },
+      {
+        id: "settings-account",
+        label: "Account",
+        secondaryId: "settings-account-external",
+      },
+      { id: "settings-computer-use", label: "Computer use" },
+      { id: "settings-computer-history", label: "Computer history" },
+      { id: "settings-appshots", label: "Appshots" },
+      { id: "settings-plugins", label: "Plugins" },
+      { id: "settings-browser", label: "Browser" },
+      { id: "settings-hooks", label: "Hooks" },
+      { id: "settings-connections", label: "Connections" },
+      { id: "settings-git", label: "Git" },
+      { id: "settings-environments", label: "Environments" },
+      { id: "settings-worktrees", label: "Worktrees" },
+      { id: "settings-archived-chats", label: "Archived chats" },
+    ];
+    const settingsCapture = await main.evaluate(
+      (items) => window.__codexUiKitCaptureSettingsNavigationIcons({ items }),
+      settingsNavigationItems,
+    );
+    result.icons.push(...settingsCapture.icons);
+    result.settingsNavigationObservation = {
+      itemLabels: settingsNavigationItems.map(({ label }) => label),
+      navigation: await main.getByRole("navigation", { name: "Settings" })
+        .evaluate((navigation) => {
+          const bounds = navigation.getBoundingClientRect();
+          return {
+            height: Math.round(bounds.height * 100) / 100,
+            left: Math.round(bounds.left * 100) / 100,
+            top: Math.round(bounds.top * 100) / 100,
+            width: Math.round(bounds.width * 100) / 100,
+          };
+        }),
+      searchPlaceholder: await main.getByRole("searchbox").getAttribute(
+        "placeholder",
+      ),
+    };
+  }
   if (
     !threadOnly &&
     !mcpOnly &&
     !reviewOnly &&
+    !settingsOnly &&
     !result.icons.some(
       (icon) =>
         icon.region === "composer" &&
@@ -1819,7 +1906,9 @@ try {
     });
   }
   fullCapture: try {
-    if (threadOnly || mcpOnly || projectPickerOnly || reviewOnly) break fullCapture;
+    if (threadOnly || mcpOnly || projectPickerOnly || reviewOnly || settingsOnly) {
+      break fullCapture;
+    }
     const projectRows = main.locator(
       'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
     );
@@ -2196,10 +2285,11 @@ try {
         label: "Account",
         secondaryId: "settings-account-external",
       },
+      { id: "settings-computer-use", label: "Computer use" },
+      { id: "settings-computer-history", label: "Computer history" },
       { id: "settings-appshots", label: "Appshots" },
       { id: "settings-plugins", label: "Plugins" },
       { id: "settings-browser", label: "Browser" },
-      { id: "settings-computer-use", label: "Computer use" },
       { id: "settings-hooks", label: "Hooks" },
       { id: "settings-connections", label: "Connections" },
       { id: "settings-git", label: "Git" },
@@ -2447,6 +2537,8 @@ try {
         ? "project-picker"
         : reviewOnly
           ? "review-workspace"
+          : settingsOnly
+            ? "settings-navigation"
       : "full";
 
   const canonicalize = (value) =>

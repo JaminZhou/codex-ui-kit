@@ -29,7 +29,17 @@ const threadOnly = process.argv.includes("--thread-only");
 const mcpOnly = process.argv.includes("--mcp-only");
 const projectPickerOnly = process.argv.includes("--project-picker-only");
 const reviewOnly = process.argv.includes("--review-only");
-if ([hooksOnly, threadOnly, mcpOnly, projectPickerOnly, reviewOnly].filter(Boolean).length > 1) {
+const settingsOnly = process.argv.includes("--settings-only");
+if (
+  [
+    hooksOnly,
+    threadOnly,
+    mcpOnly,
+    projectPickerOnly,
+    reviewOnly,
+    settingsOnly,
+  ].filter(Boolean).length > 1
+) {
   throw new Error("Targeted current visual asset modes are mutually exclusive.");
 }
 const supplementalMcpCapturePath =
@@ -42,7 +52,12 @@ if (
   (supplementalMcpCapturePath ||
     supplementalProjectPickerCapturePath ||
     supplementalPermissionCapturePath) &&
-  (hooksOnly || threadOnly || mcpOnly || projectPickerOnly || reviewOnly)
+  (hooksOnly ||
+    threadOnly ||
+    mcpOnly ||
+    projectPickerOnly ||
+    reviewOnly ||
+    settingsOnly)
 ) {
   throw new Error(
     "Supplemental visual captures are available only during a full visual asset refresh.",
@@ -720,6 +735,7 @@ const promotionSpecs = new Map([
     "settings-plugins",
     "settings-browser",
     "settings-computer-use",
+    "settings-computer-history",
     "settings-hooks",
     "settings-connections",
     "settings-git",
@@ -731,7 +747,7 @@ const promotionSpecs = new Map([
     {
       ownerAriaLabel: null,
       ownerEvidence:
-        "fixed current Git Settings navigation icon selected by exact structural ownership",
+        "fixed current Settings navigation icon selected by exact semantic label and structural ownership",
       region: "settings-navigation",
       semanticId: id,
     },
@@ -796,6 +812,7 @@ const runCapture = (
   captureMcpOnly = false,
   captureProjectPickerOnly = false,
   captureReviewOnly = false,
+  captureSettingsOnly = false,
 ) =>
   JSON.parse(
     execFileSync(process.execPath, [capturePath], {
@@ -810,6 +827,9 @@ const runCapture = (
           ? { CODEX_VISUAL_ASSET_PROJECT_PICKER_ONLY: "1" }
           : {}),
         ...(captureReviewOnly ? { CODEX_VISUAL_ASSET_REVIEW_ONLY: "1" } : {}),
+        ...(captureSettingsOnly
+          ? { CODEX_VISUAL_ASSET_SETTINGS_ONLY: "1" }
+          : {}),
       },
       maxBuffer: 64 * 1024 * 1024,
     }),
@@ -817,7 +837,13 @@ const runCapture = (
 const supplementalThreadCapture = includeThreadCapture
   ? runCapture(true)
   : null;
-let capture = runCapture(threadOnly, mcpOnly, projectPickerOnly, reviewOnly);
+let capture = runCapture(
+  threadOnly,
+  mcpOnly,
+  projectPickerOnly,
+  reviewOnly,
+  settingsOnly,
+);
 if (conditionalCapturePath) {
   const normalizedProfile = realpathSync(
     process.env.CODEX_VISUAL_ASSET_PROFILE,
@@ -1542,6 +1568,145 @@ if (threadOnly) {
       `Updated ${manifestPath} with current-thread assets`,
     );
     writeFileSync(rasterManifestPath, rasterOutput);
+  } else {
+    await writeOutput(output);
+  }
+  process.exit(0);
+}
+if (settingsOnly) {
+  const targetIds = [...promotionSpecs.entries()]
+    .filter(([, spec]) => spec.region === "settings-navigation")
+    .map(([id]) => id);
+  const currentFingerprint = {
+    appAsarSha256: capture.baselineContext?.appAsarSha256,
+    appVersion: capture.baselineContext?.appVersion,
+    buildNumber: capture.baselineContext?.buildNumber,
+  };
+  const expectedSettingsFingerprint = {
+    appAsarSha256:
+      "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    appVersion: "26.825.51511",
+    buildNumber: "7377",
+  };
+  const observation = capture.settingsNavigationObservation;
+  if (
+    capture.captureMode !== "settings-navigation" ||
+    capture.baselineContext?.interactionState !==
+      "open-current-settings-navigation" ||
+    canonicalize(currentFingerprint) !==
+      canonicalize(expectedSettingsFingerprint) ||
+    capture.baselineContext?.theme !== manifest.baseline.theme ||
+    canonicalize(capture.baselineContext?.viewport) !==
+      canonicalize(manifest.baseline.viewport) ||
+    canonicalize(observation?.itemLabels) !==
+      canonicalize([
+        "General",
+        "Import",
+        "Profile",
+        "Appearance",
+        "Voice",
+        "Configuration",
+        "Personalization",
+        "Pets",
+        "Keyboard shortcuts",
+        "Usage & billing",
+        "Account",
+        "Computer use",
+        "Computer history",
+        "Appshots",
+        "Plugins",
+        "Browser",
+        "Hooks",
+        "Connections",
+        "Git",
+        "Environments",
+        "Worktrees",
+        "Archived chats",
+      ]) ||
+    observation?.searchPlaceholder !== "Search settings…" ||
+    Math.abs((observation?.navigation?.width ?? 0) - 321.88) > 0.1 ||
+    observation?.navigation?.top !== 46 ||
+    observation?.navigation?.height !== 774
+  ) {
+    throw new Error(
+      `Targeted current Settings capture contract changed: ${canonicalize({
+        captureMode: capture.captureMode,
+        observation,
+      })}.`,
+    );
+  }
+
+  const promotedById = new Map();
+  const existingById = new Map(manifest.icons.map((icon) => [icon.id, icon]));
+  for (const id of targetIds) {
+    const spec = promotionSpecs.get(id);
+    const observed = capture.icons.filter(
+      (candidate) =>
+        candidate.region === spec?.region &&
+        candidate.owner?.semanticId === spec?.semanticId,
+    );
+    if (observed.length !== 1) {
+      throw new Error(
+        `Expected one targeted current Settings capture for ${id}, received ${observed.length}.`,
+      );
+    }
+    const selected = observed[0];
+    const existing = existingById.get(id);
+    const sameRootGeometry =
+      existing &&
+      existing.viewBox === selected.viewBox &&
+      canonicalize(existing.rootAttributes) ===
+        canonicalize(selected.rootAttributes);
+    const promoted = {
+      baselineContext: {
+        ...capture.baselineContext,
+        capturedAt: "2026-08-30",
+      },
+      id,
+      ownerAriaLabel: spec.ownerAriaLabel,
+      ...(spec.ownerEvidence ? { ownerEvidence: spec.ownerEvidence } : {}),
+      primitives: sameRootGeometry
+        ? promotePrimitives(existing, selected)
+        : selected.primitives,
+      region: spec.region,
+      renderSize: selected.renderSize,
+      rootAttributes: selected.rootAttributes,
+      rootComputedStyle: sameRootGeometry
+        ? promoteComputedStyle(existing.rootComputedStyle, selected.rootComputedStyle)
+        : selected.rootComputedStyle,
+      sourceClassName: selected.sourceClassName,
+      status: "runtime-observed",
+      viewBox: selected.viewBox,
+    };
+    promoted.sha256 = createHash("sha256")
+      .update(
+        canonicalize({
+          baselineContext: promoted.baselineContext,
+          primitives: promoted.primitives,
+          renderSize: promoted.renderSize,
+          rootAttributes: promoted.rootAttributes,
+          rootComputedStyle: promoted.rootComputedStyle,
+          sourceClassName: promoted.sourceClassName,
+          viewBox: promoted.viewBox,
+        }),
+      )
+      .digest("hex");
+    promotedById.set(id, promoted);
+  }
+  manifest.icons = [...promotionSpecs.keys()].map(
+    (id) => promotedById.get(id) ?? existingById.get(id),
+  );
+  manifest.settingsBaseline = {
+    ...capture.baselineContext,
+    capturedAt: "2026-08-30",
+  };
+  manifest.settingsNavigationObservation = observation;
+  const output = `${JSON.stringify(manifest, null, 2)}\n`;
+  if (write) {
+    writeManifestAndCurrentThreadSubset(
+      output,
+      `Updated ${manifestPath} with current Settings navigation assets`,
+    );
   } else {
     await writeOutput(output);
   }

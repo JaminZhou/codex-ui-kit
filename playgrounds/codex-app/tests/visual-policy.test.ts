@@ -252,11 +252,11 @@ describe("lifecycle visual policy", () => {
       "expectedActualPosition: { left: 9, top: expectedTop }",
     );
     expect(contract).toContain("const expectedTop = compact ? 447 : 587");
-    expect(contract).toContain("width: 307");
-    expect(contract).toContain(
-      'defaultMaximumRatio: scene.theme === "light" ? 0.006 : 0.005',
+    expect(contract).toContain("width: 306");
+    expect(contract).toContain("defaultMaximumRatio: 0.008");
+    expect(appSource).toMatch(
+      /currentHomeFrame \|\|[\s\S]{0,220}\? 322\.90625/,
     );
-    expect(appSource).toContain("currentHomeFrame\n                  ? 306.90625");
     expect(cdpContract).toContain(
       'helpMenuContract.heading !== "What\'s new"',
     );

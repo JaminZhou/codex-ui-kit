@@ -7,15 +7,15 @@ const styles = readFileSync(
 );
 
 describe("settings visual contract", () => {
-  it("locks the observed 322.91px Settings rail and 768px content column", () => {
+  it("locks the observed 321.88px Settings rail and 768px content column", () => {
     expect(styles).toContain(
-      "--codex-ui-settings-sidebar-width: 20.181875rem",
+      "--codex-ui-settings-sidebar-width: 20.1171875rem",
     );
     expect(styles).toMatch(
       /\.codex-ui-git-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 1\.25rem 0 2rem;/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-settings-shell__search \{[\s\S]*?height: 2rem;/,
+      /\.codex-ui-settings-shell__search \{[\s\S]*?height: 1\.8125rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-settings-shell__navigation-scroll \{[\s\S]*?overflow: auto;/,
@@ -68,7 +68,7 @@ describe("settings visual contract", () => {
       /\.codex-ui-appearance-settings__diff-preview \{[\s\S]*?height: 6\.875rem;/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-appearance-settings__editor,[\s\S]*?border-radius: 1\.0625rem;/,
+      /\.codex-ui-appearance-settings__editor,[\s\S]*?border-radius: 1\.25rem;/,
     );
     expect(styles).toMatch(
       /\.codex-ui-appearance-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,

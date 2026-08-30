@@ -509,6 +509,7 @@ for (const id of [
   "settings-plugins",
   "settings-browser",
   "settings-computer-use",
+  "settings-computer-history",
   "settings-hooks",
   "settings-hooks-reload",
   "settings-connections",
@@ -537,7 +538,7 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 115 ||
+  manifest.icons.length !== 116 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8 ||
@@ -574,7 +575,55 @@ if (
   manifest.reviewObservation?.splitDiffLabel !== "Switch to split diff"
 ) {
   throw new Error(
-    "current visual asset capture must retain 115 promoted icons plus the Composer, Project picker, and Review observations",
+    "current visual asset capture must retain 116 promoted icons plus the Composer, Project picker, and Review observations",
+  );
+}
+if (
+  manifest.settingsBaseline?.appAsarSha256 !==
+    "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7" ||
+  manifest.settingsBaseline?.appVersion !== "26.825.51511" ||
+  manifest.settingsBaseline?.buildNumber !== "7377" ||
+  manifest.settingsBaseline?.capturedAt !== "2026-08-30" ||
+  manifest.settingsBaseline?.interactionState !==
+    "open-current-settings-navigation" ||
+  manifest.settingsBaseline?.theme !== "dark" ||
+  manifest.settingsBaseline?.viewport?.width !== 1180 ||
+  manifest.settingsBaseline?.viewport?.height !== 820 ||
+  canonicalize(manifest.settingsNavigationObservation?.itemLabels) !==
+    canonicalize([
+      "General",
+      "Import",
+      "Profile",
+      "Appearance",
+      "Voice",
+      "Configuration",
+      "Personalization",
+      "Pets",
+      "Keyboard shortcuts",
+      "Usage & billing",
+      "Account",
+      "Computer use",
+      "Computer history",
+      "Appshots",
+      "Plugins",
+      "Browser",
+      "Hooks",
+      "Connections",
+      "Git",
+      "Environments",
+      "Worktrees",
+      "Archived chats",
+    ]) ||
+  manifest.settingsNavigationObservation?.searchPlaceholder !==
+    "Search settings…" ||
+  Math.abs(
+    (manifest.settingsNavigationObservation?.navigation?.width ?? 0) - 321.88,
+  ) > 0.1 ||
+  manifest.settingsNavigationObservation?.navigation?.top !== 46 ||
+  manifest.settingsNavigationObservation?.navigation?.height !== 774
+) {
+  throw new Error(
+    "current Settings visual assets require the exact component-scoped baseline and navigation observation",
   );
 }
 if (

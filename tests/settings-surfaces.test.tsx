@@ -36,7 +36,13 @@ const sections = [
   {
     id: "integrations",
     label: "Integrations",
-    items: [{ id: "plugins", label: "Plugins" }],
+    items: [
+      {
+        id: "plugins",
+        label: "Plugins",
+        trailingIcon: <svg data-testid="plugins-trailing-icon" />,
+      },
+    ],
   },
 ] as const;
 
@@ -81,27 +87,31 @@ function GitFixture({ onSave = () => undefined }) {
 const initialAppearanceValue: AppearanceSettingsValue = {
   codeFontSize: 12,
   dark: {
-    accent: "#339CFF",
+    accent: "Default",
     background: "#181818",
-    codeFont: "ui-monospace, SFMono-Regular",
+    codeFont: "System default",
+    codeFontStyle: "Regular",
     codeTheme: "Codex",
     contrast: 60,
     foreground: "#FFFFFF",
     translucentSidebar: true,
-    uiFont: "-apple-system, BlinkMacSystemFont",
+    uiFont: "System default",
+    uiFontStyle: "Regular",
   },
   diffMarkers: "color",
   dockIcon: "codex",
   fontSmoothing: true,
   light: {
-    accent: "#339CFF",
+    accent: "Default",
     background: "#FFFFFF",
-    codeFont: "ui-monospace, SFMono-Regular",
+    codeFont: "System default",
+    codeFontStyle: "Regular",
     codeTheme: "Codex",
     contrast: 45,
     foreground: "#1A1C1F",
     translucentSidebar: true,
-    uiFont: "-apple-system, BlinkMacSystemFont",
+    uiFont: "System default",
+    uiFontStyle: "Regular",
   },
   reduceMotion: "system",
   theme: "system",
@@ -131,15 +141,18 @@ const initialGeneralValue: GeneralSettingsValue = {
   ambientSuggestions: true,
   autoReview: true,
   bottomPanel: true,
+  confettiCannon: false,
   defaultFileOpenDestination: "vscode",
   followUpBehavior: "queue",
   fullAccess: true,
   language: "auto",
   permissionNotifications: true,
+  plainTextComposer: false,
   pluginsEnabled: true,
   popoutHotkey: null,
   popoutStandaloneChat: false,
   preventSleepWhileRunning: false,
+  projectlessTaskFolder: "/Users/demo/Documents/Codex",
   questionNotifications: true,
   sendShortcut: "enter",
   showContextWindowUsage: false,
@@ -149,7 +162,13 @@ const initialGeneralValue: GeneralSettingsValue = {
   turnCompletionNotifications: "unfocused",
 };
 
-function GeneralFixture({ onOpenSourceLicenses = () => undefined }) {
+function GeneralFixture({
+  onChangeProjectlessTaskFolder = () => undefined,
+  onOpenSourceLicenses = () => undefined,
+}: {
+  onChangeProjectlessTaskFolder?: () => void;
+  onOpenSourceLicenses?: () => void;
+} = {}) {
   const [value, setValue] = useState(initialGeneralValue);
   const [hotkeyCaptureActive, setHotkeyCaptureActive] = useState(false);
   return (
@@ -158,6 +177,7 @@ function GeneralFixture({ onOpenSourceLicenses = () => undefined }) {
       hotkeyCaptureActive={hotkeyCaptureActive}
       onCancelHotkeyCapture={() => setHotkeyCaptureActive(false)}
       onChange={setValue}
+      onChangeProjectlessTaskFolder={onChangeProjectlessTaskFolder}
       onOpenSourceLicenses={onOpenSourceLicenses}
       onStartHotkeyCapture={() => setHotkeyCaptureActive(true)}
       value={value}
@@ -247,6 +267,7 @@ describe("settings surfaces", () => {
     expect(screen.getByRole("button", { name: "Git" }).getAttribute("aria-current"))
       .toBe("page");
     expect(screen.getByRole("button", { name: "Back to app" })).toBeTruthy();
+    expect(screen.getByTestId("plugins-trailing-icon")).toBeTruthy();
   });
 
   it("returns grouped search results and restores the navigation", () => {
@@ -543,6 +564,24 @@ describe("settings surfaces", () => {
     fireEvent.change(lightContrast, { target: { value: "51" } });
     expect(lightContrast.getAttribute("value")).toBe("51");
     expect(screen.getByText("51", { selector: "output" })).toBeTruthy();
+
+    const lightAccent = screen.getByRole("button", {
+      name: "Light accent color",
+    });
+    expect(lightAccent.textContent).toContain("Default");
+    fireEvent.click(lightAccent);
+    expect(screen.getAllByRole("menuitem")).toHaveLength(9);
+    fireEvent.click(screen.getByRole("menuitem", { name: "Blue" }));
+    expect(lightAccent.textContent).toContain("Blue");
+
+    expect(
+      screen.getByRole("button", { name: "Light UI font" }).textContent,
+    ).toContain("System default");
+    expect(
+      screen
+        .getByRole("button", { name: "Light UI font style" })
+        .hasAttribute("disabled"),
+    ).toBe(true);
   });
 
   it("provides the current 16-option code theme menu and host actions", () => {
@@ -689,7 +728,7 @@ describe("settings surfaces", () => {
     );
   });
 
-  it("models all five current General settings groups as controlled inputs", () => {
+  it("models all six current General settings groups as controlled inputs", () => {
     render(<GeneralFixture />);
 
     for (const heading of [
@@ -698,6 +737,7 @@ describe("settings surfaces", () => {
       "Composer",
       "Popout Window",
       "Notifications",
+      "Toys",
     ]) {
       expect(
         screen.getByRole("heading", { level: 2, name: heading }),
@@ -709,11 +749,11 @@ describe("settings surfaces", () => {
     expect(defaultPermissions.hasAttribute("disabled")).toBe(true);
     expect(defaultPermissions.getAttribute("aria-checked")).toBe("true");
 
-    const autoReview = screen.getByRole("switch", {
-      name: "Show Auto-review in the composer",
+    const plainTextComposer = screen.getByRole("switch", {
+      name: "Plain text composer",
     });
-    fireEvent.click(autoReview);
-    expect(autoReview.getAttribute("aria-checked")).toBe("false");
+    fireEvent.click(plainTextComposer);
+    expect(plainTextComposer.getAttribute("aria-checked")).toBe("true");
 
     const showContext = screen.getByRole("switch", {
       name: "Show context window usage in the composer",
@@ -855,8 +895,14 @@ describe("settings surfaces", () => {
   });
 
   it("supports General segmented keyboard flow and host-owned actions", () => {
+    const onChangeProjectlessTaskFolder = vi.fn();
     const onOpenSourceLicenses = vi.fn();
-    render(<GeneralFixture onOpenSourceLicenses={onOpenSourceLicenses} />);
+    render(
+      <GeneralFixture
+        onChangeProjectlessTaskFolder={onChangeProjectlessTaskFolder}
+        onOpenSourceLicenses={onOpenSourceLicenses}
+      />,
+    );
 
     const bottom = screen.getByRole("button", { name: "Bottom" });
     bottom.focus();
@@ -867,6 +913,10 @@ describe("settings surfaces", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "View" }));
     expect(onOpenSourceLicenses).toHaveBeenCalledOnce();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Change projectless task folder" }),
+    );
+    expect(onChangeProjectlessTaskFolder).toHaveBeenCalledOnce();
 
     fireEvent.click(
       screen.getByRole("button", {

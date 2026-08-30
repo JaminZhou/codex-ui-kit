@@ -18,6 +18,7 @@ export interface SettingsNavigationItem {
   keywords?: readonly string[];
   label: string;
   resultLabel?: string;
+  trailingIcon?: ReactNode;
 }
 
 export interface SettingsNavigationSection {
@@ -198,6 +199,14 @@ export function SettingsShell({
                     {normalizedQuery && item.resultLabel ? (
                       <span className="codex-ui-settings-shell__result-label">
                         {item.resultLabel}
+                      </span>
+                    ) : null}
+                    {item.trailingIcon ? (
+                      <span
+                        aria-hidden="true"
+                        className="codex-ui-settings-shell__item-trailing-icon"
+                      >
+                        {item.trailingIcon}
                       </span>
                     ) : null}
                   </button>
@@ -1114,11 +1123,13 @@ export interface AppearanceThemeConfig {
   accent: string;
   background: string;
   codeFont: string;
+  codeFontStyle: string;
   codeTheme: string;
   contrast: number;
   foreground: string;
   translucentSidebar: boolean;
   uiFont: string;
+  uiFontStyle: string;
 }
 
 export interface AppearanceSettingsValue {
@@ -1136,9 +1147,12 @@ export interface AppearanceSettingsValue {
 
 export interface AppearanceSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
+  accentOptions?: readonly string[];
   chatGptDockIcon?: ReactNode;
   codeThemeOptions?: readonly string[];
   codexDockIcon?: ReactNode;
+  fontOptions?: readonly string[];
+  fontStyleOptions?: readonly string[];
   onChange: (value: AppearanceSettingsValue) => void;
   onCopyTheme?: (theme: AppearanceThemeKind) => void;
   onImportTheme?: (theme: AppearanceThemeKind) => void;
@@ -1163,6 +1177,21 @@ const defaultCodeThemeOptions = [
   "VS Code Plus",
   "Xcode",
 ] as const;
+
+const defaultAppearanceAccentOptions = [
+  "Default",
+  "Blue",
+  "Green",
+  "Yellow",
+  "Pink",
+  "Orange",
+  "Purple",
+  "Black",
+  "Custom",
+] as const;
+
+const defaultAppearanceFontOptions = ["System default"] as const;
+const defaultAppearanceFontStyleOptions = ["Regular"] as const;
 
 function AppearanceThemePreview({
   checked,
@@ -1254,22 +1283,84 @@ function AppearanceSwitch({
   );
 }
 
+function AppearanceMenuControl({
+  className,
+  disabled = false,
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  className?: string;
+  disabled?: boolean;
+  label: string;
+  onChange: (value: string) => void;
+  options: readonly string[];
+  value: string;
+}) {
+  const trigger = (
+    <button
+      aria-label={label}
+      className={[
+        "codex-ui-appearance-settings__menu-trigger",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      disabled={disabled}
+      type="button"
+    >
+      <span>{value}</span>
+      <span aria-hidden="true">⌄</span>
+    </button>
+  );
+  if (disabled) return trigger;
+
+  const currentOptions = options.includes(value)
+    ? options
+    : [value, ...options];
+  return (
+    <Menu
+      align="end"
+      className="codex-ui-appearance-settings__value-menu"
+      label={label}
+      sideOffset={4}
+      trigger={trigger}
+    >
+      {currentOptions.map((option) => (
+        <MenuItem
+          aria-current={option === value ? "true" : undefined}
+          key={option}
+          onSelect={() => onChange(option)}
+        >
+          {option}
+        </MenuItem>
+      ))}
+    </Menu>
+  );
+}
+
 function AppearanceThemeEditor({
+  accentOptions,
   codeThemeOptions,
   config,
+  fontOptions,
+  fontStyleOptions,
   kind,
   onChange,
   onCopy,
   onImport,
 }: {
+  accentOptions: readonly string[];
   codeThemeOptions: readonly string[];
   config: AppearanceThemeConfig;
+  fontOptions: readonly string[];
+  fontStyleOptions: readonly string[];
   kind: AppearanceThemeKind;
   onChange: (config: AppearanceThemeConfig) => void;
   onCopy?: () => void;
   onImport?: () => void;
 }) {
-  const accentInputRef = useRef<HTMLInputElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
   const foregroundInputRef = useRef<HTMLInputElement>(null);
   const update = <K extends keyof AppearanceThemeConfig>(
@@ -1277,7 +1368,6 @@ function AppearanceThemeEditor({
     nextValue: AppearanceThemeConfig[K],
   ) => onChange({ ...config, [key]: nextValue });
   const colorRows = [
-    ["accent", "Accent", accentInputRef],
     ["background", "Background", backgroundInputRef],
     ["foreground", "Foreground", foregroundInputRef],
   ] as const;
@@ -1335,6 +1425,16 @@ function AppearanceThemeEditor({
           </Menu>
         </div>
       </header>
+      <div className="codex-ui-appearance-settings__editor-row">
+        <span>Accent</span>
+        <AppearanceMenuControl
+          className="codex-ui-appearance-settings__accent-trigger"
+          label={`${kind} accent color`}
+          onChange={(accent) => update("accent", accent)}
+          options={accentOptions}
+          value={config.accent}
+        />
+      </div>
       {colorRows.map(([key, label, inputRef]) => (
         <div className="codex-ui-appearance-settings__editor-row" key={key}>
           <span>{label}</span>
@@ -1366,26 +1466,48 @@ function AppearanceThemeEditor({
           </div>
         </div>
       ))}
-      <label className="codex-ui-appearance-settings__editor-row">
+      <div className="codex-ui-appearance-settings__editor-row">
         <span>UI font</span>
-        <input
-          aria-label={`${kind} UI font`}
-          onChange={(event) => update("uiFont", event.currentTarget.value)}
-          spellCheck={false}
-          type="text"
-          value={config.uiFont}
-        />
-      </label>
-      <label className="codex-ui-appearance-settings__editor-row">
+        <div className="codex-ui-appearance-settings__font-controls">
+          <AppearanceMenuControl
+            className="codex-ui-appearance-settings__font-trigger"
+            label={`${kind} UI font`}
+            onChange={(uiFont) => update("uiFont", uiFont)}
+            options={fontOptions}
+            value={config.uiFont}
+          />
+          <AppearanceMenuControl
+            className="codex-ui-appearance-settings__font-style-trigger"
+            disabled={config.uiFont === "System default"}
+            label={`${kind} UI font style`}
+            onChange={(uiFontStyle) => update("uiFontStyle", uiFontStyle)}
+            options={fontStyleOptions}
+            value={config.uiFontStyle}
+          />
+        </div>
+      </div>
+      <div className="codex-ui-appearance-settings__editor-row">
         <span>Code font</span>
-        <input
-          aria-label={`${kind} code font`}
-          onChange={(event) => update("codeFont", event.currentTarget.value)}
-          spellCheck={false}
-          type="text"
-          value={config.codeFont}
-        />
-      </label>
+        <div className="codex-ui-appearance-settings__font-controls">
+          <AppearanceMenuControl
+            className="codex-ui-appearance-settings__font-trigger"
+            label={`${kind} code font`}
+            onChange={(codeFont) => update("codeFont", codeFont)}
+            options={fontOptions}
+            value={config.codeFont}
+          />
+          <AppearanceMenuControl
+            className="codex-ui-appearance-settings__font-style-trigger"
+            disabled={config.codeFont === "System default"}
+            label={`${kind} code font style`}
+            onChange={(codeFontStyle) =>
+              update("codeFontStyle", codeFontStyle)
+            }
+            options={fontStyleOptions}
+            value={config.codeFontStyle}
+          />
+        </div>
+      </div>
       <div className="codex-ui-appearance-settings__editor-row">
         <span>Translucent sidebar</span>
         <AppearanceSwitch
@@ -1551,10 +1673,13 @@ function AppearanceNumberInput({
 }
 
 export function AppearanceSettingsPage({
+  accentOptions = defaultAppearanceAccentOptions,
   chatGptDockIcon,
   className,
   codeThemeOptions = defaultCodeThemeOptions,
   codexDockIcon,
+  fontOptions = defaultAppearanceFontOptions,
+  fontStyleOptions = defaultAppearanceFontStyleOptions,
   onChange,
   onCopyTheme,
   onImportTheme,
@@ -1601,9 +1726,12 @@ export function AppearanceSettingsPage({
           </div>
           <AppearanceDiffPreview />
         </section>
-        <AppearanceThemeEditor
-          codeThemeOptions={codeThemeOptions}
-          config={value.light}
+          <AppearanceThemeEditor
+            accentOptions={accentOptions}
+            codeThemeOptions={codeThemeOptions}
+            config={value.light}
+            fontOptions={fontOptions}
+            fontStyleOptions={fontStyleOptions}
           kind="Light"
           onChange={(light) => update("light", light)}
           onCopy={
@@ -1613,9 +1741,12 @@ export function AppearanceSettingsPage({
             onImportTheme ? () => onImportTheme("Light") : undefined
           }
         />
-        <AppearanceThemeEditor
-          codeThemeOptions={codeThemeOptions}
-          config={value.dark}
+          <AppearanceThemeEditor
+            accentOptions={accentOptions}
+            codeThemeOptions={codeThemeOptions}
+            config={value.dark}
+            fontOptions={fontOptions}
+            fontStyleOptions={fontStyleOptions}
           kind="Dark"
           onChange={(dark) => update("dark", dark)}
           onCopy={onCopyTheme ? () => onCopyTheme("Dark") : undefined}
@@ -1767,18 +1898,23 @@ export type GeneralFollowUpBehavior = "queue" | "steer";
 export type GeneralCompletionNotifications = "never" | "unfocused" | "always";
 
 export interface GeneralSettingsValue {
-  ambientSuggestions: boolean;
-  autoReview: boolean;
+  /** @deprecated Not shown by the current General settings surface. */
+  ambientSuggestions?: boolean;
+  /** @deprecated Not shown by the current General settings surface. */
+  autoReview?: boolean;
   bottomPanel: boolean;
+  confettiCannon: boolean;
   defaultFileOpenDestination: string;
   followUpBehavior: GeneralFollowUpBehavior;
   fullAccess: boolean;
   language: string;
   permissionNotifications: boolean;
+  plainTextComposer: boolean;
   pluginsEnabled: boolean;
   popoutHotkey: string | null;
   popoutStandaloneChat: boolean;
   preventSleepWhileRunning: boolean;
+  projectlessTaskFolder: string;
   questionNotifications: boolean;
   sendShortcut: GeneralSendShortcut;
   showContextWindowUsage: boolean;
@@ -1803,6 +1939,7 @@ export interface GeneralSettingsPageProps
   languageOptions?: readonly GeneralSettingsOption[];
   onCancelHotkeyCapture?: () => void;
   onChange: (value: GeneralSettingsValue) => void;
+  onChangeProjectlessTaskFolder?: () => void;
   onOpenSourceLicenses?: () => void;
   onStartHotkeyCapture?: () => void;
   value: GeneralSettingsValue;
@@ -2260,6 +2397,7 @@ export function GeneralSettingsPage({
   languageOptions = defaultGeneralLanguageOptions,
   onCancelHotkeyCapture,
   onChange,
+  onChangeProjectlessTaskFolder,
   onOpenSourceLicenses,
   onStartHotkeyCapture,
   value,
@@ -2315,18 +2453,6 @@ export function GeneralSettingsPage({
         </GeneralSettingsRow>
         <GeneralSettingsRow
           description={riskDescription(
-            "ChatGPT can read and edit files in its workspace. ChatGPT automatically reviews requests for additional access. Auto-review can make mistakes.",
-          )}
-          label="Auto-review"
-        >
-          <GeneralSwitch
-            checked={value.autoReview}
-            label="Show Auto-review in the composer"
-            onChange={(autoReview) => update("autoReview", autoReview)}
-          />
-        </GeneralSettingsRow>
-        <GeneralSettingsRow
-          description={riskDescription(
             "When ChatGPT runs with full access, it can edit any file on your computer and run commands with network, without your approval. This significantly increases the risk of data loss, leaks, or unexpected behavior.",
           )}
           label="Full access"
@@ -2340,6 +2466,25 @@ export function GeneralSettingsPage({
       </GeneralSettingsSection>
 
       <GeneralSettingsSection label="General">
+        <GeneralSettingsRow
+          description="The location where tasks started outside of projects store their data by default."
+          label="Projectless task folder"
+        >
+          <div className="codex-ui-general-settings__folder-control">
+            <span title={value.projectlessTaskFolder}>
+              {value.projectlessTaskFolder}
+            </span>
+            <button
+              aria-label="Change projectless task folder"
+              className="codex-ui-general-settings__secondary-action"
+              disabled={!onChangeProjectlessTaskFolder}
+              onClick={onChangeProjectlessTaskFolder}
+              type="button"
+            >
+              Change
+            </button>
+          </div>
+        </GeneralSettingsRow>
         <GeneralSettingsRow
           description="Where files and folders open by default"
           label="Default file open destination"
@@ -2421,18 +2566,6 @@ export function GeneralSettingsPage({
           />
         </GeneralSettingsRow>
         <GeneralSettingsRow
-          description="Suggest what to do next by searching project files and connected apps"
-          label="Suggested prompts"
-        >
-          <GeneralSwitch
-            checked={value.ambientSuggestions}
-            label="Enable ambient suggestions"
-            onChange={(ambientSuggestions) =>
-              update("ambientSuggestions", ambientSuggestions)
-            }
-          />
-        </GeneralSettingsRow>
-        <GeneralSettingsRow
           description="Third-party notices for bundled dependencies"
           label="Open source licenses"
         >
@@ -2458,6 +2591,18 @@ export function GeneralSettingsPage({
       </GeneralSettingsSection>
 
       <GeneralSettingsSection label="Composer">
+        <GeneralSettingsRow
+          description="Keep code, Markdown, and links as literal text while writing messages"
+          label="Plain text composer"
+        >
+          <GeneralSwitch
+            checked={value.plainTextComposer}
+            label="Plain text composer"
+            onChange={(plainTextComposer) =>
+              update("plainTextComposer", plainTextComposer)
+            }
+          />
+        </GeneralSettingsRow>
         <GeneralSettingsRow label="Show context window usage">
           <GeneralSwitch
             checked={value.showContextWindowUsage}
@@ -2620,6 +2765,21 @@ export function GeneralSettingsPage({
             label="Enable question notifications"
             onChange={(questionNotifications) =>
               update("questionNotifications", questionNotifications)
+            }
+          />
+        </GeneralSettingsRow>
+      </GeneralSettingsSection>
+
+      <GeneralSettingsSection label="Toys">
+        <GeneralSettingsRow
+          description="Let Codex fire confetti in the app when you ask!"
+          label="Confetti cannon"
+        >
+          <GeneralSwitch
+            checked={value.confettiCannon}
+            label="Confetti cannon"
+            onChange={(confettiCannon) =>
+              update("confettiCannon", confettiCannon)
             }
           />
         </GeneralSettingsRow>
