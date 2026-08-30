@@ -476,6 +476,20 @@ const currentBuildPersonalizationSettingsMenuReference =
   process.env.CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_MENU_REFERENCE;
 const currentBuildPersonalizationSettingsCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_COMPACT_REFERENCE;
+const currentBuildKeyboardSettingsReference =
+  process.env.CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_REFERENCE;
+const currentBuildKeyboardSettingsSearchReference =
+  process.env.CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_SEARCH_REFERENCE;
+const currentBuildKeyboardSettingsCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_COMPACT_REFERENCE;
+const currentBuildVoiceSettingsReference =
+  process.env.CODEX_UI_KIT_CURRENT_VOICE_26_825_REFERENCE;
+const currentBuildVoiceSettingsMicrophoneReference =
+  process.env.CODEX_UI_KIT_CURRENT_VOICE_26_825_MICROPHONE_REFERENCE;
+const currentBuildVoiceSettingsPickerReference =
+  process.env.CODEX_UI_KIT_CURRENT_VOICE_26_825_PICKER_REFERENCE;
+const currentBuildVoiceSettingsCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_VOICE_26_825_COMPACT_REFERENCE;
 const currentBuildWorktreeSettingsReference =
   process.env.CODEX_UI_KIT_CURRENT_26_825_WORKTREE_SETTINGS_REFERENCE;
 const currentBuildHooksSettingsReference =
@@ -3791,6 +3805,110 @@ for (const scene of selectedScenes) {
       maximumRatioName:
         "CODEX_UI_KIT_CURRENT_PERSONALIZATION_26_825_COMPACT_MAX_DIFF_RATIO",
       referencePath: currentBuildPersonalizationSettingsCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-keyboard-shortcuts" &&
+    currentBuildKeyboardSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.06,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_MAX_DIFF_RATIO",
+      referencePath: currentBuildKeyboardSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-keyboard-shortcuts-search" &&
+    currentBuildKeyboardSettingsSearchReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.06,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_SEARCH_MAX_DIFF_RATIO",
+      referencePath: currentBuildKeyboardSettingsSearchReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-keyboard-shortcuts-compact" &&
+    currentBuildKeyboardSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.08,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_KEYBOARD_26_825_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildKeyboardSettingsCompactReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-voice-settings" &&
+    currentBuildVoiceSettingsReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.055,
+      masks: [],
+      maximumRatioName: "CODEX_UI_KIT_CURRENT_VOICE_26_825_MAX_DIFF_RATIO",
+      referencePath: currentBuildVoiceSettingsReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-voice-settings-microphone-menu" &&
+    currentBuildVoiceSettingsMicrophoneReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.055,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_VOICE_26_825_MICROPHONE_MAX_DIFF_RATIO",
+      referencePath: currentBuildVoiceSettingsMicrophoneReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-voice-settings-picker" &&
+    currentBuildVoiceSettingsPickerReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.06,
+      masks: [{ height: 144, left: 518, top: 290, width: 144 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_VOICE_26_825_PICKER_MAX_DIFF_RATIO",
+      referencePath: currentBuildVoiceSettingsPickerReference,
+      sceneId: scene.id,
+    });
+  }
+
+  if (
+    scene.id === "workspace-voice-settings-compact" &&
+    currentBuildVoiceSettingsCompactReference
+  ) {
+    await compareCurrentBuildWorkspaceFrame({
+      actual,
+      defaultMaximumRatio: 0.075,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_VOICE_26_825_COMPACT_MAX_DIFF_RATIO",
+      referencePath: currentBuildVoiceSettingsCompactReference,
       sceneId: scene.id,
     });
   }

@@ -706,6 +706,20 @@ and zero horizontal overflow. Local-only wide/menu/compact comparisons pass at
 5.4469%, 4.5811%, and 7.4199% under 5.5%/5.5%/8% ceilings. Other Settings
 routes are not promoted by this result.
 
+The same build now independently promotes Keyboard shortcuts and
+Voice/Dictation. Keyboard exposes 129 rows, exact `dictation` filtering to
+three commands, shortcut editing/capture, a bottom-sticky search field, and
+the product's observed 720px geometry where the copy column collapses while
+the 384px binding column remains authoritative. Voice covers the microphone
+menu, nine-option picker, screen-context switch, three hotkey controls,
+dependent dictation-bar switch, dictionary and recent-recording cards, and
+wide/compact bottom reachability. Browser/CDP and Electron own state and
+interaction; ten reviewed replay baselines own regression pixels. Local-only
+full-window product ratios are 4.4204%/3.2076%/4.7363% for Keyboard
+wide/search/compact and 3.2773%/3.6313%/3.3589%/6.4479% for Voice
+wide/microphone/picker/compact. The picker masks only host-supplied voice
+artwork; no product screenshot or profile is committed.
+
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
 thread scenario must not be generalized to unobserved routes or states.

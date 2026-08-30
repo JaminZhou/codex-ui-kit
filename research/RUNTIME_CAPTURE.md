@@ -2025,6 +2025,30 @@ sanitized instructions and safe callbacks to verify dirty/restore, switch,
 Delete delegation, selection, keyboard movement, Escape dismissal, and focus
 return. Product screenshots and profile data stay local-only.
 
+## Current `26.825.51511` Keyboard shortcuts and Voice sample
+
+Use the same loopback-only isolated process, but treat Keyboard shortcuts and
+Voice as independent app-owned routes. Keyboard capture records the 129 fixed
+visible command names/descriptions and shortcut bindings, `dictation` search,
+one edit-capture state, the sticky search position at bottom, and 1180×820 plus
+720×680 geometry. At 720px, preserve the observed zero-width copy column and
+324.125px binding column; this is current evidence, not a responsive design
+recommendation.
+
+Voice capture records fixed labels, the System-default and host microphone
+menu geometry, nine fixed voice names/descriptions, screen-context and
+dictation controls, dictionary/recording cards, picker geometry, and
+wide/compact top/bottom scroll ownership. Do not persist a product selection,
+record audio, or retain host/profile data. Voice artwork remains host supplied:
+mask only the 144×144 picker artwork ownership region while keeping the picker,
+navigation, radio dots, copy, buttons, and backdrop pixel-gated.
+
+The accepted replay uses ten reviewed baselines. CDP checks current geometry,
+row/radio counts, filtering, capture, dependent switches, menus, scrolling,
+and zero horizontal overflow; Electron repeats controlled interactions and the
+wide→compact transition. Product screenshots and the disposable profile stay
+local-only.
+
 ## Promotion rule
 
 After a capture:

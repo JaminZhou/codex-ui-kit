@@ -24,6 +24,7 @@ export * from "./components/ProposedPlan.js";
 export * from "./components/ResourceSurfaces.js";
 export * from "./components/SearchActivity.js";
 export * from "./components/SettingsSurfaces.js";
+export * from "./components/KeyboardVoiceSettings.js";
 export * from "./components/StatusIndicator.js";
 export * from "./components/SubagentActivity.js";
 export * from "./components/McpToolCallGroup.js";

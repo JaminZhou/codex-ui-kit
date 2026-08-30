@@ -256,6 +256,31 @@ textarea {
   box-shadow: none;
 }
 
+.demo-root:is(
+    [data-frame^="workspace-keyboard-shortcuts"],
+    [data-frame^="workspace-voice-settings"]
+  )
+  .codex-ui-app-shell__layout {
+  --codex-ui-app-shell-sidebar-track: 0rem;
+  grid-template-columns: 0 minmax(0, 1fr) 0;
+}
+
+.demo-root:is(
+    [data-frame^="workspace-keyboard-shortcuts"],
+    [data-frame^="workspace-voice-settings"]
+  )
+  :is(.codex-ui-app-shell__sidebar, .codex-ui-app-shell__sidebar-resizer) {
+  display: none;
+}
+
+.demo-root:is(
+    [data-frame^="workspace-keyboard-shortcuts"],
+    [data-frame^="workspace-voice-settings"]
+  )
+  .codex-ui-app-shell__main {
+  box-shadow: none;
+}
+
 .demo-codex-dock-icon {
   align-items: center;
   background: linear-gradient(145deg, #fff 0 42%, #202020 42% 100%);

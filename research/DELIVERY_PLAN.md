@@ -13,9 +13,9 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 89 surface groups: 59 P0, 21 P1, and 9 P2.
-- 33 groups have current-build runtime evidence, 43 have previous-build-only
-  runtime evidence, and 13 have not been sampled.
+- The inventory contains 90 surface groups: 59 P0, 21 P1, and 10 P2.
+- 35 groups have current-build runtime evidence, 43 have previous-build-only
+  runtime evidence, and 12 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
@@ -1087,8 +1087,13 @@ without confusing package readiness with full product reconstruction.
     automations, each with one end-to-end vertical slice. The current
     `settings.personalization` slice is delivered for Custom instructions,
     Memory controls, warning, Personality menu, wide/compact/bottom geometry,
-    Browser/CDP, Electron, and local-only current-product pixels; Keyboard,
-    Voice, Usage, and remaining integration routes stay open.
+    Browser/CDP, Electron, and local-only current-product pixels. Keyboard
+    shortcuts and Voice/Dictation are now separate delivered slices: the first
+    gates all 129 visible commands, filtering, edit/capture, sticky scrolling,
+    and the current narrow-column behavior; the second gates microphone and
+    nine-voice selection, screen context, hotkeys, dictionary, recordings,
+    wide/compact scrolling, and host-supplied voice artwork boundaries. Usage
+    and remaining integration routes stay open.
 12. **Full-app validation and global convergence**: replay/live App Server
     attribution, dark/light and wide/compact matrices, current-build regional
     pixels, public contract freeze, compatibility matrix, and release

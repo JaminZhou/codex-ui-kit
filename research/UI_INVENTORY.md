@@ -188,7 +188,17 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 33 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 13 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 28 groups and Electron verification covers 28.
+The current Keyboard shortcuts and Voice follow-up splits the former combined
+candidate into independently owned `settings.keyboard-shortcuts` and
+`settings.voice-dictation` groups. It records the 129-row shortcut catalog,
+search/edit/capture and sticky-scroll lifecycle, plus microphone, nine-voice
+picker, screen-context, hotkey, dictionary, recording, wide/compact and
+bottom-scroll states. CDP geometry, controlled Electron interaction, ten
+reviewed replay baselines, and seven local-only full-window product comparisons
+now gate those two groups. The host supplies Voice artwork; only that artwork
+region is masked in the picker comparison.
+
+Current inventory: 90 surface groups; 35 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 30 groups and Electron verification covers 30.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
