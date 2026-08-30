@@ -64,7 +64,8 @@ observation from a previous build remains historical evidence.
   geometry rather than private task counts. It revalidates the 320px Help menu
   and content-dependent Projects Index. The sidebar is now 321.875px wide;
   the collapsed 600px Projects route remains 559px with 415/128 columns.
-  `Sites` is absent from every sampled fixed-route stack. Details are in
+  Explore is present and `Sites` is absent from the sampled fixed-route stack.
+  Details are in
   [`26.825.51511.md`](26.825.51511.md). The rich Markdown streaming follow-up
   is current on 26.825.51511; activity, Plan, Search/Browser, and long-thread
   follow-ups remain 26.825.31414
@@ -84,9 +85,11 @@ observation from a previous build remains historical evidence.
   External page content is explicitly source-owned and excluded. Multi-tab,
   authentication, download, permission, history, and page error states remain
   incomplete.
-  account/settings, other feature-state,
-  and exact visual-asset captures remain previous-build evidence until
-  recaptured.
+  The same-build follow-up now also covers the six-item Account menu across
+  Dark/Light and wide/compact states, the 22-row Settings rail, General,
+  Appearance, and a naturally completed basic turn across 1180, 721, and
+  720px widths. Other feature-state and lifecycle captures remain
+  previous-build evidence until recaptured.
 - A previous 26.820 route-continuity probe locks Projects → Back → Forward
   location restoration, x=88/120/152 titlebar controls, `opacity: 0.4`
   unavailable navigation, 720px pinned continuity, explicit Hide/Show, and
@@ -103,15 +106,14 @@ observation from a previous build remains historical evidence.
   return, and zero compact overflow. Four unmasked owned-main comparisons pass
   between 0.2708% and 1.7855% under a 2.5% hard limit; the product preference
   was restored to System after capture.
-- The previous 26.820 account-menu sample covers Dark and Light at 1180×820 and
-  720×680. It locks the 322.90625px sidebar, 306.90625×188.375px portalled
-  menu, six 28.5625px rows at weight 400, 9px visual divider, five exact
-  sampled icons, one avatar, menu-surface focus, zero role separators, zero
-  compact overflow, Escape dismissal, and trigger focus return. The account
-  trigger width remains content-dependent and is gated by inset, height,
-  footer position, containment, and a minimum usable width. Privacy-masked
-  menu-region comparisons pass between 0.3794% and 0.5284% under independent
-  Dark 0.5% and Light 0.6% limits; product screenshots remain local-only.
+- The current 26.825 Account-menu sample covers Dark and Light at 1180×820 and
+  720×680. It locks the 321.875px sidebar, 305.875×188.375px portalled menu,
+  six weight-400 items, zero compact overflow, Escape dismissal, trigger focus
+  return, and restoration to System. The account trigger width remains
+  content-dependent and is gated by inset, height, footer position,
+  containment, and a minimum usable width. The previous 26.820 privacy-masked
+  product comparisons remain regression evidence; current raw account
+  screenshots remain local-only.
 - The project action menu remains on the frozen
   `electronBridge.showContextMenu` path. The independent replica now locks the
   current provider separately from the rendered AppKit composition. The
@@ -120,12 +122,14 @@ observation from a previous build remains historical evidence.
   118×34 `New section…` submenu. The exact 16×16 Section source, conditional
   unread variant, ArrowRight/ArrowLeft/Escape lifecycle, two reviewed frames,
   and local-only 3.8155%/6.9542% unmasked region comparisons are current.
-- The previous 26.818 fixed-message task revalidates the sampled completed
-  conversation shell. It locks the 768px thread and 736×98 Composer at
-  1180×820, compact containment at 820×680, 14/22px message typography, the
-  20px user bubble, four exact response-action assets, and all five Composer
-  control hit targets. The local-only 768×774 product crop is compared without
-  masks at 0.4320% changed pixels under a 0.5% hard limit.
+- The current 26.825 fixed-message task revalidates the sampled completed
+  conversation shell. It locks the 736×98 Composer at 1180×820, the exact
+  721px open/720px collapsed boundary, 14/22.75px message typography, the 22px
+  user bubble, the separate project/title header composition, four exact
+  response actions, and all five Composer targets. Three reviewed baselines
+  and nine local-only product regions pass independent 7% header, 0.6% thread,
+  and 1% Composer limits. The prior 26.818 0.4320% crop remains regression
+  evidence.
 - The previous 26.820 thirty-turn task refreshes that shell and adds responsive
   virtualization/navigation evidence. Wide mode exposes the 30-button
   36×10px rail, 11 mounted turns, message-15 materialization, and the sampled
@@ -184,7 +188,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 17 have current-build runtime evidence, 58 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 16 groups and Electron verification covers 16.
+Current inventory: 89 surface groups; 23 have current-build runtime evidence, 52 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 22 groups and Electron verification covers 22.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

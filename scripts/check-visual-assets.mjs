@@ -517,9 +517,11 @@ for (const id of [
   "settings-environments",
   "settings-worktrees",
   "settings-archived-chats",
+  "sidebar-explore",
   "composer-send",
   "thread-header-project",
   "thread-header-actions",
+  "thread-header-share",
   "thread-header-open-in-chevron",
   "thread-header-summary",
   "thread-header-bottom-panel",
@@ -538,7 +540,7 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 116 ||
+  manifest.icons.length !== 118 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8 ||
@@ -575,7 +577,47 @@ if (
   manifest.reviewObservation?.splitDiffLabel !== "Switch to split diff"
 ) {
   throw new Error(
-    "current visual asset capture must retain 116 promoted icons plus the Composer, Project picker, and Review observations",
+    "current visual asset capture must retain 118 promoted icons plus the Composer, Project picker, and Review observations",
+  );
+}
+const currentBasicThreadIconIds = [
+  "sidebar-explore",
+  "window-chrome-sidebar",
+  "composer-send",
+  "thread-header-project",
+  "thread-header-actions",
+  "thread-header-share",
+  "thread-header-summary",
+  "thread-header-bottom-panel",
+  "thread-header-side-panel",
+  "thread-assistant-copy",
+  "thread-assistant-good",
+  "thread-assistant-bad",
+  "thread-assistant-fork",
+];
+if (
+  manifest.threadBaseline?.appAsarSha256 !==
+    "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7" ||
+  manifest.threadBaseline?.appVersion !== "26.825.51511" ||
+  manifest.threadBaseline?.buildNumber !== "7377" ||
+  manifest.threadBaseline?.capturedAt !== "2026-08-30" ||
+  manifest.threadBaseline?.interactionState !==
+    "completed-current-basic-thread" ||
+  manifest.threadBaseline?.theme !== "dark" ||
+  manifest.threadBaseline?.viewport?.width !== 1180 ||
+  manifest.threadBaseline?.viewport?.height !== 820 ||
+  manifest.threadObservation?.structuralNewChatIconCount !== 0 ||
+  currentBasicThreadIconIds.some((id) => {
+    const icon = manifest.icons.find((candidate) => candidate.id === id);
+    return (
+      !icon ||
+      canonicalize(icon.baselineContext) !==
+        canonicalize(manifest.threadBaseline)
+    );
+  })
+) {
+  throw new Error(
+    "current basic-thread visual assets require the exact component-scoped baseline and removed header New chat evidence",
   );
 }
 if (

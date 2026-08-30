@@ -209,6 +209,7 @@ type SidebarGlyphName =
   | "automation"
   | "archive-current"
   | "chevron-current"
+  | "explore-current"
   | "folder"
   | "folder-current"
   | "help-current"
@@ -277,6 +278,9 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   }
   if (name === "pull-request") {
     return <CurrentBuildIcon name="sidebar-pull-request" />;
+  }
+  if (name === "explore-current") {
+    return <CurrentBuildIcon name="sidebar-explore" />;
   }
   if (name === "sites") {
     return <CurrentBuildIcon name="sidebar-sites" />;
@@ -2913,6 +2917,10 @@ export function App() {
     mode === "replay" && scenarioId === "streaming-recovery";
   const isCurrentBasicMessageReplay =
     mode === "replay" && scenarioId === "current-basic-message";
+  const isCurrentBasic26825Replay =
+    mode === "replay" && scenarioId === "current-basic-message-26-825";
+  const isAnyCurrentBasicMessageReplay =
+    isCurrentBasicMessageReplay || isCurrentBasic26825Replay;
   const isCurrentBrowser26825Replay =
     mode === "replay" && scenarioId === "current-browser-26-825";
   const isCurrentMarkdown26818Replay =
@@ -4640,6 +4648,22 @@ export function App() {
         </div>
       )}
       primaryNavigation={
+        isCurrentBasic26825Replay ? (
+          <>
+            <AppSidebarItem leading={<SidebarGlyph name="pull-request" />}>
+              Pull requests
+            </AppSidebarItem>
+            <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
+              Scheduled
+            </AppSidebarItem>
+            <AppSidebarItem leading={<SidebarGlyph name="plugins-current" />}>
+              Plugins
+            </AppSidebarItem>
+            <AppSidebarItem leading={<SidebarGlyph name="explore-current" />}>
+              Explore
+            </AppSidebarItem>
+          </>
+        ) : (
         <>
           <AppSidebarItem
             leading={<SidebarGlyph name="pull-request" />}
@@ -4663,6 +4687,7 @@ export function App() {
             Plugins
           </AppSidebarItem>
         </>
+        )
       }
       titlebarInset
     >
@@ -5221,7 +5246,7 @@ export function App() {
       isCurrentCommand26820Replay ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
-      isCurrentBasicMessageReplay ||
+      isAnyCurrentBasicMessageReplay ||
       isCurrentBrowser26825Replay ||
       isCurrentPlan26825Replay ||
       isCurrentSearch26825Replay ||
@@ -5254,8 +5279,29 @@ export function App() {
         )) ?? composerPermissionOptions[2]!;
   const header = (
     <ThreadHeader
+      className={
+        isCurrentBasic26825Replay
+          ? "demo-current-basic-26-825-header"
+          : undefined
+      }
       endActions={
-        current26820HeaderFrame ? (
+        isCurrentBasic26825Replay ? (
+          <div className="demo-current-basic-26-825-header-actions">
+            <button aria-label="Share" type="button">
+              <CurrentBuildIcon name="thread-header-share" />
+              <span>Share</span>
+            </button>
+            <button aria-label="Toggle summary" type="button">
+              <CurrentBuildIcon name="thread-header-summary" />
+            </button>
+            <button aria-label="Toggle bottom panel" type="button">
+              <CurrentBuildIcon name="thread-header-bottom-panel" />
+            </button>
+            <button aria-label="Toggle side panel" type="button">
+              <CurrentBuildIcon name="thread-header-side-panel" />
+            </button>
+          </div>
+        ) : current26820HeaderFrame ? (
           <div className="demo-current-long-thread-header-actions">
             <button aria-label="Share thread" type="button">
               <span aria-hidden="true">↥</span>
@@ -5517,7 +5563,17 @@ export function App() {
         )
       }
       navigation={
-        current26820HeaderFrame ? (
+        isCurrentBasic26825Replay ? (
+          <button
+            aria-expanded={sidebarOpen}
+            aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+            className="demo-current-basic-26-825-sidebar-toggle"
+            onClick={() => setSidebarOpen((open) => !open)}
+            type="button"
+          >
+            <CurrentBuildIcon name="window-chrome-sidebar" />
+          </button>
+        ) : current26820HeaderFrame ? (
           <div className="demo-current-long-thread-header-navigation">
             <button aria-label="Open quick chat" type="button">
               <CurrentBuildIcon name="sidebar-quick-chat" />
@@ -5556,7 +5612,15 @@ export function App() {
           : state.threadId ?? "Local app-server"
       }
       startActions={
-        current26820HeaderFrame ? (
+        isCurrentBasic26825Replay ? (
+          <button
+            aria-label="Chat actions"
+            className="demo-current-basic-26-825-title-actions"
+            type="button"
+          >
+            <CurrentBuildIcon name="thread-header-actions" />
+          </button>
+        ) : current26820HeaderFrame ? (
           <button
             aria-label="Thread actions"
             className="demo-current-long-thread-title-actions"
@@ -5567,7 +5631,24 @@ export function App() {
         ) : undefined
       }
       title={
-        current26820HeaderFrame
+        isCurrentBasic26825Replay
+          ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="demo-current-basic-26-825-project-icon"
+                >
+                  <CurrentBuildIcon name="thread-header-project" />
+                </span>
+                <button
+                  className="demo-current-basic-26-825-header-title"
+                  type="button"
+                >
+                  <span>Reply with CURRENT BASIC MESSAGE</span>
+                </button>
+              </>
+            )
+          : current26820HeaderFrame
           ? current26820LongFrame
             ? "LONG THREAD 01"
             : isCurrentCommand26820Replay
@@ -5607,7 +5688,7 @@ export function App() {
       isCurrentCommand26820Replay ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
-      isCurrentBasicMessageReplay ||
+      isAnyCurrentBasicMessageReplay ||
       isCurrentBrowser26825Replay ||
       isCurrentPlan26825Replay ||
       isCurrentSearch26825Replay ||
@@ -5906,7 +5987,7 @@ export function App() {
           </span>
         ) : showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
-            {isCurrentBasicMessageReplay ? (
+            {isAnyCurrentBasicMessageReplay ? (
               <button
                 className="demo-current-composer-model"
                 type="button"
@@ -5967,7 +6048,7 @@ export function App() {
         isCurrentCommandInterruptionReplay ||
         isCurrentContextCompactionReplay ||
         isCurrentTransportRecoveryReplay ||
-        isCurrentBasicMessageReplay ||
+        isAnyCurrentBasicMessageReplay ||
         currentProductAttachmentFrame
           ? "Send"
           : undefined
@@ -9307,8 +9388,9 @@ export function App() {
                     message.id === "assistant-approval-similar-second")) ||
                 (scenarioId === "long-command-output" &&
                   message.id === "assistant-long-command-final") ||
-                (isCurrentBasicMessageReplay &&
-                  message.id === "assistant-current-basic") ||
+                (isAnyCurrentBasicMessageReplay &&
+                  (message.id === "assistant-current-basic" ||
+                    message.id === "assistant-current-basic-26-825")) ||
                 (scenarioId === "command-failure-recovery" &&
                   (message.id === "assistant-command-failure-recovered" ||
                     message.id === "assistant-command-follow-up")) ||
@@ -9338,7 +9420,7 @@ export function App() {
                 scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ||
                 isCurrentCommand26820Replay ||
-                isCurrentBasicMessageReplay ||
+                isAnyCurrentBasicMessageReplay ||
                 isCurrentMarkdown26818Replay ||
                 isCurrentMarkdown26820MediaReplay ||
                 isCurrentMarkdown26825Replay ||
@@ -9346,7 +9428,7 @@ export function App() {
                 isCurrentSubagentReplay ? (
                   <McpResponseActions
                     copyLabel={
-                      isCurrentBasicMessageReplay ||
+                      isAnyCurrentBasicMessageReplay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
                       usesCurrentMarkdown26825Presentation
@@ -9354,7 +9436,7 @@ export function App() {
                         : undefined
                     }
                     label={
-                      isCurrentBasicMessageReplay ||
+                      isAnyCurrentBasicMessageReplay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
                       usesCurrentMarkdown26825Presentation
@@ -9373,7 +9455,7 @@ export function App() {
                         : undefined
                     }
                     toolbar={
-                      !isCurrentBasicMessageReplay &&
+                      !isAnyCurrentBasicMessageReplay &&
                       !isCurrentMarkdown26818Replay &&
                       !isCurrentMarkdown26820MediaReplay &&
                       !usesCurrentMarkdown26825Presentation
@@ -11588,7 +11670,8 @@ export function App() {
         sidebarWidth={
           currentSidebarThreadLifecycle ||
           currentSidebarWorktreeLifecycle ||
-          isCurrentRichMarkdownStreamingReplay
+          isCurrentRichMarkdownStreamingReplay ||
+          isCurrentBasic26825Replay
             ? 321.875
             : currentHomeFrame ||
                 isCurrentBrowser26825Replay ||

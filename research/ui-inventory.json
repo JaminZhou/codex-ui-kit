@@ -105,7 +105,14 @@
       "id": "thread.shell",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["thread-app-shell-chrome", "thread-scroll-layout"],
+      "packageEvidence": [
+        "thread-app-shell-chrome",
+        "thread-scroll-layout",
+        "replay:current-26.825-basic-message-wide-721-open-and-720-collapsed",
+        "browser-cdp:current-26.825-header-thread-composer-responsive-boundary-contract",
+        "electron:current-26.825-native-window-header-thread-composer-responsive-boundary-contract",
+        "pixel:three-reviewed-current-26.825-basic-thread-baselines-and-nine-local-only-product-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:new-chat-shell-dark-wide",
@@ -116,18 +123,25 @@
         "cdp-26.803.61601:completed-thread-1180x820-and-720x680-header-thread-composer-geometry-zero-overflow-and-responsive-collapse",
         "cdp-26.810.52044:completed-successful-command-thread-header-actions-and-composer-assets",
         "cdp-26.818.41509:completed-basic-thread-wide-and-820x680-compact-shell-composer-geometry-zero-overflow",
-        "cdp-26.820.60940:thirty-turn-wide-and-720x680-shell-header-timeline-composer-geometry-zero-overflow"
+        "cdp-26.820.60940:thirty-turn-wide-and-720x680-shell-header-timeline-composer-geometry-zero-overflow",
+        "cdp-26.825.51511:completed-basic-message-wide-721-open-720-collapsed-header-thread-composer-geometry-zero-overflow"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
       "id": "thread.messages-basic",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["conversation-markdown"],
+      "packageEvidence": [
+        "conversation-markdown",
+        "replay:current-26.825-exact-basic-user-and-assistant-turn",
+        "browser-cdp:current-26.825-exact-message-style-and-four-response-actions",
+        "electron:current-26.825-native-message-and-keyboard-focus-contract",
+        "pixel:current-26.825-wide-boundary-compact-thread-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:basic-user-and-assistant-turn",
@@ -137,11 +151,12 @@
         "cdp-26.803.61601:real-plain-text-streaming-wide-to-compact-reverse-origin-follow-and-natural-completion",
         "cdp-26.810.52044:completed-assistant-copy-good-bad-and-fork-actions",
         "cdp-26.818.41509:fixed-user-assistant-turn-four-exact-actions-five-composer-controls-and-0.432-percent-unmasked-thread-region",
-        "cdp-26.820.60940:thirty-exact-user-prompts-and-assistant-replies-wide-and-compact-turn-window"
+        "cdp-26.820.60940:thirty-exact-user-prompts-and-assistant-replies-wide-and-compact-turn-window",
+        "cdp-26.825.51511:exact-user-bubble-assistant-no-period-four-response-actions-14x22.75-wide-721-720-and-regional-pixels"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -624,7 +639,13 @@
       "id": "composer.shell",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["composer-utility-bar"],
+      "packageEvidence": [
+        "composer-utility-bar",
+        "replay:current-26.825-basic-message-five-control-composer",
+        "browser-cdp:current-26.825-wide-721-720-composer-geometry",
+        "electron:current-26.825-native-wide-721-720-composer-geometry",
+        "pixel:current-26.825-wide-boundary-compact-composer-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:empty-submitting-and-completed-composer",
@@ -641,7 +662,8 @@
         "cdp-26.818.41509:new-chat-wide-medium-721-720-editor-and-two-voice-control-matrix",
         "cdp-26.820.60940:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix",
         "cdp-26.825.31414:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix",
-        "cdp-26.825.51511:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix"
+        "cdp-26.825.51511:new-chat-wide-medium-721-720-editor-and-explicit-hide-show-control-matrix",
+        "cdp-26.825.51511:completed-basic-thread-736-366.125-687-by-98-composer-five-controls-and-44px-editor"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -831,7 +853,8 @@
         "cdp-26.820.60940:new-chat-pull-requests-sites-scheduled-plugins-and-route-restoration",
         "cdp-26.820.60940:projects-back-forward-restoration-and-unified-source-fixed-route-drift",
         "cdp-26.825.31414:new-chat-pull-requests-scheduled-plugins-sites-absent-and-route-restoration",
-        "cdp-26.825.51511:new-chat-pull-requests-scheduled-plugins-sites-absent-and-route-restoration"
+        "cdp-26.825.51511:new-chat-pull-requests-scheduled-plugins-sites-absent-and-route-restoration",
+        "cdp-26.825.51511:completed-thread-new-chat-pull-requests-scheduled-plugins-explore-and-sites-absent"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",
@@ -1004,7 +1027,12 @@
       "id": "app.sidebar-footer-account-settings",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main",
+        "browser-cdp:current-account-menu-dark-light-wide-compact-focus-and-zero-overflow",
+        "electron:current-account-menu-dark-light-wide-compact-contract",
+        "pixel:four-reviewed-current-account-menu-baselines"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:fixed-footer-account-avatar-settings-and-bottom-scroll-padding",
@@ -1015,11 +1043,12 @@
         "cdp-26.810.52044:fixed-46px-footer-voice-help-and-account-six-items-five-icons-no-usage-chevron",
         "cdp-26.818.41509:fixed-footer-voice-help-and-zero-settings-controls",
         "cdp-26.818.41509:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-zero-role-separators-zero-overflow-and-escape-focus-return",
-        "cdp-26.820.60940:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-menu-surface-focus-400-weight-zero-role-separators-zero-overflow-and-escape-focus-return"
+        "cdp-26.820.60940:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-menu-surface-focus-400-weight-zero-role-separators-zero-overflow-and-escape-focus-return",
+        "cdp-26.825.51511:account-menu-system-restored-dark-light-wide-compact-six-items-305.875x188.375-400-weight-zero-overflow-and-escape-focus-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1479,52 +1508,72 @@
       "id": "settings.shell-search",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["settings-page", "settings-command-menu-section-items", "virtual-settings-search-documents"],
+      "packageEvidence": [
+        "settings-page",
+        "settings-command-menu-section-items",
+        "virtual-settings-search-documents",
+        "browser-cdp:current-settings-wide-compact-route-and-search-contract",
+        "electron:current-settings-wide-compact-route-contract",
+        "pixel:reviewed-current-settings-baselines"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:settings-full-page-shell-sidebar-and-search",
         "cdp-26.803.61601:full-page-settings-shell-back-search-21-items-and-24-exact-navigation-icons",
-        "cdp-26.810.52044:visible-settings-git-shell-search-21-items-and-24-exact-navigation-icons"
+        "cdp-26.810.52044:visible-settings-git-shell-search-21-items-and-24-exact-navigation-icons",
+        "cdp-26.825.51511:settings-1180x820-search-22-visible-navigation-rows-305.875-by-29-321.875-rail-and-zero-overflow"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {
       "id": "settings.general",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["general-settings"],
+      "packageEvidence": [
+        "general-settings",
+        "browser-cdp:current-general-wide-compact-controls-and-route-persistence",
+        "electron:current-general-wide-compact-controls-and-route-persistence",
+        "pixel:reviewed-current-general-settings-baselines"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:general-form-and-appearance-theme-preferences",
         "cdp-26.803.61601:general-permissions-general-composer-popout-and-notifications",
         "cdp-26.803.61601:general-five-menus-language-search-and-hotkey-capture",
         "cdp-26.803.61601:general-wide-compact-bottom-scroll-geometry-and-regional-pixels",
-        "cdp-26.803.61601:general-controlled-browser-electron-interactions-and-route-persistence"
+        "cdp-26.803.61601:general-controlled-browser-electron-interactions-and-route-persistence",
+        "cdp-26.825.51511:general-768px-content-permission-composer-panel-notification-controls-and-zero-overflow"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {
       "id": "settings.appearance",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["appearance-settings"],
+      "packageEvidence": [
+        "appearance-settings",
+        "browser-cdp:current-appearance-wide-compact-theme-and-preference-controls",
+        "electron:current-appearance-wide-compact-theme-and-preference-controls",
+        "pixel:reviewed-current-appearance-settings-baselines"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:general-form-and-appearance-theme-preferences",
         "cdp-26.803.61601:appearance-theme-previews-light-dark-editors-and-preferences",
         "cdp-26.803.61601:appearance-wide-medium-compact-scroll-geometry-and-sixteen-code-themes",
         "cdp-26.803.61601:appearance-controlled-browser-electron-interactions",
-        "cdp-26.803.61601:appearance-wide-compact-preferences-regional-pixel-gates"
+        "cdp-26.803.61601:appearance-wide-compact-preferences-regional-pixel-gates",
+        "cdp-26.825.51511:appearance-system-light-dark-248-by-199.609-previews-theme-editors-fonts-contrast-and-zero-overflow"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

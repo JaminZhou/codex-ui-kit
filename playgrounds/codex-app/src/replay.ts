@@ -8,6 +8,7 @@ import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.js
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import currentBasicMessageTrace from "../fixtures/traces/current-basic-message.jsonl?raw";
+import currentBasicMessage26825Trace from "../fixtures/traces/current-basic-message-26-825.jsonl?raw";
 import currentBrowser26825Trace from "../fixtures/traces/current-browser-26-825.jsonl?raw";
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentPlan26825Trace from "../fixtures/traces/current-plan-26-825.jsonl?raw";
@@ -73,6 +74,7 @@ export type ReplayScenarioId =
   | "compaction"
   | "context-summary"
   | "current-basic-message"
+  | "current-basic-message-26-825"
   | "current-browser-26-825"
   | "current-mixed-tool-thread"
   | "current-plan-26-825"
@@ -434,6 +436,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Reply with exactly CURRENT BASIC MESSAGE.",
     "A current 26.818 plain-text user and assistant turn with the completed response actions and restored Composer.",
     currentBasicMessageTrace,
+  ),
+  "current-basic-message-26-825": scenario(
+    "current-basic-message-26-825",
+    "Reply with CURRENT BASIC MESSAGE",
+    "The completed plain-text anchor observed on Codex Desktop 26.825.51511, including its current header, sidebar, message bubble, response actions, and Composer.",
+    currentBasicMessage26825Trace,
   ),
 };
 

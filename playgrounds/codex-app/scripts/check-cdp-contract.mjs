@@ -57,6 +57,7 @@ const currentReplayComposerScenarios = new Set([
   "compaction",
   "context-summary",
   "current-basic-message",
+  "current-basic-message-26-825",
   "current-browser-26-825",
   "current-mixed-tool-thread",
   "current-plan-26-825",
@@ -3463,6 +3464,335 @@ for (const scene of selectedScenes) {
       );
     }
     if (
+      [
+        "current-basic-26-825-wide",
+        "current-basic-26-825-boundary-open",
+        "current-basic-26-825-compact",
+      ].includes(scene.id)
+    ) {
+      const basicThread = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const style = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            borderRadius: value.borderRadius,
+            fontSize: value.fontSize,
+            fontWeight: value.fontWeight,
+            lineHeight: value.lineHeight,
+            maxWidth: value.maxWidth,
+            padding: value.padding,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const user = document.querySelector(
+          '[data-item-id="user-current-basic-26-825"]',
+        );
+        const userContent = user?.querySelector(
+          ".codex-ui-agent-message__content",
+        );
+        const assistant = document.querySelector(
+          '[data-item-id="assistant-current-basic-26-825"]',
+        );
+        const assistantContent = assistant?.querySelector(
+          ".codex-ui-agent-message__content",
+        );
+        const actionStrip = assistant?.querySelector(
+          ".demo-mcp-turn-actions",
+        );
+        const composer = document.querySelector(".codex-ui-composer");
+        const header = document.querySelector(
+          ".demo-current-basic-26-825-header",
+        );
+        return {
+          actionButtons: Array.from(
+            actionStrip?.querySelectorAll("button") ?? [],
+            (button) => ({
+              icon: button
+                .querySelector("[data-current-build-icon]")
+                ?.getAttribute("data-current-build-icon"),
+              label: button.getAttribute("aria-label"),
+              rect: rect(button),
+            }),
+          ),
+          actionStrip: rect(actionStrip),
+          assistant: rect(assistant),
+          assistantStyle: style(assistantContent),
+          assistantText: assistantContent?.textContent?.trim(),
+          body: rect(
+            document.querySelector(
+              ".codex-ui-conversation-thread-shell__body",
+            ),
+          ),
+          composer: rect(composer),
+          composerButtons: Array.from(
+            composer?.querySelectorAll("button") ?? [],
+            (button) => ({
+              icon: button
+                .querySelector("[data-current-build-icon]")
+                ?.getAttribute("data-current-build-icon"),
+              label: button.getAttribute("aria-label"),
+              rect: rect(button),
+            }),
+          ),
+          editor: rect(
+            composer?.querySelector("textarea, [contenteditable='true']"),
+          ),
+          frame: root?.getAttribute("data-frame"),
+          headerButtons: Array.from(header?.querySelectorAll("button") ?? [], (button) => ({
+            icon: button
+              .querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon"),
+            label: button.getAttribute("aria-label"),
+            rect: rect(button),
+          })),
+          projectIcon: rect(
+            header?.querySelector(
+              '[data-current-build-icon="thread-header-project"]',
+            ),
+          ),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          main: rect(document.querySelector(".codex-ui-app-shell__main")),
+          scenario: root?.getAttribute("data-scenario"),
+          sidebar: rect(document.querySelector(".codex-ui-app-shell__sidebar")),
+          sidebarCurrent: root?.getAttribute("data-sidebar-current"),
+          status: root?.getAttribute("data-status"),
+          user: rect(user),
+          userContent: rect(userContent),
+          userStyle: style(userContent),
+          userText: userContent?.textContent?.trim(),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const expectedByScene = {
+        "current-basic-26-825-wide": {
+          action: { left: 379.4375, top: 193.5 },
+          assistant: { left: 383.4375, top: 167.75, width: 736 },
+          body: { left: 322.875, top: 47, width: 857.125 },
+          composer: { left: 383.4375, top: 706, width: 736 },
+          composerButtons: [
+            { left: 391.4375, width: 28 },
+            { left: 424.4375, width: 105.0625 },
+            { left: 900.078125, width: 147.359375 },
+            { left: 1047.4375, width: 28 },
+            { left: 1083.4375, width: 28 },
+          ],
+          editor: { left: 395.4375, top: 720, width: 712 },
+          header: {
+            action: 623.3125,
+            share: 994.734375,
+            title: 357.875,
+          },
+          main: { left: 321.875, width: 858.125 },
+          sidebar: { left: 0, width: 321.875 },
+          sidebarLabel: "Hide sidebar",
+          user: { left: 383.4375, top: 79, width: 736 },
+          userContent: { left: 784.78125, width: 334.65625 },
+          viewport: { height: 820, width: 1180 },
+        },
+        "current-basic-26-825-boundary-open": {
+          action: { left: 334.875, top: 216.25 },
+          assistant: { left: 338.875, top: 190.5, width: 366.125 },
+          body: { left: 322.875, top: 47, width: 398.125 },
+          composer: { left: 338.875, top: 566, width: 366.125 },
+          composerButtons: [
+            { left: 346.875, width: 28 },
+            { left: 379.875, width: 34 },
+            { left: 485.640625, width: 147.359375 },
+            { left: 633, width: 28 },
+            { left: 669, width: 28 },
+          ],
+          editor: { left: 350.875, top: 580, width: 342.125 },
+          header: { action: 505.015625, share: 535.734375, title: 357.875 },
+          main: { left: 321.875, width: 399.125 },
+          sidebar: { left: 0, width: 321.875 },
+          sidebarLabel: "Hide sidebar",
+          user: { left: 338.875, top: 79, width: 366.125 },
+          userContent: { left: 448.71875, width: 256.28125 },
+          viewport: { height: 680, width: 721 },
+        },
+        "current-basic-26-825-compact": {
+          action: { left: 13, top: 193.5 },
+          assistant: { left: 17, top: 167.75, width: 687 },
+          body: { left: 1, top: 47, width: 719 },
+          composer: { left: 17, top: 566, width: 687 },
+          composerButtons: [
+            { left: 25, width: 28 },
+            { left: 58, width: 105.0625 },
+            { left: 484.640625, width: 147.359375 },
+            { left: 632, width: 28 },
+            { left: 668, width: 28 },
+          ],
+          editor: { left: 29, top: 580, width: 663 },
+          header: { action: 459.9375, share: 534.734375, title: 194.5 },
+          main: { left: 0, width: 720 },
+          sidebar: { left: 0, width: 0 },
+          sidebarLabel: "Show sidebar",
+          user: { left: 17, top: 79, width: 687 },
+          userContent: { left: 369.34375, width: 334.65625 },
+          viewport: { height: 680, width: 720 },
+        },
+      };
+      const expected = expectedByScene[scene.id];
+      const close = (actual, target, tolerance = 0.1) =>
+        Math.abs((actual ?? Number.POSITIVE_INFINITY) - target) <= tolerance;
+      const expectedActionLabels = [
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ];
+      const expectedActionIcons = [
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ];
+      const expectedComposerLabels = [
+        "Add files and more",
+        "Change permissions",
+        null,
+        "Dictate",
+        "Send",
+      ];
+      const expectedComposerIcons = [
+        "composer-add-files",
+        "composer-permission",
+        "composer-model-chevron",
+        "composer-dictate",
+        undefined,
+      ];
+      const expectedHeaderLabels = [
+        expected.sidebarLabel,
+        null,
+        "Chat actions",
+        "Share",
+        "Toggle summary",
+        "Toggle bottom panel",
+        "Toggle side panel",
+      ];
+      const expectedHeaderIcons = [
+        "window-chrome-sidebar",
+        undefined,
+        "thread-header-actions",
+        "thread-header-share",
+        "thread-header-summary",
+        "thread-header-bottom-panel",
+        "thread-header-side-panel",
+      ];
+      if (
+        basicThread.frame !== "current-basic-26-825-completed" ||
+        basicThread.scenario !== "current-basic-message-26-825" ||
+        basicThread.status !== "completed" ||
+        basicThread.sidebarCurrent !== "true" ||
+        basicThread.horizontalOverflow > 1 ||
+        basicThread.viewport.width !== expected.viewport.width ||
+        basicThread.viewport.height !== expected.viewport.height ||
+        !close(basicThread.sidebar?.left, expected.sidebar.left) ||
+        !close(basicThread.sidebar?.width, expected.sidebar.width) ||
+        !close(basicThread.main?.left, expected.main.left) ||
+        !close(basicThread.main?.width, expected.main.width) ||
+        !close(basicThread.body?.left, expected.body.left) ||
+        !close(basicThread.body?.top, expected.body.top) ||
+        !close(basicThread.body?.width, expected.body.width) ||
+        !close(basicThread.user?.left, expected.user.left) ||
+        !close(basicThread.user?.top, expected.user.top) ||
+        !close(basicThread.user?.width, expected.user.width) ||
+        !close(basicThread.userContent?.left, expected.userContent.left) ||
+        !close(basicThread.userContent?.width, expected.userContent.width) ||
+        basicThread.userStyle?.backgroundColor !==
+          "rgba(50, 50, 50, 0.85)" ||
+        basicThread.userStyle?.borderRadius !== "22px" ||
+        basicThread.userStyle?.fontSize !== "14px" ||
+        basicThread.userStyle?.fontWeight !== "400" ||
+        basicThread.userStyle?.lineHeight !== "22.75px" ||
+        basicThread.userStyle?.maxWidth !== "70%" ||
+        basicThread.userStyle?.padding !== "10px 16px" ||
+        !close(basicThread.assistant?.left, expected.assistant.left) ||
+        !close(basicThread.assistant?.top, expected.assistant.top) ||
+        !close(basicThread.assistant?.width, expected.assistant.width) ||
+        basicThread.assistantStyle?.fontSize !== "14px" ||
+        basicThread.assistantStyle?.fontWeight !== "400" ||
+        basicThread.assistantStyle?.lineHeight !== "22.75px" ||
+        !close(basicThread.actionStrip?.left, expected.action.left) ||
+        !close(basicThread.actionStrip?.top, expected.action.top) ||
+        basicThread.actionStrip?.width !== 110 ||
+        basicThread.actionStrip?.height !== 26 ||
+        basicThread.userText !==
+          "Reply with exactly CURRENT BASIC MESSAGE." ||
+        basicThread.assistantText !== "CURRENT BASIC MESSAGE" ||
+        JSON.stringify(basicThread.actionButtons.map(({ label }) => label)) !==
+          JSON.stringify(expectedActionLabels) ||
+        JSON.stringify(basicThread.actionButtons.map(({ icon }) => icon)) !==
+          JSON.stringify(expectedActionIcons) ||
+        basicThread.actionButtons.some(
+          ({ rect }, index) =>
+            !close(rect?.left, expected.action.left + index * 28) ||
+            !close(rect?.top, expected.action.top) ||
+            rect?.width !== 26 ||
+            rect?.height !== 26,
+        ) ||
+        !close(basicThread.composer?.left, expected.composer.left) ||
+        !close(basicThread.composer?.top, expected.composer.top) ||
+        !close(basicThread.composer?.width, expected.composer.width) ||
+        basicThread.composer?.height !== 98 ||
+        !close(basicThread.editor?.left, expected.editor.left) ||
+        !close(basicThread.editor?.top, expected.editor.top) ||
+        !close(basicThread.editor?.width, expected.editor.width) ||
+        basicThread.editor?.height !== 44 ||
+        JSON.stringify(basicThread.composerButtons.map(({ label }) => label)) !==
+          JSON.stringify(expectedComposerLabels) ||
+        JSON.stringify(basicThread.composerButtons.map(({ icon }) => icon)) !==
+          JSON.stringify(expectedComposerIcons) ||
+        basicThread.composerButtons.some(
+          ({ rect }, index) =>
+            !close(rect?.left, expected.composerButtons[index].left) ||
+            !close(rect?.top, expected.composer.top + 62) ||
+            !close(rect?.width, expected.composerButtons[index].width) ||
+            rect?.height !== 28,
+        ) ||
+        JSON.stringify(basicThread.headerButtons.map(({ label }) => label)) !==
+          JSON.stringify(expectedHeaderLabels) ||
+        JSON.stringify(basicThread.headerButtons.map(({ icon }) => icon)) !==
+          JSON.stringify(expectedHeaderIcons) ||
+        !close(basicThread.projectIcon?.left, expected.header.title - 22) ||
+        !close(basicThread.projectIcon?.top, 15) ||
+        basicThread.projectIcon?.width !== 16 ||
+        basicThread.projectIcon?.height !== 16 ||
+        !close(basicThread.headerButtons[0]?.rect?.left, 88) ||
+        !close(basicThread.headerButtons[0]?.rect?.top, 9) ||
+        !close(basicThread.headerButtons[1]?.rect?.left, expected.header.title) ||
+        !close(basicThread.headerButtons[1]?.rect?.top, 11) ||
+        !close(basicThread.headerButtons[2]?.rect?.left, expected.header.action) ||
+        !close(basicThread.headerButtons[2]?.rect?.top, 9) ||
+        !close(basicThread.headerButtons[3]?.rect?.left, expected.header.share) ||
+        basicThread.headerButtons.slice(4).some(
+          ({ rect }, index) =>
+            !close(rect?.left, expected.header.share + 81.265625 + index * 34),
+        )
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 basic thread contract failed: ${JSON.stringify(basicThread)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}-message.json`),
+        `${JSON.stringify(basicThread, null, 2)}\n`,
+      );
+    }
+    if (
       currentReplayComposerScenarios.has(scene.scenario) ||
       currentApprovalComposerScenes.has(scene.id)
     ) {
@@ -3498,7 +3828,8 @@ for (const scene of selectedScenes) {
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
                   scene.scenario === "markdown-current-26-825" ||
-                  scene.scenario === "current-basic-message"
+                  scene.scenario === "current-basic-message" ||
+                  scene.scenario === "current-basic-message-26-825"
                     ? "composer-permission"
                     : "composer-permission-ask",
                 width: 16,
@@ -10229,7 +10560,10 @@ for (const scene of selectedScenes) {
     }
     const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
     const minimumConversationViewportWidth =
-      expectedWindowWidth <= 720
+      scene.scenario === "current-basic-message-26-825" &&
+      expectedWindowWidth <= 721
+        ? 390
+        : expectedWindowWidth <= 720
         ? scene.id.startsWith("current-sidebar-thread-lifecycle") ||
           scene.id.startsWith("current-sidebar-worktree-lifecycle") ||
           scene.id.startsWith("current-worktree-setup-")
@@ -10276,9 +10610,11 @@ for (const scene of selectedScenes) {
       scene.scenario === "current-browser-26-825" ||
       scene.scenario === "markdown-current-26-825" ||
       scene.scenario === "markdown-streaming-large" ||
+      scene.scenario === "current-basic-message-26-825" ||
       currentSidebarThreadLifecycleScene ||
       currentSidebarWorktreeLifecycleScene
-        ? scene.scenario === "markdown-streaming-large"
+        ? scene.scenario === "markdown-streaming-large" ||
+          scene.scenario === "current-basic-message-26-825"
           ? 321.875
           : currentSidebarThreadLifecycleScene
             ? 321.875
@@ -10773,7 +11109,9 @@ for (const scene of selectedScenes) {
       }
     }
     const expectedSidebarMax =
-      scene.scenario === "current-browser-26-825"
+      scene.id === "current-basic-26-825-boundary-open"
+        ? "481"
+      : scene.scenario === "current-browser-26-825"
         ? "454"
       : scene.id === "current-sidebar-thread-lifecycle-compact" ||
           scene.id === "current-sidebar-worktree-lifecycle-compact" ||

@@ -143,6 +143,34 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("replays the current 26.825 basic turn without changing its exact reply", () => {
+    const scenario = replayScenarios["current-basic-message-26-825"];
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "current-basic-26-825-completed": 5,
+    });
+    expect(completed.status).toBe("completed");
+    expect(
+      completed.messages.map(({ id, status, text }) => ({
+        id,
+        status,
+        text,
+      })),
+    ).toEqual([
+      {
+        id: "user-current-basic-26-825",
+        status: "completed",
+        text: "Reply with exactly CURRENT BASIC MESSAGE.",
+      },
+      {
+        id: "assistant-current-basic-26-825",
+        status: "completed",
+        text: "CURRENT BASIC MESSAGE",
+      },
+    ]);
+  });
+
   it("settles an approved command replay with completed work and a final response", () => {
     const scenario = replayScenarios["approval-denied"];
     const completed = reduceProtocolTrace(scenario.events);

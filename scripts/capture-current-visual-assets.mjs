@@ -57,15 +57,17 @@ const baselineContext = {
   }).split(/\s+/)[0],
   appVersion: plistValue("CFBundleShortVersionString"),
   buildNumber: plistValue("CFBundleVersion"),
-  interactionState: mcpOnly
-    ? "completed-current-mcp-thread"
+  interactionState: threadOnly
+    ? "completed-current-basic-thread"
+    : mcpOnly
+      ? "completed-current-mcp-thread"
     : projectPickerOnly
       ? "open-current-project-picker"
       : reviewOnly
         ? "open-current-review-workspace"
         : settingsOnly
           ? "open-current-settings-navigation"
-    : "resting-and-open-sidebar-menus",
+          : "resting-and-open-sidebar-menus",
   theme: "dark",
   viewport: { height: 820, width: 1180 },
 };
@@ -192,6 +194,7 @@ const semanticLabels = new Map([
   ["Copy", "thread-assistant-copy"],
   ["Copy message", "thread-user-copy"],
   ["Edit message", "thread-user-edit"],
+  ["Explore", "sidebar-explore"],
   ["Good response", "thread-assistant-good"],
   ["Hide sidebar", "window-chrome-sidebar"],
   ["Plugins", "sidebar-plugins"],
@@ -199,6 +202,7 @@ const semanticLabels = new Map([
   ["Quick chat", "sidebar-quick-chat"],
   ["Search", "sidebar-search"],
   ["Secondary action", "thread-header-open-in-chevron"],
+  ["Share", "thread-header-share"],
   ["Close Review tab", "review-close"],
   ["Collapse all diffs", "review-collapse-all"],
   ["Copy path", "review-copy-path"],
@@ -365,16 +369,31 @@ try {
     (threadOnly || mcpOnly) &&
     (await main.locator(".group\\/activity-header:visible").count()) === 0
   ) {
-    const workedFor = main.getByText(/^Worked for /);
-    if ((await workedFor.count()) === 0) {
-      throw new Error(
-        "Completed-thread capture requires a visible Worked for disclosure.",
-      );
+    const completedThreadActionCounts = threadOnly
+      ? await Promise.all(
+          ["Copy", "Good response", "Bad response", "Fork chat from here"].map(
+            (name) =>
+              main.getByRole("button", { exact: true, name }).count(),
+          ),
+        )
+      : [];
+    const completedBasicThread =
+      threadOnly &&
+      completedThreadActionCounts.every((count) => count === 1) &&
+      (await main.getByRole("button", { exact: true, name: "Stop" }).count()) ===
+        0;
+    if (!completedBasicThread) {
+      const workedFor = main.getByText(/^Worked for /);
+      if ((await workedFor.count()) === 0) {
+        throw new Error(
+          "Completed-thread capture requires a visible activity disclosure or all four settled response actions.",
+        );
+      }
+      await workedFor.last().click();
+      await main.waitForSelector(".group\\/activity-header:visible", {
+        timeout: 15_000,
+      });
     }
-    await workedFor.last().click();
-    await main.waitForSelector(".group\\/activity-header:visible", {
-      timeout: 15_000,
-    });
   }
   if (mcpOnly) {
     const workedFor = main.getByRole("button", { name: /^Worked for / });
@@ -600,8 +619,7 @@ try {
     if (!navigationBounds && !threadOnly && !mcpOnly) {
       throw new Error("Current visual capture requires one visible navigation.");
     }
-    const navigationRight =
-      threadOnly || mcpOnly ? 0 : navigationBounds?.right ?? 0;
+    const navigationRight = navigationBounds?.right ?? 0;
     const reviewPanelBounds = reviewOnly
       ? document
           .querySelector('aside[data-app-shell-focus-area="right-panel"]')
@@ -1872,6 +1890,7 @@ try {
           style.visibility === "visible"
         );
       });
+      if (candidates.length === 0) return [];
       if (candidates.length !== 1) {
         throw new Error(
           `Expected one visible VS Code titlebar image, received ${candidates.length}.`,

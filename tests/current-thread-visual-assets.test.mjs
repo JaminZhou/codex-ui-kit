@@ -26,11 +26,13 @@ describe("current-thread visual asset subset", () => {
   it("includes every promoted MCP replay asset", () => {
     expect(currentThreadVisualAssetIds).toEqual(
       expect.arrayContaining([
+        "sidebar-explore",
         "thread-mcp-tool",
         "thread-activity-chevron",
+        "thread-header-share",
         "thread-reconnecting",
       ]),
     );
-    expect(currentThreadVisualAssetIds).toHaveLength(41);
+    expect(currentThreadVisualAssetIds).toHaveLength(43);
   });
 });
