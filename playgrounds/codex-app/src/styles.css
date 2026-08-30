@@ -3059,6 +3059,62 @@ textarea {
   width: 0;
 }
 
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"] {
+  -webkit-font-smoothing: antialiased;
+  --codex-ui-conversation-thread-header-height: 2.9375rem;
+  --codex-ui-user-message-compact-max-width: 70%;
+  --codex-ui-user-message-max-width: 70%;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"],
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .demo-current-basic-26-825-header
+  .codex-ui-thread-header__context {
+  margin-inline-start: 166.5px;
+}
+
+.demo-current-mcp-26-825-header-navigation {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  left: 88px;
+  position: fixed;
+  top: 9px;
+}
+
+.demo-current-mcp-26-825-header-navigation > button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 12.5px;
+  color: inherit;
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  padding: 0;
+  width: 28px;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  background: rgba(50, 50, 50, 0.85);
+  border-radius: 22px;
+  font-weight: 400;
+  padding: 10px 16px;
+  white-space: pre-wrap;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .demo-turn-actions.demo-mcp-turn-actions {
+  gap: 2px;
+}
+
 .demo-current-basic-26-825-sidebar-toggle {
   align-items: center;
   background: transparent;
@@ -3494,6 +3550,101 @@ textarea {
 .demo-root[data-scenario="current-mixed-tool-thread"]
   .codex-ui-conversation-thread-shell__composer {
   transform: translateX(0.046875px);
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-thread-viewport,
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  scrollbar-width: none;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-thread-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  :is(
+    .codex-ui-thread-header__title,
+    .codex-ui-agent-message .codex-ui-agent-message__content,
+    .codex-ui-activity-timeline__toggle,
+    .codex-ui-turn-duration,
+    .codex-ui-mcp-tool-call-group,
+    .codex-ui-mcp-tool-call-group *,
+    .codex-ui-tool-call,
+    .codex-ui-tool-call *,
+    .demo-current-mcp-answer,
+    .demo-current-mcp-source-summary-panel,
+    .demo-current-mcp-source-summary-panel *
+  ) {
+  font-weight: 400;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-activity-timeline__toggle {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-mcp-tool-call-group
+  > .codex-ui-activity__disclosure
+  > .codex-ui-activity__header {
+  color: rgb(255, 255, 255);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call {
+  color: rgba(255, 255, 255, 0.6);
+  min-height: 25px;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-mcp-tool-call-group__calls
+  > .codex-ui-tool-call
+  > .codex-ui-activity__header {
+  min-height: 21px;
+  padding: 0;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .codex-ui-tool-call__label {
+  align-items: center;
+  display: inline-flex;
+  line-height: 21px;
+  min-height: 21px;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  .demo-current-mcp-answer {
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"][data-frame="mcp-current-26-825-success"]
+  .codex-ui-activity-timeline {
+  transform: translateY(3px);
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"]
+  :is(
+    .codex-ui-thread-viewport__content,
+    .codex-ui-conversation-thread-shell__composer
+  ) {
+  transform: translateX(0.046875px);
+}
+
+.demo-root[data-scenario="mcp-current-26-825-lifecycle"][data-summary-pinned="true"]
+  :is(
+    .codex-ui-thread-viewport__content,
+    .codex-ui-conversation-thread-shell__composer
+  ) {
+  translate: 4px 0;
 }
 
 .demo-root:is(

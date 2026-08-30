@@ -391,7 +391,9 @@
         "cdp-26.818.41509:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
         "cdp-26.818.41509:current-mcp-success-computed-styles-public-favicon-and-unmasked-tool-group-pixel-gate",
         "cdp-26.820.60940:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
-        "cdp-26.820.60940:current-mcp-success-computed-styles-noninteractive-call-rows-and-unmasked-tool-group-pixel-gate"
+        "cdp-26.820.60940:current-mcp-success-computed-styles-noninteractive-call-rows-and-unmasked-tool-group-pixel-gate",
+        "cdp-26.825.51511:real-openai-developer-docs-search-fetch-success-and-same-thread-recovery-expanded-1180x820-and-720x680",
+        "cdp-26.825.51511:current-mcp-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -419,7 +421,9 @@
         "cdp-26.818.41509:real-openai-developer-docs-invalid-url-search-fetch-recovery-expanded-1180x820-and-720x680",
         "cdp-26.818.41509:current-mcp-recovery-computed-styles-public-favicon-and-unmasked-720x680-card-pixel-gate",
         "cdp-26.820.60940:real-openai-developer-docs-invalid-url-fetch-search-fetch-recovery-expanded-1180x820-and-720x680",
-        "cdp-26.820.60940:current-mcp-direct-failure-and-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
+        "cdp-26.820.60940:current-mcp-direct-failure-and-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates",
+        "cdp-26.825.51511:real-openai-developer-docs-invalid-url-fetch-search-fetch-same-thread-recovery-expanded-1180x820-and-720x680",
+        "cdp-26.825.51511:current-mcp-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -610,7 +614,8 @@
         "cdp-26.721:bottom-panel-toggle-resize-close-restore",
         "cdp-26.727.40816:bottom-terminal-and-right-pr-panel-open-read-only",
         "cdp-26.818.41509:pinned-sources-summary-floating-dismissed-and-repinned-thread-layout",
-        "cdp-26.820.60940:pinned-sources-summary-offscreen-unpinned-and-repinned-thread-layout"
+        "cdp-26.820.60940:pinned-sources-summary-offscreen-unpinned-and-repinned-thread-layout",
+        "cdp-26.825.51511:pinned-environment-sources-summary-300x313-closed-and-repinned-thread-layout"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -628,7 +633,9 @@
         "cdp-26.818.41509:pinned-sources-summary-300x189-floating-dismissed-and-repinned",
         "cdp-26.818.41509:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate",
         "cdp-26.820.60940:pinned-sources-summary-300x189-offscreen-unpinned-and-repinned",
-        "cdp-26.820.60940:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate"
+        "cdp-26.820.60940:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate",
+        "cdp-26.825.51511:pinned-environment-sources-summary-300x313-closed-and-repinned",
+        "cdp-26.825.51511:current-environment-sources-summary-computed-styles-and-regional-pixel-gate"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

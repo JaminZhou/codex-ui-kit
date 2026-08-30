@@ -74,6 +74,7 @@ const currentReplayComposerScenarios = new Set([
   "mcp-current-26-818-success",
   "mcp-current-26-820-recovery",
   "mcp-current-26-820-success",
+  "mcp-current-26-825-lifecycle",
   "mcp-current-recovery",
   "mcp-current-success",
   "mcp-recovery-mixed-thread",
@@ -11890,6 +11891,333 @@ for (const scene of selectedScenes) {
           workflow: contract.workflow,
         })}`,
       );
+    }
+    if (scene.currentMcp26825) {
+      const currentMcp26825 = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const style = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = getComputedStyle(element);
+          return {
+            color: value.color,
+            fontFamily: value.fontFamily,
+            fontSize: value.fontSize,
+            fontWeight: value.fontWeight,
+            lineHeight: value.lineHeight,
+          };
+        };
+        const answers = [
+          "assistant-current-mcp-26-825-success",
+          "assistant-current-mcp-26-825-recovery",
+        ].map((id) => {
+          const element = document.querySelector(`[data-item-id="${id}"]`);
+          const answer = element?.querySelector(".demo-current-mcp-answer");
+          return answer
+            ? {
+                href: answer.querySelector("a")?.getAttribute("href"),
+                id,
+                rect: rect(answer),
+                style: style(answer),
+                text:
+                  answer instanceof HTMLElement
+                    ? answer.innerText.replace(/\s+/g, " ").trim()
+                    : null,
+              }
+            : null;
+        }).filter(Boolean);
+        const timelines = Array.from(
+          document.querySelectorAll(".codex-ui-activity-timeline"),
+          (timeline) => {
+            const toggle = timeline.querySelector(
+              ".codex-ui-activity-timeline__toggle",
+            );
+            const group = timeline.querySelector(
+              ".codex-ui-mcp-tool-call-group",
+            );
+            const groupHeader = group?.querySelector(
+              ":scope > .codex-ui-activity__disclosure > .codex-ui-activity__header",
+            );
+            return {
+              expanded: toggle?.getAttribute("aria-expanded"),
+              group: group
+                ? {
+                    expanded:
+                      group
+                        .querySelector(
+                          ":scope > .codex-ui-activity__disclosure",
+                        )
+                        ?.getAttribute("data-open") === "true",
+                    label: groupHeader?.textContent?.trim(),
+                    rect: rect(groupHeader),
+                    rows: Array.from(
+                      group.querySelectorAll(".codex-ui-tool-call"),
+                      (row) => {
+                        const label = row.querySelector(
+                          ".codex-ui-tool-call__label",
+                        );
+                        return {
+                          disclosureCount: row.querySelectorAll(
+                            "button, details, summary",
+                          ).length,
+                          label: label?.textContent?.trim(),
+                          rect: rect(label),
+                          status: row.getAttribute("data-status"),
+                          style: style(row),
+                        };
+                      },
+                    ),
+                    style: style(groupHeader),
+                  }
+                : null,
+              label: toggle?.textContent?.trim(),
+              rect: rect(toggle),
+              style: style(toggle),
+            };
+          },
+        ).filter(({ group }) => group !== null);
+        const panel = document.querySelector(
+          ".demo-current-mcp-source-summary-panel",
+        );
+        const dock = document.querySelector(
+          ".demo-current-mcp-source-summary-dock",
+        );
+        return {
+          answers,
+          dock: {
+            open: dock?.getAttribute("data-open") ?? null,
+            pinned: dock?.getAttribute("data-pinned") ?? null,
+          },
+          errorCardCount: document.querySelectorAll(
+            ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+          ).length,
+          headerIcons: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-thread-header [data-current-build-icon]",
+            ),
+            (element) => element.getAttribute("data-current-build-icon"),
+          ),
+          headerTitle: document
+            .querySelector(".codex-ui-thread-header__title")
+            ?.textContent?.trim(),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          panel: panel
+            ? {
+                rect: rect(panel),
+                rowLabels: Array.from(
+                  panel.querySelectorAll(
+                    ".codex-ui-thread-summary-item__label",
+                  ),
+                  (element) => element.textContent?.trim(),
+                ),
+                sectionTitles: Array.from(
+                  panel.querySelectorAll(
+                    ".codex-ui-thread-summary-section__title",
+                  ),
+                  (element) => element.textContent?.trim(),
+                ),
+                style: style(panel),
+              }
+            : null,
+          timelines,
+          togglePressed:
+            document
+              .querySelector('button[aria-label="Toggle summary"]')
+              ?.getAttribute("aria-pressed") ?? null,
+        };
+      });
+      const isSuccess =
+        scene.id === "mcp-current-26-825-success";
+      const isCompact =
+        scene.id === "mcp-current-26-825-recovery-compact";
+      const isPinned =
+        scene.id === "mcp-current-26-825-sources-pinned";
+      const expectedAnswers = isSuccess
+        ? [
+            "CURRENT MCP 26.825 SUCCESS — Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp",
+          ]
+        : [
+            "CURRENT MCP 26.825 SUCCESS — Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp",
+            "CURRENT MCP 26.825 RECOVERY — Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp",
+          ];
+      const expectedRows = isSuccess
+        ? [["Search OpenAI docs", "Fetch OpenAI doc"]]
+        : [
+            ["Search OpenAI docs", "Fetch OpenAI doc"],
+            [
+              "Fetch OpenAI doc",
+              "Search OpenAI docs",
+              "Fetch OpenAI doc",
+            ],
+          ];
+      const expectedDurations = isSuccess
+        ? ["Worked for 20s"]
+        : ["Worked for 20s", "Worked for 10s"];
+      if (
+        currentMcp26825.headerTitle !== "查找官方 MCP 文档页面" ||
+        JSON.stringify(currentMcp26825.headerIcons) !==
+          JSON.stringify([
+            "window-chrome-sidebar",
+            "sidebar-new-chat",
+            "thread-header-project",
+            "thread-header-actions",
+            "thread-header-share",
+            "thread-header-summary",
+            "thread-header-bottom-panel",
+            "thread-header-side-panel",
+          ]) ||
+        currentMcp26825.horizontalOverflow !== 0 ||
+        currentMcp26825.errorCardCount !== 0 ||
+        currentMcp26825.answers.length !== expectedAnswers.length ||
+        currentMcp26825.answers.some(
+          (answer, index) =>
+            answer.text !== expectedAnswers[index] ||
+            answer.href !==
+              "https://learn.chatgpt.com/docs/extend/mcp" ||
+            answer.style?.fontSize !== "14px" ||
+            answer.style?.fontWeight !== "400" ||
+            answer.style?.lineHeight !== "21px",
+        ) ||
+        currentMcp26825.timelines.length !== expectedRows.length ||
+        currentMcp26825.timelines.some(
+          (timeline, index) =>
+            timeline.label !== expectedDurations[index] ||
+            timeline.expanded !== "true" ||
+            !timeline.group?.expanded ||
+            timeline.group.label !==
+              "Used OpenAI Developer Docs integration" ||
+            timeline.group.style?.fontFamily !==
+              '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+            timeline.group.style?.fontSize !== "14px" ||
+            timeline.group.style?.fontWeight !== "400" ||
+            timeline.group.style?.lineHeight !== "21px" ||
+            timeline.group.style?.color !== "rgb(255, 255, 255)" ||
+            JSON.stringify(
+              timeline.group.rows.map(({ label }) => label),
+            ) !== JSON.stringify(expectedRows[index]) ||
+            timeline.group.rows.some(
+              (row) =>
+                row.disclosureCount !== 0 ||
+                !row.rect ||
+                Math.abs(row.rect.height - 21) > 0.1 ||
+                row.style?.fontWeight !== "400" ||
+                !row.style?.color.includes("0.6"),
+            ),
+        ) ||
+        (isSuccess &&
+          (!currentMcp26825.timelines[0]?.group?.rect ||
+            Math.abs(
+              currentMcp26825.timelines[0].group.rect.left - 222,
+            ) > 1 ||
+            Math.abs(
+              currentMcp26825.timelines[0].group.rect.top - 303,
+            ) > 1)) ||
+        (isCompact &&
+          (!currentMcp26825.timelines[1]?.group?.rect ||
+            Math.abs(
+              currentMcp26825.timelines[1].group.rect.left - 16,
+            ) > 1 ||
+            Math.abs(
+              currentMcp26825.timelines[1].group.rect.top - 338,
+            ) > 2)) ||
+        (!isSuccess &&
+          !isCompact &&
+          !isPinned &&
+          (!currentMcp26825.timelines[1]?.group?.rect ||
+            Math.abs(
+              currentMcp26825.timelines[1].group.rect.left - 222,
+            ) > 1 ||
+            Math.abs(
+              currentMcp26825.timelines[1].group.rect.top - 501,
+            ) > 2)) ||
+        (isPinned &&
+          (currentMcp26825.dock.open !== "true" ||
+            currentMcp26825.dock.pinned !== "true" ||
+            currentMcp26825.togglePressed !== "true" ||
+            !currentMcp26825.panel?.rect ||
+            Math.abs(currentMcp26825.panel.rect.left - 864) > 1 ||
+            Math.abs(currentMcp26825.panel.rect.top - 59) > 1 ||
+            Math.abs(currentMcp26825.panel.rect.width - 300) > 1 ||
+            Math.abs(currentMcp26825.panel.rect.height - 313) > 1 ||
+            currentMcp26825.panel.style?.fontWeight !== "400" ||
+            JSON.stringify(currentMcp26825.panel.rowLabels) !==
+              JSON.stringify([
+                "Changes",
+                "Local",
+                "feat/current-mcp-anchor",
+                "Commit or push",
+                "Create pull request",
+                "openai-docs-mcp",
+                "View all",
+              ]) ||
+            !currentMcp26825.timelines[0]?.group?.rect ||
+            Math.abs(
+              currentMcp26825.timelines[0].group.rect.left - 68,
+            ) > 1))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 MCP lifecycle contract failed: ${JSON.stringify(currentMcp26825)}`,
+        );
+      }
+      if (isPinned) {
+        const toggle = page.getByRole("button", {
+          name: "Toggle summary",
+        });
+        const readDockState = () =>
+          page.evaluate(() => {
+            const dock = document.querySelector(
+              ".demo-current-mcp-source-summary-dock",
+            );
+            const panel = dock?.querySelector(
+              ".demo-current-mcp-source-summary-panel",
+            );
+            const bounds = panel?.getBoundingClientRect();
+            return {
+              open: dock?.getAttribute("data-open"),
+              panelLeft: bounds?.left ?? null,
+              pinned: dock?.getAttribute("data-pinned"),
+              pressed: document
+                .querySelector('button[aria-label="Toggle summary"]')
+                ?.getAttribute("aria-pressed"),
+            };
+          });
+        await toggle.click();
+        const closed = await readDockState();
+        await page.mouse.click(600, 600);
+        const outside = await readDockState();
+        await toggle.click();
+        const repinned = await readDockState();
+        if (
+          closed.open !== "false" ||
+          closed.pinned !== "false" ||
+          closed.pressed !== "false" ||
+          JSON.stringify(outside) !== JSON.stringify(closed) ||
+          repinned.open !== "true" ||
+          repinned.pinned !== "true" ||
+          repinned.pressed !== "true" ||
+          Math.abs((repinned.panelLeft ?? 0) - 864) > 1
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 MCP summary lifecycle failed: ${JSON.stringify({ closed, outside, repinned })}`,
+          );
+        }
+        currentMcp26825.summaryLifecycle = {
+          closed,
+          outside,
+          repinned,
+        };
+      }
+      contract.currentMcp26825 = currentMcp26825;
     }
     if (scene.toolCount !== undefined) {
       const isCurrentMcp26820 =

@@ -188,7 +188,7 @@ observation from a previous build remains historical evidence.
   previous-build regression evidence.
   They are not relabeled as current merely because the shell capture passes.
 
-Current inventory: 89 surface groups; 28 have current-build runtime evidence, 47 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
+Current inventory: 89 surface groups; 32 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 14 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 27 groups and Electron verification covers 27.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1348,6 +1348,23 @@ direct failed row, 1.2123% for compact recovery, and 1.7707% for Sources under
 independent 2.3%, 3.4%, 1.3%, and 2% hard limits. The replay-only in-progress
 Search frame is not promoted as a current-product pixel because that transient
 state was not captured live.
+
+Build `26.825.51511` supersedes those sampled primary MCP and Sources anchors
+again with one real same-thread two-turn lifecycle. The first turn completes
+Search → Fetch in 20 seconds; the second completes invalid-URL Fetch →
+Search → valid Fetch in 10 seconds. Both integration groups and every call
+row are flat, expanded, and noninteractive. At 1180×820 the success and
+recovery groups start at x=222/y=303 and x=222/y=501; at 720×680 the recovery
+group starts at x=16/y=338 with call labels at x=38 and zero horizontal
+overflow.
+
+The current pinned summary is now 300×313px at x=864/y=59 and combines
+Environment plus Sources with 272×29px rows. Clearing the pinned toggle closes
+it, an outside click leaves it closed, and the same header control repins it.
+Browser/CDP and Electron cover the two turns, compact resize, and summary
+lifecycle. Four reviewed internal baselines pass. Local-only product regions
+differ by 2.6742% success, 4.8070% recovery, 3.8995% compact recovery, and
+2.9276% pinned summary under independent 2.8%, 5%, 4.1%, and 3.1% limits.
 
 This promotes `thread.mcp-tool-events`, `thread.mcp-tool-failure-retry`,
 `thread.panel-system`, and `thread.sources-panel` to current-build runtime,

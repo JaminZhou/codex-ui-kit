@@ -105,9 +105,46 @@ describe("lifecycle visual policy", () => {
     expect(electronContract).toContain(
       'id: "electron-current-mcp-26-820-recovery"',
     );
-    expect(appSource).toContain("collapsible={!isCurrentMcp26820Replay}");
+    expect(appSource).toContain("collapsible={!usesCurrentMcpFlatRows}");
     expect(appStyles).toContain(
       '[data-scenario="mcp-current-26-820-recovery"]',
+    );
+  });
+
+  it("gates the runtime-observed 26.825 MCP two-turn lifecycle", () => {
+    for (const scene of [
+      "mcp-current-26-825-success",
+      "mcp-current-26-825-recovery",
+      "mcp-current-26-825-recovery-compact",
+      "mcp-current-26-825-sources-pinned",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_825_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_825_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_825_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_825_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      "current 26.825 MCP lifecycle contract failed",
+    );
+    expect(cdpContract).toContain(
+      "current 26.825 MCP summary lifecycle failed",
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-825-success"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-825-recovery"',
+    );
+    expect(appSource).toContain(
+      'scenarioId === "mcp-current-26-825-lifecycle"',
+    );
+    expect(appStyles).toContain(
+      '[data-scenario="mcp-current-26-825-lifecycle"]',
     );
   });
 

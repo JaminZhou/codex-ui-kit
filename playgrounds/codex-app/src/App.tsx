@@ -424,12 +424,14 @@ function CurrentMcpLink({ href }: { href: string }) {
 
 function CurrentMcpAnswer({
   current26820 = false,
+  current26825 = false,
   recovery = false,
 }: {
   current26820?: boolean;
+  current26825?: boolean;
   recovery?: boolean;
 }) {
-  const href = recovery
+  const href = recovery && !current26825
     ? "https://learn.chatgpt.com/docs/mcp-server"
     : "https://learn.chatgpt.com/docs/extend/mcp";
   return (
@@ -438,7 +440,12 @@ function CurrentMcpAnswer({
       data-markdown-text-style="assistant-message"
     >
       <p>
-        {current26820 ? (
+        {current26825 ? (
+          <>
+            CURRENT MCP 26.825 {recovery ? "RECOVERY" : "SUCCESS"} — Model
+            Context Protocol — <CurrentMcpLink href={href} />
+          </>
+        ) : current26820 ? (
           <>
             {recovery
               ? "Use Codex with the Agents SDK"
@@ -2967,16 +2974,22 @@ export function App() {
     mode === "replay" && scenarioId === "mcp-current-26-820-recovery";
   const isCurrentMcp26820Replay =
     isCurrentMcp26820SuccessReplay || isCurrentMcp26820RecoveryReplay;
+  const isCurrentMcp26825Replay =
+    mode === "replay" && scenarioId === "mcp-current-26-825-lifecycle";
+  const usesCurrentMcpFlatRows =
+    isCurrentMcp26820Replay || isCurrentMcp26825Replay;
   const isCurrentMcpSuccessReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-success" ||
       scenarioId === "mcp-current-26-818-success" ||
-      scenarioId === "mcp-current-26-820-success");
+      scenarioId === "mcp-current-26-820-success" ||
+      scenarioId === "mcp-current-26-825-lifecycle");
   const isCurrentMcpRecoveryReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-recovery" ||
       scenarioId === "mcp-current-26-818-recovery" ||
-      scenarioId === "mcp-current-26-820-recovery");
+      scenarioId === "mcp-current-26-820-recovery" ||
+      scenarioId === "mcp-current-26-825-lifecycle");
 
   const clearCurrentWorktreeSetupTimers = useCallback(() => {
     currentWorktreeSetupTimersRef.current.forEach((timer) =>
@@ -5158,7 +5171,7 @@ export function App() {
           isCurrentContextCompactionReplay ||
           isCurrentMixedToolReplay ||
           isCurrentSubagentReplay ||
-          isCurrentMcp26820Replay) &&
+          usesCurrentMcpFlatRows) &&
           state.status === "running");
   const composerIsDisabled =
     liveStartPending ||
@@ -5297,18 +5310,44 @@ export function App() {
   const header = (
     <ThreadHeader
       className={
-        isCurrentBasic26825Replay
+        isCurrentBasic26825Replay || isCurrentMcp26825Replay
           ? "demo-current-basic-26-825-header"
           : undefined
       }
       endActions={
-        isCurrentBasic26825Replay ? (
+        isCurrentBasic26825Replay || isCurrentMcp26825Replay ? (
           <div className="demo-current-basic-26-825-header-actions">
             <button aria-label="Share" type="button">
               <CurrentBuildIcon name="thread-header-share" />
               <span>Share</span>
             </button>
-            <button aria-label="Toggle summary" type="button">
+            <button
+              aria-label="Toggle summary"
+              aria-pressed={
+                isCurrentMcp26825Replay
+                  ? mcpSourceSummaryPinned
+                  : undefined
+              }
+              onClick={
+                isCurrentMcp26825Replay
+                  ? () => {
+                      if (mcpSourceSummaryOpen && mcpSourceSummaryPinned) {
+                        setMcpSourceSummaryOpen(false);
+                        setMcpSourceSummaryPinned(false);
+                        return;
+                      }
+                      setMcpSourceSummaryOpen(true);
+                      setMcpSourceSummaryPinned(true);
+                    }
+                  : undefined
+              }
+              ref={
+                isCurrentMcp26825Replay
+                  ? mcpSourceSummaryTriggerRef
+                  : undefined
+              }
+              type="button"
+            >
               <CurrentBuildIcon name="thread-header-summary" />
             </button>
             <button aria-label="Toggle bottom panel" type="button">
@@ -5580,7 +5619,21 @@ export function App() {
         )
       }
       navigation={
-        isCurrentBasic26825Replay ? (
+        isCurrentMcp26825Replay ? (
+          <div className="demo-current-mcp-26-825-header-navigation">
+            <button
+              aria-expanded={sidebarOpen}
+              aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+              onClick={() => setSidebarOpen((open) => !open)}
+              type="button"
+            >
+              <CurrentBuildIcon name="window-chrome-sidebar" />
+            </button>
+            <button aria-label="New chat" type="button">
+              <CurrentBuildIcon name="sidebar-new-chat" />
+            </button>
+          </div>
+        ) : isCurrentBasic26825Replay ? (
           <button
             aria-expanded={sidebarOpen}
             aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
@@ -5629,7 +5682,7 @@ export function App() {
           : state.threadId ?? "Local app-server"
       }
       startActions={
-        isCurrentBasic26825Replay ? (
+        isCurrentBasic26825Replay || isCurrentMcp26825Replay ? (
           <button
             aria-label="Chat actions"
             className="demo-current-basic-26-825-title-actions"
@@ -5648,7 +5701,7 @@ export function App() {
         ) : undefined
       }
       title={
-        isCurrentBasic26825Replay
+        isCurrentBasic26825Replay || isCurrentMcp26825Replay
           ? (
               <>
                 <span
@@ -5661,7 +5714,11 @@ export function App() {
                   className="demo-current-basic-26-825-header-title"
                   type="button"
                 >
-                  <span>Reply with CURRENT BASIC MESSAGE</span>
+                  <span>
+                    {isCurrentMcp26825Replay
+                      ? scenario.label
+                      : "Reply with CURRENT BASIC MESSAGE"}
+                  </span>
                 </button>
               </>
             )
@@ -9389,13 +9446,17 @@ export function App() {
                     message.id ===
                       "assistant-current-mcp-26-818-success" ||
                     message.id ===
-                      "assistant-current-mcp-26-820-success")) ||
+                      "assistant-current-mcp-26-820-success" ||
+                    message.id ===
+                      "assistant-current-mcp-26-825-success")) ||
                 (isCurrentMcpRecoveryReplay &&
                   (message.id === "assistant-current-mcp-recovery" ||
                     message.id ===
                       "assistant-current-mcp-26-818-recovery" ||
                     message.id ===
-                      "assistant-current-mcp-26-820-recovery")) ||
+                      "assistant-current-mcp-26-820-recovery" ||
+                    message.id ===
+                      "assistant-current-mcp-26-825-recovery")) ||
                 (scenarioId === "mcp-current-integration-recovery" &&
                   (message.id ===
                     "assistant-current-integration-unavailable" ||
@@ -9575,6 +9636,12 @@ export function App() {
               ) : message.id ===
                 "assistant-current-mcp-26-820-recovery" ? (
                 <CurrentMcpAnswer current26820 recovery />
+              ) : message.id ===
+                "assistant-current-mcp-26-825-success" ? (
+                <CurrentMcpAnswer current26825 />
+              ) : message.id ===
+                "assistant-current-mcp-26-825-recovery" ? (
+                <CurrentMcpAnswer current26825 recovery />
               ) : (
                 <AgentMarkdown
                   allowWideMedia={isCurrentMarkdown26820MediaReplay}
@@ -10052,7 +10119,9 @@ export function App() {
             activeFrame === "mcp-current-26-818-running" ||
             activeFrame === "mcp-current-26-818-success" ||
             activeFrame === "mcp-current-26-820-running" ||
-            activeFrame === "mcp-current-26-820-success")) ||
+            activeFrame === "mcp-current-26-820-success" ||
+            activeFrame === "mcp-current-26-825-success" ||
+            activeFrame === "mcp-current-26-825-recovery")) ||
         (isCurrentMcpRecoveryReplay &&
           (activeFrame === "mcp-current-recovery-failed" ||
             activeFrame === "mcp-current-recovery-retrying" ||
@@ -10061,7 +10130,8 @@ export function App() {
             activeFrame === "mcp-current-26-818-recovery-retrying" ||
             activeFrame === "mcp-current-26-818-recovery-completed" ||
             activeFrame === "mcp-current-26-820-recovery-retrying" ||
-            activeFrame === "mcp-current-26-820-recovery-completed")) ||
+            activeFrame === "mcp-current-26-820-recovery-completed" ||
+            activeFrame === "mcp-current-26-825-recovery")) ||
         (scenarioId === "mcp-current-integration-recovery" &&
           (activeFrame === "mcp-current-integration-recovering" ||
             activeFrame === "mcp-current-integration-recovered")) ||
@@ -10123,35 +10193,35 @@ export function App() {
               const presentation = mcpToolCallPresentation(call);
               return (
                 <ToolCallCard
-                  collapsible={!isCurrentMcp26820Replay}
+                  collapsible={!usesCurrentMcpFlatRows}
                   data-item-id={call.id}
                   disclosureIcon={
-                    isCurrentMcpReplay && !isCurrentMcp26820Replay ? (
+                    isCurrentMcpReplay && !usesCurrentMcpFlatRows ? (
                       <CurrentBuildIcon name="thread-activity-chevron" />
                     ) : undefined
                   }
                   disclosureMode={
-                    isCurrentMcpReplay && !isCurrentMcp26820Replay
+                    isCurrentMcpReplay && !usesCurrentMcpFlatRows
                       ? "overlay-button"
                       : undefined
                   }
                   error={
-                    isCurrentMcp26820Replay
+                    usesCurrentMcpFlatRows
                       ? undefined
                       : presentation.error
                   }
                   errorLanguage={
-                    call.status === "failed" && !isCurrentMcp26820Replay
+                    call.status === "failed" && !usesCurrentMcpFlatRows
                       ? "plaintext"
                       : undefined
                   }
                   errorPresentation={
-                    call.status === "failed" && !isCurrentMcp26820Replay
+                    call.status === "failed" && !usesCurrentMcpFlatRows
                       ? "output"
                       : undefined
                   }
                   failedAriaLabel={
-                    call.status === "failed" && !isCurrentMcp26820Replay
+                    call.status === "failed" && !usesCurrentMcpFlatRows
                       ? `${call.toolLabel} failed`
                       : undefined
                   }
@@ -10182,7 +10252,7 @@ export function App() {
                       : undefined
                   }
                   onViewRawOutput={
-                    call.status === "failed" && !isCurrentMcp26820Replay
+                    call.status === "failed" && !usesCurrentMcpFlatRows
                       ? (value) =>
                           setRawToolOutput({
                             name: call.toolLabel,
@@ -10191,7 +10261,7 @@ export function App() {
                       : undefined
                   }
                   rawOutput={
-                    call.status === "failed" && !isCurrentMcp26820Replay
+                    call.status === "failed" && !usesCurrentMcpFlatRows
                       ? {
                           arguments: call.arguments,
                           error: call.error,
@@ -11450,12 +11520,12 @@ export function App() {
       data-sidebar-current={currentSidebarComposition || undefined}
       data-sidebar-state={initialSelection.sidebarState ?? undefined}
       data-summary-open={
-        isCurrentMcp26818Replay || isCurrentMcp26820Replay
+        isCurrentMcp26818Replay || usesCurrentMcpFlatRows
           ? mcpSourceSummaryOpen
           : undefined
       }
       data-summary-pinned={
-        isCurrentMcp26818Replay || isCurrentMcp26820Replay
+        isCurrentMcp26818Replay || usesCurrentMcpFlatRows
           ? mcpSourceSummaryPinned
           : undefined
       }
@@ -12038,7 +12108,7 @@ export function App() {
 
                 {state.status === "running" &&
                 !isCurrentContextCompactionReplay &&
-                !isCurrentMcp26820Replay &&
+                !usesCurrentMcpFlatRows &&
                 !activeTurnHasWork &&
                 !state.messages.some(
                   ({ role, status, turnId }) =>
@@ -12052,7 +12122,7 @@ export function App() {
               </AgentTurn>
             </ConversationThreadShell>
 
-            {isCurrentMcp26818Replay || isCurrentMcp26820Replay ? (
+            {isCurrentMcp26818Replay || usesCurrentMcpFlatRows ? (
               <ThreadSummaryDock
                 anchorRef={mcpSourceSummaryTriggerRef}
                 className="demo-current-mcp-source-summary-dock"
@@ -12073,25 +12143,68 @@ export function App() {
                   className="demo-current-mcp-source-summary-panel"
                   label="MCP sources summary"
                 >
-                  <ThreadSummarySection
-                    actions={
-                      <ThreadSummaryIconButton
-                        icon="+"
+                  {isCurrentMcp26825Replay ? (
+                    <ThreadSummarySection
+                      actions={
+                        <ThreadSummaryIconButton
+                          icon="+"
+                          label="Set up local environment"
+                        />
+                      }
+                      title="Environment"
+                    >
+                      <ThreadSummaryItem
+                        label="Changes"
+                        leading={<SummaryGlyph name="changes" />}
+                        meta={<ThreadSummaryDelta added={0} removed={0} />}
+                      />
+                      <ThreadSummaryItem
+                        label="Local"
+                        leading={<SummaryGlyph name="computer" />}
+                        title="Select where to run the chat"
+                        trailing="⌄"
+                      />
+                      <ThreadSummaryItem
+                        label="feat/current-mcp-anchor"
+                        leading={<SummaryGlyph name="branch" />}
+                        title="Switch branch"
+                        trailing="⌄"
+                      />
+                      <ThreadSummaryItem
+                        disabled
+                        label="Commit or push"
+                        leading={<SummaryGlyph name="commit" />}
+                      />
+                      <ThreadSummaryItem
+                        label="Create pull request"
+                        leading={<SummaryGlyph name="github" />}
+                      />
+                    </ThreadSummarySection>
+                  ) : (
+                    <ThreadSummarySection
+                      actions={
+                        <ThreadSummaryIconButton
+                          icon="+"
+                          label="Create a file or site"
+                        />
+                      }
+                      title="Outputs"
+                    >
+                      <ThreadSummaryItem
+                        disabled
                         label="Create a file or site"
                       />
-                    }
-                    title="Outputs"
-                  >
-                    <ThreadSummaryItem
-                      disabled
-                      label="Create a file or site"
-                    />
-                  </ThreadSummarySection>
+                    </ThreadSummarySection>
+                  )}
                   <ThreadSummarySection
                     actions={
                       <ThreadSummaryIconButton
                         icon="+"
-                        label="Add a source"
+                        label={
+                          isCurrentMcp26825Replay
+                            ? "Attach files or connect apps"
+                            : "Add a source"
+                        }
                       />
                     }
                     title="Sources"

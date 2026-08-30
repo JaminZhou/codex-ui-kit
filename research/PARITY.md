@@ -605,6 +605,18 @@ gate the 736×80 success region at 1.9565% under 2% and the complete 688×67
 compact failure card at 1.20184% under 1.21%; product screenshots remain
 uncommitted.
 
+The `26.825.51511` MCP refresh now supersedes the sampled primary MCP and
+Sources anchors. One real same-thread task completes Search → Fetch in 20
+seconds, then invalid-URL Fetch → Search → valid Fetch in 10 seconds.
+Completed and failed calls are flat noninteractive rows with no legacy error
+card or disclosure. Browser/CDP and Electron cover both expanded groups,
+native compact geometry, and the current 300×313 Environment + Sources summary
+close/repin lifecycle. Four reviewed internal frames pass. Local-only product
+ratios are 2.6742% success, 4.8070% recovery, 3.8995% compact recovery, and
+2.9276% pinned summary under independent 2.8%, 5%, 4.1%, and 3.1% limits.
+Product screenshots remain uncommitted, and unobserved integration variants
+remain partial.
+
 A separate `26.803.41515` unavailable/fallback task now promotes
 `thread.tool-unavailable-recovery`. Its GitHub-MCP-only turn emits no false MCP
 row and completes with the exact unavailable response; the next same-thread
