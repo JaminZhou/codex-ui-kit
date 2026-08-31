@@ -81,6 +81,7 @@ export interface PullRequestListItem {
   commentCount?: number;
   id: string;
   indicator?: ReactNode;
+  meta?: ReactNode;
   number: number | string;
   openLabel?: string;
   repository?: ReactNode;
@@ -161,17 +162,21 @@ export function PullRequestList({
                     {item.title}
                   </span>
                   <span className="codex-ui-pull-request-list__meta">
-                    <span>#{item.number}</span>
-                    {item.author ? <span>{item.author}</span> : null}
-                    {item.updatedAt ? <span>{item.updatedAt}</span> : null}
-                    {item.checkStatus ? (
-                      <span data-check-status={item.checkStatus}>
-                        {pullRequestCheckLabels[item.checkStatus]}
-                      </span>
-                    ) : null}
-                    {item.commentCount !== undefined ? (
-                      <span>{item.commentCount} comments</span>
-                    ) : null}
+                    {item.meta ?? (
+                      <>
+                        <span>#{item.number}</span>
+                        {item.author ? <span>{item.author}</span> : null}
+                        {item.updatedAt ? <span>{item.updatedAt}</span> : null}
+                        {item.checkStatus ? (
+                          <span data-check-status={item.checkStatus}>
+                            {pullRequestCheckLabels[item.checkStatus]}
+                          </span>
+                        ) : null}
+                        {item.commentCount !== undefined ? (
+                          <span>{item.commentCount} comments</span>
+                        ) : null}
+                      </>
+                    )}
                   </span>
                 </button>
               </li>
@@ -367,6 +372,7 @@ export interface PullRequestPanelSummaryProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   checks?: ReactNode;
   checksHeading?: ReactNode;
+  commentPlacement?: "after-timeline" | "before-timeline";
   commentComposer?: ReactNode;
   description?: ReactNode;
   descriptionAction?: ReactNode;
@@ -381,6 +387,7 @@ export interface PullRequestPanelSummaryProps
 export function PullRequestPanelSummary({
   checks,
   checksHeading = "Checks",
+  commentPlacement = "before-timeline",
   className,
   commentComposer,
   description,
@@ -460,7 +467,7 @@ export function PullRequestPanelSummary({
           {checks}
         </section>
       ) : null}
-      {commentComposer ? (
+      {commentComposer && commentPlacement === "before-timeline" ? (
         <div className="codex-ui-pull-request-panel-summary__comment">
           {commentComposer}
         </div>
@@ -468,6 +475,11 @@ export function PullRequestPanelSummary({
       {timeline ? (
         <div className="codex-ui-pull-request-panel-summary__timeline">
           {timeline}
+        </div>
+      ) : null}
+      {commentComposer && commentPlacement === "after-timeline" ? (
+        <div className="codex-ui-pull-request-panel-summary__comment">
+          {commentComposer}
         </div>
       ) : null}
     </article>
@@ -541,6 +553,7 @@ export interface PullRequestCheck {
   id: string;
   name: ReactNode;
   status: PullRequestCheckStatus;
+  statusLabel?: ReactNode;
 }
 
 export interface PullRequestCheckListProps
@@ -582,7 +595,7 @@ export function PullRequestCheckList({
                 ) : null}
               </span>
               <span className="codex-ui-pull-request-checks__status">
-                {pullRequestCheckLabels[check.status]}
+                {check.statusLabel ?? pullRequestCheckLabels[check.status]}
                 {check.duration ? <> · {check.duration}</> : null}
               </span>
             </li>

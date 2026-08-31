@@ -641,4 +641,24 @@ describe("pull request workspace surfaces", () => {
     ).toBeTruthy();
     expect(screen.getByText("Codex reviewed the latest push.")).toBeTruthy();
   });
+
+  it("can place the pull request comment composer after the timeline", () => {
+    render(
+      <PullRequestPanelSummary
+        commentComposer={<textarea aria-label="Pull request comment" />}
+        commentPlacement="after-timeline"
+        timeline={<article>Jamin opened this pull request.</article>}
+        title="Current pull request"
+      />,
+    );
+
+    const timeline = screen.getByText("Jamin opened this pull request.");
+    const comment = screen.getByRole("textbox", {
+      name: "Pull request comment",
+    });
+    expect(
+      timeline.compareDocumentPosition(comment) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
 });
