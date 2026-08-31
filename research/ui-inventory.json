@@ -272,7 +272,8 @@
         "cdp:thinking-working-worked-activity",
         "cdp:worked-activity-group-disclosure",
         "cdp-26.825.31414:real-no-tool-and-terminal-thinking-cadence-worked-for-disclosure-and-ran-row",
-        "cdp-26.825.31414:real-three-five-eight-ten-step-plan-writing-progress-tooltip-and-completion-removal"
+        "cdp-26.825.31414:real-three-five-eight-ten-step-plan-writing-progress-tooltip-and-completion-removal",
+        "cdp-26.825.51511:real-read-only-eight-step-plan-step-five-hover-card-completion-removal-and-settled-answer-with-semantic-drift"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
