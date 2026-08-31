@@ -303,6 +303,7 @@ export interface ThreadSummaryPopoverProps {
   label?: string;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
+  sideOffset?: number;
   trigger?: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>;
   triggerIcon?: ReactNode;
   triggerLabel?: string;
@@ -324,6 +325,7 @@ export function ThreadSummaryPopover({
   label = "Thread summary",
   onOpenChange,
   open,
+  sideOffset = 8,
   trigger,
   triggerIcon,
   triggerLabel = "Toggle summary",
@@ -363,7 +365,7 @@ export function ThreadSummaryPopover({
       open={resolvedOpen}
       role="dialog"
       side="bottom"
-      sideOffset={8}
+      sideOffset={sideOffset}
       trigger={resolvedTrigger}
       width="auto"
     >

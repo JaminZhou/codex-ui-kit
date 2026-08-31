@@ -6619,7 +6619,7 @@ for (const scene of selectedScenes) {
     const panelBounds = {
       height: 199,
       left: 804,
-      top: 45,
+      top: 53,
       width: 300,
     };
     const referencePanel = cropPng(
@@ -6636,7 +6636,13 @@ for (const scene of selectedScenes) {
       panelBounds.width,
       panelBounds.height,
     );
-    const comparison = comparePng(referencePanel, actualPanel);
+    const dynamicDeltaMask = [
+      { height: 29, left: 218, top: 40, width: 72 },
+    ];
+    const comparison = comparePng(
+      maskPng(referencePanel, dynamicDeltaMask),
+      maskPng(actualPanel, dynamicDeltaMask),
+    );
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_CONTEXT_SUMMARY_MAX_DIFF_RATIO",
       0.03,

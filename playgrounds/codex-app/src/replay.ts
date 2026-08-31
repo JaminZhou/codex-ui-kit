@@ -287,8 +287,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "context-summary": scenario(
     "context-summary",
-    "Probe context summary panel",
-    "The current thread summary toggle opens the compact environment and Git workflow overlay.",
+    "Inspect current context summary",
+    "The runtime-observed 26.825.51511 thread summary toggle opens the compact environment and Git workflow overlay.",
     contextSummaryTrace,
   ),
   "current-mixed-tool-thread": scenario(
