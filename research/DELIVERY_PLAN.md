@@ -14,8 +14,15 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 46 groups have current-build runtime evidence, 34 have previous-build-only
+- 47 groups have current-build runtime evidence, 33 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current Plan follow-up confirms that simple ordinary and Plan-mode
+  prompts can now settle without progress, while one complex read-only audit
+  reaches `Step 5 / 8`, opens the eight-row 95.578125×200px hover card, removes
+  the chip after completion, and settles cleanly. Its local-only product
+  comparison passes at 3.5294%; the replay deliberately retains button and
+  tooltip semantics absent from the sampled product. Current generic reasoning
+  remains unsampled, so the combined group stays partial.
 - The current thirty-turn follow-up refreshes timeline virtualization and
   message navigation across 1180×820 and 720×680. It locks 12/9 mounted turns,
   the viewport-derived message-11 rail marker, compact rail suppression, and
@@ -63,13 +70,15 @@ exit gates; it does not replace the inventory.
   collapsed/expanded `Worked for` plus `Ran …` rows. Browser/CDP, Electron, a
   reviewed 1180×820 baseline, and a 0.6% tight current-product foreground
   comparison gate the pre-answer state. A second 26.825.31414 follow-up
-  gates Plan writing/completion: 3/5/8/10-step probes establish the Composer-
-  dock ownership, `Step n / total` progress, variable-height tooltip list, and
-  removal after every step completes. Browser/CDP and Electron cover active,
-  expanded, progress, all-complete, and settled states; three reviewed
-  baselines and a 2.8869% foreground product comparison cover the 1180×820
-  composition. Free-form reasoning and unsampled reasoning variants remain P0
-  work, so the combined inventory group stays partial.
+  originally gated Plan writing/completion: 3/5/8/10-step probes established
+  Composer-dock ownership, `Step n / total` progress, variable-height tooltip
+  lists, and removal after every step completed. The current 26.825.51511
+  revalidation supersedes that sampled Plan runtime with one real eight-step
+  read-only audit, exact Step 5/8 and completion states, and a 3.5294%
+  foreground product comparison. Browser/CDP and Electron retain the active,
+  expanded, progress, all-complete, and settled contracts. Free-form reasoning
+  and unsampled reasoning variants remain P0 work, so the combined inventory
+  group stays partial.
   A further read-only 26.825.31414 probe promotes
   `thread.search-tool-events`, `thread.browser-tool-events`, and
   `workspace.browser`. Web Search preserves the two-level `Worked for 21s` →

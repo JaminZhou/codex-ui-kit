@@ -66,19 +66,23 @@ observation from a previous build remains historical evidence.
   the collapsed 600px Projects route remains 559px with 415/128 columns.
   Explore is present and `Sites` is absent from the sampled fixed-route stack.
   Details are in
-  [`26.825.51511.md`](26.825.51511.md). The rich Markdown streaming follow-up
-  is current on 26.825.51511; activity, Plan, Search/Browser, and long-thread
-  follow-ups remain 26.825.31414
-  regression evidence. That previous activity follow-up re-observes the 14/21px
+  [`26.825.51511.md`](26.825.51511.md). Rich Markdown streaming, Plan progress,
+  and long-thread navigation are current on 26.825.51511; activity and
+  Search/Browser follow-ups remain 26.825.31414 regression evidence. That
+  previous activity follow-up re-observes the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
-  current-product `Thinking` comparison passes at 0.6%. A further no-tool
-  Plan probe covers 3/5/8/10 steps, the Composer-dock `Step n / total` chip,
-  variable-height tooltip, progress, all-complete removal, and settled answer.
-  CDP/Electron gate the lifecycle and its tight local-only eight-step product
-  comparison passes at 2.8869%. Broader reasoning,
-  A separate current read-only Search/Browser probe covers the two-level Web
-  Search disclosure, the generic MCP-backed Browser activity group, and the
+  previous-product `Thinking` comparison passes at 0.6%. The current Plan
+  follow-up shows that simple ordinary and Plan-mode prompts may settle without
+  progress, while a complex read-only audit still reaches `Step 5 / 8`, the
+  Composer-dock chip, 95.578125×200px hover card, all-complete removal, and the
+  settled answer. The replay retains its accessible button and tooltip roles
+  even though the sampled product now exposes nonsemantic `div`/`span`
+  containers. CDP/Electron continue to gate the lifecycle and the tight
+  current-product comparison passes at 3.5294%. Broader reasoning remains
+  incomplete. A separate current read-only Search/Browser probe covers the
+  two-level Web Search disclosure, the generic MCP-backed Browser activity
+  group, and the
   419.59375px one-tab Browser workspace. CDP gates six frames; Electron repeats
   both open lifecycles and collapse/reopen. The local-only Search, Browser
   activity, and Browser-chrome comparisons pass at 10.32%, 8.45%, and 2.80%.
@@ -220,7 +224,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 46 have current-build runtime evidence, 34 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 42 groups and Electron verification covers 42.
+Current inventory: 91 surface groups; 47 have current-build runtime evidence, 33 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 42 groups and Electron verification covers 42.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
