@@ -248,6 +248,30 @@ describe("composer auxiliary surfaces", () => {
     expect(screen.queryByRole("menu")).toBeNull();
   });
 
+  it("supports current-build menuitem semantics without changing the default", () => {
+    render(
+      <ComposerPermissionMenu
+        onSelect={() => undefined}
+        optionRole="menuitem"
+        options={[
+          { id: "ask", label: "Ask for approval" },
+          { id: "full", label: "Full access" },
+        ]}
+        selectedIcon={<span data-testid="selected-permission">selected</span>}
+        selectedId="full"
+        trigger={<button type="button">Full access</button>}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Full access" }));
+    const options = screen.getAllByRole("menuitem");
+    expect(options).toHaveLength(2);
+    expect(options.every((option) => !option.hasAttribute("aria-checked"))).toBe(
+      true,
+    );
+    expect(screen.getByTestId("selected-permission")).not.toBeNull();
+  });
+
   it("navigates the current grouped Composer resource picker", () => {
     const onSelect = vi.fn();
     const onDismiss = vi.fn();
@@ -356,6 +380,11 @@ describe("composer auxiliary surfaces", () => {
         '.codex-ui-composer-mode[data-kind="plan"] svg',
       ),
     ).not.toBeNull();
+    expect(
+      container.querySelector(
+        '.codex-ui-composer-mode[data-kind="plan"] svg[viewBox="0 0 16 16"]',
+      ),
+    ).not.toBeNull();
 
     rerender(
       <ComposerModeIndicator
@@ -370,6 +399,11 @@ describe("composer auxiliary surfaces", () => {
         '.codex-ui-composer-mode[data-kind="goal"] svg',
       ),
     ).not.toBeNull();
+    expect(
+      container.querySelectorAll(
+        '.codex-ui-composer-mode[data-kind="goal"] svg path',
+      ),
+    ).toHaveLength(3);
   });
 
   it("covers interrupted, paused, queued, and editing prompt actions", () => {

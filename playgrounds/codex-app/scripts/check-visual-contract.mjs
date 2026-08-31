@@ -250,6 +250,18 @@ const currentComposer26820PlanReference =
   process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_REFERENCE;
 const currentComposer26820PlanCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_820_PLAN_COMPACT_REFERENCE;
+const currentComposer26825PermissionReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PERMISSION_REFERENCE;
+const currentComposer26825PermissionCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PERMISSION_COMPACT_REFERENCE;
+const currentComposer26825GoalReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_GOAL_REFERENCE;
+const currentComposer26825GoalCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_GOAL_COMPACT_REFERENCE;
+const currentComposer26825PlanReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PLAN_REFERENCE;
+const currentComposer26825PlanCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PLAN_COMPACT_REFERENCE;
 const currentBuildAttachmentReadyReference =
   process.env.CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE;
 const currentBuildAttachmentCompletedReference =
@@ -1345,6 +1357,7 @@ for (const scene of selectedScenes) {
   let workspaceProjectListboxBounds;
   let currentContext26825Bounds;
   let currentComposer26820ModeBounds;
+  let currentComposer26825Bounds;
   let workspaceWorktreeMenuBounds;
   let workspaceBranchCreateBounds;
   let currentApprovalBounds;
@@ -1761,6 +1774,22 @@ for (const scene of selectedScenes) {
     ) {
       currentComposer26820ModeBounds = await page
         .locator(".codex-ui-composer")
+        .evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            height: Math.round(rect.height),
+            left: Math.round(rect.left),
+            top: Math.round(rect.top),
+            width: Math.round(rect.width),
+          };
+        });
+    }
+    if (scene.id.startsWith("workspace-composer-current-26-825-")) {
+      const selector = scene.id.includes("permissions")
+        ? ".codex-ui-composer-permission-menu--current-26-825"
+        : ".demo-workspace-start .codex-ui-composer";
+      currentComposer26825Bounds = await page
+        .locator(selector)
         .evaluate((element) => {
           const rect = element.getBoundingClientRect();
           return {
@@ -5546,6 +5575,97 @@ for (const scene of selectedScenes) {
     console.log(
       `${scene.id}: current 26.820 Composer mode pixel ratio ${comparison.ratio}`,
     );
+  }
+
+  const currentComposer26825Comparison =
+    scene.id === "workspace-composer-current-26-825-permissions"
+      ? {
+          maximumRatioName:
+            "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PERMISSION_MAX_DIFF_RATIO",
+          defaultMaximumRatio: 0.07,
+          referenceCrop: { height: 162, left: 427, top: 604, width: 439 },
+          referencePath: currentComposer26825PermissionReference,
+        }
+      : scene.id ===
+          "workspace-composer-current-26-825-permissions-compact"
+        ? {
+            maximumRatioName:
+              "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PERMISSION_COMPACT_MAX_DIFF_RATIO",
+            defaultMaximumRatio: 0.07,
+            referenceCrop: { height: 162, left: 61, top: 464, width: 439 },
+            referencePath: currentComposer26825PermissionCompactReference,
+            referenceSize: { height: 680, width: 720 },
+          }
+        : scene.id === "workspace-composer-current-26-825-goal"
+          ? {
+              maximumRatioName:
+                "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_GOAL_MAX_DIFF_RATIO",
+              referenceCrop: {
+                height: 134,
+                left: 383,
+                top: 670,
+                width: 736,
+              },
+              referencePath: currentComposer26825GoalReference,
+            }
+          : scene.id === "workspace-composer-current-26-825-goal-compact"
+            ? {
+                maximumRatioName:
+                  "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_GOAL_COMPACT_MAX_DIFF_RATIO",
+                referenceCrop: {
+                  height: 134,
+                  left: 16,
+                  top: 530,
+                  width: 688,
+                },
+                referencePath: currentComposer26825GoalCompactReference,
+                referenceSize: { height: 680, width: 720 },
+              }
+            : scene.id === "workspace-composer-current-26-825-plan"
+              ? {
+                  maximumRatioName:
+                    "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PLAN_MAX_DIFF_RATIO",
+                  referenceCrop: {
+                    height: 98,
+                    left: 383,
+                    top: 706,
+                    width: 736,
+                  },
+                  referencePath: currentComposer26825PlanReference,
+                }
+              : scene.id ===
+                  "workspace-composer-current-26-825-plan-compact"
+                ? {
+                    maximumRatioName:
+                      "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PLAN_COMPACT_MAX_DIFF_RATIO",
+                    referenceCrop: {
+                      height: 98,
+                      left: 16,
+                      top: 566,
+                      width: 688,
+                    },
+                    referencePath: currentComposer26825PlanCompactReference,
+                    referenceSize: { height: 680, width: 720 },
+                  }
+                : null;
+  if (
+    currentComposer26825Comparison?.referencePath &&
+    currentComposer26825Bounds
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentComposer26825Bounds,
+      defaultMaximumRatio:
+        currentComposer26825Comparison.defaultMaximumRatio ?? 0.05,
+      masks: [],
+      maximumRatioName: currentComposer26825Comparison.maximumRatioName,
+      referenceCrop: currentComposer26825Comparison.referenceCrop,
+      referencePath: currentComposer26825Comparison.referencePath,
+      referenceSize:
+        currentComposer26825Comparison.referenceSize ??
+        currentBuildWorkspaceReferenceSize,
+      sceneId: scene.id,
+    });
   }
 
   if (scene.id === "thread-windowed" && currentBuildLongThreadReference) {

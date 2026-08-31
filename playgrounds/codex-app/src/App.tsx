@@ -838,14 +838,29 @@ type ComposerOverlay = "permissions" | "resources" | null;
 type ComposerMode = Extract<ComposerModeKind, "goal" | "plan"> | null;
 
 function initialComposerOverlay(frame: string | null): ComposerOverlay {
-  if (frame === "composer-permissions-menu") return "permissions";
+  if (
+    frame === "composer-permissions-menu" ||
+    frame === "workspace-composer-current-26-825-permissions"
+  ) {
+    return "permissions";
+  }
   if (frame === "composer-resources-menu") return "resources";
   return null;
 }
 
 function initialComposerMode(frame: string | null): ComposerMode {
-  if (frame === "composer-goal") return "goal";
-  if (frame === "composer-plan") return "plan";
+  if (
+    frame === "composer-goal" ||
+    frame === "workspace-composer-current-26-825-goal"
+  ) {
+    return "goal";
+  }
+  if (
+    frame === "composer-plan" ||
+    frame === "workspace-composer-current-26-825-plan"
+  ) {
+    return "plan";
+  }
   return null;
 }
 
@@ -1016,6 +1031,28 @@ const composerPermissionOptions: readonly ComposerPermissionOption[] = [
     description:
       "Unrestricted access to the internet and any file on your computer",
     icon: "◉",
+    id: "full",
+    label: "Full access",
+  },
+];
+
+const currentComposerPermissionOptions: readonly ComposerPermissionOption[] = [
+  {
+    description: "Always ask to edit external files and use the internet",
+    icon: <CurrentBuildIcon name="composer-permission-ask" />,
+    id: "ask",
+    label: "Ask for approval",
+  },
+  {
+    description: "Only ask for actions detected as potentially unsafe",
+    icon: <CurrentBuildIcon name="composer-permission" />,
+    id: "approve",
+    label: "Approve for me",
+  },
+  {
+    description:
+      "Unrestricted access to the internet and any file on your computer",
+    icon: <CurrentBuildIcon name="composer-permission" />,
     id: "full",
     label: "Full access",
   },
@@ -2148,11 +2185,17 @@ const initialPersonalizationSettings: PersonalizationSettingsValue = {
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
-  const currentContext26825Replay =
+  const currentComposerControls26825Replay =
     initialSelection.view === "workspace" &&
     initialSelection.frame?.startsWith(
-      "workspace-context-current-26-825-",
+      "workspace-composer-current-26-825-",
     );
+  const currentContext26825Replay =
+    initialSelection.view === "workspace" &&
+    (initialSelection.frame?.startsWith(
+      "workspace-context-current-26-825-",
+    ) ||
+      currentComposerControls26825Replay);
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
     initialSelection.scenarioId,
   );
@@ -5520,12 +5563,16 @@ export function App() {
     isCurrentSubagentReplay ||
     scenarioId === "current-review-rename" ||
     isCurrentReviewFilesReplay;
+  const availableComposerPermissionOptions =
+    currentComposerControls26825Replay
+      ? currentComposerPermissionOptions
+      : composerPermissionOptions;
   const selectedComposerPermission =
     (usesCurrentAskPermission
-      ? composerPermissionOptions[0]
-      : composerPermissionOptions.find(
+      ? availableComposerPermissionOptions[0]
+      : availableComposerPermissionOptions.find(
           ({ id }) => id === composerPermissionId,
-        )) ?? composerPermissionOptions[2]!;
+        )) ?? availableComposerPermissionOptions[2]!;
   const header = (
     <ThreadHeader
       className={
@@ -6836,6 +6883,14 @@ export function App() {
         ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
+      : currentComposerControls26825Replay
+        ? composerOverlay === "permissions"
+          ? "workspace-composer-current-26-825-permissions"
+          : composerMode === "goal"
+            ? "workspace-composer-current-26-825-goal"
+            : composerMode === "plan"
+              ? "workspace-composer-current-26-825-plan"
+              : "workspace-composer-current-26-825-ready"
       : currentContext26825Replay
         ? workspaceProjectId === null
           ? "workspace-context-current-26-825-no-project"
@@ -7758,10 +7813,63 @@ export function App() {
           <button aria-label="Add files and more" type="button">
             <CurrentBuildIcon name="composer-add-files" />
           </button>
-          <button aria-label="Change permissions" type="button">
-            <CurrentBuildIcon name="composer-permission" />
-            Full access
-          </button>
+          {currentComposerControls26825Replay ? (
+            <ComposerPermissionMenu
+              align="start"
+              className="codex-ui-composer-permission-menu--current-26-825"
+              heading="How should ChatGPT actions be approved?"
+              initialFocus="none"
+              learnMore="Learn more"
+              onOpenChange={(open) =>
+                setComposerOverlay(open ? "permissions" : null)
+              }
+              onSelect={(option) => {
+                setComposerPermissionId(option.id);
+                setComposerOverlay(null);
+              }}
+              open={composerOverlay === "permissions"}
+              optionRole="menuitem"
+              options={currentComposerPermissionOptions}
+              selectedIcon={
+                <CurrentBuildIcon name="workspace-selection-check" />
+              }
+              selectedId={selectedComposerPermission.id}
+              side="top"
+              sideOffset={1.5}
+              trigger={
+                <button
+                  aria-label="Change permissions"
+                  className="demo-composer-permission-trigger"
+                  type="button"
+                >
+                  <CurrentBuildIcon
+                    name={
+                      selectedComposerPermission.id === "ask"
+                        ? "composer-permission-ask"
+                        : "composer-permission"
+                    }
+                  />
+                  {selectedComposerPermission.label}
+                </button>
+              }
+            />
+          ) : (
+            <button aria-label="Change permissions" type="button">
+              <CurrentBuildIcon name="composer-permission" />
+              Full access
+            </button>
+          )}
+          {currentComposerControls26825Replay && composerMode ? (
+            <ComposerModeIndicator
+              clearLabel={composerMode === "goal" ? "Clear goal" : "Plan"}
+              kind={composerMode}
+              label={composerMode === "goal" ? "Goal" : "Plan"}
+              onClear={() => {
+                setComposerMode(null);
+                requestAnimationFrame(() => composerInputRef.current?.focus());
+              }}
+            />
+          ) : null}
         </span>
       }
       controls={
@@ -7830,8 +7938,21 @@ export function App() {
         });
       }}
       onValueChange={setComposerValue}
-      placeholder="Do anything"
-      textareaLabel="Do anything"
+      placeholder={
+        composerMode === "goal"
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerMode === "plan"
+            ? "Describe your task to generate a plan..."
+            : "Do anything"
+      }
+      ref={composerInputRef}
+      textareaLabel={
+        composerMode === "goal"
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerMode === "plan"
+            ? "Describe your task to generate a plan..."
+            : "Do anything"
+      }
       value={composerValue}
     />
   );
@@ -12254,12 +12375,16 @@ export function App() {
           : undefined
       }
       data-composer-overlay={
-        isConversationLifecycle || isCurrentAttachmentReplay
+        isConversationLifecycle ||
+        isCurrentAttachmentReplay ||
+        currentComposerControls26825Replay
           ? composerOverlay ?? undefined
           : undefined
       }
       data-composer-mode={
-        isConversationLifecycle ? composerMode ?? undefined : undefined
+        isConversationLifecycle || currentComposerControls26825Replay
+          ? composerMode ?? undefined
+          : undefined
       }
       data-queue-count={
         isConversationLifecycle ? queuedPrompts.length : undefined
@@ -12300,6 +12425,9 @@ export function App() {
       data-current-home={currentHomeFrame || undefined}
       data-current-context-26-825={
         currentContext26825Replay || undefined
+      }
+      data-current-composer-controls-26-825={
+        currentComposerControls26825Replay || undefined
       }
       data-route-history-index={routeHistory.index}
       data-route-history-length={routeHistory.entries.length}

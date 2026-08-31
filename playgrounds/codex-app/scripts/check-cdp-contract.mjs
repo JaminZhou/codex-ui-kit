@@ -4933,6 +4933,18 @@ for (const scene of selectedScenes) {
         const composer = document.querySelector(
           ".demo-workspace-start .codex-ui-composer",
         );
+        const composerInput = composer?.querySelector(
+          ".codex-ui-composer__input",
+        );
+        const composerMode = composer?.querySelector(
+          ".codex-ui-composer-mode",
+        );
+        const composerPermissionMenu = document.querySelector(
+          ".codex-ui-composer-permission-menu--current-26-825",
+        );
+        const composerPermissionItems = Array.from(
+          composerPermissionMenu?.querySelectorAll('[role="menuitem"]') ?? [],
+        );
         const heading = document.querySelector(
           ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
         );
@@ -5075,6 +5087,39 @@ for (const scene of selectedScenes) {
           activeElement:
             document.activeElement?.getAttribute("aria-label") ?? null,
           composer: rect(composer),
+          composerInput: {
+            label: composerInput?.getAttribute("aria-label") ?? null,
+            rect: rect(composerInput),
+            style: style(composerInput),
+          },
+          composerMode: composerMode
+            ? {
+                kind: composerMode.getAttribute("data-kind"),
+                label: composerMode.getAttribute("aria-label"),
+                pathCount: composerMode.querySelectorAll("svg path").length,
+                rect: rect(composerMode),
+                style: style(composerMode),
+                viewBox:
+                  composerMode.querySelector("svg")?.getAttribute("viewBox") ??
+                  null,
+              }
+            : null,
+          composerPermissionMenu: composerPermissionMenu
+            ? {
+                checkedCount: composerPermissionMenu.querySelectorAll(
+                  '[aria-checked="true"]',
+                ).length,
+                items: composerPermissionItems.map((item) => ({
+                  ariaChecked: item.getAttribute("aria-checked"),
+                  label: item.textContent?.trim() ?? "",
+                  rect: rect(item),
+                  selected: item.hasAttribute("data-selected"),
+                  style: style(item),
+                })),
+                rect: rect(composerPermissionMenu),
+                style: style(composerPermissionMenu),
+              }
+            : null,
           branchCreation: branchCreationDialog
             ? {
                 error:
@@ -5291,9 +5336,12 @@ for (const scene of selectedScenes) {
         );
         continue;
       }
-      const currentContextExpected = scene.frame.startsWith(
-        "workspace-context-current-26-825-",
+      const currentComposerControlsExpected = scene.frame.startsWith(
+        "workspace-composer-current-26-825-",
       );
+      const currentContextExpected =
+        scene.frame.startsWith("workspace-context-current-26-825-") ||
+        currentComposerControlsExpected;
       const projectExpected =
         scene.frame === "workspace-project-menu" ||
         scene.frame.endsWith("-project-menu");
@@ -5322,7 +5370,14 @@ for (const scene of selectedScenes) {
         worktreeEnvironmentExpected;
       const compactExpected =
         scene.frame === "workspace-compact-ready" ||
-        projectCompactExpected;
+        projectCompactExpected ||
+        (currentComposerControlsExpected && scene.id.endsWith("-compact"));
+      const composerGoalExpected =
+        scene.frame === "workspace-composer-current-26-825-goal";
+      const composerPlanExpected =
+        scene.frame === "workspace-composer-current-26-825-plan";
+      const composerPermissionsExpected =
+        scene.frame === "workspace-composer-current-26-825-permissions";
       const currentHomeExpected = scene.frame.startsWith("current-home-");
       const currentHomeCompactExpected =
         currentHomeExpected && scene.frame.endsWith("-compact");
@@ -5415,7 +5470,8 @@ for (const scene of selectedScenes) {
         !contract.heading ||
         contract.contextButtons.length !== expectedContextButtonCount ||
         Math.abs(contract.composer.width - expectedComposerWidth) > 1 ||
-        Math.abs(contract.composer.height - 98) > 1 ||
+        Math.abs(contract.composer.height - (composerGoalExpected ? 134 : 98)) >
+          1 ||
         Math.abs(contract.composer.left - expectedComposerLeft) > 1 ||
         Math.abs(contract.composer.bottom - expectedComposerBottom) > 1 ||
         Math.abs(contract.heading.top - expectedHeadingTop) > 1 ||
@@ -5484,6 +5540,157 @@ for (const scene of selectedScenes) {
         throw new Error(
           `${scene.id}: workspace entry contract failed: ${JSON.stringify(contract)}`,
         );
+      }
+      if (currentComposerControlsExpected) {
+        const expectedMode = composerGoalExpected
+          ? "goal"
+          : composerPlanExpected
+            ? "plan"
+            : null;
+        const expectedInputLabel = composerGoalExpected
+          ? "Describe your goal, define measurable outcomes for best results"
+          : composerPlanExpected
+            ? "Describe your task to generate a plan..."
+            : "Do anything";
+        const expectedInputTop = compactExpected
+          ? composerGoalExpected
+            ? 544
+            : 580
+          : composerGoalExpected
+            ? 684
+            : 720;
+        const expectedModeLeft = compactExpected ? 173.0625 : 540;
+        const expectedModeTop = compactExpected ? 628 : 768;
+        const permissionMenu = contract.composerPermissionMenu;
+        if (
+          contract.composerInput.label !== expectedInputLabel ||
+          !contract.composerInput.rect ||
+          Math.abs(contract.composerInput.rect.left - expectedComposerLeft) >
+            1 ||
+          Math.abs(contract.composerInput.rect.top - expectedInputTop) > 1 ||
+          Math.abs(contract.composerInput.rect.width - expectedComposerWidth) >
+            1 ||
+          Math.abs(contract.composerInput.rect.height - 44) > 1 ||
+          contract.composerInput.style.padding !== "12px 12px 0px" ||
+          Boolean(permissionMenu) !== composerPermissionsExpected ||
+          Boolean(contract.composerMode) !== Boolean(expectedMode)
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 Composer base contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        if (
+          composerPermissionsExpected &&
+          (!permissionMenu ||
+            Math.abs(
+              permissionMenu.rect.left -
+                (compactExpected ? 58 : 424.9375),
+            ) > 1 ||
+            Math.abs(
+              permissionMenu.rect.top -
+                (compactExpected ? 464.8125 : 604.8125),
+            ) > 1 ||
+            Math.abs(permissionMenu.rect.width - 438.6875) > 1 ||
+            Math.abs(permissionMenu.rect.height - 161.6875) > 1 ||
+            permissionMenu.style.backdropFilter !== "blur(8px)" ||
+            permissionMenu.style.borderRadius !== "20px" ||
+            permissionMenu.style.padding !== "4px" ||
+            !permissionMenu.style.boxShadow.includes("0px 8px 16px -4px") ||
+            permissionMenu.checkedCount !== 0 ||
+            permissionMenu.items.length !== 3 ||
+            permissionMenu.items.filter(({ selected }) => selected).length !==
+              1 ||
+            permissionMenu.items.some(
+              ({ ariaChecked, rect: value, style: itemStyle }) =>
+                ariaChecked !== null ||
+                !value ||
+                Math.abs(value.width - 430.6875) > 1 ||
+                Math.abs(value.height - 42.5625) > 1 ||
+                itemStyle.borderRadius !== "15px" ||
+                itemStyle.fontSize !== "13px" ||
+                itemStyle.fontWeight !== "400" ||
+                itemStyle.lineHeight !== "18.5714px" ||
+                itemStyle.padding !== "5px 8px",
+            ) ||
+            !permissionMenu.items[0]?.label.includes("Ask for approval") ||
+            !permissionMenu.items[1]?.label.includes("Approve for me") ||
+            !permissionMenu.items[2]?.label.includes("Full access"))
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 permission menu contract failed: ${JSON.stringify(permissionMenu)}`,
+          );
+        }
+        if (
+          expectedMode &&
+          (!contract.composerMode ||
+            contract.composerMode.kind !== expectedMode ||
+            contract.composerMode.label !==
+              (composerGoalExpected ? "Clear goal" : "Plan") ||
+            contract.composerMode.pathCount !==
+              (composerGoalExpected ? 3 : 6) ||
+            contract.composerMode.viewBox !==
+              (composerGoalExpected ? "0 0 20 20" : "0 0 16 16") ||
+            Math.abs(contract.composerMode.rect.left - expectedModeLeft) > 1 ||
+            Math.abs(contract.composerMode.rect.top - expectedModeTop) > 1 ||
+            Math.abs(contract.composerMode.rect.height - 28) > 1 ||
+            contract.composerMode.style.borderRadius !== "999px" ||
+            contract.composerMode.style.fontSize !== "13px" ||
+            contract.composerMode.style.padding !== "0px 8px")
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 Composer mode contract failed: ${JSON.stringify(contract.composerMode)}`,
+          );
+        }
+        if (composerPermissionsExpected) {
+          await page
+            .getByRole("menuitem", { name: /Ask for approval/ })
+            .click();
+          await page.waitForSelector(
+            '.demo-root[data-frame="workspace-composer-current-26-825-ready"]:not([data-composer-overlay])',
+          );
+          const permissionTrigger = page.getByRole("button", {
+            name: "Change permissions",
+          });
+          const selectedPermission = await permissionTrigger.evaluate(
+            (element) => ({
+              icon: element
+                .querySelector("[data-current-build-icon]")
+                ?.getAttribute("data-current-build-icon"),
+              text: element.textContent?.trim(),
+            }),
+          );
+          if (
+            selectedPermission.icon !== "composer-permission-ask" ||
+            selectedPermission.text !== "Ask for approval"
+          ) {
+            throw new Error(
+              `${scene.id}: permission selection did not update the trigger: ${JSON.stringify(selectedPermission)}`,
+            );
+          }
+          await permissionTrigger.click();
+          await page.getByRole("menu").press("Escape");
+          await page.waitForSelector(
+            '.demo-root:not([data-composer-overlay])',
+          );
+          await page.waitForFunction(
+            () =>
+              document.activeElement?.getAttribute("aria-label") ===
+              "Change permissions",
+          );
+        }
+        if (expectedMode) {
+          await page
+            .getByRole("button", {
+              name: composerGoalExpected ? "Clear goal" : "Plan",
+            })
+            .click();
+          await page.waitForSelector(
+            '.demo-root[data-frame="workspace-composer-current-26-825-ready"]:not([data-composer-mode])',
+          );
+          await page.waitForFunction(
+            () => document.activeElement?.getAttribute("aria-label") === "Do anything",
+          );
+        }
       }
       if (
         branchCreationExpected &&

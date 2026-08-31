@@ -216,7 +216,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 40 have current-build runtime evidence, 40 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 36 groups and Electron verification covers 36.
+Current inventory: 91 surface groups; 42 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 38 groups and Electron verification covers 38.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1830,3 +1830,19 @@ under independent ceilings. This promotes the sampled paths of
 verification. Their implementation remains partial because populated
 environment creation/editing, Remote, branch-operation failures, and other
 provider-specific states are still open.
+
+The adjacent current Composer-control follow-up supersedes the previous
+`26.820.60940` permission and mode anchors. The sampled permission overlay is
+438.6875×161.6875px with 4px padding, 20px radius, 8px backdrop blur, three
+42.5625px ordinary `menuitem` rows, no radio-state attributes, and the exact
+current permission/check primitives. Ask for approval selection, menu
+dismissal, and trigger-focus restoration are reversible in Browser/CDP and
+Electron. Goal retains the 736×134px wide and 688×134px compact Composer;
+Plan retains 736×98px and 688×98px. Both use the current SVG geometry,
+placeholder, clear action, and editor-focus restoration. Six reviewed
+wide/compact baselines pass. Local-only product comparisons pass at 6.5300%
+and 6.5272% for the text-dense permission overlay under a 7% limit, 3.2000%
+and 3.6825% for Goal, and 2.9919% and 3.5062% for Plan under 5% limits. This
+promotes the sampled current paths of `composer.permissions` and
+`composer.modes`; custom permission policy, unavailable modes, persistence,
+and other host-owned variants keep their implementations `partial`.
