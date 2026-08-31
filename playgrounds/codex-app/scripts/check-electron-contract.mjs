@@ -2974,6 +2974,93 @@ async function currentMarkdown26820MediaContract(page) {
   });
 }
 
+async function currentMarkdown26825MediaContract(page) {
+  return page.evaluate(() => {
+    const rect = (element) => {
+      const value = element?.getBoundingClientRect();
+      return value
+        ? {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          }
+        : null;
+    };
+    const style = (element) => {
+      if (!element) return null;
+      const value = getComputedStyle(element);
+      return {
+        backgroundColor: value.backgroundColor,
+        borderRadius: value.borderRadius,
+        borderWidth: value.borderWidth,
+        boxShadow: value.boxShadow,
+        margin: value.margin,
+        marginBlockStart: value.marginBlockStart,
+        maxHeight: value.maxHeight,
+        maxWidth: value.maxWidth,
+        objectFit: value.objectFit,
+        rect: rect(element),
+      };
+    };
+    const response = (id) => {
+      const item = document.querySelector(`[data-item-id="${id}"]`);
+      if (!item) return null;
+      const root = item.querySelector(".codex-ui-markdown");
+      const media = root?.querySelector(
+        "[data-markdown-image-preview-trigger], [data-markdown-image-state]",
+      );
+      const image = media?.querySelector("img");
+      const icon = media?.querySelector("svg");
+      return {
+        actions: Array.from(
+          item.querySelectorAll(".demo-turn-actions button"),
+          (button) => ({
+            icon: button
+              .querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon"),
+            label: button.getAttribute("aria-label"),
+            rect: rect(button),
+          }),
+        ),
+        icon: style(icon),
+        image: image
+          ? {
+              naturalHeight: image.naturalHeight,
+              naturalWidth: image.naturalWidth,
+              sourceKind: image.currentSrc.startsWith("data:image/x-icon")
+                ? "embedded-x-icon"
+                : image.currentSrc,
+              style: style(image),
+            }
+          : null,
+        media: media
+          ? {
+              disabled:
+                media instanceof HTMLButtonElement ? media.disabled : false,
+              href: media.getAttribute("href"),
+              label: media.getAttribute("aria-label"),
+              state:
+                media.getAttribute("data-markdown-image-state") ?? "ready",
+              style: style(media),
+              tag: media.tagName,
+            }
+          : null,
+        paragraphs: Array.from(root?.querySelectorAll("p") ?? [], style),
+        root: style(root),
+        text: root?.textContent?.trim(),
+      };
+    };
+    return {
+      horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+      loaded: response("assistant-markdown-current-26-825-media-loaded"),
+      unavailable: response(
+        "assistant-markdown-current-26-825-media-unavailable",
+      ),
+    };
+  });
+}
+
 for (const currentMarkdownScene of [
   {
     currentSidebar: true,
@@ -3240,6 +3327,242 @@ for (const currentMarkdownScene of [
   }
 }
 
+for (const currentMarkdown26825MediaScene of [
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-loaded",
+    id: "electron-markdown-current-26-825-media-loaded",
+    scenario: "markdown-current-26-825-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-loaded",
+    id: "electron-markdown-current-26-825-media-loaded-compact",
+    scenario: "markdown-current-26-825-media",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-loaded",
+    id: "electron-markdown-current-26-825-media-preview",
+    scenario: "markdown-current-26-825-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-unavailable",
+    id: "electron-markdown-current-26-825-media-unavailable",
+    scenario: "markdown-current-26-825-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-unavailable",
+    id: "electron-markdown-current-26-825-media-unavailable-compact",
+    scenario: "markdown-current-26-825-media",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const { app: markdownMediaApp, page: markdownMediaPage } =
+    await launchScene(currentMarkdown26825MediaScene, { capture: false });
+  try {
+    const compact = currentMarkdown26825MediaScene.id.endsWith("-compact");
+    const expectsUnavailable =
+      currentMarkdown26825MediaScene.frame.endsWith("media-unavailable");
+    const expectedRootWidth = compact ? 688 : 736;
+    const expectedMediaWidth = compact ? 688 : 780.546875;
+    const expectedActions = [
+      ["Copy", "thread-assistant-copy"],
+      ["Good response", "thread-assistant-good"],
+      ["Bad response", "thread-assistant-bad"],
+      ["Fork chat from here", "thread-assistant-fork"],
+    ];
+    const nativeBounds = await markdownMediaApp.evaluate(
+      ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const contract = await currentMarkdown26825MediaContract(markdownMediaPage);
+    const loaded = contract.loaded;
+    const unavailable = contract.unavailable;
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      !loaded?.root?.rect ||
+      Math.abs(loaded.root.rect.width - expectedRootWidth) > 0.1 ||
+      Math.abs(loaded.root.rect.height - 110.75) > 0.1 ||
+      loaded.text !== "CURRENT MEDIA LOADED." ||
+      loaded.paragraphs.length !== 2 ||
+      Math.abs(loaded.paragraphs[0].rect.width - expectedMediaWidth) > 0.1 ||
+      Math.abs(loaded.paragraphs[0].rect.height - 74) > 0.1 ||
+      loaded.paragraphs[1].marginBlockStart !== "14px" ||
+      loaded.media?.tag !== "BUTTON" ||
+      loaded.media.state !== "ready" ||
+      loaded.media.label !== "OpenAI favicon" ||
+      loaded.media.disabled ||
+      Math.abs(loaded.media.style.rect.width - 50) > 0.1 ||
+      Math.abs(loaded.media.style.rect.height - 74) > 0.1 ||
+      loaded.image?.naturalWidth !== 48 ||
+      loaded.image.naturalHeight !== 48 ||
+      loaded.image.sourceKind !== "embedded-x-icon" ||
+      Math.abs(loaded.image.style.rect.width - 50) > 0.1 ||
+      Math.abs(loaded.image.style.rect.height - 50) > 0.1 ||
+      loaded.image.style.borderRadius !== "10px" ||
+      loaded.image.style.borderWidth !== "1px" ||
+      loaded.image.style.margin !== "12px 0px" ||
+      loaded.image.style.maxHeight !== "200px" ||
+      loaded.image.style.maxWidth !== "200px" ||
+      loaded.image.style.objectFit !== "contain" ||
+      loaded.actions.length !== 4 ||
+      loaded.actions.some(
+        (action, index) =>
+          action.label !== expectedActions[index]?.[0] ||
+          action.icon !== expectedActions[index]?.[1] ||
+          Math.abs(action.rect.width - 26) > 0.1 ||
+          Math.abs(action.rect.height - 26) > 0.1,
+      ) ||
+      Boolean(unavailable) !== expectsUnavailable ||
+      (expectsUnavailable &&
+        (!unavailable?.root?.rect ||
+          Math.abs(unavailable.root.rect.width - expectedRootWidth) > 0.1 ||
+          Math.abs(unavailable.root.rect.height - 156.75) > 0.1 ||
+          unavailable.text !== "CURRENT MEDIA UNAVAILABLE." ||
+          unavailable.paragraphs.length !== 2 ||
+          Math.abs(unavailable.paragraphs[0].rect.width - expectedMediaWidth) >
+            0.1 ||
+          Math.abs(unavailable.paragraphs[0].rect.height - 120) > 0.1 ||
+          unavailable.paragraphs[1].marginBlockStart !== "14px" ||
+          unavailable.media?.tag !== "BUTTON" ||
+          unavailable.media.state !== "unavailable" ||
+          unavailable.media.label !== "Unavailable sample" ||
+          !unavailable.media.disabled ||
+          unavailable.media.href !== null ||
+          Math.abs(unavailable.media.style.rect.width - 96) > 0.1 ||
+          Math.abs(unavailable.media.style.rect.height - 96) > 0.1 ||
+          unavailable.media.style.borderRadius !== "10px" ||
+          unavailable.media.style.borderWidth !== "0px" ||
+          unavailable.media.style.margin !== "12px 0px" ||
+          unavailable.media.style.maxHeight !== (compact ? "544px" : "656px") ||
+          unavailable.media.style.maxWidth !== "100%" ||
+          !unavailable.icon?.rect ||
+          Math.abs(unavailable.icon?.rect.width - 28) > 0.1 ||
+          Math.abs(unavailable.icon?.rect.height - 28) > 0.1 ||
+          unavailable.actions.length !== 4)) ||
+      contract.horizontalOverflow !== 0
+    ) {
+      throw new Error(
+        `${currentMarkdown26825MediaScene.id}: current 26.825 Markdown media Electron contract failed: ${JSON.stringify({ contract, nativeBounds })}`,
+      );
+    }
+
+    if (currentMarkdown26825MediaScene.id.endsWith("-preview")) {
+      const trigger = markdownMediaPage.getByRole("button", {
+        name: "OpenAI favicon",
+      });
+      await trigger.click();
+      const dialog = markdownMediaPage.getByRole("dialog", {
+        name: "Image preview",
+      });
+      await dialog.waitFor({ state: "visible" });
+      const preview = await dialog.evaluate((element) => {
+        const rect = (target) => {
+          const value = target?.getBoundingClientRect();
+          return value
+            ? {
+                height: value.height,
+                left: value.left,
+                top: value.top,
+                width: value.width,
+              }
+            : null;
+        };
+        const image = element.querySelector(
+          ".codex-ui-image-preview__immersive-stage > img",
+        );
+        const caption = element.querySelector(
+          ".codex-ui-image-preview__immersive-caption",
+        );
+        return {
+          activeLabel: document.activeElement?.getAttribute("aria-label"),
+          bodyOverflow: getComputedStyle(document.body).overflow,
+          buttons: Array.from(
+            element.querySelectorAll("button[aria-label]"),
+            (button) => ({
+              label: button.getAttribute("aria-label"),
+              rect: rect(button),
+            }),
+          ),
+          caption: caption
+            ? {
+                rect: rect(caption),
+                text: caption.textContent?.trim(),
+              }
+            : null,
+          image: rect(image),
+          imageRadius: image ? getComputedStyle(image).borderRadius : null,
+          rect: rect(element),
+          toolbar: rect(
+            element.querySelector(".codex-ui-image-preview__zoom-toolbar"),
+          ),
+        };
+      });
+      const expectedButtons = [
+        ["Close image preview", 1126, 12, 42, 40],
+        ["Zoom out image", 518, 748, 36, 36],
+        ["Zoom in image", 626, 748, 36, 36],
+      ];
+      if (
+        !preview.rect ||
+        !preview.image ||
+        !preview.toolbar ||
+        !preview.caption?.rect ||
+        preview.activeLabel !== "Close image preview" ||
+        preview.bodyOverflow !== "hidden" ||
+        preview.rect.width !== 1180 ||
+        preview.rect.height !== 820 ||
+        Math.abs(preview.image.left - 566) > 0.1 ||
+        Math.abs(preview.image.top - 338.71875) > 0.1 ||
+        preview.image.width !== 48 ||
+        preview.image.height !== 48 ||
+        preview.imageRadius !== "12.5px" ||
+        preview.caption.text !== "OpenAI favicon" ||
+        Math.abs(preview.caption.rect.left - 527.96875) > 0.2 ||
+        Math.abs(preview.caption.rect.top - 697.4375) > 0.2 ||
+        Math.abs(preview.caption.rect.width - 124.046875) > 0.2 ||
+        Math.abs(preview.caption.rect.height - 34.5625) > 0.2 ||
+        preview.toolbar.left !== 514 ||
+        preview.toolbar.top !== 744 ||
+        preview.toolbar.width !== 152 ||
+        preview.toolbar.height !== 44 ||
+        preview.buttons.length !== expectedButtons.length ||
+        preview.buttons.some((button, index) => {
+          const expected = expectedButtons[index];
+          return (
+            button.label !== expected?.[0] ||
+            Math.abs(button.rect.left - expected[1]) > 0.1 ||
+            Math.abs(button.rect.top - expected[2]) > 0.1 ||
+            Math.abs(button.rect.width - expected[3]) > 0.1 ||
+            Math.abs(button.rect.height - expected[4]) > 0.1
+          );
+        })
+      ) {
+        throw new Error(
+          `${currentMarkdown26825MediaScene.id}: current 26.825 Markdown media preview Electron contract failed: ${JSON.stringify(preview)}`,
+        );
+      }
+      await markdownMediaPage
+        .getByRole("button", { name: "Close image preview" })
+        .click();
+      await dialog.waitFor({ state: "detached" });
+      if (!(await trigger.evaluate((element) => element === document.activeElement))) {
+        throw new Error(
+          `${currentMarkdown26825MediaScene.id}: Markdown preview did not restore focus.`,
+        );
+      }
+    }
+  } finally {
+    await markdownMediaApp.close();
+  }
+}
+
 for (const currentMarkdownMediaScene of [
   {
     currentSidebar: true,
@@ -3318,11 +3641,10 @@ for (const currentMarkdownMediaScene of [
       Math.abs(loaded.rect.width - 200) > 1 ||
       Math.abs(loaded.image.width - 199.96875) > 1 ||
       Math.abs(loaded.image.height - 139.578125) > 1 ||
-      unavailable?.tag !== "A" ||
+      unavailable?.tag !== "BUTTON" ||
       unavailable.state !== "unavailable" ||
       unavailable.label !== "Unavailable preview" ||
-      unavailable.href !==
-        "https://example.invalid/codex-ui-kit-missing.png" ||
+      unavailable.href !== null ||
       Math.abs(unavailable.rect.width - 96) > 1 ||
       Math.abs(unavailable.rect.height - 96) > 1 ||
       contract.horizontalOverflow !== 0
@@ -3337,7 +3659,7 @@ for (const currentMarkdownMediaScene of [
     });
     await trigger.click();
     const dialog = markdownMediaPage.getByRole("dialog", {
-      name: "Loaded preview",
+      name: "Image preview",
     });
     await dialog.waitFor({ state: "visible" });
     const preview = await dialog.evaluate((element) => ({

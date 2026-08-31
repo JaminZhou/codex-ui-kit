@@ -65,6 +65,7 @@ const currentReplayComposerScenarios = new Set([
   "current-plan-26-825",
   "current-search-26-825",
   "markdown-current-26-825",
+  "markdown-current-26-825-media",
   "current-review-files",
   "current-review-26-825-files",
   "current-review-rename",
@@ -4610,6 +4611,7 @@ for (const scene of selectedScenes) {
                   scene.scenario === "current-citations-26-825" ||
                   scene.scenario === "current-review-26-825-files" ||
                   scene.scenario === "markdown-current-26-825" ||
+                  scene.scenario === "markdown-current-26-825-media" ||
                   scene.scenario === "current-basic-message" ||
                   scene.scenario === "current-basic-message-26-825"
                     ? "composer-permission"
@@ -7884,7 +7886,7 @@ for (const scene of selectedScenes) {
         }),
       );
       const markdownItem = document.querySelector(
-        '[data-item-id="assistant-markdown"], [data-item-id="assistant-markdown-media"], [data-item-id="assistant-markdown-current-26-825"]',
+        '[data-item-id="assistant-markdown"], [data-item-id="assistant-markdown-media"], [data-item-id="assistant-markdown-current-26-825"], [data-item-id^="assistant-markdown-current-26-825-media-"]',
       );
       const markdownRoot = markdownItem?.querySelector(".codex-ui-markdown");
       const markdownItemId = markdownItem?.getAttribute("data-item-id");
@@ -11394,6 +11396,7 @@ for (const scene of selectedScenes) {
       scene.scenario === "current-search-26-825" ||
       scene.scenario === "current-browser-26-825" ||
       scene.scenario === "markdown-current-26-825" ||
+      scene.scenario === "markdown-current-26-825-media" ||
       scene.scenario === "markdown-streaming-large" ||
       scene.scenario === "current-basic-message-26-825" ||
       scene.scenario === "current-citations-26-825" ||
@@ -13962,11 +13965,10 @@ for (const scene of selectedScenes) {
         Math.abs(loaded.rect.width - 200) > 1 ||
         Math.abs(loaded.image.rect.width - 199.96875) > 1 ||
         Math.abs(loaded.image.rect.height - 139.578125) > 1 ||
-        unavailable?.tag !== "A" ||
+        unavailable?.tag !== "BUTTON" ||
         unavailable.state !== "unavailable" ||
         unavailable.label !== "Unavailable preview" ||
-        unavailable.href !==
-          "https://example.invalid/codex-ui-kit-missing.png" ||
+        unavailable.href !== null ||
         Math.abs(unavailable.rect.width - 96) > 1 ||
         Math.abs(unavailable.rect.height - 96) > 1 ||
         contract.horizontalOverflow !== 0
@@ -13980,7 +13982,7 @@ for (const scene of selectedScenes) {
         name: "Loaded preview",
       });
       await previewTrigger.click();
-      const preview = page.getByRole("dialog", { name: "Loaded preview" });
+      const preview = page.getByRole("dialog", { name: "Image preview" });
       await preview.waitFor({ state: "visible" });
       const previewContract = await preview.evaluate((element) => ({
         imageCount: element.querySelectorAll(
@@ -14004,6 +14006,311 @@ for (const scene of selectedScenes) {
         throw new Error(
           `${scene.id}: current 26.820 Markdown preview did not restore trigger focus.`,
         );
+      }
+    }
+
+    if (scene.scenario === "markdown-current-26-825-media") {
+      const media = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                height: value.height,
+                left: value.left,
+                top: value.top,
+                width: value.width,
+              }
+            : null;
+        };
+        const style = (element) => {
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            backgroundColor: value.backgroundColor,
+            borderColor: value.borderColor,
+            borderRadius: value.borderRadius,
+            borderWidth: value.borderWidth,
+            boxShadow: value.boxShadow,
+            color: value.color,
+            margin: value.margin,
+            marginBlockStart: value.marginBlockStart,
+            maxHeight: value.maxHeight,
+            maxWidth: value.maxWidth,
+            objectFit: value.objectFit,
+            overflow: value.overflow,
+            padding: value.padding,
+            rect: rect(element),
+          };
+        };
+        const response = (id) => {
+          const item = document.querySelector(`[data-item-id="${id}"]`);
+          if (!item) return null;
+          const root = item.querySelector(".codex-ui-markdown");
+          const mediaElement = root?.querySelector(
+            "[data-markdown-image-preview-trigger], [data-markdown-image-state]",
+          );
+          const image = mediaElement?.querySelector("img");
+          const icon = mediaElement?.querySelector("svg");
+          return {
+            actions: Array.from(
+              item.querySelectorAll(".demo-turn-actions button"),
+              (button) => ({
+                icon: button
+                  .querySelector("[data-current-build-icon]")
+                  ?.getAttribute("data-current-build-icon"),
+                label: button.getAttribute("aria-label"),
+                rect: rect(button),
+              }),
+            ),
+            media: mediaElement
+              ? {
+                  disabled:
+                    mediaElement instanceof HTMLButtonElement
+                      ? mediaElement.disabled
+                      : false,
+                  href: mediaElement.getAttribute("href"),
+                  label: mediaElement.getAttribute("aria-label"),
+                  state:
+                    mediaElement.getAttribute("data-markdown-image-state") ??
+                    "ready",
+                  style: style(mediaElement),
+                  tag: mediaElement.tagName,
+                }
+              : null,
+            icon: icon
+              ? {
+                  pathCount: icon.querySelectorAll("path").length,
+                  pathStart:
+                    icon.querySelector("path")?.getAttribute("d")?.slice(0, 24) ??
+                    null,
+                  style: style(icon),
+                }
+              : null,
+            image: image
+              ? {
+                  naturalHeight: image.naturalHeight,
+                  naturalWidth: image.naturalWidth,
+                  sourceKind: image.currentSrc.startsWith("data:image/x-icon")
+                    ? "embedded-x-icon"
+                    : image.currentSrc,
+                  style: style(image),
+                }
+              : null,
+            paragraphs: Array.from(root?.querySelectorAll("p") ?? [], style),
+            root: style(root),
+            text: root?.textContent?.trim(),
+          };
+        };
+        const dialog = document.querySelector(
+          '.codex-ui-image-preview[data-presentation="immersive"]',
+        );
+        const previewImage = dialog?.querySelector(
+          ".codex-ui-image-preview__immersive-stage > img",
+        );
+        const toolbar = dialog?.querySelector(
+          ".codex-ui-image-preview__zoom-toolbar",
+        );
+        const titleId = dialog?.getAttribute("aria-labelledby");
+        return {
+          bodyOverflow: getComputedStyle(document.body).overflow,
+          dialog: dialog
+            ? {
+                activeLabel: document.activeElement?.getAttribute("aria-label"),
+                buttons: Array.from(
+                  dialog.querySelectorAll("button[aria-label]"),
+                  (button) => ({
+                    label: button.getAttribute("aria-label"),
+                    rect: rect(button),
+                  }),
+                ),
+                caption: (() => {
+                  const caption = dialog.querySelector(
+                    ".codex-ui-image-preview__immersive-caption",
+                  );
+                  return caption
+                    ? {
+                        style: style(caption),
+                        text: caption.textContent?.trim(),
+                      }
+                    : null;
+                })(),
+                image: style(previewImage),
+                label: titleId
+                  ? document.getElementById(titleId)?.textContent?.trim()
+                  : null,
+                rect: rect(dialog),
+                toolbar: rect(toolbar),
+              }
+            : null,
+          loaded: response(
+            "assistant-markdown-current-26-825-media-loaded",
+          ),
+          unavailable: response(
+            "assistant-markdown-current-26-825-media-unavailable",
+          ),
+        };
+      });
+      contract.currentMarkdownMedia26825 = media;
+      const compact = scene.id.endsWith("-compact");
+      const expectedRootWidth = compact ? 688 : 736;
+      const expectedMediaWidth = compact ? 688 : 780.546875;
+      const expectedActions = [
+        ["Copy", "thread-assistant-copy"],
+        ["Good response", "thread-assistant-good"],
+        ["Bad response", "thread-assistant-bad"],
+        ["Fork chat from here", "thread-assistant-fork"],
+      ];
+      const loaded = media.loaded;
+      const loadedParagraphs = loaded?.paragraphs ?? [];
+      if (
+        !loaded?.root?.rect ||
+        Math.abs(loaded.root.rect.width - expectedRootWidth) > 0.1 ||
+        Math.abs(loaded.root.rect.height - 110.75) > 0.1 ||
+        loaded.text !== "CURRENT MEDIA LOADED." ||
+        loadedParagraphs.length !== 2 ||
+        Math.abs(loadedParagraphs[0].rect.width - expectedMediaWidth) > 0.1 ||
+        Math.abs(loadedParagraphs[0].rect.height - 74) > 0.1 ||
+        loadedParagraphs[1].marginBlockStart !== "14px" ||
+        Math.abs(loadedParagraphs[1].rect.height - 22.75) > 0.1 ||
+        loaded.media?.tag !== "BUTTON" ||
+        loaded.media.state !== "ready" ||
+        loaded.media.label !== "OpenAI favicon" ||
+        loaded.media.disabled ||
+        Math.abs(loaded.media.style.rect.width - 50) > 0.1 ||
+        Math.abs(loaded.media.style.rect.height - 74) > 0.1 ||
+        loaded.image?.naturalWidth !== 48 ||
+        loaded.image.naturalHeight !== 48 ||
+        loaded.image.sourceKind !== "embedded-x-icon" ||
+        Math.abs(loaded.image.style.rect.width - 50) > 0.1 ||
+        Math.abs(loaded.image.style.rect.height - 50) > 0.1 ||
+        loaded.image.style.borderRadius !== "10px" ||
+        loaded.image.style.borderWidth !== "1px" ||
+        loaded.image.style.margin !== "12px 0px" ||
+        loaded.image.style.maxHeight !== "200px" ||
+        loaded.image.style.maxWidth !== "200px" ||
+        loaded.image.style.objectFit !== "contain" ||
+        !loaded.image.style.boxShadow.includes(
+          "rgba(0, 0, 0, 0.08) 0px 2px 4px -1px",
+        ) ||
+        loaded.actions.length !== 4 ||
+        loaded.actions.some(
+          (action, index) =>
+            action.label !== expectedActions[index]?.[0] ||
+            action.icon !== expectedActions[index]?.[1] ||
+            Math.abs(action.rect.width - 26) > 0.1 ||
+            Math.abs(action.rect.height - 26) > 0.1,
+        ) ||
+        contract.horizontalOverflow !== 0
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 Markdown loaded-media contract failed: ${JSON.stringify(media)}`,
+        );
+      }
+
+      const expectsUnavailable = scene.frame.endsWith("media-unavailable");
+      const unavailable = media.unavailable;
+      const unavailableParagraphs = unavailable?.paragraphs ?? [];
+      if (
+        Boolean(unavailable) !== expectsUnavailable ||
+        (expectsUnavailable &&
+          (!unavailable?.root?.rect ||
+            Math.abs(unavailable.root.rect.width - expectedRootWidth) > 0.1 ||
+            Math.abs(unavailable.root.rect.height - 156.75) > 0.1 ||
+            unavailable.text !== "CURRENT MEDIA UNAVAILABLE." ||
+            unavailableParagraphs.length !== 2 ||
+            Math.abs(
+              unavailableParagraphs[0].rect.width - expectedMediaWidth,
+            ) > 0.1 ||
+            Math.abs(unavailableParagraphs[0].rect.height - 120) > 0.1 ||
+            unavailableParagraphs[1].marginBlockStart !== "14px" ||
+            unavailable.media?.tag !== "BUTTON" ||
+            unavailable.media.state !== "unavailable" ||
+            unavailable.media.label !== "Unavailable sample" ||
+            !unavailable.media.disabled ||
+            unavailable.media.href !== null ||
+            Math.abs(unavailable.media.style.rect.width - 96) > 0.1 ||
+            Math.abs(unavailable.media.style.rect.height - 96) > 0.1 ||
+            unavailable.media.style.borderRadius !== "10px" ||
+            unavailable.media.style.borderWidth !== "0px" ||
+            unavailable.media.style.margin !== "12px 0px" ||
+            unavailable.media.style.maxHeight !== (compact ? "544px" : "656px") ||
+            unavailable.media.style.maxWidth !== "100%" ||
+            !unavailable.media.style.boxShadow.includes(
+              "rgba(0, 0, 0, 0.08) 0px 2px 4px -1px",
+            ) ||
+            unavailable.icon?.pathCount !== 1 ||
+            !unavailable.icon.pathStart?.startsWith("M16.0012 7.78796") ||
+            Math.abs(unavailable.icon.style.rect.width - 28) > 0.1 ||
+            Math.abs(unavailable.icon.style.rect.height - 28) > 0.1 ||
+            unavailable.actions.length !== 4))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 Markdown unavailable-media contract failed: ${JSON.stringify(media)}`,
+        );
+      }
+
+      if (scene.markdownImagePreview) {
+        const preview = media.dialog;
+        const expectedButtons = [
+          ["Close image preview", 1126, 12, 42, 40],
+          ["Zoom out image", 518, 748, 36, 36],
+          ["Zoom in image", 626, 748, 36, 36],
+        ];
+        if (
+          !preview?.rect ||
+          preview.label !== "Image preview" ||
+          preview.activeLabel !== "Close image preview" ||
+          preview.rect.left !== 0 ||
+          preview.rect.top !== 0 ||
+          preview.rect.width !== 1180 ||
+          preview.rect.height !== 820 ||
+          Math.abs(preview.image.rect.left - 566) > 0.1 ||
+          Math.abs(preview.image.rect.top - 338.71875) > 0.1 ||
+          preview.image.rect.width !== 48 ||
+          preview.image.rect.height !== 48 ||
+          preview.image.borderRadius !== "12.5px" ||
+          preview.toolbar.left !== 514 ||
+          preview.toolbar.top !== 744 ||
+          preview.toolbar.width !== 152 ||
+          preview.toolbar.height !== 44 ||
+          preview.buttons.length !== expectedButtons.length ||
+          preview.caption?.text !== "OpenAI favicon" ||
+          Math.abs(preview.caption.style.rect.left - 527.96875) > 0.2 ||
+          Math.abs(preview.caption.style.rect.top - 697.4375) > 0.2 ||
+          Math.abs(preview.caption.style.rect.width - 124.046875) > 0.2 ||
+          Math.abs(preview.caption.style.rect.height - 34.5625) > 0.2 ||
+          preview.caption.style.borderRadius !== "20px" ||
+          preview.caption.style.padding !== "8px 16px" ||
+          preview.buttons.some((button, index) => {
+            const expected = expectedButtons[index];
+            return (
+              button.label !== expected?.[0] ||
+              Math.abs(button.rect.left - expected[1]) > 0.1 ||
+              Math.abs(button.rect.top - expected[2]) > 0.1 ||
+              Math.abs(button.rect.width - expected[3]) > 0.1 ||
+              Math.abs(button.rect.height - expected[4]) > 0.1
+            );
+          }) ||
+          media.bodyOverflow !== "hidden"
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 Markdown image-preview contract failed: ${JSON.stringify(media)}`,
+          );
+        }
+        const trigger = page.getByRole("button", { name: "OpenAI favicon" });
+        await page
+          .getByRole("button", { name: "Close image preview" })
+          .click();
+        await page
+          .getByRole("dialog", { name: "Image preview" })
+          .waitFor({ state: "detached" });
+        if (!(await trigger.evaluate((element) => element === document.activeElement))) {
+          throw new Error(
+            `${scene.id}: current 26.825 Markdown image preview did not restore trigger focus.`,
+          );
+        }
+      } else if (media.dialog !== null) {
+        throw new Error(`${scene.id}: unexpected Markdown image preview dialog.`);
       }
     }
 
@@ -15041,7 +15348,8 @@ for (const scene of selectedScenes) {
       scene.id !== "approval-current-26-820-file-options-compact" &&
       scene.id !== "approval-current-26-820-file-allow-pending-compact" &&
       !scene.id.startsWith("current-review-undo-failed") &&
-      !scene.id.startsWith("attachment-current-preview")
+      !scene.id.startsWith("attachment-current-preview") &&
+      !scene.markdownImagePreview
     ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
         ? contract.review.firstContentLabel

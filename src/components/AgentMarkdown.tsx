@@ -831,7 +831,9 @@ export interface MarkdownImageProps
   allowWide?: boolean;
   loadingLabel?: string;
   preview?: boolean;
+  previewDialogLabel?: string;
   previewLabel?: string;
+  previewSrc?: string;
   status?: MarkdownImageStatus;
   unavailableLabel?: string;
 }
@@ -852,26 +854,17 @@ function MarkdownImageFallbackIcon() {
   );
 }
 
-function publicMarkdownImageHref(source: string | undefined) {
-  if (!source) return undefined;
-  try {
-    const url = new URL(source);
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? source
-      : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 export function MarkdownImage({
   allowWide = false,
   alt = "",
   className,
   loadingLabel = "Image loading",
   onError,
+  onLoad,
   preview = true,
+  previewDialogLabel = "Image preview",
   previewLabel = "Open image preview",
+  previewSrc,
   src,
   status = "auto",
   title,
@@ -879,10 +872,12 @@ export function MarkdownImage({
   ...imageProps
 }: MarkdownImageProps) {
   const [failedSource, setFailedSource] = useState<string>();
+  const [loadedSize, setLoadedSize] = useState({ height: 0, width: 0 });
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setFailedSource(undefined);
+    setLoadedSize({ height: 0, width: 0 });
     setOpen(false);
   }, [src]);
 
@@ -895,7 +890,6 @@ export function MarkdownImage({
       : status;
   const stateLabel = alt ||
     (resolvedStatus === "loading" ? loadingLabel : unavailableLabel);
-  const fallbackHref = publicMarkdownImageHref(src);
   const fallbackContents =
     resolvedStatus === "loading" ? (
       <span aria-hidden="true" className="codex-ui-markdown-image__spinner" />
@@ -911,17 +905,7 @@ export function MarkdownImage({
     ]
       .filter(Boolean)
       .join(" ");
-    return resolvedStatus === "unavailable" && fallbackHref ? (
-      <a
-        aria-label={stateLabel}
-        className={fallbackClassName}
-        data-markdown-image-state={resolvedStatus}
-        href={fallbackHref}
-        title={title}
-      >
-        {fallbackContents}
-      </a>
-    ) : (
+    return (
       <button
         aria-label={stateLabel}
         className={fallbackClassName}
@@ -938,10 +922,13 @@ export function MarkdownImage({
   const image: GeneratedImageItem = {
     alt,
     height:
-      typeof imageProps.height === "number" ? imageProps.height : undefined,
+      loadedSize.height ||
+      (typeof imageProps.height === "number" ? imageProps.height : undefined),
     id: src,
-    src,
-    width: typeof imageProps.width === "number" ? imageProps.width : undefined,
+    src: previewSrc ?? src,
+    width:
+      loadedSize.width ||
+      (typeof imageProps.width === "number" ? imageProps.width : undefined),
   };
   const triggerLabel = alt || previewLabel;
 
@@ -970,18 +957,29 @@ export function MarkdownImage({
             setFailedSource(src);
             onError?.(event);
           }}
+          onLoad={(event) => {
+            setLoadedSize({
+              height: event.currentTarget.naturalHeight,
+              width: event.currentTarget.naturalWidth,
+            });
+            onLoad?.(event);
+          }}
           src={src}
           title={title}
         />
       </button>
       {preview ? (
         <ImagePreviewDialog
+          className="codex-ui-markdown-image-preview"
+          downloadable={false}
           imageId={src}
           images={[image]}
+          immersiveCaption={alt || undefined}
+          immersiveInitialFocus="close"
           onOpenChange={setOpen}
           open={open}
           presentation="immersive"
-          title={triggerLabel}
+          title={previewDialogLabel}
         />
       ) : null}
     </>
@@ -1114,9 +1112,12 @@ export interface AgentMarkdownProps
   codeBlockWrapToggleable?: boolean;
   components?: Components;
   density?: "compact" | "regular";
+  expandWideMedia?: boolean;
   imageLoadingLabel?: string;
   imagePreview?: boolean;
+  imagePreviewDialogLabel?: string;
   imagePreviewLabel?: string;
+  imagePreviewSourceResolver?: (source: string) => string;
   imageSourceResolver?: (source: string) => string;
   imageStatus?: MarkdownImageStatus | MarkdownImageStatusResolver;
   imageUnavailableLabel?: string;
@@ -1148,9 +1149,12 @@ export function AgentMarkdown({
   codeBlockWrapToggleable = false,
   components,
   density = "regular",
+  expandWideMedia = false,
   imageLoadingLabel = "Image loading",
   imagePreview = true,
+  imagePreviewDialogLabel = "Image preview",
   imagePreviewLabel = "Open image preview",
+  imagePreviewSourceResolver,
   imageSourceResolver,
   imageStatus = "auto",
   imageUnavailableLabel = "Image unavailable",
@@ -1221,7 +1225,13 @@ export function AgentMarkdown({
             alt={alt}
             loadingLabel={imageLoadingLabel}
             preview={imagePreview}
+            previewDialogLabel={imagePreviewDialogLabel}
             previewLabel={imagePreviewLabel}
+            previewSrc={
+              src && imagePreviewSourceResolver
+                ? imagePreviewSourceResolver(src)
+                : undefined
+            }
             src={resolvedSource}
             status={resolvedStatus}
             unavailableLabel={imageUnavailableLabel}
@@ -1328,6 +1338,8 @@ export function AgentMarkdown({
                 {...paragraphProps}
                 className={[
                   "codex-ui-markdown__media-paragraph",
+                  expandWideMedia &&
+                    "codex-ui-markdown__media-paragraph--wide",
                   images.length > 1 &&
                     "codex-ui-markdown__media-grid-paragraph",
                 ]
@@ -1376,11 +1388,14 @@ export function AgentMarkdown({
       codeBlockWrapToggleable,
       codeHighlighter,
       components,
+      expandWideMedia,
       hasCodeCopyHandler,
       hasTableCopyHandler,
       imageLoadingLabel,
       imagePreview,
+      imagePreviewDialogLabel,
       imagePreviewLabel,
+      imagePreviewSourceResolver,
       imageSourceResolver,
       imageStatus,
       imageUnavailableLabel,

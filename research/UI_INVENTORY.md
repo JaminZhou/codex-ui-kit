@@ -174,8 +174,15 @@ observation from a previous build remains historical evidence.
   independent wide/compact replay verifies KaTeX/MathML semantics, 200px loaded
   media, a 96px unavailable external-source link, real pointer preview and
   focus restoration in Browser/CDP and Electron, plus two reviewed internal
-  pixel baselines. No current product response emitted raw image media, so no
-  current-product media raster comparison is claimed.
+  pixel baselines. That historical reachability gap is now superseded by the
+  current media slice below.
+- A current 26.825 media follow-up reaches a public 48×48 favicon, a disabled
+  96×96 unavailable state, and the pointer-opened immersive preview. Five
+  Browser/CDP frames and five Electron flows cover wide/compact geometry,
+  empty preview payload, caption, Close, zoom, body lock, and focus return.
+  Five reviewed baselines and five local-only product comparisons pass: four
+  response roots differ by 0.0197–1.2369%, while preview-owned regions remain
+  at or below 3.4912%.
 - The previous 26.818 sidebar task reaches sampled project-task and Recents hover actions
   plus active, completed, and unread ordinary states. Both task families use
   19×20 Pin/Archive controls with an 8px gap and 35px/8px right insets. The
@@ -1782,8 +1789,8 @@ leak. Browser/CDP covers six checkpoints; Electron repeats code copy, table
 focus, scroll-away/return, native bounds, and completion. Five reviewed
 baselines and four local-only product regions pass at 2.4398%, 4.7698%,
 2.7219%, and 1.7196% under 8%. This advances the group to current evidence; it
-does not claim citations, live media, renderer/table errors, or plugin-provided
-Markdown variants.
+does not claim renderer/table errors or plugin-provided Markdown variants.
+Citations and live media are now independently current.
 
 Read-only structural inspection continues to support `inline-markdown`, the
 in-progress boundary, the latest-turn follow controller and table container/
@@ -1797,6 +1804,6 @@ and viewport preview path. The public five-event replay contributes to the
 preview interaction, and 720×680 action reachability, and three reviewed
 internal baselines pass. A local-only
 1180×820 reference gates the preview and close regions at 3.9737% and 0.5929%
-under 4% and 1% ceilings. Rich streaming product reachability is now current;
-citations/sources, plugin variants, table error variants, live media emission,
+under 4% and 1% ceilings. Rich streaming, citations/sources, and live media
+product reachability are now current; plugin variants, table error variants,
 and broader Markdown error reachability remain open.

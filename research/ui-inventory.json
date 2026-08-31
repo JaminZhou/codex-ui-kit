@@ -4,7 +4,7 @@
     "appVersion": "26.825.51511",
     "buildNumber": "7377",
     "sampledAt": "2026-08-30",
-    "reverifiedAt": "2026-08-30",
+    "reverifiedAt": "2026-08-31",
     "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -189,21 +189,25 @@
         "replay:current-26.818-heading-inline-code-quote-list-full-width-table-code-block-and-source-owned-url-text",
         "replay:current-26.820-block-math-literal-unsupported-source-and-loaded-unavailable-media-grid",
         "replay:current-26.825-compact-density-inline-favicon-link-full-width-table-current-code-assets-and-block-math",
+        "replay:current-26.825-loaded-and-unavailable-markdown-media-turns",
     "browser-cdp:current-26.825-six-rich-markdown-streaming-checkpoints-reverse-origin-follow-and-zero-overflow",
         "browser-cdp:wide-table-resting-hover-copy-preview-and-focus-contract",
         "browser-cdp:current-26.818-wide-and-720px-computed-style-geometry-response-action-and-zero-overflow-contract",
         "browser-cdp:current-26.820-wide-and-720px-katex-media-fallback-preview-focus-and-zero-overflow-contract",
         "browser-cdp:current-26.825-wide-and-720px-exact-semantic-computed-style-geometry-icon-link-math-action-and-zero-overflow-contract",
+        "browser-cdp:current-26.825-loaded-unavailable-and-immersive-preview-media-wide-compact-contract",
     "electron:current-26.825-rich-markdown-code-copy-table-focus-user-scroll-away-return-to-latest-and-native-window-contract",
         "electron:wide-table-copy-horizontal-wheel-preview-and-focus-restoration",
         "electron:current-26.818-wide-and-720px-markdown-contract",
         "electron:current-26.820-wide-and-720px-katex-media-fallback-preview-and-focus-restoration",
         "electron:current-26.825-wide-and-720px-markdown-copy-wrap-table-focus-and-native-window-contract",
+        "electron:current-26.825-loaded-unavailable-preview-close-zoom-and-focus-restoration-media-contract",
     "pixel:five-reviewed-current-26.825-rich-markdown-streaming-baselines-and-four-local-only-product-regions",
         "pixel:three-reviewed-wide-table-baselines-including-720px-actions-and-current-build-preview-regions",
         "pixel:current-26.818-unmasked-wide-and-720px-markdown-root-regions",
         "pixel:two-reviewed-current-26.820-wide-and-720px-markdown-media-replay-baselines",
-        "pixel:current-26.825-wide-response-root-at-1.3292-percent-and-two-reviewed-wide-compact-baselines"
+        "pixel:current-26.825-wide-response-root-at-1.3292-percent-and-two-reviewed-wide-compact-baselines",
+        "pixel:five-reviewed-current-26.825-media-baselines-and-five-local-only-product-comparisons"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -213,7 +217,8 @@
         "cdp-26.818.41509:real-heading-strong-inline-code-quote-list-full-width-table-code-block-and-source-owned-external-url-text-1180x820-720x680",
         "cdp-26.820.60940:real-double-dollar-block-math-literal-single-dollar-heading-external-image-source-and-footnote-syntax",
     "cdp-26.825.31414:real-heading-strong-inline-code-favicon-link-quote-list-full-width-table-current-code-assets-literal-inline-math-rendered-block-math-and-four-response-actions",
-    "cdp-26.825.51511:real-rich-markdown-link-open-empty-code-card-task-list-seven-column-table-thirty-six-section-stream-tail-and-completion"
+    "cdp-26.825.51511:real-rich-markdown-link-open-empty-code-card-task-list-seven-column-table-thirty-six-section-stream-tail-and-completion",
+        "cdp-26.825.51511:real-public-favicon-loaded-unavailable-external-image-and-immersive-preview-wide-compact"
       ],
       "implementationStatus": "partial",
   "browserStatus": "verified",
