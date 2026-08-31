@@ -75,6 +75,15 @@ The authoritative current-build inventory is:
   2.80% for Browser chrome. External page pixels and unsampled multi-tab,
   authentication, download, permission, history, and error states are not
   claimed.
+- A current 26.825.51511 Browser-only failure follow-up replaces the earlier
+  manually stopped attempts for the terminal error path. Two real turns settle
+  naturally as a missing Playwright Chromium error after 3m46s and an
+  unsupported browser service request after 27s. The 12-event replay retains
+  both failed protocol calls while the settled UI hides their rows, preserves
+  Copy/Good/Bad/Fork, and restores writable 736/688×98 Composers. Three CDP,
+  Electron, and reviewed-pixel frames pass; local-only owned-region comparisons
+  are 1.08–3.11%. This promotes only `thread.tool-unavailable-recovery` and
+  current failure evidence, not successful Browser activity or workspace.
 - A current no-tool rich Markdown stream reaches link-only output, an open
   empty TypeScript card, task rows, filled code, a seven-column table, 36 H2
   sections, running tail, Stop, and completion. The public `AgentMarkdown`

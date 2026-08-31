@@ -4,7 +4,7 @@
     "appVersion": "26.825.51511",
     "buildNumber": "7377",
     "sampledAt": "2026-08-30",
-    "reverifiedAt": "2026-08-31",
+    "reverifiedAt": "2026-09-01",
     "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
     "runtimeEvidence": "scoped_cdp",
     "runtimeEvidenceBuilds": {
@@ -411,12 +411,17 @@
         "browser-activity-current-mcp-group",
         "browser-cdp:current-26-825-browser-activity-and-workspace-shell",
         "electron:current-26-825-browser-disclosure-lifecycle",
-        "pixel:current-26-825-browser-activity-and-chrome-regions"
+        "pixel:current-26-825-browser-activity-and-chrome-regions",
+        "replay:current-26-825-browser-chromium-and-unsupported-service-failures",
+        "browser-cdp:current-26-825-browser-failure-terminal-collapse-and-composer-recovery",
+        "electron:current-26-825-browser-failure-terminal-collapse-and-composer-recovery",
+        "pixel:current-26-825-browser-failure-wide-compact-content-and-composer-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:synthetic-browser-completed-expanded-compact-526x600",
-        "cdp-26.825.31414:real-read-only-browser-mcp-group-three-steps-and-workspace-panel"
+        "cdp-26.825.31414:real-read-only-browser-mcp-group-three-steps-and-workspace-panel",
+        "cdp-26.825.51511:real-browser-playwright-chromium-missing-and-unsupported-service-terminal-failures-wide-and-720"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -488,16 +493,24 @@
       "id": "thread.tool-unavailable-recovery",
       "area": "conversation",
       "ownership": "turn",
-      "packageEvidence": ["local-conversation-page", "mcp-capability-view-page"],
+      "packageEvidence": [
+        "local-conversation-page",
+        "mcp-capability-view-page",
+        "replay:current-26-825-browser-chromium-and-unsupported-service-failures",
+        "browser-cdp:current-26-825-browser-failure-terminal-collapse-and-composer-recovery",
+        "electron:current-26-825-browser-failure-terminal-collapse-and-composer-recovery",
+        "pixel:current-26-825-browser-failure-wide-compact-content-and-composer-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:synthetic-github-mcp-unavailable-assistant-recovery-compact-526x600",
         "cdp-26.803.41515:real-github-integration-unavailable-followed-by-openai-developer-docs-search-fetch-recovery-same-thread-1180x820-and-720x680",
-        "cdp-26.803.41515:current-integration-recovery-computed-styles-and-720x680-group-pixel-gate"
+        "cdp-26.803.41515:current-integration-recovery-computed-styles-and-720x680-group-pixel-gate",
+        "cdp-26.825.51511:real-browser-failure-terminal-collapse-exact-errors-response-actions-and-writable-composer-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

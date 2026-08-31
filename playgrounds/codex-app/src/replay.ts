@@ -10,6 +10,7 @@ import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import currentBasicMessageTrace from "../fixtures/traces/current-basic-message.jsonl?raw";
 import currentBasicMessage26825Trace from "../fixtures/traces/current-basic-message-26-825.jsonl?raw";
 import currentBrowser26825Trace from "../fixtures/traces/current-browser-26-825.jsonl?raw";
+import currentBrowser26825FailureTrace from "../fixtures/traces/current-browser-26-825-failure.jsonl?raw";
 import currentCitations26825Trace from "../fixtures/traces/current-citations-26-825.jsonl?raw";
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentPlan26825Trace from "../fixtures/traces/current-plan-26-825.jsonl?raw";
@@ -83,6 +84,7 @@ export type ReplayScenarioId =
   | "current-basic-message"
   | "current-basic-message-26-825"
   | "current-browser-26-825"
+  | "current-browser-26-825-failure"
   | "current-citations-26-825"
   | "current-mixed-tool-thread"
   | "current-plan-26-825"
@@ -304,6 +306,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "查找 Codex 页面 desktop",
     "The runtime-observed 26.825 Browser lifecycle groups read-only MCP activity in the thread and opens the one-tab in-app Browser workspace shell.",
     currentBrowser26825Trace,
+  ),
+  "current-browser-26-825-failure": scenario(
+    "current-browser-26-825-failure",
+    "在 Codex 页面查找 desktop",
+    "The runtime-observed 26.825.51511 Browser failure lifecycle settles two read-only attempts, preserves their exact errors, collapses work into duration rows, and restores the Composer without opening a Browser workspace.",
+    currentBrowser26825FailureTrace,
   ),
   "current-citations-26-825": scenario(
     "current-citations-26-825",

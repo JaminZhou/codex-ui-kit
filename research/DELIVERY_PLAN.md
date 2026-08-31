@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 54 groups have current-build runtime evidence, 26 have previous-build-only
+- 56 groups have current-build runtime evidence, 24 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current Pull request review follow-up promotes
   `workspace.pull-request-review`. Its read-only PR #228 replay locks five
@@ -44,9 +44,12 @@ exit gates; it does not replace the inventory.
   `Worked for 23s`, and exposes the current `Searched the web for Codex app
   desktop` / `Searched the web for "desktop"` rows. Three CDP frames, native
   Electron disclosure interaction, three reviewed baselines, and a 4.0506%
-  foreground comparison promote `thread.search-tool-events`. The Browser page
-  opened during current probing but two turns failed to settle after reconnect,
-  so Browser activity/workspace remain 26.825.31414 regression evidence.
+  foreground comparison promote `thread.search-tool-events`. A later Browser-
+  only probe now naturally settles with exact missing-Chromium and unsupported-
+  service errors. Its 12-event/two-turn replay, three wide/720 CDP and Electron
+  frames, three reviewed baselines, and 1.08–3.11% owned-region comparisons
+  promote the sampled `thread.tool-unavailable-recovery` path. Successful
+  Browser activity/workspace remain 26.825.31414 regression evidence.
 - The current command-failure follow-up reaches a real exit-code-7 command and
   an exact same-thread no-tool recovery. The Renderer keeps the failure as a
   neutral `Ran …` row and hides stdout, stderr, Shell, and exit-code cards while
@@ -135,10 +138,14 @@ exit gates; it does not replace the inventory.
   `thread.search-tool-events`, `thread.browser-tool-events`, and
   `workspace.browser`. Web Search is now refreshed on 26.825.51511 with the
   two-level `Worked for 23s` → `Searched the web` disclosure and two 14/21px
-  current result rows. Browser remains 26.825.31414 evidence and presents
-  the current generic read-only MCP sequence as `Used the browser, loaded a
-  tool`, retains the skill/connect/navigation steps, and opens a 419.59375px
-  one-tab workspace with a 46px tab strip and 40px navigation toolbar.
+  current result rows. The successful Browser flow remains 26.825.31414
+  evidence and presents the generic read-only MCP sequence as `Used the
+  browser, loaded a tool`, retains the skill/connect/navigation steps, and
+  opens a 419.59375px one-tab workspace with a 46px tab strip and 40px
+  navigation toolbar. A current 26.825.51511 failure slice independently locks
+  the naturally settled missing-Chromium and unsupported-service answers,
+  3m46s/27s durations, terminal collapse, four response actions, and writable
+  wide/720 Composer recovery without inferring successful navigation.
   Search Browser/CDP covers three collapsed/expanded frames, Electron repeats
   its open lifecycle, and its local-only foreground comparison passes at
   4.0506% under 5%. The previous Browser activity and chrome comparisons pass
@@ -633,7 +640,8 @@ exit gates; it does not replace the inventory.
   environment creation/editing, Remote, and branch-mutation failures open.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
-  current build.
+  current build. The sampled unavailable-tool recovery is now current verified;
+  successful Browser activity/workspace deliberately remain partial legacy.
 - The current-style mixed-tool thread is now delivered as one schema-valid,
   protocol-backed composition: Web Search → Browser open/find, OpenAI
   Developer Docs Search → Fetch, command approval, file Review, and one

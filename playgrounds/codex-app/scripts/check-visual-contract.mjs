@@ -428,6 +428,10 @@ const currentSearch26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_SEARCH_26_825_REFERENCE;
 const currentBrowser26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_BROWSER_26_825_REFERENCE;
+const currentBrowserFailure26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_REFERENCE;
+const currentBrowserFailure26825CompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_COMPACT_REFERENCE;
 const currentPlan26825ReferenceSize = {
   height: 820,
   width: 1180,
@@ -2782,6 +2786,100 @@ for (const scene of selectedScenes) {
     console.log(
       `${scene.id}: current 26.825 Browser pixel ratios activity=${activityComparison.ratio}, chrome=${chromeComparison.ratio}`,
     );
+  }
+
+  const currentBrowserFailureReference = scene.id.endsWith(
+    "unsupported-error-compact",
+  )
+    ? currentBrowserFailure26825CompactReference
+    : scene.id === "conversation-browser-current-26-825-unsupported-error"
+      ? currentBrowserFailure26825Reference
+      : undefined;
+  if (currentBrowserFailureReference) {
+    const compact = scene.id.endsWith("-compact");
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentBrowserFailureReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    const expectedSize = compact
+      ? { height: 820, width: 720 }
+      : { height: 820, width: 1180 };
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current Browser failure comparison requires exact ${expectedSize.width}x${expectedSize.height} product and playground frames.`,
+      );
+    }
+    const contentRegion = compact
+      ? { height: 641, left: 0, top: 47, width: 720 }
+      : { height: 641, left: 323, top: 47, width: 857 };
+    const composerRegion = compact
+      ? { height: 98, left: 16, top: 706, width: 688 }
+      : { height: 98, left: 383, top: 706, width: 736 };
+    const compareRegion = async ({ name, region, maximumRatioName, limit }) => {
+      const referenceCrop = cropPng(
+        reference,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      );
+      const actualCrop = cropPng(
+        actual,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      );
+      const comparison = comparePng(referenceCrop, actualCrop, 0.12);
+      const sceneName = `${scene.id}.current-product-${name}`;
+      await writeFile(
+        join(artifactDirectory, `${sceneName}.png`),
+        PNG.sync.write(referenceCrop),
+      );
+      await writeFile(
+        join(artifactDirectory, `${sceneName}.current-build.png`),
+        PNG.sync.write(actualCrop),
+      );
+      const diffPath = join(
+        artifactDirectory,
+        `${sceneName}.current-build.diff.png`,
+      );
+      if (comparison.pixels > 0) {
+        await writeFile(diffPath, PNG.sync.write(comparison.diff));
+      } else {
+        await rm(diffPath, { force: true });
+      }
+      const maximumRatio = environmentRatio(maximumRatioName, limit);
+      if (comparison.ratio > maximumRatio) {
+        throw new Error(
+          `${scene.id}: current Browser failure ${name} pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+        );
+      }
+      console.log(
+        `${scene.id}: current Browser failure ${name} pixel ratio ${comparison.ratio}`,
+      );
+    };
+    await compareRegion({
+      limit: compact ? 0.035 : 0.03,
+      maximumRatioName: compact
+        ? "CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_COMPACT_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_MAX_DIFF_RATIO",
+      name: "content",
+      region: contentRegion,
+    });
+    await compareRegion({
+      limit: 0.04,
+      maximumRatioName: compact
+        ? "CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_COMPACT_COMPOSER_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_COMPOSER_MAX_DIFF_RATIO",
+      name: "composer",
+      region: composerRegion,
+    });
   }
 
   if (

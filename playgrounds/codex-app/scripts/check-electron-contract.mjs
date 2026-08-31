@@ -13794,6 +13794,167 @@ for (const browserSurface of [false, true]) {
   }
 }
 
+for (const browserFailureScene of [
+  {
+    currentSidebar: true,
+    frame: "conversation-browser-current-26-825-chromium-error",
+    id: "electron-conversation-browser-current-26-825-chromium-error",
+    scenario: "current-browser-26-825-failure",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    currentSidebar: true,
+    frame: "conversation-browser-current-26-825-unsupported-error",
+    id: "electron-conversation-browser-current-26-825-unsupported-error",
+    scenario: "current-browser-26-825-failure",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    currentSidebar: true,
+    frame: "conversation-browser-current-26-825-unsupported-error",
+    id: "electron-conversation-browser-current-26-825-unsupported-error-compact",
+    layoutMode: "narrow",
+    scenario: "current-browser-26-825-failure",
+    sidebarState: "hidden",
+    windowSize: { height: 820, width: 720 },
+  },
+]) {
+  const { app, page } = await launchScene(browserFailureScene, {
+    capture: false,
+  });
+  try {
+    const nativeWindow = await app.evaluate(({ BrowserWindow }) => {
+      const window = BrowserWindow.getAllWindows()[0];
+      return window
+        ? {
+            destroyed: window.isDestroyed(),
+            size: window.getContentSize(),
+          }
+        : null;
+    });
+    const contract = await page.evaluate(() => {
+      const rect = (element) => {
+        const bounds = element?.getBoundingClientRect();
+        return bounds
+          ? {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            }
+          : null;
+      };
+      const response = (suffix) => {
+        const root = document.querySelector(
+          `[data-item-id="assistant-current-browser-26-825-${suffix}"]`,
+        );
+        return root
+          ? {
+              actionIcons: Array.from(
+                root.querySelectorAll("[data-current-build-icon]"),
+                (icon) => icon.getAttribute("data-current-build-icon"),
+              ),
+              rect: rect(root.querySelector("p")),
+              text: root.textContent?.trim() ?? null,
+            }
+          : null;
+      };
+      return {
+        browserWorkspace: Boolean(
+          document.querySelector(
+            '[data-testid="current-browser-workspace"]',
+          ),
+        ),
+        chromiumDuration: document
+          .querySelector(
+            '[data-testid="current-browser-failure-duration-chromium"]',
+          )
+          ?.textContent?.trim(),
+        chromiumError: response("chromium-error"),
+        composer: rect(document.querySelector(".codex-ui-composer")),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        mcpGroupCount: document.querySelectorAll(
+          ".codex-ui-mcp-tool-call-group",
+        ).length,
+        status: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-status"),
+        stopButton: Boolean(
+          document.querySelector('button[aria-label="Stop"]'),
+        ),
+        unsupportedDuration: document
+          .querySelector(
+            '[data-testid="current-browser-failure-duration-unsupported"]',
+          )
+          ?.textContent?.trim(),
+        unsupportedError: response("unsupported-error"),
+      };
+    });
+    const unsupported = browserFailureScene.id.includes(
+      "unsupported-error",
+    );
+    const compact = browserFailureScene.id.endsWith("-compact");
+    const expectedActions = [
+      "thread-assistant-copy",
+      "thread-assistant-good",
+      "thread-assistant-bad",
+      "thread-assistant-fork",
+    ];
+    if (
+      !nativeWindow ||
+      nativeWindow.destroyed ||
+      JSON.stringify(nativeWindow.size) !==
+        JSON.stringify(compact ? [720, 820] : [1180, 820]) ||
+      contract.status !== "completed" ||
+      contract.stopButton ||
+      contract.browserWorkspace ||
+      contract.mcpGroupCount !== 0 ||
+      contract.horizontalOverflow > 1 ||
+      contract.chromiumDuration !== "Worked for 3m 46s" ||
+      contract.chromiumError?.text !==
+        "错误：Browser 启动失败，缺少 Playwright Chromium 可执行文件。" ||
+      JSON.stringify(contract.chromiumError?.actionIcons) !==
+        JSON.stringify(expectedActions) ||
+      !contract.composer ||
+      Math.abs(contract.composer.top - 706) > 0.1 ||
+      Math.abs(contract.composer.height - 98) > 0.1 ||
+      (unsupported &&
+        (contract.unsupportedDuration !== "Worked for 27s" ||
+          contract.unsupportedError?.text !==
+            "Browser error: Unsupported browser service request." ||
+          JSON.stringify(contract.unsupportedError?.actionIcons) !==
+            JSON.stringify(expectedActions) ||
+          !contract.unsupportedError?.rect ||
+          Math.abs(
+            contract.unsupportedError.rect.left -
+              (compact ? 16 : 383.453125),
+          ) > 0.1 ||
+          Math.abs(
+            contract.unsupportedError.rect.top -
+              (compact ? 438.25 : 413.25),
+          ) > 2))
+    ) {
+      throw new Error(
+        `Electron current 26.825 Browser failure contract failed: ${JSON.stringify({ browserFailureScene, contract, nativeWindow })}`,
+      );
+    }
+    const composer = page.getByRole("textbox", {
+      name: "Message composer",
+    });
+    await composer.fill("recovery after Browser failure");
+    if ((await composer.inputValue()) !== "recovery after Browser failure") {
+      throw new Error(
+        `Electron current 26.825 Browser failure Composer did not recover for ${browserFailureScene.id}.`,
+      );
+    }
+    await composer.fill("");
+  } finally {
+    await app.close();
+  }
+}
+
 const conversationLifecycleScene = {
   frame: "conversation-thread-ready",
   id: "electron-conversation-lifecycle",
