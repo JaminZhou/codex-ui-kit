@@ -226,7 +226,19 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 50 have current-build runtime evidence, 30 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 45 groups and Electron verification covers 45.
+The current Thread summary follow-up refreshes its 28px trigger and 300×199
+Environment/Git overlay on 26.825.51511. The overlay now sits at x=804/y=53,
+uses a 25px radius and 14/21px weight-400 visible labels, keeps five 272×29px
+rows, and exposes enabled Commit and pull-request actions for the sampled dirty
+branch. Collapse, Escape, and outside dismissal were exercised in-product; the
+public replay deliberately retains trigger focus restoration even though the
+sampled product left focus unset. CDP, Electron, one reviewed baseline, and a
+dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
+`/compact` attempt reached the current no-percentage command row and
+`Compacting context`, but the remote compact task failed and exposed Resume,
+so successful compaction/recovery remains previous-build evidence.
+
+Current inventory: 91 surface groups; 51 have current-build runtime evidence, 29 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 46 groups and Electron verification covers 46.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1750,6 +1762,17 @@ The ownership-scoped 300×199 current-build comparison differs by
 covers 76 frames. This promotes `thread.context-summary` only for the sampled
 Environment/Git workflow overlay; populated artifact/source sections,
 light theme, pinned layout, and host mutations remain separate gates.
+
+The `26.825.51511` revalidation supersedes that sampled summary geometry and
+typography: the same 28px trigger now places the 300×199 panel at x=804/y=53,
+the visible labels use 14/21px weight-400 system typography, and both Commit
+and pull-request rows are enabled on the sampled dirty branch. Product
+collapse, Escape, and outside dismissal pass; the replay keeps its safer focus
+return rather than copying the sampled product's unset focus. The reviewed
+baseline and dynamic-delta-masked product crop differ by 2.6918% under 3%.
+Successful `/compact` settlement is not promoted: the current attempt reached
+the new no-percentage menu and running state but ended in a remote-task error
+with Resume.
 
 A `26.730.61639` isolated task then delegated one real long-running subagent,
 observed its `working` and completed states, and opened the populated

@@ -15971,14 +15971,14 @@ for (const scene of selectedScenes) {
         Math.abs((summary.trigger.rect?.width ?? 0) - 28) > 1 ||
         Math.abs((summary.trigger.rect?.top ?? 0) - 9) > 1 ||
         Math.abs((summary.popover.rect?.left ?? 0) - 804) > 1 ||
-        Math.abs((summary.popover.rect?.top ?? 0) - 45) > 1 ||
+        Math.abs((summary.popover.rect?.top ?? 0) - 53) > 1 ||
         Math.abs((summary.popover.rect?.width ?? 0) - 300) > 1 ||
         Math.abs((summary.popover.rect?.height ?? 0) - 199) > 1 ||
         summary.panel.style?.backgroundColor !== "rgb(45, 45, 45)" ||
         summary.panel.style?.borderRadius !== "25px" ||
-        summary.panel.style?.fontSize !== "14px" ||
-        summary.panel.style?.fontWeight !== "445" ||
-        summary.panel.style?.lineHeight !== "21px" ||
+        summary.panel.style?.fontSize !== "16px" ||
+        summary.panel.style?.fontWeight !== "400" ||
+        summary.panel.style?.lineHeight !== "24px" ||
         summary.sectionExpanded !== "true" ||
         summary.rows.length !== 5 ||
         summary.rows.some(
@@ -15987,8 +15987,8 @@ for (const scene of selectedScenes) {
             Math.abs(value.height - 29) > 1 ||
             Math.abs(value.width - 272) > 1,
         ) ||
-        summary.rows.filter(({ disabled }) => disabled).length !== 1 ||
-        summary.delta !== "+0-0"
+        summary.rows.filter(({ disabled }) => disabled).length !== 0 ||
+        summary.delta !== "+1-0"
       ) {
         throw new Error(
           `${scene.id}: current thread summary contract failed: ${JSON.stringify(summary)}`,

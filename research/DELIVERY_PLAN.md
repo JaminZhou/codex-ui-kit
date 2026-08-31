@@ -14,8 +14,17 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 50 groups have current-build runtime evidence, 30 have previous-build-only
+- 51 groups have current-build runtime evidence, 29 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current Thread summary follow-up promotes `thread.context-summary`. Its
+  28px trigger now anchors the 300×199 Environment/Git overlay at x=804/y=53,
+  with a 25px radius, 14/21px weight-400 visible labels, five 272×29px rows,
+  enabled Commit and PR actions, collapse, Escape, and outside dismissal. CDP,
+  Electron, a reviewed baseline, and a dynamic-delta-masked 2.6918% product
+  comparison gate the slice. The same probe reached the current `/compact`
+  menu and running state, but the remote compact task failed and exposed
+  Resume; successful compaction/recovery therefore remains previous-build P0
+  evidence rather than being promoted.
 - The current Web Search follow-up reaches two real public searches, settles as
   `Worked for 23s`, and exposes the current `Searched the web for Codex app
   desktop` / `Searched the web for "desktop"` rows. Three CDP frames, native

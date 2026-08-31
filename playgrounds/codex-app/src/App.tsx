@@ -5906,6 +5906,7 @@ export function App() {
               <ThreadSummaryPopover
                 onOpenChange={setThreadSummaryOpen}
                 open={threadSummaryOpen}
+                sideOffset={isCurrentContextSummaryReplay ? 16 : undefined}
                 triggerIcon={
                   <CurrentBuildIcon name="thread-header-summary" />
                 }
@@ -5972,7 +5973,7 @@ export function App() {
                     </ThreadSummarySection>
                   </ThreadSummaryPanel>
                 ) : (
-                  <ThreadSummaryPanel>
+                  <ThreadSummaryPanel className="demo-current-context-summary-panel">
                     <ThreadSummarySection
                       actions={
                         <ThreadSummaryIconButton
@@ -5987,7 +5988,7 @@ export function App() {
                       <ThreadSummaryItem
                         label="Changes"
                         leading={<SummaryGlyph name="changes" />}
-                        meta={<ThreadSummaryDelta added={0} removed={0} />}
+                        meta={<ThreadSummaryDelta added={1} removed={0} />}
                       />
                       <ThreadSummaryItem
                         label="Local"
@@ -5996,13 +5997,12 @@ export function App() {
                         trailing="⌄"
                       />
                       <ThreadSummaryItem
-                        label="feat/current-context-summary"
+                        label="feat/current-context-continuity"
                         leading={<SummaryGlyph name="branch" />}
                         title="Switch branch"
                         trailing="⌄"
                       />
                       <ThreadSummaryItem
-                        disabled
                         label="Commit or push"
                         leading={<SummaryGlyph name="commit" />}
                       />

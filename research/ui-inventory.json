@@ -619,11 +619,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.730.61309:real-thread-summary-toggle-environment-git-workflow-overlay-and-computed-styles",
-        "cdp-26.730.61309:real-thread-summary-300x199-ownership-scoped-pixels"
+        "cdp-26.730.61309:real-thread-summary-300x199-ownership-scoped-pixels",
+        "cdp-26.825.51511:real-thread-summary-toggle-collapse-escape-outside-dismiss-environment-git-overlay-and-current-computed-styles",
+        "cdp-26.825.51511:real-thread-summary-300x199-dynamic-delta-masked-2.6918-percent-product-region"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

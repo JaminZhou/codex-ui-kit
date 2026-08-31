@@ -14501,14 +14501,14 @@ try {
     !summary.panel ||
     !summary.popover ||
     Math.abs(summary.popover.left - 804) > 1 ||
-    Math.abs(summary.popover.top - 45) > 1 ||
+    Math.abs(summary.popover.top - 53) > 1 ||
     Math.abs(summary.popover.width - 300) > 1 ||
     Math.abs(summary.popover.height - 199) > 1 ||
     summary.panelStyle?.backgroundColor !== "rgb(45, 45, 45)" ||
     summary.panelStyle?.borderRadius !== "25px" ||
-    summary.panelStyle?.fontSize !== "14px" ||
-    summary.panelStyle?.fontWeight !== "445" ||
-    summary.panelStyle?.lineHeight !== "21px" ||
+    summary.panelStyle?.fontSize !== "16px" ||
+    summary.panelStyle?.fontWeight !== "400" ||
+    summary.panelStyle?.lineHeight !== "24px" ||
     summary.rowCount !== 5 ||
     summary.rows.some(
       (row) =>
@@ -14516,7 +14516,7 @@ try {
         Math.abs(row.height - 29) > 1 ||
         Math.abs(row.width - 272) > 1,
     ) ||
-    summary.disabledRows !== 1
+    summary.disabledRows !== 0
   ) {
     throw new Error(
       `Electron current thread summary geometry failed: ${JSON.stringify({ nativeBounds, summary })}`,

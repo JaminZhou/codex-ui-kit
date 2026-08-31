@@ -489,6 +489,17 @@ The twenty-seventh slice reaches the current thread summary overlay on
 - the 76-frame reviewed matrix adds the summary overlay, and its ownership-
   scoped component comparison differs by 2.86% under a 3% hard limit.
 
+A later `26.825.51511` follow-up supersedes that sampled summary layout. The
+28px trigger now anchors the 300×199 overlay at x=804/y=53, visible labels use
+14/21px weight-400 system typography inside current row containers, and the
+sampled dirty branch keeps Commit and pull-request actions enabled. Browser/CDP
+and Electron retain collapse, dismissal, compact containment, and the replay's
+safer Escape focus return. The refreshed reviewed baseline passes, and a
+local-only product crop masks only the dynamic Changes delta before passing at
+2.6918% under 3%. The companion current `/compact` probe reached the new
+no-percentage command row and running state but failed remotely, so successful
+compaction and same-thread recovery are not promoted by this slice.
+
 ## Twenty-eighth vertical slice
 
 The twenty-eighth slice reaches a successful current command approval on

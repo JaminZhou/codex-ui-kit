@@ -2184,6 +2184,28 @@ textarea {
   gap: 0.375rem;
 }
 
+.demo-current-context-summary-panel {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+.demo-current-context-summary-panel
+  :is(
+    .codex-ui-thread-summary-section__header,
+    .codex-ui-thread-summary-item__label,
+    .codex-ui-thread-summary-item__meta,
+    .codex-ui-thread-summary-item__trailing
+  ) {
+  font-size: 0.875rem;
+  line-height: 1.3125rem;
+}
+
+.demo-current-context-summary-panel .codex-ui-thread-summary-delta {
+  gap: 0.25rem;
+  line-height: 0.875rem;
+}
+
 .demo-root:is(
     [data-scenario="subagent-delegation"],
     [data-scenario="subagent-concurrency"],
