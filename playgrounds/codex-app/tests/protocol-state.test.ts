@@ -1396,7 +1396,7 @@ describe("protocol lifecycle reducer", () => {
     expect(secondThread.eventCount).toBe(3);
   });
 
-  it("replays current manual context compaction and same-thread recovery", () => {
+  it("replays current manual context compaction, recovery, and repetition", () => {
     const scenario = replayScenarios.compaction;
     const running = reduceProtocolTrace(
       scenario.events.slice(
@@ -1410,7 +1410,25 @@ describe("protocol lifecycle reducer", () => {
         scenario.frames["context-compaction-completed"],
       ),
     );
-    const recovered = reduceProtocolTrace(scenario.events);
+    const recovered = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["context-compaction-recovered"],
+      ),
+    );
+    const repeatedRunning = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["context-compaction-repeated-running"],
+      ),
+    );
+    const repeatedCompleted = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["context-compaction-repeated-completed"],
+      ),
+    );
+    const repeatedRecovered = reduceProtocolTrace(scenario.events);
 
     expect(running.compaction).toBe("running");
     expect(completed.compaction).toBe("completed");
@@ -1425,13 +1443,28 @@ describe("protocol lifecycle reducer", () => {
     });
     expect(recovered.messages.at(-1)).toMatchObject({
       id: "assistant-context-compaction-recovery",
-      text: "COMPACTION RECOVERY ACCEPTED",
+      text: "CURRENT 26.825 COMPACTION RECOVERY ACCEPTED",
     });
     expect(recovered.messages.at(-1)?.compaction).toBeUndefined();
-    expect(recovered.turnDurationsMs).toMatchObject({
+    expect(repeatedRunning.messages.at(-1)).toMatchObject({
+      compaction: "running",
+      id: "assistant-context-compaction-recovery",
+    });
+    expect(repeatedCompleted.messages.at(-1)).toMatchObject({
+      compaction: "completed",
+      id: "assistant-context-compaction-recovery",
+    });
+    expect(repeatedRecovered.messages.at(-1)).toMatchObject({
+      id: "assistant-context-compaction-repeated-recovery",
+      text: "CURRENT 26.825 REPEATED COMPACTION RECOVERY ACCEPTED",
+    });
+    expect(repeatedRecovered.messages.at(-1)?.compaction).toBeUndefined();
+    expect(repeatedRecovered.turnDurationsMs).toMatchObject({
       "turn-compaction-baseline": 1_500,
       "turn-context-compaction": 8_000,
       "turn-context-compaction-recovery": 1_500,
+      "turn-context-compaction-repeated": 8_000,
+      "turn-context-compaction-repeated-recovery": 1_500,
     });
   });
 

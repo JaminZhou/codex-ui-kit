@@ -4499,18 +4499,27 @@ export function App() {
     cancelReplaySubmitTimer();
     setComposerValue("");
     setComposerOverlay(null);
+    const repeated =
+      activeFrame === "context-compaction-recovered" ||
+      activeFrame?.startsWith("context-compaction-repeated-");
+    const runningFrame = repeated
+      ? "context-compaction-repeated-running"
+      : "context-compaction-running";
+    const completedFrame = repeated
+      ? "context-compaction-repeated-completed"
+      : "context-compaction-completed";
     setReplayCount(
-      replayScenarios.compaction.frames["context-compaction-running"] ??
+      replayScenarios.compaction.frames[runningFrame] ??
         replayScenarios.compaction.events.length,
     );
-    setActiveFrame("context-compaction-running");
+    setActiveFrame(runningFrame);
     replaySubmitTimerRef.current = window.setTimeout(() => {
       replaySubmitTimerRef.current = null;
       setReplayCount(
-        replayScenarios.compaction.frames["context-compaction-completed"] ??
+        replayScenarios.compaction.frames[completedFrame] ??
           replayScenarios.compaction.events.length,
       );
-      setActiveFrame("context-compaction-completed");
+      setActiveFrame(completedFrame);
       requestAnimationFrame(() => composerInputRef.current?.focus());
     }, 900);
   };
@@ -4597,14 +4606,17 @@ export function App() {
       cancelReplaySubmitTimer();
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
+      const recoveredFrame =
+        activeFrame === "context-compaction-repeated-completed"
+          ? "context-compaction-repeated-recovered"
+          : "context-compaction-recovered";
       replaySubmitTimerRef.current = window.setTimeout(() => {
         replaySubmitTimerRef.current = null;
         setReplayCount(
-          replayScenarios.compaction.frames[
-            "context-compaction-recovered"
-          ] ?? replayScenarios.compaction.events.length,
+          replayScenarios.compaction.frames[recoveredFrame] ??
+            replayScenarios.compaction.events.length,
         );
-        setActiveFrame("context-compaction-recovered");
+        setActiveFrame(recoveredFrame);
         completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
       }, 160);
@@ -6062,7 +6074,6 @@ export function App() {
     isCurrentLongCommandReplay ||
     isCurrentCommandFailureReplay ||
     isCurrentCommandInterruptionReplay ||
-    isCurrentContextCompactionReplay ||
     isCurrentContextSummaryReplay ||
     isCurrentTransportRecoveryReplay ||
     isCurrentMixedToolReplay ||
@@ -6931,7 +6942,7 @@ export function App() {
             role="listbox"
           >
             <button
-              aria-label="Compact this chat's context (9% full)"
+              aria-label="Compact this chat's context (10% full)"
               className="demo-compaction-command"
               onClick={startReplayCompaction}
               role="option"
@@ -6942,7 +6953,7 @@ export function App() {
               </span>
               <span className="demo-compaction-command__label">Compact</span>
               <span className="demo-compaction-command__description">
-                Compact this chat&apos;s context (9% full)
+                Compact this chat&apos;s context (10% full)
               </span>
             </button>
           </div>
@@ -11441,7 +11452,9 @@ export function App() {
                 (scenarioId === "compaction" &&
                   (message.id === "assistant-compaction-baseline" ||
                     message.id ===
-                      "assistant-context-compaction-recovery"))) &&
+                      "assistant-context-compaction-recovery" ||
+                    message.id ===
+                      "assistant-context-compaction-repeated-recovery"))) &&
               message.status === "completed" ? (
                 isCurrentMcpReplay ||
                 scenarioId === "mcp-tool-call" ||

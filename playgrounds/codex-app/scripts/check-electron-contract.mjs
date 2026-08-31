@@ -13309,7 +13309,7 @@ try {
   }
   await composer.fill("/compact");
   const compactCommand = contextCompactionPage.getByRole("option", {
-    name: "Compact this chat's context (9% full)",
+    name: "Compact this chat's context (10% full)",
   });
   await compactCommand.waitFor({ state: "visible" });
   await compactCommand.click();
@@ -13345,7 +13345,7 @@ try {
     '.demo-root[data-frame="context-compaction-completed"][data-status="completed"][data-composer-phase="idle"] .codex-ui-thread-context-event[data-status="completed"]',
   );
   await composer.fill(
-    "Do not use tools. Reply with exactly: COMPACTION RECOVERY ACCEPTED",
+    "Do not use tools. Reply with exactly CURRENT 26.825 COMPACTION RECOVERY ACCEPTED",
   );
   await composer.press("Enter");
   await contextCompactionPage.waitForSelector(
@@ -13376,7 +13376,8 @@ try {
   }));
   if (
     recovered.activeElement !== "Message composer" ||
-    recovered.assistantText !== "COMPACTION RECOVERY ACCEPTED" ||
+    recovered.assistantText !==
+      "CURRENT 26.825 COMPACTION RECOVERY ACCEPTED" ||
     recovered.contextLabel !== "Context compacted" ||
     recovered.stopCount !== 0
   ) {
@@ -13387,25 +13388,32 @@ try {
   await composer.fill("/compact");
   await composer.press("Enter");
   await contextCompactionPage.waitForSelector(
-    '.demo-root[data-frame="context-compaction-running"][data-status="running"] button[aria-label="Stop"]',
+    '.demo-root[data-frame="context-compaction-repeated-running"][data-status="running"] button[aria-label="Stop"]',
   );
-  await contextCompactionPage.getByRole("button", { name: "Stop" }).click();
   await contextCompactionPage.waitForSelector(
-    '.demo-root[data-frame="context-compaction-ready"][data-status="completed"][data-composer-phase="idle"]',
+    '.demo-root[data-frame="context-compaction-repeated-completed"][data-status="completed"][data-composer-phase="idle"] .codex-ui-thread-context-event[data-status="completed"]',
+  );
+  await composer.fill(
+    "Do not use tools. Reply with exactly CURRENT 26.825 REPEATED COMPACTION RECOVERY ACCEPTED",
+  );
+  await composer.press("Enter");
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-repeated-recovered"][data-status="completed"][data-composer-phase="idle"] [data-item-id="assistant-context-compaction-repeated-recovery"]',
   );
   await contextCompactionPage.waitForFunction(
     () =>
       document.activeElement?.getAttribute("aria-label") ===
       "Message composer",
   );
-  const stopped = await contextCompactionPage.evaluate(() => ({
+  const repeated = await contextCompactionPage.evaluate(() => ({
     activeElement: document.activeElement?.getAttribute("aria-label"),
-    composerValue: (() => {
-      const composer = document.querySelector(
-        '[aria-label="Message composer"]',
-      );
-      return composer && "value" in composer ? composer.value : null;
-    })(),
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-context-compaction-repeated-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
     contextCount: document.querySelectorAll(
       ".codex-ui-thread-context-event",
     ).length,
@@ -13414,13 +13422,14 @@ try {
     ).length,
   }));
   if (
-    stopped.activeElement !== "Message composer" ||
-    stopped.composerValue !== "" ||
-    stopped.contextCount !== 0 ||
-    stopped.stopCount !== 0
+    repeated.activeElement !== "Message composer" ||
+    repeated.assistantText !==
+      "CURRENT 26.825 REPEATED COMPACTION RECOVERY ACCEPTED" ||
+    repeated.contextCount !== 2 ||
+    repeated.stopCount !== 0
   ) {
     throw new Error(
-      `Electron current context compaction Stop reset failed: ${JSON.stringify(stopped)}`,
+      `Electron current context compaction repeated recovery failed: ${JSON.stringify(repeated)}`,
     );
   }
 } finally {

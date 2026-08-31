@@ -2126,6 +2126,33 @@ export const visualScenes = [
     scenario: "compaction",
   },
   {
+    frame: "context-compaction-repeated-running",
+    id: "context-compaction-repeated-running",
+    maxPixelRatio: 0.0225,
+    scenario: "compaction",
+  },
+  {
+    frame: "context-compaction-repeated-completed",
+    id: "context-compaction-repeated-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "compaction",
+  },
+  {
+    frame: "context-compaction-repeated-recovered",
+    id: "context-compaction-repeated-recovered",
+    maxPixelRatio: 0.0225,
+    scenario: "compaction",
+  },
+  {
+    currentSidebar: true,
+    frame: "context-compaction-repeated-recovered",
+    id: "context-compaction-repeated-recovered-compact",
+    maxPixelRatio: 0.0225,
+    scenario: "compaction",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "context-summary-open",
     id: "context-summary-open",
     maxPixelRatio: 0.0225,

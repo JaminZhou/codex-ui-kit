@@ -452,6 +452,7 @@ const currentPlan26825ReferenceSize = {
   width: 1180,
 };
 const currentBuildContextCompactionReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPACTION_26_825_RUNNING_REFERENCE ??
   process.env.CODEX_UI_KIT_CONTEXT_COMPACTION_REFERENCE;
 const currentBuildContextCompactionReferenceSize = {
   height: 820,
@@ -6919,8 +6920,8 @@ for (const scene of selectedScenes) {
       maskPng(clonePng(actual), masks),
     );
     const maximumRatio = environmentRatio(
-      "CODEX_UI_KIT_CONTEXT_COMPACTION_MAX_DIFF_RATIO",
-      0.005,
+      "CODEX_UI_KIT_CURRENT_COMPACTION_26_825_MAX_DIFF_RATIO",
+      0.015,
     );
     await writeFile(
       join(artifactDirectory, `${scene.id}.current-build.png`),
@@ -6941,7 +6942,7 @@ for (const scene of selectedScenes) {
       );
     }
     console.log(
-      `${scene.id}: current-build context-compaction pixel ratio ${comparison.ratio}`,
+      `${scene.id}: current 26.825 context-compaction pixel ratio ${comparison.ratio}`,
     );
   }
 

@@ -14,8 +14,14 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 60 groups have current-build runtime evidence, 20 have previous-build-only
+- 61 groups have current-build runtime evidence, 19 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current manual context-compaction follow-up promotes
+  `thread.context-compaction`. A fresh isolated task reaches the dynamic
+  `10% full` command, running, completed, and exact recovery states; a second
+  `/compact` in the same task also settles and recovers. CDP, Electron, eight
+  reviewed baselines, wide/compact zero-overflow contracts, and a 1.3189%
+  ownership-masked product comparison gate the slice.
 - The current Pull request review follow-up promotes
   `workspace.pull-request-review`. Its read-only PR #228 replay locks five
   Summary facts, two running checks, two Activity entries before the comment

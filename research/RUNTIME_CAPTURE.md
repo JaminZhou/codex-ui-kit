@@ -2253,6 +2253,44 @@ recoverably to Trash, terminate only the validated isolated process tree and
 profile-owned Crashpad handlers, prove the port is closed, and recheck that the
 user-owned Codex PID remains alive.
 
+## Current `26.825.51511` manual context-compaction sample
+
+Use `pnpm capture:current-compaction-26-825` only with the explicit
+`CODEX_CURRENT_COMPACTION_ALLOW_MUTATION=1` opt-in, an exact isolated profile,
+and a loopback listener owned by the validated second Codex process. The helper
+fails closed unless version `26.825.51511`, build `7377`, Chromium
+`151.0.7922.174`, the expected ASAR size and SHA-256, the profile path, owner
+PID, listener, and a new profile-owned output directory all match. It records
+only a task-title hash and task ID; screenshots and the profile remain local.
+
+The accepted sample first obtains an exact no-tool baseline response, types
+`/compact` with keyboard events, selects the current content-dependent
+`Compact this chat's context (10% full)` command, and observes `Working`,
+`Compacting context`, `Context compacted`, and an exact same-thread recovery.
+The current menu label is 13/18.5714px weight 400. Running and completed labels
+are 14/21px weight 400; Stop and Send are 28×28px. The helper resets only a
+CDP-resize-induced horizontal scroll offset before capture and requires zero
+horizontal overflow at 1180×820 and 720×680.
+
+A second `/compact` in the same recovered task also settled successfully. The
+public trace therefore includes first and repeated running, completed, and
+recovered states. Browser/CDP and Electron drive both rounds; eight reviewed
+pixel baselines include compact repeated recovery. The optional local-only
+running comparison is:
+
+```bash
+CODEX_UI_KIT_CURRENT_COMPACTION_26_825_RUNNING_REFERENCE=/absolute/path/to/running-wide.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=context-compaction-running
+```
+
+It masks non-owned sidebar/title/transcript/Composer interiors and passes at
+1.3189% under the current 1.5% limit. Archive the exact disposable task IDs,
+terminate only the validated isolated process tree, verify the loopback port
+closed, move the exact profile recoverably to Trash, and confirm the user's
+primary Codex process is still alive. Never commit product screenshots, task
+contents, navigation metadata, or profile data.
+
 ## Promotion rule
 
 After a capture:

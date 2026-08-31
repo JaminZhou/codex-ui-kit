@@ -2889,6 +2889,11 @@ textarea {
 }
 
 .demo-root[data-scenario="compaction"]
+  .demo-composer-permission-trigger {
+  color: rgb(255, 104, 40);
+}
+
+.demo-root[data-scenario="compaction"]
   .codex-ui-thread-viewport::-webkit-scrollbar {
   display: none;
 }
@@ -2898,7 +2903,7 @@ textarea {
 .demo-root[data-scenario="compaction"]
   .codex-ui-thread-context-optimization {
   font-size: 14px;
-  font-weight: 445;
+  font-weight: 400;
   line-height: 21px;
 }
 

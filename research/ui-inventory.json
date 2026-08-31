@@ -655,16 +655,25 @@
       "id": "thread.context-compaction",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["local-conversation-page"],
+      "packageEvidence": [
+        "local-conversation-page",
+        "replay:current-26.825-first-and-repeated-manual-compaction-recovery",
+        "browser-cdp:current-26.825-command-running-completed-recovered-and-repeated-lifecycle",
+        "electron:current-26.825-first-and-repeated-manual-compaction-recovery",
+        "pixel:eight-reviewed-current-26.825-compaction-scenes-and-local-only-running-product-region"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:slash-compact-running-and-completed-raster",
         "cdp-26.730.61309:real-slash-compact-menu-running-completed-and-same-thread-recovery",
-        "cdp-26.730.61309:real-manual-compaction-computed-styles-and-ownership-masked-full-window-pixels"
+        "cdp-26.730.61309:real-manual-compaction-computed-styles-and-ownership-masked-full-window-pixels",
+        "cdp-26.825.51511:real-dynamic-ten-percent-menu-running-completed-and-exact-same-thread-recovery",
+        "cdp-26.825.51511:real-repeated-manual-compaction-in-the-same-task",
+        "cdp-26.825.51511:manual-compaction-current-computed-styles-zero-overflow-wide-compact-and-1.3189-percent-product-region"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
