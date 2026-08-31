@@ -145,18 +145,17 @@ observation from a previous build remains historical evidence.
   control. Browser/CDP and Electron repeat both flows; local-only structural
   comparisons pass at 1.5731% and 1.3954% under 2% limits. The previous
   26.820 stale message-30 marker remains historical drift evidence.
-- The current 26.825 command tasks revalidate an 8-second success and an exact
-  exit-code-7 acknowledgement with same-thread recovery; the previous 26.820
-  task retains a stopped
-  120-second loop and second same-thread recovery. The current Renderer uses
+- The current 26.825 command tasks revalidate an 8-second success, an exact
+  exit-code-7 acknowledgement with same-thread recovery, and a stopped
+  120-second loop with a second same-thread recovery. The current Renderer uses
   neutral noninteractive `Ran …` rows for both exit 0 and exit 7, hides Shell,
   output, and exit-code cards while the protocol retains output/exit code, and
   uses a square `Background terminal stopped with …` row after interruption.
-  The sampled interruption changes from `You stopped after 0s` to a 16-second
-  settled duration; that one timing is not generalized. Browser/CDP covers ten
+  The sampled interruption changes from `You stopped after 0s` to a 20-second
+  settled duration; that one timing is not generalized. Browser/CDP covers nine
   frames, Electron repeats wide/compact states, and unmasked current-product
-  regions pass at 1.2761% current failure recovery, 5.4109% stopped,
-  and 2.3502% compact recovery under independent hard limits.
+  regions pass at 1.2761% current failure recovery, 4.9372% stopped,
+  and 2.0661% compact recovery under independent hard limits.
 - A fresh `26.818.41509` MCP slice reaches a real OpenAI Developer Docs
   Search → Fetch success and an invalid-URL Fetch → Search → Fetch recovery.
   It also records the 300×189 pinned Sources summary, its 316px layout
@@ -225,7 +224,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 48 have current-build runtime evidence, 32 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 43 groups and Electron verification covers 43.
+Current inventory: 91 surface groups; 49 have current-build runtime evidence, 31 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 44 groups and Electron verification covers 44.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1678,8 +1677,8 @@ value. Browser/CDP and Electron gate `Worked for 8s`, the expanded
 Stop removal, Send recovery, native wide/720 resize, and zero overflow. Two
 reviewed baselines pass. Local-only activity, Composer, and header comparisons
 pass at 1.9196%–6.5485% under independent 2.3%/1.2%/7% ceilings. This promotes
-only `thread.command-execution`; failure, interruption, background-process,
-and direct Terminal-tab lifecycles remain previous-build P0 evidence.
+`thread.command-execution`; the following current-build follow-ups cover
+failure and interruption while broader command/process surfaces remain open.
 
 A second current `26.825.51511` command task independently re-observes an
 exit-code-7 failure followed by a successful no-tool turn in the same thread.
@@ -1693,6 +1692,22 @@ pass, and the unmasked 736×125 product/replay activity region differs by
 `thread.command-failure-recovery` on the current build while interruption,
 background-process, direct Terminal-tab, and broader command-kind variants
 retain separate gates.
+
+A third current `26.825.51511` command task independently re-observes a real
+turn stop and same-thread recovery. The 120-second read-only loop first exposes
+`Working for 19s` and the 28×28 Stop control. Immediately after Stop the turn
+shows `You stopped after 0s`; after the child process settles it updates to
+`You stopped after 20s` and retains the square
+`Background terminal stopped with …` row. An exact no-tool follow-up then
+completes in the same task while the stopped row remains visible. The public
+trace separates running, immediate-stop, settled, recovered, and compact
+composition without retaining command output. Browser/CDP gates four rendered
+frames and Electron repeats all four native states. Four reviewed baselines
+pass; local-only unmasked stopped-wide and recovered-compact regions differ by
+4.9372% and 2.0661% under independent 5.5% and 3% limits. This promotes
+`thread.interruption-stop` on the current build. Full background-process
+management, direct Terminal tabs, command-output truncation, and broader
+command kinds remain separate gates.
 
 A fourth `26.730.61309` disposable task entered `/compact` only after an exact
 no-tool baseline response. The current menu exposed `Compact this chat's

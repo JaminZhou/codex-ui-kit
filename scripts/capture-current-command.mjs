@@ -40,7 +40,7 @@ const scenarios = [
   },
   {
     id: "interruption",
-    marker: "CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED",
+    marker: "CURRENT 26.825 INTERRUPTION RECOVERY ACCEPTED",
     taskTitleSha256:
       process.env.CODEX_CURRENT_COMMAND_INTERRUPTION_TASK_TITLE_SHA256,
     viewports: ["wide", "compact"],

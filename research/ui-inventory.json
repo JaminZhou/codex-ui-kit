@@ -580,7 +580,14 @@
       "id": "thread.interruption-stop",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["local-conversation-page", "run-command-animation"],
+      "packageEvidence": [
+        "local-conversation-page",
+        "run-command-animation",
+        "replay:current-26.825-command-interruption-zero-to-twenty-second-settlement-and-recovery",
+        "browser-cdp:current-26.825-command-interruption-four-frame-contract",
+        "electron:current-26.825-native-stop-settlement-and-recovery",
+        "pixel:current-26.825-stopped-wide-and-recovered-compact-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:stop-button-you-stopped-summary-and-stopped-command",
@@ -594,11 +601,12 @@
         "cdp-26.803.61601:real-command-stop-background-terminal-stopping-settlement-and-same-thread-recovery",
         "cdp-26.810.52044:real-command-stop-persistent-background-terminal-stopped-row-and-same-thread-recovery",
         "cdp-26.818.41509:real-command-stop-58s-persistent-background-terminal-row-and-same-thread-recovery",
-        "cdp-26.820.60940:real-command-stop-zero-second-immediate-sixteen-second-settlement-and-exact-same-thread-recovery"
+        "cdp-26.820.60940:real-command-stop-zero-second-immediate-sixteen-second-settlement-and-exact-same-thread-recovery",
+        "cdp-26.825.51511:real-command-stop-zero-second-immediate-twenty-second-settlement-persistent-background-terminal-row-and-exact-same-thread-recovery"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

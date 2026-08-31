@@ -14,15 +14,20 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 48 groups have current-build runtime evidence, 32 have previous-build-only
+- 49 groups have current-build runtime evidence, 31 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current command-failure follow-up reaches a real exit-code-7 command and
   an exact same-thread no-tool recovery. The Renderer keeps the failure as a
   neutral `Ran …` row and hides stdout, stderr, Shell, and exit-code cards while
   the protocol replay retains them. Three CDP frames, native Electron, three
   reviewed baselines, and a 1.2761% unmasked activity-region comparison promote
-  `thread.command-failure-recovery` on 26.825; interruption and background
-  process management remain previous-build P0 evidence.
+  `thread.command-failure-recovery` on 26.825. A third real task promotes
+  `thread.interruption-stop`: it records the 19-second running state, the
+  immediate `You stopped after 0s` frame, 20-second settlement with a
+  persistent stopped-terminal row, and exact same-thread recovery. Four CDP
+  and Electron frames, four reviewed baselines, and 4.9372%/2.0661% wide and
+  compact product-region gates pass. Full background-process management stays
+  previous-build P0 evidence.
 - The current Plan follow-up confirms that simple ordinary and Plan-mode
   prompts can now settle without progress, while one complex read-only audit
   reaches `Step 5 / 8`, opens the eight-row 95.578125×200px hover card, removes
@@ -174,17 +179,23 @@ exit gates; it does not replace the inventory.
   `Worked for 8s` → `Ran /usr/bin/uuidgen` composition, hidden raw protocol
   output, response actions, Send recovery, and the 1180/720 native boundary.
   Two reviewed baselines and six local-only activity/Composer/header regions
-  pass under independent 2.3%/1.2%/7% limits. Failure, interruption,
-  background-process, and direct Terminal-tab paths remain previous-build
-  work.
+  pass under independent 2.3%/1.2%/7% limits. The following current tasks
+  refresh failure and interruption; broader background-process and direct
+  Terminal-tab paths remain previous-build work.
   A second current command task now promotes
   `thread.command-failure-recovery`: an exit-code-7 command settles as the
   neutral `Worked for 15s` → `Ran …; exit 7` composition without visible raw
   output or exit-code card, then accepts an exact no-tool recovery. Three CDP
   frames, native Electron, three reviewed baselines, and an unmasked 1.2761%
-  activity-region comparison gate this current path. Interruption,
-  background-process, and direct Terminal-tab paths remain previous-build
-  work.
+  activity-region comparison gate this current path.
+  A third current command task promotes `thread.interruption-stop`: one
+  120-second read-only loop exposes `Working for 19s`, changes from
+  `You stopped after 0s` to `You stopped after 20s` after settlement, retains
+  the square stopped-terminal row, and accepts an exact no-tool recovery in the
+  same task. Four CDP frames, native Electron, four reviewed baselines, and
+  4.9372%/2.0661% stopped-wide/recovered-compact comparisons gate this path.
+  Full background-process management and direct Terminal tabs remain
+  previous-build work.
   The previous 26.820 command tasks promote `thread.command-execution`,
   `thread.command-failure-recovery`, and `thread.interruption-stop`. They reach
   one 12-second success, one exit-code-7 stdout/stderr command followed by an

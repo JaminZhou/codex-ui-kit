@@ -18,7 +18,7 @@ import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.j
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
 import currentReview26825FilesTrace from "../fixtures/traces/current-review-26-825-files.jsonl?raw";
 import commandCurrent26825FailureTrace from "../fixtures/traces/command-current-26-825-failure.jsonl?raw";
-import commandCurrent26820InterruptionTrace from "../fixtures/traces/command-current-26-820-interruption.jsonl?raw";
+import commandCurrent26825InterruptionTrace from "../fixtures/traces/command-current-26-825-interruption.jsonl?raw";
 import commandCurrent26820SuccessTrace from "../fixtures/traces/command-current-26-820-success.jsonl?raw";
 import commandCurrent26825SuccessTrace from "../fixtures/traces/command-current-26-825-success.jsonl?raw";
 import commandFailureRecoveryTrace from "../fixtures/traces/command-failure-recovery.jsonl?raw";
@@ -65,7 +65,7 @@ export type ReplayScenarioId =
   | "attachment-lifecycle"
   | "background-terminal"
   | "command-current-26-825-failure"
-  | "command-current-26-820-interruption"
+  | "command-current-26-825-interruption"
   | "command-current-26-820-success"
   | "command-current-26-825-success"
   | "command-failure-recovery"
@@ -225,11 +225,11 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "The runtime-observed 26.825 product keeps an exit-7 command as a noninteractive Ran row without exposing stdout, stderr, or an exit-code card, then accepts a same-thread recovery.",
     commandCurrent26825FailureTrace,
   ),
-  "command-current-26-820-interruption": scenario(
-    "command-current-26-820-interruption",
-    "监控 CURRENT 26.820 中断",
-    "The runtime-observed 26.820 product moves from a running terminal row through an immediate zero-second stop to a settled sixteen-second stop and same-thread recovery.",
-    commandCurrent26820InterruptionTrace,
+  "command-current-26-825-interruption": scenario(
+    "command-current-26-825-interruption",
+    "Monitor 26.825 interruption",
+    "The runtime-observed 26.825 product moves from a running terminal row through an immediate zero-second stop to a settled twenty-second stop and same-thread recovery.",
+    commandCurrent26825InterruptionTrace,
   ),
   "command-current-26-825-success": scenario(
     "command-current-26-825-success",

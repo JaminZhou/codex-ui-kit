@@ -1149,43 +1149,43 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
-  it("replays the current 26.820 immediate and settled interruption durations", () => {
+  it("replays the current 26.825 immediate and settled interruption durations", () => {
     const scenario = replayScenarios[
-      "command-current-26-820-interruption"
+      "command-current-26-825-interruption"
     ];
     const immediate = reduceProtocolTrace(
       scenario.events.slice(
         0,
         scenario.frames[
-          "command-current-26-820-interruption-stopped-immediate"
+          "command-current-26-825-interruption-stopped-immediate"
         ],
       ),
     );
     const settled = reduceProtocolTrace(
       scenario.events.slice(
         0,
-        scenario.frames["command-current-26-820-interruption-settled"],
+        scenario.frames["command-current-26-825-interruption-settled"],
       ),
     );
     const recovered = reduceProtocolTrace(scenario.events);
     const interruptionDuration = (state: typeof immediate) =>
       state.messages.find(
-        ({ id }) => id === "user-command-current-26-820-interruption",
+        ({ id }) => id === "user-command-current-26-825-interruption",
       )?.interruptionDurationMs;
 
     expect(immediate.status).toBe("interrupted");
     expect(interruptionDuration(immediate)).toBe(0);
     expect(settled.status).toBe("interrupted");
     expect(settled.commands[0]).toMatchObject({
-      durationMs: 16_000,
+      durationMs: 20_000,
       exitCode: 0,
       status: "completed",
     });
-    expect(interruptionDuration(settled)).toBe(16_000);
+    expect(interruptionDuration(settled)).toBe(20_000);
     expect(recovered.status).toBe("completed");
-    expect(interruptionDuration(recovered)).toBe(16_000);
+    expect(interruptionDuration(recovered)).toBe(20_000);
     expect(recovered.messages.at(-1)?.text).toBe(
-      "CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED",
+      "CURRENT 26.825 INTERRUPTION RECOVERY ACCEPTED",
     );
   });
 
