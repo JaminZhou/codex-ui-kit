@@ -14,8 +14,14 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 40 groups have current-build runtime evidence, 40 have previous-build-only
+- 42 groups have current-build runtime evidence, 38 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current Composer-control follow-up re-observes the exact three-row
+  permission overlay plus active Goal and Plan across 1180×820 and 720×680.
+  Browser/CDP, Electron, six reviewed baselines, and six local-only
+  current-product comparisons promote the sampled permission/mode paths while
+  leaving custom policy, persistence, unavailable modes, and other host-owned
+  variants partial.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
@@ -1018,6 +1024,12 @@ without confusing package readiness with full product reconstruction.
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
    resources, multiline/long-input geometry, active Goal/Plan modes, and the
    sampled long-thread navigation/windowing contract are also delivered. The
+   `26.825.51511` Composer-control refresh replaces the older permission/mode
+   anchor with the 438.6875×161.6875 three-item permission overlay, ordinary
+   `menuitem` semantics, exact current permission/check and Goal/Plan SVGs,
+   wide/compact geometry, selection/dismissal, clear, and focus restoration.
+   Six reviewed frames and six local-only product comparisons gate the slice.
+   The
    current Plan-writing follow-up additionally locks schema-valid
    `turn/plan/updated` ownership, `Step n / total`, the variable-height tooltip,
    progress, completion removal, and Worked/final-answer ordering across CDP,

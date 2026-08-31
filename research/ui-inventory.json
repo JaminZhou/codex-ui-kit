@@ -787,11 +787,12 @@
         "cdp:permission-menu-four-modes",
         "cdp-26.721.81911:ask-approve-full-custom-permission-menu",
         "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222",
-        "cdp-26.820.60940:ask-approve-full-three-mode-menu-476x175-and-ask-risk-boundary"
+        "cdp-26.820.60940:ask-approve-full-three-mode-menu-476x175-and-ask-risk-boundary",
+        "cdp-26.825.51511:ask-approve-full-three-mode-menu-438.6875x161.6875-plain-menuitems-current-icons-and-focus"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -809,11 +810,12 @@
         "cdp:model-effort-speed-menu",
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
         "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus",
-        "cdp-26.820.60940:goal-736x134-688x134-plan-736x98-688x98-active-mode-placeholder-clear-focus"
+        "cdp-26.820.60940:goal-736x134-688x134-plan-736x98-688x98-active-mode-placeholder-clear-focus",
+        "cdp-26.825.51511:goal-plan-exact-current-glyphs-wide-compact-geometry-placeholder-clear-and-focus"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

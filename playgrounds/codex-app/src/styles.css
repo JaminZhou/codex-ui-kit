@@ -1158,6 +1158,41 @@ textarea {
   width: auto;
 }
 
+.demo-root[data-current-composer-controls-26-825]
+  .demo-workspace-start
+  .demo-composer-controls
+  .demo-composer-permission-trigger {
+  flex-basis: 105.0625px;
+  padding-inline: 8px;
+  width: 105.0625px;
+}
+
+.demo-root[data-current-composer-controls-26-825]
+  .demo-workspace-start
+  .demo-composer-controls
+  > .codex-ui-composer-mode {
+  flex: 0 0 auto;
+  margin-left: 6px;
+  padding-inline: 8px;
+  width: auto;
+}
+
+.demo-root[data-current-composer-controls-26-825][data-composer-mode="goal"]
+  .demo-workspace-start
+  .codex-ui-composer,
+.demo-root[data-current-composer-controls-26-825][data-composer-mode="goal"]
+  .demo-workspace-start
+  .codex-ui-composer__fieldset {
+  height: 134px;
+  min-height: 134px;
+}
+
+.demo-root[data-current-composer-controls-26-825][data-composer-mode="goal"]
+  .demo-workspace-start
+  .codex-ui-composer__toolbar {
+  margin-top: 36px;
+}
+
 .demo-root[data-current-context-26-825] .demo-workspace-project-dialog,
 .demo-workspace-context-menu--current-26-825 {
   backdrop-filter: blur(8px);

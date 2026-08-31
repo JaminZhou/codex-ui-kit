@@ -10531,6 +10531,212 @@ try {
   await currentContext26825CompactApp.close();
 }
 
+const currentComposerPermission26825Scene = {
+  currentSidebar: true,
+  frame: "workspace-composer-current-26-825-permissions",
+  id: "electron-workspace-composer-current-26-825-permissions",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "workspace",
+};
+const {
+  app: currentComposerPermission26825App,
+  page: currentComposerPermission26825Page,
+} = await launchScene(currentComposerPermission26825Scene, { capture: false });
+try {
+  const nativeBounds = await currentComposerPermission26825App.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  const permissionContract =
+    await currentComposerPermission26825Page.evaluate(() => {
+      const menu = document.querySelector(
+        ".codex-ui-composer-permission-menu--current-26-825",
+      );
+      const value = menu?.getBoundingClientRect();
+      const style = menu ? getComputedStyle(menu) : null;
+      const items = Array.from(menu?.querySelectorAll('[role="menuitem"]') ?? []);
+      return {
+        checked: items.map((item) => item.getAttribute("aria-checked")),
+        height: value?.height,
+        itemHeights: items.map(
+          (item) => item.getBoundingClientRect().height,
+        ),
+        labels: items.map((item) => item.textContent?.trim()),
+        left: value?.left,
+        selectedCount: items.filter((item) =>
+          item.hasAttribute("data-selected"),
+        ).length,
+        style: style
+          ? {
+              backdropFilter: style.backdropFilter,
+              borderRadius: style.borderRadius,
+              padding: style.padding,
+            }
+          : null,
+        top: value?.top,
+        width: value?.width,
+      };
+    });
+  if (
+    nativeBounds?.width !== 1180 ||
+    nativeBounds?.height !== 820 ||
+    Math.abs(permissionContract.left - 424.9375) > 1 ||
+    Math.abs(permissionContract.top - 604.8125) > 1 ||
+    Math.abs(permissionContract.width - 438.6875) > 1 ||
+    Math.abs(permissionContract.height - 161.6875) > 1 ||
+    permissionContract.style?.backdropFilter !== "blur(8px)" ||
+    permissionContract.style?.borderRadius !== "20px" ||
+    permissionContract.style?.padding !== "4px" ||
+    permissionContract.checked.some((value) => value !== null) ||
+    permissionContract.selectedCount !== 1 ||
+    permissionContract.itemHeights.some(
+      (height) => Math.abs(height - 42.5625) > 1,
+    ) ||
+    permissionContract.labels.length !== 3 ||
+    !permissionContract.labels[0]?.includes("Ask for approval") ||
+    !permissionContract.labels[2]?.includes("Full access")
+  ) {
+    throw new Error(
+      `Electron current 26.825 permission menu failed: ${JSON.stringify(permissionContract)}.`,
+    );
+  }
+  await currentComposerPermission26825Page
+    .getByRole("menuitem", { name: /Ask for approval/ })
+    .click();
+  await currentComposerPermission26825Page.waitForSelector(
+    '.demo-root[data-frame="workspace-composer-current-26-825-ready"]:not([data-composer-overlay])',
+  );
+  const permissionTrigger = currentComposerPermission26825Page.getByRole(
+    "button",
+    { name: "Change permissions" },
+  );
+  const selectedPermissionText = (
+    await permissionTrigger.textContent()
+  )?.trim();
+  if (selectedPermissionText !== "Ask for approval") {
+    throw new Error(
+      `Electron current 26.825 permission selection failed: ${JSON.stringify(selectedPermissionText)}.`,
+    );
+  }
+  await permissionTrigger.click();
+  await currentComposerPermission26825Page.getByRole("menu").press("Escape");
+  await currentComposerPermission26825Page.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Change permissions",
+  );
+} finally {
+  await currentComposerPermission26825App.close();
+}
+
+for (const currentComposerMode26825 of [
+  {
+    frame: "workspace-composer-current-26-825-goal",
+    inputLabel:
+      "Describe your goal, define measurable outcomes for best results",
+    kind: "goal",
+    label: "Clear goal",
+    pathCount: 3,
+    surfaceTop: 530,
+    surfaceHeight: 134,
+    viewBox: "0 0 20 20",
+  },
+  {
+    frame: "workspace-composer-current-26-825-plan",
+    inputLabel: "Describe your task to generate a plan...",
+    kind: "plan",
+    label: "Plan",
+    pathCount: 6,
+    surfaceTop: 566,
+    surfaceHeight: 98,
+    viewBox: "0 0 16 16",
+  },
+]) {
+  const { app, page } = await launchScene(
+    {
+      currentSidebar: true,
+      frame: currentComposerMode26825.frame,
+      id: `electron-${currentComposerMode26825.frame}-compact`,
+      scenario: "workspace-workflow",
+      sidebarState: "compact-collapsed",
+      theme: "dark",
+      view: "workspace",
+      windowSize: { height: 680, width: 720 },
+    },
+    { capture: false },
+  );
+  try {
+    const nativeBounds = await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const modeContract = await page.evaluate(() => {
+      const measure = (selector) => {
+        const element = document.querySelector(selector);
+        const value = element?.getBoundingClientRect();
+        return value
+          ? {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            }
+          : null;
+      };
+      const mode = document.querySelector(
+        ".demo-workspace-start .codex-ui-composer-mode",
+      );
+      return {
+        input: measure(".demo-workspace-start .codex-ui-composer__input"),
+        inputLabel: document
+          .querySelector(".demo-workspace-start .codex-ui-composer__input")
+          ?.getAttribute("aria-label"),
+        mode: measure(".demo-workspace-start .codex-ui-composer-mode"),
+        modeKind: mode?.getAttribute("data-kind"),
+        pathCount: mode?.querySelectorAll("svg path").length,
+        surface: measure(".demo-workspace-start .codex-ui-composer"),
+        viewBox: mode?.querySelector("svg")?.getAttribute("viewBox"),
+      };
+    });
+    if (
+      nativeBounds?.width !== 720 ||
+      nativeBounds?.height !== 680 ||
+      modeContract.inputLabel !== currentComposerMode26825.inputLabel ||
+      modeContract.modeKind !== currentComposerMode26825.kind ||
+      modeContract.pathCount !== currentComposerMode26825.pathCount ||
+      modeContract.viewBox !== currentComposerMode26825.viewBox ||
+      Math.abs(modeContract.surface?.left - 16) > 1 ||
+      Math.abs(
+        modeContract.surface?.top - currentComposerMode26825.surfaceTop,
+      ) > 1 ||
+      Math.abs(modeContract.surface?.width - 688) > 1 ||
+      Math.abs(
+        modeContract.surface?.height - currentComposerMode26825.surfaceHeight,
+      ) > 1 ||
+      Math.abs(modeContract.input?.left - 16) > 1 ||
+      Math.abs(modeContract.input?.width - 688) > 1 ||
+      Math.abs(modeContract.input?.height - 44) > 1 ||
+      Math.abs(modeContract.mode?.left - 173.0625) > 1 ||
+      Math.abs(modeContract.mode?.top - 628) > 1 ||
+      Math.abs(modeContract.mode?.height - 28) > 1
+    ) {
+      throw new Error(
+        `Electron current 26.825 ${currentComposerMode26825.kind} mode failed: ${JSON.stringify(modeContract)}.`,
+      );
+    }
+    await page
+      .getByRole("button", { name: currentComposerMode26825.label })
+      .click();
+    await page.waitForSelector(
+      '.demo-root[data-frame="workspace-composer-current-26-825-ready"]:not([data-composer-mode])',
+    );
+    await page.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "Do anything",
+    );
+  } finally {
+    await app.close();
+  }
+}
+
 const currentCheckoutGitDirectory = await mkdtemp(
   join(tmpdir(), "codex-ui-kit-electron-current-checkout-"),
 );
