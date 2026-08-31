@@ -4216,8 +4216,42 @@ textarea {
   --codex-ui-user-message-max-width: 70%;
 }
 
-.demo-root[data-frame="conversation-thinking-current-26-825"] {
+.demo-root[data-frame="conversation-thinking-current-26-825"],
+.demo-root[data-scenario="current-reasoning-26-825"] {
   -webkit-font-smoothing: antialiased;
+}
+
+.demo-root[data-scenario="current-reasoning-26-825"] {
+  --codex-ui-user-message-compact-max-width: 70%;
+  --codex-ui-user-message-max-width: 70%;
+}
+
+.demo-root[data-scenario="current-reasoning-26-825"]
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  background: #2d2d2d;
+  border-radius: 22px;
+  line-height: 22px;
+  padding: 10px 16px 13px;
+  white-space: pre-wrap;
+}
+
+.demo-root[data-scenario="current-reasoning-26-825"]
+  :is(.codex-ui-activity-timeline__toggle, .codex-ui-turn-duration) {
+  color: oklab(0.903646 0.0000412762 0.0000180602 / 0.6);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.demo-root[data-frame="conversation-reasoning-summary-current-26-825"]
+  .codex-ui-activity-timeline__toggle-row {
+  gap: 6px;
+}
+
+.demo-root[data-frame="conversation-reasoning-summary-current-26-825"]
+  .codex-ui-thread-thinking {
+  margin-top: 4px;
 }
 
 .demo-root[data-scenario^="command-current-26-8"],

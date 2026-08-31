@@ -115,6 +115,34 @@ describe("protocol lifecycle reducer", () => {
     expect(lateUpdate.plan).toEqual([]);
   });
 
+  it("replays current pure reasoning from summary to a tool-free completion", () => {
+    const scenario = replayScenarios["current-reasoning-26-825"];
+    const running = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["conversation-reasoning-summary-current-26-825"],
+      ),
+    );
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "conversation-reasoning-current-26-825-completed": 5,
+      "conversation-reasoning-summary-current-26-825": 2,
+    });
+    expect(running.status).toBe("running");
+    expect(running.messages).toHaveLength(1);
+    expect(running.commands).toHaveLength(0);
+    expect(running.mcpToolCalls).toHaveLength(0);
+    expect(completed.status).toBe("completed");
+    expect(completed.turnDurationMs).toBe(14_000);
+    expect(completed.messages.at(-1)).toEqual(
+      expect.objectContaining({
+        id: "assistant-current-reasoning-26-825",
+        status: "completed",
+      }),
+    );
+  });
+
   it("replays the current fixed basic turn to a clean completion", () => {
     const scenario = replayScenarios["current-basic-message"];
     const completed = reduceProtocolTrace(scenario.events);

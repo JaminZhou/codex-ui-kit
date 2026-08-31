@@ -3506,6 +3506,8 @@ export function App() {
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentPlan26825Replay =
     mode === "replay" && scenarioId === "current-plan-26-825";
+  const isCurrentReasoning26825Replay =
+    mode === "replay" && scenarioId === "current-reasoning-26-825";
   const isCurrentSearch26825Replay =
     mode === "replay" && scenarioId === "current-search-26-825";
   const isCurrentReviewFilesReplay =
@@ -5803,6 +5805,7 @@ export function App() {
       ? isTurnActive(liveState.status)
       : (isConversationLifecycle && replayComposerRunning) ||
         (isCurrentPlan26825Replay && state.status === "running") ||
+        (isCurrentReasoning26825Replay && state.status === "running") ||
         (isCurrentTransportRecoveryReplay && isTurnActive(state.status)) ||
         ((isCurrentCommandInterruptionReplay ||
           isCurrentCommandReplay ||
@@ -5917,6 +5920,7 @@ export function App() {
       isCurrentBrowser26825Replay ||
       isCurrentCitations26825Replay ||
       isCurrentPlan26825Replay ||
+      isCurrentReasoning26825Replay ||
       isCurrentSearch26825Replay ||
       isCurrentMarkdown26818Replay ||
       isCurrentMarkdown26825Replay ||
@@ -6424,6 +6428,7 @@ export function App() {
       isCurrentBrowser26825Replay ||
       isCurrentCitations26825Replay ||
       isCurrentPlan26825Replay ||
+      isCurrentReasoning26825Replay ||
       isCurrentSearch26825Replay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay);
@@ -11119,6 +11124,14 @@ export function App() {
               }
             />
           ) : null}
+          {isCurrentReasoning26825Replay &&
+          message.id === "assistant-current-reasoning-26-825" ? (
+            <ActivityTimeline
+              className="demo-current-reasoning-26-825__duration"
+              data-testid="current-reasoning-duration"
+              summary={<TurnDuration durationMs={14_000} status="worked" />}
+            />
+          ) : null}
           {isCurrentCitations26825Replay &&
           message.id === "assistant-current-citations-26-825" ? (
             <ActivityTimeline
@@ -13856,6 +13869,17 @@ export function App() {
                   />
                 ) : null}
 
+                {isCurrentReasoning26825Replay &&
+                state.status === "running" ? (
+                  <ActivityTimeline
+                    className="demo-current-reasoning-26-825__duration"
+                    data-testid="current-reasoning-duration"
+                    summary={
+                      <TurnDuration durationMs={19_000} status="working" />
+                    }
+                  />
+                ) : null}
+
                 {isCurrentCommandInterruptionReplay &&
                 activeFrame === "command-interruption-stopping" ? (
                   <TerminalProcessList
@@ -13924,7 +13948,13 @@ export function App() {
                     status === "running" &&
                     turnId === state.currentTurnId,
                 ) ? (
-                  <ThreadThinkingPlaceholder />
+                  <ThreadThinkingPlaceholder
+                    label={
+                      isCurrentReasoning26825Replay
+                        ? "Defining evidence categories and priorities"
+                        : undefined
+                    }
+                  />
                 ) : null}
 
               </AgentTurn>

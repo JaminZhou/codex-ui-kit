@@ -265,7 +265,11 @@
       "packageEvidence": [
         "is-plan-event-enabled",
         "plan-summary-page",
-        "composer-plan-progress"
+        "composer-plan-progress",
+        "replay:current-26.825-pure-reasoning-summary-and-completion",
+        "browser-cdp:current-26.825-reasoning-summary-worked-final-answer",
+        "electron:current-26.825-native-reasoning-summary-and-completion",
+        "pixel:current-26.825-reasoning-summary-foreground"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -273,11 +277,12 @@
         "cdp:worked-activity-group-disclosure",
         "cdp-26.825.31414:real-no-tool-and-terminal-thinking-cadence-worked-for-disclosure-and-ran-row",
         "cdp-26.825.31414:real-three-five-eight-ten-step-plan-writing-progress-tooltip-and-completion-removal",
-        "cdp-26.825.51511:real-read-only-eight-step-plan-step-five-hover-card-completion-removal-and-settled-answer-with-semantic-drift"
+        "cdp-26.825.51511:real-read-only-eight-step-plan-step-five-hover-card-completion-removal-and-settled-answer-with-semantic-drift",
+        "cdp-26.825.51511:real-no-tool-thinking-generated-summary-worked-for-14s-and-final-answer"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

@@ -64,8 +64,13 @@ exit gates; it does not replace the inventory.
   reaches `Step 5 / 8`, opens the eight-row 95.578125×200px hover card, removes
   the chip after completion, and settles cleanly. Its local-only product
   comparison passes at 3.5294%; the replay deliberately retains button and
-  tooltip semantics absent from the sampled product. Current generic reasoning
-  remains unsampled, so the combined group stays partial.
+  tooltip semantics absent from the sampled product. A separate current
+  no-tool turn now covers the generated `Defining evidence categories and
+  priorities` shimmer summary, a sampled `Worked for 14s` completion, and the
+  final answer with zero command/MCP rows. CDP and native Electron gate both
+  frames. The tight product crop is pixel-identical at 0% difference and the
+  wider prompt/activity/summary region passes at 3.3389%.
+  Unsampled reasoning variants keep the combined implementation partial.
 - The current thirty-turn follow-up refreshes timeline virtualization and
   message navigation across 1180×820 and 720×680. It locks 12/9 mounted turns,
   the viewport-derived message-11 rail marker, compact rail suppression, and
@@ -119,9 +124,13 @@ exit gates; it does not replace the inventory.
   revalidation supersedes that sampled Plan runtime with one real eight-step
   read-only audit, exact Step 5/8 and completion states, and a 3.5294%
   foreground product comparison. Browser/CDP and Electron retain the active,
-  expanded, progress, all-complete, and settled contracts. Free-form reasoning
-  and unsampled reasoning variants remain P0 work, so the combined inventory
-  group stays partial.
+  expanded, progress, all-complete, and settled contracts. The current
+  free-form no-tool probe additionally reaches `Thinking`, a generated
+  reasoning summary, `Worked for 14s`, and the final answer; its CDP/Electron
+  contracts prove zero tool rows; its foreground comparison is 0% and its
+  wider product-region comparison is 3.3389%.
+  Unsampled reasoning variants remain P0 work, so the combined implementation
+  stays partial while its sampled current Browser/Electron status is verified.
   A further read-only probe originally covered
   `thread.search-tool-events`, `thread.browser-tool-events`, and
   `workspace.browser`. Web Search is now refreshed on 26.825.51511 with the
@@ -1108,8 +1117,11 @@ without confusing package readiness with full product reconstruction.
    current Plan-writing follow-up additionally locks schema-valid
    `turn/plan/updated` ownership, `Step n / total`, the variable-height tooltip,
    progress, completion removal, and Worked/final-answer ordering across CDP,
-   Electron, reviewed pixels, and a local-only current-product crop. Broader
-   reasoning remains partial. The
+   Electron, reviewed pixels, and a local-only current-product crop. Current
+   free-form reasoning now also locks a no-tool generated summary and a
+   `Worked for 14s` settled answer across CDP, Electron, a pixel-identical
+   foreground crop, and a 3.3389% wider region; unsampled reasoning variants
+   remain partial. The
    previous `26.820.60940` refresh replaces the old runtime anchor with the
    sampled four-item/48px rail gates, 30-message responsive composition,
    11/9/8 mounted-turn windows, message materialization, stale-current-marker

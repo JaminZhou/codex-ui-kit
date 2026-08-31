@@ -258,6 +258,12 @@ describe("complete thread surfaces", () => {
         '.codex-ui-loading-shimmer__sweep[aria-hidden="true"] .codex-ui-loading-shimmer__highlight',
       ),
     ).toHaveLength(1);
+    rerender(
+      <ThreadThinkingPlaceholder label="Defining evidence categories and priorities" />,
+    );
+    expect(screen.getByRole("status").textContent).toContain(
+      "Defining evidence categories and priorities",
+    );
     rerender(<ThreadSkeleton lines={4} />);
     expect(screen.getByRole("status", { name: "Loading thread" })).toBeTruthy();
     expect(document.querySelectorAll(".codex-ui-thread-skeleton__line")).toHaveLength(4);
