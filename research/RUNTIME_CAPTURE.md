@@ -1174,6 +1174,39 @@ raw captures recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-current-mcp.4ct2le-20260831`. The
 user-owned Codex PID `21152` remained running.
 
+### 26.825.51511 Browser failure and Composer recovery capture
+
+The Browser-only follow-up used exact isolated PID `70709`, loopback-only CDP
+port `9892`, and unique profile
+`/private/tmp/codex-ui-kit-browser-26-825-20260901`. The running app matched
+version `26.825.51511` (`7377`). The main user-owned Codex PID `13503` was
+excluded from every capture and cleanup action.
+
+The first prompt requested only Browser open/find against the public Codex URL
+and naturally settled after 3m46s with
+`错误：Browser 启动失败，缺少 Playwright Chromium 可执行文件。`. A second
+same-thread prompt placed the exact URL on its own line and naturally settled
+after 27s with `Browser error: Unsupported browser service request.`. This
+rules out the first prompt's inline punctuation as the cause, but does not
+establish whether the missing executable and unsupported-service responses
+share one underlying failure.
+
+CDP recorded 1180×820 and emulated 720×820 terminal geometry and computed
+styles. The settled interface hides the failed tool-call rows, shows no
+Browser workspace, removes Stop, exposes four normal response actions, and
+restores writable 736/688×98 Composers. The public two-turn trace retains the
+failed calls in protocol state. Three deterministic CDP frames, three native
+Electron variants, and three reviewed baselines cover both errors and compact
+recovery. Optional local-only product comparisons pass at 1.9864%/1.0800%
+wide content/Composer and 3.1108%/1.4832% compact.
+
+Cleanup terminated only validated isolated PID `70709`, verified port `9892`
+closed, and moved the unique profile plus screenshots recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-browser-26-825-20260901-9892-evidence`.
+PID `13503` remained running. This capture promotes only the sampled current
+unavailable-tool recovery; successful Browser activity/workspace and external
+page states remain previous-build or unsampled evidence.
+
 ### 26.810.52044 MCP success, failure, and reconnect capture
 
 The refresh used exact main PID `15575`, loopback-only CDP port `9841`, and

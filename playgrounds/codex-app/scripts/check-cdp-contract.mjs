@@ -60,6 +60,7 @@ const currentReplayComposerScenarios = new Set([
   "current-basic-message",
   "current-basic-message-26-825",
   "current-browser-26-825",
+  "current-browser-26-825-failure",
   "current-citations-26-825",
   "current-mixed-tool-thread",
   "current-plan-26-825",
@@ -4608,6 +4609,7 @@ for (const scene of selectedScenes) {
                   scene.scenario === "current-plan-26-825" ||
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
+                  scene.scenario === "current-browser-26-825-failure" ||
                   scene.scenario === "current-citations-26-825" ||
                   scene.scenario === "current-review-26-825-files" ||
                   scene.scenario === "markdown-current-26-825" ||
@@ -12168,6 +12170,7 @@ for (const scene of selectedScenes) {
     const expectedSidebarWidth =
       scene.scenario === "current-search-26-825" ||
       scene.scenario === "current-browser-26-825" ||
+      scene.scenario === "current-browser-26-825-failure" ||
       scene.scenario === "markdown-current-26-825" ||
       scene.scenario === "markdown-current-26-825-media" ||
       scene.scenario === "markdown-streaming-large" ||
@@ -13306,6 +13309,179 @@ for (const scene of selectedScenes) {
           `${scene.id}-current-search-browser.json`,
         ),
         `${JSON.stringify(currentSearchBrowser, null, 2)}\n`,
+      );
+    }
+    if (scene.scenario === "current-browser-26-825-failure") {
+      const browserFailure = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                bottom: value.bottom,
+                height: value.height,
+                left: value.left,
+                top: value.top,
+                width: value.width,
+              }
+            : null;
+        };
+        const style = (element) => {
+          if (!element) return null;
+          const value = getComputedStyle(element);
+          return {
+            fontFamily: value.fontFamily,
+            fontSize: value.fontSize,
+            fontWeight: value.fontWeight,
+            lineHeight: value.lineHeight,
+            whiteSpace: value.whiteSpace,
+          };
+        };
+        const message = (id) => {
+          const root = document.querySelector(`[data-item-id="${id}"]`);
+          const content = root?.querySelector(
+            ".codex-ui-agent-message__content",
+          );
+          const paragraph = root?.querySelector(".codex-ui-markdown p");
+          return root
+            ? {
+                actions: Array.from(
+                  root.querySelectorAll(
+                    ".demo-turn-actions [data-current-build-icon]",
+                  ),
+                  (icon) =>
+                    icon.getAttribute("data-current-build-icon"),
+                ),
+                content: rect(content),
+                paragraph: rect(paragraph),
+                style: style(paragraph ?? content),
+                text: paragraph?.textContent?.trim() ??
+                  content?.textContent?.trim() ??
+                  null,
+              }
+            : null;
+        };
+        const duration = (suffix) => {
+          const root = document.querySelector(
+            `[data-testid="current-browser-failure-duration-${suffix}"]`,
+          );
+          const label = root?.querySelector(".codex-ui-turn-duration");
+          return root
+            ? {
+                rect: rect(label),
+                style: style(label),
+                text: root.textContent?.trim() ?? null,
+              }
+            : null;
+        };
+        const composer = document.querySelector(".codex-ui-composer");
+        return {
+          browserWorkspace: Boolean(
+            document.querySelector(
+              '[data-testid="current-browser-workspace"]',
+            ),
+          ),
+          chromiumDuration: duration("chromium"),
+          chromiumError: message(
+            "assistant-current-browser-26-825-chromium-error",
+          ),
+          composer: rect(composer),
+          composerPhase: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-composer-phase"),
+          mcpGroupCount: document.querySelectorAll(
+            ".codex-ui-mcp-tool-call-group",
+          ).length,
+          status: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-status"),
+          stopButton: Boolean(
+            document.querySelector('button[aria-label="Stop"]'),
+          ),
+          unsupportedDuration: duration("unsupported"),
+          unsupportedError: message(
+            "assistant-current-browser-26-825-unsupported-error",
+          ),
+          unsupportedUser: message(
+            "user-current-browser-26-825-unsupported-error",
+          ),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const unsupported = scene.id.includes("unsupported-error");
+      const compact = scene.id.endsWith("-compact");
+      const expectedActions = [
+        "thread-assistant-copy",
+        "thread-assistant-good",
+        "thread-assistant-bad",
+        "thread-assistant-fork",
+      ];
+      const chromiumStyle = browserFailure.chromiumError?.style;
+      const chromiumDurationStyle =
+        browserFailure.chromiumDuration?.style;
+      if (
+        browserFailure.status !== "completed" ||
+        browserFailure.stopButton ||
+        browserFailure.browserWorkspace ||
+        browserFailure.mcpGroupCount !== 0 ||
+        ![null, "idle"].includes(browserFailure.composerPhase) ||
+        browserFailure.chromiumDuration?.text !== "Worked for 3m 46s" ||
+        browserFailure.chromiumError?.text !==
+          "错误：Browser 启动失败，缺少 Playwright Chromium 可执行文件。" ||
+        JSON.stringify(browserFailure.chromiumError?.actions) !==
+          JSON.stringify(expectedActions) ||
+        chromiumStyle?.fontSize !== "14px" ||
+        chromiumStyle?.fontWeight !== "400" ||
+        chromiumStyle?.lineHeight !== "22.75px" ||
+        chromiumDurationStyle?.fontSize !== "14px" ||
+        chromiumDurationStyle?.fontWeight !== "400" ||
+        chromiumDurationStyle?.lineHeight !== "21px" ||
+        !browserFailure.composer ||
+        Math.abs(browserFailure.composer.top - 706) > 0.1 ||
+        Math.abs(browserFailure.composer.height - 98) > 0.1
+      ) {
+        throw new Error(
+          `${scene.id}: current Browser Chromium failure contract failed: ${JSON.stringify(browserFailure)}`,
+        );
+      }
+      if (
+        unsupported &&
+        (browserFailure.unsupportedDuration?.text !== "Worked for 27s" ||
+          browserFailure.unsupportedError?.text !==
+            "Browser error: Unsupported browser service request." ||
+          JSON.stringify(browserFailure.unsupportedError?.actions) !==
+            JSON.stringify(expectedActions) ||
+          browserFailure.unsupportedError?.style?.fontSize !== "14px" ||
+          browserFailure.unsupportedError?.style?.fontWeight !== "400" ||
+          browserFailure.unsupportedError?.style?.lineHeight !== "22.75px" ||
+          browserFailure.unsupportedUser?.style?.whiteSpace !== "pre-wrap" ||
+          !browserFailure.unsupportedUser?.text?.includes(
+            "https://openai.com/codex/",
+          ) ||
+          !browserFailure.unsupportedError?.paragraph ||
+          Math.abs(
+            browserFailure.unsupportedError.paragraph.left -
+              (compact ? 16 : 383.453125),
+          ) > 0.1 ||
+          Math.abs(
+            browserFailure.unsupportedError.paragraph.top -
+              (compact ? 438.25 : 413.25),
+          ) > 2 ||
+          Math.abs(
+            browserFailure.composer.left -
+              (compact ? 16 : 383.453125),
+          ) > 0.1 ||
+          Math.abs(
+            browserFailure.composer.width - (compact ? 688 : 736),
+          ) > 0.1)
+      ) {
+        throw new Error(
+          `${scene.id}: current Browser unsupported-service recovery contract failed: ${JSON.stringify(browserFailure)}`,
+        );
+      }
+      contract.browserFailure = browserFailure;
+      await writeFile(
+        join(artifactDirectory, `${scene.id}-browser-failure.json`),
+        `${JSON.stringify(browserFailure, null, 2)}\n`,
       );
     }
     if (scene.surfaces?.includes("bottomPanel")) {

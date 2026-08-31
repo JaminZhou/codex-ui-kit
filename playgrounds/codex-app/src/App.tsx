@@ -1733,6 +1733,46 @@ function McpResponseActions({
   );
 }
 
+function CurrentBrowserFailureLink() {
+  return (
+    <span className="demo-current-browser-failure-link">
+      <svg aria-hidden="true" viewBox="0 0 16 16">
+        <circle cx="8" cy="8" r="6.25" />
+        <path d="M1.75 8h12.5M8 1.75c1.75 1.68 2.63 3.76 2.63 6.25S9.75 12.57 8 14.25C6.25 12.57 5.38 10.49 5.38 8S6.25 3.43 8 1.75Z" />
+      </svg>
+      <a href="https://openai.com/codex/">https://openai.com/codex/</a>
+    </span>
+  );
+}
+
+function CurrentBrowserFailurePrompt({ retry = false }: { retry?: boolean }) {
+  if (!retry) {
+    return (
+      <>
+        {"不要读取或修改本地文件，不要运行命令，不要使用 Web Search。仅使用 Browser 工具：打开 "}
+        <CurrentBrowserFailureLink />
+        {"，在页面中查找文本 desktop，然后只回复 BROWSER OPEN FIND DONE。若 Browser 失败，请明确返回错误，不要改用其他工具。"}
+      </>
+    );
+  }
+  return (
+    <div className="demo-current-browser-failure-prompt">
+      <span>Do not read or modify local files.</span>
+      <span>Do not run commands.</span>
+      <span>Do not use Web Search.</span>
+      <span>Use only the Browser tool.</span>
+      <span>Open this exact URL:</span>
+      <CurrentBrowserFailureLink />
+      <span>Find the text desktop in the page.</span>
+      <span>Reply only BROWSER OPEN FIND DONE.</span>
+      <span>
+        If Browser fails, report the Browser error and do not use any other
+        tool.
+      </span>
+    </div>
+  );
+}
+
 // Public source: https://openai.com/favicon.ico, captured from the current
 // Codex external-link renderer so visual acceptance stays deterministic.
 const currentMarkdownOpenAiFavicon =
@@ -3479,6 +3519,8 @@ export function App() {
     isCurrentBasicMessageReplay || isCurrentBasic26825Replay;
   const isCurrentBrowser26825Replay =
     mode === "replay" && scenarioId === "current-browser-26-825";
+  const isCurrentBrowserFailure26825Replay =
+    mode === "replay" && scenarioId === "current-browser-26-825-failure";
   const isCurrentCitations26825Replay =
     mode === "replay" && scenarioId === "current-citations-26-825";
   const isCurrentPullRequestReviewReplay =
@@ -3510,6 +3552,12 @@ export function App() {
     mode === "replay" && scenarioId === "current-reasoning-26-825";
   const isCurrentSearch26825Replay =
     mode === "replay" && scenarioId === "current-search-26-825";
+  const usesCurrent322SidebarWidth =
+    isCurrentBrowser26825Replay ||
+    isCurrentBrowserFailure26825Replay ||
+    isCurrentSearch26825Replay ||
+    isCurrentMarkdown26825Replay ||
+    isCurrentMarkdown26825MediaReplay;
   const isCurrentReviewFilesReplay =
     mode === "replay" && scenarioId === "current-review-files";
   const isCurrentReviewRenameReplay =
@@ -5918,6 +5966,7 @@ export function App() {
       scenarioId === "context-summary" ||
       isAnyCurrentBasicMessageReplay ||
       isCurrentBrowser26825Replay ||
+      isCurrentBrowserFailure26825Replay ||
       isCurrentCitations26825Replay ||
       isCurrentPlan26825Replay ||
       isCurrentReasoning26825Replay ||
@@ -6426,6 +6475,7 @@ export function App() {
       scenarioId === "context-summary" ||
       isAnyCurrentBasicMessageReplay ||
       isCurrentBrowser26825Replay ||
+      isCurrentBrowserFailure26825Replay ||
       isCurrentCitations26825Replay ||
       isCurrentPlan26825Replay ||
       isCurrentReasoning26825Replay ||
@@ -11132,6 +11182,27 @@ export function App() {
               summary={<TurnDuration durationMs={14_000} status="worked" />}
             />
           ) : null}
+          {isCurrentBrowserFailure26825Replay &&
+          message.id.startsWith("assistant-current-browser-26-825-") ? (
+            <ActivityTimeline
+              className="demo-current-browser-26-825-failure__duration"
+              data-testid={`current-browser-failure-duration-${
+                message.id.endsWith("chromium-error")
+                  ? "chromium"
+                  : "unsupported"
+              }`}
+              summary={
+                <TurnDuration
+                  durationMs={
+                    message.id.endsWith("chromium-error")
+                      ? 226_000
+                      : 27_000
+                  }
+                  status="worked"
+                />
+              }
+            />
+          ) : null}
           {isCurrentCitations26825Replay &&
           message.id === "assistant-current-citations-26-825" ? (
             <ActivityTimeline
@@ -11218,6 +11289,10 @@ export function App() {
                 (isAnyCurrentBasicMessageReplay &&
                   (message.id === "assistant-current-basic" ||
                     message.id === "assistant-current-basic-26-825")) ||
+                (isCurrentBrowserFailure26825Replay &&
+                  message.id.startsWith(
+                    "assistant-current-browser-26-825-",
+                  )) ||
                 (isCurrentCitations26825Replay &&
                   message.id === "assistant-current-citations-26-825") ||
                 (scenarioId === "command-failure-recovery" &&
@@ -11250,6 +11325,7 @@ export function App() {
                 isAnyCurrentBasicMessageReplay ||
                 isCurrentCitations26825Replay ||
                 isCurrentMarkdown26818Replay ||
+                isCurrentBrowserFailure26825Replay ||
                 isCurrentMarkdown26820MediaReplay ||
                 isCurrentMarkdown26825MediaReplay ||
                 isCurrentMarkdown26825Replay ||
@@ -11260,6 +11336,7 @@ export function App() {
                       isAnyCurrentBasicMessageReplay ||
                       isCurrentCitations26825Replay ||
                       isCurrentMarkdown26818Replay ||
+                      isCurrentBrowserFailure26825Replay ||
                       isCurrentMarkdown26820MediaReplay ||
                       isCurrentMarkdown26825MediaReplay ||
                       usesCurrentMarkdown26825Presentation
@@ -11291,6 +11368,7 @@ export function App() {
                       !isAnyCurrentBasicMessageReplay &&
                       !isCurrentCitations26825Replay &&
                       !isCurrentMarkdown26818Replay &&
+                      !isCurrentBrowserFailure26825Replay &&
                       !isCurrentMarkdown26820MediaReplay &&
                       !isCurrentMarkdown26825MediaReplay &&
                       !usesCurrentMarkdown26825Presentation
@@ -11455,7 +11533,15 @@ export function App() {
                 </AgentMarkdown>
               )
             ) : (
-              submittedMessageText || null
+              message.id ===
+              "user-current-browser-26-825-chromium-error" ? (
+                <CurrentBrowserFailurePrompt />
+              ) : message.id ===
+                "user-current-browser-26-825-unsupported-error" ? (
+                <CurrentBrowserFailurePrompt retry />
+              ) : (
+                submittedMessageText || null
+              )
             )}
           </AgentMessage>
           {message.interruptionDurationMs !== undefined ? (
@@ -11619,6 +11705,7 @@ export function App() {
     if (entry.kind === "mcpToolCall") {
       const calls = mcpToolCallGroupForEntry(state, entryIndex);
       if (!calls) return null;
+      if (isCurrentBrowserFailure26825Replay) return null;
       const toolCall = calls[0];
       if (
         isCurrentBrowser26825Replay &&
@@ -13666,11 +13753,7 @@ export function App() {
           isCurrentCitations26825Replay ||
           isCurrentPullRequestRouteReplay
             ? 321.875
-            : currentHomeFrame ||
-                isCurrentBrowser26825Replay ||
-                isCurrentSearch26825Replay ||
-                isCurrentMarkdown26825Replay ||
-                isCurrentMarkdown26825MediaReplay
+            : currentHomeFrame || usesCurrent322SidebarWidth
               ? 322.90625
               : undefined
         }

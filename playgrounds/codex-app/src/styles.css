@@ -4244,6 +4244,107 @@ textarea {
   line-height: 21px;
 }
 
+.demo-root[data-scenario="current-browser-26-825-failure"] {
+  -webkit-font-smoothing: antialiased;
+  --codex-ui-conversation-thread-header-height: 2.9375rem;
+  --codex-ui-conversation-thread-assistant-actions-gap: 3.75px;
+  --codex-ui-user-message-compact-max-width: 68%;
+  --codex-ui-user-message-max-width: 66.25%;
+}
+
+.demo-root[data-scenario="current-browser-26-825-failure"],
+.demo-root[data-scenario="current-browser-26-825-failure"]
+  *:not(code):not(kbd):not(pre) {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-scenario="current-browser-26-825-failure"]
+  .codex-ui-agent-message
+  .codex-ui-agent-message__content {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+}
+
+.demo-root[data-scenario="current-browser-26-825-failure"]
+  .codex-ui-agent-message[data-role="assistant"]
+  .codex-ui-markdown
+  p {
+  line-height: 22.75px;
+}
+
+.demo-root[data-scenario="current-browser-26-825-failure"]
+  .codex-ui-agent-message[data-role="user"]
+  .codex-ui-agent-message__content {
+  background: rgba(50, 50, 50, 0.85);
+  border-radius: 22px;
+  padding: 10px 16px;
+  white-space: pre-wrap;
+}
+
+.demo-root[data-scenario="current-browser-26-825-failure"]
+  :is(.codex-ui-activity-timeline__toggle, .codex-ui-turn-duration) {
+  color: oklab(0.903646 0.0000412762 0.0000180602 / 0.6);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="current-browser-26-825-failure"]
+  .demo-turn-actions.demo-mcp-turn-actions {
+  gap: 2px;
+}
+
+.demo-current-browser-failure-prompt {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-current-browser-failure-link {
+  align-items: center;
+  display: inline-flex;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.demo-current-browser-failure-link svg {
+  fill: none;
+  flex: 0 0 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.1;
+  width: 16px;
+}
+
+.demo-current-browser-failure-link a {
+  color: #5b9ff4;
+  text-decoration: none;
+}
+
+.demo-root[data-frame="conversation-browser-current-26-825-unsupported-error"]
+  .codex-ui-conversation-thread-shell__thread {
+  padding-bottom: 335px;
+}
+
+.demo-root[data-frame="conversation-browser-current-26-825-unsupported-error"]
+  [data-item-id="user-current-browser-26-825-unsupported-error"] {
+  margin-top: -6px;
+}
+
+.demo-root[data-frame="conversation-browser-current-26-825-unsupported-error"]
+  [data-item-id="assistant-current-browser-26-825-unsupported-error"] {
+  position: relative;
+  top: 6px;
+}
+
+@media (min-width: 721px) {
+  .demo-root[data-frame="conversation-browser-current-26-825-unsupported-error"]
+    .codex-ui-conversation-thread-shell__thread {
+    padding-bottom: 361px;
+  }
+
+}
+
 .demo-root[data-frame="conversation-reasoning-summary-current-26-825"]
   .codex-ui-activity-timeline__toggle-row {
   gap: 6px;
@@ -5033,7 +5134,10 @@ textarea {
   width: 6.31640625rem;
 }
 
-.demo-root[data-scenario="current-browser-26-825"]
+.demo-root:is(
+    [data-scenario="current-browser-26-825"],
+    [data-scenario="current-browser-26-825-failure"]
+  )
   .demo-composer-controls
   .demo-composer-permission-trigger {
   justify-content: center;

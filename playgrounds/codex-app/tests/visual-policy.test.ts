@@ -148,6 +148,34 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the runtime-observed 26.825 Browser failure and Composer recovery", () => {
+    for (const scene of [
+      "conversation-browser-current-26-825-chromium-error",
+      "conversation-browser-current-26-825-unsupported-error",
+      "conversation-browser-current-26-825-unsupported-error-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_COMPACT_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      "current Browser unsupported-service recovery contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron current 26.825 Browser failure contract failed",
+    );
+    expect(appSource).toContain(
+      'scenarioId === "current-browser-26-825-failure"',
+    );
+    expect(appStyles).toContain(
+      '[data-scenario="current-browser-26-825-failure"]',
+    );
+  });
+
   it("gates the runtime-observed 26.825 project and run-location controls", () => {
     for (const scene of [
       "workspace-context-current-26-825-ready",

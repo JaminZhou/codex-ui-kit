@@ -53,6 +53,46 @@ describe("protocol lifecycle reducer", () => {
         readOnlyHint: true,
       }),
     ]);
+
+    const failureScenario =
+      replayScenarios["current-browser-26-825-failure"];
+    const failure = reduceProtocolTrace(failureScenario.events);
+    expect(failureScenario.frames).toEqual({
+      "conversation-browser-current-26-825-chromium-error": 6,
+      "conversation-browser-current-26-825-unsupported-error": 12,
+    });
+    expect(failure.mcpToolCalls).toEqual([
+      expect.objectContaining({
+        browserUse: true,
+        browserUrl: "https://openai.com/codex/",
+        error: "Browser 启动失败，缺少 Playwright Chromium 可执行文件。",
+        status: "failed",
+      }),
+      expect.objectContaining({
+        browserUse: true,
+        browserUrl: "https://openai.com/codex/",
+        error: "Unsupported browser service request.",
+        status: "failed",
+      }),
+    ]);
+    expect(failure.messages.map(({ id, text }) => ({ id, text }))).toEqual([
+      {
+        id: "user-current-browser-26-825-chromium-error",
+        text: "不要读取或修改本地文件，不要运行命令，不要使用 Web Search。仅使用 Browser 工具：打开 https://openai.com/codex/，在页面中查找文本 desktop，然后只回复 BROWSER OPEN FIND DONE。若 Browser 失败，请明确返回错误，不要改用其他工具。",
+      },
+      {
+        id: "assistant-current-browser-26-825-chromium-error",
+        text: "错误：Browser 启动失败，缺少 Playwright Chromium 可执行文件。",
+      },
+      {
+        id: "user-current-browser-26-825-unsupported-error",
+        text: expect.stringContaining("Open this exact URL:"),
+      },
+      {
+        id: "assistant-current-browser-26-825-unsupported-error",
+        text: "Browser error: Unsupported browser service request.",
+      },
+    ]);
   });
 
   it("tracks the current Plan updates only for the active turn", () => {

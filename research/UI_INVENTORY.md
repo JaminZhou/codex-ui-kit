@@ -67,8 +67,9 @@ observation from a previous build remains historical evidence.
   Explore is present and `Sites` is absent from the sampled fixed-route stack.
   Details are in
   [`26.825.51511.md`](26.825.51511.md). Rich Markdown streaming, Plan progress,
-  pure-reasoning cadence, long-thread navigation, and Web Search are current
-  on 26.825.51511; the Browser follow-up remains 26.825.31414 regression
+  pure-reasoning cadence, long-thread navigation, Web Search, and the sampled
+  Browser failure/recovery terminal path are current on 26.825.51511;
+  successful Browser activity and workspace remain 26.825.31414 regression
   evidence. The previous activity follow-up first re-observed the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
@@ -92,8 +93,15 @@ observation from a previous build remains historical evidence.
   local-only foreground comparison passes at 4.0506% under 5%. The previous
   26.825.31414 Browser probe retains the generic MCP-backed activity group and
   419.59375px one-tab workspace, with 8.45% activity and 2.80% chrome
-  comparisons. Two attempted 26.825.51511 Browser turns opened the public page
-  but did not settle after network reconnect, so Browser is not promoted.
+  comparisons. Two later 26.825.51511 Browser-only turns naturally settle as
+  `错误：Browser 启动失败，缺少 Playwright Chromium 可执行文件。` and
+  `Browser error: Unsupported browser service request.`. The current replay
+  locks their 3m46s/27s durations, terminal collapse, four response actions,
+  wide/720 geometry, and writable 736/688×98 Composer recovery through CDP,
+  Electron, and three reviewed baselines. Local-only product comparisons pass
+  at 1.9864%/1.0800% for wide content/Composer and 3.1108%/1.4832% for compact.
+  This promotes only the sampled unavailable-tool recovery; successful Browser
+  activity and workspace are not inferred from a failure path.
   External page content is explicitly source-owned and excluded. Multi-tab,
   authentication, download, permission, history, and page error states remain
   incomplete.
@@ -251,7 +259,7 @@ dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
 `Compacting context`, but the remote compact task failed and exposed Resume,
 so successful compaction/recovery remains previous-build evidence.
 
-Current inventory: 91 surface groups; 54 have current-build runtime evidence, 26 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 50 groups and Electron verification covers 50.
+Current inventory: 91 surface groups; 56 have current-build runtime evidence, 24 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 51 groups and Electron verification covers 51.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1115,7 +1123,8 @@ card or panel state. Seventeen exact current Review SVGs replace hand-drawn
 playground approximations; context-dependent computed layout styles are
 removed before replay while SVG paint and geometry remain exact.
 
-The protocol matrix is now 34 fixtures and 426 events. Browser/CDP and a real
+At that Review slice, the protocol matrix reached 34 fixtures and 426 events.
+Browser/CDP and a real
 Electron `BrowserWindow` drive the current Review controls, focus return,
 selection, responsive panel, and Undo failure. Three reviewed integrated
 baselines guard the file card, open workspace, and failure dialog frames. The
@@ -1295,10 +1304,13 @@ mismatch, input, picker, close, and resizing interactions. Against the exact
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
 MCP tool-event rows. `26.721.41059` CDP evidence previously verified completed
-web search and Browser activity in the Browser gate; both are now
-`partial_legacy`. The unsuccessful GitHub request is tracked separately as
-`thread.tool-unavailable-recovery`: it proves the visible assistant recovery
-message, not an MCP call. `BrowserActivity` supplies a protocol-neutral
+web search and Browser activity in the Browser gate. Web Search has since been
+refreshed; successful Browser activity remains `partial_legacy`. The current
+26.825.51511 Browser-only failure sample now promotes
+`thread.tool-unavailable-recovery`: it proves two naturally settled assistant
+errors, collapsed failed protocol calls, normal response actions, and restored
+Composer input, not a successful Browser call or workspace. `BrowserActivity`
+supplies a protocol-neutral
 completed/running/failed disclosure with ordered browser steps, and the
 Electron playground exercises that public component without claiming exact
 compact-window parity.
@@ -1310,6 +1322,12 @@ auto-follow/scroll position. Search, unavailable recovery, and failed-command
 geometry remain independent, so a passing plain assistant fallback cannot
 promote MCP tool rendering and a failed command cannot promote thread-level
 render/retry recovery.
+
+The added current Browser failure trace contributes 12 protocol events across
+two turns and three wide/compact lifecycle frames. The full deterministic
+matrix is now 57 fixtures, 641 events, and 370 Browser/CDP and reviewed-pixel
+scenes. Its optional current-product gates compare only owned conversation and
+Composer regions; public-page pixels remain source-owned and excluded.
 
 The original successful-MCP slice samples a real read-only
 `openaiDeveloperDocs` run on build `26.721.41059`. That build's CDP evidence
