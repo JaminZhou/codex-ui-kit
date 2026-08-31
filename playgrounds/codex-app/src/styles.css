@@ -2760,6 +2760,22 @@ textarea {
   margin-top: 8px;
 }
 
+.demo-root[data-scenario="command-current-26-825-failure"]
+  [data-item-id="assistant-command-current-26-825-failure"] {
+  margin-top: 8px;
+}
+
+.demo-root[data-scenario="command-current-26-825-failure"]
+  .codex-ui-activity-timeline {
+  transform: translateY(4px);
+}
+
+.demo-root[data-scenario="command-current-26-825-failure"]
+  [data-item-id="assistant-command-current-26-825-failure"]
+  .demo-turn-actions {
+  visibility: hidden;
+}
+
 .demo-root[data-scenario="interruption"] {
   --codex-ui-conversation-thread-content-top-inset: 1.0625rem;
 }

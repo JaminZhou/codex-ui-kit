@@ -33,7 +33,7 @@ const scenarios = [
   },
   {
     id: "failure",
-    marker: "CURRENT 26.820 COMMAND RECOVERY ACCEPTED",
+    marker: "CURRENT 26.825 COMMAND RECOVERY ACCEPTED",
     taskTitleSha256:
       process.env.CODEX_CURRENT_COMMAND_FAILURE_TASK_TITLE_SHA256,
     viewports: ["wide"],
@@ -331,7 +331,7 @@ try {
         .filter((element) => {
           const text = element.textContent?.replace(/\s+/g, " ").trim() ?? "";
           return (
-            text.includes("CURRENT 26.820") &&
+            /CURRENT 26\.(820|825)/.test(text) &&
             (text.startsWith("Ran ") ||
               text.startsWith("Background terminal stopped with "))
           );

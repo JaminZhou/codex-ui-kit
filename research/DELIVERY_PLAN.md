@@ -14,8 +14,15 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 47 groups have current-build runtime evidence, 33 have previous-build-only
+- 48 groups have current-build runtime evidence, 32 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current command-failure follow-up reaches a real exit-code-7 command and
+  an exact same-thread no-tool recovery. The Renderer keeps the failure as a
+  neutral `Ran …` row and hides stdout, stderr, Shell, and exit-code cards while
+  the protocol replay retains them. Three CDP frames, native Electron, three
+  reviewed baselines, and a 1.2761% unmasked activity-region comparison promote
+  `thread.command-failure-recovery` on 26.825; interruption and background
+  process management remain previous-build P0 evidence.
 - The current Plan follow-up confirms that simple ordinary and Plan-mode
   prompts can now settle without progress, while one complex read-only audit
   reaches `Step 5 / 8`, opens the eight-row 95.578125×200px hover card, removes
@@ -168,6 +175,14 @@ exit gates; it does not replace the inventory.
   output, response actions, Send recovery, and the 1180/720 native boundary.
   Two reviewed baselines and six local-only activity/Composer/header regions
   pass under independent 2.3%/1.2%/7% limits. Failure, interruption,
+  background-process, and direct Terminal-tab paths remain previous-build
+  work.
+  A second current command task now promotes
+  `thread.command-failure-recovery`: an exit-code-7 command settles as the
+  neutral `Worked for 15s` → `Ran …; exit 7` composition without visible raw
+  output or exit-code card, then accepts an exact no-tool recovery. Three CDP
+  frames, native Electron, three reviewed baselines, and an unmasked 1.2761%
+  activity-region comparison gate this current path. Interruption,
   background-process, and direct Terminal-tab paths remain previous-build
   work.
   The previous 26.820 command tasks promote `thread.command-execution`,

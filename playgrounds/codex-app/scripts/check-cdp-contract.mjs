@@ -50,7 +50,7 @@ if (requestedSceneIds && selectedScenes.length !== requestedSceneIds.size) {
 const currentReplayComposerScenarios = new Set([
   "attachment-lifecycle",
   "approval-review-timeout",
-  "command-current-26-820-failure",
+  "command-current-26-825-failure",
   "command-current-26-820-interruption",
   "command-current-26-820-success",
   "command-current-26-825-success",
@@ -15335,7 +15335,7 @@ for (const scene of selectedScenes) {
           ? "运行 uuidgen 生成 UUID"
           : "Observe long-running shell command"
         : failure
-          ? "Observe command failure"
+          ? "Run 26.825 failure command"
           : "监控 CURRENT 26.820 中断";
       const expectedRootStatus = running
         ? "running"
@@ -15361,7 +15361,9 @@ for (const scene of selectedScenes) {
             : current26825
               ? "Worked for 8s"
               : "Worked for 22s"
-          : "Worked for 12s";
+          : current26825
+            ? "Worked for 15s"
+            : "Worked for 12s";
       const expectedSummaryPrefix = interruption
         ? running
           ? "Running for i in $(seq 1 120)"
@@ -15428,10 +15430,10 @@ for (const scene of selectedScenes) {
               : "CURRENT 26.820 LONG COMMAND OBSERVED")) ||
         (failure &&
           (currentCommand.assistantTexts[0] !==
-            "CURRENT 26.820 COMMAND FAILURE OBSERVED" ||
+            "CURRENT 26.825 COMMAND FAILURE OBSERVED" ||
             (recovered &&
               currentCommand.assistantTexts[1] !==
-                "CURRENT 26.820 COMMAND RECOVERY ACCEPTED"))) ||
+                "CURRENT 26.825 COMMAND RECOVERY ACCEPTED"))) ||
         (interruption &&
           (recovered
             ? currentCommand.assistantTexts[0] !==

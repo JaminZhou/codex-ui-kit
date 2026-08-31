@@ -12592,7 +12592,7 @@ for (const responsiveCase of currentCommandResponsiveCases) {
   }
 }
 
-const currentCommand26820ElectronCases = [
+const currentCommandElectronCases = [
   {
     assistantTexts: ["00000000-0000-4000-8000-000000000000"],
     commandStatus: "completed",
@@ -12613,15 +12613,15 @@ const currentCommand26820ElectronCases = [
   },
   {
     assistantTexts: [
-      "CURRENT 26.820 COMMAND FAILURE OBSERVED",
-      "CURRENT 26.820 COMMAND RECOVERY ACCEPTED",
+      "CURRENT 26.825 COMMAND FAILURE OBSERVED",
+      "CURRENT 26.825 COMMAND RECOVERY ACCEPTED",
     ],
     commandStatus: "failed",
-    frame: "command-current-26-820-failure-recovered",
+    frame: "command-current-26-825-failure-recovered",
     interruption: null,
-    scenario: "command-current-26-820-failure",
-    timelineLabel: "Worked for 12s",
-    title: "Observe command failure",
+    scenario: "command-current-26-825-failure",
+    timelineLabel: "Worked for 15s",
+    title: "Run 26.825 failure command",
   },
   {
     assistantTexts: [],
@@ -12643,7 +12643,7 @@ const currentCommand26820ElectronCases = [
   },
 ];
 
-for (const currentCase of currentCommand26820ElectronCases) {
+for (const currentCase of currentCommandElectronCases) {
   const { app: currentCommandApp, page: currentCommandPage } =
     await launchScene(
       {
@@ -12755,7 +12755,7 @@ for (const currentCase of currentCommand26820ElectronCases) {
       Math.abs((compact.composer?.width ?? 0) - 688) > 1
     ) {
       throw new Error(
-        `${currentCase.frame}: Electron current 26.820 command contract drifted: ${JSON.stringify({ compact, wide })}`,
+        `${currentCase.frame}: Electron current command contract drifted: ${JSON.stringify({ compact, wide })}`,
       );
     }
   } finally {
