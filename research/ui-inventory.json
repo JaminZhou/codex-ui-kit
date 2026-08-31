@@ -54,7 +54,11 @@
         "composer-project-selector",
         "worktree-environment-dropdown",
         "browser-cdp:current-wide-compact-context-and-project-routing",
-        "electron:current-wide-compact-context-and-project-routing"
+        "electron:current-wide-compact-context-and-project-routing",
+        "replay:current-26.825-context-project-run-location-environment-branch",
+        "browser-cdp:current-26.825-context-overlay-semantics-geometry-and-styles",
+        "electron:current-26.825-context-overlay-lifecycle-and-compact-boundary",
+        "pixel:seven-reviewed-current-26.825-context-scenes-and-seven-local-only-product-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -68,11 +72,13 @@
         "cdp-26.810.52044:visible-composer-project-worktree-branch-exact-assets",
         "cdp-26.818.41509:new-local-worktree-current-context-controls-exact-labels-and-no-environment-state",
         "cdp-26.820.60940:new-local-worktree-selected-context-no-environment-main-start-and-real-task-success",
-        "cdp-26.820.60940:project-local-main-context-wide-compact-current-geometry"
+        "cdp-26.820.60940:project-local-main-context-wide-compact-current-geometry",
+        "cdp-26.825.51511:project-local-main-and-new-worktree-four-part-context-controls-wide-compact",
+        "cdp-26.825.51511:work-in-environment-and-branch-overlays-current-semantics-geometry-and-computed-style"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -84,7 +90,11 @@
         "project-selector-items",
         "browser-cdp:current-scroll-fixed-option-listbox-and-focus",
         "electron:current-scroll-fixed-option-listbox-and-focus",
-        "pixel:current-wide-compact-project-listbox"
+        "pixel:current-wide-compact-project-listbox",
+        "replay:current-26.825-project-search-fixed-actions-selected-icon-and-no-project-roundtrip",
+        "browser-cdp:current-26.825-project-dialog-computed-style-wide-compact",
+        "electron:current-26.825-project-search-focus-and-compact-boundary",
+        "pixel:reviewed-and-local-only-current-26.825-project-dialog-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -94,11 +104,13 @@
         "cdp-26.730.61309:project-dialog-260x249.5-listbox-252x142.81-14-options",
         "cdp-26.803.61601:project-dialog-260x221-search-listbox-252x143.5-fourteen-options-new-project-only-and-native-panel-entry",
         "cdp-26.810.52044:project-dialog-260x249.5-search-listbox-252x142.81-fourteen-options-new-and-clear-project-empty-escape-focus-clear-restore",
-        "cdp-26.820.60940:project-dialog-260x249.5-listbox-252x208.9375-scroll-142.8125-divider-9-pinned-options-57.125-empty-focus-restore"
+        "cdp-26.820.60940:project-dialog-260x249.5-listbox-252x208.9375-scroll-142.8125-divider-9-pinned-options-57.125-empty-focus-restore",
+        "cdp-26.825.51511:project-dialog-260x249.5-search-listbox-fixed-actions-selected-icon-empty-and-focus-restore",
+        "cdp-26.825.51511:project-dialog-wide-compact-20-radius-8-blur-13px-option-contract"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -726,7 +738,14 @@
       "id": "composer.project-worktree-selection",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["composer-project-selector", "worktree-environment-dropdown"],
+      "packageEvidence": [
+        "composer-project-selector",
+        "worktree-environment-dropdown",
+        "replay:current-26.825-run-location-new-worktree-environment-and-branch-menus",
+        "browser-cdp:current-26.825-menu-semantics-geometry-focus-and-computed-style",
+        "electron:current-26.825-run-location-worktree-environment-branch-lifecycle",
+        "pixel:reviewed-and-local-only-current-26.825-context-menu-family"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:project-local-and-branch-controls",
@@ -744,11 +763,13 @@
         "cdp-26.803.61601:work-in-five-action-menu-external-codex-web-anchor-and-exact-icons",
         "cdp-26.810.52044:visible-composer-context-and-work-in-five-action-exact-assets",
         "cdp-26.818.41509:work-in-new-local-worktree-no-environment-main-context-and-current-menus",
-        "cdp-26.820.60940:work-in-new-local-worktree-selection-no-environment-main-context-and-real-submit"
+        "cdp-26.820.60940:work-in-new-local-worktree-selection-no-environment-main-context-and-real-submit",
+        "cdp-26.825.51511:work-in-five-action-menu-new-worktree-four-controls-and-two-action-environment-menu",
+        "cdp-26.825.51511:branch-menu-296x280-eight-menuitems-no-radio-state-no-local-environment-action-current-search"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

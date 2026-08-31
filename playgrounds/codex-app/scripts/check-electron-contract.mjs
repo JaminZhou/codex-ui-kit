@@ -10188,6 +10188,349 @@ try {
   });
 }
 
+const currentContext26825Scene = {
+  currentSidebar: true,
+  frame: "workspace-context-current-26-825-ready",
+  id: "electron-workspace-context-current-26-825",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "workspace",
+};
+const {
+  app: currentContext26825App,
+  page: currentContext26825Page,
+} = await launchScene(currentContext26825Scene, { capture: false });
+try {
+  const initialContract = await currentContext26825Page.evaluate(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      const value = element?.getBoundingClientRect();
+      return value
+        ? {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          }
+        : null;
+    };
+    return {
+      composer: rect(".demo-workspace-start .codex-ui-composer"),
+      context: rect(
+        ".demo-workspace-start .codex-ui-conversation-context-bar",
+      ),
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      heading: rect(
+        ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
+      ),
+      horizontalOverflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      kinds: Array.from(
+        document.querySelectorAll(
+          ".demo-workspace-start .codex-ui-conversation-context-bar button",
+        ),
+        (button) => button.getAttribute("data-kind"),
+      ),
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    initialContract.frame !== "workspace-context-current-26-825-ready" ||
+    JSON.stringify(initialContract.viewport) !==
+      JSON.stringify({ height: 820, width: 1180 }) ||
+    initialContract.horizontalOverflow > 1 ||
+    Math.abs(initialContract.composer?.left - 382.9375) > 1 ||
+    Math.abs(initialContract.composer?.width - 736) > 1 ||
+    Math.abs(initialContract.composer?.bottom - 804) > 1 ||
+    Math.abs(initialContract.context?.top - 673) > 1 ||
+    Math.abs(initialContract.context?.width - 736) > 1 ||
+    Math.abs(initialContract.heading?.top - 363.40625) > 1 ||
+    JSON.stringify(initialContract.kinds) !==
+      JSON.stringify(["project", "run-location", "worktree"])
+  ) {
+    throw new Error(
+      `Electron current 26.825 context entry failed: ${JSON.stringify(initialContract)}.`,
+    );
+  }
+
+  const currentProjectTrigger = currentContext26825Page.getByRole("button", {
+    name: "Change project: codex-ui-kit",
+  });
+  await currentProjectTrigger.click();
+  const currentProjectDialog = currentContext26825Page.getByRole("dialog", {
+    name: "Choose a project",
+  });
+  const currentProjectSearch = currentProjectDialog.getByRole("searchbox", {
+    name: "Search projects",
+  });
+  await currentProjectSearch.waitFor();
+  const currentProjectContract = await currentProjectDialog.evaluate(
+    (dialog) => {
+      const value = dialog.getBoundingClientRect();
+      const style = getComputedStyle(dialog);
+      return {
+        backdropFilter: style.backdropFilter,
+        borderRadius: style.borderRadius,
+        height: value.height,
+        left: value.left,
+        searchPlaceholder: dialog
+          .querySelector('input[type="search"]')
+          ?.getAttribute("placeholder"),
+        top: value.top,
+        width: value.width,
+      };
+    },
+  );
+  if (
+    Math.abs(currentProjectContract.left - 400.9375) > 1 ||
+    Math.abs(currentProjectContract.top - 422) > 1 ||
+    Math.abs(currentProjectContract.width - 260) > 1 ||
+    Math.abs(currentProjectContract.height - 249.5) > 0.2 ||
+    currentProjectContract.backdropFilter !== "blur(8px)" ||
+    currentProjectContract.borderRadius !== "20px" ||
+    currentProjectContract.searchPlaceholder !== "Search projects"
+  ) {
+    throw new Error(
+      `Electron current 26.825 project picker failed: ${JSON.stringify(currentProjectContract)}.`,
+    );
+  }
+  await currentProjectSearch.fill("__codex_ui_kit_no_project__");
+  if (
+    (await currentProjectDialog.getByRole("option").count()) !== 2 ||
+    (await currentProjectDialog
+      .getByRole("option", { name: "New project" })
+      .count()) !== 1 ||
+    (await currentProjectDialog
+      .getByRole("option", { name: "Don't work in a project" })
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron current 26.825 project search lost its fixed actions.",
+    );
+  }
+  await currentProjectSearch.press("Escape");
+  await currentContext26825Page.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Change project: codex-ui-kit",
+  );
+
+  const currentRunLocation = currentContext26825Page.getByRole("button", {
+    name: "Select where to run the chat",
+  });
+  await currentRunLocation.click();
+  const currentRunMenu = currentContext26825Page.getByRole("menu", {
+    name: "Work in",
+  });
+  const currentRunMenuContract = await currentRunMenu.evaluate((menu) => {
+    const value = menu.getBoundingClientRect();
+    return {
+      height: value.height,
+      labels: Array.from(
+        menu.querySelectorAll('[role="menuitem"]'),
+        (item) =>
+          item
+            .querySelector(".codex-ui-menu-item__label")
+            ?.textContent?.trim(),
+      ),
+      left: value.left,
+      top: value.top,
+      width: value.width,
+    };
+  });
+  if (
+    Math.abs(currentRunMenuContract.left - 522.4375) > 1 ||
+    Math.abs(currentRunMenuContract.top - 481.6875) > 1 ||
+    Math.abs(currentRunMenuContract.width - 216) > 1 ||
+    Math.abs(currentRunMenuContract.height - 189.3125) > 0.2 ||
+    JSON.stringify(currentRunMenuContract.labels) !==
+      JSON.stringify([
+        "Local",
+        "New local worktree",
+        "Connect Codex web",
+        "Cloud",
+        "Usage remaining",
+      ])
+  ) {
+    throw new Error(
+      `Electron current 26.825 run-location picker failed: ${JSON.stringify(currentRunMenuContract)}.`,
+    );
+  }
+  await currentRunMenu
+    .getByRole("menuitem", { name: "New local worktree" })
+    .click();
+  await currentContext26825Page.waitForSelector(
+    '.demo-root[data-frame="workspace-context-current-26-825-new-worktree"]',
+  );
+  const currentWorktreeKinds = await currentContext26825Page
+    .locator(
+      ".demo-workspace-start .codex-ui-conversation-context-bar button",
+    )
+    .evaluateAll((buttons) =>
+      buttons.map((button) => button.getAttribute("data-kind")),
+    );
+  if (
+    JSON.stringify(currentWorktreeKinds) !==
+    JSON.stringify([
+      "project",
+      "run-location",
+      "environment",
+      "starting-state",
+    ])
+  ) {
+    throw new Error(
+      `Electron current 26.825 worktree controls failed: ${JSON.stringify(currentWorktreeKinds)}.`,
+    );
+  }
+  const currentEnvironmentTrigger = currentContext26825Page.getByRole(
+    "button",
+    { name: "Select a local environment" },
+  );
+  await currentEnvironmentTrigger.click();
+  const currentEnvironmentPicker = currentContext26825Page.getByRole("menu", {
+    name: "Environment",
+  });
+  const currentEnvironmentPickerContract =
+    await currentEnvironmentPicker.evaluate((menu) => {
+      const value = menu.getBoundingClientRect();
+      return {
+        height: value.height,
+        labels: Array.from(
+          menu.querySelectorAll(".codex-ui-menu-item__label"),
+          (label) => label.textContent?.trim(),
+        ),
+        left: value.left,
+        top: value.top,
+        width: value.width,
+      };
+    });
+  if (
+    Math.abs(currentEnvironmentPickerContract.left - 686.078125) > 1 ||
+    Math.abs(currentEnvironmentPickerContract.top - 579.875) > 1 ||
+    Math.abs(currentEnvironmentPickerContract.width - 264) > 1 ||
+    Math.abs(currentEnvironmentPickerContract.height - 91.125) > 0.2 ||
+    JSON.stringify(currentEnvironmentPickerContract.labels) !==
+      JSON.stringify(["Work without environment", "Set up project"])
+  ) {
+    throw new Error(
+      `Electron current 26.825 environment picker failed: ${JSON.stringify(currentEnvironmentPickerContract)}.`,
+    );
+  }
+  await currentContext26825Page.keyboard.press("Escape");
+  await currentContext26825Page.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+      "Select a local environment",
+  );
+  await currentRunLocation.click();
+  await currentRunMenu.getByRole("menuitem", { name: "Local", exact: true }).click();
+  await currentContext26825Page.waitForSelector(
+    '.demo-root[data-frame="workspace-context-current-26-825-ready"]',
+  );
+
+  const currentBranchTrigger = currentContext26825Page.getByRole("button", {
+    name: "Switch branch",
+  });
+  await currentBranchTrigger.click();
+  const currentBranchMenu = currentContext26825Page.getByRole("menu", {
+    name: "Branches",
+  });
+  const currentBranchContract = await currentBranchMenu.evaluate((menu) => {
+    const value = menu.getBoundingClientRect();
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"]'));
+    return {
+      checked: items.map((item) => item.getAttribute("aria-checked")),
+      createCount: items.filter((item) =>
+        item.textContent?.includes("Create and checkout new branch…"),
+      ).length,
+      height: value.height,
+      itemCount: items.length,
+      left: value.left,
+      placeholder: menu
+        .querySelector('input[type="search"]')
+        ?.getAttribute("placeholder"),
+      selectEnvironmentCount: items.filter((item) =>
+        item.textContent?.includes("Select local environment…"),
+      ).length,
+      selectedIconCount: menu.querySelectorAll(
+        '[data-current-build-icon="workspace-selection-check"]',
+      ).length,
+      top: value.top,
+      width: value.width,
+    };
+  });
+  if (
+    Math.abs(currentBranchContract.left - 602.546875) > 1 ||
+    Math.abs(currentBranchContract.top - 390.875) > 1 ||
+    Math.abs(currentBranchContract.width - 296) > 1 ||
+    Math.abs(currentBranchContract.height - 280.125) > 0.2 ||
+    currentBranchContract.itemCount !== 8 ||
+    currentBranchContract.checked.some((value) => value !== null) ||
+    currentBranchContract.placeholder !== "Search codex-ui-kit branches" ||
+    currentBranchContract.selectEnvironmentCount !== 0 ||
+    currentBranchContract.createCount !== 1 ||
+    currentBranchContract.selectedIconCount !== 1
+  ) {
+    throw new Error(
+      `Electron current 26.825 branch picker failed: ${JSON.stringify(currentBranchContract)}.`,
+    );
+  }
+  await currentContext26825Page.keyboard.press("Escape");
+  await currentContext26825Page.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") === "Switch branch",
+  );
+} finally {
+  await currentContext26825App.close();
+}
+
+const currentContext26825CompactScene = {
+  ...currentContext26825Scene,
+  frame: "workspace-context-current-26-825-project-menu",
+  id: "electron-workspace-context-current-26-825-compact",
+  sidebarState: "compact-collapsed",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: currentContext26825CompactApp,
+  page: currentContext26825CompactPage,
+} = await launchScene(currentContext26825CompactScene, { capture: false });
+try {
+  const compactProjectContract = await currentContext26825CompactPage.evaluate(
+    () => {
+      const dialog = document.querySelector(".demo-workspace-project-dialog");
+      const value = dialog?.getBoundingClientRect();
+      return {
+        height: value?.height,
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        left: value?.left,
+        top: value?.top,
+        viewport: { height: innerHeight, width: innerWidth },
+        width: value?.width,
+      };
+    },
+  );
+  if (
+    JSON.stringify(compactProjectContract.viewport) !==
+      JSON.stringify({ height: 680, width: 720 }) ||
+    compactProjectContract.horizontalOverflow > 1 ||
+    Math.abs(compactProjectContract.left - 35) > 1 ||
+    Math.abs(compactProjectContract.top - 282) > 1 ||
+    Math.abs(compactProjectContract.width - 260) > 1 ||
+    Math.abs(compactProjectContract.height - 249.5) > 0.2
+  ) {
+    throw new Error(
+      `Electron current 26.825 compact project picker failed: ${JSON.stringify(compactProjectContract)}.`,
+    );
+  }
+} finally {
+  await currentContext26825CompactApp.close();
+}
+
 const currentCheckoutGitDirectory = await mkdtemp(
   join(tmpdir(), "codex-ui-kit-electron-current-checkout-"),
 );
@@ -17547,5 +17890,5 @@ try {
 }
 
 console.log(
-  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Usage and embedded plan selection, Hooks, and Personalization plus package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818, 26.820, and 26.825 MCP success/failure/recovery/Sources interactions, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
+  "Electron host, native-window, current basic message thread, current project-directory creation, coding-workspace routing and persisted/missing-worktree recovery replay, current 26.825 project/run-location/worktree context controls, conversation/Composer and current image-attachment lifecycle plus current mixed post-picker and immersive preview interactions and menus, current long, failed, and interrupted command output plus manual context compaction, transport retry/recovery, fatal App Server restart, bounded global notification queue and current success stack, thread summary, replay/live single, concurrent, nested, and mixed-recovery subagent delegation with 4/10 pagination, current mixed Search/Browser/MCP/approval/file/subagent flow, runtime-observed Usage and embedded plan selection, Hooks, and Personalization plus package-observed Code review Settings, default 720px narrow reachability, resizable navigation/Review/Terminal/PR detail, PR tabs and expansion, current 26.818, 26.820, and 26.825 MCP success/failure/recovery/Sources interactions, MCP disclosure/result/unavailable-fallback, multi-file and mixed-content Review, selection/Undo, large diff scrolling, and compact geometry contracts passed.",
 );

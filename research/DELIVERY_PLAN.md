@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 37 groups have current-build runtime evidence, 43 have previous-build-only
+- 40 groups have current-build runtime evidence, 40 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -533,6 +533,14 @@ exit gates; it does not replace the inventory.
   semantics, background agent-process reopening, current-product review submission and
   mutating comment/merge transitions, and the remaining Markdown, tool, and
   attachment variants remain on their recorded evidence levels.
+- The current `26.825.51511` context-control follow-up now supersedes the
+  previous project/Local/main sample. Seven Browser/CDP, Electron, reviewed
+  baseline, and local-only product-region gates cover the wide/compact project
+  picker, five-action run-location menu, New local worktree controls,
+  Environment menu, and current non-radio Branches menu. This promotes the
+  sampled `conversation.context-controls`, `conversation.project-picker`, and
+  `composer.project-worktree-selection` paths while keeping populated
+  environment creation/editing, Remote, and branch-mutation failures open.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build.
@@ -746,6 +754,14 @@ SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
 
+The Composer context family is now independently current on `26.825.51511`.
+Project search and fixed actions, Local/New local worktree selection,
+No environment, starting branch, the current Branches search/roles, Escape
+focus return, exact overlay geometry/style, and the 720px boundary pass
+Browser/CDP, Electron, and seven reviewed/product-region pixel gates.
+Populated environments, Remote, and branch-operation failures remain Stage 3
+work rather than blockers for this sampled Stage 2 context path.
+
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
 structural evidence, Browser acceptance, and Electron acceptance.
 
@@ -768,6 +784,11 @@ run-location transition, environment empty menu, seven-branch picker, and
 1180→720 responsive geometry now pass Browser/CDP, Electron, and external
 pixel gates. The historical 600×600 local-environment dialog remains an
 independent host capability rather than the current New worktree entry path.
+The `26.825.51511` refresh supersedes its context-menu visuals and semantics:
+the current project picker, `Work in`, New local worktree, Environment, and
+Branches lifecycle now passes same-build wide/compact CDP, Electron, and
+product-region gates. Continue with populated environment creation/editing,
+Remote connections, and real branch-operation failure/recovery.
 The previous `26.818.41509` Projects Index follow-up delivers the primary
 ready/expanded/sort/empty/compact route at both 1180×820 and explicitly
 collapsed 600×600, with sampled structural geometry and Browser/CDP evidence.
@@ -1032,8 +1053,12 @@ without confusing package readiness with full product reconstruction.
    restart after the directory is restored. Project and branch creation are
    delivered. The current Work in/no-environment entry and unavailable
    Environments route are also delivered without inventing a cloud working
-   directory. Continue with populated environment creation/editing, repair
-   variants, and real Remote connection lifecycles.
+   directory. The latest 26.825 follow-up additionally refreshes the exact
+   wide/compact project picker, five-action run-location menu, four-control New
+   local worktree state, two-action Environment menu, and non-radio Branches
+   menu through CDP, Electron, reviewed baselines, and local-only product
+   regions. Continue with populated environment creation/editing, repair
+   variants, branch-operation failures, and real Remote connection lifecycles.
 7. **Review content variants — delivered for the sampled current card,
    workspace, and Undo/Reapply family**: `26.820.60940` now covers a real
    added/modified/deleted `+4 −4` group, marker-backed two-file rename,

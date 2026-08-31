@@ -1113,6 +1113,136 @@ textarea {
   display: none;
 }
 
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-new-conversation-start__header {
+  top: calc(50% - 149.59375px);
+}
+
+.demo-root[data-current-context-26-825] {
+  font-weight: 400;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-new-conversation-start__eyebrow {
+  height: 56px;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-new-conversation-start__header h3 {
+  margin-top: 24px;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-new-conversation-start__prompt {
+  bottom: 168px;
+}
+
+.demo-root[data-current-context-26-825]
+  .demo-workspace-prompts--current-context {
+  width: 100%;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-conversation-context-bar {
+  gap: 8px;
+  padding-inline-start: 17.5px;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-conversation-context-bar__item {
+  font-weight: 400;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-start
+  .codex-ui-conversation-context-bar__item[data-kind="run-location"] {
+  width: auto;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-project-dialog,
+.demo-workspace-context-menu--current-26-825 {
+  backdrop-filter: blur(8px);
+  border: 0 solid currentColor;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.082),
+    0 0 0 0.5px rgba(255, 255, 255, 0.082),
+    0 8px 16px -4px rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.demo-workspace-context-menu--current-26-825 {
+  translate: 0 -1px;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-project-dialog {
+  gap: 4px;
+  grid-template-rows: 28.5625px 208.9375px;
+  left: 18px;
+}
+
+@container codex-ui-app-shell (max-width: 45rem) {
+  .demo-root[data-current-context-26-825] .demo-workspace-project-dialog {
+    left: 19px;
+  }
+}
+
+.demo-workspace-project-dialog__search,
+.demo-workspace-worktree-menu__search {
+  align-items: center;
+  color: var(--demo-shell-text-secondary);
+  display: grid;
+  gap: 4px;
+  grid-template-columns: 16px minmax(0, 1fr);
+  height: 28.5625px;
+  padding: 5px 8px;
+}
+
+.demo-workspace-project-dialog__search .demo-current-build-icon,
+.demo-workspace-worktree-menu__search .demo-current-build-icon {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-workspace-project-dialog__search > input,
+.demo-workspace-worktree-menu__search > input {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--demo-shell-overlay-text);
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  height: 18.5625px;
+  line-height: 18.5714px;
+  min-width: 0;
+  outline: none;
+  padding: 0;
+  width: 100%;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-project-dialog
+  .codex-ui-conversation-project-options__item,
+.demo-workspace-context-menu--current-26-825 .codex-ui-menu-item {
+  border-radius: 15px;
+  font-weight: 400;
+  line-height: 18.5714px;
+}
+
+.demo-root[data-current-context-26-825] .demo-workspace-project-dialog
+  .codex-ui-conversation-project-options__check
+  .demo-current-build-icon {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-workspace-worktree-menu--current-26-825,
+.demo-workspace-worktree-menu.demo-workspace-context-menu--current-26-825 {
+  height: 280.125px;
+}
+
 .demo-workspace-model {
   align-items: center;
   display: inline-flex;

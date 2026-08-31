@@ -453,6 +453,28 @@ describe("project conversation routing", () => {
     );
   });
 
+  it("renders an observed project-selection icon without changing option semantics", () => {
+    render(
+      <ConversationProjectListbox
+        items={[{ id: "ui-kit", label: "UI Kit" }]}
+        onSelect={() => undefined}
+        selectedIcon={<span data-testid="selected-project-icon">selected</span>}
+        selectedId="ui-kit"
+      />,
+    );
+
+    const selected = screen.getByRole("option", {
+      name: "Select project UI Kit",
+    });
+    expect(selected.getAttribute("aria-selected")).toBe("true");
+    expect(within(selected).getByTestId("selected-project-icon")).toBeTruthy();
+    expect(
+      selected.querySelector(
+        ".codex-ui-conversation-project-options__check",
+      )?.textContent,
+    ).toBe("selected");
+  });
+
   it("keeps pinned project actions inside the listbox navigation order", () => {
     const onSelect = vi.fn();
     render(

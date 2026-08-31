@@ -312,7 +312,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   expansion, status, and disabled semantics.
 - `ConversationProjectListbox`: linked project options with selected/disabled
   states, initial focus, arrow/Home/End navigation, Escape dismissal, and
-  outside-pointer dismissal.
+  outside-pointer dismissal. `selectedIcon` lets a host supply its observed
+  selection primitive while the listbox continues to own option semantics and
+  focus behavior.
 - `LocalEnvironmentDialog`: searchable, grouped local checkout/worktree
   selection with branch, metadata, repair/loading states, scrolling, and a
   host-owned create action.

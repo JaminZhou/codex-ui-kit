@@ -756,3 +756,17 @@ query order, 76px summary inset, 418.515625px wide panel, and the
 and five local-only product comparisons gate summary, Sources, thread,
 Composer, and header regions at 1.1478%–4.6384%. Other providers, citation
 failures, empty/loading Sources, and live-media emission remain partial.
+
+The same build now independently refreshes the new-chat project and
+run-location context family. The public replay covers Local and New local
+worktree, the wide/compact project dialog, the two-action Environment menu,
+and the current Branches menu. Browser/CDP verifies exact roles, focus,
+geometry, 20px/8px overlay surface, fixed project actions, and the current
+non-radio branch semantics. Electron drives the entire click path and a native
+720×680 compact boundary. Seven reviewed baselines and seven local-only owned
+regions pass; their differences are 0.7909%–4.1699% except the icon-heavy
+run-location menu at 11.1381% under its independent 11.5% ceiling. This
+promotes the sampled paths of `conversation.context-controls`,
+`conversation.project-picker`, and `composer.project-worktree-selection` to
+current Browser/Electron verification without claiming populated environment,
+Remote, or branch-mutation lifecycles.
