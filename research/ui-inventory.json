@@ -1213,15 +1213,22 @@
       "id": "app.route-lifecycle-feedback",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main",
+        "replay:current-26.825-pull-request-route-loading-empty-split-list",
+        "browser-cdp:current-26.825-pull-request-route-state-and-wide-split-geometry",
+        "electron:current-26.825-pull-request-route-state-and-wide-split-geometry",
+        "pixel:two-reviewed-and-two-local-only-current-26.825-pull-request-route-scenes"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:pull-requests-route-loading-status-and-content-preservation-boundary",
-        "cdp-26.727.40816:pull-request-detail-loading-to-code-content"
+        "cdp-26.727.40816:pull-request-detail-loading-to-code-content",
+        "cdp-26.825.51511:pull-request-index-loading-to-empty-current-split-route"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1509,17 +1516,27 @@
       "id": "workspace.pull-request-route",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["pull-request-route", "pull-request-actions", "pull-request-detail-query", "pull-request-media"],
+      "packageEvidence": [
+        "pull-request-route",
+        "pull-request-actions",
+        "pull-request-detail-query",
+        "pull-request-media",
+        "replay:current-26.825-pull-request-tabs-search-loading-empty-and-fixed-detail-placeholder",
+        "browser-cdp:current-26.825-pull-request-wide-split-list-contract",
+        "electron:current-26.825-pull-request-wide-split-list-contract",
+        "pixel:current-26.825-pull-request-loading-empty-main-and-detail-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:pull-request-index-tabs-search-split-layout",
         "cdp-26.721:pull-request-index-all-search-lists-800x600",
         "cdp-26.721.81911:public-pr-80-summary-timeline-responsive-overlay-history",
-        "cdp-26.727.40816:public-pr-80-two-tab-summary-code-responsive-overlay"
+        "cdp-26.727.40816:public-pr-80-two-tab-summary-code-responsive-overlay",
+        "cdp-26.825.51511:pull-request-index-five-row-loading-empty-tabs-search-filter-and-fixed-detail-placeholder"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

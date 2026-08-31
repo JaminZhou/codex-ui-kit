@@ -54,6 +54,16 @@ const currentBuildPullRequestReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentPullRequestRouteReferences = {
+  "pr-index-current-26-825-empty":
+    process.env.CODEX_UI_KIT_CURRENT_PR_26_825_EMPTY_REFERENCE,
+  "pr-index-current-26-825-loading":
+    process.env.CODEX_UI_KIT_CURRENT_PR_26_825_LOADING_REFERENCE,
+};
+const currentPullRequestRouteReferenceSize = {
+  height: 820,
+  width: 1180,
+};
 const currentBuildTerminalReference =
   process.env.CODEX_UI_KIT_TERMINAL_REFERENCE;
 const currentBuildTerminalReferenceSize = {
@@ -7001,6 +7011,108 @@ for (const scene of selectedScenes) {
         conversation: conversationComparison.ratio,
         full: comparison.ratio,
         review: reviewComparison.ratio,
+      })}`,
+    );
+  }
+
+  const currentPullRequestRouteReference =
+    currentPullRequestRouteReferences[scene.id];
+  if (currentPullRequestRouteReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentPullRequestRouteReference),
+    );
+    if (
+      reference.width !== currentPullRequestRouteReferenceSize.width ||
+      reference.height !== currentPullRequestRouteReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current pull request reference and capture must both be exactly ${currentPullRequestRouteReferenceSize.width}x${currentPullRequestRouteReferenceSize.height}, received reference ${reference.width}x${reference.height} and capture ${actual.width}x${actual.height}.`,
+      );
+    }
+    const cropLeft = 322;
+    const indexWidth = 438;
+    const contentWidth = reference.width - cropLeft;
+    const referenceContent = cropPng(
+      reference,
+      cropLeft,
+      0,
+      contentWidth,
+      reference.height,
+    );
+    const actualContent = cropPng(
+      actual,
+      cropLeft,
+      0,
+      contentWidth,
+      actual.height,
+    );
+    const comparison = comparePng(referenceContent, actualContent);
+    const indexComparison = comparePng(
+      cropPng(referenceContent, 0, 0, indexWidth, reference.height),
+      cropPng(actualContent, 0, 0, indexWidth, actual.height),
+    );
+    const detailComparison = comparePng(
+      cropPng(
+        referenceContent,
+        indexWidth,
+        0,
+        contentWidth - indexWidth,
+        reference.height,
+      ),
+      cropPng(
+        actualContent,
+        indexWidth,
+        0,
+        contentWidth - indexWidth,
+        actual.height,
+      ),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualContent),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PR_26_825_MAX_DIFF_RATIO",
+      0.025,
+    );
+    const maximumIndexRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PR_26_825_INDEX_MAX_DIFF_RATIO",
+      0.035,
+    );
+    const maximumDetailRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PR_26_825_DETAIL_MAX_DIFF_RATIO",
+      0.015,
+    );
+    if (
+      comparison.ratio > maximumRatio ||
+      indexComparison.ratio > maximumIndexRatio ||
+      detailComparison.ratio > maximumDetailRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current pull request pixel ratios ${JSON.stringify({
+          detail: detailComparison.ratio,
+          full: comparison.ratio,
+          index: indexComparison.ratio,
+        })} exceed ${JSON.stringify({
+          detail: maximumDetailRatio,
+          full: maximumRatio,
+          index: maximumIndexRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current pull request pixel ratios ${JSON.stringify({
+        detail: detailComparison.ratio,
+        full: comparison.ratio,
+        index: indexComparison.ratio,
       })}`,
     );
   }

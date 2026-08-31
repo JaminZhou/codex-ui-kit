@@ -14,8 +14,15 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 51 groups have current-build runtime evidence, 29 have previous-build-only
+- 53 groups have current-build runtime evidence, 27 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current Pull requests route follow-up promotes
+  `app.route-lifecycle-feedback` and `workspace.pull-request-route`. It locks
+  the current persistent 321.875/437.53125/419.59375px sidebar/list/detail
+  split, five-row loading skeleton, settled tabs/search/filter empty state,
+  exact labels and SVG paths. CDP, Electron, two reviewed baselines, and
+  local-only product comparisons at 0.3508%/0.6348% for the list and 0.1339%
+  for the detail region gate the slice.
 - The current Thread summary follow-up promotes `thread.context-summary`. Its
   28px trigger now anchors the 300×199 Environment/Git overlay at x=804/y=53,
   with a 25px radius, 14/21px weight-400 visible labels, five 272×29px rows,

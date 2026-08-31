@@ -7363,12 +7363,23 @@ for (const scene of selectedScenes) {
             index: indexState
               ? {
                   busy: indexState.getAttribute("aria-busy"),
+                  heading:
+                    indexState
+                      .querySelector(
+                        ".codex-ui-pull-request-query-state__copy strong",
+                      )
+                      ?.textContent?.trim() ?? null,
                   skeletons: indexState.querySelectorAll(
                     ".codex-ui-pull-request-query-state__skeleton",
                   ).length,
                   status: indexState.getAttribute("data-status"),
+                  variant: indexState.getAttribute("data-variant"),
                 }
               : null,
+            indexHeader:
+              document
+                .querySelector(".demo-pr-index > header")
+                ?.textContent?.trim() ?? null,
             layoutMode: shell?.getAttribute("data-layout-mode"),
             main: rect(
               document.querySelector(".codex-ui-app-shell__main"),
@@ -7388,6 +7399,10 @@ for (const scene of selectedScenes) {
                 ".codex-ui-app-shell__side-panel",
               ),
             ),
+            panelText:
+              document
+                .querySelector(".codex-ui-app-shell__side-panel")
+                ?.textContent?.trim() ?? null,
             panelOpen: shell?.hasAttribute("data-side-panel-open"),
             resizer: rect(
               document.querySelector(
@@ -7420,6 +7435,14 @@ for (const scene of selectedScenes) {
               document
                 .querySelector(".codex-ui-app-shell__sidebar")
                 ?.getAttribute("aria-hidden") === "true",
+            search: rect(
+              document.querySelector(
+                '.demo-pr-index input[aria-label="Search pull requests"]',
+              ),
+            ),
+            tabs: document.querySelectorAll(
+              '.demo-pr-index [role="tab"]',
+            ).length,
           };
         });
         const failed =
@@ -7430,6 +7453,33 @@ for (const scene of selectedScenes) {
               lifecycle.index.busy !== "true" ||
               lifecycle.index.skeletons !== 5 ||
               lifecycle.panelOpen)) ||
+          (scene.frame === "pr-index-current-26-825-loading" &&
+            (lifecycle.index?.status !== "loading" ||
+              lifecycle.index.busy !== "true" ||
+              lifecycle.index.variant !== "split-list" ||
+              lifecycle.index.skeletons !== 5 ||
+              lifecycle.indexHeader !== "Pull requests" ||
+              lifecycle.tabs !== 0 ||
+              lifecycle.search !== null ||
+              !lifecycle.panelOpen ||
+              lifecycle.panelText !== "Select pull request to view" ||
+              Math.abs((lifecycle.sidebar?.width ?? 0) - 321.875) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 419.59375) > 1 ||
+              Math.abs((lifecycle.main?.width ?? 0) - 438.53125) > 1)) ||
+          (scene.frame === "pr-index-current-26-825-empty" &&
+            (lifecycle.index?.status !== "empty" ||
+              lifecycle.index.busy !== null ||
+              lifecycle.index.variant !== "split-list" ||
+              lifecycle.index.heading !== "No pull requests found" ||
+              lifecycle.index.skeletons !== 0 ||
+              lifecycle.tabs !== 3 ||
+              lifecycle.search === null ||
+              !lifecycle.panelOpen ||
+              lifecycle.panelText !== "Select pull request to view" ||
+              Math.abs((lifecycle.search?.height ?? 0) - 32) > 1 ||
+              Math.abs((lifecycle.sidebar?.width ?? 0) - 321.875) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 419.59375) > 1 ||
+              Math.abs((lifecycle.main?.width ?? 0) - 438.53125) > 1)) ||
           (scene.frame === "pr-index-failed" &&
             (lifecycle.index?.status !== "error" ||
               lifecycle.index.busy !== null ||

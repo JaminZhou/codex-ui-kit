@@ -326,6 +326,26 @@ function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
   );
 }
 
+function CurrentPullRequestRouteIcon({
+  name,
+}: {
+  name: "filter" | "search";
+}) {
+  const path =
+    name === "search"
+      ? "M7.33057 1.98535C10.2484 1.98535 12.6136 4.3508 12.6138 7.26855C12.6138 8.58031 12.1346 9.77942 11.3433 10.7031L13.9897 13.3496C14.1655 13.5253 14.1655 13.8106 13.9897 13.9863C13.814 14.1621 13.5288 14.1621 13.353 13.9863L10.7017 11.335C9.78678 12.0942 8.61243 12.5518 7.33057 12.5518C4.41281 12.5516 2.04736 10.1864 2.04736 7.26855C2.04754 4.35091 4.41292 1.98553 7.33057 1.98535ZM7.33057 2.88574C4.90998 2.88592 2.94793 4.84796 2.94775 7.26855C2.94775 9.68929 4.90987 11.6522 7.33057 11.6523C9.75141 11.6523 11.7144 9.6894 11.7144 7.26855C11.7142 4.84786 9.75131 2.88574 7.33057 2.88574Z"
+      : "M16.0013 5.00024C16.0013 4.44715 15.5534 3.99847 15.0003 3.99829H5.00031C4.4471 3.99829 3.99835 4.44704 3.99835 5.00024V5.97583C3.99835 6.24147 4.10349 6.49697 4.29132 6.68481L7.48175 9.87524L7.63702 10.0461C7.97691 10.461 8.16534 10.9826 8.16534 11.5237V15.1663C8.16534 15.3015 8.24656 15.4238 8.3714 15.4758L11.3714 16.7258C11.592 16.8176 11.8353 16.6553 11.8353 16.4163V11.5237C11.8353 10.9054 12.0808 10.3125 12.5179 9.87524L15.7083 6.68481L15.7747 6.6106C15.9206 6.43239 16.0013 6.20818 16.0013 5.97583V5.00024ZM17.3314 5.97583C17.3314 6.51694 17.144 7.03943 16.804 7.45435L16.6487 7.62524L13.4583 10.8157C13.2706 11.0035 13.1653 11.2581 13.1653 11.5237V16.4163C13.1653 17.6044 11.9564 18.4103 10.8597 17.9534L7.85968 16.7034C7.23925 16.4448 6.83527 15.8384 6.83527 15.1663V11.5237C6.83527 11.258 6.72917 11.0035 6.54132 10.8157L3.35089 7.62524C2.91364 7.18798 2.66827 6.59421 2.66827 5.97583V5.00024C2.66827 3.7125 3.71256 2.66821 5.00031 2.66821H15.0003C16.2879 2.66839 17.3314 3.71261 17.3314 5.00024V5.97583Z";
+  return (
+    <svg
+      aria-hidden="true"
+      data-current-pull-request-icon={name}
+      viewBox={name === "search" ? "0 0 16 16" : "0 0 20 20"}
+    >
+      <path d={path} fill="currentColor" />
+    </svg>
+  );
+}
+
 function SummaryGlyph({ name }: { name: SummaryGlyphName }) {
   const path = {
     branch:
@@ -3136,9 +3156,14 @@ export function App() {
   const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
   const [pullRequestOpen, setPullRequestOpen] = useState(
     initialSelection.view === "pull-request" &&
-      pullRequestState.selectedId !== null,
+      (pullRequestState.selectedId !== null ||
+        initialSelection.frame?.startsWith("pr-index-current-26-825-")),
   );
-  const [pullRequestWidth, setPullRequestWidth] = useState(370);
+  const [pullRequestWidth, setPullRequestWidth] = useState(
+    initialSelection.frame?.startsWith("pr-index-current-26-825-")
+      ? 419.59375
+      : 370,
+  );
   const [pullRequestTab, setPullRequestTab] = useState<
     "code" | "summary"
   >(
@@ -3334,6 +3359,9 @@ export function App() {
     mode === "replay" && scenarioId === "current-browser-26-825";
   const isCurrentCitations26825Replay =
     mode === "replay" && scenarioId === "current-citations-26-825";
+  const isCurrentPullRequestRouteReplay =
+    mode === "replay" &&
+    activeFrame?.startsWith("pr-index-current-26-825-");
   const isCurrentMarkdown26818Replay =
     mode === "replay" && scenarioId === "markdown-current-26-818";
   const isCurrentMarkdown26820MediaReplay =
@@ -5150,9 +5178,20 @@ export function App() {
         </div>
       )}
       primaryNavigation={
-        isCurrentBasic26825Replay || isCurrentCitations26825Replay ? (
+        isCurrentBasic26825Replay ||
+        isCurrentCitations26825Replay ||
+        isCurrentPullRequestRouteReplay ? (
           <>
-            <AppSidebarItem leading={<SidebarGlyph name="pull-request" />}>
+            <AppSidebarItem
+              leading={<SidebarGlyph name="pull-request" />}
+              onClick={() => {
+                setMode("replay");
+                setView("pull-request");
+                setPullRequestOpen(!isNarrowDemoWindow());
+                dismissSidebarAfterNavigation();
+              }}
+              selected={view === "pull-request"}
+            >
               Pull requests
             </AppSidebarItem>
             <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
@@ -10189,8 +10228,26 @@ export function App() {
       tabsLabel="Pull request view"
     />
   );
+  const currentPullRequestEmptyPanel = (
+    <div
+      className="demo-current-pr-empty-panel"
+      data-testid="current-pull-request-empty-panel"
+    >
+      Select pull request to view
+    </div>
+  );
   const pullRequestIndex = (
-    <section aria-label="Pull requests" className="demo-pr-index">
+    <section
+      aria-label="Pull requests"
+      className={[
+        "demo-pr-index",
+        isCurrentPullRequestRouteReplay
+          ? "demo-current-pr-index"
+          : undefined,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <button
         aria-expanded={sidebarOpen}
         aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
@@ -10201,30 +10258,47 @@ export function App() {
         <SidebarGlyph name="sidebar" />
       </button>
       <header>
-        <div role="tablist" aria-label="Pull request filters">
-          <button aria-selected="true" role="tab" type="button">
-            All
-          </button>
-          <button aria-selected="false" role="tab" type="button">
-            Reviewing
-          </button>
-          <button aria-selected="false" role="tab" type="button">
-            Authored
+        {isCurrentPullRequestRouteReplay &&
+        pullRequestState.indexStatus === "loading" ? (
+          <h1>Pull requests</h1>
+        ) : (
+          <div role="tablist" aria-label="Pull request filters">
+            <button aria-selected="true" role="tab" type="button">
+              All
+            </button>
+            <button aria-selected="false" role="tab" type="button">
+              Reviewing
+            </button>
+            <button aria-selected="false" role="tab" type="button">
+              Authored
+            </button>
+          </div>
+        )}
+      </header>
+      {!isCurrentPullRequestRouteReplay ||
+      pullRequestState.indexStatus !== "loading" ? (
+        <div className="demo-pr-index__search">
+          {isCurrentPullRequestRouteReplay ? (
+            <span aria-hidden="true" className="demo-current-pr-search-icon">
+              <CurrentPullRequestRouteIcon name="search" />
+            </span>
+          ) : null}
+          <input
+            aria-label="Search pull requests"
+            defaultValue={isCurrentPullRequestRouteReplay ? undefined : "80"}
+            placeholder="Search pull requests"
+            type="search"
+          />
+          <button aria-label="Filter pull requests" type="button">
+            {isCurrentPullRequestRouteReplay ? (
+              <CurrentPullRequestRouteIcon name="filter" />
+            ) : (
+              "≡"
+            )}
           </button>
         </div>
-      </header>
-      <div className="demo-pr-index__search">
-        <input
-          aria-label="Search pull requests"
-          defaultValue="80"
-          placeholder="Search pull requests"
-          type="search"
-        />
-        <button aria-label="Filter pull requests" type="button">
-          ≡
-        </button>
-      </div>
-      <h2>Authored</h2>
+      ) : null}
+      {isCurrentPullRequestRouteReplay ? null : <h2>Authored</h2>}
       {pullRequestState.indexStatus === "ready" ? (
         <PullRequestList
           items={[
@@ -10267,8 +10341,9 @@ export function App() {
       ) : (
         <PullRequestQueryState
           action={
-            pullRequestState.indexStatus === "error" ||
-            pullRequestState.indexStatus === "empty" ? (
+            !isCurrentPullRequestRouteReplay &&
+            (pullRequestState.indexStatus === "error" ||
+              pullRequestState.indexStatus === "empty") ? (
               <button
                 onClick={() =>
                   schedulePullRequestTransition(
@@ -10285,14 +10360,24 @@ export function App() {
             ) : undefined
           }
           description={
-            pullRequestState.indexStatus === "error"
+            isCurrentPullRequestRouteReplay
+              ? undefined
+              : pullRequestState.indexStatus === "error"
               ? "Check the connection and try again."
               : pullRequestState.indexStatus === "empty"
                 ? "No pull requests match the current filters."
                 : undefined
           }
+          heading={
+            isCurrentPullRequestRouteReplay &&
+            pullRequestState.indexStatus === "empty"
+              ? "No pull requests found"
+              : undefined
+          }
           status={pullRequestState.indexStatus}
-          variant="list"
+          variant={
+            isCurrentPullRequestRouteReplay ? "split-list" : "list"
+          }
         />
       )}
     </section>
@@ -12980,7 +13065,9 @@ export function App() {
         responsiveSidebarContinuity={false}
         sidePanel={
           view === "pull-request"
-            ? pullRequestPanel
+            ? isCurrentPullRequestRouteReplay
+              ? currentPullRequestEmptyPanel
+              : pullRequestPanel
             : isCurrentCitations26825Replay
               ? citationSourcesPanel
             : isCurrentBrowser26825Replay
@@ -13050,7 +13137,9 @@ export function App() {
               ? subagentPanelOpen
               : reviewOpen && Boolean(reviewPanel)
         }
-        sidePanelOverlay={view === "pull-request"}
+        sidePanelOverlay={
+          view === "pull-request" && !isCurrentPullRequestRouteReplay
+        }
         sidePanelOverlayModal={
           view !== "pull-request" &&
           !isCurrentCitations26825Replay &&
@@ -13078,7 +13167,8 @@ export function App() {
           currentContext26825Replay ||
           isCurrentRichMarkdownStreamingReplay ||
           isCurrentBasic26825Replay ||
-          isCurrentCitations26825Replay
+          isCurrentCitations26825Replay ||
+          isCurrentPullRequestRouteReplay
             ? 321.875
             : currentHomeFrame ||
                 isCurrentBrowser26825Replay ||

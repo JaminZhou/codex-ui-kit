@@ -10,6 +10,18 @@ describe("pull request lifecycle", () => {
       indexStatus: "loading",
       selectedId: null,
     });
+    expect(
+      initialPullRequestLifecycleState("pr-index-current-26-825-loading"),
+    ).toMatchObject({
+      indexStatus: "loading",
+      selectedId: null,
+    });
+    expect(
+      initialPullRequestLifecycleState("pr-index-current-26-825-empty"),
+    ).toMatchObject({
+      indexStatus: "empty",
+      selectedId: null,
+    });
     expect(initialPullRequestLifecycleState("pr-comment-failed")).toMatchObject({
       commentStatus: "error",
       commentError: "The comment was not posted. Try again.",
