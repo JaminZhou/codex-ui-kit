@@ -4615,7 +4615,8 @@ for (const scene of selectedScenes) {
                   scene.scenario === "markdown-current-26-825" ||
                   scene.scenario === "markdown-current-26-825-media" ||
                   scene.scenario === "current-basic-message" ||
-                  scene.scenario === "current-basic-message-26-825"
+                  scene.scenario === "current-basic-message-26-825" ||
+                  scene.scenario === "compaction"
                     ? "composer-permission"
                     : "composer-permission-ask",
                 width: 16,
@@ -9071,9 +9072,10 @@ for (const scene of selectedScenes) {
       const interruptionRule = interruptionSummary?.querySelector(
         ".codex-ui-thread-interruption-summary__rule",
       );
-      const contextEvent = document.querySelector(
+      const contextEvents = document.querySelectorAll(
         ".codex-ui-thread-context-event",
       );
+      const contextEvent = contextEvents[contextEvents.length - 1] ?? null;
       const contextOptimization = contextEvent?.querySelector(
         ".codex-ui-thread-context-optimization",
       );
@@ -16648,17 +16650,22 @@ for (const scene of selectedScenes) {
     }
 
     if (scene.id.startsWith("context-compaction-")) {
-      const commandMenu = scene.id === "context-compaction-command-menu";
-      const running = scene.id === "context-compaction-running";
-      const recovered = scene.id === "context-compaction-recovered";
+      const compactionFrame = scene.frame ?? scene.id;
+      const commandMenu =
+        compactionFrame === "context-compaction-command-menu";
+      const repeated = compactionFrame.startsWith(
+        "context-compaction-repeated-",
+      );
+      const running = compactionFrame.endsWith("-running");
+      const recovered = compactionFrame.endsWith("-recovered");
       const compactionState = await page.evaluate(() => ({
-        assistantText:
-          document
-            .querySelector(
-              '[data-item-id="assistant-context-compaction-recovery"] .codex-ui-markdown',
-            )
-            ?.textContent?.replace(/\s+/g, " ")
-            .trim() ?? null,
+        assistantTexts: [
+          ...document.querySelectorAll(
+            '[data-item-id^="assistant-context-compaction-"][data-item-id$="recovery"] .codex-ui-markdown',
+          ),
+        ].map((element) =>
+          (element.textContent ?? "").replace(/\s+/g, " ").trim(),
+        ),
         commandDescription:
           document
             .querySelector(".demo-compaction-command__description")
@@ -16703,7 +16710,7 @@ for (const scene of selectedScenes) {
           ? context !== null ||
             compactionState.commandLabel !== "Compact" ||
             compactionState.commandDescription !==
-              "Compact this chat's context (9% full)" ||
+              "Compact this chat's context (10% full)" ||
             compactionState.composerValue !== "/compact"
           : !context ||
             context.eventStatus !== (running ? "running" : "completed") ||
@@ -16713,16 +16720,27 @@ for (const scene of selectedScenes) {
             context.text !==
               (running ? "Compacting context" : "Context compacted") ||
             context.textStyle?.fontSize !== "14px" ||
-            context.textStyle?.fontWeight !== "445" ||
+            context.textStyle?.fontWeight !== "400" ||
             context.textStyle?.lineHeight !== "21px" ||
-            Math.abs((context.eventRect.width ?? 0) - 736) > 1 ||
+            Math.abs(
+              (context.eventRect.width ?? 0) -
+                (scene.windowSize?.width === 720 ? 688 : 736),
+            ) > 1 ||
             (running
               ? context.working !== "Working" ||
                 context.rule?.style.height !== "1px"
               : context.working !== null || context.rule !== null)) ||
-        (recovered
-          ? compactionState.assistantText !== "COMPACTION RECOVERY ACCEPTED"
-          : compactionState.assistantText !== null)
+        JSON.stringify(compactionState.assistantTexts) !==
+          JSON.stringify(
+            repeated && recovered
+              ? [
+                  "CURRENT 26.825 COMPACTION RECOVERY ACCEPTED",
+                  "CURRENT 26.825 REPEATED COMPACTION RECOVERY ACCEPTED",
+                ]
+              : repeated || recovered
+                ? ["CURRENT 26.825 COMPACTION RECOVERY ACCEPTED"]
+                : [],
+          )
       ) {
         throw new Error(
           `${scene.id}: current context compaction contract failed: ${JSON.stringify({
@@ -17900,7 +17918,7 @@ try {
   }
   await composer.fill("/compact");
   const compactCommand = contextCompactionPage.getByRole("option", {
-    name: "Compact this chat's context (9% full)",
+    name: "Compact this chat's context (10% full)",
   });
   await compactCommand.waitFor({ state: "visible" });
   await compactCommand.click();
@@ -17936,7 +17954,7 @@ try {
     '.demo-root[data-frame="context-compaction-completed"][data-status="completed"][data-composer-phase="idle"] .codex-ui-thread-context-event[data-status="completed"]',
   );
   const recoveryPrompt =
-    "Do not use tools. Reply with exactly: COMPACTION RECOVERY ACCEPTED";
+    "Do not use tools. Reply with exactly CURRENT 26.825 COMPACTION RECOVERY ACCEPTED";
   await composer.fill(recoveryPrompt);
   await composer.press("Enter");
   await contextCompactionPage.waitForSelector(
@@ -17967,7 +17985,8 @@ try {
   }));
   if (
     recovered.activeElement !== "Message composer" ||
-    recovered.assistantText !== "COMPACTION RECOVERY ACCEPTED" ||
+    recovered.assistantText !==
+      "CURRENT 26.825 COMPACTION RECOVERY ACCEPTED" ||
     recovered.contextLabel !== "Context compacted" ||
     recovered.stopCount !== 0
   ) {
@@ -17978,25 +17997,32 @@ try {
   await composer.fill("/compact");
   await composer.press("Enter");
   await contextCompactionPage.waitForSelector(
-    '.demo-root[data-frame="context-compaction-running"][data-status="running"] button[aria-label="Stop"]',
+    '.demo-root[data-frame="context-compaction-repeated-running"][data-status="running"] button[aria-label="Stop"]',
   );
-  await contextCompactionPage.getByRole("button", { name: "Stop" }).click();
   await contextCompactionPage.waitForSelector(
-    '.demo-root[data-frame="context-compaction-ready"][data-status="completed"][data-composer-phase="idle"]',
+    '.demo-root[data-frame="context-compaction-repeated-completed"][data-status="completed"][data-composer-phase="idle"] .codex-ui-thread-context-event[data-status="completed"]',
+  );
+  const repeatedRecoveryPrompt =
+    "Do not use tools. Reply with exactly CURRENT 26.825 REPEATED COMPACTION RECOVERY ACCEPTED";
+  await composer.fill(repeatedRecoveryPrompt);
+  await composer.press("Enter");
+  await contextCompactionPage.waitForSelector(
+    '.demo-root[data-frame="context-compaction-repeated-recovered"][data-status="completed"][data-composer-phase="idle"] [data-item-id="assistant-context-compaction-repeated-recovery"]',
   );
   await contextCompactionPage.waitForFunction(
     () =>
       document.activeElement?.getAttribute("aria-label") ===
       "Message composer",
   );
-  const stopped = await contextCompactionPage.evaluate(() => ({
+  const repeated = await contextCompactionPage.evaluate(() => ({
     activeElement: document.activeElement?.getAttribute("aria-label"),
-    composerValue: (() => {
-      const composer = document.querySelector(
-        '[aria-label="Message composer"]',
-      );
-      return composer && "value" in composer ? composer.value : null;
-    })(),
+    assistantText:
+      document
+        .querySelector(
+          '[data-item-id="assistant-context-compaction-repeated-recovery"] .codex-ui-markdown',
+        )
+        ?.textContent?.replace(/\s+/g, " ")
+        .trim() ?? null,
     contextCount: document.querySelectorAll(
       ".codex-ui-thread-context-event",
     ).length,
@@ -18005,18 +18031,19 @@ try {
     ).length,
   }));
   if (
-    stopped.activeElement !== "Message composer" ||
-    stopped.composerValue !== "" ||
-    stopped.contextCount !== 0 ||
-    stopped.stopCount !== 0
+    repeated.activeElement !== "Message composer" ||
+    repeated.assistantText !==
+      "CURRENT 26.825 REPEATED COMPACTION RECOVERY ACCEPTED" ||
+    repeated.contextCount !== 2 ||
+    repeated.stopCount !== 0
   ) {
     throw new Error(
-      `Current context compaction Stop reset failed: ${JSON.stringify(stopped)}`,
+      `Current context compaction repeated recovery failed: ${JSON.stringify(repeated)}`,
     );
   }
   await writeFile(
     join(artifactDirectory, "context-compaction-interaction.json"),
-    `${JSON.stringify({ premature, recovered, running, stopped }, null, 2)}\n`,
+    `${JSON.stringify({ premature, recovered, repeated, running }, null, 2)}\n`,
   );
 } finally {
   await contextCompactionApp.close();

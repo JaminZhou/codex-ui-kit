@@ -254,12 +254,18 @@ rows, and exposes enabled Commit and pull-request actions for the sampled dirty
 branch. Collapse, Escape, and outside dismissal were exercised in-product; the
 public replay deliberately retains trigger focus restoration even though the
 sampled product left focus unset. CDP, Electron, one reviewed baseline, and a
-dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
-`/compact` attempt reached the current no-percentage command row and
-`Compacting context`, but the remote compact task failed and exposed Resume,
-so successful compaction/recovery remains previous-build evidence.
+dynamic-delta-masked 2.6918% product comparison gate the slice. An earlier
+companion `/compact` attempt ended in a remote connection error, but a fresh
+isolated probe after network recovery supersedes that negative sample. It
+reaches the content-dependent `10% full` command, `Working`, `Compacting
+context`, `Context compacted`, and exact same-thread recovery. A second
+`/compact` in the same task also completes and recovers. Current computed
+styles lock 14/21px weight-400 labels, 28px Stop/Send controls, zero horizontal
+overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
+product comparison under a 1.5% limit. Browser/CDP and Electron drive both
+rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 60 have current-build runtime evidence, 20 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 55 groups and Electron verification covers 55.
+Current inventory: 91 surface groups; 61 have current-build runtime evidence, 19 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 56 groups and Electron verification covers 56.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1859,9 +1865,9 @@ and pull-request rows are enabled on the sampled dirty branch. Product
 collapse, Escape, and outside dismissal pass; the replay keeps its safer focus
 return rather than copying the sampled product's unset focus. The reviewed
 baseline and dynamic-delta-masked product crop differ by 2.6918% under 3%.
-Successful `/compact` settlement is not promoted: the current attempt reached
-the new no-percentage menu and running state but ended in a remote-task error
-with Resume.
+The first current `/compact` attempt ended in a remote-task error with Resume;
+the later isolated success and repeat capture documented above supersedes that
+negative sample and promotes the sampled manual lifecycle.
 
 A `26.730.61639` isolated task then delegated one real long-running subagent,
 observed its `working` and completed states, and opened the populated

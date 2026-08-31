@@ -294,7 +294,7 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   compaction: scenario(
     "compaction",
     "Acknowledge compaction baseline",
-    "The current manual /compact command transitions from running to completed and accepts a clean same-thread follow-up.",
+    "The runtime-observed 26.825 manual /compact command transitions from running to completed, accepts a clean same-thread follow-up, and repeats successfully in the same task.",
     compactionTrace,
   ),
   "context-summary": scenario(
