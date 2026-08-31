@@ -2494,7 +2494,7 @@ for (const scene of selectedScenes) {
     const referenceCrop = cropPng(
       reference,
       379,
-      276,
+      324,
       crop.width,
       crop.height,
     );
@@ -2526,7 +2526,7 @@ for (const scene of selectedScenes) {
     }
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_CURRENT_SEARCH_26_825_MAX_DIFF_RATIO",
-      0.11,
+      0.05,
     );
     if (comparison.ratio > maximumRatio) {
       throw new Error(

@@ -67,8 +67,8 @@ observation from a previous build remains historical evidence.
   Explore is present and `Sites` is absent from the sampled fixed-route stack.
   Details are in
   [`26.825.51511.md`](26.825.51511.md). Rich Markdown streaming, Plan progress,
-  and long-thread navigation are current on 26.825.51511; activity and
-  Search/Browser follow-ups remain 26.825.31414 regression evidence. That
+  long-thread navigation, and Web Search are current on 26.825.51511; activity
+  and Browser follow-ups remain 26.825.31414 regression evidence. That
   previous activity follow-up re-observes the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
@@ -80,12 +80,14 @@ observation from a previous build remains historical evidence.
   even though the sampled product now exposes nonsemantic `div`/`span`
   containers. CDP/Electron continue to gate the lifecycle and the tight
   current-product comparison passes at 3.5294%. Broader reasoning remains
-  incomplete. A separate current read-only Search/Browser probe covers the
-  two-level Web Search disclosure, the generic MCP-backed Browser activity
-  group, and the
-  419.59375px one-tab Browser workspace. CDP gates six frames; Electron repeats
-  both open lifecycles and collapse/reopen. The local-only Search, Browser
-  activity, and Browser-chrome comparisons pass at 10.32%, 8.45%, and 2.80%.
+  incomplete. A separate current read-only Web Search probe covers the
+  two-level `Worked for 23s` → `Searched the web` disclosure and current two-row
+  copy. CDP gates three frames; Electron repeats collapse/reopen, and the
+  local-only foreground comparison passes at 4.0506% under 5%. The previous
+  26.825.31414 Browser probe retains the generic MCP-backed activity group and
+  419.59375px one-tab workspace, with 8.45% activity and 2.80% chrome
+  comparisons. Two attempted 26.825.51511 Browser turns opened the public page
+  but did not settle after network reconnect, so Browser is not promoted.
   External page content is explicitly source-owned and excluded. Multi-tab,
   authentication, download, permission, history, and page error states remain
   incomplete.
@@ -224,7 +226,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 49 have current-build runtime evidence, 31 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 44 groups and Electron verification covers 44.
+Current inventory: 91 surface groups; 50 have current-build runtime evidence, 30 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 45 groups and Electron verification covers 45.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

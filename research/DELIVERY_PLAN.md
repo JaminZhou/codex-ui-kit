@@ -14,8 +14,15 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 49 groups have current-build runtime evidence, 31 have previous-build-only
+- 50 groups have current-build runtime evidence, 30 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current Web Search follow-up reaches two real public searches, settles as
+  `Worked for 23s`, and exposes the current `Searched the web for Codex app
+  desktop` / `Searched the web for "desktop"` rows. Three CDP frames, native
+  Electron disclosure interaction, three reviewed baselines, and a 4.0506%
+  foreground comparison promote `thread.search-tool-events`. The Browser page
+  opened during current probing but two turns failed to settle after reconnect,
+  so Browser activity/workspace remain 26.825.31414 regression evidence.
 - The current command-failure follow-up reaches a real exit-code-7 command and
   an exact same-thread no-tool recovery. The Renderer keeps the failure as a
   neutral `Ran …` row and hides stdout, stderr, Shell, and exit-code cards while
@@ -91,16 +98,18 @@ exit gates; it does not replace the inventory.
   expanded, progress, all-complete, and settled contracts. Free-form reasoning
   and unsampled reasoning variants remain P0 work, so the combined inventory
   group stays partial.
-  A further read-only 26.825.31414 probe promotes
+  A further read-only probe originally covered
   `thread.search-tool-events`, `thread.browser-tool-events`, and
-  `workspace.browser`. Web Search preserves the two-level `Worked for 21s` →
-  `Searched the web` disclosure and two 14/21px result rows. Browser presents
+  `workspace.browser`. Web Search is now refreshed on 26.825.51511 with the
+  two-level `Worked for 23s` → `Searched the web` disclosure and two 14/21px
+  current result rows. Browser remains 26.825.31414 evidence and presents
   the current generic read-only MCP sequence as `Used the browser, loaded a
   tool`, retains the skill/connect/navigation steps, and opens a 419.59375px
   one-tab workspace with a 46px tab strip and 40px navigation toolbar.
-  Browser/CDP covers six collapsed/expanded frames, Electron repeats both open
-  lifecycles, and local-only product comparisons pass at 10.32% for Search,
-  8.45% for Browser activity, and 2.80% for Browser chrome. External page
+  Search Browser/CDP covers three collapsed/expanded frames, Electron repeats
+  its open lifecycle, and its local-only foreground comparison passes at
+  4.0506% under 5%. The previous Browser activity and chrome comparisons pass
+  at 8.45% and 2.80%. External page
   pixels remain source-owned and are excluded behind an explicit content
   boundary. Multi-tab, authentication, downloads, permission prompts, and
   page-owned states remain incomplete.

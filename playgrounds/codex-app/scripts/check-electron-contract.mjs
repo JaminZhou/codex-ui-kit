@@ -13406,8 +13406,8 @@ for (const browserSurface of [false, true]) {
           "打开页面并查找 desktop",
         ]
       : [
-          "Searched the web for Codex app desktop | openai.com",
-          "Searched the web for 'desktop'",
+          "Searched the web for Codex app desktop",
+          'Searched the web for "desktop"',
         ];
     const expectedToolbarLabels = [
       "Back",

@@ -13110,7 +13110,7 @@ for (const scene of selectedScenes) {
         activityOpen || scene.id.endsWith("-worked-open");
       const expectedDuration =
         scene.scenario === "current-search-26-825"
-          ? "Worked for 21s"
+          ? "Worked for 23s"
           : "Worked for 56s";
       if (
         currentSearchBrowser.timelineExpanded !== timelineOpen ||
@@ -13133,8 +13133,8 @@ for (const scene of selectedScenes) {
         (currentSearchBrowser.activity?.summary !== "Searched the web" ||
           JSON.stringify(currentSearchBrowser.entries) !==
             JSON.stringify([
-              "Searched the web for Codex app desktop | openai.com",
-              "Searched the web for 'desktop'",
+              "Searched the web for Codex app desktop",
+              'Searched the web for "desktop"',
             ]))
       ) {
         throw new Error(

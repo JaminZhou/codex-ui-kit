@@ -32,7 +32,7 @@ describe("protocol lifecycle reducer", () => {
         query: "Codex app desktop",
         status: "completed",
       }),
-      expect.objectContaining({ query: "'desktop'", status: "completed" }),
+      expect.objectContaining({ query: '\"desktop\"', status: "completed" }),
     ]);
 
     const browserScenario = replayScenarios["current-browser-26-825"];
