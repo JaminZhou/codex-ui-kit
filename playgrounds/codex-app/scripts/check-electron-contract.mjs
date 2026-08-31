@@ -17962,6 +17962,175 @@ for (const expected of [
   }
 }
 
+for (const expected of [
+  {
+    currentWaitCount: 1,
+    frame: "current-transport-network-waiting",
+    id: "electron-current-transport-network-waiting",
+    status: "retrying",
+  },
+  {
+    currentWaitCount: 2,
+    frame: "current-transport-network-waiting-repeated",
+    id: "electron-current-transport-network-waiting-repeated",
+    status: "retrying",
+  },
+  {
+    currentWaitCount: 2,
+    frame: "current-transport-network-waiting-repeated",
+    id: "electron-current-transport-network-waiting-repeated-compact",
+    status: "retrying",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentWaitCount: 6,
+    frame: "current-transport-network-waiting-sixth",
+    id: "electron-current-transport-network-waiting-sixth",
+    status: "retrying",
+  },
+  {
+    currentWaitCount: 0,
+    frame: "current-transport-recovered",
+    id: "electron-current-transport-recovered",
+    status: "completed",
+  },
+  {
+    currentWaitCount: 0,
+    frame: "current-transport-followup",
+    followup: "CURRENT 26.825 TRANSPORT RECOVERY ACCEPTED",
+    id: "electron-current-transport-followup",
+    status: "completed",
+  },
+]) {
+  const { app, page } = await launchScene(
+    {
+      currentSidebar: true,
+      frame: expected.frame,
+      id: expected.id,
+      scenario: "streaming-recovery-current-26-825",
+      sidebarState: "hidden",
+      windowSize: expected.windowSize,
+    },
+    { capture: false },
+  );
+  try {
+    const contract = await page.evaluate(() => {
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const value = element.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const notices = [
+        ...document.querySelectorAll(".codex-ui-stream-notice"),
+      ].map((notice) => {
+        const currentNetworkWait = notice.classList.contains(
+          "codex-ui-stream-notice--current-network-wait",
+        );
+        const icon = notice.querySelector(
+          ".codex-ui-stream-notice__icon",
+        );
+        const iconSvg = icon?.querySelector("svg");
+        const style = getComputedStyle(notice);
+        return {
+          currentNetworkWait,
+          icon: rect(icon),
+          iconPathCount: iconSvg?.querySelectorAll("path").length ?? 0,
+          iconSvg: rect(iconSvg),
+          rect: rect(notice),
+          role: notice.getAttribute("role"),
+          style: {
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            lineHeight: style.lineHeight,
+          },
+          text: notice.textContent?.replace(/\s+/g, " ").trim() ?? null,
+        };
+      });
+      return {
+        assistant: document
+          .querySelector('[data-item-id="assistant-current-transport-26-825"]')
+          ?.textContent?.replace(/\s+/g, " ")
+          .trim(),
+        followup: document
+          .querySelector(
+            '[data-item-id="assistant-current-transport-followup-26-825"]',
+          )
+          ?.textContent?.replace(/\s+/g, " ")
+          .trim(),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        notices,
+        sendCount: document.querySelectorAll(
+          '.codex-ui-composer__primary[aria-label="Send"]',
+        ).length,
+        status: document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-status"),
+        stopCount: document.querySelectorAll(
+          '.codex-ui-composer__primary[aria-label="Stop"]',
+        ).length,
+        window: { height: innerHeight, width: innerWidth },
+      };
+    });
+    const currentWaits = contract.notices.filter(
+      ({ currentNetworkWait }) => currentNetworkWait,
+    );
+    const standardRetries = contract.notices.filter(
+      ({ currentNetworkWait }) => !currentNetworkWait,
+    );
+    const currentWaitGaps = currentWaits.slice(1).map(
+      ({ rect }, index) =>
+        (rect?.top ?? Number.NaN) -
+        (currentWaits[index].rect?.top ?? Number.NaN),
+    );
+    const waiting = expected.status === "retrying";
+    if (
+      contract.status !== expected.status ||
+      contract.horizontalOverflow > 1 ||
+      standardRetries.length !== 1 ||
+      standardRetries[0].text !== "Reconnecting 1/5" ||
+      currentWaits.length !== expected.currentWaitCount ||
+      currentWaits.some(
+        (notice) =>
+          notice.text !== "Reconnecting... waiting for network" ||
+          notice.role !== "status" ||
+          notice.style.fontSize !== "14px" ||
+          notice.style.fontWeight !== "400" ||
+          notice.style.lineHeight !== "21px" ||
+          notice.icon?.width !== 16 ||
+          notice.icon?.height !== 21 ||
+          notice.iconSvg?.width !== 16 ||
+          notice.iconSvg?.height !== 16 ||
+          notice.iconPathCount !== 4 ||
+          notice.rect?.height !== 21,
+      ) ||
+      currentWaitGaps.some((gap) => Math.abs(gap - 37) > 1) ||
+      contract.stopCount !== (waiting ? 1 : 0) ||
+      contract.sendCount !== (waiting ? 0 : 1) ||
+      (!waiting &&
+        !contract.assistant?.includes(
+          "continued after the isolated network returned",
+        )) ||
+      (expected.followup && contract.followup !== expected.followup) ||
+      (expected.windowSize &&
+        (contract.window.width !== expected.windowSize.width ||
+          contract.window.height !== expected.windowSize.height))
+    ) {
+      throw new Error(
+        `${expected.id} contract failed: ${JSON.stringify({ ...contract, currentWaitGaps })}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const currentBasicThreadScene = {
   currentSidebar: true,
   frame: "current-basic-completed",

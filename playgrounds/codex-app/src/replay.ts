@@ -50,6 +50,7 @@ import mcpRecoveryMixedThreadTrace from "../fixtures/traces/mcp-recovery-mixed-t
 import mixedFileReviewTrace from "../fixtures/traces/mixed-file-review.jsonl?raw";
 import multiFileReviewTrace from "../fixtures/traces/multi-file-review.jsonl?raw";
 import recoveryTrace from "../fixtures/traces/streaming-recovery.jsonl?raw";
+import currentTransport26825Trace from "../fixtures/traces/streaming-recovery-current-26-825.jsonl?raw";
 import subagentConcurrencyTrace from "../fixtures/traces/subagent-concurrency.jsonl?raw";
 import subagentDelegationTrace from "../fixtures/traces/subagent-delegation.jsonl?raw";
 import subagentNestedTrace from "../fixtures/traces/subagent-nested.jsonl?raw";
@@ -75,6 +76,7 @@ export type ReplayScenarioId =
   | "command-failure-recovery"
   | "conversation-lifecycle"
   | "streaming-recovery"
+  | "streaming-recovery-current-26-825"
   | "subagent-concurrency"
   | "subagent-delegation"
   | "subagent-nested"
@@ -260,6 +262,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Streaming retry, failure, and recovery",
     "Incremental reply, in-place retry progress, successful recovery, final failure, and a successful same-thread follow-up.",
     recoveryTrace,
+  ),
+  "streaming-recovery-current-26-825": scenario(
+    "streaming-recovery-current-26-825",
+    "Current 26.825 network recovery",
+    "A current standard reconnect row, repeated open-ended waiting-for-network activities, successful cleanup, and a same-task follow-up.",
+    currentTransport26825Trace,
   ),
   "subagent-delegation": scenario(
     "subagent-delegation",

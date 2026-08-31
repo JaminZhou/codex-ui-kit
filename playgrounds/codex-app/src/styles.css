@@ -2594,6 +2594,11 @@ textarea {
   gap: 12px;
 }
 
+.demo-root[data-scenario="streaming-recovery-current-26-825"]
+  .codex-ui-agent-turn {
+  gap: 16px;
+}
+
 .demo-root[data-scenario="approval-allow-once"],
 .demo-root[data-scenario="approval-denied"],
 .demo-root[data-scenario="approval-similar-commands"] {

@@ -2253,6 +2253,52 @@ recoverably to Trash, terminate only the validated isolated process tree and
 profile-owned Crashpad handlers, prove the port is closed, and recheck that the
 user-owned Codex PID remains alive.
 
+## Current `26.825.51511` transport recovery sample
+
+Use only a second Codex process with a unique profile and loopback CDP port.
+Never proxy the primary user-owned process. Start the repository helper with a
+new loopback port and the explicit mutation opt-in:
+
+```bash
+CODEX_CURRENT_TRANSPORT_PROXY_PORT=9913 \
+CODEX_CURRENT_TRANSPORT_PROXY_ALLOW_DROP=1 \
+  pnpm capture:current-transport-proxy-26-825
+```
+
+Launch the isolated app process directly with `HTTPS_PROXY`, `HTTP_PROXY`, and
+`ALL_PROXY` pointing to that exact loopback proxy; keep localhost in
+`NO_PROXY`. Before any drop, verify the installed 26.825.51511/7377
+fingerprint, exact isolated profile, CDP owner PID, proxy owner PID/listener,
+and proxy logs showing the isolated app's 443 CONNECT tunnels. `SIGUSR1` puts
+only this helper offline and destroys its recorded tunnels. `SIGUSR2` resumes
+new CONNECTs. Do not use machine-wide network controls, alter system proxy
+settings, or signal an unvalidated PID.
+
+During an active sanitized no-tool turn, require the current standard
+`Reconnecting 1/5` row followed by exact
+`Reconnecting... waiting for network` rows. The accepted sample observes six
+network waits at approximately 3.1/10.9/24.1/47.1/90.2/153.3 seconds. Capture
+fixed labels, counts, geometry, computed style, reusable SVG paths, and wide /
+compact screenshots only. After `SIGUSR2`, require in-place completion,
+removal of all transient network-wait rows, retention of the standard retry
+row, Stop-to-Send recovery, zero horizontal overflow, and an exact same-task
+follow-up response.
+
+The external pixel gate remains optional and local-only:
+
+```bash
+CODEX_UI_KIT_CURRENT_TRANSPORT_26_825_WAITING_REFERENCE=/absolute/path/to/current-waiting-network-wide.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=current-transport-network-waiting,current-transport-network-waiting-repeated,current-transport-network-waiting-repeated-compact,current-transport-network-waiting-sixth,current-transport-recovered,current-transport-followup
+```
+
+It requires exact 1180×820 frames, crops only the owned 280×32 waiting row,
+and defaults to a 4% maximum difference. Product frames remain outside the
+repository. Archive the exact disposable task, terminate only the validated
+isolated process tree and profile-owned Crashpad handlers, stop the exact proxy
+PID, prove both loopback ports closed, move the exact profile and raw evidence
+recoverably to Trash, and recheck that the primary Codex PID remains alive.
+
 ## Current `26.825.51511` manual context-compaction sample
 
 Use `pnpm capture:current-compaction-26-825` only with the explicit

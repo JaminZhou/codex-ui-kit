@@ -148,6 +148,37 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the runtime-observed 26.825 transport recovery lifecycle", () => {
+    for (const scene of [
+      "current-transport-network-waiting",
+      "current-transport-network-waiting-repeated",
+      "current-transport-network-waiting-repeated-compact",
+      "current-transport-network-waiting-sixth",
+      "current-transport-recovered",
+      "current-transport-followup",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_TRANSPORT_26_825_WAITING_REFERENCE",
+    );
+    expect(contract).toContain(
+      "CODEX_UI_KIT_CURRENT_TRANSPORT_26_825_WAITING_MAX_DIFF_RATIO",
+    );
+    expect(cdpContract).toContain(
+      "current transport recovery contract failed",
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-transport-followup"',
+    );
+    expect(appSource).toContain(
+      'scenarioId === "streaming-recovery-current-26-825"',
+    );
+    expect(appStyles).toContain(
+      '[data-scenario="streaming-recovery-current-26-825"]',
+    );
+  });
+
   it("gates the runtime-observed 26.825 Browser failure and Composer recovery", () => {
     for (const scene of [
       "conversation-browser-current-26-825-chromium-error",

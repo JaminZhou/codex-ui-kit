@@ -3572,8 +3572,14 @@ export function App() {
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
-  const isCurrentTransportRecoveryReplay =
+  const isCurrentNetworkTransportRecoveryReplay =
+    mode === "replay" &&
+    scenarioId === "streaming-recovery-current-26-825";
+  const isLegacyTransportRecoveryReplay =
     mode === "replay" && scenarioId === "streaming-recovery";
+  const isCurrentTransportRecoveryReplay =
+    isLegacyTransportRecoveryReplay ||
+    isCurrentNetworkTransportRecoveryReplay;
   const isCurrentBasicMessageReplay =
     mode === "replay" && scenarioId === "current-basic-message";
   const isCurrentBasic26825Replay =
@@ -6075,7 +6081,7 @@ export function App() {
     isCurrentCommandFailureReplay ||
     isCurrentCommandInterruptionReplay ||
     isCurrentContextSummaryReplay ||
-    isCurrentTransportRecoveryReplay ||
+    isLegacyTransportRecoveryReplay ||
     isCurrentMixedToolReplay ||
     isCurrentSubagentReplay ||
     scenarioId === "current-review-rename" ||
@@ -11141,9 +11147,17 @@ export function App() {
     if (entry.kind === "streamError") {
       const streamError = state.streamErrors.find(({ id }) => id === entry.id);
       if (!streamError) return null;
+      const isCurrentNetworkWait =
+        isCurrentNetworkTransportRecoveryReplay &&
+        streamError.content === "Reconnecting... waiting for network";
       return (
         <StreamNotice
           additionalDetails={streamError.additionalDetails}
+          className={
+            isCurrentNetworkWait
+              ? "codex-ui-stream-notice--current-network-wait"
+              : undefined
+          }
           data-item-id={streamError.id}
           icon={
             isCurrentTransportRecoveryReplay ? (
@@ -11157,9 +11171,15 @@ export function App() {
           }
           serverBusy={streamError.serverBusy}
         >
-          {streamError.reconnectAttempt === null
-            ? streamError.content
-            : undefined}
+          {streamError.reconnectAttempt === null ? (
+            isCurrentNetworkWait ? (
+              <span className="codex-ui-current-network-wait-label">
+                {streamError.content}
+              </span>
+            ) : (
+              streamError.content
+            )
+          ) : undefined}
         </StreamNotice>
       );
     }

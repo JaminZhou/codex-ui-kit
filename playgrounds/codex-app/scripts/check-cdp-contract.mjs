@@ -86,6 +86,7 @@ const currentReplayComposerScenarios = new Set([
   "subagent-delegation",
   "subagent-nested",
   "subagent-recovery",
+  "streaming-recovery-current-26-825",
 ]);
 const currentApprovalComposerScenes = new Set([
   "approval-current-allow-once-completed",
@@ -3995,6 +3996,163 @@ for (const scene of selectedScenes) {
         `${JSON.stringify(transport, null, 2)}\n`,
       );
     }
+    if (
+      scene.scenario === "streaming-recovery-current-26-825" &&
+      [
+        "current-transport-network-waiting",
+        "current-transport-network-waiting-repeated",
+        "current-transport-network-waiting-repeated-compact",
+        "current-transport-network-waiting-sixth",
+        "current-transport-recovered",
+        "current-transport-followup",
+      ].includes(scene.id)
+    ) {
+      const transport = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const visible = (element) =>
+          element instanceof HTMLElement &&
+          element.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          });
+        const notices = [
+          ...document.querySelectorAll(".codex-ui-stream-notice"),
+        ].map((notice) => {
+          const icon = notice.querySelector(
+            ".codex-ui-stream-notice__icon",
+          );
+          const iconSvg = icon?.querySelector("svg");
+          const label = notice.querySelector(
+            ".codex-ui-current-network-wait-label",
+          );
+          const style = getComputedStyle(notice);
+          return {
+            currentNetworkWait: notice.classList.contains(
+              "codex-ui-stream-notice--current-network-wait",
+            ),
+            icon: rect(icon),
+            iconPathCount: iconSvg?.querySelectorAll("path").length ?? 0,
+            iconSvg: rect(iconSvg),
+            label: rect(label),
+            rect: rect(notice),
+            role: notice.getAttribute("role"),
+            style: {
+              color: style.color,
+              fontSize: style.fontSize,
+              fontWeight: style.fontWeight,
+              lineHeight: style.lineHeight,
+            },
+            text: notice.textContent?.replace(/\s+/g, " ").trim() ?? null,
+          };
+        });
+        return {
+          assistant: document
+            .querySelector('[data-item-id="assistant-current-transport-26-825"]')
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim(),
+          followup: document
+            .querySelector(
+              '[data-item-id="assistant-current-transport-followup-26-825"]',
+            )
+            ?.textContent?.replace(/\s+/g, " ")
+            .trim(),
+          frame: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-frame"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          notices,
+          sendCount: [...document.querySelectorAll("button")].filter(
+            (button) =>
+              visible(button) && button.getAttribute("aria-label") === "Send",
+          ).length,
+          status: document
+            .querySelector(".demo-root")
+            ?.getAttribute("data-status"),
+          stopCount: [...document.querySelectorAll("button")].filter(
+            (button) =>
+              visible(button) && button.getAttribute("aria-label") === "Stop",
+          ).length,
+          window: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const waiting = scene.id.includes("network-waiting");
+      const expectedCurrentWaitCount =
+        scene.id === "current-transport-network-waiting"
+          ? 1
+          : scene.id === "current-transport-network-waiting-repeated" ||
+              scene.id ===
+                "current-transport-network-waiting-repeated-compact"
+            ? 2
+            : scene.id === "current-transport-network-waiting-sixth"
+              ? 6
+              : 0;
+      const currentWaits = transport.notices.filter(
+        ({ currentNetworkWait }) => currentNetworkWait,
+      );
+      const standardRetries = transport.notices.filter(
+        ({ currentNetworkWait }) => !currentNetworkWait,
+      );
+      const currentWaitTops = currentWaits
+        .map(({ rect }) => rect?.top)
+        .filter((top) => typeof top === "number");
+      const currentWaitGaps = currentWaitTops.slice(1).map(
+        (top, index) => top - currentWaitTops[index],
+      );
+      if (
+        transport.frame !== scene.frame ||
+        transport.status !== (waiting ? "retrying" : "completed") ||
+        transport.horizontalOverflow > 1 ||
+        transport.notices.length !== 1 + expectedCurrentWaitCount ||
+        standardRetries.length !== 1 ||
+        standardRetries[0].text !== "Reconnecting 1/5" ||
+        standardRetries[0].role !== "status" ||
+        currentWaits.length !== expectedCurrentWaitCount ||
+        currentWaits.some(
+          (notice) =>
+            notice.text !== "Reconnecting... waiting for network" ||
+            notice.role !== "status" ||
+            notice.style.fontSize !== "14px" ||
+            notice.style.lineHeight !== "21px" ||
+            notice.style.fontWeight !== "400" ||
+            Math.abs((notice.icon?.width ?? 0) - 16) > 1 ||
+            Math.abs((notice.icon?.height ?? 0) - 21) > 1 ||
+            Math.abs((notice.iconSvg?.width ?? 0) - 16) > 1 ||
+            Math.abs((notice.iconSvg?.height ?? 0) - 16) > 1 ||
+            notice.iconPathCount !== 4 ||
+            Math.abs((notice.label?.height ?? 0) - 17) > 1 ||
+            Math.abs((notice.rect?.height ?? 0) - 21) > 1,
+        ) ||
+        currentWaitGaps.some((gap) => Math.abs(gap - 37) > 1) ||
+        transport.stopCount !== (waiting ? 1 : 0) ||
+        transport.sendCount !== (waiting ? 0 : 1) ||
+        (!waiting &&
+          !transport.assistant?.includes(
+            "continued after the isolated network returned",
+          )) ||
+        (scene.id === "current-transport-followup" &&
+          transport.followup !==
+            "CURRENT 26.825 TRANSPORT RECOVERY ACCEPTED")
+      ) {
+        throw new Error(
+          `${scene.id}: current transport recovery contract failed: ${JSON.stringify(transport)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}-current-transport.json`),
+        `${JSON.stringify({ ...transport, currentWaitGaps }, null, 2)}\n`,
+      );
+    }
     if (scene.id === "current-basic-thread") {
       const basicThread = await page.evaluate(() => {
         const rect = (element) => {
@@ -4616,7 +4774,9 @@ for (const scene of selectedScenes) {
                   scene.scenario === "markdown-current-26-825-media" ||
                   scene.scenario === "current-basic-message" ||
                   scene.scenario === "current-basic-message-26-825" ||
-                  scene.scenario === "compaction"
+                  scene.scenario === "compaction" ||
+                  scene.scenario ===
+                    "streaming-recovery-current-26-825"
                     ? "composer-permission"
                     : "composer-permission-ask",
                 width: 16,
