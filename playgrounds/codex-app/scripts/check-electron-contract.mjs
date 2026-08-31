@@ -13710,23 +13710,23 @@ try {
   await currentWindowedApp.close();
 }
 
-const current26820LongThreadScene = {
+const current26825LongThreadScene = {
   currentSidebar: true,
-  frame: "thread-current-26-820-middle",
-  id: "electron-current-26-820-long-thread",
+  frame: "thread-current-26-825-middle",
+  id: "electron-current-26-825-long-thread",
   scenario: "conversation-lifecycle",
   sidebarState: "hidden",
 };
 const {
-  app: current26820LongThreadApp,
-  page: current26820LongThreadPage,
-} = await launchScene(current26820LongThreadScene, { capture: false });
+  app: current26825LongThreadApp,
+  page: current26825LongThreadPage,
+} = await launchScene(current26825LongThreadScene, { capture: false });
 try {
-  await current26820LongThreadPage.waitForSelector(
-    '.demo-root[data-windowed-timeline="current-26-820"][data-thread-following="false"] [data-selected-message-index="15"][data-mounted-turn-count="11"]',
+  await current26825LongThreadPage.waitForSelector(
+    '.demo-root[data-windowed-timeline="current-26-825"][data-thread-following="false"] [data-selected-message-index="15"][data-mounted-turn-count="12"]',
   );
-  const current26820Geometry =
-    await current26820LongThreadPage.evaluate(() => {
+  const current26825Geometry =
+    await current26825LongThreadPage.evaluate(() => {
       const rect = (selector) => {
         const element = document.querySelector(selector);
         if (!(element instanceof Element)) return null;
@@ -13771,41 +13771,41 @@ try {
       };
     });
   if (
-    current26820Geometry.activeNavigation !==
-      "Jump to user message 30" ||
-    current26820Geometry.navigationButtons !== 30 ||
-    current26820Geometry.mountedTurns !== 11 ||
-    current26820Geometry.placeholders !== 2 ||
-    !current26820Geometry.navigation ||
-    Math.abs(current26820Geometry.navigation.left - 17) > 1 ||
-    Math.abs(current26820Geometry.navigation.top - 283.5) > 1 ||
-    Math.abs(current26820Geometry.navigation.width - 36) > 1 ||
-    Math.abs(current26820Geometry.navigation.height - 300) > 1 ||
-    !current26820Geometry.composer ||
-    Math.abs(current26820Geometry.composer.left - 222.5) > 1 ||
-    Math.abs(current26820Geometry.composer.top - 706) > 1 ||
-    Math.abs(current26820Geometry.composer.width - 736) > 1 ||
-    Math.abs(current26820Geometry.composer.height - 98) > 1 ||
-    !current26820Geometry.viewport ||
-    current26820Geometry.viewport.flexDirection !== "column-reverse" ||
-    Math.abs(current26820Geometry.viewport.scrollTop + 2_346) > 1 ||
-    Math.abs(current26820Geometry.viewport.scrollHeight - 4_618) > 2
+    current26825Geometry.activeNavigation !==
+      "Jump to user message 11" ||
+    current26825Geometry.navigationButtons !== 30 ||
+    current26825Geometry.mountedTurns !== 12 ||
+    current26825Geometry.placeholders !== 2 ||
+    !current26825Geometry.navigation ||
+    Math.abs(current26825Geometry.navigation.left - 16) > 1 ||
+    Math.abs(current26825Geometry.navigation.top - 283.5) > 1 ||
+    Math.abs(current26825Geometry.navigation.width - 36) > 1 ||
+    Math.abs(current26825Geometry.navigation.height - 300) > 1 ||
+    !current26825Geometry.composer ||
+    Math.abs(current26825Geometry.composer.left - 222) > 1 ||
+    Math.abs(current26825Geometry.composer.top - 706) > 1 ||
+    Math.abs(current26825Geometry.composer.width - 736) > 1 ||
+    Math.abs(current26825Geometry.composer.height - 98) > 1 ||
+    !current26825Geometry.viewport ||
+    current26825Geometry.viewport.flexDirection !== "column-reverse" ||
+    Math.abs(current26825Geometry.viewport.scrollTop + 2_394) > 1 ||
+    Math.abs(current26825Geometry.viewport.scrollHeight - 4_687) > 2
   ) {
     throw new Error(
-      `Electron current 26.820 long-thread geometry failed: ${JSON.stringify(current26820Geometry)}`,
+      `Electron current 26.825 long-thread geometry failed: ${JSON.stringify(current26825Geometry)}`,
     );
   }
 
-  await current26820LongThreadPage
+  await current26825LongThreadPage
     .getByRole("button", { name: "Jump to user message 29" })
     .click();
-  await current26820LongThreadPage.waitForSelector(
+  await current26825LongThreadPage.waitForSelector(
     '[data-selected-message-index="29"] [data-item-id="current-windowed-user-29"]',
   );
-  await current26820LongThreadPage
+  await current26825LongThreadPage
     .getByRole("button", { name: "Jump to user message 15" })
     .click();
-  await current26820LongThreadPage.waitForFunction(() => {
+  await current26825LongThreadPage.waitForFunction(() => {
     const viewport = document.querySelector(
       ".codex-ui-conversation-thread-shell__viewport",
     );
@@ -13820,15 +13820,34 @@ try {
         .querySelector(
           '.codex-ui-message-navigation-rail__button[aria-current="true"]',
         )
-        ?.getAttribute("aria-label") === "Jump to user message 30" &&
+        ?.getAttribute("aria-label") === "Jump to user message 11" &&
       viewport instanceof HTMLElement &&
-      Math.abs(viewport.scrollTop + 2_346) <= 1
+      Math.abs(viewport.scrollTop + 2_394) <= 1
     );
   });
-  await current26820LongThreadPage
+  await current26825LongThreadPage
     .getByRole("button", { name: "Scroll to bottom" })
     .click();
-  await current26820LongThreadPage.waitForFunction(() => {
+  await current26825LongThreadPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-thread-following") === "false" &&
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "28" &&
+      document.querySelectorAll("[data-windowed-turn]").length === 12 &&
+      viewport instanceof HTMLElement &&
+      Math.abs(viewport.scrollTop + 402) <= 1
+    );
+  });
+  await current26825LongThreadPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await current26825LongThreadPage.waitForFunction(() => {
     const viewport = document.querySelector(
       ".codex-ui-conversation-thread-shell__viewport",
     );
@@ -13845,23 +13864,23 @@ try {
     );
   });
 } finally {
-  await current26820LongThreadApp.close();
+  await current26825LongThreadApp.close();
 }
 
-const current26820CompactAwayScene = {
+const current26825CompactAwayScene = {
   currentSidebar: true,
-  frame: "thread-current-26-820-compact-away",
-  id: "electron-current-26-820-compact-away",
+  frame: "thread-current-26-825-compact-away",
+  id: "electron-current-26-825-compact-away",
   scenario: "conversation-lifecycle",
   sidebarState: "hidden",
   windowSize: { height: 680, width: 720 },
 };
 const {
-  app: current26820CompactAwayApp,
-  page: current26820CompactAwayPage,
-} = await launchScene(current26820CompactAwayScene, { capture: false });
+  app: current26825CompactAwayApp,
+  page: current26825CompactAwayPage,
+} = await launchScene(current26825CompactAwayScene, { capture: false });
 try {
-  await current26820CompactAwayPage.waitForFunction(() => {
+  await current26825CompactAwayPage.waitForFunction(() => {
     const viewport = document.querySelector(
       ".codex-ui-conversation-thread-shell__viewport",
     );
@@ -13871,12 +13890,12 @@ try {
     return (
       document.querySelectorAll("[data-windowed-turn]").length === 9 &&
       viewport instanceof HTMLElement &&
-      Math.abs(viewport.scrollTop + 900) <= 1 &&
+      Math.abs(viewport.scrollTop + 968) <= 1 &&
       navigation instanceof HTMLElement &&
       getComputedStyle(navigation).display === "none"
     );
   });
-  const compactGeometry = await current26820CompactAwayPage.evaluate(() => {
+  const compactGeometry = await current26825CompactAwayPage.evaluate(() => {
     const rect = (selector) => {
       const element = document.querySelector(selector);
       if (!(element instanceof Element)) return null;
@@ -13913,17 +13932,36 @@ try {
     Math.abs(compactGeometry.viewport.height - 633) > 1
   ) {
     throw new Error(
-      `Electron current 26.820 compact-away geometry failed: ${JSON.stringify(compactGeometry)}`,
+      `Electron current 26.825 compact-away geometry failed: ${JSON.stringify(compactGeometry)}`,
     );
   }
-  await current26820CompactAwayPage
+  await current26825CompactAwayPage
     .getByRole("button", { name: "Scroll to bottom" })
     .click();
-  await current26820CompactAwayPage.waitForFunction(() => {
+  await current26825CompactAwayPage.waitForFunction(() => {
     const viewport = document.querySelector(
       ".codex-ui-conversation-thread-shell__viewport",
     );
     return (
+      document
+        .querySelector("[data-selected-message-index]")
+        ?.getAttribute("data-selected-message-index") === "28" &&
+      document.querySelectorAll("[data-windowed-turn]").length === 9 &&
+      viewport instanceof HTMLElement &&
+      Math.abs(viewport.scrollTop + 402) <= 1
+    );
+  });
+  await current26825CompactAwayPage
+    .getByRole("button", { name: "Scroll to bottom" })
+    .click();
+  await current26825CompactAwayPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return (
+      document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-thread-following") === "true" &&
       document
         .querySelector("[data-selected-message-index]")
         ?.getAttribute("data-selected-message-index") === "30" &&
@@ -13933,7 +13971,7 @@ try {
     );
   });
 } finally {
-  await current26820CompactAwayApp.close();
+  await current26825CompactAwayApp.close();
 }
 
 const composerMenusScene = {

@@ -59,12 +59,32 @@ try {
     throw new Error("Main Codex Renderer target not found structurally.");
   }
 
-  const titleRow = page.getByText(title, { exact: true }).first();
-  if ((await titleRow.count()) === 1 && (await titleRow.isVisible())) {
-    await titleRow.click();
-    await page.waitForTimeout(500);
+  const currentThreadVisible =
+    (await page
+      .locator("main")
+      .getByText(/^LONG THREAD \d{2}\.$/)
+      .count()) > 0;
+  if (!currentThreadVisible) {
+    const titleRows = page.getByText(title, { exact: true });
+    const titleRowCount = await titleRows.count();
+    for (let index = 0; index < titleRowCount; index += 1) {
+      const candidate = titleRows.nth(index);
+      if (
+        (await candidate.isVisible()) &&
+        (await candidate.evaluate((element) => !element.closest("main")))
+      ) {
+        await candidate.click();
+        await page.waitForTimeout(500);
+        break;
+      }
+    }
   }
-  if ((await page.getByText(title, { exact: true }).count()) === 0) {
+  if (
+    (await page
+      .locator("main")
+      .getByText(/^LONG THREAD \d{2}\.$/)
+      .count()) === 0
+  ) {
     throw new Error(`Disposable long-thread task is not reachable: ${title}`);
   }
 
@@ -80,15 +100,17 @@ try {
       await page.waitForTimeout(300);
     }
     const pinnedSummary = page.getByRole("button", {
-      exact: true,
-      name: "Toggle pinned summary",
+      name: /Toggle (?:pinned )?summary/,
     });
     if (
       (await pinnedSummary.count()) === 1 &&
       (await pinnedSummary.isVisible())
     ) {
       const summaryHeading = page.getByText("Environment", { exact: true });
-      if ((await summaryHeading.count()) > 0) {
+      if (
+        (await summaryHeading.count()) > 0 &&
+        (await summaryHeading.first().isVisible())
+      ) {
         await pinnedSummary.click();
         await page.waitForTimeout(300);
       }
@@ -96,14 +118,30 @@ try {
   };
 
   const returnToLatest = async () => {
-    const control = page.getByRole("button", {
-      exact: true,
-      name: "Scroll to bottom",
-    });
-    if ((await control.count()) === 1 && (await control.isVisible())) {
+    let clickCount = 0;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const distance = await page.evaluate(() => {
+        const viewport = [...document.querySelectorAll("main *")].find(
+          (element) =>
+            element instanceof HTMLElement &&
+            getComputedStyle(element).flexDirection === "column-reverse" &&
+            element.scrollHeight > element.clientHeight,
+        );
+        return viewport instanceof HTMLElement
+          ? Math.abs(viewport.scrollTop)
+          : 0;
+      });
+      if (distance <= 1) break;
+      const control = page.getByRole("button", {
+        exact: true,
+        name: "Scroll to bottom",
+      });
+      if ((await control.count()) !== 1 || !(await control.isVisible())) break;
       await control.click();
-      await page.waitForTimeout(350);
+      clickCount += 1;
+      await page.waitForTimeout(450);
     }
+    return clickCount;
   };
 
   const capture = async () =>
@@ -122,7 +160,8 @@ try {
       const visible = (element) =>
         element instanceof HTMLElement &&
         element.getClientRects().length > 0 &&
-        getComputedStyle(element).visibility === "visible";
+        getComputedStyle(element).visibility === "visible" &&
+        getComputedStyle(element).opacity !== "0";
       const scrollCandidates = [...document.querySelectorAll("main *")]
         .filter((element) => {
           if (!visible(element)) return false;
@@ -151,8 +190,20 @@ try {
       const composerInput = document.querySelector(
         '[contenteditable="true"][role="textbox"][aria-label="Do anything"]',
       );
-      const composer = composerInput?.closest('[data-slot="composer"]') ??
-        composerInput?.parentElement?.parentElement;
+      const composer = composerInput
+        ? [...composerInput.closest("main")?.querySelectorAll(
+            '[role="presentation"]',
+          ) ?? []]
+            .filter((element) => element.contains(composerInput))
+            .sort((left, right) => {
+              const leftRect = left.getBoundingClientRect();
+              const rightRect = right.getBoundingClientRect();
+              return (
+                rightRect.width * rightRect.height -
+                leftRect.width * leftRect.height
+              );
+            })[0]
+        : null;
       const floating = [...document.querySelectorAll("button")].find(
         (button) => button.getAttribute("aria-label") === "Scroll to bottom",
       );
@@ -195,7 +246,7 @@ try {
     });
 
   await normalizeWide();
-  await returnToLatest();
+  const wideReturnClickCount = await returnToLatest();
   const latest = await capture();
   const message15 = page.getByRole("button", {
     exact: true,
@@ -209,6 +260,8 @@ try {
   const middle = await capture();
   const wideScreenshot = output.replace(/\.json$/, "-wide-middle.png");
   await page.screenshot({ path: wideScreenshot });
+  const wideMiddleReturnClickCount = await returnToLatest();
+  const wideAfterMiddleReturn = await capture();
 
   await page.setViewportSize({ height: 680, width: 720 });
   await page.waitForTimeout(400);
@@ -229,17 +282,21 @@ try {
   const compactAway = await capture();
   const compactScreenshot = output.replace(/\.json$/, "-compact-away.png");
   await page.screenshot({ path: compactScreenshot });
-  await returnToLatest();
+  const compactReturnClickCount = await returnToLatest();
   const compactLatest = await capture();
 
   const result = {
     compactAway,
     compactLatest,
+    compactReturnClickCount,
     compactScreenshot,
     latest,
     middle,
     titleHashInputLength: title.length,
     wideScreenshot,
+    wideReturnClickCount,
+    wideAfterMiddleReturn,
+    wideMiddleReturnClickCount,
   };
   await writeFile(output, `${JSON.stringify(result, null, 2)}\n`, {
     flag: "wx",

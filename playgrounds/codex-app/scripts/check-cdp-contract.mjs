@@ -468,25 +468,25 @@ for (const scene of selectedScenes) {
         return viewport instanceof HTMLElement && viewport.scrollTop < -10_000;
       });
     }
-    if (scene.id === "thread-current-26-820-middle") {
+    if (scene.id === "thread-current-26-825-middle") {
       await page.waitForFunction(() => {
         const viewport = document.querySelector(
           ".codex-ui-conversation-thread-shell__viewport",
         );
         return (
           viewport instanceof HTMLElement &&
-          Math.abs(viewport.scrollTop + 2_346) <= 1
+          Math.abs(viewport.scrollTop + 2_394) <= 1
         );
       });
     }
-    if (scene.id === "thread-current-26-820-compact-away") {
+    if (scene.id === "thread-current-26-825-compact-away") {
       await page.waitForFunction(() => {
         const viewport = document.querySelector(
           ".codex-ui-conversation-thread-shell__viewport",
         );
         return (
           viewport instanceof HTMLElement &&
-          Math.abs(viewport.scrollTop + 900) <= 1
+          Math.abs(viewport.scrollTop + 968) <= 1
         );
       });
     }
@@ -10738,6 +10738,7 @@ for (const scene of selectedScenes) {
               );
               return selected && marker
                 ? {
+                    ariaLabel: selected.getAttribute("aria-label"),
                     button: rect(selected),
                     marker: rect(marker),
                     opacity: getComputedStyle(marker).opacity,
@@ -10902,8 +10903,8 @@ for (const scene of selectedScenes) {
         "composer-auto-continued",
         "composer-queue-paused",
         "conversation-thinking-current-26-825",
-        "thread-current-26-820-middle",
-        "thread-current-26-820-compact-away",
+        "thread-current-26-825-middle",
+        "thread-current-26-825-compact-away",
       ].includes(scene.id);
       const expectedCurrentIconNames = [
         ...(expectsContext
@@ -11247,14 +11248,14 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "thread-current-26-820-middle" &&
+        scene.id === "thread-current-26-825-middle" &&
         (conversation.placeholder.count !== 2 ||
           conversation.navigation.buttonCount !== 30 ||
           conversation.navigation.activeCount !== 1 ||
           conversation.navigation.density !== "compact" ||
           conversation.navigation.display === "none" ||
           !conversation.navigation.rect ||
-          Math.abs(conversation.navigation.rect.left - 17) > 1 ||
+          Math.abs(conversation.navigation.rect.left - 16) > 1 ||
           Math.abs(conversation.navigation.rect.top - 283.5) > 1 ||
           Math.abs(conversation.navigation.rect.width - 36) > 1 ||
           Math.abs(conversation.navigation.rect.height - 300) > 1 ||
@@ -11262,6 +11263,8 @@ for (const scene of selectedScenes) {
           conversation.navigation.list.clientHeight !== 300 ||
           conversation.navigation.list.scrollHeight !== 300 ||
           !conversation.navigation.selectedMarker ||
+          conversation.navigation.selectedMarker.ariaLabel !==
+            "Jump to user message 11" ||
           conversation.navigation.selectedMarker.opacity !== "1" ||
           Math.abs(
             conversation.navigation.selectedMarker.button.width - 36,
@@ -11272,20 +11275,20 @@ for (const scene of selectedScenes) {
           !conversation.viewport ||
           conversation.viewport.latestOrigin !== "start" ||
           conversation.viewport.flexDirection !== "column-reverse" ||
-          Math.abs(conversation.viewport.scrollTop + 2_346) > 1 ||
-          Math.abs(conversation.viewport.scrollHeight - 4_618) > 2 ||
-          Math.abs(conversation.viewport.rect.left - 1) > 1 ||
+          Math.abs(conversation.viewport.scrollTop + 2_394) > 1 ||
+          Math.abs(conversation.viewport.scrollHeight - 4_687) > 2 ||
+          Math.abs(conversation.viewport.rect.left) > 1 ||
           Math.abs(conversation.viewport.rect.top - 47) > 1 ||
-          Math.abs(conversation.viewport.rect.width - 1_179) > 1 ||
+          Math.abs(conversation.viewport.rect.width - 1_180) > 1 ||
           Math.abs(conversation.viewport.rect.height - 773) > 1 ||
           !conversation.composer.rect ||
-          Math.abs(conversation.composer.rect.left - 222.5) > 1 ||
+          Math.abs(conversation.composer.rect.left - 222) > 1 ||
           Math.abs(conversation.composer.rect.top - 706) > 1 ||
           Math.abs(conversation.composer.rect.width - 736) > 1 ||
           Math.abs(conversation.composer.rect.height - 98) > 1 ||
           !conversation.windowed ||
-          conversation.windowed.mountedTurnCount !== 11 ||
-          conversation.windowed.mountedUserBubbleCount !== 11 ||
+          conversation.windowed.mountedTurnCount !== 12 ||
+          conversation.windowed.mountedUserBubbleCount !== 12 ||
           conversation.windowed.placeholderCount !== 2 ||
           conversation.windowed.selectedMessageIndex !== "15" ||
           conversation.windowed.totalMessageCount !== "30" ||
@@ -11294,11 +11297,11 @@ for (const scene of selectedScenes) {
           conversation.floating.hidden !== "false")
       ) {
         throw new Error(
-          `${scene.id}: current 26.820 middle-window contract failed: ${JSON.stringify(conversation)}`,
+          `${scene.id}: current 26.825 middle-window contract failed: ${JSON.stringify(conversation)}`,
         );
       }
       if (
-        scene.id === "thread-current-26-820-compact-away" &&
+        scene.id === "thread-current-26-825-compact-away" &&
         (conversation.placeholder.count !== 2 ||
           conversation.navigation.buttonCount !== 30 ||
           conversation.navigation.activeCount !== 1 ||
@@ -11309,12 +11312,12 @@ for (const scene of selectedScenes) {
           !conversation.viewport ||
           conversation.viewport.latestOrigin !== "start" ||
           conversation.viewport.flexDirection !== "column-reverse" ||
-          Math.abs(conversation.viewport.scrollTop + 900) > 1 ||
+          Math.abs(conversation.viewport.scrollTop + 968) > 1 ||
           Math.abs(conversation.viewport.rect.left) > 1 ||
           Math.abs(conversation.viewport.rect.top - 47) > 1 ||
           Math.abs(conversation.viewport.rect.width - 720) > 1 ||
           Math.abs(conversation.viewport.rect.height - 633) > 1 ||
-          Math.abs(conversation.viewport.scrollHeight - 4_882) > 2 ||
+          Math.abs(conversation.viewport.scrollHeight - 5_118) > 2 ||
           !conversation.windowed ||
           conversation.windowed.mountedTurnCount !== 9 ||
           conversation.windowed.mountedUserBubbleCount !== 9 ||
@@ -11335,8 +11338,65 @@ for (const scene of selectedScenes) {
           Math.abs(conversation.composer.rect.height - 98) > 1)
       ) {
         throw new Error(
-          `${scene.id}: current 26.820 compact-away contract failed: ${JSON.stringify(conversation)}`,
+          `${scene.id}: current 26.825 compact-away contract failed: ${JSON.stringify(conversation)}`,
         );
+      }
+      if (
+        [
+          "thread-current-26-825-middle",
+          "thread-current-26-825-compact-away",
+        ].includes(scene.id)
+      ) {
+        const scrollToBottom = page.getByRole("button", {
+          exact: true,
+          name: "Scroll to bottom",
+        });
+        await scrollToBottom.click();
+        await page.waitForFunction(() => {
+          const root = document.querySelector(".demo-root");
+          const viewport = document.querySelector(
+            ".codex-ui-conversation-thread-shell__viewport",
+          );
+          return (
+            root?.getAttribute("data-thread-following") === "false" &&
+            document
+              .querySelector("[data-selected-message-index]")
+              ?.getAttribute("data-selected-message-index") === "28" &&
+            viewport instanceof HTMLElement &&
+            Math.abs(viewport.scrollTop + 402) <= 1
+          );
+        });
+        const firstReturnMountedCount = await page.locator(
+          "[data-windowed-turn]",
+        ).count();
+        const expectedFirstReturnMountedCount =
+          scene.id === "thread-current-26-825-compact-away" ? 9 : 12;
+        if (firstReturnMountedCount !== expectedFirstReturnMountedCount) {
+          throw new Error(
+            `${scene.id}: first return stage mounted ${firstReturnMountedCount} turns instead of ${expectedFirstReturnMountedCount}.`,
+          );
+        }
+        await scrollToBottom.click();
+        await page.waitForFunction(() => {
+          const root = document.querySelector(".demo-root");
+          const viewport = document.querySelector(
+            ".codex-ui-conversation-thread-shell__viewport",
+          );
+          const floating = document.querySelector(
+            ".codex-ui-thread-floating-button",
+          );
+          return (
+            root?.getAttribute("data-thread-following") === "true" &&
+            document
+              .querySelector("[data-selected-message-index]")
+              ?.getAttribute("data-selected-message-index") === "30" &&
+            document.querySelectorAll("[data-windowed-turn]").length === 8 &&
+            viewport instanceof HTMLElement &&
+            viewport.scrollTop === 0 &&
+            floating?.getAttribute("aria-hidden") === "true" &&
+            getComputedStyle(floating).opacity === "0"
+          );
+        });
       }
       if (scene.id === "composer-permissions-menu") {
         await page.getByRole("menu").press("Escape");
