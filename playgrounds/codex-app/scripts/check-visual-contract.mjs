@@ -416,6 +416,8 @@ const currentCommand26820CompactReferenceSize = {
 };
 const currentThinking26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_THINKING_26_825_REFERENCE;
+const currentReasoning26825Reference =
+  process.env.CODEX_UI_KIT_CURRENT_REASONING_26_825_REFERENCE;
 const currentThinking26825ReferenceSize = {
   height: 820,
   width: 1180,
@@ -1415,6 +1417,7 @@ for (const scene of selectedScenes) {
   let currentCommandFailureBounds;
   let currentCommandInterruptionBounds;
   let currentThinking26825Bounds;
+  let currentReasoning26825Bounds;
   let currentPlan26825Bounds;
   let currentSearchBrowser26825Bounds;
   let currentMarkdownStreamingBounds;
@@ -1691,6 +1694,19 @@ for (const scene of selectedScenes) {
     }
     if (scene.id === "conversation-thinking-current-26-825") {
       currentThinking26825Bounds = await page
+        .locator(".codex-ui-thread-thinking .codex-ui-loading-shimmer__highlight")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "conversation-reasoning-summary-current-26-825") {
+      currentReasoning26825Bounds = await page
         .locator(".codex-ui-thread-thinking .codex-ui-loading-shimmer__highlight")
         .evaluate((element) => {
           const value = element.getBoundingClientRect();
@@ -2410,6 +2426,127 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current 26.825 Thinking foreground pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "conversation-reasoning-summary-current-26-825" &&
+    currentReasoning26825Reference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentReasoning26825Reference),
+    );
+    if (
+      reference.width !== currentThinking26825ReferenceSize.width ||
+      reference.height !== currentThinking26825ReferenceSize.height ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height ||
+      !currentReasoning26825Bounds ||
+      currentReasoning26825Bounds.left !== 222 ||
+      currentReasoning26825Bounds.width !== 276 ||
+      currentReasoning26825Bounds.height !== 21
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 reasoning comparison requires exact 1180x820 frames and a 276x21 x=222 label: ${JSON.stringify({ actual: { height: actual.height, width: actual.width }, bounds: currentReasoning26825Bounds, reference: { height: reference.height, width: reference.width } })}`,
+      );
+    }
+    const crop = {
+      height: 25,
+      left: 220,
+      width: 300,
+    };
+    const referenceCrop = cropPng(
+      reference,
+      crop.left,
+      280,
+      crop.width,
+      crop.height,
+    );
+    const actualCrop = cropPng(
+      actual,
+      crop.left,
+      currentReasoning26825Bounds.top - 2,
+      crop.width,
+      crop.height,
+    );
+    const comparison = comparePng(
+      foregroundMaskPng(referenceCrop),
+      foregroundMaskPng(actualCrop),
+      0,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceCrop),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualCrop),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REASONING_26_825_MAX_DIFF_RATIO",
+      0.04,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 reasoning foreground pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 reasoning foreground pixel ratio ${comparison.ratio}`,
+    );
+
+    const region = {
+      height: 250,
+      left: 220,
+      top: 70,
+      width: 740,
+    };
+    const referenceRegion = cropPng(
+      reference,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const regionComparison = comparePng(referenceRegion, actualRegion, 0.12);
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product-region.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build-region.png`),
+      PNG.sync.write(actualRegion),
+    );
+    if (regionComparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build-region.diff.png`),
+        PNG.sync.write(regionComparison.diff),
+      );
+    }
+    const maximumRegionRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_REASONING_26_825_REGION_MAX_DIFF_RATIO",
+      0.045,
+    );
+    if (regionComparison.ratio > maximumRegionRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 reasoning region pixel ratio ${regionComparison.ratio} exceeds ${maximumRegionRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 reasoning region pixel ratio ${regionComparison.ratio}`,
     );
   }
 

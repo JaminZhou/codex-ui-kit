@@ -67,9 +67,9 @@ observation from a previous build remains historical evidence.
   Explore is present and `Sites` is absent from the sampled fixed-route stack.
   Details are in
   [`26.825.51511.md`](26.825.51511.md). Rich Markdown streaming, Plan progress,
-  long-thread navigation, and Web Search are current on 26.825.51511; activity
-  and Browser follow-ups remain 26.825.31414 regression evidence. That
-  previous activity follow-up re-observes the 14/21px
+  pure-reasoning cadence, long-thread navigation, and Web Search are current
+  on 26.825.51511; the Browser follow-up remains 26.825.31414 regression
+  evidence. The previous activity follow-up first re-observed the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
   previous-product `Thinking` comparison passes at 0.6%. The current Plan
@@ -79,8 +79,14 @@ observation from a previous build remains historical evidence.
   settled answer. The replay retains its accessible button and tooltip roles
   even though the sampled product now exposes nonsemantic `div`/`span`
   containers. CDP/Electron continue to gate the lifecycle and the tight
-  current-product comparison passes at 3.5294%. Broader reasoning remains
-  incomplete. A separate current read-only Web Search probe covers the
+  current-product comparison passes at 3.5294%. A current no-tool probe adds
+  `Thinking`, the generated `Defining evidence categories and priorities`
+  shimmer summary, `Worked for 14s`, and a settled answer. The replay proves
+  zero command/MCP rows across CDP and native Electron. Its 300×25px
+  current-product foreground crop is pixel-identical at 0% difference, and
+  the wider prompt/activity/summary region passes at 3.3389%. Other
+  unsampled reasoning variants remain incomplete. A separate current
+  read-only Web Search probe covers the
   two-level `Worked for 23s` → `Searched the web` disclosure and current two-row
   copy. CDP gates three frames; Electron repeats collapse/reopen, and the
   local-only foreground comparison passes at 4.0506% under 5%. The previous
@@ -245,7 +251,7 @@ dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
 `Compacting context`, but the remote compact task failed and exposed Resume,
 so successful compaction/recovery remains previous-build evidence.
 
-Current inventory: 91 surface groups; 54 have current-build runtime evidence, 26 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 49 groups and Electron verification covers 49.
+Current inventory: 91 surface groups; 54 have current-build runtime evidence, 26 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 50 groups and Electron verification covers 50.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

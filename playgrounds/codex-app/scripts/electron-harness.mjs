@@ -739,6 +739,20 @@ export const visualScenes = [
     sidebarState: "hidden",
   },
   {
+    frame: "conversation-reasoning-summary-current-26-825",
+    id: "conversation-reasoning-summary-current-26-825",
+    maxPixelRatio: 0.0225,
+    scenario: "current-reasoning-26-825",
+    sidebarState: "hidden",
+  },
+  {
+    frame: "conversation-reasoning-current-26-825-completed",
+    id: "conversation-reasoning-current-26-825-completed",
+    maxPixelRatio: 0.0225,
+    scenario: "current-reasoning-26-825",
+    sidebarState: "hidden",
+  },
+  {
     frame: "conversation-plan-current-26-825",
     id: "conversation-plan-current-26-825",
     maxPixelRatio: 0.0225,

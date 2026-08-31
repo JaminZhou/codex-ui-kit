@@ -13,6 +13,7 @@ import currentBrowser26825Trace from "../fixtures/traces/current-browser-26-825.
 import currentCitations26825Trace from "../fixtures/traces/current-citations-26-825.jsonl?raw";
 import currentMixedToolThreadTrace from "../fixtures/traces/current-mixed-tool-thread.jsonl?raw";
 import currentPlan26825Trace from "../fixtures/traces/current-plan-26-825.jsonl?raw";
+import currentReasoning26825Trace from "../fixtures/traces/current-reasoning-26-825.jsonl?raw";
 import currentSearch26825Trace from "../fixtures/traces/current-search-26-825.jsonl?raw";
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
@@ -85,6 +86,7 @@ export type ReplayScenarioId =
   | "current-citations-26-825"
   | "current-mixed-tool-thread"
   | "current-plan-26-825"
+  | "current-reasoning-26-825"
   | "current-search-26-825"
   | "current-review-rename"
   | "current-review-files"
@@ -314,6 +316,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "创建八步只读探测计划",
     "The runtime-observed 26.825 Plan lifecycle anchors Step n / total above the Composer, exposes the full status list in a tooltip, and removes the surface after completion.",
     currentPlan26825Trace,
+  ),
+  "current-reasoning-26-825": scenario(
+    "current-reasoning-26-825",
+    "构造 UI 验收证据冲突矩阵",
+    "The runtime-observed 26.825 pure-reasoning lifecycle moves from a generated shimmer summary to a settled Worked for 14s row and final answer without tool activity.",
+    currentReasoning26825Trace,
   ),
   "current-search-26-825": scenario(
     "current-search-26-825",

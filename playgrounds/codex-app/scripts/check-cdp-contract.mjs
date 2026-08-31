@@ -19717,6 +19717,146 @@ try {
   await currentThinkingApp.close();
 }
 
+const currentReasoningSummaryScene = {
+  frame: "conversation-reasoning-summary-current-26-825",
+  id: "conversation-reasoning-summary-current-26-825-contract",
+  scenario: "current-reasoning-26-825",
+  sidebarState: "hidden",
+};
+const {
+  app: currentReasoningSummaryApp,
+  page: currentReasoningSummaryPage,
+} = await launchScene(currentReasoningSummaryScene, { capture: false });
+try {
+  await currentReasoningSummaryPage.waitForSelector(
+    '.demo-root[data-frame="conversation-reasoning-summary-current-26-825"] .codex-ui-thread-thinking',
+  );
+  const currentReasoningSummary = await currentReasoningSummaryPage.evaluate(
+    () => {
+      const root = document.querySelector(".demo-root");
+      const thinking = document.querySelector(".codex-ui-thread-thinking");
+      const shimmer = thinking?.querySelector(".codex-ui-loading-shimmer");
+      if (!(thinking instanceof HTMLElement) || !shimmer) return null;
+      const bounds = shimmer.getBoundingClientRect();
+      const style = getComputedStyle(thinking);
+      return {
+        ariaLive: thinking.getAttribute("aria-live"),
+        commandRows: document.querySelectorAll(".codex-ui-command-activity")
+          .length,
+        fontFamily: style.fontFamily,
+        fontSize: style.fontSize,
+        fontWeight: style.fontWeight,
+        height: bounds.height,
+        horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+        label: shimmer.firstChild?.textContent?.trim(),
+        left: bounds.left,
+        lineHeight: style.lineHeight,
+        mcpRows: document.querySelectorAll(".codex-ui-mcp-tool-call").length,
+        role: thinking.getAttribute("role"),
+        status: root?.getAttribute("data-status"),
+        stopButton: Boolean(document.querySelector('button[aria-label="Stop"]')),
+        top: bounds.top,
+        workingDuration: document
+          .querySelector('[data-testid="current-reasoning-duration"]')
+          ?.textContent?.trim(),
+        viewport: { height: innerHeight, width: innerWidth },
+        width: bounds.width,
+      };
+    },
+  );
+  if (
+    !currentReasoningSummary ||
+    currentReasoningSummary.ariaLive !== "polite" ||
+    currentReasoningSummary.commandRows !== 0 ||
+    currentReasoningSummary.fontSize !== "14px" ||
+    currentReasoningSummary.fontWeight !== "400" ||
+    Math.abs(currentReasoningSummary.height - 21) > 0.1 ||
+    currentReasoningSummary.horizontalOverflow > 1 ||
+    currentReasoningSummary.label !==
+      "Defining evidence categories and priorities" ||
+    Math.abs(currentReasoningSummary.left - 222) > 0.1 ||
+    currentReasoningSummary.lineHeight !== "21px" ||
+    currentReasoningSummary.mcpRows !== 0 ||
+    currentReasoningSummary.role !== "status" ||
+    currentReasoningSummary.status !== "running" ||
+    !currentReasoningSummary.stopButton ||
+    Math.abs(currentReasoningSummary.top - 282) > 0.1 ||
+    JSON.stringify(currentReasoningSummary.viewport) !==
+      JSON.stringify({ height: 820, width: 1180 }) ||
+    Math.abs(currentReasoningSummary.width - 276.046875) > 0.1 ||
+    currentReasoningSummary.workingDuration !== "Working for 19s"
+  ) {
+    throw new Error(
+      `Current 26.825 reasoning summary contract failed: ${JSON.stringify(currentReasoningSummary)}`,
+    );
+  }
+  await writeFile(
+    join(
+      artifactDirectory,
+      "conversation-reasoning-summary-current-26-825.json",
+    ),
+    `${JSON.stringify(currentReasoningSummary, null, 2)}\n`,
+  );
+} finally {
+  await currentReasoningSummaryApp.close();
+}
+
+const currentReasoningCompletedScene = {
+  frame: "conversation-reasoning-current-26-825-completed",
+  id: "conversation-reasoning-current-26-825-completed-contract",
+  scenario: "current-reasoning-26-825",
+  sidebarState: "hidden",
+};
+const {
+  app: currentReasoningCompletedApp,
+  page: currentReasoningCompletedPage,
+} = await launchScene(currentReasoningCompletedScene, { capture: false });
+try {
+  await currentReasoningCompletedPage.getByText("Worked for 14s", {
+    exact: true,
+  }).waitFor({ state: "visible" });
+  const currentReasoningCompleted =
+    await currentReasoningCompletedPage.evaluate(() => ({
+      answer: document
+        .querySelector('[data-item-id="assistant-current-reasoning-26-825"]')
+        ?.textContent?.trim(),
+      commandRows: document.querySelectorAll(".codex-ui-command-activity")
+        .length,
+      duration: document
+        .querySelector('[data-testid="current-reasoning-duration"]')
+        ?.textContent?.trim(),
+      mcpRows: document.querySelectorAll(".codex-ui-mcp-tool-call").length,
+      status: document
+        .querySelector(".demo-root")
+        ?.getAttribute("data-status"),
+      stopButton: Boolean(document.querySelector('button[aria-label="Stop"]')),
+      viewport: { height: innerHeight, width: innerWidth },
+    }));
+  if (
+    !currentReasoningCompleted.answer?.startsWith("裁决顺序：") ||
+    currentReasoningCompleted.commandRows !== 0 ||
+    currentReasoningCompleted.duration !== "Worked for 14s" ||
+    currentReasoningCompleted.mcpRows !== 0 ||
+    currentReasoningCompleted.status !== "completed" ||
+    currentReasoningCompleted.stopButton ||
+    JSON.stringify(currentReasoningCompleted.viewport) !==
+      JSON.stringify({ height: 820, width: 1180 })
+  ) {
+    throw new Error(
+      `Current 26.825 reasoning completion contract failed: ${JSON.stringify(currentReasoningCompleted)}`,
+    );
+  }
+  await writeFile(
+    join(
+      artifactDirectory,
+      "conversation-reasoning-current-26-825-completed.json",
+    ),
+    `${JSON.stringify(currentReasoningCompleted, null, 2)}\n`,
+  );
+} finally {
+  await currentReasoningCompletedApp.close();
+}
+
 const currentPlanScene = {
   frame: "conversation-plan-current-26-825",
   id: "conversation-plan-current-26-825-contract",
