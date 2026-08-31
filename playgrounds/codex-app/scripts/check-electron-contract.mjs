@@ -12626,20 +12626,20 @@ const currentCommandElectronCases = [
   {
     assistantTexts: [],
     commandStatus: "interrupted",
-    frame: "command-current-26-820-interruption-stopped-immediate",
+    frame: "command-current-26-825-interruption-stopped-immediate",
     interruption: "You stopped after 0s",
-    scenario: "command-current-26-820-interruption",
+    scenario: "command-current-26-825-interruption",
     timelineLabel: null,
-    title: "监控 CURRENT 26.820 中断",
+    title: "Monitor 26.825 interruption",
   },
   {
-    assistantTexts: ["CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED"],
+    assistantTexts: ["CURRENT 26.825 INTERRUPTION RECOVERY ACCEPTED"],
     commandStatus: "interrupted",
-    frame: "command-current-26-820-interruption-recovered",
-    interruption: "You stopped after 16s",
-    scenario: "command-current-26-820-interruption",
+    frame: "command-current-26-825-interruption-recovered",
+    interruption: "You stopped after 20s",
+    scenario: "command-current-26-825-interruption",
     timelineLabel: null,
-    title: "监控 CURRENT 26.820 中断",
+    title: "Monitor 26.825 interruption",
   },
 ];
 

@@ -4266,13 +4266,13 @@ textarea {
   color: rgb(223, 223, 223);
 }
 
-.demo-root[data-scenario="command-current-26-820-interruption"]
-  [data-item-id="command-current-26-820-interruption"] {
+.demo-root[data-scenario="command-current-26-825-interruption"]
+  [data-item-id="command-current-26-825-interruption"] {
   transform: translateY(2px);
 }
 
-.demo-root[data-scenario="command-current-26-820-interruption"]
-  [data-item-id="user-command-current-26-820-interruption-recovery"] {
+.demo-root[data-scenario="command-current-26-825-interruption"]
+  [data-item-id="user-command-current-26-825-interruption-recovery"] {
   margin-top: 4px;
 }
 
@@ -4297,12 +4297,12 @@ textarea {
   display: none;
 }
 
-.demo-root[data-scenario="command-current-26-820-interruption"]
+.demo-root[data-scenario="command-current-26-825-interruption"]
   .codex-ui-thread-interruption-summary::before {
   content: none;
 }
 
-.demo-root[data-scenario="command-current-26-820-interruption"]
+.demo-root[data-scenario="command-current-26-825-interruption"]
   .codex-ui-thread-interruption-summary__label {
   font-size: 14px;
   font-weight: 400;
@@ -4310,13 +4310,13 @@ textarea {
   min-height: 21px;
 }
 
-.demo-root[data-scenario="command-current-26-820-interruption"]
+.demo-root[data-scenario="command-current-26-825-interruption"]
   .codex-ui-thread-interruption-summary__rule {
   margin-top: 8px;
 }
 
 @media (max-width: 720px) {
-  .demo-root[data-scenario="command-current-26-820-interruption"][data-frame="command-current-26-820-interruption-recovered"]
+  .demo-root[data-scenario="command-current-26-825-interruption"][data-frame="command-current-26-825-interruption-recovered"]
     .codex-ui-agent-turn {
     transform: translateY(43px);
   }

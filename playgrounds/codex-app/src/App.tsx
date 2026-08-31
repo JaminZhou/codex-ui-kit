@@ -3308,15 +3308,15 @@ export function App() {
     mode === "replay" && scenarioId === "command-current-26-820-success";
   const isCurrentCommand26825FailureReplay =
     mode === "replay" && scenarioId === "command-current-26-825-failure";
-  const isCurrentCommand26820InterruptionReplay =
+  const isCurrentCommand26825InterruptionReplay =
     mode === "replay" &&
-    scenarioId === "command-current-26-820-interruption";
+    scenarioId === "command-current-26-825-interruption";
   const isCurrentCommand26825SuccessReplay =
     mode === "replay" && scenarioId === "command-current-26-825-success";
   const isCurrentCommandReplay =
     isCurrentCommand26820SuccessReplay ||
     isCurrentCommand26825FailureReplay ||
-    isCurrentCommand26820InterruptionReplay ||
+    isCurrentCommand26825InterruptionReplay ||
     isCurrentCommand26825SuccessReplay;
   const isCurrentContextCompactionReplay =
     mode === "replay" && scenarioId === "compaction";
@@ -11626,7 +11626,7 @@ export function App() {
       ) {
         const running =
           command.status === "running" && state.status === "running";
-        if (isCurrentCommand26820InterruptionReplay) {
+        if (isCurrentCommand26825InterruptionReplay) {
           const stopped = !running;
           const execution = (
             <CommandExecution
@@ -11660,7 +11660,7 @@ export function App() {
             <ActivityTimeline
               key={`command:${command.id}`}
               open
-              summary={<TurnDuration durationMs={10_000} status="working" />}
+              summary={<TurnDuration durationMs={19_000} status="working" />}
             >
               {execution}
             </ActivityTimeline>

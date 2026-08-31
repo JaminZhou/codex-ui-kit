@@ -380,10 +380,10 @@ const currentCommand26820SuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_REFERENCE;
 const currentCommand26825FailureReference =
   process.env.CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_825_REFERENCE;
-const currentCommand26820InterruptionStoppedReference =
-  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_REFERENCE;
-const currentCommand26820InterruptionCompactReference =
-  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_REFERENCE;
+const currentCommand26825InterruptionStoppedReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_825_REFERENCE;
+const currentCommand26825InterruptionCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_825_COMPACT_REFERENCE;
 const currentCommand26820WideReferenceSize = {
   height: 820,
   width: 1180,
@@ -3098,11 +3098,11 @@ for (const scene of selectedScenes) {
   }
 
   if (
-    scene.id === "command-current-26-820-interruption-stopped-immediate" &&
-    currentCommand26820InterruptionStoppedReference
+    scene.id === "command-current-26-825-interruption-stopped-immediate" &&
+    currentCommand26825InterruptionStoppedReference
   ) {
     const reference = PNG.sync.read(
-      await readFile(currentCommand26820InterruptionStoppedReference),
+      await readFile(currentCommand26825InterruptionStoppedReference),
     );
     if (
       reference.width !== currentCommand26820WideReferenceSize.width ||
@@ -3111,33 +3111,33 @@ for (const scene of selectedScenes) {
       actual.height !== reference.height
     ) {
       throw new Error(
-        `${scene.id}: current 26.820 stopped-command comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+        `${scene.id}: current 26.825 stopped-command comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
       );
     }
     const comparison = comparePng(
       cropPng(reference, 222, 282, 736, 74),
-      cropPng(actual, 222, 283, 736, 74),
+      cropPng(actual, 222, 278, 736, 74),
     );
     const maximumRatio = environmentRatio(
-      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_825_MAX_DIFF_RATIO",
       0.055,
     );
     if (comparison.ratio > maximumRatio) {
       throw new Error(
-        `${scene.id}: current 26.820 stopped-command region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+        `${scene.id}: current 26.825 stopped-command region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
       );
     }
     console.log(
-      `${scene.id}: current 26.820 stopped-command region pixel ratio ${comparison.ratio}`,
+      `${scene.id}: current 26.825 stopped-command region pixel ratio ${comparison.ratio}`,
     );
   }
 
   if (
-    scene.id === "command-current-26-820-interruption-compact" &&
-    currentCommand26820InterruptionCompactReference
+    scene.id === "command-current-26-825-interruption-compact" &&
+    currentCommand26825InterruptionCompactReference
   ) {
     const reference = PNG.sync.read(
-      await readFile(currentCommand26820InterruptionCompactReference),
+      await readFile(currentCommand26825InterruptionCompactReference),
     );
     if (
       reference.width !== currentCommand26820CompactReferenceSize.width ||
@@ -3146,24 +3146,24 @@ for (const scene of selectedScenes) {
       actual.height !== reference.height
     ) {
       throw new Error(
-        `${scene.id}: current 26.820 compact interruption comparison requires exact 720x680 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+        `${scene.id}: current 26.825 compact interruption comparison requires exact 720x680 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
       );
     }
     const comparison = comparePng(
-      cropPng(reference, 16, 294, 688, 242),
-      cropPng(actual, 16, 291, 688, 242),
+      cropPng(reference, 16, 52, 688, 242),
+      cropPng(actual, 16, 316, 688, 242),
     );
     const maximumRatio = environmentRatio(
-      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_825_COMPACT_MAX_DIFF_RATIO",
       0.03,
     );
     if (comparison.ratio > maximumRatio) {
       throw new Error(
-        `${scene.id}: current 26.820 compact interruption region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+        `${scene.id}: current 26.825 compact interruption region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
       );
     }
     console.log(
-      `${scene.id}: current 26.820 compact interruption region pixel ratio ${comparison.ratio}`,
+      `${scene.id}: current 26.825 compact interruption region pixel ratio ${comparison.ratio}`,
     );
   }
 

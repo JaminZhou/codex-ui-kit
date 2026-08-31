@@ -948,18 +948,18 @@ describe("lifecycle visual policy", () => {
       "command-current-26-825-failure-completed",
       "command-current-26-825-failure-recovered",
       "command-current-26-825-failure-compact",
-      "command-current-26-820-interruption-running",
-      "command-current-26-820-interruption-stopped-immediate",
-      "command-current-26-820-interruption-recovered",
-      "command-current-26-820-interruption-compact",
+      "command-current-26-825-interruption-running",
+      "command-current-26-825-interruption-stopped-immediate",
+      "command-current-26-825-interruption-recovered",
+      "command-current-26-825-interruption-compact",
     ]) {
       expect(electronHarness).toContain(`id: "${scene}"`);
     }
     for (const reference of [
       "CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_REFERENCE",
       "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_825_REFERENCE",
-      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_REFERENCE",
-      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_825_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_825_COMPACT_REFERENCE",
     ]) {
       expect(contract).toContain(reference);
     }
@@ -984,7 +984,7 @@ describe("lifecycle visual policy", () => {
       "current 26.820 command success region pixel ratio",
     );
     expect(contract).toContain(
-      "current 26.820 stopped-command region pixel ratio",
+      "current 26.825 stopped-command region pixel ratio",
     );
   });
 

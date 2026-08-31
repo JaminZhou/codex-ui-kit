@@ -51,7 +51,7 @@ const currentReplayComposerScenarios = new Set([
   "attachment-lifecycle",
   "approval-review-timeout",
   "command-current-26-825-failure",
-  "command-current-26-820-interruption",
+  "command-current-26-825-interruption",
   "command-current-26-820-success",
   "command-current-26-825-success",
   "command-failure-recovery",
@@ -15336,7 +15336,7 @@ for (const scene of selectedScenes) {
           : "Observe long-running shell command"
         : failure
           ? "Run 26.825 failure command"
-          : "监控 CURRENT 26.820 中断";
+          : "Monitor 26.825 interruption";
       const expectedRootStatus = running
         ? "running"
         : interruption && !recovered
@@ -15351,7 +15351,7 @@ for (const scene of selectedScenes) {
             : "completed";
       const expectedTimelineLabel = interruption
         ? running
-          ? "Working for 10s"
+          ? "Working for 19s"
           : null
         : success
           ? running
@@ -15373,7 +15373,7 @@ for (const scene of selectedScenes) {
           : "Ran ";
       const expectedInterruptionText = interruption && !running
         ? recovered
-          ? "You stopped after 16s"
+          ? "You stopped after 20s"
           : "You stopped after 0s"
         : null;
       if (
@@ -15437,7 +15437,7 @@ for (const scene of selectedScenes) {
         (interruption &&
           (recovered
             ? currentCommand.assistantTexts[0] !==
-              "CURRENT 26.820 INTERRUPTION RECOVERY ACCEPTED"
+              "CURRENT 26.825 INTERRUPTION RECOVERY ACCEPTED"
             : currentCommand.assistantTexts.length !== 0))
       ) {
         throw new Error(
