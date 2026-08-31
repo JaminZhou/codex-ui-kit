@@ -23,6 +23,7 @@ import {
   type AppearanceSettingsValue,
   ArtifactList,
   ApprovalCommandPreview,
+  ApprovalFilePreview,
   ApprovalRequest,
   AutomaticApprovalReview,
   type AutomaticApprovalReviewStatus,
@@ -338,6 +339,7 @@ void AppSidebarItem;
 void AppSidebarSection;
 void ArtifactList;
 void ApprovalCommandPreview;
+void ApprovalFilePreview;
 void ApprovalRequest;
 void AutomaticApprovalReview;
 void BranchCreationDialog;

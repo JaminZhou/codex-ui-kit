@@ -259,7 +259,7 @@ dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
 `Compacting context`, but the remote compact task failed and exposed Resume,
 so successful compaction/recovery remains previous-build evidence.
 
-Current inventory: 91 surface groups; 59 have current-build runtime evidence, 21 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 54 groups and Electron verification covers 54.
+Current inventory: 91 surface groups; 60 have current-build runtime evidence, 20 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 55 groups and Electron verification covers 55.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1618,6 +1618,23 @@ compact, and 5.1795% for the compact options menu under independent 6.2%,
 6.3%, and 5.5% ceilings. Exact geometry remains separately hard-gated, so the
 regional ratio is not used to conceal layout drift. Session approval lifetime,
 automatic-review runtime reachability, and other approval kinds remain open.
+
+The current `26.825.51511` refresh re-observes the same bounded external-file
+deny/allow lifecycle instead of carrying the previous card forward. The
+turn-owned card is now 736×177px at x=222/y=627 wide and 688×177px at
+x=16/y=487 compact. Its fixed copy is `Edit files` and `Allow ChatGPT to edit
+the following file?`; the split menu now exposes `Allow once` and `Allow all
+edits`, replacing the previous build's `Allow this conversation` wording. The
+file preview independently exposes its directory, file name, +1 addition, and
+-0 deletion. Deny leaves its exact target absent and settles after 10 seconds;
+Allow once creates the exact requested bytes, reports `Edited 1 file`, and
+settles after 13 seconds. Browser/CDP gates six pending/options/settled frames,
+Electron repeats both decisions, and six reviewed baselines cover wide and
+compact composition. Unmasked product regions differ by 3.1787% wide, 3.3225%
+compact, and 1.3415% for the compact options menu, below 6.5%, 6.5%, and 5.5%
+limits. The three disposable tasks were archived; the created file and isolated
+profile were moved recoverably to Trash. Session-wide acceptance, automatic
+review, other approval kinds, and rule lifetime across restart remain open.
 
 The earlier attachment slice used a separate `26.730.61309` new chat and a
 synthetic 1×1 PNG delivered through the Composer paste path, avoiding the

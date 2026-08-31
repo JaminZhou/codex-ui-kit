@@ -11665,7 +11665,7 @@ for (const decision of ["Deny", "Allow once"]) {
     await page.waitForSelector(
       `.demo-root[data-frame="${expectedFrame}"]`,
     );
-    await page.getByText(expectedReply, { exact: true }).waitFor();
+    await page.getByText(expectedReply, { exact: true }).first().waitFor();
     const settled = await page.evaluate(() => ({
       approvalCount: document.querySelectorAll(
         '[data-testid="current-approval-request"]',
@@ -11697,6 +11697,170 @@ for (const decision of ["Deny", "Allow once"]) {
     ) {
       throw new Error(
         `Electron current 26.820 file approval did not settle ${decision}: ${JSON.stringify(settled)}`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
+const current26825FileApprovalBaseScene = {
+  currentSidebar: true,
+  scenario: "approval-current-26-825-file",
+  sidebarState: "hidden",
+  windowSize: { height: 680, width: 720 },
+};
+
+const {
+  app: current26825FileApprovalOptionsApp,
+  page: current26825FileApprovalOptionsPage,
+} = await launchScene(
+  {
+    ...current26825FileApprovalBaseScene,
+    frame: "approval-current-26-825-file-deny-pending",
+    id: "electron-current-26-825-file-approval-options",
+  },
+  { capture: false },
+);
+try {
+  const approval = current26825FileApprovalOptionsPage.getByTestId(
+    "current-approval-request",
+  );
+  const approvalRect = await approval.evaluate((element) => {
+    const value = element.getBoundingClientRect();
+    return {
+      height: value.height,
+      left: value.left,
+      top: value.top,
+      width: value.width,
+    };
+  });
+  if (
+    Math.abs(approvalRect.left - 16) > 1 ||
+    Math.abs(approvalRect.top - 487) > 1 ||
+    Math.abs(approvalRect.width - 688) > 1 ||
+    Math.abs(approvalRect.height - 177) > 1
+  ) {
+    throw new Error(
+      `Electron current 26.825 file approval geometry drifted: ${JSON.stringify(approvalRect)}`,
+    );
+  }
+  await approval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const menu = current26825FileApprovalOptionsPage.locator(
+    ".codex-ui-approval-request__options-menu",
+  );
+  await menu.waitFor();
+  const options = await menu
+    .locator('[role="menuitem"]')
+    .evaluateAll((elements) =>
+      elements.map(
+        (element) =>
+          element.firstElementChild?.textContent?.trim() ??
+          element.textContent?.trim() ??
+          "",
+      ),
+    );
+  const infoCount = await menu.locator(
+    '[aria-label="Allow this and future file edits in this conversation without asking again"]',
+  ).count();
+  const menuRect = await menu.evaluate((element) => {
+    const value = element.getBoundingClientRect();
+    return {
+      height: value.height,
+      left: value.left,
+      top: value.top,
+      width: value.width,
+    };
+  });
+  if (
+    JSON.stringify(options) !==
+      JSON.stringify(["Allow once", "Allow all edits"]) ||
+    infoCount !== 1 ||
+    Math.abs(menuRect.left - 519) > 1 ||
+    Math.abs(menuRect.top - 551) > 1 ||
+    Math.abs(menuRect.width - 168) > 1 ||
+    Math.abs(menuRect.height - 67.125) > 1
+  ) {
+    throw new Error(
+      `Electron current 26.825 file approval options drifted: ${JSON.stringify({ infoCount, menuRect, options })}`,
+    );
+  }
+  await current26825FileApprovalOptionsPage.keyboard.press("Escape");
+  await current26825FileApprovalOptionsPage.waitForFunction(
+    () =>
+      document.activeElement?.getAttribute("aria-label") ===
+        "Approval options" &&
+      document.querySelectorAll(
+        ".codex-ui-approval-request__options-menu",
+      ).length === 0,
+  );
+} finally {
+  await current26825FileApprovalOptionsApp.close();
+}
+
+for (const decision of ["Deny", "Allow once"]) {
+  const denied = decision === "Deny";
+  const { app, page } = await launchScene(
+    {
+      ...current26825FileApprovalBaseScene,
+      frame: denied
+        ? "approval-current-26-825-file-deny-pending"
+        : "approval-current-26-825-file-allow-pending",
+      id: `electron-current-26-825-file-${denied ? "denied" : "allowed"}`,
+    },
+    { capture: false },
+  );
+  try {
+    await page
+      .getByTestId("current-approval-request")
+      .getByRole("button", { exact: true, name: decision })
+      .click();
+    const expectedFrame = denied
+      ? "approval-current-26-825-file-denied"
+      : "approval-current-26-825-file-allowed";
+    const expectedReply = denied
+      ? "Jamin，权限审批被拒绝，文件未创建。"
+      : "CURRENT 26.825 FILE APPROVAL ALLOWED";
+    await page.waitForSelector(`.demo-root[data-frame="${expectedFrame}"]`);
+    await page.getByText(expectedReply, { exact: true }).first().waitFor();
+    const settled = await page.evaluate(() => ({
+      approvalCount: document.querySelectorAll(
+        '[data-testid="current-approval-request"]',
+      ).length,
+      composerLabel:
+        document
+          .querySelector(".codex-ui-composer textarea")
+          ?.getAttribute("aria-label") ?? null,
+      fileStatus:
+        [...document.querySelectorAll('[data-testid="file-change-group"]')]
+          .at(-1)
+          ?.getAttribute("data-file-status") ?? null,
+      permissionIcon:
+        document
+          .querySelector(
+            ".demo-composer-permission-trigger [data-current-build-icon]",
+          )
+          ?.getAttribute("data-current-build-icon") ?? null,
+      permissionLabel:
+        document
+          .querySelector(".demo-composer-permission-trigger")
+          ?.textContent?.trim() ?? null,
+      status:
+        document.querySelector(".demo-root")?.getAttribute("data-status") ??
+        null,
+    }));
+    if (
+      settled.approvalCount !== 0 ||
+      settled.composerLabel !== "Message composer" ||
+      settled.permissionIcon !== "composer-permission-ask" ||
+      settled.permissionLabel !== "Ask for approval" ||
+      settled.status !== "completed" ||
+      (!denied && settled.fileStatus !== "applied")
+    ) {
+      throw new Error(
+        `Electron current 26.825 file approval did not settle ${decision}: ${JSON.stringify(settled)}`,
       );
     }
   } finally {

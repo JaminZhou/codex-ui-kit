@@ -369,6 +369,12 @@ const currentApproval26820PendingCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_APPROVAL_26_820_PENDING_COMPACT_REFERENCE;
 const currentApproval26820OptionsCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_APPROVAL_26_820_OPTIONS_COMPACT_REFERENCE;
+const currentApproval26825PendingWideReference =
+  process.env.CODEX_UI_KIT_CURRENT_APPROVAL_26_825_PENDING_WIDE_REFERENCE;
+const currentApproval26825PendingCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_APPROVAL_26_825_PENDING_COMPACT_REFERENCE;
+const currentApproval26825OptionsCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_APPROVAL_26_825_OPTIONS_COMPACT_REFERENCE;
 const currentApprovalPendingRegionReferenceSize = {
   height: 162,
   width: 736,
@@ -1426,6 +1432,8 @@ for (const scene of selectedScenes) {
   let currentApprovalComposerBounds;
   let currentApproval26820Bounds;
   let currentApproval26820OptionsBounds;
+  let currentApproval26825Bounds;
+  let currentApproval26825OptionsBounds;
   let currentBasicThreadBounds;
   let currentCommandFailureBounds;
   let currentCommandInterruptionBounds;
@@ -2019,7 +2027,8 @@ for (const scene of selectedScenes) {
       scene.id === "approval-current-options" ||
       scene.id === "approval-current-similar-menu" ||
       scene.id === "approval-current-session-menu" ||
-      scene.id === "approval-current-26-820-file-options-compact"
+      scene.id === "approval-current-26-820-file-options-compact" ||
+      scene.id === "approval-current-26-825-file-options-compact"
     ) {
       await page
         .getByTestId("current-approval-request")
@@ -2035,6 +2044,8 @@ for (const scene of selectedScenes) {
               ? "Allow all edits"
               : scene.id === "approval-current-26-820-file-options-compact"
                 ? "Allow this conversation"
+              : scene.id === "approval-current-26-825-file-options-compact"
+                ? "Allow all edits"
               : "Allow similar commands",
         })
         .waitFor();
@@ -2086,6 +2097,35 @@ for (const scene of selectedScenes) {
     }
     if (scene.id === "approval-current-26-820-file-options-compact") {
       currentApproval26820OptionsBounds = await page
+        .locator(".codex-ui-approval-request__options-menu")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (
+      scene.id === "approval-current-26-825-file-deny-pending" ||
+      scene.id === "approval-current-26-825-file-deny-pending-compact"
+    ) {
+      currentApproval26825Bounds = await page
+        .locator(".demo-current-26-825-file-approval")
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
+    if (scene.id === "approval-current-26-825-file-options-compact") {
+      currentApproval26825OptionsBounds = await page
         .locator(".codex-ui-approval-request__options-menu")
         .evaluate((element) => {
           const value = element.getBoundingClientRect();
@@ -6586,6 +6626,53 @@ for (const scene of selectedScenes) {
         "CODEX_UI_KIT_CURRENT_APPROVAL_26_820_OPTIONS_COMPACT_MAX_DIFF_RATIO",
       referenceCrop: { height: 67, left: 519, top: 551, width: 168 },
       referencePath: currentApproval26820OptionsCompactReference,
+      referenceSize: { height: 680, width: 720 },
+      sceneId: `${scene.id}.current-product`,
+    });
+  }
+  const currentApproval26825Reference =
+    scene.id === "approval-current-26-825-file-deny-pending"
+      ? currentApproval26825PendingWideReference
+      : scene.id === "approval-current-26-825-file-deny-pending-compact"
+        ? currentApproval26825PendingCompactReference
+        : undefined;
+  if (currentApproval26825Reference) {
+    const compact = scene.id.endsWith("compact");
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentApproval26825Bounds,
+      defaultMaximumRatio: 0.065,
+      expectedActualPosition: compact
+        ? { left: 16, top: 487 }
+        : { left: 222, top: 627 },
+      masks: [],
+      maximumRatioName: compact
+        ? "CODEX_UI_KIT_CURRENT_APPROVAL_26_825_PENDING_COMPACT_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_APPROVAL_26_825_PENDING_WIDE_MAX_DIFF_RATIO",
+      referenceCrop: compact
+        ? { height: 177, left: 16, top: 487, width: 688 }
+        : { height: 177, left: 222, top: 627, width: 736 },
+      referencePath: currentApproval26825Reference,
+      referenceSize: compact
+        ? { height: 680, width: 720 }
+        : { height: 820, width: 1180 },
+      sceneId: `${scene.id}.current-product`,
+    });
+  }
+  if (
+    scene.id === "approval-current-26-825-file-options-compact" &&
+    currentApproval26825OptionsCompactReference
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentApproval26825OptionsBounds,
+      defaultMaximumRatio: 0.055,
+      expectedActualPosition: { left: 519, top: 551 },
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_APPROVAL_26_825_OPTIONS_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 67, left: 519, top: 551, width: 168 },
+      referencePath: currentApproval26825OptionsCompactReference,
       referenceSize: { height: 680, width: 720 },
       sceneId: `${scene.id}.current-product`,
     });

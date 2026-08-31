@@ -492,6 +492,15 @@ The authoritative current-build inventory is:
   traces, and four ownership-masked current-build frames pass under their 1.5%
   limits. Approval timeout, repeated denial, other approval kinds, and rule
   lifetime across restart boundaries remain open.
+- A current `26.825.51511` external-file refresh replaces the previous-build
+  approval-card boundary. The sampled product uses a 736/688×177px card,
+  `Edit files`, the current `Allow ChatGPT to edit the following file?` copy,
+  independent path/+1/-0 semantics, and a compact `Allow once`/`Allow all
+  edits` split menu. Real deny and allow-once decisions prove absent and
+  exact-created file outcomes. Six Browser/CDP, Electron, and reviewed replay
+  frames pass; unmasked product card/menu regions differ by 3.1787%, 3.3225%,
+  and 1.3415%. Session-wide acceptance, auto-review runtime reachability,
+  other approval kinds, and restart lifetime remain partial.
 - A separate current-build pasted-image task drives attachment ready, Remove,
   focus restoration, re-add, submit, sent-media ownership, exact completion,
   and empty-Composer restoration. The public `ComposerAttachment`,

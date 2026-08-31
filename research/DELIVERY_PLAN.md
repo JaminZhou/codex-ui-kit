@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 59 groups have current-build runtime evidence, 21 have previous-build-only
+- 60 groups have current-build runtime evidence, 20 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current Pull request review follow-up promotes
   `workspace.pull-request-review`. Its read-only PR #228 replay locks five
@@ -266,7 +266,16 @@ exit gates; it does not replace the inventory.
   approval frames and the permission menu; Electron repeats both decisions.
   Unmasked product regions pass at 6.0489% wide, 6.1328% compact, and 5.1795%
   for the options menu under 6.2%, 6.3%, and 5.5% ceilings, with exact geometry
-  independently gated. The previous 26.820 MCP task promotes `thread.mcp-tool-events`,
+  independently gated. The current 26.825 external-file refresh replaces that
+  previous-build boundary with a 736/688×177px card, current `Edit files` and
+  `Allow ChatGPT to edit the following file?` copy, independent path/delta
+  semantics, and the `Allow once`/`Allow all edits` options menu. Real deny and
+  allow transitions prove absent and exact-created file outcomes. Six CDP,
+  Electron, and reviewed replay frames pass; unmasked current-product regions
+  pass at 3.1787%, 3.3225%, and 1.3415%. This promotes
+  `thread.approval-permission-events` to current-build verification while
+  leaving session-wide acceptance, automatic review, other approval kinds, and
+  restart lifetime open. The previous 26.820 MCP task promotes `thread.mcp-tool-events`,
   `thread.mcp-tool-failure-retry`, `thread.panel-system`, and
   `thread.sources-panel`. It reaches one real Search → Fetch success and one
   captured invalid-URL Fetch → Search → Fetch recovery. Current completed and

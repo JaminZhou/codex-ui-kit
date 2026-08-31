@@ -1,5 +1,6 @@
 import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
 import approvalCurrent26820FileTrace from "../fixtures/traces/approval-current-26-820-file.jsonl?raw";
+import approvalCurrent26825FileTrace from "../fixtures/traces/approval-current-26-825-file.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import approvalForSessionTrace from "../fixtures/traces/approval-for-session.jsonl?raw";
 import approvalReviewTimeoutTrace from "../fixtures/traces/approval-review-timeout.jsonl?raw";
@@ -60,6 +61,7 @@ import type { ProtocolEventRecord } from "./protocol-state";
 export type ReplayScenarioId =
   | "approval-allow-once"
   | "approval-current-26-820-file"
+  | "approval-current-26-825-file"
   | "approval-denied"
   | "approval-for-session"
   | "approval-review-timeout"
@@ -192,6 +194,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Conversation and Composer lifecycle",
     "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, automatic continuation, and legacy paused-queue compatibility.",
     conversationLifecycleTrace,
+  ),
+  "approval-current-26-825-file": scenario(
+    "approval-current-26-825-file",
+    "Create approval probe file",
+    "The runtime-observed 26.825 external-file edit pauses in the Edit files card, exposes one-time and all-edits choices, preserves a denied no-write result, and completes an independently allowed write.",
+    approvalCurrent26825FileTrace,
   ),
   "background-terminal": scenario(
     "background-terminal",

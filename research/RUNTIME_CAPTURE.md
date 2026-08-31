@@ -2217,6 +2217,42 @@ comparisons use seven external full-window references but crop only the owned
 context or overlay region; they write outputs only to ignored artifacts. Raw
 product screenshots and the isolated profile are never committed.
 
+## Current `26.825.51511` external-file approval sample
+
+Use one loopback-only isolated process, three disposable tasks, and three exact
+external paths: pending, denied, and allowed. Keep the user-owned Codex process
+untouched. Hash the task titles before capture and permit the helper to navigate
+only when the installed fingerprint, exact profile, exact CDP owner, loopback
+listener, title hashes, and a new profile-owned output directory all match.
+
+The accepted pending sample covers 1180×820 and 720×680 with the sidebar
+hidden. It requires `Edit files`, `Allow ChatGPT to edit the following file?`,
+a separately exposed directory/file name and +1/-0 delta, Deny, Allow once,
+and Approval options. At compact width, the split menu must contain exactly
+`Allow once` and `Allow all edits`, dismiss on Escape, and restore trigger
+focus. The settled samples must prove that Deny leaves its exact target absent
+and Allow once creates exactly the requested bytes; UI copy alone is not
+sufficient file evidence.
+
+Browser/CDP and Electron drive both real transitions and six deterministic
+replay frames. Optional external pixel gates accept only local, untracked raw
+screenshots and compare the owned card/menu regions without masks:
+
+```bash
+CODEX_UI_KIT_CURRENT_APPROVAL_26_825_PENDING_WIDE_REFERENCE=/absolute/path/to/pending-wide.png \
+CODEX_UI_KIT_CURRENT_APPROVAL_26_825_PENDING_COMPACT_REFERENCE=/absolute/path/to/pending-compact.png \
+CODEX_UI_KIT_CURRENT_APPROVAL_26_825_OPTIONS_COMPACT_REFERENCE=/absolute/path/to/options-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=approval-current-26-825-file-deny-pending,approval-current-26-825-file-deny-pending-compact,approval-current-26-825-file-options-compact
+```
+
+After capture, archive only the exact disposable tasks. A still-running pending
+task requires the product's explicit Stop and archive confirmation. Verify all
+three external paths, move the allowed file and exact isolated profile
+recoverably to Trash, terminate only the validated isolated process tree and
+profile-owned Crashpad handlers, prove the port is closed, and recheck that the
+user-owned Codex PID remains alive.
+
 ## Promotion rule
 
 After a capture:

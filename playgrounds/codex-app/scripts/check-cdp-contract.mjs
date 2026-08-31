@@ -9905,14 +9905,17 @@ for (const scene of selectedScenes) {
               ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
           composer: rect(composer),
           fileStatus:
-            document
-              .querySelector('[data-testid="file-change-group"]')
+            [...document.querySelectorAll('[data-testid="file-change-group"]')]
+              .at(-1)
               ?.getAttribute("data-file-status") ?? null,
           menu: menu
             ? {
                 items: Array.from(
                   menu.querySelectorAll('[role="menuitem"]'),
-                  (item) => item.textContent?.trim() ?? "",
+                  (item) =>
+                    item.querySelector("span")?.textContent?.trim() ??
+                    item.textContent?.trim() ??
+                    "",
                 ),
                 rect: rect(menu),
               }
@@ -10041,6 +10044,281 @@ for (const scene of selectedScenes) {
           '.demo-root[data-frame="approval-current-26-820-file-allowed"]',
         );
         await page.getByText("Jamin，文件已创建。", { exact: true }).waitFor();
+      }
+    }
+    if (scene.scenario === "approval-current-26-825-file") {
+      const optionsScene =
+        scene.id === "approval-current-26-825-file-options-compact";
+      if (optionsScene) {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { name: "Approval options" })
+          .click();
+        await page
+          .locator(
+            '.codex-ui-approval-request__options-menu [role="menuitem"]',
+          )
+          .filter({ hasText: "Allow all edits" })
+          .waitFor();
+      }
+      const currentFileApproval = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const approval = document.querySelector(
+          ".demo-current-26-825-file-approval",
+        );
+        const composer = document.querySelector(".codex-ui-composer");
+        const menu = document.querySelector(
+          ".codex-ui-approval-request__options-menu",
+        );
+        const permissionTrigger = document.querySelector(
+          ".demo-composer-permission-trigger",
+        );
+        return {
+          approval: approval
+            ? {
+                actions: Array.from(
+                  approval.querySelectorAll("button"),
+                  (button) => ({
+                    ariaLabel: button.getAttribute("aria-label"),
+                    rect: rect(button),
+                    shortcut:
+                      button
+                        .querySelector(
+                          ".codex-ui-approval-request__shortcut",
+                        )
+                        ?.textContent?.trim() ?? null,
+                    text: button.textContent?.replace(/\s+/g, " ").trim(),
+                  }),
+                ),
+                backgroundColor: getComputedStyle(approval).backgroundColor,
+                borderRadius: getComputedStyle(approval).borderRadius,
+                identity:
+                  approval
+                    .querySelector(".codex-ui-approval-request__identity")
+                    ?.textContent?.trim() ?? null,
+                identityIcon:
+                  approval
+                    .querySelector(
+                      ".codex-ui-approval-request__identity-icon [data-current-build-icon]",
+                    )
+                    ?.getAttribute("data-current-build-icon") ?? null,
+                preview: (() => {
+                  const preview = approval.querySelector(
+                    ".codex-ui-approval-file-preview",
+                  );
+                  return preview
+                    ? {
+                        additions:
+                          preview.querySelector('[data-tone="added"]')
+                            ?.textContent ?? null,
+                        deletions:
+                          preview.querySelector('[data-tone="removed"]')
+                            ?.textContent ?? null,
+                        directory:
+                          preview
+                            .querySelector(
+                              ".codex-ui-approval-file-preview__directory",
+                            )
+                            ?.textContent?.trim() ?? null,
+                        fileName:
+                          preview
+                            .querySelector(
+                              ".codex-ui-approval-file-preview__name",
+                            )
+                            ?.textContent?.trim() ?? null,
+                        rect: rect(preview),
+                      }
+                    : null;
+                })(),
+                question:
+                  approval
+                    .querySelector(".codex-ui-approval-request__heading h3")
+                    ?.textContent?.trim() ?? null,
+                rect: rect(approval),
+              }
+            : null,
+          assistantText:
+            [...document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"]',
+            )]
+              .at(-1)
+              ?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+          composer: rect(composer),
+          fileStatus:
+            [...document.querySelectorAll('[data-testid="file-change-group"]')]
+              .at(-1)
+              ?.getAttribute("data-file-status") ?? null,
+          menu: menu
+            ? {
+                items: Array.from(
+                  menu.querySelectorAll('[role="menuitem"]'),
+                  (item) =>
+                    item.querySelector("span")?.textContent?.trim() ??
+                    item.textContent?.trim() ??
+                    "",
+                ),
+                rect: rect(menu),
+              }
+            : null,
+          permissionIcon:
+            permissionTrigger
+              ?.querySelector("[data-current-build-icon]")
+              ?.getAttribute("data-current-build-icon") ?? null,
+          permissionLabel:
+            permissionTrigger?.textContent?.trim() ?? null,
+        };
+      });
+      const compact = scene.windowSize?.width === 720;
+      const pending = scene.frame?.endsWith("pending");
+      const expectedFileName = scene.frame?.includes("allow-pending")
+        ? "codex-ui-kit-26-825-approval-probe-allowed.txt"
+        : "codex-ui-kit-26-825-approval-probe-pending.txt";
+      if (
+        pending &&
+        (!currentFileApproval.approval ||
+          Math.abs(
+            currentFileApproval.approval.rect.left - (compact ? 16 : 222),
+          ) > 1 ||
+          Math.abs(
+            currentFileApproval.approval.rect.top - (compact ? 487 : 627),
+          ) > 1 ||
+          Math.abs(
+            currentFileApproval.approval.rect.width - (compact ? 688 : 736),
+          ) > 1 ||
+          Math.abs(currentFileApproval.approval.rect.height - 177) > 1 ||
+          currentFileApproval.approval.backgroundColor !==
+            "rgba(45, 45, 45, 0.96)" ||
+          currentFileApproval.approval.borderRadius !== "25px" ||
+          currentFileApproval.approval.identity !== "Edit files" ||
+          currentFileApproval.approval.identityIcon !==
+            "sidebar-project-menu-edit" ||
+          currentFileApproval.approval.question !==
+            "Allow ChatGPT to edit the following file?" ||
+          currentFileApproval.approval.preview?.directory !==
+            "/Users/demo-user/Desktop/" ||
+          currentFileApproval.approval.preview?.fileName !== expectedFileName ||
+          currentFileApproval.approval.preview?.additions !== "+1" ||
+          currentFileApproval.approval.preview?.deletions !== "-0" ||
+          Math.abs(
+            currentFileApproval.approval.preview.rect.left -
+              (compact ? 32 : 238),
+          ) > 1 ||
+          Math.abs(
+            currentFileApproval.approval.preview.rect.top -
+              (compact ? 571 : 711),
+          ) > 1 ||
+          Math.abs(
+            currentFileApproval.approval.preview.rect.width -
+              (compact ? 656 : 704),
+          ) > 1 ||
+          Math.abs(currentFileApproval.approval.preview.rect.height - 33) >
+            1 ||
+          !currentFileApproval.approval.actions.some(
+            ({ shortcut, text }) => shortcut === "Esc" && text === "DenyEsc",
+          ) ||
+          !currentFileApproval.approval.actions.some(
+            ({ shortcut, text }) =>
+              shortcut === "⏎" && text === "Allow once⏎",
+          ) ||
+          !currentFileApproval.approval.actions.some(
+            ({ ariaLabel }) => ariaLabel === "Approval options",
+          ) ||
+          currentFileApproval.composer !== null)
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 file approval card contract failed: ${JSON.stringify(currentFileApproval)}`,
+        );
+      }
+      if (
+        optionsScene &&
+        (!currentFileApproval.menu ||
+          JSON.stringify(currentFileApproval.menu.items) !==
+            JSON.stringify(["Allow once", "Allow all edits"]) ||
+          Math.abs(currentFileApproval.menu.rect.left - 519) > 1 ||
+          Math.abs(currentFileApproval.menu.rect.top - 551) > 1 ||
+          Math.abs(currentFileApproval.menu.rect.width - 168) > 1 ||
+          Math.abs(currentFileApproval.menu.rect.height - 67.125) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 file approval options contract failed: ${JSON.stringify(currentFileApproval)}`,
+        );
+      }
+      if (optionsScene) {
+        await page.keyboard.press("Escape");
+        const dismissed = await page.evaluate(() => ({
+          activeLabel: document.activeElement?.getAttribute("aria-label"),
+          menuCount: document.querySelectorAll(
+            ".codex-ui-approval-request__options-menu",
+          ).length,
+        }));
+        if (
+          dismissed.activeLabel !== "Approval options" ||
+          dismissed.menuCount !== 0
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 approval options did not dismiss cleanly: ${JSON.stringify(dismissed)}`,
+          );
+        }
+      }
+      if (
+        !pending &&
+        (currentFileApproval.approval !== null ||
+          !currentFileApproval.composer ||
+          Math.abs(currentFileApproval.composer.left - 16) > 1 ||
+          Math.abs(currentFileApproval.composer.top - 566) > 1 ||
+          Math.abs(currentFileApproval.composer.width - 688) > 1 ||
+          Math.abs(currentFileApproval.composer.height - 98) > 1 ||
+          currentFileApproval.permissionLabel !== "Ask for approval" ||
+          currentFileApproval.permissionIcon !== "composer-permission-ask" ||
+          !currentFileApproval.assistantText?.includes(
+            scene.frame?.endsWith("denied")
+              ? "Jamin，权限审批被拒绝，文件未创建。"
+              : "已获批准，并使用 apply_patch 创建指定文件",
+          ) ||
+          (scene.frame?.endsWith("allowed") &&
+            currentFileApproval.fileStatus !== "applied"))
+      ) {
+        throw new Error(
+          `${scene.id}: current 26.825 file approval settlement contract failed: ${JSON.stringify(currentFileApproval)}`,
+        );
+      }
+      if (scene.id === "approval-current-26-825-file-deny-pending") {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { exact: true, name: "Deny" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-26-825-file-denied"]',
+        );
+        await page
+          .getByText("Jamin，权限审批被拒绝，文件未创建。", {
+            exact: true,
+          })
+          .waitFor();
+      }
+      if (
+        scene.id === "approval-current-26-825-file-allow-pending-compact"
+      ) {
+        await page
+          .getByTestId("current-approval-request")
+          .getByRole("button", { exact: true, name: "Allow once" })
+          .click();
+        await page.waitForSelector(
+          '.demo-root[data-frame="approval-current-26-825-file-allowed"]',
+        );
+        await page
+          .getByText("CURRENT 26.825 FILE APPROVAL ALLOWED", { exact: true })
+          .first()
+          .waitFor();
       }
     }
     if (
@@ -16555,6 +16833,9 @@ for (const scene of selectedScenes) {
       !scene.id.includes("approval-current-26-820-file-deny-pending") &&
       scene.id !== "approval-current-26-820-file-options-compact" &&
       scene.id !== "approval-current-26-820-file-allow-pending-compact" &&
+      !scene.id.includes("approval-current-26-825-file-deny-pending") &&
+      scene.id !== "approval-current-26-825-file-options-compact" &&
+      scene.id !== "approval-current-26-825-file-allow-pending-compact" &&
       !scene.id.startsWith("current-review-undo-failed") &&
       !scene.id.startsWith("attachment-current-preview") &&
       !scene.markdownImagePreview

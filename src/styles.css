@@ -12767,6 +12767,60 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   margin-bottom: 0;
 }
 
+.codex-ui-approval-file-preview {
+  align-items: center;
+  background: color-mix(
+    in srgb,
+    var(--codex-ui-background-surface) 50%,
+    transparent
+  );
+  border-radius: 0.78125rem;
+  color: var(--codex-ui-text);
+  display: flex;
+  font-size: var(--codex-ui-font-size-chat);
+  font-weight: var(--codex-ui-font-weight-medium);
+  gap: 0.625rem;
+  line-height: 1.3125rem;
+  min-height: 2.0625rem;
+  min-width: 0;
+  padding: 0.375rem;
+}
+
+.codex-ui-approval-file-preview__path {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.codex-ui-approval-file-preview__directory {
+  color: var(--codex-ui-text-tertiary);
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.codex-ui-approval-file-preview__name {
+  flex: 0 0 auto;
+}
+
+.codex-ui-approval-file-preview__delta {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+  line-height: 1rem;
+  margin-left: auto;
+}
+
+.codex-ui-approval-file-preview__delta [data-tone="added"] {
+  color: var(--codex-ui-success);
+}
+
+.codex-ui-approval-file-preview__delta [data-tone="removed"] {
+  color: var(--codex-ui-danger);
+}
+
 .codex-ui-approval-request__actions {
   align-items: center;
   border: 0;

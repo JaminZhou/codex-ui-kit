@@ -120,6 +120,8 @@ failure/cancellation policy, pagination, and transcript streaming.
 - `ApprovalRequest`: command, patch, network, permission, and generic approval
   card with scoped actions, shortcuts, loading, outcome states, and default or
   current Composer-dock presentation.
+- `ApprovalFilePreview`: path and additions/deletions preview for file-edit
+  approval cards; filesystem decisions and mutations remain host-owned.
 - `AutomaticApprovalReview`: in-progress, approved, denied, high-risk denied,
   timed-out, and aborted reviewer-agent status with action, rationale, and
   accessible terminal semantics. It reports protocol state only; it never

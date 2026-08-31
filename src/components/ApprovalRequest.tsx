@@ -614,6 +614,53 @@ export interface ApprovalCommandPreviewProps
   forceCollapsible?: boolean;
 }
 
+export interface ApprovalFilePreviewProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  additions?: number;
+  deletions?: number;
+  directory?: ReactNode;
+  fileName: ReactNode;
+}
+
+export function ApprovalFilePreview({
+  additions = 0,
+  className,
+  deletions = 0,
+  directory,
+  fileName,
+  "aria-label": ariaLabel = "File change preview",
+  ...props
+}: ApprovalFilePreviewProps) {
+  return (
+    <div
+      aria-label={ariaLabel}
+      className={["codex-ui-approval-file-preview", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="group"
+      {...props}
+    >
+      <span className="codex-ui-approval-file-preview__path">
+        {directory ? (
+          <span className="codex-ui-approval-file-preview__directory">
+            {directory}
+          </span>
+        ) : null}
+        <span className="codex-ui-approval-file-preview__name">
+          {fileName}
+        </span>
+      </span>
+      <span
+        aria-label={`${additions} additions, ${deletions} deletions`}
+        className="codex-ui-approval-file-preview__delta"
+      >
+        <span data-tone="added">+{additions}</span>
+        <span data-tone="removed">-{deletions}</span>
+      </span>
+    </div>
+  );
+}
+
 export function ApprovalCommandPreview({
   className,
   collapseLabel = "Collapse",

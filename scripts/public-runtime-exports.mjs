@@ -24,6 +24,7 @@ export const publicRuntimeExports = [
   "AppWindowChrome",
   "AppearanceSettingsPage",
   "ApprovalCommandPreview",
+  "ApprovalFilePreview",
   "ApprovalRequest",
   "ArtifactList",
   "AutomaticApprovalReview",
