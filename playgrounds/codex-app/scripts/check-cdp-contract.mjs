@@ -7349,6 +7349,18 @@ for (const scene of selectedScenes) {
                   status: comment.getAttribute("data-status"),
                 }
               : null,
+            activityItems: document.querySelectorAll(
+              ".demo-current-pr-activity article",
+            ).length,
+            codeFileCount: document.querySelectorAll(
+              ".demo-current-pr-code__files > li",
+            ).length,
+            codePreviewCount: document.querySelectorAll(
+              ".demo-current-pr-code__preview",
+            ).length,
+            codeToolbarControls: document.querySelectorAll(
+              ".demo-current-pr-code__toolbar button",
+            ).length,
             detail: detailState
               ? {
                   busy: detailState.getAttribute("aria-busy"),
@@ -7399,6 +7411,10 @@ for (const scene of selectedScenes) {
                 ".codex-ui-app-shell__side-panel",
               ),
             ),
+            panelExpanded:
+              document
+                .querySelector(".demo-current-pr-panel")
+                ?.hasAttribute("data-expanded") ?? false,
             panelText:
               document
                 .querySelector(".codex-ui-app-shell__side-panel")
@@ -7422,6 +7438,30 @@ for (const scene of selectedScenes) {
             runningChecks: document.querySelectorAll(
               '.codex-ui-pull-request-checks li[data-status="running"]',
             ).length,
+            summaryFactLabels: [
+              ...document.querySelectorAll(
+                ".demo-current-pr-summary .codex-ui-pull-request-panel-summary__label",
+              ),
+            ].filter((element) => element.getBoundingClientRect().width > 1)
+              .length,
+            summaryHeading:
+              document
+                .querySelector(".demo-current-pr-summary h1")
+                ?.textContent?.trim() ?? null,
+            summaryOrder: (() => {
+              const activity = document.querySelector(
+                ".demo-current-pr-activity",
+              );
+              const comment = document.querySelector(
+                ".demo-current-pr-summary .codex-ui-pull-request-panel-summary__comment",
+              );
+              return activity && comment
+                ? activity.compareDocumentPosition(comment) &
+                    Node.DOCUMENT_POSITION_FOLLOWING
+                  ? "activity-before-comment"
+                  : "comment-before-activity"
+                : null;
+            })(),
             selectedTab:
               document
                 .querySelector(
@@ -7478,6 +7518,35 @@ for (const scene of selectedScenes) {
               lifecycle.panelText !== "Select pull request to view" ||
               Math.abs((lifecycle.search?.height ?? 0) - 32) > 1 ||
               Math.abs((lifecycle.sidebar?.width ?? 0) - 321.875) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 419.59375) > 1 ||
+              Math.abs((lifecycle.main?.width ?? 0) - 438.53125) > 1)) ||
+          (scene.frame === "pr-detail-current-26-825-summary" &&
+            (lifecycle.selectedTab !== "Summary" ||
+              lifecycle.summaryHeading !==
+                "feat: refresh current pull request review" ||
+              lifecycle.runningChecks !== 2 ||
+              lifecycle.activityItems !== 2 ||
+              lifecycle.summaryFactLabels !== 0 ||
+              lifecycle.summaryOrder !== "activity-before-comment" ||
+              lifecycle.panelExpanded ||
+              Math.abs((lifecycle.sidebar?.width ?? 0) - 321.875) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 419.59375) > 1 ||
+              Math.abs((lifecycle.main?.width ?? 0) - 438.53125) > 1)) ||
+          (scene.frame === "pr-detail-current-26-825-summary-expanded" &&
+            (lifecycle.selectedTab !== "Summary" ||
+              lifecycle.summaryHeading !==
+                "feat: refresh current pull request review" ||
+              lifecycle.summaryFactLabels !== 5 ||
+              !lifecycle.panelExpanded ||
+              Math.abs((lifecycle.sidebar?.width ?? 0) - 321.875) > 1 ||
+              Math.abs((lifecycle.panel?.width ?? 0) - 858.125) > 1 ||
+              Math.abs(lifecycle.main?.width ?? 1) > 1)) ||
+          (scene.frame === "pr-detail-current-26-825-code" &&
+            (lifecycle.selectedTab !== "Code" ||
+              lifecycle.codeToolbarControls !== 4 ||
+              lifecycle.codeFileCount !== 9 ||
+              lifecycle.codePreviewCount !== 2 ||
+              lifecycle.panelExpanded ||
               Math.abs((lifecycle.panel?.width ?? 0) - 419.59375) > 1 ||
               Math.abs((lifecycle.main?.width ?? 0) - 438.53125) > 1)) ||
           (scene.frame === "pr-index-failed" &&

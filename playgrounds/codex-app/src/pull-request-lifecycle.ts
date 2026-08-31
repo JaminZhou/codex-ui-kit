@@ -94,6 +94,14 @@ export function initialPullRequestLifecycleState(
   frame: string | null,
 ): PullRequestLifecycleState {
   const state = { ...basePullRequestLifecycleState };
+  if (frame?.startsWith("pr-detail-current-26-825-")) {
+    return {
+      ...state,
+      checkStatus: "running",
+      mergeStatus: "checking",
+      selectedId: "228",
+    };
+  }
   switch (frame) {
     case "pr-index-loading":
     case "pr-index-current-26-825-loading":

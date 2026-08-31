@@ -240,6 +240,11 @@ describe("pull request workspace surfaces", () => {
               {
                 checkStatus: "running",
                 id: "51",
+                meta: (
+                  <span data-testid="pr-custom-meta">
+                    current branch metadata
+                  </span>
+                ),
                 number: 51,
                 repository: "ui-kit",
                 state: "draft",
@@ -276,6 +281,7 @@ describe("pull request workspace surfaces", () => {
                 id: "review",
                 name: "Review",
                 status: "running",
+                statusLabel: "In progress",
               },
             ]}
           />
@@ -312,6 +318,10 @@ describe("pull request workspace surfaces", () => {
     );
     expect(onSelect).toHaveBeenCalledWith("51");
     expect(screen.getByText("Passed · 1m")).toBeTruthy();
+    expect(screen.getByText("In progress")).toBeTruthy();
+    expect(screen.getByTestId("pr-custom-meta").textContent).toBe(
+      "current branch metadata",
+    );
     expect(screen.getByText("Commented")).toBeTruthy();
     expect(screen.getByText("src/example.ts:42")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Merge" })).toBeTruthy();
@@ -640,5 +650,25 @@ describe("pull request workspace surfaces", () => {
       screen.getByRole("textbox", { name: "Pull request comment" }),
     ).toBeTruthy();
     expect(screen.getByText("Codex reviewed the latest push.")).toBeTruthy();
+  });
+
+  it("can place the pull request comment composer after the timeline", () => {
+    render(
+      <PullRequestPanelSummary
+        commentComposer={<textarea aria-label="Pull request comment" />}
+        commentPlacement="after-timeline"
+        timeline={<article>Jamin opened this pull request.</article>}
+        title="Current pull request"
+      />,
+    );
+
+    const timeline = screen.getByText("Jamin opened this pull request.");
+    const comment = screen.getByRole("textbox", {
+      name: "Pull request comment",
+    });
+    expect(
+      timeline.compareDocumentPosition(comment) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

@@ -4326,6 +4326,39 @@ describe("application sidebar", () => {
 });
 
 describe("workspace panel", () => {
+  it("renders host-provided expand and restore icons", () => {
+    const { rerender } = render(
+      <WorkspacePanel
+        activeTabId="review"
+        expandIcon={<span data-testid="workspace-expand-icon">expand</span>}
+        label="Workspace"
+        onActiveTabChange={() => undefined}
+        onExpandedChange={() => undefined}
+        restoreIcon={<span data-testid="workspace-restore-icon">restore</span>}
+        tabs={[{ content: "Review content", id: "review", label: "Review" }]}
+      />,
+    );
+
+    expect(screen.getByTestId("workspace-expand-icon")).toBeTruthy();
+    expect(screen.queryByTestId("workspace-restore-icon")).toBeNull();
+
+    rerender(
+      <WorkspacePanel
+        activeTabId="review"
+        expandIcon={<span data-testid="workspace-expand-icon">expand</span>}
+        expanded
+        label="Workspace"
+        onActiveTabChange={() => undefined}
+        onExpandedChange={() => undefined}
+        restoreIcon={<span data-testid="workspace-restore-icon">restore</span>}
+        tabs={[{ content: "Review content", id: "review", label: "Review" }]}
+      />,
+    );
+
+    expect(screen.queryByTestId("workspace-expand-icon")).toBeNull();
+    expect(screen.getByTestId("workspace-restore-icon")).toBeTruthy();
+  });
+
   it("coordinates tabs and host-owned panel actions", () => {
     const onActiveTabChange = vi.fn();
     const onCloseTab = vi.fn();

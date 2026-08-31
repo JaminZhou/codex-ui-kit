@@ -171,6 +171,8 @@ import {
   type ProtocolEventRecord,
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
+import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
+import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
 import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
 import {
   isScenarioId,
@@ -342,6 +344,121 @@ function CurrentPullRequestRouteIcon({
       viewBox={name === "search" ? "0 0 16 16" : "0 0 20 20"}
     >
       <path d={path} fill="currentColor" />
+    </svg>
+  );
+}
+
+type CurrentPullRequestIconName =
+  | "branch"
+  | "checks"
+  | "comments"
+  | "edit"
+  | "merge"
+  | "plus"
+  | "restore"
+  | "reviewers"
+  | "status";
+
+function CurrentPullRequestIcon({
+  name,
+}: {
+  name: CurrentPullRequestIconName;
+}) {
+  if (name === "branch") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <circle cx="5.4165" cy="5" r="1.875" />
+        <circle cx="5.4165" cy="15" r="1.875" />
+        <circle cx="14.5833" cy="5" r="1.875" />
+        <path d="M5.4165 6.66664V13.3333" />
+        <path d="M5.41658 12.5V11.6667C5.41658 10.7462 6.16278 10 7.08325 10H12.9166C13.8371 10 14.5833 9.25381 14.5833 8.33333V7.5" />
+      </svg>
+    );
+  }
+  if (name === "reviewers") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path
+          d="M16.585 10C16.585 6.3632 13.6368 3.41504 10 3.41504C6.3632 3.41504 3.41504 6.3632 3.41504 10C3.41504 11.9528 4.26592 13.7062 5.61621 14.9121C6.6544 13.6452 8.23235 12.835 10 12.835C11.7674 12.835 13.3447 13.6454 14.3828 14.9121C15.7334 13.7062 16.585 11.9531 16.585 10ZM10 14.165C8.67626 14.165 7.49115 14.7585 6.69531 15.6953C7.66679 16.2602 8.79525 16.585 10 16.585C11.2041 16.585 12.3316 16.2597 13.3027 15.6953C12.5069 14.759 11.3233 14.1651 10 14.165ZM11.835 8.5C11.835 7.48656 11.0134 6.66504 10 6.66504C8.98656 6.66504 8.16504 7.48656 8.16504 8.5C8.16504 9.51344 8.98656 10.335 10 10.335C11.0134 10.335 11.835 9.51344 11.835 8.5ZM17.915 10C17.915 14.3713 14.3713 17.915 10 17.915C5.62867 17.915 2.08496 14.3713 2.08496 10C2.08496 5.62867 5.62867 2.08496 10 2.08496C14.3713 2.08496 17.915 5.62867 17.915 10ZM13.165 8.5C13.165 10.248 11.748 11.665 10 11.665C8.25202 11.665 6.83496 10.248 6.83496 8.5C6.83496 6.75202 8.25202 5.33496 10 5.33496C11.748 5.33496 13.165 6.75202 13.165 8.5Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+  if (name === "comments") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path
+          d="M11.335 12.083C11.3347 9.97242 9.44966 8.16504 7 8.16504C4.55034 8.16504 2.66527 9.97242 2.66504 12.083C2.66504 12.8512 2.90887 13.5704 3.33691 14.1797C3.4302 14.3125 3.47218 14.4745 3.4541 14.6357C3.40535 15.0678 3.31415 15.4843 3.19922 15.8877C3.66136 15.8098 4.10651 15.6986 4.54297 15.5508L4.66699 15.5215C4.79159 15.5045 4.91938 15.5238 5.03516 15.5771C5.62294 15.8481 6.2901 16.002 7 16.002C9.44981 16.002 11.335 14.1938 11.335 12.083ZM17.335 7.91309C17.3348 5.80247 15.4497 3.99512 13 3.99512C11.5595 3.99512 10.298 4.62925 9.51465 5.58496C9.28182 5.86891 8.86214 5.9105 8.57812 5.67773C8.29409 5.44493 8.25257 5.02526 8.48535 4.74121C9.52649 3.47094 11.1693 2.66504 13 2.66504C16.0729 2.66504 18.6648 4.96138 18.665 7.91309C18.665 8.8753 18.3824 9.77408 17.8984 10.5459C17.9866 11.1153 18.1604 11.6767 18.3848 12.2568C18.4665 12.4681 18.4355 12.7068 18.3018 12.8896C18.1681 13.0723 17.9505 13.1739 17.7246 13.1602C16.8659 13.1076 16.0585 12.9617 15.2734 12.7178C15.1054 12.7861 14.9347 12.8511 14.7588 12.9043C14.4073 13.0104 14.036 12.8113 13.9297 12.46C13.8235 12.1084 14.0226 11.7372 14.374 11.6309C14.5782 11.5692 14.7758 11.4944 14.9648 11.4072L15.084 11.3652C15.2063 11.3351 15.3361 11.3399 15.457 11.3809C15.8932 11.5286 16.338 11.6399 16.7998 11.7178C16.6849 11.3144 16.5946 10.8978 16.5459 10.4658C16.5278 10.3046 16.5698 10.1426 16.6631 10.0098C17.0911 9.40048 17.335 8.68131 17.335 7.91309ZM12.665 12.083C12.665 15.0349 10.073 17.332 7 17.332C6.19184 17.332 5.42143 17.1731 4.72266 16.8887C4.04698 17.0983 3.35521 17.2365 2.62793 17.3037L2.27539 17.3301C2.04946 17.3438 1.83192 17.2422 1.69824 17.0596C1.56452 16.8767 1.53354 16.638 1.61523 16.4268L1.79297 15.9375C1.93133 15.5279 2.03737 15.1238 2.10059 14.7158C1.61678 13.9441 1.33496 13.045 1.33496 12.083C1.33519 9.13134 3.92709 6.83496 7 6.83496C10.0729 6.83496 12.6648 9.13134 12.665 12.083Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+  if (name === "checks") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 18 18">
+        <g transform="rotate(-90 9 9)">
+          <circle cx="9" cy="9" r="5.75" stroke="#22c55e" />
+          <circle
+            cx="9"
+            cy="9"
+            r="5.75"
+            stroke="#facc15"
+            strokeDasharray="10 36.13"
+          />
+        </g>
+      </svg>
+    );
+  }
+  if (name === "edit") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path
+          d="M11.7313 4.20472C13.1489 2.92391 15.3377 2.96644 16.7039 4.33265L16.8318 4.46742C18.0713 5.8393 18.0713 7.93343 16.8318 9.30531L16.7039 9.44007L10.4119 15.7311C10.0884 16.0546 9.85387 16.2917 9.62188 16.4821L9.3875 16.6588C9.18236 16.799 8.96432 16.9196 8.73711 17.0192L8.50762 17.1119C8.32585 17.1785 8.13845 17.2266 7.92168 17.2711L4.76348 17.8053C4.46916 17.8552 4.10835 17.875 3.81426 17.7907C3.59124 17.695 3.40749 17.5271 3.2918 17.316C3.1596 17.0209 3.18138 16.5674 3.23125 16.2731L3.76445 13.1149C3.85797 12.7108 4.01738 12.2985 4.37774 11.6491L4.55352 11.4147C4.74395 11.1825 4.98173 10.9484 5.30547 10.6246L11.5965 4.33265L11.7313 4.20472ZM6.2459 11.5651C5.89673 11.9142 5.71261 12.0998 5.58672 12.2526C5.38197 12.5358 5.23516 12.8327 5.17363 12.9869C5.1025 13.2125 5.06817 13.3815 4.94121 14.0983L4.54277 16.4918L6.93828 16.0944C7.65508 15.9684 7.82408 15.9341 8.04961 15.8629C8.35464 15.7349 8.63652 15.5602 8.78399 15.4498C8.93677 15.3239 9.12233 15.1398 9.47149 14.7907L14.4588 9.80238L11.2332 6.57679L6.2459 11.5651ZM15.7635 5.27308C14.9282 4.43776 13.6058 4.38573 12.7098 5.11683L12.1736 5.63636L15.4002 8.86195L15.9197 8.32581C16.6016 7.48961 16.6016 6.28311 15.9197 5.44691L15.7635 5.27308Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+  if (name === "plus") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path
+          d="M9.33496 16.5V10.665H3.5C3.13273 10.665 2.83496 10.3673 2.83496 10C2.83496 9.63273 3.13273 9.33496 3.5 9.33496H9.33496V3.5C9.33496 3.13273 9.63273 2.83496 10 2.83496C10.3673 2.83496 10.665 3.13273 10.665 3.5V9.33496H16.5C16.8673 9.33496 17.165 9.63273 17.165 10C17.165 10.3673 16.8673 10.665 16.5 10.665H10.665V16.5C10.665 16.8673 10.3673 17.165 10 17.165C9.63273 17.165 9.33496 16.8673 9.33496 16.5Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
+  }
+  if (name === "restore") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 16 16">
+        <path d="M6.1664 8.80845C6.7325 8.80845 7.1918 9.26774 7.1918 9.83384V13.3338C7.19155 13.6236 6.9562 13.8592 6.6664 13.8592C6.37672 13.8591 6.14126 13.6235 6.14101 13.3338V10.5936L2.70547 14.0379C2.50071 14.243 2.16753 14.2435 1.9623 14.0389C1.75709 13.8342 1.75665 13.501 1.96133 13.2957L5.39101 9.85923H2.6664C2.37672 9.85909 2.14126 9.6235 2.14101 9.33384C2.14101 9.04397 2.37657 8.80858 2.6664 8.80845H6.1664Z" fill="currentColor" />
+        <path d="M13.2943 1.96274C13.4989 1.75743 13.8311 1.75731 14.0365 1.96177C14.2419 2.16637 14.243 2.49854 14.0385 2.70395L10.6127 6.14145H13.3334C13.6233 6.14145 13.8588 6.37689 13.8588 6.66684C13.8587 6.95674 13.6233 7.19223 13.3334 7.19223H9.8334C9.26734 7.19223 8.80807 6.73288 8.80801 6.16684V2.66684C8.80801 2.37689 9.04345 2.14145 9.3334 2.14145C9.62335 2.14145 9.85879 2.37689 9.85879 2.66684V5.41098L13.2943 1.96274Z" fill="currentColor" />
+      </svg>
+    );
+  }
+  const statusPath =
+    "M2.54004 0C3.94284 0 5.08008 1.13724 5.08008 2.54004C5.08008 3.71238 4.28484 4.69567 3.20508 4.98828V10.0908C4.28496 10.3833 5.08008 11.3676 5.08008 12.54C5.08008 13.9428 3.94284 15.0801 2.54004 15.0801C1.13724 15.0801 0 13.9428 0 12.54C0 11.3676 0.795113 10.3833 1.875 10.0908V4.98828C0.795239 4.69567 0 3.71238 0 2.54004C0 1.13724 1.13724 0 2.54004 0ZM2.54004 11.3301C1.87177 11.3301 1.33008 11.8718 1.33008 12.54C1.33008 13.2083 1.87177 13.75 2.54004 13.75C3.2083 13.75 3.75 13.2083 3.75 12.54C3.75 11.8718 3.2083 11.3301 2.54004 11.3301ZM2.54004 1.33008C1.87177 1.33008 1.33008 1.87177 1.33008 2.54004C1.33008 3.2083 1.87177 3.75 2.54004 3.75C3.2083 3.75 3.75 3.2083 3.75 2.54004C3.75 1.87177 3.2083 1.33008 2.54004 1.33008Z";
+  if (name === "merge") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <g transform="translate(2.87695 2.45996)">
+          <path d={`${statusPath} M12.917 10.04C12.917 9.37188 12.3751 8.83025 11.707 8.83008C11.0388 8.83008 10.4971 9.37177 10.4971 10.04C10.4971 10.7083 11.0388 11.25 11.707 11.25C12.3751 11.2498 12.917 10.7082 12.917 10.04ZM3.81055 4.73633C4.22936 5.91905 4.89909 6.81802 5.75879 7.48242C6.72602 8.22983 7.9664 8.70627 9.42676 8.9248C9.83996 8.08166 10.7048 7.5 11.707 7.5C13.1097 7.50018 14.2471 8.63734 14.2471 10.04C14.2471 11.4427 13.1097 12.5799 11.707 12.5801C10.3687 12.5801 9.2737 11.5448 9.17578 10.2314C7.57006 9.98395 6.12118 9.44292 4.94629 8.53516C4.25331 7.99967 3.66805 7.34453 3.20508 6.56836V10.0908H1.875V4.98828C2.59363 4.79363 3.18666 4.29138 3.50586 3.63379L3.81055 4.73633Z`} fill="currentColor" />
+        </g>
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <g transform="translate(2.87695 2.45996)">
+        <path d={statusPath} fill="currentColor" />
+        <path
+          d="M12.123 9.375C12.4903 9.375 12.7881 9.67277 12.7881 10.04V11.458H14.207V12.7881H12.7881V14.207C12.7879 14.5742 12.4902 14.8721 12.123 14.8721C11.756 14.8719 11.4582 14.574 11.458 14.207V12.7881H10.04C9.67277 12.7881 9.375 12.4903 9.375 12.123C9.37518 11.7559 9.67288 11.458 10.04 11.458H11.458V10.04C11.458 9.67288 11.7559 9.37518 12.123 9.375Z"
+          fill="currentColor"
+        />
+      </g>
     </svg>
   );
 }
@@ -3153,21 +3270,26 @@ export function App() {
     initialSelection.frame,
     initialPullRequestLifecycleState,
   );
-  const [pullRequestExpanded, setPullRequestExpanded] = useState(false);
+  const [pullRequestExpanded, setPullRequestExpanded] = useState(
+    initialSelection.frame === "pr-detail-current-26-825-summary-expanded",
+  );
   const [pullRequestOpen, setPullRequestOpen] = useState(
     initialSelection.view === "pull-request" &&
       (pullRequestState.selectedId !== null ||
-        initialSelection.frame?.startsWith("pr-index-current-26-825-")),
+        initialSelection.frame?.startsWith("pr-index-current-26-825-") ||
+        initialSelection.frame?.startsWith("pr-detail-current-26-825-")),
   );
   const [pullRequestWidth, setPullRequestWidth] = useState(
-    initialSelection.frame?.startsWith("pr-index-current-26-825-")
+    initialSelection.frame?.startsWith("pr-index-current-26-825-") ||
+      initialSelection.frame?.startsWith("pr-detail-current-26-825-")
       ? 419.59375
       : 370,
   );
   const [pullRequestTab, setPullRequestTab] = useState<
     "code" | "summary"
   >(
-    initialSelection.frame?.startsWith("pr-review-")
+    initialSelection.frame?.startsWith("pr-review-") ||
+      initialSelection.frame === "pr-detail-current-26-825-code"
       ? "code"
       : "summary",
   );
@@ -3359,9 +3481,13 @@ export function App() {
     mode === "replay" && scenarioId === "current-browser-26-825";
   const isCurrentCitations26825Replay =
     mode === "replay" && scenarioId === "current-citations-26-825";
+  const isCurrentPullRequestReviewReplay =
+    mode === "replay" &&
+    activeFrame?.startsWith("pr-detail-current-26-825-");
   const isCurrentPullRequestRouteReplay =
     mode === "replay" &&
-    activeFrame?.startsWith("pr-index-current-26-825-");
+    (activeFrame?.startsWith("pr-index-current-26-825-") ||
+      isCurrentPullRequestReviewReplay);
   const isCurrentMarkdown26818Replay =
     mode === "replay" && scenarioId === "markdown-current-26-818";
   const isCurrentMarkdown26820MediaReplay =
@@ -9875,6 +10001,189 @@ export function App() {
       </article>
     </div>
   );
+  const currentPullRequestChecks = [
+    {
+      id: "check",
+      name: "check",
+      status: "running" as const,
+      statusLabel: "In progress",
+    },
+    {
+      id: "electron",
+      name: "Codex app Electron acceptance",
+      status: "running" as const,
+      statusLabel: "In progress",
+    },
+    {
+      id: "javascript",
+      name: "Analyze JavaScript and TypeScript",
+      status: "passed" as const,
+    },
+    {
+      id: "react-18",
+      name: "React 18 / Bundler consumer",
+      status: "passed" as const,
+    },
+    {
+      id: "react-19",
+      name: "React 19 / Bundler consumer",
+      status: "passed" as const,
+    },
+    {
+      id: "react-nodenext",
+      name: "React 19 / NodeNext consumer",
+      status: "passed" as const,
+    },
+    { id: "codeql", name: "CodeQL", status: "passed" as const },
+  ];
+  const currentPullRequestTimeline = (
+    <section
+      aria-label="Pull request activity"
+      className="demo-current-pr-activity"
+    >
+      <header>
+        <h2>
+          Activity <span aria-hidden="true">⌄</span>
+        </h2>
+        <span>2</span>
+      </header>
+      <article>
+        <span aria-hidden="true" className="demo-current-pr-activity__icon">
+          ◎
+        </span>
+        <div>
+          <strong>chore: open current pull request fixture</strong>
+          <span>
+            <code>679ff2a</code> · 1m
+          </span>
+        </div>
+      </article>
+      <article>
+        <span aria-hidden="true" className="demo-current-pr-activity__icon">
+          <CurrentPullRequestIcon name="status" />
+        </span>
+        <div>
+          <strong>JaminZhou opened this pull request</strong>
+          <span>1m</span>
+        </div>
+      </article>
+    </section>
+  );
+  const currentPullRequestSummaryReady = (
+    <PullRequestPanelSummary
+      checks={
+        <PullRequestCheckList
+          checks={currentPullRequestChecks}
+          className="demo-current-pr-checks"
+        />
+      }
+      className="demo-pr-panel__summary demo-current-pr-summary"
+      commentComposer={
+        <PullRequestCommentComposer
+          aria-label="Pull request comment composer"
+          value=""
+        />
+      }
+      commentPlacement="after-timeline"
+      description={
+        <div className="demo-pr-description demo-current-pr-description">
+          <h3>Scope</h3>
+          <ul>
+            <li>use this open PR as a read-only current-build fixture</li>
+            <li>
+              refresh the current Pull request detail, Timeline, and Code
+              workspace contracts
+            </li>
+            <li>
+              add CDP, Electron, reviewed pixel, and local-only product-region
+              gates
+            </li>
+          </ul>
+          <p>
+            Implementation and final local verification will be pushed to this
+            same PR before direct squash merge.
+          </p>
+        </div>
+      }
+      descriptionAction={
+        <button aria-label="Description actions" type="button">
+          <CurrentPullRequestIcon name="edit" />
+        </button>
+      }
+      descriptionHeading={
+        <>
+          Description <span aria-hidden="true">⌄</span>
+        </>
+      }
+      facts={[
+        {
+          id: "branch",
+          indicator: <CurrentPullRequestIcon name="branch" />,
+          label: "Branch",
+          value: (
+            <span className="demo-pr-branch demo-current-pr-branch">
+              <span>feat/current-pull-request-review</span>
+              <span aria-hidden="true">›</span>
+              <span>main</span>
+              <button aria-label="Review pull request changes" type="button">
+                <span className="demo-pr-additions">+0</span>
+                <span className="demo-pr-deletions">−0</span>
+              </button>
+            </span>
+          ),
+        },
+        {
+          id: "reviewers",
+          indicator: <CurrentPullRequestIcon name="reviewers" />,
+          label: "Reviewers",
+          value: (
+            <button aria-label="Request reviewers" type="button">
+              <CurrentPullRequestIcon name="plus" />
+              Request
+            </button>
+          ),
+        },
+        {
+          id: "comments",
+          indicator: <CurrentPullRequestIcon name="comments" />,
+          label: "Comments",
+          value: "No comments",
+        },
+        {
+          id: "checks",
+          indicator: <CurrentPullRequestIcon name="checks" />,
+          label: "Checks",
+          tone: "warning" as const,
+          value: "Pending",
+        },
+        {
+          id: "status",
+          indicator: <CurrentPullRequestIcon name="status" />,
+          label: "Status",
+          value: (
+            <button aria-label="Change pull request status" type="button">
+              Ready for review <span aria-hidden="true">⌄</span>
+            </button>
+          ),
+        },
+      ]}
+      meta={
+        <>
+          <span className="demo-pr-avatar demo-pr-avatar--small">J</span>
+          <span>JaminZhou</span>
+          <span>·</span>
+          <span>1m</span>
+        </>
+      }
+      timeline={currentPullRequestTimeline}
+      title="feat: refresh current pull request review"
+      titleAction={
+        <button aria-label="Edit title" type="button">
+          <CurrentPullRequestIcon name="edit" />
+        </button>
+      }
+    />
+  );
   const pullRequestSummaryReady = (
     <PullRequestPanelSummary
       checks={
@@ -10098,8 +10407,104 @@ export function App() {
       />
     );
   const pullRequestSummary =
-    pullRequestDetailState ?? pullRequestSummaryReady;
-  const pullRequestCode = (
+    pullRequestDetailState ??
+    (isCurrentPullRequestReviewReplay
+      ? currentPullRequestSummaryReady
+      : pullRequestSummaryReady);
+  const currentPullRequestCodeFiles = [
+    {
+      additions: 18,
+      deletions: 0,
+      path: "playgrounds/codex-app/scripts/electron-harness.mjs",
+    },
+    {
+      additions: 442,
+      deletions: 57,
+      path: "playgrounds/codex-app/src/App.tsx",
+    },
+    {
+      additions: 8,
+      deletions: 0,
+      path: "playgrounds/codex-app/src/pull-request-lifecycle.ts",
+    },
+    {
+      additions: 576,
+      deletions: 0,
+      path: "playgrounds/codex-app/src/styles.css",
+    },
+    {
+      additions: 0,
+      deletions: 0,
+      path: "playgrounds/codex-app/tests/visual/baselines/pr-detail-current-26-825-summary-expanded.png",
+      preview: currentPullRequestSummaryExpandedPreview,
+    },
+    {
+      additions: 0,
+      deletions: 0,
+      path: "playgrounds/codex-app/tests/visual/baselines/pr-detail-current-26-825-summary.png",
+      preview: currentPullRequestSummaryPreview,
+    },
+    {
+      additions: 9,
+      deletions: 1,
+      path: "src/components/AppShell.tsx",
+    },
+    {
+      additions: 26,
+      deletions: 13,
+      path: "src/components/PullRequestSurfaces.tsx",
+    },
+    {
+      additions: 20,
+      deletions: 0,
+      path: "tests/workflow-surfaces.test.tsx",
+    },
+  ];
+  const currentPullRequestCode = (
+    <div className="demo-current-pr-code">
+      <div aria-label="Code review controls" className="demo-current-pr-code__toolbar">
+        <button aria-label="Review options" type="button">
+          <CurrentBuildIcon name="review-options" />
+        </button>
+        <button aria-label="Collapse all diffs" type="button">
+          <CurrentBuildIcon name="review-collapse-all" />
+        </button>
+        <button aria-label="Switch to split diff" type="button">
+          <CurrentBuildIcon name="review-split-diff" />
+        </button>
+        <button aria-label="Show file tree" type="button">
+          <CurrentBuildIcon name="review-files-toggle" />
+        </button>
+      </div>
+      <ol aria-label="Pull request code review" className="demo-current-pr-code__files">
+        {currentPullRequestCodeFiles.map((file) => (
+          <li key={file.path}>
+            <button
+              aria-expanded={Boolean(file.preview)}
+              aria-label={file.path}
+              type="button"
+            >
+              <span className="demo-current-pr-code__path">{file.path}</span>
+              <span className="demo-current-pr-code__stats">
+                <span className="demo-pr-additions">+{file.additions}</span>
+                <span className="demo-pr-deletions">-{file.deletions}</span>
+              </span>
+              <span aria-hidden="true" className="demo-current-pr-code__open-slot" />
+              <span aria-hidden="true" className="demo-current-pr-code__chevron">
+                <CurrentBuildIcon name="review-file-toggle" />
+              </span>
+            </button>
+            {file.preview ? (
+              <div className="demo-current-pr-code__preview">
+                <img alt="" src={file.preview} />
+              </div>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+  const legacyPullRequestCode = (
     <div
       className="demo-pr-panel__code"
       data-review-open={pullRequestReviewOpen || undefined}
@@ -10178,37 +10583,61 @@ export function App() {
       />
     </div>
   );
+  const pullRequestCode = isCurrentPullRequestReviewReplay
+    ? currentPullRequestCode
+    : legacyPullRequestCode;
   const pullRequestPanel = (
     <WorkspacePanel
       actions={
-        <>
-          <button aria-label="Open in browser" type="button">
-            ↗
-          </button>
-          <button type="button">
-            Auto-merge
-          </button>
-          <button
-            disabled={pullRequestState.mergeStatus !== "ready"}
-            onClick={() =>
-              schedulePullRequestTransition(
-                { type: "merge/start" },
-                { type: "merge/succeed" },
-              )
-            }
-            type="button"
-          >
-            {pullRequestState.mergeStatus === "merged"
-              ? "Merged"
-              : pullRequestState.mergeStatus === "merging"
-                ? "Merging…"
-                : "Merge"}
-          </button>
-        </>
+        isCurrentPullRequestReviewReplay ? (
+          <>
+            <button aria-label="Open in browser" type="button">
+              <CurrentBuildIcon name="review-open-in" />
+            </button>
+            <button type="button">Open chat</button>
+            <button type="button">
+              <CurrentPullRequestIcon name="merge" />
+              Merge
+              <span aria-hidden="true">⌄</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <button aria-label="Open in browser" type="button">
+              ↗
+            </button>
+            <button type="button">Auto-merge</button>
+            <button
+              disabled={pullRequestState.mergeStatus !== "ready"}
+              onClick={() =>
+                schedulePullRequestTransition(
+                  { type: "merge/start" },
+                  { type: "merge/succeed" },
+                )
+              }
+              type="button"
+            >
+              {pullRequestState.mergeStatus === "merged"
+                ? "Merged"
+                : pullRequestState.mergeStatus === "merging"
+                  ? "Merging…"
+                  : "Merge"}
+            </button>
+          </>
+        )
       }
       activeTabId={pullRequestTab}
-      className="demo-pr-panel"
+      className={
+        isCurrentPullRequestReviewReplay
+          ? "demo-pr-panel demo-current-pr-panel"
+          : "demo-pr-panel"
+      }
       data-testid="pull-request-panel"
+      expandIcon={
+        isCurrentPullRequestReviewReplay ? (
+          <CurrentBuildIcon name="review-expand" />
+        ) : undefined
+      }
       expanded={pullRequestExpanded}
       label="Pull request"
       onActiveTabChange={(id) =>
@@ -10216,6 +10645,11 @@ export function App() {
       }
       onExpandedChange={setPullRequestExpanded}
       placement="side"
+      restoreIcon={
+        isCurrentPullRequestReviewReplay ? (
+          <CurrentPullRequestIcon name="restore" />
+        ) : undefined
+      }
       restorePanelLabel="Restore panel width"
       tabs={[
         { content: pullRequestSummary, id: "summary", label: "Summary" },
@@ -10285,7 +10719,13 @@ export function App() {
           ) : null}
           <input
             aria-label="Search pull requests"
-            defaultValue={isCurrentPullRequestRouteReplay ? undefined : "80"}
+            defaultValue={
+              isCurrentPullRequestReviewReplay
+                ? "228"
+                : isCurrentPullRequestRouteReplay
+                  ? undefined
+                  : "80"
+            }
             placeholder="Search pull requests"
             type="search"
           />
@@ -10298,32 +10738,73 @@ export function App() {
           </button>
         </div>
       ) : null}
-      {isCurrentPullRequestRouteReplay ? null : <h2>Authored</h2>}
+      {isCurrentPullRequestRouteReplay ? (
+        isCurrentPullRequestReviewReplay ? <h2>Authored⌄</h2> : null
+      ) : (
+        <h2>Authored</h2>
+      )}
       {pullRequestState.indexStatus === "ready" ? (
         <PullRequestList
-          items={[
-            {
-              author: "JaminZhou",
-              checkStatus:
-                pullRequestState.checkStatus === "passed"
-                  ? "passed"
-                  : pullRequestState.checkStatus === "failed"
-                    ? "failed"
-                    : "running",
-              commentCount: 6,
-              id: "80",
-              indicator: (
-                <span className="demo-pr-branch-indicator">
-                  ⑂<i />
-                </span>
-              ),
-              number: 80,
-              repository: "codex-ui-kit",
-              state: "open",
-              title: "feat: add terminal session lifecycle",
-              updatedAt: "now",
-            },
-          ]}
+          items={
+            isCurrentPullRequestReviewReplay
+              ? [
+                  {
+                    author: "JaminZhou",
+                    checkStatus: "running" as const,
+                    id: "228",
+                    indicator: (
+                      <span className="demo-current-pr-list-indicator">
+                        <CurrentPullRequestIcon name="status" />
+                        <i />
+                      </span>
+                    ),
+                    meta: (
+                      <>
+                        <span>JaminZhou/codex-ui-kit</span>
+                        <span>feat/current-pull-request-review</span>
+                        <span>
+                          <span className="demo-pr-additions">+0</span>{" "}
+                          <span className="demo-pr-deletions">−0</span>
+                        </span>
+                      </>
+                    ),
+                    number: 228,
+                    openLabel: "feat: refresh current pull request review",
+                    repository: "codex-ui-kit",
+                    state: "open" as const,
+                    title: (
+                      <>
+                        <span>feat: refresh current pull request review</span>
+                        <time dateTime="PT1M">1m</time>
+                      </>
+                    ),
+                    updatedAt: "1m",
+                  },
+                ]
+              : [
+                  {
+                    author: "JaminZhou",
+                    checkStatus:
+                      pullRequestState.checkStatus === "passed"
+                        ? ("passed" as const)
+                        : pullRequestState.checkStatus === "failed"
+                          ? ("failed" as const)
+                          : ("running" as const),
+                    commentCount: 6,
+                    id: "80",
+                    indicator: (
+                      <span className="demo-pr-branch-indicator">
+                        ⑂<i />
+                      </span>
+                    ),
+                    number: 80,
+                    repository: "codex-ui-kit",
+                    state: "open" as const,
+                    title: "feat: add terminal session lifecycle",
+                    updatedAt: "now",
+                  },
+                ]
+          }
           onSelect={(id) => {
             dispatchPullRequest({ id, type: "select" });
             setPullRequestOpen(true);
@@ -13066,7 +13547,9 @@ export function App() {
         sidePanel={
           view === "pull-request"
             ? isCurrentPullRequestRouteReplay
-              ? currentPullRequestEmptyPanel
+              ? isCurrentPullRequestReviewReplay
+                ? pullRequestPanel
+                : currentPullRequestEmptyPanel
               : pullRequestPanel
             : isCurrentCitations26825Replay
               ? citationSourcesPanel

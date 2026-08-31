@@ -2713,6 +2713,7 @@ export interface WorkspacePanelProps
   actions?: ReactNode;
   closeIcon?: ReactNode;
   emptyState?: ReactNode;
+  expandIcon?: ReactNode;
   expandPanelLabel?: string;
   expanded?: boolean;
   label: string;
@@ -2723,6 +2724,7 @@ export interface WorkspacePanelProps
   onOpenTab?: () => void;
   openTabLabel?: string;
   placement?: WorkspacePanelPlacement;
+  restoreIcon?: ReactNode;
   restorePanelLabel?: string;
   tabCloseButtons?: boolean;
   tabs: readonly WorkspacePanelTab[];
@@ -2735,6 +2737,7 @@ export function WorkspacePanel({
   className,
   closeIcon,
   emptyState = "No open tabs",
+  expandIcon,
   expandPanelLabel = "Expand panel",
   expanded = false,
   label,
@@ -2745,6 +2748,7 @@ export function WorkspacePanel({
   onOpenTab,
   openTabLabel = "Open panel tab",
   placement = "side",
+  restoreIcon,
   restorePanelLabel = "Restore panel",
   style,
   tabCloseButtons = false,
@@ -2928,7 +2932,11 @@ export function WorkspacePanel({
           ) : null}
           {onExpandedChange ? (
             <IconButton
-              icon={<ExpandIcon expanded={expanded} />}
+              icon={
+                expanded
+                  ? (restoreIcon ?? <ExpandIcon expanded />)
+                  : (expandIcon ?? <ExpandIcon />)
+              }
               label={
                 expanded ? restorePanelLabel : expandPanelLabel
               }
