@@ -2124,6 +2124,32 @@ baselines are committed; optional product comparisons use external paths and
 write only owned regional crops/diffs to ignored artifacts. Product images
 and the disposable profile are never committed.
 
+## Current `26.825.51511` project and run-location context sample
+
+Use a loopback-only isolated profile and keep the user's primary Codex process
+untouched. Capture the empty new-chat context, project picker at 1180×820 and
+720×680, `Work in`, selected New local worktree, Environment, and Branches.
+Retain only fixed labels, roles, accessible state, geometry, computed styles,
+and reusable public icon identities; project history, task labels, screenshots,
+and profile data remain local-only.
+
+The accepted sample requires a 736×28 context row above the 736×98 Composer,
+a 260×249.5 project dialog with search and fixed actions, a 216×189.3125
+five-action run-location menu, a four-control New local worktree state, a
+264×91.125 two-action Environment menu, and a 296×280.125 Branches menu.
+The current branch surface uses project-specific search, ordinary `menuitem`
+roles without `aria-checked`, no legacy Select local environment row, and one
+Create and checkout action. The 720×680 project dialog starts at x=35/y=282
+and must not introduce horizontal overflow.
+
+CDP verifies exact semantics, geometry, computed styles, no-match fixed
+actions, reversible project selection, and focus return. Electron drives the
+same click sequence in a native window and independently launches the compact
+frame. Seven reviewed replay baselines are committed. Optional local-product
+comparisons use seven external full-window references but crop only the owned
+context or overlay region; they write outputs only to ignored artifacts. Raw
+product screenshots and the isolated profile are never committed.
+
 ## Promotion rule
 
 After a capture:

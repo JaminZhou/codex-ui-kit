@@ -148,6 +148,51 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the runtime-observed 26.825 project and run-location controls", () => {
+    for (const scene of [
+      "workspace-context-current-26-825-ready",
+      "workspace-context-current-26-825-project-menu",
+      "workspace-context-current-26-825-project-menu-compact",
+      "workspace-context-current-26-825-environment-menu",
+      "workspace-context-current-26-825-new-worktree",
+      "workspace-context-current-26-825-environment-picker",
+      "workspace-context-current-26-825-worktree-menu",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_READY_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_PROJECT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_PROJECT_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_RUN_LOCATION_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_NEW_WORKTREE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_ENVIRONMENT_PICKER_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_WORKTREE_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      "workspace project dialog failed",
+    );
+    expect(cdpContract).toContain(
+      "Search codex-ui-kit branches",
+    );
+    expect(electronContract).toContain(
+      'id: "electron-workspace-context-current-26-825"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-workspace-context-current-26-825-compact"',
+    );
+    expect(appSource).toContain("currentContext26825Replay");
+    expect(appSource).toContain(
+      'placeholder={`Search ${workspaceProject?.label ?? "project"} branches`}',
+    );
+    expect(appStyles).toContain(
+      ".demo-workspace-context-menu--current-26-825",
+    );
+    expect(appStyles).toContain("backdrop-filter: blur(8px)");
+  });
+
   it("keeps the main gate strict while scoping raster tolerance to the sidebar", () => {
     expect(contract).toContain(
       "const defaultLifecycleMainPixelRatio = 0.0025",

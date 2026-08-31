@@ -478,6 +478,20 @@ const currentBuildWorkspaceWorktreeReference =
   process.env.CODEX_UI_KIT_WORKSPACE_WORKTREE_REFERENCE;
 const currentBuildWorkspaceBranchCreateReference =
   process.env.CODEX_UI_KIT_WORKSPACE_BRANCH_CREATE_REFERENCE;
+const currentContext26825ReadyReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_READY_REFERENCE;
+const currentContext26825ProjectReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_PROJECT_REFERENCE;
+const currentContext26825ProjectCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_PROJECT_COMPACT_REFERENCE;
+const currentContext26825RunLocationReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_RUN_LOCATION_REFERENCE;
+const currentContext26825NewWorktreeReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_NEW_WORKTREE_REFERENCE;
+const currentContext26825EnvironmentPickerReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_ENVIRONMENT_PICKER_REFERENCE;
+const currentContext26825WorktreeReference =
+  process.env.CODEX_UI_KIT_CURRENT_CONTEXT_26_825_WORKTREE_REFERENCE;
 const currentBuildGitSettingsReference =
   process.env.CODEX_UI_KIT_GIT_SETTINGS_REFERENCE;
 const currentBuildGitSettingsCompactReference =
@@ -1329,6 +1343,7 @@ for (const scene of selectedScenes) {
   let workspaceEnvironmentPickerBounds;
   let workspaceEnvironmentSettingsBounds;
   let workspaceProjectListboxBounds;
+  let currentContext26825Bounds;
   let currentComposer26820ModeBounds;
   let workspaceWorktreeMenuBounds;
   let workspaceBranchCreateBounds;
@@ -1691,6 +1706,34 @@ for (const scene of selectedScenes) {
         const active = document.activeElement;
         if (active instanceof HTMLElement) active.blur();
       });
+    }
+    if (scene.id.startsWith("workspace-context-current-26-825-")) {
+      const selector =
+        scene.id === "workspace-context-current-26-825-ready" ||
+        scene.id === "workspace-context-current-26-825-new-worktree"
+          ? ".demo-workspace-start .codex-ui-conversation-context-bar"
+          : scene.id === "workspace-context-current-26-825-project-menu" ||
+              scene.id ===
+                "workspace-context-current-26-825-project-menu-compact"
+            ? ".demo-workspace-project-dialog"
+            : scene.id ===
+                "workspace-context-current-26-825-environment-menu"
+              ? '.demo-workspace-environment-menu[role="menu"]'
+              : scene.id ===
+                  "workspace-context-current-26-825-environment-picker"
+                ? '.demo-workspace-worktree-environment-menu[role="menu"]'
+                : '.demo-workspace-worktree-menu[role="menu"]';
+      currentContext26825Bounds = await page
+        .locator(selector)
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
     }
     if (
       scene.id === "workspace-project-menu" ||
@@ -3608,6 +3651,174 @@ for (const scene of selectedScenes) {
     console.log(
       `${scene.id}: current-build project list pixel ratio ${comparison.ratio}`,
     );
+  }
+
+  const currentContext26825Comparison =
+    scene.id === "workspace-context-current-26-825-ready"
+      ? {
+          defaultMaximumRatio: 0.08,
+          masks: [
+            { height: 20, left: 46, top: 4, width: 69 },
+            { height: 20, left: 170, top: 4, width: 40 },
+            { height: 20, left: 250, top: 4, width: 180 },
+          ],
+          maximumRatioName:
+            "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_READY_MAX_DIFF_RATIO",
+          referenceCrop: { height: 28, left: 383, top: 673, width: 736 },
+          referencePath: currentContext26825ReadyReference,
+        }
+      : scene.id === "workspace-context-current-26-825-project-menu"
+        ? {
+            defaultMaximumRatio: 0.1,
+            masks: [
+              { height: 20, left: 32, top: 5, width: 210 },
+              ...Array.from({ length: 7 }, (_, index) => ({
+                height: 20,
+                left: 36,
+                top: 35 + index * 28,
+                width: 190,
+              })),
+            ],
+            maximumRatioName:
+              "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_PROJECT_MAX_DIFF_RATIO",
+            referenceCrop: {
+              height: 250,
+              left: 401,
+              top: 422,
+              width: 260,
+            },
+            referencePath: currentContext26825ProjectReference,
+          }
+        : scene.id ===
+            "workspace-context-current-26-825-project-menu-compact"
+          ? {
+              defaultMaximumRatio: 0.1,
+              masks: [
+                { height: 20, left: 32, top: 5, width: 210 },
+                ...Array.from({ length: 7 }, (_, index) => ({
+                  height: 20,
+                  left: 36,
+                  top: 35 + index * 28,
+                  width: 190,
+                })),
+              ],
+              maximumRatioName:
+                "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_PROJECT_COMPACT_MAX_DIFF_RATIO",
+              referenceCrop: {
+                height: 250,
+                left: 35,
+                top: 282,
+                width: 260,
+              },
+              referencePath: currentContext26825ProjectCompactReference,
+              referenceSize: { height: 680, width: 720 },
+            }
+          : scene.id ===
+              "workspace-context-current-26-825-environment-menu"
+            ? {
+                defaultMaximumRatio: 0.115,
+                masks: [
+                  { height: 18, left: 12, top: 10, width: 96 },
+                  ...[39, 68, 97, 126, 163].map((top) => ({
+                    height: 18,
+                    left: 34,
+                    top,
+                    width: 142,
+                  })),
+                ],
+                maximumRatioName:
+                  "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_RUN_LOCATION_MAX_DIFF_RATIO",
+                referenceCrop: {
+                  height: 189,
+                  left: 523,
+                  top: 482,
+                  width: 216,
+                },
+                referencePath: currentContext26825RunLocationReference,
+              }
+            : scene.id ===
+                "workspace-context-current-26-825-new-worktree"
+              ? {
+                  defaultMaximumRatio: 0.08,
+                  masks: [
+                    { height: 20, left: 46, top: 4, width: 69 },
+                    { height: 20, left: 188, top: 4, width: 120 },
+                    { height: 20, left: 350, top: 4, width: 100 },
+                    { height: 20, left: 500, top: 4, width: 60 },
+                  ],
+                  maximumRatioName:
+                    "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_NEW_WORKTREE_MAX_DIFF_RATIO",
+                  referenceCrop: {
+                    height: 28,
+                    left: 383,
+                    top: 673,
+                    width: 736,
+                  },
+                  referencePath: currentContext26825NewWorktreeReference,
+                }
+              : scene.id ===
+                  "workspace-context-current-26-825-environment-picker"
+                ? {
+                    defaultMaximumRatio: 0.1,
+                    masks: [
+                      { height: 18, left: 12, top: 10, width: 96 },
+                      { height: 18, left: 34, top: 39, width: 190 },
+                      { height: 18, left: 34, top: 68, width: 190 },
+                    ],
+                    maximumRatioName:
+                      "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_ENVIRONMENT_PICKER_MAX_DIFF_RATIO",
+                    referenceCrop: {
+                      height: 91,
+                      left: 687,
+                      top: 580,
+                      width: 264,
+                    },
+                    referencePath:
+                      currentContext26825EnvironmentPickerReference,
+                  }
+                : scene.id ===
+                    "workspace-context-current-26-825-worktree-menu"
+                  ? {
+                      defaultMaximumRatio: 0.1,
+                      masks: [
+                        { height: 20, left: 32, top: 5, width: 240 },
+                        ...Array.from({ length: 8 }, (_, index) => ({
+                          height: 20,
+                          left: 36,
+                          top: 35 + index * 28,
+                          width: 210,
+                        })),
+                      ],
+                      maximumRatioName:
+                        "CODEX_UI_KIT_CURRENT_CONTEXT_26_825_WORKTREE_MAX_DIFF_RATIO",
+                      referenceCrop: {
+                        height: 280,
+                        left: 603,
+                        top: 391,
+                        width: 296,
+                      },
+                      referencePath: currentContext26825WorktreeReference,
+                    }
+                  : null;
+  if (
+    currentContext26825Comparison?.referencePath &&
+    currentContext26825Bounds
+  ) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentContext26825Bounds,
+      defaultMaximumRatio:
+        currentContext26825Comparison.defaultMaximumRatio,
+      masks: currentContext26825Comparison.masks,
+      maximumRatioName:
+        currentContext26825Comparison.maximumRatioName,
+      referenceCrop: currentContext26825Comparison.referenceCrop,
+      referencePath: currentContext26825Comparison.referencePath,
+      referenceSize:
+        currentContext26825Comparison.referenceSize ??
+        currentBuildWorkspaceReferenceSize,
+      sceneId: scene.id,
+    });
   }
 
   if (

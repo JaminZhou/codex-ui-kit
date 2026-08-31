@@ -2148,6 +2148,11 @@ const initialPersonalizationSettings: PersonalizationSettingsValue = {
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
+  const currentContext26825Replay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame?.startsWith(
+      "workspace-context-current-26-825-",
+    );
   const [scenarioId, setScenarioId] = useState<ReplayScenarioId>(
     initialSelection.scenarioId,
   );
@@ -2258,8 +2263,8 @@ export function App() {
   const [workspaceEnvironmentId, setWorkspaceEnvironmentId] =
     useState<"local" | "worktree">(
       initialSelection.view === "workspace" &&
-        (initialSelection.frame === "workspace-new-worktree" ||
-          initialSelection.frame === "workspace-environment-picker" ||
+        (initialSelection.frame?.endsWith("-new-worktree") ||
+          initialSelection.frame?.endsWith("-environment-picker") ||
           initialSelection.frame === "workspace-environments-unavailable")
         ? "worktree"
         : "local",
@@ -2570,16 +2575,16 @@ export function App() {
     | null
   >(
     initialSelection.view === "workspace" &&
-      initialSelection.frame === "workspace-project-menu"
+      initialSelection.frame?.endsWith("-project-menu")
       ? "project"
       : initialSelection.view === "workspace" &&
-          initialSelection.frame === "workspace-environment-menu"
+          initialSelection.frame?.endsWith("-environment-menu")
         ? "environment"
         : initialSelection.view === "workspace" &&
-            initialSelection.frame === "workspace-worktree-menu"
+            initialSelection.frame?.endsWith("-worktree-menu")
           ? "worktree"
           : initialSelection.view === "workspace" &&
-              initialSelection.frame === "workspace-environment-picker"
+              initialSelection.frame?.endsWith("-environment-picker")
             ? "worktree-environment"
             : null,
   );
@@ -6831,6 +6836,12 @@ export function App() {
         ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
+      : currentContext26825Replay
+        ? workspaceProjectId === null
+          ? "workspace-context-current-26-825-no-project"
+          : workspaceEnvironmentId === "worktree"
+            ? "workspace-context-current-26-825-new-worktree"
+            : "workspace-context-current-26-825-ready"
       : initialSelection.frame === "workspace-compact-ready"
       ? "workspace-compact-ready"
       : workspaceProjectId === null
@@ -6987,18 +6998,22 @@ export function App() {
       | "worktree-environment"
       | null,
   ) => {
+    const currentFrame = (suffix: string) =>
+      currentContext26825Replay
+        ? `workspace-context-current-26-825-${suffix}`
+        : `workspace-${suffix}`;
     if (overlay) setWorkspaceLocalEnvironmentOpen(false);
     if (overlay !== "project") setWorkspaceProjectQuery("");
     setWorkspaceOverlay(overlay);
     setActiveFrame(
       overlay === "project"
-        ? "workspace-project-menu"
+        ? currentFrame("project-menu")
         : overlay === "environment"
-          ? "workspace-environment-menu"
+          ? currentFrame("environment-menu")
           : overlay === "worktree"
-            ? "workspace-worktree-menu"
+            ? currentFrame("worktree-menu")
             : overlay === "worktree-environment"
-              ? "workspace-environment-picker"
+              ? currentFrame("environment-picker")
               : workspaceBaseFrame,
     );
   };
@@ -7231,8 +7246,12 @@ export function App() {
     setWorkspaceOverlay(null);
     setActiveFrame(
       environmentId === "worktree"
-        ? "workspace-new-worktree"
-        : "workspace-ready",
+        ? currentContext26825Replay
+          ? "workspace-context-current-26-825-new-worktree"
+          : "workspace-new-worktree"
+        : currentContext26825Replay
+          ? "workspace-context-current-26-825-ready"
+          : "workspace-ready",
     );
   };
   const workspaceContext = (
@@ -7360,7 +7379,11 @@ export function App() {
             return (
               <Menu
                 align="start"
-                className="demo-workspace-context-menu demo-workspace-environment-menu"
+                className={`demo-workspace-context-menu demo-workspace-environment-menu${
+                  currentContext26825Replay
+                    ? " demo-workspace-context-menu--current-26-825"
+                    : ""
+                }`}
                 label="Work in"
                 onOpenChange={(open) =>
                   setWorkspaceOverlayState(open ? "environment" : null)
@@ -7438,7 +7461,11 @@ export function App() {
             return (
               <Menu
                 align="start"
-                className="demo-workspace-context-menu demo-workspace-worktree-environment-menu"
+                className={`demo-workspace-context-menu demo-workspace-worktree-environment-menu${
+                  currentContext26825Replay
+                    ? " demo-workspace-context-menu--current-26-825"
+                    : ""
+                }`}
                 initialFocus="none"
                 label="Environment"
                 onOpenChange={(open) =>
@@ -7482,7 +7509,11 @@ export function App() {
             return (
               <Menu
                 align="start"
-                className="demo-workspace-context-menu demo-workspace-worktree-menu"
+                className={`demo-workspace-context-menu demo-workspace-worktree-menu${
+                  currentContext26825Replay
+                    ? " demo-workspace-context-menu--current-26-825"
+                    : ""
+                }`}
                 label="Branches"
                 onOpenChange={(open) => {
                   if (!open) setWorkspaceBranchQuery("");
@@ -7494,20 +7525,39 @@ export function App() {
                 trigger={worktreeTrigger}
                 width="auto"
               >
-                <input
-                  aria-label="Search branches"
-                  onChange={(event) =>
-                    setWorkspaceBranchQuery(event.currentTarget.value)
-                  }
-                  placeholder="Search branches"
-                  type="search"
-                  value={workspaceBranchQuery}
-                />
+                {currentContext26825Replay ? (
+                  <div className="demo-workspace-worktree-menu__search">
+                    <CurrentBuildIcon name="sidebar-search" />
+                    <input
+                      aria-label="Search branches"
+                      onChange={(event) =>
+                        setWorkspaceBranchQuery(event.currentTarget.value)
+                      }
+                      placeholder={`Search ${workspaceProject?.label ?? "project"} branches`}
+                      type="search"
+                      value={workspaceBranchQuery}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    aria-label="Search branches"
+                    onChange={(event) =>
+                      setWorkspaceBranchQuery(event.currentTarget.value)
+                    }
+                    placeholder="Search branches"
+                    type="search"
+                    value={workspaceBranchQuery}
+                  />
+                )}
                 <MenuSectionLabel>Branches</MenuSectionLabel>
                 <div className="demo-workspace-worktree-menu__branches">
                   {filteredWorkspaceWorktrees.map((worktree) => (
                     <MenuItem
-                      aria-checked={worktree.id === workspaceWorktreeId}
+                      aria-checked={
+                        currentContext26825Replay
+                          ? undefined
+                          : worktree.id === workspaceWorktreeId
+                      }
                       disabled={
                         !workspaceBranchOperationsAvailable ||
                         worktree.checkedOutInLinkedWorktree ||
@@ -7515,15 +7565,27 @@ export function App() {
                       }
                       endIcon={
                         worktree.id === workspaceWorktreeId
-                          ? "✓"
+                          ? currentContext26825Replay
+                            ? <CurrentBuildIcon name="workspace-selection-check" />
+                            : "✓"
                           : undefined
                       }
                       key={worktree.id}
                       onSelect={() => {
                         void selectWorkspaceBranch(worktree);
                       }}
-                      role="menuitemradio"
-                      startIcon="⑂"
+                      role={
+                        currentContext26825Replay
+                          ? "menuitem"
+                          : "menuitemradio"
+                      }
+                      startIcon={
+                        currentContext26825Replay ? (
+                          <CurrentBuildIcon name="composer-branch" />
+                        ) : (
+                          "⑂"
+                        )
+                      }
                       subText={
                         worktree.checkedOutInLinkedWorktree
                           ? "Checked out in another worktree"
@@ -7537,14 +7599,16 @@ export function App() {
                   ))}
                 </div>
                 <MenuSeparator />
-                <MenuItem
-                  onSelect={() =>
-                    openWorkspaceLocalEnvironment("worktree")
-                  }
-                  startIcon={<CurrentBuildIcon name="composer-worktree" />}
-                >
-                  Select local environment…
-                </MenuItem>
+                {currentContext26825Replay ? null : (
+                  <MenuItem
+                    onSelect={() =>
+                      openWorkspaceLocalEnvironment("worktree")
+                    }
+                    startIcon={<CurrentBuildIcon name="composer-worktree" />}
+                  >
+                    Select local environment…
+                  </MenuItem>
+                )}
                 <MenuItem
                   disabled={!workspaceBranchOperationsAvailable}
                   onSelect={openWorkspaceBranchCreation}
@@ -7597,16 +7661,32 @@ export function App() {
           id="demo-workspace-project-dialog"
           role="dialog"
         >
-          <input
-            aria-label="Search projects"
-            autoFocus
-            onChange={(event) =>
-              setWorkspaceProjectQuery(event.currentTarget.value)
-            }
-            placeholder="Search projects"
-            type="search"
-            value={workspaceProjectQuery}
-          />
+          {currentContext26825Replay ? (
+            <div className="demo-workspace-project-dialog__search">
+              <CurrentBuildIcon name="sidebar-search" />
+              <input
+                aria-label="Search projects"
+                autoFocus
+                onChange={(event) =>
+                  setWorkspaceProjectQuery(event.currentTarget.value)
+                }
+                placeholder="Search projects"
+                type="search"
+                value={workspaceProjectQuery}
+              />
+            </div>
+          ) : (
+            <input
+              aria-label="Search projects"
+              autoFocus
+              onChange={(event) =>
+                setWorkspaceProjectQuery(event.currentTarget.value)
+              }
+              placeholder="Search projects"
+              type="search"
+              value={workspaceProjectQuery}
+            />
+          )}
           <ConversationProjectListbox
             dismissBoundaryId="demo-workspace-project-dialog"
             initialFocus="none"
@@ -7622,7 +7702,11 @@ export function App() {
               }
               if (projectId === workspaceNoProjectOptionId) {
                 openWorkspace(null);
-                setActiveFrame("workspace-no-project");
+                setActiveFrame(
+                  currentContext26825Replay
+                    ? "workspace-context-current-26-825-no-project"
+                    : "workspace-no-project",
+                );
                 setWorkspaceProjectQuery("");
                 return;
               }
@@ -7630,10 +7714,19 @@ export function App() {
               setWorkspaceEnvironmentId("local");
               updateWorkspaceWorktreeId("main");
               setWorkspaceOverlayState(null);
-              setActiveFrame("workspace-ready");
+              setActiveFrame(
+                currentContext26825Replay
+                  ? "workspace-context-current-26-825-ready"
+                  : "workspace-ready",
+              );
               setWorkspaceProjectQuery("");
             }}
             pinnedItems={workspaceProjectPinnedItems}
+            selectedIcon={
+              currentContext26825Replay ? (
+                <CurrentBuildIcon name="workspace-selection-check" />
+              ) : undefined
+            }
             selectedId={
               workspaceProjectId ?? workspaceNoProjectOptionId
             }
@@ -7778,7 +7871,7 @@ export function App() {
           )
         }
         eyebrow={
-          currentHomeFrame ? (
+          currentHomeFrame || currentContext26825Replay ? (
             <CurrentBuildIcon
               className="demo-current-home-mark"
               name="home-mark"
@@ -7840,6 +7933,21 @@ export function App() {
                 },
               ]}
             />
+          ) : currentContext26825Replay ? (
+            <div className="demo-workspace-prompts demo-workspace-prompts--current-context">
+              <button
+                onClick={() =>
+                  setComposerValue(
+                    "Complete the current context-controls parity slice.",
+                  )
+                }
+                type="button"
+              >
+                <SidebarGlyph name="thread" />
+                <span>Complete the current context-controls parity slice</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
           ) : workspaceProject ? (
             <div className="demo-workspace-prompts">
               <button
@@ -12190,6 +12298,9 @@ export function App() {
       data-app-server-state={appServerCrashed ? "crashed" : "running"}
       data-notification-action={shellNotificationAction ?? undefined}
       data-current-home={currentHomeFrame || undefined}
+      data-current-context-26-825={
+        currentContext26825Replay || undefined
+      }
       data-route-history-index={routeHistory.index}
       data-route-history-length={routeHistory.entries.length}
       data-view={view}
@@ -12505,6 +12616,7 @@ export function App() {
         sidebarWidth={
           currentSidebarThreadLifecycle ||
           currentSidebarWorktreeLifecycle ||
+          currentContext26825Replay ||
           isCurrentRichMarkdownStreamingReplay ||
           isCurrentBasic26825Replay ||
           isCurrentCitations26825Replay

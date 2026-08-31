@@ -216,7 +216,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 37 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 33 groups and Electron verification covers 33.
+Current inventory: 91 surface groups; 40 have current-build runtime evidence, 40 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 36 groups and Electron verification covers 36.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1807,3 +1807,26 @@ internal baselines pass. A local-only
 under 4% and 1% ceilings. Rich streaming, citations/sources, and live media
 product reachability are now current; plugin variants, table error variants,
 and broader Markdown error reachability remain open.
+
+The latest `26.825.51511` context-control follow-up supersedes the previous
+`26.820.60940` sample for the project/Local/main entry family. It re-observes
+the 736×28 context row, 260×249.5 project dialog at wide and 720×680 compact,
+216×189.3125 `Work in` menu, four-part New local worktree state,
+264×91.125 Environment menu, and 296×280.125 Branches menu. The current
+branch list uses eight ordinary `menuitem` rows, no `aria-checked`, a
+project-specific search placeholder, no legacy Select local environment row,
+and one Create and checkout action.
+
+The public listbox adds a host-supplied selected icon without changing option
+or focus semantics. Seven Browser/CDP frames lock roles, focus restoration,
+geometry, responsive containment, 20px radius, 8px blur, and weight-400
+typography. Electron drives the full project → New local worktree →
+Environment → Local → Branches lifecycle and a separate compact native
+window. Seven reviewed baselines pass; seven local-only product-region ratios
+are 0.7909%, 2.9154%, 2.9108%, 11.1381%, 1.7372%, 1.3736%, and 4.1699%
+under independent ceilings. This promotes the sampled paths of
+`conversation.context-controls`, `conversation.project-picker`, and
+`composer.project-worktree-selection` to current Browser/Electron
+verification. Their implementation remains partial because populated
+environment creation/editing, Remote, branch-operation failures, and other
+provider-specific states are still open.

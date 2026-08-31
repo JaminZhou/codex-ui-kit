@@ -5059,9 +5059,11 @@ for (const scene of selectedScenes) {
           if (!element) return null;
           const computed = getComputedStyle(element);
           return {
+            backdropFilter: computed.backdropFilter,
             backgroundColor: computed.backgroundColor,
             borderColor: computed.borderColor,
             borderRadius: computed.borderRadius,
+            boxShadow: computed.boxShadow,
             color: computed.color,
             fontSize: computed.fontSize,
             fontWeight: computed.fontWeight,
@@ -5124,9 +5126,13 @@ for (const scene of selectedScenes) {
                   (icon) => icon.getAttribute("data-current-build-icon"),
                 ),
                 rect: rect(environmentMenu),
+                firstItemStyle: style(
+                  environmentMenu.querySelector(".codex-ui-menu-item"),
+                ),
                 separatorCount:
                   environmentMenu.querySelectorAll('[role="separator"]')
                     .length,
+                style: style(environmentMenu),
               }
             : null,
           localEnvironment: localEnvironmentDialog
@@ -5171,6 +5177,22 @@ for (const scene of selectedScenes) {
                   (icon) => icon.getAttribute("data-current-build-icon"),
                 ),
                 listbox: rect(projectListbox),
+                search: projectDialog.querySelector("input")
+                  ? {
+                      placeholder:
+                        projectDialog
+                          .querySelector("input")
+                          ?.getAttribute("placeholder") ?? null,
+                      rect: rect(projectDialog.querySelector("input")),
+                      style: style(projectDialog.querySelector("input")),
+                    }
+                  : null,
+                selectedStyle: style(
+                  projectListbox?.querySelector(
+                    '[role="option"][aria-selected="true"]',
+                  ),
+                ),
+                style: style(projectDialog),
                 pinned: rect(
                   projectListbox?.querySelector(
                     ".codex-ui-conversation-project-options__pinned",
@@ -5190,7 +5212,15 @@ for (const scene of selectedScenes) {
           worktree: worktreeMenu
             ? {
                 buttons: worktreeButtons,
+                firstItemStyle: style(
+                  worktreeMenu.querySelector(".codex-ui-menu-item"),
+                ),
                 rect: rect(worktreeMenu),
+                searchPlaceholder:
+                  worktreeMenu.querySelector("input")?.getAttribute(
+                    "placeholder",
+                  ) ?? null,
+                style: style(worktreeMenu),
               }
             : null,
           worktreeEnvironment: worktreeEnvironmentMenu
@@ -5207,6 +5237,12 @@ for (const scene of selectedScenes) {
                   (icon) => icon.getAttribute("data-current-build-icon"),
                 ),
                 rect: rect(worktreeEnvironmentMenu),
+                firstItemStyle: style(
+                  worktreeEnvironmentMenu.querySelector(
+                    ".codex-ui-menu-item",
+                  ),
+                ),
+                style: style(worktreeEnvironmentMenu),
               }
             : null,
         };
@@ -5255,23 +5291,34 @@ for (const scene of selectedScenes) {
         );
         continue;
       }
-      const projectExpected = scene.frame === "workspace-project-menu";
+      const currentContextExpected = scene.frame.startsWith(
+        "workspace-context-current-26-825-",
+      );
+      const projectExpected =
+        scene.frame === "workspace-project-menu" ||
+        scene.frame.endsWith("-project-menu");
       const projectCompactExpected =
-        scene.id === "workspace-project-menu-compact";
+        scene.id === "workspace-project-menu-compact" ||
+        scene.id.endsWith("-project-menu-compact");
       const environmentExpected =
-        scene.frame === "workspace-environment-menu";
+        scene.frame === "workspace-environment-menu" ||
+        scene.frame.endsWith("-environment-menu");
       const localEnvironmentExpected =
         scene.frame === "workspace-environment";
-      const worktreeExpected = scene.frame === "workspace-worktree-menu";
+      const worktreeExpected =
+        scene.frame === "workspace-worktree-menu" ||
+        scene.frame.endsWith("-worktree-menu");
       const branchCreationExpected = [
         "workspace-branch-create",
         "workspace-branch-create-error",
       ].includes(scene.frame);
       const worktreeEnvironmentExpected =
-        scene.frame === "workspace-environment-picker";
+        scene.frame === "workspace-environment-picker" ||
+        scene.frame.endsWith("-environment-picker");
       const noProjectExpected = scene.frame === "workspace-no-project";
       const newWorktreeExpected =
         scene.frame === "workspace-new-worktree" ||
+        scene.frame.endsWith("-new-worktree") ||
         worktreeEnvironmentExpected;
       const compactExpected =
         scene.frame === "workspace-compact-ready" ||
@@ -5291,6 +5338,8 @@ for (const scene of selectedScenes) {
           : 736;
       const expectedComposerLeft = currentHomeCompactExpected
         ? 339.40625
+        : currentContextExpected && !compactExpected
+          ? 382.9375
         : currentHomeExpected
           ? 383.953125
           : compactExpected
@@ -5300,6 +5349,10 @@ for (const scene of selectedScenes) {
         compactExpected || currentHomeCompactExpected ? 664 : 804;
       const expectedHeadingTop = currentHomeCompactExpected
         ? 259.796875
+        : currentContextExpected
+          ? compactExpected
+            ? 293.40625
+            : 363.40625
         : currentHomeExpected
           ? 363.390625
           : compactExpected
@@ -5310,17 +5363,21 @@ for (const scene of selectedScenes) {
         ({ kind }) => kind === "worktree",
       );
       const expectedCurrentIconNames = [
-        ...(currentHomeExpected
+        ...(currentHomeExpected || currentContextExpected
           ? [
               "home-mark",
-              "home-suggestion-explore",
-              "home-suggestion-build",
-              ...(currentHomeCompactExpected
-                ? []
-                : [
-                    "home-suggestion-review",
-                    "home-suggestion-fix",
-                  ]),
+              ...(currentHomeExpected
+                ? [
+                    "home-suggestion-explore",
+                    "home-suggestion-build",
+                    ...(currentHomeCompactExpected
+                      ? []
+                      : [
+                          "home-suggestion-review",
+                          "home-suggestion-fix",
+                        ]),
+                  ]
+                : []),
             ]
           : []),
         "composer-project",
@@ -5334,7 +5391,13 @@ for (const scene of selectedScenes) {
               ]
             : ["workspace-run-location-local", "composer-branch"]),
         ...(projectExpected
-          ? ["composer-new-project", "composer-clear-project"]
+          ? [
+              ...(currentContextExpected
+                ? ["sidebar-search", "workspace-selection-check"]
+                : []),
+              "composer-new-project",
+              "composer-clear-project",
+            ]
           : []),
         "composer-add-files",
         "composer-permission",
@@ -5363,6 +5426,8 @@ for (const scene of selectedScenes) {
         contract.prompts.length !==
           (noProjectExpected
             ? 0
+            : currentContextExpected
+              ? 1
             : currentHomeExpected
               ? currentHomeCompactExpected
                 ? 2
@@ -5375,6 +5440,10 @@ for (const scene of selectedScenes) {
               value.width -
                 (currentHomeCompactExpected
                   ? 163.046875
+                  : currentContextExpected
+                    ? compactExpected
+                      ? 606
+                      : 654
                   : currentHomeExpected
                     ? 168.5
                     : compactExpected
@@ -5461,6 +5530,27 @@ for (const scene of selectedScenes) {
               "composer-new-project",
               "composer-clear-project",
             ]) ||
+          (currentContextExpected &&
+            (contract.project.style.backdropFilter !== "blur(8px)" ||
+              contract.project.style.borderRadius !== "20px" ||
+              contract.project.style.fontWeight !== "400" ||
+              contract.project.style.padding !== "4px" ||
+              !contract.project.style.boxShadow.includes("0.5px") ||
+              !contract.project.style.boxShadow.includes(
+                "0px 8px 16px -4px",
+              ) ||
+              contract.project.search?.placeholder !== "Search projects" ||
+              Math.abs(contract.project.search.rect.width - 216) > 1 ||
+              Math.abs(contract.project.search.rect.height - 18.56) > 0.2 ||
+              contract.project.search.style.fontSize !== "13px" ||
+              contract.project.search.style.fontWeight !== "400" ||
+              contract.project.search.style.lineHeight !== "18.5714px" ||
+              contract.project.search.style.padding !== "0px" ||
+              contract.project.selectedStyle.borderRadius !== "15px" ||
+              contract.project.selectedStyle.fontSize !== "13px" ||
+              contract.project.selectedStyle.fontWeight !== "400" ||
+              contract.project.selectedStyle.lineHeight !== "18.5714px" ||
+              contract.project.selectedStyle.padding !== "5px 8px")) ||
           contract.activeElement !== "Search projects" ||
           contract.contextButtons[0]?.expanded !== "true" ||
           contract.contextButtons[0]?.haspopup !== "dialog")
@@ -5511,7 +5601,11 @@ for (const scene of selectedScenes) {
           .getByRole("option", { name: "Don't work in a project" })
           .click();
         await page.waitForSelector(
-          '.demo-root[data-frame="workspace-no-project"]',
+          `.demo-root[data-frame="${
+            currentContextExpected
+              ? "workspace-context-current-26-825-no-project"
+              : "workspace-no-project"
+          }"]`,
         );
         const chooseProject = page.getByRole("button", {
           name: "Choose project",
@@ -5521,7 +5615,11 @@ for (const scene of selectedScenes) {
           .getByRole("option", { name: "Select project codex-ui-kit" })
           .click();
         await page.waitForSelector(
-          '.demo-root[data-frame="workspace-ready"]',
+          `.demo-root[data-frame="${
+            currentContextExpected
+              ? "workspace-context-current-26-825-ready"
+              : "workspace-ready"
+          }"]`,
         );
         await page.getByRole("button", {
           name: "Change project: codex-ui-kit",
@@ -5566,7 +5664,16 @@ for (const scene of selectedScenes) {
               "workspace-run-location-send-cloud",
               "workspace-run-location-usage",
               "workspace-run-location-usage-chevron",
-            ]))
+            ]) ||
+          (currentContextExpected &&
+            (contract.environment.style.backdropFilter !== "blur(8px)" ||
+              contract.environment.style.borderRadius !== "20px" ||
+              contract.environment.style.fontWeight !== "400" ||
+              contract.environment.style.padding !== "4px" ||
+              contract.environment.firstItemStyle.borderRadius !== "15px" ||
+              contract.environment.firstItemStyle.fontWeight !== "400" ||
+              contract.environment.firstItemStyle.lineHeight !== "18.5714px" ||
+              contract.environment.firstItemStyle.padding !== "5px 8px")))
       ) {
         throw new Error(
           `${scene.id}: workspace environment dialog failed: ${JSON.stringify(contract)}`,
@@ -5611,7 +5718,21 @@ for (const scene of selectedScenes) {
             JSON.stringify([
               "workspace-selection-check",
               "workspace-environment-settings",
-            ]))
+            ]) ||
+          (currentContextExpected &&
+            (contract.worktreeEnvironment.style.backdropFilter !==
+              "blur(8px)" ||
+              contract.worktreeEnvironment.style.borderRadius !== "20px" ||
+              contract.worktreeEnvironment.style.fontWeight !== "400" ||
+              contract.worktreeEnvironment.style.padding !== "4px" ||
+              contract.worktreeEnvironment.firstItemStyle.borderRadius !==
+                "15px" ||
+              contract.worktreeEnvironment.firstItemStyle.fontWeight !==
+                "400" ||
+              contract.worktreeEnvironment.firstItemStyle.lineHeight !==
+                "18.5714px" ||
+              contract.worktreeEnvironment.firstItemStyle.padding !==
+                "5px 8px")))
       ) {
         throw new Error(
           `${scene.id}: workspace environment picker failed: ${JSON.stringify(contract)}`,
@@ -5622,16 +5743,41 @@ for (const scene of selectedScenes) {
         (!contract.worktree ||
           Math.abs(contract.worktree.rect.width - 296) > 1 ||
           Math.abs(contract.worktree.rect.height - 280) > 1 ||
-          contract.worktree.buttons.length !== 9 ||
-          contract.worktree.buttons.filter(
-            ({ role }) => role === "menuitemradio",
-          ).length !== 7 ||
-          !contract.worktree.buttons.some(({ text }) =>
-            text?.includes("Select local environment…"),
-          ) ||
-          contract.worktree.buttons.filter(
-            ({ checked }) => checked === "true",
-          ).length !== 1 ||
+          (currentContextExpected
+            ? contract.worktree.buttons.length !== 8 ||
+              contract.worktree.buttons.some(
+                ({ role }) => role !== "menuitem",
+              ) ||
+              contract.worktree.buttons.some(({ text }) =>
+                text?.includes("Select local environment…"),
+              ) ||
+              !contract.worktree.buttons.some(({ text }) =>
+                text?.includes("Create and checkout new branch…"),
+              ) ||
+              contract.worktree.buttons.some(
+                ({ checked }) => checked !== null,
+              ) ||
+              contract.worktree.searchPlaceholder !==
+                "Search codex-ui-kit branches"
+            : contract.worktree.buttons.length !== 9 ||
+              contract.worktree.buttons.filter(
+                ({ role }) => role === "menuitemradio",
+              ).length !== 7 ||
+              !contract.worktree.buttons.some(({ text }) =>
+                text?.includes("Select local environment…"),
+              ) ||
+              contract.worktree.buttons.filter(
+                ({ checked }) => checked === "true",
+              ).length !== 1) ||
+          (currentContextExpected &&
+            (contract.worktree.style.backdropFilter !== "blur(8px)" ||
+              contract.worktree.style.borderRadius !== "20px" ||
+              contract.worktree.style.fontWeight !== "400" ||
+              contract.worktree.style.padding !== "4px" ||
+              contract.worktree.firstItemStyle.borderRadius !== "15px" ||
+              contract.worktree.firstItemStyle.fontWeight !== "400" ||
+              contract.worktree.firstItemStyle.lineHeight !== "18.5714px" ||
+              contract.worktree.firstItemStyle.padding !== "5px 8px")) ||
           contract.activeElement !== "Search branches")
       ) {
         throw new Error(

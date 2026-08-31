@@ -1307,6 +1307,7 @@ export interface ConversationProjectListboxProps
   onDismiss?: () => void;
   onSelect: (projectId: string) => void;
   pinnedItems?: readonly ProjectIndexItem[];
+  selectedIcon?: ReactNode;
   selectedId?: string;
   triggerId?: string;
 }
@@ -1365,6 +1366,7 @@ export function ConversationProjectListbox({
   onDismiss,
   onSelect,
   pinnedItems = [],
+  selectedIcon,
   selectedId,
   triggerId,
   ...props
@@ -1587,7 +1589,7 @@ export function ConversationProjectListbox({
           aria-hidden="true"
           className="codex-ui-conversation-project-options__check"
         >
-          {selected ? "✓" : ""}
+          {selected ? (selectedIcon ?? "✓") : ""}
         </span>
       </button>
     );
