@@ -1193,6 +1193,147 @@ textarea {
   margin-top: 36px;
 }
 
+.demo-current-chrome-icon {
+  background:
+    radial-gradient(circle at center, #4285f4 0 25%, #fff 26% 31%, transparent 32%),
+    conic-gradient(from -30deg, #ea4335 0 33.333%, #fbbc05 0 66.666%, #34a853 0);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
+  display: block;
+  height: 16px;
+  width: 16px;
+}
+
+.demo-root[data-current-composer-controls-26-825]
+  .codex-ui-composer-resource-picker--current-26-825 {
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+}
+
+.demo-root[data-current-composer-controls-26-825]
+  .demo-workspace-start
+  .codex-ui-composer__input {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.demo-current-composer-queue-dock
+  > .codex-ui-composer-dock__queue {
+  backdrop-filter: blur(8px);
+  background: oklab(0.297161 0.0000135154 0.00000594556 / 0.9);
+  border: 0;
+  margin-bottom: -4px;
+}
+
+.demo-current-composer-queue-dock
+  > .codex-ui-composer-dock__queue
+  > .codex-ui-composer-queue {
+  padding: 0;
+}
+
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__row {
+  border-radius: 0;
+  box-sizing: border-box;
+  gap: 4px;
+  min-height: 37px;
+  padding: 2px 10px;
+}
+
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__interrupted {
+  background: transparent;
+  border-radius: 0;
+  color: var(--codex-ui-text-secondary);
+  margin-bottom: 0;
+  min-height: 35px;
+  padding: 2px 10px 2px 12px;
+}
+
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__interrupted > button,
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__send-now {
+  align-items: center;
+  border-radius: 9999px;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 4px;
+  height: 24px;
+  line-height: 18px;
+  min-height: 24px;
+  padding: 2px 8px;
+}
+
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__handle,
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__icon-button,
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__more {
+  height: 24px;
+  width: 24px;
+}
+
+.demo-current-composer-queue-dock
+  .codex-ui-composer-queue__text {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.demo-root:is(
+    [data-frame="workspace-composer-current-26-825-multiline-four"],
+    [data-frame="workspace-composer-current-26-825-multiline-long"]
+  )
+  .demo-workspace-start
+  .codex-ui-composer__input {
+  box-sizing: border-box;
+  margin-inline: 12px;
+  padding: 0;
+  width: calc(100% - 24px);
+}
+
+.demo-root[data-frame="workspace-composer-current-26-825-multiline-four"]
+  .demo-workspace-start
+  :is(.codex-ui-composer, .codex-ui-composer__fieldset) {
+  height: 134px;
+  min-height: 134px;
+}
+
+.demo-root[data-frame="workspace-composer-current-26-825-multiline-four"]
+  .demo-workspace-start
+  .codex-ui-composer__input {
+  height: 80px !important;
+}
+
+.demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+  .demo-workspace-start
+  :is(.codex-ui-composer, .codex-ui-composer__fieldset) {
+  height: 259px;
+  min-height: 259px;
+}
+
+.demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+  .demo-workspace-start
+  .codex-ui-composer__input {
+  height: 205px !important;
+}
+
+@container codex-ui-app-shell (max-width: 45rem) {
+  .demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+    .demo-workspace-start
+    :is(.codex-ui-composer, .codex-ui-composer__fieldset) {
+    height: 224px;
+    min-height: 224px;
+  }
+
+  .demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+    .demo-workspace-start
+    .codex-ui-composer__input {
+    height: 170px !important;
+  }
+}
+
 .demo-root[data-current-context-26-825] .demo-workspace-project-dialog,
 .demo-workspace-context-menu--current-26-825 {
   backdrop-filter: blur(8px);
@@ -1322,6 +1463,11 @@ textarea {
   gap: 6px;
   height: 28px;
   justify-content: center;
+}
+
+.demo-workspace-start .codex-ui-composer__primary {
+  height: 28px;
+  width: 28px;
 }
 
 .demo-workspace-start .demo-composer-controls button:first-child {

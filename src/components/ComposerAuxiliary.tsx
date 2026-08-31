@@ -229,6 +229,7 @@ export interface ComposerResourceGroup {
 export interface ComposerResourcePickerProps
   extends Omit<ComponentPropsWithoutRef<"div">, "children" | "onSelect"> {
   activeId?: string;
+  descriptionSeparator?: ReactNode;
   groups: readonly ComposerResourceGroup[];
   heading?: ReactNode;
   onActiveIdChange?: (id: string) => void;
@@ -239,6 +240,7 @@ export interface ComposerResourcePickerProps
 export function ComposerResourcePicker({
   activeId,
   className,
+  descriptionSeparator = " — ",
   groups,
   heading = "Add",
   onActiveIdChange,
@@ -400,7 +402,7 @@ export function ComposerResourcePicker({
                       </span>
                       {option.description ? (
                         <span className="codex-ui-composer-resource-picker__description">
-                          {" — "}
+                          {descriptionSeparator}
                           {option.description}
                         </span>
                       ) : null}
@@ -726,6 +728,54 @@ export interface QueuedPromptListProps
   queueingEnabled?: boolean;
 }
 
+function QueuePausedIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <path d="M6.75 5.25C7.16421 5.25 7.5 5.58579 7.5 6V14C7.5 14.4142 7.16421 14.75 6.75 14.75C6.33579 14.75 6 14.4142 6 14V6C6 5.58579 6.33579 5.25 6.75 5.25ZM13.25 5.25C13.6642 5.25 14 5.58579 14 6V14C14 14.4142 13.6642 14.75 13.25 14.75C12.8358 14.75 12.5 14.4142 12.5 14V6C12.5 5.58579 12.8358 5.25 13.25 5.25Z" />
+    </svg>
+  );
+}
+
+function QueueResumeIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <path d="M6 14.7227V5.27693C6 4.29057 7.08894 3.6928 7.9211 4.22235L15.3428 8.94526C16.1147 9.43645 16.1147 10.5632 15.3428 11.0544L7.92109 15.7773C7.08894 16.3069 6 15.7091 6 14.7227Z" />
+    </svg>
+  );
+}
+
+function QueuePromptIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 21 21">
+      <path d="M5.5 5.25V9.5C5.5 11.1569 6.84315 12.5 8.5 12.5H14.25M11.75 9.75L14.5 12.5L11.75 15.25" />
+    </svg>
+  );
+}
+
+function QueueSteerIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 21 21">
+      <path d="M13.1293 7.34753C13.3565 7.12027 13.7081 7.09207 13.9662 7.26257L14.0707 7.34753L18.0707 11.3475C18.3304 11.6072 18.3304 12.0292 18.0707 12.2889L14.0707 16.2889C13.811 16.5486 13.389 16.5486 13.1293 16.2889C12.8696 16.0292 12.8696 15.6072 13.1293 15.3475L15.9935 12.4833H6.59998C4.57585 12.4833 2.93494 10.8424 2.93494 8.81824V5.31824C2.93494 4.95097 3.23271 4.6532 3.59998 4.6532C3.96724 4.6532 4.26501 4.95097 4.26501 5.31824V8.81824C4.26501 10.1078 5.31039 11.1532 6.59998 11.1532H15.9935L13.1293 8.28894L13.0443 8.18445C12.8738 7.92632 12.902 7.5748 13.1293 7.34753Z" />
+    </svg>
+  );
+}
+
+function QueueDeleteIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <path d="M10.6299 1.33496C12.0335 1.33496 13.2695 2.25996 13.666 3.60645L13.8809 4.33496H17L17.1338 4.34863C17.4369 4.41057 17.665 4.67858 17.665 5C17.665 5.32142 17.4369 5.58943 17.1338 5.65137L17 5.66504H16.6543L15.8574 14.9912C15.7177 16.629 14.3478 17.8877 12.7041 17.8877H7.2959C5.75502 17.8877 4.45439 16.7815 4.18262 15.2939L4.14258 14.9912L3.34668 5.66504H3C2.63273 5.66504 2.33496 5.36727 2.33496 5C2.33496 4.63273 2.63273 4.33496 3 4.33496H6.11914L6.33398 3.60645L6.41797 3.3584C6.88565 2.14747 8.05427 1.33496 9.37012 1.33496H10.6299ZM5.46777 14.8779L5.49121 15.0537C5.64881 15.9161 6.40256 16.5576 7.2959 16.5576H12.7041C13.6571 16.5576 14.4512 15.8275 14.5322 14.8779L15.3193 5.66504H4.68164L5.46777 14.8779ZM7.66797 12.8271V8.66016C7.66797 8.29299 7.96588 7.99528 8.33301 7.99512C8.70028 7.99512 8.99805 8.29289 8.99805 8.66016V12.8271C8.99779 13.1942 8.70012 13.4912 8.33301 13.4912C7.96604 13.491 7.66823 13.1941 7.66797 12.8271ZM11.002 12.8271V8.66016C11.002 8.29289 11.2997 7.99512 11.667 7.99512C12.0341 7.9953 12.332 8.293 12.332 8.66016V12.8271C12.3318 13.1941 12.0339 13.491 11.667 13.4912C11.2999 13.4912 11.0022 13.1942 11.002 12.8271ZM9.37012 2.66504C8.60726 2.66504 7.92938 3.13589 7.6582 3.83789L7.60938 3.98145L7.50586 4.33496H12.4941L12.3906 3.98145C12.1607 3.20084 11.4437 2.66504 10.6299 2.66504H9.37012Z" />
+    </svg>
+  );
+}
+
+function QueueMoreIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 21 21">
+      <path d="M15.6981 9.04712C16.5255 9.04712 17.1959 9.71781 17.1961 10.5452C17.1961 11.3727 16.5256 12.0442 15.6981 12.0442C14.8706 12.0442 14.2 11.3727 14.2 10.5452C14.2002 9.71781 14.8707 9.04712 15.6981 9.04712ZM4.69806 9.04712C5.52546 9.04712 6.19691 9.71781 6.19708 10.5452C6.19708 11.3727 5.52557 12.0442 4.69806 12.0442C3.8707 12.044 3.20001 11.3726 3.20001 10.5452C3.20019 9.71792 3.87081 9.04729 4.69806 9.04712ZM10.2003 9.04712C11.0276 9.0473 11.6982 9.71792 11.6984 10.5452C11.6984 11.3726 11.0277 12.044 10.2003 12.0442C9.37284 12.0442 8.70132 11.3727 8.70132 10.5452C8.7015 9.71781 9.37295 9.04712 10.2003 9.04712Z" />
+    </svg>
+  );
+}
+
 export function QueuedPromptList({
   className,
   interrupted = false,
@@ -769,9 +819,13 @@ export function QueuedPromptList({
     <div className={classes} data-interrupted={interrupted || undefined} {...props}>
       {interrupted ? (
         <div className="codex-ui-composer-queue__interrupted" role="status">
-          <span>Queue paused because you interrupted</span>
+          <span className="codex-ui-composer-queue__interrupted-copy">
+            <QueuePausedIcon />
+            <span>Queue paused because you interrupted</span>
+          </span>
           {onResume ? (
             <button onClick={onResume} type="button">
+              <QueueResumeIcon />
               Resume
             </button>
           ) : null}
@@ -802,7 +856,7 @@ export function QueuedPromptList({
                 title="Drag to reorder · Alt+Arrow to move"
                 type="button"
               >
-                <span aria-hidden="true">↳</span>
+                <QueuePromptIcon />
               </button>
               {paused ? (
                 <span
@@ -829,8 +883,8 @@ export function QueuedPromptList({
                   onClick={() => onSendNow(item.id)}
                   title={paused ? "Try sending this queued prompt again" : "Submit without interrupting the agent"}
                   type="button"
-                >
-                  <span aria-hidden="true">↪</span>
+              >
+                  <QueueSteerIcon />
                   {paused ? "Retry" : "Steer"}
                 </button>
               ) : null}
@@ -840,8 +894,8 @@ export function QueuedPromptList({
                   className="codex-ui-composer-queue__icon-button"
                   onClick={() => onDelete(item.id)}
                   type="button"
-                >
-                  ×
+              >
+                  <QueueDeleteIcon />
                 </button>
               ) : null}
               {onEdit || onQueueingChange ? (
@@ -855,7 +909,7 @@ export function QueuedPromptList({
                       className="codex-ui-composer-queue__more"
                       type="button"
                     >
-                      •••
+                      <QueueMoreIcon />
                     </button>
                   }
                 >

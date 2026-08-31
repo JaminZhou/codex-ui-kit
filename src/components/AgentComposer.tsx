@@ -45,11 +45,14 @@ export interface AgentComposerProps
   isRunning?: boolean;
   layout?: ComposerLayout;
   onStop?: () => void;
+  onResume?: () => void;
   onSubmit: (value: string) => void;
   onValueChange: (value: string) => void;
   placeholder?: string;
   queue?: ReactNode;
   suggestions?: ReactNode;
+  resumeIcon?: ReactNode;
+  resumeLabel?: string;
   stopIcon?: ReactNode;
   stopLabel?: string;
   submitIcon?: ReactNode;
@@ -78,6 +81,7 @@ export const AgentComposer = forwardRef<
     isRunning = false,
     layout = "auto",
     onStop,
+    onResume,
     onSubmit,
     onValueChange,
     placeholder = "Ask the agent to do something…",
@@ -89,6 +93,8 @@ export const AgentComposer = forwardRef<
     textareaLabel = "Message",
     textareaProps,
     suggestions,
+    resumeIcon,
+    resumeLabel = "Resume",
     stopIcon,
     value,
     "aria-label": ariaLabel = "Agent composer",
@@ -419,6 +425,22 @@ export const AgentComposer = forwardRef<
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path d="M4.5 5.75C4.5 5.05964 5.05964 4.5 5.75 4.5H14.25C14.9404 4.5 15.5 5.05964 15.5 5.75V14.25C15.5 14.9404 14.9404 15.5 14.25 15.5H5.75C5.05964 15.5 4.5 14.9404 4.5 14.25V5.75Z" />
+                  </svg>
+                )}
+              </button>
+            ) : onResume ? (
+              <button
+                aria-label={resumeLabel}
+                className="codex-ui-composer__primary"
+                data-action="resume"
+                disabled={disabled}
+                onClick={onResume}
+                title={resumeLabel}
+                type="button"
+              >
+                {resumeIcon ?? (
+                  <svg aria-hidden="true" viewBox="0 0 20 20">
+                    <path d="M6 14.7227V5.27693C6 4.29057 7.08894 3.6928 7.9211 4.22235L15.3428 8.94526C16.1147 9.43645 16.1147 10.5632 15.3428 11.0544L7.92109 15.7773C7.08894 16.3069 6 15.7091 6 14.7227Z" />
                   </svg>
                 )}
               </button>
