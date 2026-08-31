@@ -363,6 +363,70 @@ describe("protocol lifecycle reducer", () => {
     });
   });
 
+  it("replays current open-ended network waits and clears only those rows after recovery", () => {
+    const scenario =
+      replayScenarios["streaming-recovery-current-26-825"];
+    const waiting = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-transport-network-waiting"],
+      ),
+    );
+    const repeated = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-transport-network-waiting-repeated"],
+      ),
+    );
+    const sixth = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-transport-network-waiting-sixth"],
+      ),
+    );
+    const recovered = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["current-transport-recovered"],
+      ),
+    );
+    const followedUp = reduceProtocolTrace(scenario.events);
+
+    expect(waiting.status).toBe("retrying");
+    expect(waiting.streamErrors.map(({ content }) => content)).toEqual([
+      "Reconnecting 1/5",
+      "Reconnecting... waiting for network",
+    ]);
+    expect(repeated.streamErrors).toHaveLength(3);
+    expect(
+      repeated.streamErrors.filter(({ clearOnSuccessfulTurn }) =>
+        clearOnSuccessfulTurn,
+      ),
+    ).toHaveLength(2);
+    expect(sixth.streamErrors).toHaveLength(7);
+    expect(
+      sixth.timeline.filter(({ kind }) => kind === "streamError"),
+    ).toHaveLength(7);
+    expect(recovered.status).toBe("completed");
+    expect(recovered.retrying).toBe(false);
+    expect(recovered.streamErrors.map(({ content }) => content)).toEqual([
+      "Reconnecting 1/5",
+    ]);
+    expect(
+      recovered.timeline.filter(({ kind }) => kind === "streamError"),
+    ).toHaveLength(1);
+    expect(recovered.messages.at(-1)?.text).toContain(
+      "continued after the isolated network returned",
+    );
+    expect(followedUp.status).toBe("completed");
+    expect(followedUp.streamErrors.map(({ content }) => content)).toEqual([
+      "Reconnecting 1/5",
+    ]);
+    expect(followedUp.messages.at(-1)?.text).toBe(
+      "CURRENT 26.825 TRANSPORT RECOVERY ACCEPTED",
+    );
+  });
+
   it("updates consecutive reconnect progress in place and preserves details", () => {
     const first = reduceProtocolNotification(initialProtocolState, {
       method: "error",

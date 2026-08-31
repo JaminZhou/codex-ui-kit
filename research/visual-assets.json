@@ -36933,7 +36933,7 @@
     {
       "id": "thread-reconnecting",
       "ownerAriaLabel": null,
-      "ownerEvidence": "current completed activity Reconnecting row selected structurally from a real recovered turn",
+      "ownerEvidence": "current 26.825.51511 standard retry and repeated waiting-for-network rows selected structurally from a real in-place recovered turn",
       "primitives": [
         {
           "attributes": {

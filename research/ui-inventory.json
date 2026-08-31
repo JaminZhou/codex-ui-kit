@@ -590,15 +590,25 @@
       "id": "thread.error-retry-recovery",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["local-conversation-page", "remote-conversation-page"],
+      "packageEvidence": [
+        "local-conversation-page",
+        "remote-conversation-page",
+        "replay:current-26.825.51511-six-network-waits-recovery-and-followup",
+        "browser-cdp:current-26.825.51511-six-frame-transport-wait-repeat-sixth-recovery-followup-contract",
+        "electron:current-26.825.51511-native-transport-wait-repeat-sixth-recovery-followup-contract",
+        "pixel:current-26.825.51511-six-reviewed-transport-baselines-and-local-only-waiting-row-product-region"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
+        "cdp-26.825.51511:isolated-loopback-proxy-real-standard-retry-plus-six-open-ended-waiting-for-network-rows-and-in-place-recovery",
+        "cdp-26.825.51511:exact-14-by-21-weight-400-sixty-percent-waiting-row-sixteen-by-sixteen-four-path-icon-37px-repeat-cadence-and-zero-overflow",
+        "cdp-26.825.51511:recovered-turn-clears-network-wait-rows-retains-standard-retry-and-accepts-exact-same-thread-followup",
         "cdp-26.810.52044:real-reconnecting-2-of-5-during-openai-developer-docs-turn-and-successful-in-place-recovery",
         "cdp-26.810.52044:exact-four-path-reconnecting-glyph-and-replay-lifecycle-gates"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

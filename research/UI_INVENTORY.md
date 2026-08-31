@@ -265,7 +265,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 61 have current-build runtime evidence, 19 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 56 groups and Electron verification covers 56.
+Current inventory: 91 surface groups; 62 have current-build runtime evidence, 18 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 57 groups and Electron verification covers 57.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -640,13 +640,19 @@ local-only product comparison passes at 0.1101% full-frame and 1.1993% in the
 owned core. This new `app.app-server-crash-recovery` row is current-runtime
 verified and remains separate from `thread.error-retry-recovery`.
 
-The thread transport replay follows current package structure through
-Reconnecting 1/5, in-place 2/5 progress, recovered completion, terminal system
-error, and successful same-thread follow-up. Browser/CDP, Electron, and five
-reviewed state pixels pass with the observed 14/21px notice and Stop/Send
-transitions. A real response-stream disconnect remains unsampled, so the
-transport row retains `not_sampled` rather than borrowing fatal-process
-evidence.
+The current `26.825.51511` transport probe now reaches a real response-stream
+disconnect without touching the user-owned process. One exact isolated app
+instance traverses a loopback-only CONNECT proxy, shows the persisted standard
+`Reconnecting 1/5` row and at least six open-ended
+`Reconnecting... waiting for network` rows, then completes in place after the
+proxy returns and accepts an exact same-thread follow-up. The current waiting
+row is 14/21px, weight 400, 60%-foreground with a 16×16 four-path glyph; repeat
+tops differ by 37px at wide and compact sizes with zero horizontal overflow.
+Successful completion removes only the transient waiting rows and retains the
+standard retry history. Browser/CDP, native Electron, six reviewed baselines,
+and a local-only 3.3371% owned-row product comparison now verify the sampled
+recovery lifecycle. Terminal transport failure and other retry causes remain
+partial; the fatal App Server recovery stays a separate surface.
 
 The first P0 shell slice provides independently implemented `AppShell`,
 `AppSidebar`, and `WorkspacePanel` compositions. It covers the measured wide
@@ -1428,8 +1434,9 @@ at 1.1017% under 1.2%. Product screenshots remain outside the repository.
 current-build Browser/Electron verified while their implementation remains
 partial for the open variants below.
 
-Build `26.810.52044` refreshed both MCP rows and promoted the previously
-unsampled transport-recovery row. The accepted real success performs exactly
+Build `26.810.52044` refreshed both MCP rows and first promoted the previously
+unsampled transport-recovery row as regression evidence. The accepted real
+success performs exactly
 one Search OpenAI docs call and one Fetch OpenAI doc call, completes in 25
 seconds, and returns `Model Context Protocol` with the canonical
 `https://developers.openai.com/codex/mcp` URL. A second accepted real turn
@@ -1452,11 +1459,14 @@ reconnect baselines pass. Optional local-only 26.810 comparisons keep the
 688×67 compact failure card at 1.2018396390142311% under 1.21%; product frames
 remain outside the repository.
 
-This makes `thread.mcp-tool-events`, `thread.mcp-tool-failure-retry`, and
-`thread.error-retry-recovery` current-build runtime-observed and
-Browser/Electron verified. Implementation remains partial because
-authentication, elicitation, MCP approvals, cancellation, same-transport final
-failure, and other integrations are still open.
+This made `thread.mcp-tool-events`, `thread.mcp-tool-failure-retry`, and
+`thread.error-retry-recovery` runtime-observed and Browser/Electron verified
+for that build. The later `26.825.51511` isolated-proxy capture now supersedes
+the primary transport anchor with real standard retry, six open-ended network
+waits, successful in-place recovery, and exact same-thread follow-up.
+Implementation remains partial because authentication, elicitation, MCP
+approvals, cancellation, same-transport final failure, and other retry causes
+are still open.
 
 The same build now refreshes `thread.tool-unavailable-recovery` with a separate
 real two-turn task. The first turn permits only GitHub MCP, emits no fabricated
@@ -1516,8 +1526,9 @@ This promotes `thread.mcp-tool-events`, `thread.mcp-tool-failure-retry`,
 Browser, and Electron evidence. Their implementation remains partial for the
 open variants below.
 
-Authentication, elicitation, MCP approvals, same-transport disconnect/reconnect,
-other integrations, and cancellation remain open.
+Authentication, elicitation, MCP approvals, terminal same-transport failure,
+other retry causes, other integrations, and cancellation remain open. The
+current isolated-proxy transport recovery is documented independently above.
 
 The independent `current-mixed-tool-thread` trace now joins the separately
 validated search, Browser, MCP, command, approval, file Review, and subagent
@@ -1730,9 +1741,10 @@ and focus restoration. The ownership-masked full-window comparison measures
 `0.0043520049607275735` under a 0.5% hard limit. This promotes
 `thread.interruption-stop` for the sampled command-interruption lifecycle;
 queue continuation and broader background-process management retain their own
-gates. The `26.721.81911` MCP tool-call error/retry state is now
-captured separately; the broader thread-transport error/retry state has not
-been safely reached and remains an unpromoted gate.
+gates. The `26.721.81911` MCP tool-call error/retry state is captured
+separately. The broader thread-transport recovery state is now safely reached
+on `26.825.51511` through an isolated per-process loopback proxy; terminal
+transport failure remains an unpromoted gate.
 
 The `26.803.61601` current-command follow-up supersedes the sampled success,
 failure/recovery, interruption, and background-process boundary above. A

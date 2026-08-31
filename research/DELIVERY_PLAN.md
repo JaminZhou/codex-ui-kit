@@ -14,8 +14,17 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 61 groups have current-build runtime evidence, 19 have previous-build-only
+- 62 groups have current-build runtime evidence, 18 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current transport-recovery follow-up promotes
+  `thread.error-retry-recovery`. A real response stream in one isolated
+  per-process proxy instance keeps the standard `Reconnecting 1/5` row, emits
+  at least six open-ended `Reconnecting... waiting for network` rows, then
+  completes in place and accepts an exact same-thread follow-up after network
+  restoration. CDP and native Electron gate six wide/compact lifecycle frames;
+  six reviewed baselines and a 3.3371% local-only owned-row product comparison
+  gate the current appearance. Terminal transport failure and other retry
+  causes remain P0 work.
 - The current manual context-compaction follow-up promotes
   `thread.context-compaction`. A fresh isolated task reaches the dynamic
   `10% full` command, running, completed, and exact recovery states; a second
@@ -301,8 +310,8 @@ exit gates; it does not replace the inventory.
   close/outside-click/repin behavior. Browser/CDP and Electron cover four
   frames; local-only regions pass at 2.6742%, 4.8070%, 3.8995%, and 2.9276%
   under independent 2.8%, 5%, 4.1%, and 3.1% limits. Authentication,
-  elicitation, MCP approvals, cancellation, same-transport reconnect, and
-  other integrations remain open. The current citations follow-up separately
+  elicitation, MCP approvals, cancellation, terminal same-transport failure,
+  and other integrations remain open. The current citations follow-up separately
   reaches three real inline OpenAI citations and the five-query Web Search
   Sources workspace. Six wide/compact replay frames pass Browser/CDP,
   Electron, reviewed pixels, and optional local-only product regions; the
@@ -1110,8 +1119,10 @@ without confusing package readiness with full product reconstruction.
    remains regression evidence. The schema-valid current-style mixed
    replay now adds Web Search → Browser open/find, MCP Search → Fetch,
    command approval, file Review, and delegated audit across wide and 720px
-   layouts. Retain true same-transport disconnect/reconnect and a single real
-   product task spanning the full composition as separate unsampled boundaries.
+   layouts. Current 26.825 evidence now covers a true isolated
+   same-transport disconnect/reconnect with six open-ended network-wait rows;
+   retain terminal transport failure and a single real product task spanning
+   the full composition as separate unsampled boundaries.
 4. **App shell continuity — fatal recovery and sampled success notification
    delivered**: window chrome, global feedback, loading/error/offline
    states, route and selection restoration. Current-build evidence covers
@@ -1249,8 +1260,10 @@ without confusing package readiness with full product reconstruction.
     restoration, and five product-region pixel gates. Continue with plugin
     attachment variants and table/Markdown error variants, populated
     artifact/source sections, real-product subagent
-    recovery capture, real transport runtime reachability, and real global
-    notification reachability. The independent transport state machine and
+    recovery capture, terminal transport failure, and broader real global
+    notification reachability. Current real transport recovery is delivered
+    through an isolated proxy plus CDP/Electron/pixel gates. The independent
+    transport state machine and
     subagent
     waiting/failure/interruption/streaming/pagination matrix is delivered.
 11. **P1 resources and integrations**: Browser/artifact/document previews,

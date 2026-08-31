@@ -231,6 +231,8 @@ const currentMcp26825RecoveryCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_825_COMPACT_REFERENCE;
 const currentMcp26825SourcesReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_825_REFERENCE;
+const currentTransport26825WaitingReference =
+  process.env.CODEX_UI_KIT_CURRENT_TRANSPORT_26_825_WAITING_REFERENCE;
 const currentMcp26820WideReferenceSize = {
   height: 820,
   width: 1180,
@@ -8933,6 +8935,70 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: 26.825 MCP Sources panel pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id === "current-transport-network-waiting" &&
+    currentTransport26825WaitingReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentTransport26825WaitingReference),
+    );
+    if (
+      reference.width !== 1180 ||
+      reference.height !== 820 ||
+      actual.width !== reference.width ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 transport comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const region = { height: 32, left: 214, top: 594, width: 280 };
+    const referenceRegion = cropPng(
+      reference,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.12);
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    const productDiffPath = join(
+      artifactDirectory,
+      `${scene.id}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(productDiffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(productDiffPath, { force: true });
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_TRANSPORT_26_825_WAITING_MAX_DIFF_RATIO",
+      0.04,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 transport waiting-row ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 transport waiting-row pixel ratio ${comparison.ratio}`,
     );
   }
 

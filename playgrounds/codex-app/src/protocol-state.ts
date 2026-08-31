@@ -230,6 +230,7 @@ export interface DemoSubagent {
 
 export interface DemoStreamError {
   additionalDetails: string | null;
+  clearOnSuccessfulTurn: boolean;
   content: string;
   errorInfo: JsonValue;
   id: string;
@@ -2015,6 +2016,8 @@ export function reduceProtocolNotification(
         : `stream-error:${turnId ?? "unknown"}:${state.streamErrors.length + 1}`;
       const streamError: DemoStreamError = {
         additionalDetails: asString(error.additionalDetails),
+        clearOnSuccessfulTurn:
+          progress.content === "Reconnecting... waiting for network",
         content: progress.content,
         errorInfo,
         id,
@@ -2067,6 +2070,17 @@ export function reduceProtocolNotification(
       status === "running"
         ? state.messages
         : finalizeRunningMessages(state.messages, status);
+    const clearedStreamErrorIds = new Set(
+      status === "completed"
+        ? state.streamErrors
+            .filter(
+              (streamError) =>
+                streamError.turnId === turnId &&
+                streamError.clearOnSuccessfulTurn,
+            )
+            .map(({ id }) => id)
+        : [],
+    );
     return {
       ...next,
       error:
@@ -2079,6 +2093,19 @@ export function reduceProtocolNotification(
           ? recordTurnInterruption(finalizedMessages, turnId, durationMs)
           : finalizedMessages,
       retrying: false,
+      streamErrors:
+        clearedStreamErrorIds.size > 0
+          ? state.streamErrors.filter(
+              ({ id }) => !clearedStreamErrorIds.has(id),
+            )
+          : state.streamErrors,
+      timeline:
+        clearedStreamErrorIds.size > 0
+          ? state.timeline.filter(
+              ({ id, kind }) =>
+                kind !== "streamError" || !clearedStreamErrorIds.has(id),
+            )
+          : state.timeline,
       plan: [],
       planExplanation: null,
       planTurnId: null,
