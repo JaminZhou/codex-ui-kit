@@ -16594,6 +16594,131 @@ for (const scene of currentBasic26825ElectronScenes) {
   }
 }
 
+const currentCitationsElectronScene = {
+  currentSidebar: true,
+  frame: "citations-current-26-825-sources-expanded-compact",
+  id: "electron-current-citations-26-825-sources-compact",
+  scenario: "current-citations-26-825",
+  sidebarState: "hidden",
+  theme: "dark",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: currentCitationsElectronApp,
+  page: currentCitationsElectronPage,
+} = await launchScene(currentCitationsElectronScene, {
+  capture: false,
+  layoutMode: "wide",
+});
+try {
+  const nativeBounds = await currentCitationsElectronApp.evaluate(
+    ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+  );
+  const initial = await currentCitationsElectronPage.evaluate(() => {
+    const rect = (element) => {
+      const value = element?.getBoundingClientRect();
+      return value
+        ? { height: value.height, left: value.left, width: value.width }
+        : null;
+    };
+    return {
+      citationCount: document.querySelectorAll(
+        "a[data-inline-mention-interactive]",
+      ).length,
+      expanded: document
+        .querySelector(".codex-ui-source-search-activity__trigger")
+        ?.getAttribute("aria-expanded"),
+      queryCount: document.querySelectorAll(
+        ".codex-ui-source-search-activity__queries li",
+      ).length,
+      sidePanel: rect(document.querySelector(".codex-ui-app-shell__side-panel")),
+      summaryOpen:
+        document
+          .querySelector(".demo-current-citations-summary-dock")
+          ?.getAttribute("data-open") === "true",
+      summary: rect(
+        document.querySelector(".demo-current-citations-summary-panel"),
+      ),
+      workspaceHeader: rect(
+        document.querySelector(
+          ".demo-current-citations-sources .codex-ui-workspace-panel__header",
+        ),
+      ),
+    };
+  });
+  if (
+    nativeBounds?.width !== 720 ||
+    nativeBounds?.height !== 680 ||
+    initial.citationCount !== 3 ||
+    initial.expanded !== "true" ||
+    initial.queryCount !== 5 ||
+    !initial.summaryOpen ||
+    Math.abs((initial.sidePanel?.left ?? 0) - 374.328125) > 0.5 ||
+    Math.abs((initial.sidePanel?.width ?? 0) - 345.671875) > 0.5 ||
+    Math.abs((initial.summary?.left ?? 0) - 68.328125) > 0.5 ||
+    Math.abs((initial.summary?.width ?? 0) - 300) > 0.5 ||
+    initial.workspaceHeader?.height !== 46
+  ) {
+    throw new Error(
+      `Electron current citation Sources contract failed: ${JSON.stringify({ initial, nativeBounds })}`,
+    );
+  }
+  const searchTrigger = currentCitationsElectronPage.getByRole("button", {
+    name: "Searched 5 times",
+  });
+  await searchTrigger.click();
+  if (
+    (await searchTrigger.getAttribute("aria-expanded")) !== "false" ||
+    (await currentCitationsElectronPage
+      .locator(".codex-ui-source-search-activity__queries li")
+      .count()) !== 0
+  ) {
+    throw new Error("Electron Sources search activity did not collapse.");
+  }
+  await searchTrigger.click();
+  await currentCitationsElectronPage
+    .getByRole("button", { name: "Close Sources tab" })
+    .click();
+  await currentCitationsElectronPage.waitForFunction(
+    () =>
+      !document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-open"),
+  );
+  const summaryDock = currentCitationsElectronPage.locator(
+    ".demo-current-citations-summary-dock",
+  );
+  if ((await summaryDock.getAttribute("data-open")) !== "true") {
+    await currentCitationsElectronPage
+      .getByRole("button", { name: "Toggle summary" })
+      .click();
+    await currentCitationsElectronPage.waitForFunction(
+      () =>
+        document
+          .querySelector(".demo-current-citations-summary-dock")
+          ?.getAttribute("data-open") === "true",
+    );
+  }
+  await currentCitationsElectronPage
+    .getByRole("button", { name: "View all" })
+    .click();
+  await currentCitationsElectronPage.waitForFunction(
+    () =>
+      document
+        .querySelector(".codex-ui-app-shell")
+        ?.hasAttribute("data-side-panel-open"),
+  );
+  if (
+    (await summaryDock.getAttribute("data-open")) !== "true"
+  ) {
+    throw new Error(
+      "Electron compact View all did not preserve the Sources summary.",
+    );
+  }
+} finally {
+  await currentCitationsElectronApp.close();
+}
+
 const appServerCrashScene = {
   frame: "app-server-crashed",
   id: "electron-app-server-crashed",

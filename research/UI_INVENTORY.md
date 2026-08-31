@@ -209,7 +209,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 90 surface groups; 36 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 31 groups and Electron verification covers 31.
+Current inventory: 91 surface groups; 37 have current-build runtime evidence, 43 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 33 groups and Electron verification covers 33.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

@@ -128,6 +128,20 @@ const currentReview26825References = {
   "current-review-26-825-files-compact":
     process.env.CODEX_UI_KIT_CURRENT_REVIEW_26_825_WORKSPACE_COMPACT_REFERENCE,
 };
+const currentCitations26825References = {
+  "current-citations-26-825-compact":
+    process.env.CODEX_UI_KIT_CURRENT_CITATIONS_26_825_COMPACT_REFERENCE,
+  "current-citations-26-825-sources-compact":
+    process.env.CODEX_UI_KIT_CURRENT_CITATIONS_26_825_SOURCES_COMPACT_REFERENCE,
+  "current-citations-26-825-sources-wide":
+    process.env.CODEX_UI_KIT_CURRENT_CITATIONS_26_825_SOURCES_WIDE_REFERENCE,
+  "current-citations-26-825-summary-compact":
+    process.env.CODEX_UI_KIT_CURRENT_CITATIONS_26_825_SUMMARY_COMPACT_REFERENCE,
+  "current-citations-26-825-summary-wide":
+    process.env.CODEX_UI_KIT_CURRENT_CITATIONS_26_825_SUMMARY_WIDE_REFERENCE,
+  "current-citations-26-825-wide":
+    process.env.CODEX_UI_KIT_CURRENT_CITATIONS_26_825_WIDE_REFERENCE,
+};
 const currentMcpSuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SUCCESS_REFERENCE;
 const currentMcpSuccessReferenceSize = {
@@ -997,6 +1011,79 @@ async function compareCurrentReview26825({
     }
     console.log(
       `${sceneId}: current 26.825 Review ${name} pixel ratio ${comparison.ratio}`,
+    );
+  }
+}
+
+async function compareCurrentCitations26825({
+  actual,
+  referencePath,
+  regions,
+  sceneId,
+}) {
+  const reference = PNG.sync.read(await readFile(referencePath));
+  const maximumRatios = {
+    composer: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_CITATIONS_26_825_COMPOSER_MAX_DIFF_RATIO",
+      0.025,
+    ),
+    header: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_CITATIONS_26_825_HEADER_MAX_DIFF_RATIO",
+      0.07,
+    ),
+    sources: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_CITATIONS_26_825_SOURCES_MAX_DIFF_RATIO",
+      0.04,
+    ),
+    summary: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_CITATIONS_26_825_SUMMARY_MAX_DIFF_RATIO",
+      0.04,
+    ),
+    thread: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_CITATIONS_26_825_THREAD_MAX_DIFF_RATIO",
+      0.05,
+    ),
+  };
+  for (const [name, region] of Object.entries(regions)) {
+    const referenceRegion = cropPng(
+      reference,
+      region.reference?.left ?? region.left,
+      region.reference?.top ?? region.top,
+      region.width,
+      region.height,
+    );
+    const actualRegion = cropPng(
+      actual,
+      region.actual?.left ?? region.left,
+      region.actual?.top ?? region.top,
+      region.width,
+      region.height,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.1);
+    await writeFile(
+      join(artifactDirectory, `${sceneId}.${name}.current-product.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${sceneId}.${name}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    const diffPath = join(
+      artifactDirectory,
+      `${sceneId}.${name}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(diffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(diffPath, { force: true });
+    }
+    if (comparison.ratio > maximumRatios[name]) {
+      throw new Error(
+        `${sceneId}: current 26.825 citations ${name} pixel ratio ${comparison.ratio} exceeds ${maximumRatios[name]}.`,
+      );
+    }
+    console.log(
+      `${sceneId}: current 26.825 citations ${name} pixel ratio ${comparison.ratio}`,
     );
   }
 }
@@ -2730,6 +2817,61 @@ for (const scene of selectedScenes) {
     await compareCurrentReview26825({
       actual,
       referencePath: currentReview26825Reference,
+      regions,
+      sceneId: scene.id,
+    });
+  }
+
+  const currentCitations26825Reference =
+    currentCitations26825References[scene.id];
+  if (currentCitations26825Reference) {
+    const regions = {
+      "current-citations-26-825-compact": {
+        composer: { height: 98, left: 16, top: 566, width: 688 },
+        header: { height: 47, left: 0, top: 0, width: 720 },
+        thread: { height: 390, left: 16, top: 75, width: 688 },
+      },
+      "current-citations-26-825-sources-compact": {
+        composer: { height: 98, left: 17, top: 566, width: 340 },
+        sources: { height: 680, left: 375, top: 0, width: 345 },
+        summary: {
+          actual: { left: 68, top: 53 },
+          height: 313,
+          reference: { left: 68, top: 52 },
+          width: 300,
+        },
+        thread: { height: 440, left: 17, top: 80, width: 340 },
+      },
+      "current-citations-26-825-sources-wide": {
+        composer: {
+          actual: { left: 339, top: 706 },
+          height: 98,
+          reference: { left: 339, top: 710 },
+          width: 405,
+        },
+        sources: {
+          actual: { left: 761, top: 0 },
+          height: 820,
+          reference: { left: 759, top: 0 },
+          width: 417,
+        },
+        thread: { height: 480, left: 339, top: 80, width: 405 },
+      },
+      "current-citations-26-825-summary-compact": {
+        summary: { height: 313, left: 344, top: 53, width: 300 },
+      },
+      "current-citations-26-825-summary-wide": {
+        summary: { height: 313, left: 804, top: 53, width: 300 },
+      },
+      "current-citations-26-825-wide": {
+        composer: { height: 98, left: 383, top: 706, width: 737 },
+        header: { height: 47, left: 322, top: 0, width: 858 },
+        thread: { height: 390, left: 383, top: 75, width: 737 },
+      },
+    }[scene.id];
+    await compareCurrentCitations26825({
+      actual,
+      referencePath: currentCitations26825Reference,
       regions,
       sceneId: scene.id,
     });

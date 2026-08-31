@@ -171,6 +171,23 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
+  it("replays the current 26.825 citation response to a stable completed frame", () => {
+    const scenario = replayScenarios["current-citations-26-825"];
+    const completed = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "citations-current-26-825-completed": 5,
+    });
+    expect(completed.status).toBe("completed");
+    expect(completed.messages.at(-1)).toEqual(
+      expect.objectContaining({
+        id: "assistant-current-citations-26-825",
+        status: "completed",
+        text: "CITATION_SOURCES_READY",
+      }),
+    );
+  });
+
   it("settles an approved command replay with completed work and a final response", () => {
     const scenario = replayScenarios["approval-denied"];
     const completed = reduceProtocolTrace(scenario.events);

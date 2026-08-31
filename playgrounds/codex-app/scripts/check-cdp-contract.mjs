@@ -60,6 +60,7 @@ const currentReplayComposerScenarios = new Set([
   "current-basic-message",
   "current-basic-message-26-825",
   "current-browser-26-825",
+  "current-citations-26-825",
   "current-mixed-tool-thread",
   "current-plan-26-825",
   "current-search-26-825",
@@ -4606,6 +4607,7 @@ for (const scene of selectedScenes) {
                   scene.scenario === "current-plan-26-825" ||
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
+                  scene.scenario === "current-citations-26-825" ||
                   scene.scenario === "current-review-26-825-files" ||
                   scene.scenario === "markdown-current-26-825" ||
                   scene.scenario === "current-basic-message" ||
@@ -11340,7 +11342,9 @@ for (const scene of selectedScenes) {
     }
     const expectedWindowWidth = scene.windowSize?.width ?? 1_180;
     const minimumConversationViewportWidth =
-      scene.scenario === "current-basic-message-26-825" &&
+      scene.id.startsWith("current-citations-26-825-sources-")
+        ? 374.328125
+      : scene.scenario === "current-basic-message-26-825" &&
       expectedWindowWidth <= 721
         ? 390
         : expectedWindowWidth <= 720
@@ -11392,10 +11396,12 @@ for (const scene of selectedScenes) {
       scene.scenario === "markdown-current-26-825" ||
       scene.scenario === "markdown-streaming-large" ||
       scene.scenario === "current-basic-message-26-825" ||
+      scene.scenario === "current-citations-26-825" ||
       currentSidebarThreadLifecycleScene ||
       currentSidebarWorktreeLifecycleScene
         ? scene.scenario === "markdown-streaming-large" ||
-          scene.scenario === "current-basic-message-26-825"
+          scene.scenario === "current-basic-message-26-825" ||
+          scene.scenario === "current-citations-26-825"
           ? 321.875
           : currentSidebarThreadLifecycleScene
             ? 321.875
@@ -11894,6 +11900,8 @@ for (const scene of selectedScenes) {
         ? "481"
       : scene.scenario === "current-browser-26-825"
         ? "454"
+      : scene.id === "current-citations-26-825-sources-wide"
+        ? "486"
       : scene.id === "current-sidebar-thread-lifecycle-compact" ||
           scene.id === "current-sidebar-worktree-lifecycle-compact" ||
           scene.id === "current-worktree-setup-failed-compact"
@@ -12161,10 +12169,171 @@ for (const scene of selectedScenes) {
     const backgroundSidePanelScene =
       scene.id === "terminal-current-background-list" ||
       scene.id === "terminal-current-background-open";
+    if (scene.scenario === "current-citations-26-825") {
+      const citationContract = await page.evaluate(() => {
+        const rect = (element) => {
+          const value = element?.getBoundingClientRect();
+          return value
+            ? {
+                bottom: value.bottom,
+                height: value.height,
+                left: value.left,
+                right: value.right,
+                top: value.top,
+                width: value.width,
+              }
+            : null;
+        };
+        const links = Array.from(
+          document.querySelectorAll("a[data-inline-mention-interactive]"),
+          (link) => {
+            const icon = link.querySelector("img");
+            return {
+              font: getComputedStyle(link).font,
+              href: link instanceof HTMLAnchorElement ? link.href : null,
+              iconRadius: icon ? getComputedStyle(icon).borderRadius : null,
+              iconRect: rect(icon),
+              rect: rect(link),
+              rel: link instanceof HTMLAnchorElement ? link.rel : null,
+              target: link instanceof HTMLAnchorElement ? link.target : null,
+            };
+          },
+        );
+        const summaryDock = document.querySelector(
+          ".demo-current-citations-summary-dock",
+        );
+        const summary = document.querySelector(
+          ".demo-current-citations-summary-panel",
+        );
+        const sources = document.querySelector(
+          ".demo-current-citations-sources",
+        );
+        const sidePanel = document.querySelector(
+          ".codex-ui-app-shell__side-panel",
+        );
+        const sourceTrigger = document.querySelector(
+          ".codex-ui-source-search-activity__trigger",
+        );
+        return {
+          links,
+          main: rect(document.querySelector(".codex-ui-app-shell__main")),
+          queries: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-source-search-activity__queries li",
+            ),
+            (query) => query.textContent?.trim() ?? "",
+          ),
+          sidePanel: rect(sidePanel),
+          sources: sources
+            ? {
+                expanded: sourceTrigger?.getAttribute("aria-expanded") ?? null,
+                header: rect(
+                  sources.querySelector(".codex-ui-workspace-panel__header"),
+                ),
+                rect: rect(sources),
+                searchedLabel: sourceTrigger?.textContent?.trim() ?? null,
+                tabCloseLabel:
+                  sources
+                    .querySelector(".codex-ui-workspace-panel__tab-close")
+                    ?.getAttribute("aria-label") ?? null,
+                title:
+                  sources
+                    .querySelector(".codex-ui-source-search-activity__title")
+                    ?.textContent?.trim() ?? null,
+              }
+            : null,
+          summary: summary
+            ? {
+                background: getComputedStyle(summary).backgroundColor,
+                radius: getComputedStyle(summary).borderRadius,
+                rect: rect(summary),
+              }
+            : null,
+          summaryOpen: summaryDock?.getAttribute("data-open") === "true",
+          viewportWidth: window.innerWidth,
+        };
+      });
+      const expectedHrefs = [
+        "https://openai.com/index/introducing-codex/",
+        "https://openai.com/index/introducing-codex/",
+        "https://openai.com/index/unrolling-the-codex-agent-loop/",
+      ];
+      const expectedQueries = [
+        'site:developers.openai.com/codex/guides "AGENTS.md"',
+        'site:developers.openai.com/codex "AGENTS.override.md"',
+        'site:developers.openai.com/codex "project_doc_fallback_filenames"',
+        "site:developers.openai.com/codex AGENTS.md",
+        "site:openai.com AGENTS.md Codex",
+      ];
+      const expectsSummary =
+        scene.id.includes("summary-") ||
+        scene.id === "current-citations-26-825-sources-compact";
+      const expectsSources = scene.id.startsWith(
+        "current-citations-26-825-sources-",
+      );
+      if (
+        JSON.stringify(citationContract.links.map(({ href }) => href)) !==
+          JSON.stringify(expectedHrefs) ||
+        citationContract.links.some(
+          ({ font, iconRadius, iconRect, rel, target }) =>
+            font !==
+              '14px / 22.75px -apple-system, "system-ui", "Segoe UI", sans-serif' ||
+            iconRadius !== "2.5px" ||
+            iconRect?.width !== 16 ||
+            iconRect?.height !== 16 ||
+            rel !== "noopener noreferrer" ||
+            target !== "_blank",
+        ) ||
+        citationContract.summaryOpen !== expectsSummary ||
+        (expectsSummary &&
+          (!citationContract.summary?.rect ||
+            Math.abs(citationContract.summary.rect.width - 300) > 0.5 ||
+            Math.abs(citationContract.summary.rect.top - 53) > 0.5 ||
+            Math.abs(
+              citationContract.summary.rect.right -
+                ((expectsSources
+                  ? citationContract.main?.right
+                  : citationContract.viewportWidth) ?? 0) +
+                (expectsSources ? 6 : 76),
+            ) > 0.5 ||
+            citationContract.summary.radius !== "25px" ||
+            citationContract.summary.background !== "rgb(45, 45, 45)")) ||
+        (expectsSources &&
+          (!citationContract.sources?.rect ||
+            !citationContract.sidePanel ||
+            Math.abs(
+              citationContract.sidePanel.width -
+                (scene.id.endsWith("compact") ? 345.671875 : 418.515625),
+            ) > 0.5 ||
+            Math.abs(
+              citationContract.sidePanel.right - citationContract.viewportWidth,
+            ) > 0.5 ||
+            Math.abs(citationContract.sources.rect.left - 1 - citationContract.sidePanel.left) >
+              0.5 ||
+            citationContract.sources.header?.height !== 46 ||
+            citationContract.sources.expanded !== "true" ||
+            citationContract.sources.tabCloseLabel !== "Close Sources tab" ||
+            citationContract.sources.title !== "Web search" ||
+            !citationContract.sources.searchedLabel?.includes(
+              "Searched 5 times",
+            ) ||
+            JSON.stringify(citationContract.queries) !==
+              JSON.stringify(expectedQueries)))
+      ) {
+        throw new Error(
+          `${scene.id}: current citation and Sources contract failed: ${JSON.stringify(citationContract)}`,
+        );
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}-citations.json`),
+        `${JSON.stringify(citationContract, null, 2)}\n`,
+      );
+    }
     if (
       !scene.surfaces?.includes("reviewPanel") &&
       !scene.surfaces?.includes("browserWorkspace") &&
       !backgroundSidePanelScene &&
+      !scene.id.startsWith("current-citations-26-825-sources-") &&
       contract.sidePanelResizer
     ) {
       throw new Error(

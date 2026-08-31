@@ -13,8 +13,8 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 90 surface groups: 59 P0, 21 P1, and 10 P2.
-- 36 groups have current-build runtime evidence, 43 have previous-build-only
+- The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
+- 37 groups have current-build runtime evidence, 43 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
@@ -189,7 +189,14 @@ exit gates; it does not replace the inventory.
   frames; local-only regions pass at 2.6742%, 4.8070%, 3.8995%, and 2.9276%
   under independent 2.8%, 5%, 4.1%, and 3.1% limits. Authentication,
   elicitation, MCP approvals, cancellation, same-transport reconnect, and
-  other integrations remain open. A separate previous
+  other integrations remain open. The current citations follow-up separately
+  reaches three real inline OpenAI citations and the five-query Web Search
+  Sources workspace. Six wide/compact replay frames pass Browser/CDP,
+  Electron, reviewed pixels, and optional local-only product regions; the
+  compact layout locks the 374.328125/345.671875px conversation/Sources split.
+  This closes the sampled inline-citation and Web Search Sources slice without
+  generalizing to other providers, failure/empty/loading states, or live
+  media. A separate previous
   26.818 no-tool task remains regression evidence for
   `thread.messages-markdown`. It reaches heading,
   strong text, inline code, blockquote, list, a narrow table, and TypeScript
@@ -715,8 +722,9 @@ states, and completion. Reverse-origin follow, explicit scroll-away/return,
 code copy, table focus, current response actions, exact computed styles, five
 reviewed baselines, and four local-only product regions pass Browser/CDP,
 Electron, and pixel gates. Very-wide-table actions remain independently
-versioned current runtime evidence; citations, live media emission, and
-table/Markdown error variants remain open.
+versioned current runtime evidence. Inline citations now have their own
+current slice; live media emission and table/Markdown error variants remain
+open.
 
 The previous-build completed conversation core was refreshed on `26.818.41509` with
 one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,

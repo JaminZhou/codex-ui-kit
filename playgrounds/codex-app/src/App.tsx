@@ -22,6 +22,7 @@ import {
   BrowserActivity,
   BrowserWorkspacePanel,
   Button,
+  CitationMention,
   CodeReviewSettingsPage,
   CommandExecution,
   CommandOutput,
@@ -72,6 +73,8 @@ import {
   QueuedPromptList,
   ProjectIndex,
   SearchActivity,
+  SourceActivityList,
+  SourceSearchActivity,
   SettingsShell,
   StatusBanner,
   StreamNotice,
@@ -251,6 +254,7 @@ type SummaryGlyphName =
   | "commit"
   | "computer"
   | "github"
+  | "globe"
   | "link";
 
 function SidebarGlyph({ name }: { name: SidebarGlyphName }) {
@@ -334,6 +338,8 @@ function SummaryGlyph({ name }: { name: SummaryGlyphName }) {
       "M2.25 3.25h11.5v7.5H2.25v-7.5Zm3 10h5.5M8 10.75v2.5",
     github:
       "M8 2.25a5.75 5.75 0 0 0-1.82 11.2c.29.05.39-.13.39-.28v-1.1c-1.63.35-1.97-.69-1.97-.69-.27-.68-.65-.86-.65-.86-.53-.36.04-.35.04-.35.59.04.9.6.9.6.52.9 1.36.64 1.69.49.05-.38.2-.64.37-.79-1.3-.15-2.67-.65-2.67-2.9 0-.64.23-1.16.6-1.57-.06-.15-.26-.74.06-1.54 0 0 .49-.16 1.58.6A5.5 5.5 0 0 1 8 4.54c.49 0 .97.07 1.43.2 1.1-.75 1.58-.6 1.58-.6.32.8.12 1.39.06 1.54.38.41.6.93.6 1.57 0 2.25-1.37 2.75-2.68 2.89.21.18.4.54.4 1.09v1.94c0 .15.1.33.4.27A5.75 5.75 0 0 0 8 2.25Z",
+    globe:
+      "M8 1.75a6.25 6.25 0 1 0 0 12.5A6.25 6.25 0 0 0 8 1.75Zm0 0c1.55 1.7 2.35 3.78 2.35 6.25S9.55 12.55 8 14.25C6.45 12.55 5.65 10.47 5.65 8S6.45 3.45 8 1.75ZM2 8h12",
     link:
       "M6.25 9.75 9.75 6.25M5.25 11.75H4A2.75 2.75 0 0 1 4 6.25h2M10.75 4.25H12a2.75 2.75 0 1 1 0 5.5h-2",
   }[name];
@@ -1437,6 +1443,50 @@ function McpResponseActions({
 // Codex external-link renderer so visual acceptance stays deterministic.
 const currentMarkdownOpenAiFavicon =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAIAAAC0D9CtAAABFWlDQ1BfAAB4nJWQsUoDQRCGPyUgioWCpcV1gqDGBEMCIsScBttEIbG73B2HJjmPy4m+gY29rQ9haWFhZStYW/gAVqn9N1dsQFJkhtn9dvZnZ2dgEWOFIgzjLG01j51O99JZ+mZBPjHPHyXMNqnGX7n2c4f5bTkIR772X0WWqrieDMQbUc73hns5Pxq+y5JM/Gw4PW81xC/itWiKe1PsJ6nRv4sPh4Nb3/6b1TC+aGvvKDZpciOPGBCyR5s+V3gilxpF9mnIXerimtYDTnWuUOWEsqIqNreu2JW6LlVFUTLzzEsGD1DeVukVm7v+gdcnWP+wua2+vn0Eb12bszNOvNSz0x8XZvTk/OvJ4YwYn11RadJR5Q9AT0aJf0or6QAAAn9JREFUeJyUUztoWgEUrZpPTZMGQkhCAhUsJORXMoWQkM8QMiVKpsTBQZxEsA6CKSKCiINOCg6ikwjiIDrooAiKg4Ko4CBGB3+oET8YFMG/PfaFFEqH9g3vXS7n3nvuOffNrK+vf/jPZ+Y9IpFIq6uru7u7V1dXCJCp1+t+vz+ZTCKYTCa/kcSc2dnZ29tbPp9Pp9MRI0Mmk4Hr9/uZTEan0zmdzsFgQNRQFhcXAXp4eFAoFJubm4VCweFwBAKB4XCIPN5bW1uY3Gg0MHA8Hk9rlpaWGAwGChCk02mtVntxcQFuYrE4Eon4fL5wOHxzc3N2doZ2qVRqyu3g4MBisezt7RWLRb1ez2QwXyovZrP5/v4eybW1NZvNVqlUZDIZOrJYrFqtRsbS2AE9JBLJc/J54dOCwWDAkFAoZDQahd+FtC80oFutFmAAT1cFV/D2er0cDof+lY5UqVRSq9Xlcvno6Ojpx5Pb4242m71eb25uDuCp1qAOfUDs+PgYG0OcjY0NjUYDBJvNdrlcXC735OQEokMnwgMyISu2isfj19fXmAB9UYDhyIMkZES7RCIxGo3ePIVf+Jyfn6Mr6IpEIgjF4/GoVGoul0MxhUJ5bb6urKzAdAJMxlA0pn6kLn9ePj09VavU+Xx+fn4elGg0GgrgjMFouLu7A22Ap3PgFJze2dk5/HYITVVqVbVaBQ7eM5lMrIpDEQqFEC3565l6CtLtdvvy8hKawAqP2xONRk0mk0Ag2N7ettvtj4+P+/v7nU5HqVTGYrG3eyNuRyqVglKtWuv1e5gcDAZxGVAFS3a7XblcbrVaiZP7y41ib6xLqARQNpv940ZJ7//Pv/8LPwEAAP//uhbiMQAAAAZJREFUAwCcbFyQ5jiGKgAAAABJRU5ErkJggg==";
+
+const currentCitationQueries = [
+  'site:developers.openai.com/codex/guides "AGENTS.md"',
+  'site:developers.openai.com/codex "AGENTS.override.md"',
+  'site:developers.openai.com/codex "project_doc_fallback_filenames"',
+  "site:developers.openai.com/codex AGENTS.md",
+  "site:openai.com AGENTS.md Codex",
+] as const;
+
+function CurrentCitationAnswer() {
+  return (
+    <div className="demo-current-citations-answer">
+      <ul>
+        <li>
+          <code>AGENTS.md</code> guides Codex on repository structure, testing,
+          and conventions.{" "}
+          <CitationMention
+            faviconSrc={currentMarkdownOpenAiFavicon}
+            href="https://openai.com/index/introducing-codex/"
+            label="OpenAI"
+          />
+        </li>
+        <li>
+          Its scope covers its directory tree; deeper files take precedence.{" "}
+          <CitationMention
+            faviconSrc={currentMarkdownOpenAiFavicon}
+            href="https://openai.com/index/introducing-codex/"
+            label="OpenAI"
+          />
+        </li>
+        <li>
+          Codex loads instructions from $CODEX_HOME, then project root through
+          the working directory.{" "}
+          <CitationMention
+            faviconSrc={currentMarkdownOpenAiFavicon}
+            href="https://openai.com/index/unrolling-the-codex-agent-loop/"
+            label="OpenAI"
+          />
+        </li>
+      </ul>
+      <p>CITATION_SOURCES_READY</p>
+    </div>
+  );
+}
 
 function CurrentMarkdownCodeLanguageIcon() {
   return (
@@ -2663,6 +2713,23 @@ export function App() {
   const [mcpSourceSummaryPinned, setMcpSourceSummaryPinned] = useState(
     initialSelection.summaryState === "pinned",
   );
+  const [citationSummaryOpen, setCitationSummaryOpen] = useState(
+    initialSelection.frame?.includes("citations-current-26-825-summary") ||
+      initialSelection.frame ===
+        "citations-current-26-825-sources-expanded-compact",
+  );
+  const [citationSourcesOpen, setCitationSourcesOpen] = useState(
+    initialSelection.frame?.includes("citations-current-26-825-sources") ??
+      false,
+  );
+  const [citationSearchExpanded, setCitationSearchExpanded] = useState(
+    initialSelection.frame?.includes(
+      "citations-current-26-825-sources-expanded",
+    ) ?? false,
+  );
+  const [citationSourcesWidth, setCitationSourcesWidth] = useState(() =>
+    isNarrowDemoWindow() ? 345.671875 : 418.515625,
+  );
   const [replayQueuedContinuation, setReplayQueuedContinuation] =
     useState<string | null>(() =>
       initialQueuedContinuation(initialSelection.frame),
@@ -3066,6 +3133,8 @@ export function App() {
     isCurrentBasicMessageReplay || isCurrentBasic26825Replay;
   const isCurrentBrowser26825Replay =
     mode === "replay" && scenarioId === "current-browser-26-825";
+  const isCurrentCitations26825Replay =
+    mode === "replay" && scenarioId === "current-citations-26-825";
   const isCurrentMarkdown26818Replay =
     mode === "replay" && scenarioId === "markdown-current-26-818";
   const isCurrentMarkdown26820MediaReplay =
@@ -4807,7 +4876,7 @@ export function App() {
         </div>
       )}
       primaryNavigation={
-        isCurrentBasic26825Replay ? (
+        isCurrentBasic26825Replay || isCurrentCitations26825Replay ? (
           <>
             <AppSidebarItem leading={<SidebarGlyph name="pull-request" />}>
               Pull requests
@@ -5407,6 +5476,7 @@ export function App() {
       scenarioId === "context-summary" ||
       isAnyCurrentBasicMessageReplay ||
       isCurrentBrowser26825Replay ||
+      isCurrentCitations26825Replay ||
       isCurrentPlan26825Replay ||
       isCurrentSearch26825Replay ||
       isCurrentMarkdown26818Replay ||
@@ -5440,12 +5510,16 @@ export function App() {
   const header = (
     <ThreadHeader
       className={
-        isCurrentBasic26825Replay || isCurrentMcp26825Replay
+        isCurrentBasic26825Replay ||
+        isCurrentMcp26825Replay ||
+        isCurrentCitations26825Replay
           ? "demo-current-basic-26-825-header"
           : undefined
       }
       endActions={
-        isCurrentBasic26825Replay || isCurrentMcp26825Replay ? (
+        isCurrentBasic26825Replay ||
+        isCurrentMcp26825Replay ||
+        isCurrentCitations26825Replay ? (
           <div className="demo-current-basic-26-825-header-actions">
             <button aria-label="Share" type="button">
               <CurrentBuildIcon name="thread-header-share" />
@@ -5454,12 +5528,16 @@ export function App() {
             <button
               aria-label="Toggle summary"
               aria-pressed={
-                isCurrentMcp26825Replay
+                isCurrentCitations26825Replay
+                  ? citationSummaryOpen
+                  : isCurrentMcp26825Replay
                   ? mcpSourceSummaryPinned
                   : undefined
               }
               onClick={
-                isCurrentMcp26825Replay
+                isCurrentCitations26825Replay
+                  ? () => setCitationSummaryOpen((open) => !open)
+                  : isCurrentMcp26825Replay
                   ? () => {
                       if (mcpSourceSummaryOpen && mcpSourceSummaryPinned) {
                         setMcpSourceSummaryOpen(false);
@@ -5472,7 +5550,7 @@ export function App() {
                   : undefined
               }
               ref={
-                isCurrentMcp26825Replay
+                isCurrentMcp26825Replay || isCurrentCitations26825Replay
                   ? mcpSourceSummaryTriggerRef
                   : undefined
               }
@@ -5763,7 +5841,7 @@ export function App() {
               <CurrentBuildIcon name="sidebar-new-chat" />
             </button>
           </div>
-        ) : isCurrentBasic26825Replay ? (
+        ) : isCurrentBasic26825Replay || isCurrentCitations26825Replay ? (
           <button
             aria-expanded={sidebarOpen}
             aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
@@ -5812,7 +5890,9 @@ export function App() {
           : state.threadId ?? "Local app-server"
       }
       startActions={
-        isCurrentBasic26825Replay || isCurrentMcp26825Replay ? (
+        isCurrentBasic26825Replay ||
+        isCurrentMcp26825Replay ||
+        isCurrentCitations26825Replay ? (
           <button
             aria-label="Chat actions"
             className="demo-current-basic-26-825-title-actions"
@@ -5831,7 +5911,9 @@ export function App() {
         ) : undefined
       }
       title={
-        isCurrentBasic26825Replay || isCurrentMcp26825Replay
+        isCurrentBasic26825Replay ||
+        isCurrentMcp26825Replay ||
+        isCurrentCitations26825Replay
           ? (
               <>
                 <span
@@ -5845,7 +5927,7 @@ export function App() {
                   type="button"
                 >
                   <span>
-                    {isCurrentMcp26825Replay
+                    {isCurrentMcp26825Replay || isCurrentCitations26825Replay
                       ? scenario.label
                       : "Reply with CURRENT BASIC MESSAGE"}
                   </span>
@@ -5895,6 +5977,7 @@ export function App() {
       scenarioId === "context-summary" ||
       isAnyCurrentBasicMessageReplay ||
       isCurrentBrowser26825Replay ||
+      isCurrentCitations26825Replay ||
       isCurrentPlan26825Replay ||
       isCurrentSearch26825Replay ||
       isCurrentTransportRecoveryReplay ||
@@ -6192,7 +6275,7 @@ export function App() {
           </span>
         ) : showMeasuredComposer || showLifecycleComposer ? (
           <span className="demo-composer-actions">
-            {isAnyCurrentBasicMessageReplay ? (
+            {isAnyCurrentBasicMessageReplay || isCurrentCitations26825Replay ? (
               <button
                 className="demo-current-composer-model"
                 type="button"
@@ -6254,6 +6337,7 @@ export function App() {
         isCurrentContextCompactionReplay ||
         isCurrentTransportRecoveryReplay ||
         isAnyCurrentBasicMessageReplay ||
+        isCurrentCitations26825Replay ||
         currentProductAttachmentFrame
           ? "Send"
           : undefined
@@ -8966,6 +9050,74 @@ export function App() {
       </div>
     </BrowserWorkspacePanel>
   ) : null;
+  const citationSourcesPanel = isCurrentCitations26825Replay ? (
+    <WorkspacePanel
+      actions={
+        <>
+          <button
+            aria-label="Open side panel tab"
+            className="demo-current-citations-sources__action"
+            type="button"
+          >
+            +
+          </button>
+          <span className="demo-current-citations-sources__spacer" />
+          <button
+            aria-label="Expand Sources panel"
+            className="demo-current-citations-sources__action"
+            type="button"
+          >
+            <CurrentBuildIcon name="review-expand" />
+          </button>
+          <button
+            aria-label="Open Sources in bottom panel"
+            className="demo-current-citations-sources__action"
+            type="button"
+          >
+            <CurrentBuildIcon name="thread-header-bottom-panel" />
+          </button>
+          <button
+            aria-label="Toggle Sources side panel"
+            className="demo-current-citations-sources__action"
+            onClick={() => setCitationSourcesOpen(false)}
+            type="button"
+          >
+            <CurrentBuildIcon name="thread-header-side-panel" />
+          </button>
+        </>
+      }
+      activeTabId="sources"
+      className="demo-current-citations-sources"
+      data-testid="current-citations-sources"
+      label="Sources"
+      onActiveTabChange={() => undefined}
+      onCloseTab={() => setCitationSourcesOpen(false)}
+      placement="side"
+      tabCloseButtons
+      tabs={[
+        {
+          closeLabel: "Close Sources tab",
+          content: (
+            <SourceActivityList>
+              <SourceSearchActivity
+                expanded={citationSearchExpanded}
+                leading={<SummaryGlyph name="globe" />}
+                onExpandedChange={setCitationSearchExpanded}
+                queries={currentCitationQueries}
+              />
+            </SourceActivityList>
+          ),
+          id: "sources",
+          label: (
+            <span className="demo-current-citations-sources__tab-label">
+              <SummaryGlyph name="link" />
+              <span>Sources</span>
+            </span>
+          ),
+        },
+      ]}
+    />
+  ) : null;
   const subagentPanel = hasSubagentSurface ? (
     <WorkspacePanel
       activeTabId="subagents"
@@ -9851,6 +10003,13 @@ export function App() {
               }
             />
           ) : null}
+          {isCurrentCitations26825Replay &&
+          message.id === "assistant-current-citations-26-825" ? (
+            <ActivityTimeline
+              className="demo-current-citations-duration"
+              summary={<TurnDuration durationMs={24_000} status="worked" />}
+            />
+          ) : null}
           {isCurrentMarkdown26825Replay &&
           message.id === "assistant-markdown-current-26-825" ? (
             <ActivityTimeline
@@ -9926,6 +10085,8 @@ export function App() {
                 (isAnyCurrentBasicMessageReplay &&
                   (message.id === "assistant-current-basic" ||
                     message.id === "assistant-current-basic-26-825")) ||
+                (isCurrentCitations26825Replay &&
+                  message.id === "assistant-current-citations-26-825") ||
                 (scenarioId === "command-failure-recovery" &&
                   (message.id === "assistant-command-failure-recovered" ||
                     message.id === "assistant-command-follow-up")) ||
@@ -9954,6 +10115,7 @@ export function App() {
                 scenarioId === "long-command-output" ||
                 isCurrentCommand26820Replay ||
                 isAnyCurrentBasicMessageReplay ||
+                isCurrentCitations26825Replay ||
                 isCurrentMarkdown26818Replay ||
                 isCurrentMarkdown26820MediaReplay ||
                 isCurrentMarkdown26825Replay ||
@@ -9962,6 +10124,7 @@ export function App() {
                   <McpResponseActions
                     copyLabel={
                       isAnyCurrentBasicMessageReplay ||
+                      isCurrentCitations26825Replay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
                       usesCurrentMarkdown26825Presentation
@@ -9970,6 +10133,7 @@ export function App() {
                     }
                     label={
                       isAnyCurrentBasicMessageReplay ||
+                      isCurrentCitations26825Replay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
                       usesCurrentMarkdown26825Presentation
@@ -9989,6 +10153,7 @@ export function App() {
                     }
                     toolbar={
                       !isAnyCurrentBasicMessageReplay &&
+                      !isCurrentCitations26825Replay &&
                       !isCurrentMarkdown26818Replay &&
                       !isCurrentMarkdown26820MediaReplay &&
                       !usesCurrentMarkdown26825Presentation
@@ -10085,6 +10250,9 @@ export function App() {
               ) : message.id ===
                 "assistant-current-mcp-26-825-recovery" ? (
                 <CurrentMcpAnswer current26825 recovery />
+              ) : message.id ===
+                "assistant-current-citations-26-825" ? (
+                <CurrentCitationAnswer />
               ) : (
                 <AgentMarkdown
                   allowWideMedia={isCurrentMarkdown26820MediaReplay}
@@ -11963,7 +12131,9 @@ export function App() {
       data-sidebar-current={currentSidebarComposition || undefined}
       data-sidebar-state={initialSelection.sidebarState ?? undefined}
       data-summary-open={
-        isCurrentMcp26818Replay || usesCurrentMcpFlatRows
+        isCurrentCitations26825Replay
+          ? citationSummaryOpen
+          : isCurrentMcp26818Replay || usesCurrentMcpFlatRows
           ? mcpSourceSummaryOpen
           : undefined
       }
@@ -12177,6 +12347,8 @@ export function App() {
         onSidePanelOpenChange={
           view === "pull-request"
             ? setPullRequestOpen
+            : isCurrentCitations26825Replay
+              ? setCitationSourcesOpen
             : isCurrentBrowser26825Replay
               ? setBrowserPanelOpen
             : backgroundTerminalPanelSelected
@@ -12188,6 +12360,8 @@ export function App() {
         onSidePanelWidthChange={
           view === "pull-request"
             ? setPullRequestWidth
+            : isCurrentCitations26825Replay
+              ? setCitationSourcesWidth
             : isCurrentBrowser26825Replay
               ? setBrowserPanelWidth
             : backgroundTerminalPanelSelected
@@ -12205,6 +12379,8 @@ export function App() {
         sidePanel={
           view === "pull-request"
             ? pullRequestPanel
+            : isCurrentCitations26825Replay
+              ? citationSourcesPanel
             : isCurrentBrowser26825Replay
               ? browserWorkspacePanel
             : backgroundTerminalPanelSelected
@@ -12219,6 +12395,8 @@ export function App() {
         sidePanelLabel={
           view === "pull-request"
             ? "Pull request details"
+            : isCurrentCitations26825Replay
+              ? "Sources"
             : isCurrentBrowser26825Replay
               ? "Browser"
             : backgroundTerminalPanelSelected
@@ -12232,6 +12410,8 @@ export function App() {
         sidePanelMinMainWidth={
           view === "pull-request"
             ? 390
+            : isCurrentCitations26825Replay
+              ? 374.328125
             : isCurrentBrowser26825Replay
               ? 405.53125
             : backgroundTerminalPanelSelected
@@ -12245,6 +12425,8 @@ export function App() {
         sidePanelMinWidth={
           view === "pull-request"
             ? 322
+            : isCurrentCitations26825Replay
+              ? 320
             : isCurrentBrowser26825Replay
               ? 320
             : backgroundTerminalPanelSelected
@@ -12256,6 +12438,8 @@ export function App() {
         sidePanelOpen={
           view === "pull-request"
             ? pullRequestOpen
+            : isCurrentCitations26825Replay
+              ? citationSourcesOpen
             : isCurrentBrowser26825Replay
               ? browserPanelOpen
             : backgroundTerminalPanelSelected
@@ -12267,6 +12451,7 @@ export function App() {
         sidePanelOverlay={view === "pull-request"}
         sidePanelOverlayModal={
           view !== "pull-request" &&
+          !isCurrentCitations26825Replay &&
           !backgroundTerminalPanelSelected &&
           !subagentPanelSelected
         }
@@ -12274,6 +12459,8 @@ export function App() {
         sidePanelWidth={
           view === "pull-request"
             ? pullRequestWidth
+            : isCurrentCitations26825Replay
+              ? citationSourcesWidth
             : isCurrentBrowser26825Replay
               ? browserPanelWidth
             : backgroundTerminalPanelSelected
@@ -12287,7 +12474,8 @@ export function App() {
           currentSidebarThreadLifecycle ||
           currentSidebarWorktreeLifecycle ||
           isCurrentRichMarkdownStreamingReplay ||
-          isCurrentBasic26825Replay
+          isCurrentBasic26825Replay ||
+          isCurrentCitations26825Replay
             ? 321.875
             : currentHomeFrame ||
                 isCurrentBrowser26825Replay ||
@@ -12661,6 +12849,82 @@ export function App() {
                     <ThreadSummaryItem
                       label="View all"
                       leading={<SummaryGlyph name="link" />}
+                      tone="muted"
+                    />
+                  </ThreadSummarySection>
+                </ThreadSummaryPanel>
+              </ThreadSummaryDock>
+            ) : null}
+
+            {isCurrentCitations26825Replay ? (
+              <ThreadSummaryDock
+                anchorRef={mcpSourceSummaryTriggerRef}
+                className="demo-current-mcp-source-summary-dock demo-current-citations-summary-dock"
+                onOpenChange={setCitationSummaryOpen}
+                open={citationSummaryOpen}
+              >
+                <ThreadSummaryPanel
+                  className="demo-current-mcp-source-summary-panel demo-current-citations-summary-panel"
+                  label="Thread summary"
+                >
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Set up local environment"
+                      />
+                    }
+                    title="Environment"
+                  >
+                    <ThreadSummaryItem
+                      label="Changes"
+                      leading={<SummaryGlyph name="changes" />}
+                      meta={<ThreadSummaryDelta added={0} removed={0} />}
+                    />
+                    <ThreadSummaryItem
+                      label="Local"
+                      leading={<SummaryGlyph name="computer" />}
+                      title="Select where to run the chat"
+                      trailing="⌄"
+                    />
+                    <ThreadSummaryItem
+                      label="feat/current-citations-sources"
+                      leading={<SummaryGlyph name="branch" />}
+                      title="Switch branch"
+                      trailing="⌄"
+                    />
+                    <ThreadSummaryItem
+                      disabled
+                      label="Commit or push"
+                      leading={<SummaryGlyph name="commit" />}
+                    />
+                    <ThreadSummaryItem
+                      label="Create pull request"
+                      leading={<SummaryGlyph name="github" />}
+                    />
+                  </ThreadSummarySection>
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Attach files or connect apps"
+                      />
+                    }
+                    title="Sources"
+                  >
+                    <ThreadSummaryItem
+                      label="Web search"
+                      leading={<SummaryGlyph name="link" />}
+                    />
+                    <ThreadSummaryItem
+                      label="View all"
+                      leading={<SummaryGlyph name="link" />}
+                      onClick={() => {
+                        setCitationSourcesOpen(true);
+                        if (!isNarrowDemoWindow()) {
+                          setCitationSummaryOpen(false);
+                        }
+                      }}
                       tone="muted"
                     />
                   </ThreadSummarySection>

@@ -2076,6 +2076,29 @@ are committed. Optional current-product comparison accepts four Usage frames
 with only the translucent native Settings rail masked and three unmasked plan
 frames. Product screenshots and the disposable profile remain local-only.
 
+## Current `26.825.51511` inline citations and Sources workspace sample
+
+Use a loopback-only isolated profile and one disposable Web Search task that
+is restricted to public OpenAI sources. Retain only fixed public answer copy,
+anchor URLs, sanitized query strings, geometry, computed styles, and reusable
+favicon/icon evidence. Task identifiers, raw screenshots, profile contents,
+and private sidebar labels stay local-only.
+
+The accepted sample contains exactly three inline citations and five Sources
+queries. Capture the settled thread, the Environment + Sources summary, and
+the expanded Sources workspace at 1180×820 and 720×680. The summary must be
+300×313px at y=53, use a 76px standalone right inset, and remain visible in
+the compact split workspace after `View all`. The compact split is
+374.328125px conversation plus 345.671875px Sources; wide retains the
+321.875px sidebar and a 418.515625px Sources width.
+
+Browser/CDP verifies anchor security, hrefs, favicon geometry, disclosure,
+exact query order, panel ownership, and responsive boundaries. Electron
+repeats disclosure, close, reopen, and native compact geometry. Six reviewed
+baselines are committed; optional product comparisons use external paths and
+write only owned regional crops/diffs to ignored artifacts. Product images
+and the disposable profile are never committed.
+
 ## Promotion rule
 
 After a capture:
