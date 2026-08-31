@@ -171,6 +171,8 @@ import {
   type ProtocolEventRecord,
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
+import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
+import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
 import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
 import {
   isScenarioId,
@@ -10409,7 +10411,100 @@ export function App() {
     (isCurrentPullRequestReviewReplay
       ? currentPullRequestSummaryReady
       : pullRequestSummaryReady);
-  const pullRequestCode = (
+  const currentPullRequestCodeFiles = [
+    {
+      additions: 18,
+      deletions: 0,
+      path: "playgrounds/codex-app/scripts/electron-harness.mjs",
+    },
+    {
+      additions: 442,
+      deletions: 57,
+      path: "playgrounds/codex-app/src/App.tsx",
+    },
+    {
+      additions: 8,
+      deletions: 0,
+      path: "playgrounds/codex-app/src/pull-request-lifecycle.ts",
+    },
+    {
+      additions: 576,
+      deletions: 0,
+      path: "playgrounds/codex-app/src/styles.css",
+    },
+    {
+      additions: 0,
+      deletions: 0,
+      path: "playgrounds/codex-app/tests/visual/baselines/pr-detail-current-26-825-summary-expanded.png",
+      preview: currentPullRequestSummaryExpandedPreview,
+    },
+    {
+      additions: 0,
+      deletions: 0,
+      path: "playgrounds/codex-app/tests/visual/baselines/pr-detail-current-26-825-summary.png",
+      preview: currentPullRequestSummaryPreview,
+    },
+    {
+      additions: 9,
+      deletions: 1,
+      path: "src/components/AppShell.tsx",
+    },
+    {
+      additions: 26,
+      deletions: 13,
+      path: "src/components/PullRequestSurfaces.tsx",
+    },
+    {
+      additions: 20,
+      deletions: 0,
+      path: "tests/workflow-surfaces.test.tsx",
+    },
+  ];
+  const currentPullRequestCode = (
+    <div className="demo-current-pr-code">
+      <div aria-label="Code review controls" className="demo-current-pr-code__toolbar">
+        <button aria-label="Review options" type="button">
+          <CurrentBuildIcon name="review-options" />
+        </button>
+        <button aria-label="Collapse all diffs" type="button">
+          <CurrentBuildIcon name="review-collapse-all" />
+        </button>
+        <button aria-label="Switch to split diff" type="button">
+          <CurrentBuildIcon name="review-split-diff" />
+        </button>
+        <button aria-label="Show file tree" type="button">
+          <CurrentBuildIcon name="review-files-toggle" />
+        </button>
+      </div>
+      <ol aria-label="Pull request code review" className="demo-current-pr-code__files">
+        {currentPullRequestCodeFiles.map((file) => (
+          <li key={file.path}>
+            <button
+              aria-expanded={Boolean(file.preview)}
+              aria-label={file.path}
+              type="button"
+            >
+              <span className="demo-current-pr-code__path">{file.path}</span>
+              <span className="demo-current-pr-code__stats">
+                <span className="demo-pr-additions">+{file.additions}</span>
+                <span className="demo-pr-deletions">-{file.deletions}</span>
+              </span>
+              <span aria-hidden="true" className="demo-current-pr-code__open-slot" />
+              <span aria-hidden="true" className="demo-current-pr-code__chevron">
+                <CurrentBuildIcon name="review-file-toggle" />
+              </span>
+            </button>
+            {file.preview ? (
+              <div className="demo-current-pr-code__preview">
+                <img alt="" src={file.preview} />
+              </div>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+  const legacyPullRequestCode = (
     <div
       className="demo-pr-panel__code"
       data-review-open={pullRequestReviewOpen || undefined}
@@ -10488,6 +10583,9 @@ export function App() {
       />
     </div>
   );
+  const pullRequestCode = isCurrentPullRequestReviewReplay
+    ? currentPullRequestCode
+    : legacyPullRequestCode;
   const pullRequestPanel = (
     <WorkspacePanel
       actions={

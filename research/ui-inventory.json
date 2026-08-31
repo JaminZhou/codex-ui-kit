@@ -1543,16 +1543,27 @@
       "id": "workspace.pull-request-review",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["pull-request-code-review", "pull-request-reviewer-status-list", "pull-request-fix-button", "pull-request-detail-query", "pull-request-media"],
+      "packageEvidence": [
+        "pull-request-code-review",
+        "pull-request-reviewer-status-list",
+        "pull-request-fix-button",
+        "pull-request-detail-query",
+        "pull-request-media",
+        "pull-request-current-26-825-summary-activity",
+        "browser-cdp:current-26-825-pull-request-summary-expanded-code",
+        "electron:current-26-825-pull-request-detail-interactions",
+        "pixel:current-26-825-pull-request-summary-expanded-code"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:public-pr-69-summary-timeline-code-resize-expand-restore",
         "cdp-26.721.81911:public-pr-80-checks-reviewers-comments-code-loading-boundary",
-        "cdp-26.727.40816:public-pr-80-integrated-timeline-successful-code-display-menu"
+        "cdp-26.727.40816:public-pr-80-integrated-timeline-successful-code-display-menu",
+        "cdp-26.825.51511:pull-request-summary-activity-code-nine-files-two-image-previews-expanded"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

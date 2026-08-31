@@ -245,7 +245,7 @@ dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
 `Compacting context`, but the remote compact task failed and exposed Resume,
 so successful compaction/recovery remains previous-build evidence.
 
-Current inventory: 91 surface groups; 53 have current-build runtime evidence, 27 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 48 groups and Electron verification covers 48.
+Current inventory: 91 surface groups; 54 have current-build runtime evidence, 26 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 49 groups and Electron verification covers 49.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1195,6 +1195,19 @@ current list/detail split rather than using the legacy overlay, and the detail
 placeholder remains independently owned. Current Browser/CDP, Electron, two
 reviewed baselines, and two local-only product-region comparisons promote the
 route and its lifecycle feedback from previous-build-only verification.
+
+The same `26.825.51511` follow-up refreshes the selected PR review workspace
+against PR #228 without submitting a review, comment, or merge. Summary keeps
+only the Summary/Code tabs, presents five facts, two running checks, and two
+Activity entries before the comment composer. The normal 419.59375px detail
+track can expand to the 858.125px route width and restore without losing the
+selected tab. Code exposes four toolbar controls, nine file headers, and the
+two observed image previews using the exact current file-toggle asset and CDP
+computed geometry. Browser/CDP, native Electron interaction, three reviewed
+baselines, and local-only 858×820 product comparisons pass at 3.7043% for
+Summary, 3.3240% for Code, and 4.8822% for expanded Summary. This promotes the
+sampled review path to current-build Browser/Electron verification while
+keeping write operations and unsampled mutation/error variants partial.
 
 The `26.727.40816` product evidence covers the two-tab Summary/Code structure,
 Timeline integrated below the Summary comment composer, successful multi-file

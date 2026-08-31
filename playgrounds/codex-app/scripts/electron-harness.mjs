@@ -2875,6 +2875,15 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
+    frame: "pr-detail-current-26-825-code",
+    id: "pr-detail-current-26-825-code",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "pull-request",
+  },
+  {
+    currentSidebar: true,
     frame: "pr-detail-current-26-825-summary-expanded",
     id: "pr-detail-current-26-825-summary-expanded",
     maxPixelRatio: 0.01,

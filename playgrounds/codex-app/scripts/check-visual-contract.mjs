@@ -64,6 +64,18 @@ const currentPullRequestRouteReferenceSize = {
   height: 820,
   width: 1180,
 };
+const currentPullRequestReviewReferences = {
+  "pr-detail-current-26-825-code":
+    process.env.CODEX_UI_KIT_CURRENT_PR_26_825_CODE_REFERENCE,
+  "pr-detail-current-26-825-summary":
+    process.env.CODEX_UI_KIT_CURRENT_PR_26_825_SUMMARY_REFERENCE,
+  "pr-detail-current-26-825-summary-expanded":
+    process.env.CODEX_UI_KIT_CURRENT_PR_26_825_SUMMARY_EXPANDED_REFERENCE,
+};
+const currentPullRequestReviewReferenceSize = {
+  height: 820,
+  width: 858,
+};
 const currentBuildTerminalReference =
   process.env.CODEX_UI_KIT_TERMINAL_REFERENCE;
 const currentBuildTerminalReferenceSize = {
@@ -7114,6 +7126,54 @@ for (const scene of selectedScenes) {
         full: comparison.ratio,
         index: indexComparison.ratio,
       })}`,
+    );
+  }
+
+  const currentPullRequestReviewReference =
+    currentPullRequestReviewReferences[scene.id];
+  if (currentPullRequestReviewReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentPullRequestReviewReference),
+    );
+    if (
+      reference.width !== currentPullRequestReviewReferenceSize.width ||
+      reference.height !== currentPullRequestReviewReferenceSize.height ||
+      actual.width !== 1180 ||
+      actual.height !== reference.height
+    ) {
+      throw new Error(
+        `${scene.id}: current pull request review reference must be ${currentPullRequestReviewReferenceSize.width}x${currentPullRequestReviewReferenceSize.height} and capture must be 1180x820, received reference ${reference.width}x${reference.height} and capture ${actual.width}x${actual.height}.`,
+      );
+    }
+    const actualWorkspace = cropPng(
+      actual,
+      322,
+      0,
+      currentPullRequestReviewReferenceSize.width,
+      currentPullRequestReviewReferenceSize.height,
+    );
+    const comparison = comparePng(reference, actualWorkspace);
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-build.png`),
+      PNG.sync.write(actualWorkspace),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PR_26_825_REVIEW_MAX_DIFF_RATIO",
+      0.05,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current pull request review pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current pull request review pixel ratio ${comparison.ratio}`,
     );
   }
 

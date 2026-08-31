@@ -6757,6 +6757,121 @@ for (const currentPullRequestState of ["loading", "empty"]) {
   }
 }
 
+const currentPullRequestReviewScene = {
+  currentSidebar: true,
+  frame: "pr-detail-current-26-825-summary",
+  id: "electron-pr-detail-current-26-825-summary-code",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "pull-request",
+};
+const {
+  app: currentPullRequestReviewApp,
+  page: currentPullRequestReviewPage,
+} = await launchScene(currentPullRequestReviewScene, {
+  capture: false,
+  layoutMode: "wide",
+});
+
+try {
+  await currentPullRequestReviewPage.waitForSelector(
+    '.demo-current-pr-panel [aria-label="Pull request view"]',
+  );
+  const reviewContract = async () =>
+    currentPullRequestReviewPage.evaluate(() => {
+      const rect = (selector) =>
+        document.querySelector(selector)?.getBoundingClientRect().toJSON() ??
+        null;
+      return {
+        activityItems: document.querySelectorAll(
+          ".demo-current-pr-activity article",
+        ).length,
+        codeFiles: document.querySelectorAll(
+          ".demo-current-pr-code__files > li",
+        ).length,
+        codePreviews: document.querySelectorAll(
+          ".demo-current-pr-code__preview",
+        ).length,
+        codeToolbar: document.querySelectorAll(
+          ".demo-current-pr-code__toolbar button",
+        ).length,
+        factLabels: [
+          ...document.querySelectorAll(
+            ".demo-current-pr-summary .codex-ui-pull-request-panel-summary__label",
+          ),
+        ].filter((element) => element.getBoundingClientRect().width > 1)
+          .length,
+        heading:
+          document
+            .querySelector(".demo-current-pr-summary h1")
+            ?.textContent?.trim() ?? null,
+        main: rect(".codex-ui-app-shell__main"),
+        panel: rect(".codex-ui-app-shell__side-panel"),
+        selectedTab:
+          document
+            .querySelector(
+              '[aria-label="Pull request view"] [aria-selected="true"]',
+            )
+            ?.textContent?.trim() ?? null,
+      };
+    });
+  const summary = await reviewContract();
+  if (
+    !summary.main ||
+    !summary.panel ||
+    summary.selectedTab !== "Summary" ||
+    summary.heading !== "feat: refresh current pull request review" ||
+    summary.activityItems !== 2 ||
+    summary.factLabels !== 0 ||
+    Math.abs(summary.main.width - 438.53125) > 1 ||
+    Math.abs(summary.panel.width - 419.59375) > 1
+  ) {
+    throw new Error(
+      `Electron current pull request Summary contract failed: ${JSON.stringify(summary)}`,
+    );
+  }
+
+  await currentPullRequestReviewPage
+    .getByRole("button", { name: "Expand panel" })
+    .click();
+  const expanded = await reviewContract();
+  if (
+    !expanded.main ||
+    !expanded.panel ||
+    expanded.factLabels !== 5 ||
+    Math.abs(expanded.main.width) > 1 ||
+    Math.abs(expanded.panel.width - 858.125) > 1
+  ) {
+    throw new Error(
+      `Electron current pull request expanded contract failed: ${JSON.stringify(expanded)}`,
+    );
+  }
+
+  await currentPullRequestReviewPage
+    .getByRole("button", { name: "Restore panel width" })
+    .click();
+  await currentPullRequestReviewPage
+    .getByRole("tab", { name: "Code" })
+    .click();
+  const code = await reviewContract();
+  if (
+    !code.main ||
+    !code.panel ||
+    code.selectedTab !== "Code" ||
+    code.codeToolbar !== 4 ||
+    code.codeFiles !== 9 ||
+    code.codePreviews !== 2 ||
+    Math.abs(code.main.width - 438.53125) > 1 ||
+    Math.abs(code.panel.width - 419.59375) > 1
+  ) {
+    throw new Error(
+      `Electron current pull request Code contract failed: ${JSON.stringify(code)}`,
+    );
+  }
+} finally {
+  await currentPullRequestReviewApp.close();
+}
+
 const compactScene = {
   frame: "review-open",
   id: "electron-multi-file-compact",

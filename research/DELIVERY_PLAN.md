@@ -14,8 +14,16 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 53 groups have current-build runtime evidence, 27 have previous-build-only
+- 54 groups have current-build runtime evidence, 26 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current Pull request review follow-up promotes
+  `workspace.pull-request-review`. Its read-only PR #228 replay locks five
+  Summary facts, two running checks, two Activity entries before the comment
+  composer, normal/858.125px expanded detail continuity, four Code controls,
+  nine file headers, and two image previews. CDP, Electron, three reviewed
+  baselines, and local-only product comparisons at 3.7043%/3.3240%/4.8822%
+  gate Summary, Code, and expanded Summary without exercising comment, review,
+  or merge mutations.
 - The current Pull requests route follow-up promotes
   `app.route-lifecycle-feedback` and `workspace.pull-request-route`. It locks
   the current persistent 321.875/437.53125/419.59375px sidebar/list/detail
@@ -1165,7 +1173,11 @@ without confusing package readiness with full product reconstruction.
    deterministic Browser/Electron/pixel gates: index/detail loading and
    failure, checks, reviewers, comments, review submission, merge-readiness,
    merge completion, responsive non-modal panel composition, and route
-   restoration. Current-product evidence remains deliberately read-only.
+   restoration. The current 26.825.51511 read-only refresh additionally gates
+   the persistent selected-row Summary, Activity-before-comment ordering,
+   normal/expanded detail continuity, and the nine-file Code view with two
+   image previews through CDP, Electron, and three product-region pixel gates.
+   Comment, review, and merge mutations remain deliberately unexercised.
 10. **Remaining P0 turn/tool gaps**: current long command output, bounded
     scrolling, expansion, latest-line restoration, mixed stdout/stderr,
     exit-code failure, interruption/settlement, manual context compaction,
