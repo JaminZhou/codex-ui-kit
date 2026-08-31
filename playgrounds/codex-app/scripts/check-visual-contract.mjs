@@ -82,6 +82,15 @@ const currentBuildTerminalReferenceSize = {
   height: 820,
   width: 906,
 };
+const currentTerminal26825References = {
+  "terminal-current-26-825-compact":
+    process.env.CODEX_UI_KIT_CURRENT_TERMINAL_26_825_COMPACT_REFERENCE,
+  "terminal-current-26-825-compact-sidebar":
+    process.env
+      .CODEX_UI_KIT_CURRENT_TERMINAL_26_825_COMPACT_SIDEBAR_REFERENCE,
+  "terminal-current-26-825-multi":
+    process.env.CODEX_UI_KIT_CURRENT_TERMINAL_26_825_WIDE_REFERENCE,
+};
 const currentBuildMarkdownReference =
   process.env.CODEX_UI_KIT_MARKDOWN_REFERENCE;
 const currentBuildMarkdownReferenceSize = {
@@ -7608,6 +7617,107 @@ for (const scene of selectedScenes) {
       `${scene.id}: current-build Terminal pixel ratios ${JSON.stringify({
         content: contentComparison.ratio,
         full: comparison.ratio,
+        panel: panelComparison.ratio,
+      })}`,
+    );
+  }
+
+  const currentTerminal26825Reference =
+    currentTerminal26825References[scene.id];
+  if (currentTerminal26825Reference) {
+    const reference = PNG.sync.read(
+      await readFile(currentTerminal26825Reference),
+    );
+    const expectedReferenceWidth = scene.windowSize?.width ?? 1180;
+    if (
+      reference.width !== expectedReferenceWidth ||
+      reference.height !== 820 ||
+      actual.width !== expectedReferenceWidth ||
+      actual.height !== 820
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Terminal references must match the ${expectedReferenceWidth}x820 scene.`,
+      );
+    }
+    const panelLeft =
+      scene.id === "terminal-current-26-825-multi"
+        ? 323
+        : scene.id === "terminal-current-26-825-compact-sidebar"
+          ? 320
+          : 0;
+    const panelWidth = reference.width - panelLeft;
+    const terminalTop = 540;
+    const terminalHeight = 280;
+    const terminalContentTop = 581;
+    const terminalContentHeight = 239;
+    const referencePanel = cropPng(
+      reference,
+      panelLeft,
+      terminalTop,
+      panelWidth,
+      terminalHeight,
+    );
+    const actualPanel = cropPng(
+      actual,
+      panelLeft,
+      terminalTop,
+      panelWidth,
+      terminalHeight,
+    );
+    const referenceContent = cropPng(
+      reference,
+      panelLeft,
+      terminalContentTop,
+      panelWidth,
+      terminalContentHeight,
+    );
+    const actualContent = cropPng(
+      actual,
+      panelLeft,
+      terminalContentTop,
+      panelWidth,
+      terminalContentHeight,
+    );
+    const panelComparison = comparePng(referencePanel, actualPanel);
+    const contentComparison = comparePng(referenceContent, actualContent);
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-26-825-panel.png`),
+      PNG.sync.write(actualPanel),
+    );
+    if (panelComparison.pixels > 0) {
+      await writeFile(
+        join(
+          artifactDirectory,
+          `${scene.id}.current-26-825-panel.diff.png`,
+        ),
+        PNG.sync.write(panelComparison.diff),
+      );
+    }
+    const maximumPanelRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_TERMINAL_26_825_PANEL_MAX_DIFF_RATIO",
+      0.025,
+    );
+    const maximumContentRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_TERMINAL_26_825_CONTENT_MAX_DIFF_RATIO",
+      0.015,
+    );
+    if (
+      panelComparison.ratio > maximumPanelRatio ||
+      contentComparison.ratio > maximumContentRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 Terminal pixel ratios ${JSON.stringify({
+          content: contentComparison.ratio,
+          panel: panelComparison.ratio,
+        })} exceed ${JSON.stringify({
+          content: maximumContentRatio,
+          panel: maximumPanelRatio,
+        })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 Terminal pixel ratios ${JSON.stringify({
+        content: contentComparison.ratio,
         panel: panelComparison.ratio,
       })}`,
     );

@@ -8543,7 +8543,10 @@ for (const scene of selectedScenes) {
         !thread ||
         !composer ||
         !header ||
-        (!sidebarResizer && root.getAttribute("data-sidebar-state") !== "hidden")
+        (!sidebarResizer &&
+          !["hidden", "compact-collapsed", "compact-pinned"].includes(
+            root.getAttribute("data-sidebar-state") ?? "",
+          ))
       ) {
         throw new Error("Required integration surfaces are missing.");
       }
@@ -9676,6 +9679,7 @@ for (const scene of selectedScenes) {
                   ".codex-ui-workspace-panel__empty",
                 )?.textContent?.trim(),
                 inputLabel: terminalInput?.getAttribute("aria-label"),
+                inputRect: terminalInput ? rect(terminalInput) : null,
                 mismatchActions: Array.from(
                   panel.querySelectorAll(
                     ".codex-ui-terminal-workspace-mismatch button",
@@ -9697,6 +9701,13 @@ for (const scene of selectedScenes) {
                 panel: rect(panel),
                 panelContent: panelContent ? rect(panelContent) : null,
                 panelHeader: rect(panelHeader),
+                panelStyles: (() => {
+                  const styles = getComputedStyle(panel);
+                  return {
+                    backgroundColor: styles.backgroundColor,
+                    fontFamily: styles.fontFamily,
+                  };
+                })(),
                 selectedTab: selectedTab?.textContent?.trim(),
                 sessionCount: panel.querySelectorAll(
                   ".codex-ui-terminal-session",
@@ -9712,6 +9723,28 @@ for (const scene of selectedScenes) {
                     ".codex-ui-terminal-panel__tab-label",
                   ),
                   (label) => label.getAttribute("data-status"),
+                ),
+                tabGeometry: Array.from(
+                  panel.querySelectorAll(
+                    ".codex-ui-workspace-panel__tab-item",
+                  ),
+                  (item) => ({
+                    close: (() => {
+                      const close = item.querySelector(
+                        ".codex-ui-workspace-panel__tab-close",
+                      );
+                      return close ? rect(close) : null;
+                    })(),
+                    item: rect(item),
+                    label: item
+                      .querySelector(".codex-ui-terminal-panel__tab-label")
+                      ?.textContent?.trim(),
+                    selected: item.hasAttribute("data-selected"),
+                    tab: (() => {
+                      const tab = item.querySelector('[role="tab"]');
+                      return tab ? rect(tab) : null;
+                    })(),
+                  }),
                 ),
                 transcriptLive: transcript?.getAttribute("aria-live"),
               }
@@ -9730,9 +9763,20 @@ for (const scene of selectedScenes) {
                       item.getAttribute("aria-disabled") === "true" ||
                       item.hasAttribute("disabled"),
                     text: item.textContent?.trim(),
+                    rect: rect(item),
                   }),
                 ),
                 rect: rect(menu),
+                styles: (() => {
+                  const styles = getComputedStyle(menu);
+                  return {
+                    backgroundColor: styles.backgroundColor,
+                    borderRadius: styles.borderRadius,
+                    fontFamily: styles.fontFamily,
+                    fontSize: styles.fontSize,
+                    lineHeight: styles.lineHeight,
+                  };
+                })(),
               }
             : null;
         })(),
@@ -12129,9 +12173,13 @@ for (const scene of selectedScenes) {
           scene.id.startsWith("current-sidebar-worktree-lifecycle") ||
           scene.id.startsWith("current-worktree-setup-")
           ? 398
-          : 400
-        : scene.scenario === "current-browser-26-825"
+          : scene.id === "terminal-current-26-825-compact-sidebar"
+            ? 398.5
+            : 400
+      : scene.scenario === "current-browser-26-825"
           ? 430
+        : scene.id === "terminal-current-26-825-compact-sidebar"
+          ? 399
         : scene.id === "current-review-files" ||
             scene.id === "current-review-rename" ||
             scene.scenario === "current-review-26-825-files"
@@ -12151,7 +12199,9 @@ for (const scene of selectedScenes) {
       throw new Error(`${scene.id}: conversation viewport is not scrollable.`);
     }
     const expectedViewportHeight = scene.windowSize?.height ?? 820;
-    const hiddenSidebarScene = scene.sidebarState === "hidden";
+    const hiddenSidebarScene =
+      scene.sidebarState === "hidden" ||
+      scene.sidebarState === "compact-collapsed";
     const currentBuildSidebarScene =
       scene.currentSidebar === true ||
       scene.id === "current-sidebar" ||
@@ -12176,12 +12226,17 @@ for (const scene of selectedScenes) {
       scene.scenario === "markdown-streaming-large" ||
       scene.scenario === "current-basic-message-26-825" ||
       scene.scenario === "current-citations-26-825" ||
+      scene.id.startsWith("terminal-current-26-825-") ||
       currentSidebarThreadLifecycleScene ||
       currentSidebarWorktreeLifecycleScene
         ? scene.scenario === "markdown-streaming-large" ||
           scene.scenario === "current-basic-message-26-825" ||
           scene.scenario === "current-citations-26-825"
           ? 321.875
+          : scene.id === "terminal-current-26-825-compact-sidebar"
+            ? 320.265625
+            : scene.id.startsWith("terminal-current-26-825-")
+              ? 321.875
           : currentSidebarThreadLifecycleScene
             ? 321.875
             : currentSidebarWorktreeLifecycleScene
@@ -12702,12 +12757,16 @@ for (const scene of selectedScenes) {
           : scene.surfaces?.includes("reviewPanel")
             ? "508"
             : "520";
+    const compactPinnedSidebarScene =
+      scene.sidebarState === "compact-pinned";
     if (
       hiddenSidebarScene
         ? contract.sidebarResizer !== null ||
           Math.abs(
             contract.shell.width - (scene.windowSize?.width ?? 1180),
           ) > 1
+        : compactPinnedSidebarScene
+          ? contract.sidebarResizer !== null
         : contract.styles.resizerCursor !== "col-resize" ||
           Math.abs(contract.sidebarResizer.rect.width - 16) > 0.5 ||
           contract.sidebarResizer.ariaMin !== "240" ||
@@ -13489,9 +13548,26 @@ for (const scene of selectedScenes) {
       const resizer = contract.bottomPanelResizer;
       const compactTerminal =
         scene.id === "terminal-compact" ||
-        scene.id === "terminal-current-compact";
-      const expectedTerminalWidth = compactTerminal ? 546 : 906;
-      const expectedTerminalMaximum = compactTerminal ? "332" : "402";
+        scene.id === "terminal-current-compact" ||
+        scene.id === "terminal-current-26-825-compact" ||
+        scene.id === "terminal-current-26-825-compact-sidebar";
+      const currentTerminal26825 = scene.id.startsWith(
+        "terminal-current-26-825-",
+      );
+      const expectedTerminalWidth = currentTerminal26825
+        ? scene.id === "terminal-current-26-825-compact"
+          ? 719
+          : scene.id === "terminal-current-26-825-compact-sidebar"
+            ? 399.734375
+            : 857.125
+        : compactTerminal
+          ? 546
+          : 906;
+      const expectedTerminalMaximum = currentTerminal26825
+        ? "402"
+        : compactTerminal
+          ? "332"
+          : "402";
       const expectedTerminalTabs = {
         "background-terminal": 1,
         "terminal-closed": 0,
@@ -13508,6 +13584,14 @@ for (const scene of selectedScenes) {
         "terminal-current-running": 1,
         "terminal-current-single": 1,
         "terminal-current-reload": 1,
+        "terminal-current-26-825-compact": 3,
+        "terminal-current-26-825-compact-sidebar": 3,
+        "terminal-current-26-825-completed": 1,
+        "terminal-current-26-825-mismatch": 1,
+        "terminal-current-26-825-multi": 3,
+        "terminal-current-26-825-picker": 1,
+        "terminal-current-26-825-running": 1,
+        "terminal-current-26-825-single": 1,
       }[scene.id];
       const expectedTerminalStatuses = {
         "background-terminal": ["running"],
@@ -13525,8 +13609,18 @@ for (const scene of selectedScenes) {
         "terminal-current-running": ["idle"],
         "terminal-current-single": ["idle"],
         "terminal-current-reload": ["failed"],
+        "terminal-current-26-825-compact": ["idle", "idle", "idle"],
+        "terminal-current-26-825-compact-sidebar": ["idle", "idle", "idle"],
+        "terminal-current-26-825-completed": ["idle"],
+        "terminal-current-26-825-mismatch": ["idle"],
+        "terminal-current-26-825-multi": ["idle", "idle", "idle"],
+        "terminal-current-26-825-picker": ["idle"],
+        "terminal-current-26-825-running": ["idle"],
+        "terminal-current-26-825-single": ["idle"],
       }[scene.id];
-      const currentRunning = scene.id === "terminal-current-running";
+      const currentRunning =
+        scene.id === "terminal-current-running" ||
+        scene.id === "terminal-current-26-825-running";
       const currentReload = scene.id === "terminal-current-reload";
       if (
         !terminal ||
@@ -13535,10 +13629,14 @@ for (const scene of selectedScenes) {
         Math.abs(resizer.rect.height - 16) > 0.5 ||
         resizer.ariaMin !== "152" ||
         resizer.ariaMax !== expectedTerminalMaximum ||
-        resizer.ariaNow !== "272" ||
+        resizer.ariaNow !== (currentTerminal26825 ? "280" : "272") ||
         Math.abs(terminal.panel.width - expectedTerminalWidth) > 1 ||
-        Math.abs(terminal.panel.height - 272) > 1 ||
-        Math.abs(terminal.panelHeader.height - 33) > 1 ||
+        Math.abs(
+          terminal.panel.height - (currentTerminal26825 ? 279 : 272),
+        ) > 1 ||
+        Math.abs(
+          terminal.panelHeader.height - (currentTerminal26825 ? 40 : 33),
+        ) > 1 ||
         Math.abs(resizer.rect.bottom - terminal.panel.top) > 1 ||
         terminal.sessionCount !== 1 ||
         terminal.tabCount !== expectedTerminalTabs ||
@@ -13546,7 +13644,10 @@ for (const scene of selectedScenes) {
         JSON.stringify(terminal.tabStatuses) !==
           JSON.stringify(expectedTerminalStatuses) ||
         (!terminal.panelContent ||
-            Math.abs(terminal.panelContent.height - 239) > 1 ||
+            Math.abs(
+              terminal.panelContent.height -
+                (currentTerminal26825 ? 239 : 239),
+            ) > 1 ||
             !terminal.selectedTab?.includes("codex-ui-kit") ||
             (!currentReload && terminal.inputLabel !== "Terminal input") ||
             (!currentReload && terminal.transcriptLive !== "polite") ||
@@ -13579,7 +13680,8 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "terminal-picker" &&
+        (scene.id === "terminal-picker" ||
+          scene.id === "terminal-current-26-825-picker") &&
         (!contract.terminalPicker ||
           contract.terminalPicker.items.length !== 4 ||
           !contract.terminalPicker.items[0]?.text?.includes("Review") ||
@@ -13593,7 +13695,8 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "terminal-current-mismatch" &&
+        (scene.id === "terminal-current-mismatch" ||
+          scene.id === "terminal-current-26-825-mismatch") &&
         (!terminal.mismatchText?.includes(
           "does not match this chat's current worktree",
         ) ||
@@ -13604,10 +13707,164 @@ for (const scene of selectedScenes) {
           `${scene.id}: Terminal workspace mismatch contract failed: ${JSON.stringify(terminal)}`,
         );
       }
+      if (currentTerminal26825) {
+        const expectedPanelLeft =
+          scene.id === "terminal-current-26-825-compact"
+            ? 1
+            : scene.id === "terminal-current-26-825-compact-sidebar"
+              ? 320.265625
+              : 322.875;
+        const tabLabels = terminal.tabGeometry.map(({ label }) => label);
+        if (
+          Math.abs(terminal.panel.left - expectedPanelLeft) > 0.1 ||
+          Math.abs(terminal.panel.top - 541) > 0.1 ||
+          terminal.panelStyles.backgroundColor !== "rgb(24, 24, 24)" ||
+          !terminal.inputRect ||
+          Math.abs(terminal.inputRect.height - 16) > 0.1 ||
+          Math.abs(terminal.inputRect.width - 7.21875) > 0.1 ||
+          terminal.tabGeometry.some(
+            ({ close, item }, index) =>
+              Math.abs(item.height - 28) > 0.1 ||
+              Math.abs(item.width - 156) > 0.1 ||
+              Math.abs(item.top - 547) > 0.1 ||
+              (index > 0 &&
+                Math.abs(
+                  item.left -
+                    (terminal.tabGeometry[index - 1].item.left + 163),
+                ) > 0.1) ||
+              !close ||
+              Math.abs(close.height - 20) > 0.1 ||
+              Math.abs(close.width - 20) > 0.1 ||
+              Math.abs(close.top - 551) > 0.1,
+          ) ||
+          JSON.stringify(tabLabels) !==
+            JSON.stringify(
+              expectedTerminalTabs === 1
+                ? ["codex-ui-kit"]
+                : ["codex-ui-kit 1", "codex-ui-kit 2", "codex-ui-kit 3"],
+            )
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 Terminal computed geometry drifted: ${JSON.stringify(terminal)}`,
+          );
+        }
+      }
+      if (scene.id === "terminal-current-26-825-picker") {
+        const picker = contract.terminalPicker;
+        if (
+          !picker ||
+          Math.abs(picker.rect.left - 492) > 0.1 ||
+          Math.abs(picker.rect.top - 577) > 0.1 ||
+          Math.abs(picker.rect.width - 280) > 0.1 ||
+          Math.abs(picker.rect.height - 122.25) > 0.15 ||
+          picker.styles.borderRadius !== "20px" ||
+          picker.items.some(
+            ({ rect }) =>
+              Math.abs(rect.width - 272) > 0.1 ||
+              Math.abs(rect.height - 28.5625) > 0.15,
+          )
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 Terminal picker geometry drifted: ${JSON.stringify(picker)}`,
+          );
+        }
+        await page.getByRole("menuitem", { name: "Terminal", exact: true }).click();
+        if (
+          (await page.getByRole("tab").count()) !== 2 ||
+          !(await page
+            .getByRole("tab", { name: "codex-ui-kit 2", selected: true })
+            .isVisible()) ||
+          (await page.getByRole("menu").count()) !== 0
+        ) {
+          throw new Error(
+            `${scene.id}: picker did not create and select the second Terminal session.`,
+          );
+        }
+      }
+      if (scene.id === "terminal-current-26-825-multi") {
+        await page
+          .getByRole("button", { name: "Close codex-ui-kit 3 tab" })
+          .click();
+        if (
+          (await page.getByRole("tab").count()) !== 2 ||
+          !(await page
+            .getByRole("tab", { name: "codex-ui-kit 2", selected: true })
+            .isVisible())
+        ) {
+          throw new Error(`${scene.id}: closing tab 3 did not select tab 2.`);
+        }
+        await page
+          .getByRole("button", { name: "Close codex-ui-kit 2 tab" })
+          .click();
+        if (
+          !(await page
+            .getByRole("tab", { name: "codex-ui-kit", selected: true })
+            .isVisible())
+        ) {
+          throw new Error(`${scene.id}: remaining tab was not reindexed.`);
+        }
+        await page
+          .getByRole("button", { name: "Close codex-ui-kit tab" })
+          .click();
+        await page.waitForSelector(
+          ".codex-ui-app-shell:not([data-bottom-panel-open])",
+        );
+        await page.getByRole("button", { name: "Toggle bottom panel" }).click();
+        if (
+          !(await page
+            .getByRole("tab", { name: "codex-ui-kit", selected: true })
+            .isVisible()) ||
+          (await page
+            .getByRole("log", { name: "Terminal output" })
+            .textContent()) !== ""
+        ) {
+          throw new Error(`${scene.id}: fresh reopen retained stale state.`);
+        }
+      }
+      if (scene.id === "terminal-current-26-825-mismatch") {
+        const panel = page.getByTestId("terminal-panel");
+        await panel
+          .getByRole("button", { name: "Open new terminal" })
+          .click();
+        if (
+          (await page.getByRole("tab").count()) !== 2 ||
+          !(await page
+            .getByRole("tab", { name: "/ 2", selected: true })
+            .isVisible()) ||
+          (await panel.getByRole("status").count()) !== 0
+        ) {
+          throw new Error(`${scene.id}: matching workspace Terminal was not opened.`);
+        }
+        await page.getByRole("tab", { name: "codex-ui-kit 1" }).click();
+        const notice = panel.getByRole("status");
+        if (!(await notice.isVisible())) {
+          throw new Error(`${scene.id}: old workspace mismatch was not session-scoped.`);
+        }
+        await notice.getByRole("button", { name: "Dismiss" }).click();
+        if (
+          (await panel.getByRole("status").count()) !== 0 ||
+          (await page.getByRole("tab").count()) !== 2
+        ) {
+          throw new Error(`${scene.id}: dismiss removed more than the mismatch notice.`);
+        }
+      }
     } else if (contract.bottomPanelResizer) {
       throw new Error(
         `${scene.id}: hidden Terminal panel retained its resize separator.`,
       );
+    }
+    if (scene.id === "terminal-current-26-825-closed") {
+      await page.getByRole("button", { name: "Toggle bottom panel" }).click();
+      if (
+        !(await page
+          .getByRole("tab", { name: "codex-ui-kit", selected: true })
+          .isVisible()) ||
+        !(await page
+          .getByRole("textbox", { name: "Terminal input" })
+          .isVisible())
+      ) {
+        throw new Error(`${scene.id}: top-level toggle did not create a fresh Terminal.`);
+      }
     }
     if (
       backgroundSidePanelScene &&

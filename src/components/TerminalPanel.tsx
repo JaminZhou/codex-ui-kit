@@ -280,6 +280,7 @@ export function TerminalReloadNotice({
 export interface TerminalPanelSession {
   closeLabel?: string;
   entries: readonly TerminalEntry[];
+  icon?: ReactNode;
   id: string;
   inputDisabled?: boolean;
   inputLabel?: string;
@@ -300,6 +301,7 @@ export interface TerminalPanelProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   activeSessionId: string;
   actions?: ReactNode;
+  closeIcon?: ReactNode;
   emptyState?: ReactNode;
   label?: string;
   onActiveSessionChange: (id: string) => void;
@@ -320,6 +322,7 @@ export function TerminalPanel({
   actions,
   activeSessionId,
   className,
+  closeIcon,
   emptyState,
   label = "Terminal",
   onActiveSessionChange,
@@ -364,6 +367,7 @@ export function TerminalPanel({
       className={["codex-ui-terminal-panel", className]
         .filter(Boolean)
         .join(" ")}
+      closeIcon={closeIcon}
       emptyState={resolvedEmptyState}
       label={label}
       onActiveTabChange={onActiveSessionChange}
@@ -411,7 +415,9 @@ export function TerminalPanel({
               className="codex-ui-terminal-panel__tab-label"
               data-status={status}
             >
-              {showStatus ? (
+              {session.icon ? (
+                session.icon
+              ) : showStatus ? (
                 <span aria-hidden="true">
                   {terminalSessionStatusIcon[status]}
                 </span>
