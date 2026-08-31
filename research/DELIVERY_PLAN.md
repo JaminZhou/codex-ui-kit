@@ -14,8 +14,13 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 44 groups have current-build runtime evidence, 36 have previous-build-only
+- 46 groups have current-build runtime evidence, 34 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current thirty-turn follow-up refreshes timeline virtualization and
+  message navigation across 1180×820 and 720×680. It locks 12/9 mounted turns,
+  the viewport-derived message-11 rail marker, compact rail suppression, and
+  the observed two-stage return-to-latest lifecycle through CDP, Electron, and
+  two local-only structural pixel gates.
 - The current Composer-control follow-up re-observes the exact three-row
   permission overlay plus active Goal and Plan across 1180×820 and 720×680.
   Browser/CDP, Electron, six reviewed baselines, and six local-only

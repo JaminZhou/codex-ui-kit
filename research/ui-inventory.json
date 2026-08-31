@@ -180,11 +180,12 @@
       "runtimeEvidence": [
         "cdp-26.721:ten-turn-reverse-scroll-windowed-thread",
         "cdp-26.727.40816:real-82-message-compact-navigation-seven-mounted-turns-reverse-scroll-and-return",
-        "cdp-26.820.60940:real-thirty-turn-wide-eleven-mounted-compact-nine-mounted-reverse-scroll-and-eight-mounted-return"
+        "cdp-26.820.60940:real-thirty-turn-wide-eleven-mounted-compact-nine-mounted-reverse-scroll-and-eight-mounted-return",
+        "cdp-26.825.51511:real-thirty-turn-wide-twelve-mounted-message-15-message-11-current-rail-two-stage-return-and-compact-nine-to-eight-mounted"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -630,11 +631,12 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:ten-user-message-36x10-navigation-rail",
-        "cdp-26.820.60940:four-item-minimum-thirty-button-36x10-wide-rail-48px-spatial-gate-and-compact-hide"
+        "cdp-26.820.60940:four-item-minimum-thirty-button-36x10-wide-rail-48px-spatial-gate-and-compact-hide",
+        "cdp-26.825.51511:thirty-button-36x10-wide-rail-message-11-current-marker-compact-hide-and-two-stage-return"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

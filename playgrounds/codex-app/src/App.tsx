@@ -618,30 +618,31 @@ const conversationHostFrames = new Set([
   "conversation-thinking-current-26-825",
   "thread-scroll-away",
   "thread-windowed",
-  "thread-current-26-820-middle",
-  "thread-current-26-820-compact-away",
+  "thread-current-26-825-middle",
+  "thread-current-26-825-compact-away",
 ]);
 
 const currentWindowedHistorySize = 82;
 const currentWindowedTurnWindowSize = 7;
 const currentWindowedInitialIndex = 39;
-const current26820LongHistorySize = 30;
-const current26820LongMiddleIndex = 14;
-const current26820LongCompactIndex = 23;
+const current26825LongHistorySize = 30;
+const current26825LongMiddleIndex = 14;
+const current26825LongCompactIndex = 23;
+const current26825LongReturnIndex = 27;
 
-function current26820LongThreadFrame(frame: string | null) {
+function current26825LongThreadFrame(frame: string | null) {
   return (
-    frame === "thread-current-26-820-middle" ||
-    frame === "thread-current-26-820-compact-away"
+    frame === "thread-current-26-825-middle" ||
+    frame === "thread-current-26-825-compact-away"
   );
 }
 
 function initialWindowedMessageIndex(frame: string | null) {
-  if (frame === "thread-current-26-820-middle") {
-    return current26820LongMiddleIndex;
+  if (frame === "thread-current-26-825-middle") {
+    return current26825LongMiddleIndex;
   }
-  if (frame === "thread-current-26-820-compact-away") {
-    return current26820LongCompactIndex;
+  if (frame === "thread-current-26-825-compact-away") {
+    return current26825LongCompactIndex;
   }
   return currentWindowedInitialIndex;
 }
@@ -2947,7 +2948,7 @@ export function App() {
   const [threadFollowing, setThreadFollowing] = useState(
     initialSelection.frame !== "thread-scroll-away" &&
       initialSelection.frame !== "thread-windowed" &&
-      !current26820LongThreadFrame(initialSelection.frame),
+      !current26825LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
   const [currentWorktreeSetupPhase, setCurrentWorktreeSetupPhase] =
@@ -4531,14 +4532,14 @@ export function App() {
 
   const legacyWindowedFrame =
     isConversationLifecycle && activeFrame === "thread-windowed";
-  const current26820LongFrame =
-    isConversationLifecycle && current26820LongThreadFrame(activeFrame);
+  const current26825LongFrame =
+    isConversationLifecycle && current26825LongThreadFrame(activeFrame);
   const current26820HeaderFrame =
-    current26820LongFrame ||
+    current26825LongFrame ||
     isCurrentApproval26820FileReplay ||
     isCurrentMcp26820Replay ||
     isCurrentCommand26820Replay;
-  const currentWindowedFrame = legacyWindowedFrame || current26820LongFrame;
+  const currentWindowedFrame = legacyWindowedFrame || current26825LongFrame;
   const reverseOriginThread =
     currentWindowedFrame ||
     isCurrentLongCommandReplay ||
@@ -4546,28 +4547,44 @@ export function App() {
     isCurrentCommandInterruptionReplay ||
     isCurrentCommand26820Replay ||
     isCurrentRichMarkdownStreamingReplay;
-  const windowedHistorySize = current26820LongFrame
-    ? current26820LongHistorySize
+  const windowedHistorySize = current26825LongFrame
+    ? current26825LongHistorySize
     : currentWindowedHistorySize;
-  const windowedTurnWindowSize = current26820LongFrame
+  const windowedTurnWindowSize = current26825LongFrame
     ? threadFollowing
       ? 8
-      : activeFrame === "thread-current-26-820-compact-away"
+      : activeFrame === "thread-current-26-825-compact-away"
         ? 9
-        : 11
+        : 12
     : currentWindowedTurnWindowSize;
 
   const returnToLatest = useCallback(() => {
     const viewport = threadViewportRef.current;
     if (!viewport) return;
     if (currentWindowedFrame) {
+      if (
+        current26825LongFrame &&
+        windowedSelectedMessageIndex < current26825LongReturnIndex
+      ) {
+        setWindowedSelectedMessageIndex(current26825LongReturnIndex);
+        setThreadFollowing(false);
+        viewport.scrollTo({ behavior: "smooth", top: -402 });
+        return;
+      }
       setWindowedSelectedMessageIndex(windowedHistorySize - 1);
+      if (current26825LongFrame) setThreadFollowing(true);
     }
     viewport.scrollTo({
       behavior: "smooth",
       top: reverseOriginThread ? 0 : viewport.scrollHeight,
     });
-  }, [currentWindowedFrame, reverseOriginThread, windowedHistorySize]);
+  }, [
+    current26825LongFrame,
+    currentWindowedFrame,
+    reverseOriginThread,
+    windowedHistorySize,
+    windowedSelectedMessageIndex,
+  ]);
 
   useLayoutEffect(() => {
     if (scenarioSelectionVersion === 0) return;
@@ -4578,10 +4595,10 @@ export function App() {
       resetFrame = window.requestAnimationFrame(() => {
         viewport.scrollTop = activeFrame === "thread-windowed"
           ? -28_484
-          : activeFrame === "thread-current-26-820-middle"
-            ? -2_346
-            : activeFrame === "thread-current-26-820-compact-away"
-              ? -900
+          : activeFrame === "thread-current-26-825-middle"
+            ? -2_394
+            : activeFrame === "thread-current-26-825-compact-away"
+              ? -968
               : viewport.scrollHeight;
         viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
       });
@@ -4619,10 +4636,15 @@ export function App() {
           windowedHistorySize - 1 - windowedSelectedMessageIndex;
         const distanceFromLatest = messagesAfter === 0
           ? 0
-          : current26820LongFrame
-            ? activeFrame === "thread-current-26-820-compact-away" &&
-                windowedSelectedMessageIndex === current26820LongCompactIndex
-              ? 900
+          : current26825LongFrame
+            ? activeFrame === "thread-current-26-825-middle" &&
+                windowedSelectedMessageIndex === current26825LongMiddleIndex
+              ? 2_394
+              : windowedSelectedMessageIndex === current26825LongReturnIndex
+              ? 402
+              : activeFrame === "thread-current-26-825-compact-away" &&
+                  windowedSelectedMessageIndex === current26825LongCompactIndex
+                ? 968
               : messagesAfter * 148 + 126
             : messagesAfter * 672 + 320;
         viewport.scrollTop = -Math.min(
@@ -4633,12 +4655,12 @@ export function App() {
           const selectedTurn = viewport.querySelector<HTMLElement>(
             `[data-windowed-turn="${windowedSelectedMessageIndex + 1}"]`,
           );
-          if (selectedTurn && messagesAfter > 0 && !current26820LongFrame) {
+          if (selectedTurn && messagesAfter > 0 && !current26825LongFrame) {
             const viewportBounds = viewport.getBoundingClientRect();
             const selectedBounds = selectedTurn.getBoundingClientRect();
             viewport.scrollTop +=
               selectedBounds.top -
-              (viewportBounds.top + (current26820LongFrame ? 196 : 180));
+              (viewportBounds.top + (current26825LongFrame ? 196 : 180));
           }
           viewport.dispatchEvent(new Event("scroll", { bubbles: true }));
         });
@@ -4650,7 +4672,7 @@ export function App() {
     };
   }, [
     activeFrame,
-    current26820LongFrame,
+    current26825LongFrame,
     currentWindowedFrame,
     windowedHistorySize,
     windowedSelectedMessageIndex,
@@ -5736,7 +5758,7 @@ export function App() {
       isCurrentMarkdown26825MediaReplay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
-      current26820LongFrame ||
+      current26825LongFrame ||
       scenarioId === "current-review-rename" ||
       isCurrentReviewFilesReplay ||
       isCurrentReview26825FilesReplay);
@@ -6192,7 +6214,7 @@ export function App() {
               </>
             )
           : current26820HeaderFrame
-          ? current26820LongFrame
+          ? current26825LongFrame
             ? "LONG THREAD 01"
             : isCurrentCommand26820Replay
               ? scenario.label
@@ -6678,7 +6700,7 @@ export function App() {
     <ComposerDock
       composer={composerSurface}
       context={
-        !current26820LongFrame &&
+        !current26825LongFrame &&
         !composerIsRunning &&
         !queueInterrupted ? (
           <ComposerContextBar>
@@ -10338,7 +10360,7 @@ export function App() {
   const messageNavigationItems = currentWindowedFrame
     ? Array.from({ length: windowedHistorySize }, (_, index) => ({
         id: `current-windowed-user-${index + 1}`,
-        label: current26820LongFrame
+        label: current26825LongFrame
           ? `LONG THREAD ${String(index + 1).padStart(2, "0")}`
           : `Synthetic user checkpoint ${index + 1}`,
       }))
@@ -10349,13 +10371,13 @@ export function App() {
           label: message.text,
         }));
   const currentWindowStart =
-    current26820LongFrame &&
-    activeFrame === "thread-current-26-820-middle" &&
-    windowedSelectedMessageIndex === current26820LongMiddleIndex
-      ? 6
-      : current26820LongFrame &&
-          activeFrame === "thread-current-26-820-compact-away" &&
-          windowedSelectedMessageIndex === current26820LongCompactIndex
+    current26825LongFrame &&
+    activeFrame === "thread-current-26-825-middle" &&
+    windowedSelectedMessageIndex === current26825LongMiddleIndex
+      ? 5
+      : current26825LongFrame &&
+          activeFrame === "thread-current-26-825-compact-away" &&
+          windowedSelectedMessageIndex === current26825LongCompactIndex
         ? 18
         : Math.min(
             windowedHistorySize - windowedTurnWindowSize,
@@ -10367,10 +10389,10 @@ export function App() {
           );
   const currentWindowEnd =
     currentWindowStart + windowedTurnWindowSize;
-  const windowedPlaceholderRem = current26820LongFrame
-    ? activeFrame === "thread-current-26-820-compact-away"
-      ? 11.003
-      : 10.59535
+  const windowedPlaceholderRem = current26825LongFrame
+    ? activeFrame === "thread-current-26-825-compact-away"
+      ? 10.5532
+      : 9.2637
     : 42;
   const timelineContent = state.timeline.map((entry, entryIndex) => {
     if (entry.kind === "streamError") {
@@ -12184,14 +12206,14 @@ export function App() {
                 data-item-id={`current-windowed-user-${messageIndex + 1}`}
                 role="user"
               >
-                {current26820LongFrame
+                {current26825LongFrame
                   ? `Do not use tools or modify files. Reply with exactly: LONG THREAD ${String(
                       messageIndex + 1,
                     ).padStart(2, "0")}.`
                   : `Synthetic user checkpoint ${messageIndex + 1}`}
               </AgentMessage>
               <AgentMessage role="assistant">
-                {current26820LongFrame
+                {current26825LongFrame
                   ? `LONG THREAD ${String(messageIndex + 1).padStart(2, "0")}.`
                   : "The host keeps only the nearby deterministic turn window mounted."}
               </AgentMessage>
@@ -12599,8 +12621,8 @@ export function App() {
         currentWindowedFrame
           ? [
               `current-windowed-user-${
-                current26820LongFrame
-                  ? windowedHistorySize
+                current26825LongFrame
+                  ? Math.max(1, windowedSelectedMessageIndex - 3)
                   : windowedSelectedMessageIndex + 1
               }`,
             ]
@@ -12609,7 +12631,7 @@ export function App() {
       density={currentWindowedFrame ? "compact" : "regular"}
       initialScroll={currentWindowedFrame ? "end" : "start"}
       items={messageNavigationItems}
-      minItems={current26820LongFrame ? 4 : 10}
+      minItems={current26825LongFrame ? 4 : 10}
       onNavigate={(item, behavior) => {
         if (currentWindowedFrame) {
           const nextIndex =
@@ -12721,8 +12743,8 @@ export function App() {
       }
       data-windowed-timeline={
         currentWindowedFrame
-          ? current26820LongFrame
-            ? "current-26-820"
+          ? current26825LongFrame
+            ? "current-26-825"
             : "current"
           : undefined
       }
@@ -13157,7 +13179,7 @@ export function App() {
                 defaultFollowing:
                   activeFrame !== "thread-scroll-away" &&
                   activeFrame !== "thread-windowed" &&
-                  !current26820LongFrame,
+                  !current26825LongFrame,
                 followKey: state.eventCount,
                 latestOrigin: reverseOriginThread ? "start" : "end",
                 onFollowingChange: setThreadFollowing,

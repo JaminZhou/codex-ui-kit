@@ -130,13 +130,17 @@ observation from a previous build remains historical evidence.
   and nine local-only product regions pass independent 7% header, 0.6% thread,
   and 1% Composer limits. The prior 26.818 0.4320% crop remains regression
   evidence.
-- The previous 26.820 thirty-turn task refreshes that shell and adds responsive
+- The current 26.825 thirty-turn task refreshes the responsive
   virtualization/navigation evidence. Wide mode exposes the 30-button
-  36×10px rail, 11 mounted turns, message-15 materialization, and the sampled
-  stale message-30 current marker. Compact mode hides the rail at zero content
-  offset, retains nine mounted turns at `scrollTop = -900`, and returns to
-  latest with eight. Browser/CDP and Electron repeat both flows; local-only
-  structural comparisons pass at 0.8085% and 0.8397% under 1% limits.
+  36×10px rail, 12 mounted turns, message-15 materialization at
+  `scrollTop = -2394`, and the viewport-derived message-11 current marker.
+  Compact mode hides the rail at zero content offset and retains nine mounted
+  turns at `scrollTop = -968`. Both widths now expose the observed two-stage
+  return: the first click lands at `-402` with message 28 selected, and the
+  second reaches latest with eight mounted turns and hides the floating
+  control. Browser/CDP and Electron repeat both flows; local-only structural
+  comparisons pass at 1.5731% and 1.3954% under 2% limits. The previous
+  26.820 stale message-30 marker remains historical drift evidence.
 - The previous 26.820 command tasks revalidate a 12-second success, exact
   exit-code-7 acknowledgement and same-thread recovery, plus a stopped
   120-second loop and second same-thread recovery. The current Renderer uses
@@ -216,7 +220,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 44 have current-build runtime evidence, 36 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 40 groups and Electron verification covers 40.
+Current inventory: 91 surface groups; 46 have current-build runtime evidence, 34 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 42 groups and Electron verification covers 42.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
