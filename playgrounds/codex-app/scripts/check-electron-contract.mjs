@@ -6252,6 +6252,153 @@ try {
   await currentTerminalApp.close();
 }
 
+const currentTerminal26825Scene = {
+  currentSidebar: true,
+  frame: "terminal-current-26-825-multi",
+  id: "electron-current-terminal-26-825-multi",
+  scenario: "terminal-lifecycle",
+  windowSize: { height: 820, width: 1180 },
+};
+const {
+  app: currentTerminal26825App,
+  page: currentTerminal26825Page,
+} = await launchScene(currentTerminal26825Scene, { capture: false });
+
+try {
+  const panel = currentTerminal26825Page.getByTestId("terminal-panel");
+  const geometry = await panel.evaluate((element) => {
+    const rect = (target) => {
+      const value = target.getBoundingClientRect();
+      return {
+        height: value.height,
+        left: value.left,
+        top: value.top,
+        width: value.width,
+      };
+    };
+    return {
+      content: rect(
+        element.querySelector(".codex-ui-workspace-panel__content"),
+      ),
+      header: rect(
+        element.querySelector(".codex-ui-workspace-panel__header"),
+      ),
+      panel: rect(element),
+      tabs: Array.from(
+        element.querySelectorAll(".codex-ui-workspace-panel__tab-item"),
+        rect,
+      ),
+    };
+  });
+  if (
+    geometry.panel.left !== 322.875 ||
+    geometry.panel.top !== 541 ||
+    geometry.panel.width !== 857.125 ||
+    geometry.panel.height !== 279 ||
+    geometry.header.height !== 40 ||
+    geometry.content.height !== 239 ||
+    geometry.tabs.length !== 3 ||
+    geometry.tabs.some(
+      ({ height, width }, index) =>
+        height !== 28 ||
+        width !== 156 ||
+        (index > 0 &&
+          geometry.tabs[index].left - geometry.tabs[index - 1].left !== 163),
+    )
+  ) {
+    throw new Error(
+      `Electron current 26.825 Terminal geometry drifted: ${JSON.stringify(geometry)}`,
+    );
+  }
+  await panel
+    .getByRole("button", { name: "Close codex-ui-kit 3 tab" })
+    .click();
+  if (
+    !(await panel
+      .getByRole("tab", { name: "codex-ui-kit 2", selected: true })
+      .isVisible())
+  ) {
+    throw new Error("Electron current 26.825 Terminal did not select tab 2.");
+  }
+  await panel
+    .getByRole("button", { name: "Close codex-ui-kit 2 tab" })
+    .click();
+  if (
+    !(await panel
+      .getByRole("tab", { name: "codex-ui-kit", selected: true })
+      .isVisible())
+  ) {
+    throw new Error("Electron current 26.825 Terminal did not reindex the final tab.");
+  }
+  await panel
+    .getByRole("button", { name: "Close codex-ui-kit tab" })
+    .click();
+  await currentTerminal26825Page.waitForSelector(
+    ".codex-ui-app-shell:not([data-bottom-panel-open])",
+  );
+  await currentTerminal26825Page
+    .getByRole("button", { name: "Toggle bottom panel" })
+    .click();
+  await panel
+    .getByRole("button", { name: "Open bottom panel tab" })
+    .click();
+  await currentTerminal26825Page
+    .getByRole("menuitem", { name: "Terminal", exact: true })
+    .click();
+  if (
+    !(await panel
+      .getByRole("tab", { name: "codex-ui-kit 2", selected: true })
+      .isVisible())
+  ) {
+    throw new Error("Electron current 26.825 picker did not create tab 2.");
+  }
+} finally {
+  await currentTerminal26825App.close();
+}
+
+const currentTerminal26825MismatchScene = {
+  currentSidebar: true,
+  frame: "terminal-current-26-825-mismatch",
+  id: "electron-current-terminal-26-825-mismatch",
+  scenario: "terminal-lifecycle",
+  windowSize: { height: 820, width: 1180 },
+};
+const {
+  app: currentTerminal26825MismatchApp,
+  page: currentTerminal26825MismatchPage,
+} = await launchScene(currentTerminal26825MismatchScene, { capture: false });
+
+try {
+  const panel = currentTerminal26825MismatchPage.getByTestId("terminal-panel");
+  const notice = panel.getByRole("status");
+  if (
+    !(await notice.textContent())?.includes(
+      "does not match this chat's current worktree",
+    )
+  ) {
+    throw new Error("Electron current 26.825 mismatch notice is missing.");
+  }
+  await notice.getByRole("button", { name: "Open new terminal" }).click();
+  if (
+    (await panel.getByRole("tab").count()) !== 2 ||
+    !(await panel.getByRole("tab", { name: "/ 2", selected: true }).isVisible()) ||
+    (await panel.getByRole("status").count()) !== 0
+  ) {
+    throw new Error("Electron current 26.825 mismatch recovery did not open / 2.");
+  }
+  await panel.getByRole("tab", { name: "codex-ui-kit 1" }).click();
+  const restoredNotice = panel.getByRole("status");
+  await restoredNotice.getByRole("button", { name: "Dismiss" }).click();
+  if (
+    (await panel.getByRole("status").count()) !== 0 ||
+    (await panel.getByRole("tab").count()) !== 2
+  ) {
+    throw new Error("Electron current 26.825 mismatch dismissal removed session state.");
+  }
+} finally {
+  await currentTerminal26825MismatchApp.close();
+}
+
 const directTerminalExitScene = {
   frame: "terminal-current-command-exit-7",
   id: "electron-current-terminal-command-exit-7",

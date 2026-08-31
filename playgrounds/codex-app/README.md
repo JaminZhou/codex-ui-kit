@@ -1266,6 +1266,18 @@ CODEX_UI_KIT_TERMINAL_REFERENCE=/absolute/path/to/terminal-main-reference.png \
   -- --scenes=terminal-current-single
 ```
 
+The current `26.825.51511` Terminal gate accepts only local, untracked raw
+product screenshots. It crops the owned bottom panel, excluding private
+sidebar content, and separately gates the 239px content region:
+
+```bash
+CODEX_UI_KIT_CURRENT_TERMINAL_26_825_WIDE_REFERENCE=/absolute/path/to/terminal-three-tabs-1180x820.png \
+CODEX_UI_KIT_CURRENT_TERMINAL_26_825_COMPACT_REFERENCE=/absolute/path/to/terminal-three-tabs-720x820-hidden-sidebar.png \
+CODEX_UI_KIT_CURRENT_TERMINAL_26_825_COMPACT_SIDEBAR_REFERENCE=/absolute/path/to/terminal-three-tabs-720x820-shown-sidebar.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+  -- --scenes=terminal-current-26-825-multi,terminal-current-26-825-compact,terminal-current-26-825-compact-sidebar
+```
+
 The subagent gate accepts raw 1180×820 screenshots and compares only the
 owned 300×241 summary, 370×820 panel, and 370×820 transcript crops:
 

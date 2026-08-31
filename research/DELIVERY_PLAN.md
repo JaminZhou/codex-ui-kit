@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 56 groups have current-build runtime evidence, 24 have previous-build-only
+- 59 groups have current-build runtime evidence, 21 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current Pull request review follow-up promotes
   `workspace.pull-request-review`. Its read-only PR #228 replay locks five
@@ -1188,7 +1188,13 @@ without confusing package readiness with full product reconstruction.
    process summaries remain host-owned compatibility coverage. The terminal
    crash Reload copy is current package-structural evidence plus independent
    Browser/Electron coverage because intentionally crashing the product pty
-   is not a safe runtime requirement.
+   is not a safe runtime requirement. The `26.825.51511` refresh now locks the
+   280px outer track, 40px header, 239px content, 156px tabs, 280×122.25px
+   picker, 1180×820 current-sidebar split, and both 720×820 hidden/pinned
+   sidebar layouts. CDP computed-style and interaction gates, native Electron,
+   reviewed pixels, and three local-only product-region comparisons promote
+   the session, bounded-process, and worktree-mismatch inventory rows to
+   current-build verified.
 9. **Pull request lifecycle**: delivered for the public component contract and
    deterministic Browser/Electron/pixel gates: index/detail loading and
    failure, checks, reviewers, comments, review submission, merge-readiness,

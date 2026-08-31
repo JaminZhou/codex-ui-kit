@@ -319,7 +319,17 @@ The authoritative current-build inventory is:
   behavior, code search, broader connectors, or the wider thread-error, queue,
   Markdown variants, menu, global-route, and Settings states; those remain
   historical evidence from `26.715.72359` until sampled again.
-- The current Codex Desktop `26.803.61601` (`6396`) Terminal follow-up proves
+- The current Codex Desktop `26.825.51511` (`7377`) Terminal refresh locks the
+  280px outer track, 279px inner panel, 40px header, 239px xterm region,
+  current 321.875px sidebar split, 156×28px tabs at 163px cadence, and the
+  280×122.25px four-item picker. The same isolated session proves bounded
+  command persistence through hide/reopen, output settlement, close-nearest
+  and label reindexing, close-all/fresh Toggle creation, and cross-worktree
+  `Dismiss`/`Open new terminal` preservation. CDP checks semantics and computed
+  geometry; Electron repeats native interactions. Product-region ratios are
+  0.9064%/0.3706% wide, 1.1498%/0.5602% compact-hidden, and
+  2.1375%/1.1768% compact-pinned for panel/content.
+- The previous Codex Desktop `26.803.61601` (`6396`) Terminal follow-up proves
   that a child command `exit 7` leaves the direct interactive shell usable and
   does not show a terminal failure, while ordinary shell `exit` closes its tab.
   A real agent-created background loop remains active after the response,

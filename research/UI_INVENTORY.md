@@ -259,7 +259,7 @@ dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
 `Compacting context`, but the remote compact task failed and exposed Resume,
 so successful compaction/recovery remains previous-build evidence.
 
-Current inventory: 91 surface groups; 56 have current-build runtime evidence, 24 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 51 groups and Electron verification covers 51.
+Current inventory: 91 surface groups; 59 have current-build runtime evidence, 21 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 54 groups and Electron verification covers 54.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1267,6 +1267,24 @@ creates a fresh current-workspace terminal with an empty transcript instead of
 restoring the closed session. `TerminalPanel` exposes plain local accessible
 labels through `showStatus={false}` while retaining status-rich labels for the
 host-supplied process-list compatibility fixture.
+
+The `26.825.51511` refresh supersedes that presentation baseline without
+removing the historical fixtures. The current bottom track is 280px: its
+one-pixel separator is followed by a 279px panel with a 40px header and 239px
+content region. At 1180×820 the current 321.875px sidebar places the panel at
+x=322.875 with width 857.125px. At 720×820 the default hidden-sidebar panel
+uses x=1/width=719px; explicit Show keeps a 320.265625/399.734375 split. Three
+156×28px tabs advance by 163px, use the observed Terminal and close assets,
+and preserve close-nearest selection and visible-label reindexing. The
+280×122.25px picker exposes Review, Terminal, Browser, and Files. Closing the
+last tab collapses the panel, while the top Toggle creates a fresh empty
+session. A bounded real command persists while hidden and settles with the
+expected output; switching the chat to `/` exposes the exact mismatch notice,
+opens `/ 2` without discarding `codex-ui-kit 1`, and dismisses only the notice.
+CDP gates semantics plus computed geometry, Electron repeats the interactions,
+and local-only product pixels pass at 0.9064%/0.3706% wide panel/content,
+1.1498%/0.5602% compact-hidden, and 2.1375%/1.1768% compact-pinned under
+2.5%/1.5% ceilings.
 
 A real bounded `sleep 3; echo terminal-after-reopen` command additionally
 verifies running/completed transcript settlement, independent per-session

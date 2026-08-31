@@ -225,15 +225,19 @@ describe("terminal panel", () => {
 
   it("supports current plain tab labels and workspace mismatch recovery", () => {
     const onDismiss = vi.fn();
+    const onCloseSession = vi.fn();
     const onOpenNewTerminal = vi.fn();
     render(
       <TerminalPanel
         activeSessionId="current"
+        closeIcon={<span data-testid="current-terminal-close-icon">×</span>}
         onActiveSessionChange={() => undefined}
+        onCloseSession={onCloseSession}
         sessions={[
           {
             entries: [],
             id: "current",
+            icon: <span data-testid="current-terminal-icon">terminal</span>,
             label: "codex-ui-kit",
             notice: (
               <TerminalWorkspaceMismatchNotice
@@ -254,6 +258,15 @@ describe("terminal panel", () => {
       selected: true,
     });
     expect(tab.textContent?.endsWith("codex-ui-kit")).toBe(true);
+    expect(screen.getByTestId("current-terminal-icon")).toBeTruthy();
+    const close = screen.getByRole("button", {
+      name: "Close codex-ui-kit tab",
+    });
+    expect(
+      close.querySelector('[data-testid="current-terminal-close-icon"]'),
+    ).toBeTruthy();
+    fireEvent.click(close);
+    expect(onCloseSession).toHaveBeenCalledWith("current");
     expect(
       screen.getByRole("status").textContent,
     ).toContain(

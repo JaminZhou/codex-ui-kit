@@ -893,7 +893,41 @@ the original PID `96228` remained running. The exact profile and external
 evidence moved to the recoverable Trash item
 `codex-ui-kit-review-refresh-cdp.EEQtJr-20260805`.
 
-### Current `26.730.61639` Terminal lifecycle
+### Current `26.825.51511` Terminal lifecycle
+
+The current refresh used isolated main PID `11830`, loopback-only CDP port
+`9893`, and profile `/private/tmp/codex-ui-kit-terminal-26-825.4etP2b` while
+preserving the user-owned Codex PID `13503`. Each Playwright connection created
+its own CDP session and applied 1180×820 or 720×820 device metrics before
+measurement.
+
+The bounded sequence recorded the 280px outer track, one-pixel separator,
+279px panel, 40px header, 239px content, 156×28px tabs, 20×20 close controls,
+and the 280×122.25px Review/Terminal/Browser/Files picker. It created three
+sessions, verified 163px tab cadence, close-nearest selection, label
+reindexing, close-all collapse, and fresh Toggle creation. The real command
+`sleep 3; printf 'CODEX_UI_KIT_TERMINAL_26_825_DONE\n'` remained active while
+the panel was hidden and produced two marker occurrences after reopen: command
+echo plus stdout. Switching the isolated new chat to no project exposed the
+exact worktree mismatch notice; `Open new terminal` preserved the old
+`codex-ui-kit 1` session and selected `/ 2`, while `Dismiss` removed only the
+notice.
+
+At 1180×820 the current sidebar is 321.875px and the inner Terminal begins at
+x=322.875. At 720×820 the default hidden-sidebar panel is x=1/width=719px;
+explicit Show produces the observed 320.265625/399.734375 split. Browser/CDP
+and Electron gate these semantics and computed geometries. Local-only product
+comparisons pass at 0.9064%/0.3706% wide, 1.1498%/0.5602% hidden-sidebar, and
+2.1375%/1.1768% pinned-sidebar for panel/content under 2.5%/1.5% ceilings. No
+product screenshot, task identity, profile, or private sidebar content is
+tracked.
+
+Cleanup terminated only PID `11830` and its descendants, closed port `9893`,
+and moved the exact profile/evidence recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-terminal-26-825-20260901-0315`.
+The user-owned Codex PID `13503` remained alive.
+
+### Historical `26.730.61639` Terminal lifecycle
 
 The refresh used exact second-process PID `6418`, loopback-only CDP port
 `9563`, and the unique profile

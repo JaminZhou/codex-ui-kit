@@ -1483,7 +1483,16 @@
       "id": "workspace.terminal",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["terminal", "file-terminal", "shellsession", "terminal-error-reload"],
+      "packageEvidence": [
+        "terminal",
+        "file-terminal",
+        "shellsession",
+        "terminal-error-reload",
+        "replay:current-26.825-terminal-wide-compact-picker-multi-close-and-fresh-reopen",
+        "browser-cdp:current-26.825-terminal-computed-geometry-session-lifecycle-and-picker",
+        "electron:current-26.825-terminal-native-session-lifecycle-and-picker",
+        "pixel:current-26.825-terminal-wide-compact-hidden-and-pinned-product-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:bottom-terminal-tabpanel-header-and-terminal-input",
@@ -1492,42 +1501,58 @@
         "cdp-26.727.40816:project-named-terminal-tab-bottom-panel-shell-read-only",
         "cdp-26.730.61639:project-aware-multi-terminal-tabs-picker-close-renumber-140px-wide-and-135.96px-compact",
         "cdp-26.730.61639:last-tab-close-panel-collapse-and-fresh-toggle-session",
-        "cdp-26.803.61601:direct-shell-exit-7-keeps-interactive-shell-and-normal-exit-closes-tab"
+        "cdp-26.803.61601:direct-shell-exit-7-keeps-interactive-shell-and-normal-exit-closes-tab",
+        "cdp-26.825.51511:real-280px-terminal-three-tabs-picker-close-reindex-collapse-and-fresh-toggle-wide-and-720"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
       "id": "workspace.terminal-process-lifecycle",
       "area": "workspace",
       "ownership": "cross-layer",
-      "packageEvidence": ["terminal", "run-command-animation", "background-process"],
+      "packageEvidence": [
+        "terminal",
+        "run-command-animation",
+        "background-process",
+        "replay:current-26.825-terminal-running-completed-hide-reopen-persistence",
+        "browser-cdp:current-26.825-terminal-running-completed-transcript-settlement",
+        "electron:current-26.825-terminal-close-reopen-and-session-isolation"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:running-duration-stop-and-background-process-state",
         "cdp-26.730.61639:real-xterm-read-only-running-panel-close-reopen-output-and-completion",
         "cdp-26.803.61601:real-background-terminal-stop-all-and-per-process-controls-after-current-turn-stop",
-        "cdp-26.803.61601:agent-created-background-process-summary-opens-live-side-panel-terminal"
+        "cdp-26.803.61601:agent-created-background-process-summary-opens-live-side-panel-terminal",
+        "cdp-26.825.51511:real-bounded-terminal-command-persists-through-hide-reopen-and-settles-two-markers"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
       "id": "workspace.terminal-context-mismatch",
       "area": "workspace",
       "ownership": "cross-layer",
-      "packageEvidence": ["terminal", "worktree-environment-dropdown"],
+      "packageEvidence": [
+        "terminal",
+        "worktree-environment-dropdown",
+        "replay:current-26.825-terminal-worktree-mismatch-open-new-and-dismiss",
+        "browser-cdp:current-26.825-terminal-mismatch-session-preservation",
+        "electron:current-26.825-terminal-mismatch-session-preservation"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.730.61639:cross-project-terminal-worktree-mismatch-dismiss-and-open-new-terminal"
+        "cdp-26.730.61639:cross-project-terminal-worktree-mismatch-dismiss-and-open-new-terminal",
+        "cdp-26.825.51511:real-cross-worktree-terminal-warning-dismiss-and-open-new-terminal-preserves-old-session"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

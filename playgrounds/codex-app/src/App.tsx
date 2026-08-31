@@ -1449,12 +1449,27 @@ function currentTerminalFrame(frame: string | null) {
   return frame?.startsWith("terminal-current-") ?? false;
 }
 
+function currentTerminal26825Frame(frame: string | null) {
+  return frame?.startsWith("terminal-current-26-825-") ?? false;
+}
+
 function initialTerminalSessionIds(
   scenarioId: ReplayScenarioId,
   frame: string | null,
 ) {
   if (scenarioId === "background-terminal") return ["command-dev"];
   if (scenarioId !== "terminal-lifecycle") return [];
+  if (frame === "terminal-current-26-825-closed") return [];
+  if (
+    frame === "terminal-current-26-825-multi" ||
+    frame === "terminal-current-26-825-compact" ||
+    frame === "terminal-current-26-825-compact-sidebar"
+  ) {
+    return ["local-terminal-1", "local-terminal-2", "local-terminal-3"];
+  }
+  if (frame === "terminal-current-26-825-mismatch") {
+    return ["local-terminal-1"];
+  }
   if (frame === "terminal-current-closed") return [];
   if (frame === "terminal-current-background-list") return [];
   if (frame === "terminal-current-background-open") {
@@ -1482,6 +1497,9 @@ function initialTerminalWorkspaceLabels(
   frame: string | null,
 ) {
   const sessionIds = initialTerminalSessionIds(scenarioId, frame);
+  if (frame === "terminal-current-26-825-mismatch") {
+    return { "local-terminal-1": "codex-ui-kit" };
+  }
   if (frame === "terminal-current-mismatch") {
     return {
       "local-terminal-1": "assets",
@@ -1504,7 +1522,41 @@ function initialTerminalHistory(
   return Object.fromEntries(
     sessionIds.map((sessionId, index) => [
       sessionId,
-      frame === "terminal-current-background-open"
+      currentTerminal26825Frame(frame)
+        ? frame === "terminal-current-26-825-running" && index === 0
+          ? [
+              {
+                id: `${sessionId}:running-command`,
+                kind: "command" as const,
+                text: "JaminZhou@JaminZhou codex-ui-kit % sleep 3; printf 'CODEX_UI_KIT_TERMINAL_26_825_DONE\\n'",
+              },
+            ]
+          : frame === "terminal-current-26-825-completed" && index === 0
+            ? [
+                {
+                  id: `${sessionId}:completed-command`,
+                  kind: "command" as const,
+                  text: "JaminZhou@JaminZhou codex-ui-kit % sleep 3; printf 'CODEX_UI_KIT_TERMINAL_26_825_DONE\\n'",
+                },
+                {
+                  id: `${sessionId}:completed-output`,
+                  kind: "stdout" as const,
+                  text: "CODEX_UI_KIT_TERMINAL_26_825_DONE",
+                },
+              ]
+            : [
+                {
+                  id: `${sessionId}:current-prompt`,
+                  kind: "command" as const,
+                  text: "JaminZhou@JaminZhou codex-ui-kit %",
+                },
+                {
+                  id: `${sessionId}:current-ready`,
+                  kind: "stdout" as const,
+                  text: "",
+                },
+              ]
+        : frame === "terminal-current-background-open"
         ? Array.from({ length: 45 }, (_, outputIndex) => ({
             id: `${sessionId}:background:${outputIndex + 66}`,
             kind: "stdout" as const,
@@ -3118,7 +3170,9 @@ export function App() {
   >(undefined);
   const [workspaceRunProjectLabel, setWorkspaceRunProjectLabel] =
     useState(
-      initialSelection.frame === "terminal-current-mismatch"
+      initialSelection.frame === "terminal-current-26-825-mismatch"
+        ? "/"
+        : initialSelection.frame === "terminal-current-mismatch"
         ? "assets"
         : "codex-ui-kit",
     );
@@ -3220,6 +3274,7 @@ export function App() {
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal" ||
       (initialSelection.scenarioId === "terminal-lifecycle" &&
+        initialSelection.frame !== "terminal-current-26-825-closed" &&
         initialSelection.frame !== "terminal-current-closed" &&
         initialSelection.frame !== "terminal-current-background-list" &&
         initialSelection.frame !== "terminal-current-background-open" &&
@@ -3239,7 +3294,8 @@ export function App() {
       ),
     );
   const [terminalTabPickerOpen, setTerminalTabPickerOpen] = useState(
-    initialSelection.frame === "terminal-picker",
+    initialSelection.frame === "terminal-picker" ||
+      initialSelection.frame === "terminal-current-26-825-picker",
   );
   const [terminalCommandId, setTerminalCommandId] = useState<string | null>(
     () =>
@@ -3248,7 +3304,9 @@ export function App() {
         initialSelection.frame,
       ).at(-1) ?? null,
   );
-  const [terminalHeight, setTerminalHeight] = useState(272);
+  const [terminalHeight, setTerminalHeight] = useState(() =>
+    currentTerminal26825Frame(initialSelection.frame) ? 280 : 272,
+  );
   const [terminalValuesByCommand, setTerminalValuesByCommand] = useState<
     Record<string, string>
   >({});
@@ -4076,7 +4134,9 @@ export function App() {
     );
     setWorkspaceRunProjectLabel(
       workspaceContext?.projectLabel ??
-        (frame === "terminal-current-mismatch"
+        (frame === "terminal-current-26-825-mismatch"
+          ? "/"
+          : frame === "terminal-current-mismatch"
           ? "assets"
           : "codex-ui-kit"),
     );
@@ -4142,6 +4202,7 @@ export function App() {
     setTerminalOpen(
       nextId === "background-terminal" ||
         (nextId === "terminal-lifecycle" &&
+          frame !== "terminal-current-26-825-closed" &&
           frame !== "terminal-current-closed" &&
           frame !== "terminal-current-background-list" &&
           frame !== "terminal-current-background-open" &&
@@ -4161,9 +4222,12 @@ export function App() {
     setTerminalReloadSessionId(
       frame === "terminal-current-reload" ? "local-terminal-1" : null,
     );
-    setTerminalTabPickerOpen(frame === "terminal-picker");
+    setTerminalTabPickerOpen(
+      frame === "terminal-picker" ||
+        frame === "terminal-current-26-825-picker",
+    );
     setTerminalCommandId(nextTerminalSessionIds.at(-1) ?? null);
-    setTerminalHeight(272);
+    setTerminalHeight(currentTerminal26825Frame(frame) ? 280 : 272);
     setBackgroundTerminalPanelWidth(381.4375);
     setBackgroundTerminalPanelOpen(
       nextId === "terminal-lifecycle" &&
@@ -13005,6 +13069,9 @@ export function App() {
       return {
         entries: terminalEntriesBySession[sessionId]!,
         id: sessionId,
+        icon: currentTerminal26825Frame(activeFrame) ? (
+          <CurrentBuildIcon name="thread-command-terminal" />
+        ) : undefined,
         inputDisabled:
           activeFrame === "terminal-current-running" &&
           sessionId === activeTerminalSessionId,
@@ -13090,6 +13157,11 @@ export function App() {
     <TerminalPanel
       activeSessionId={activeTerminalSessionId}
       className="demo-terminal-panel"
+      closeIcon={
+        currentTerminal26825Frame(activeFrame) ? (
+          <CurrentBuildIcon name="review-close" />
+        ) : undefined
+      }
       data-testid="terminal-panel"
       label="Terminal"
       onActiveSessionChange={setTerminalCommandId}
@@ -13164,7 +13236,9 @@ export function App() {
           onOpenChange={setTerminalTabPickerOpen}
           open={terminalTabPickerOpen}
           side="bottom"
-          sideOffset={4}
+          sideOffset={
+            currentTerminal26825Frame(activeFrame) ? 2 : 4
+          }
           trigger={
             <IconButton
               icon="+"
@@ -13181,20 +13255,52 @@ export function App() {
               openReviewPanel();
               setTerminalTabPickerOpen(false);
             }}
-            startIcon="▣"
+            startIcon={
+              currentTerminal26825Frame(activeFrame) ? (
+                <CurrentBuildIcon name="review-tab" />
+              ) : (
+                "▣"
+              )
+            }
           >
             Review
           </MenuItem>
           <MenuItem
             onSelect={createTerminalSession}
-            startIcon="▣"
+            startIcon={
+              currentTerminal26825Frame(activeFrame) ? (
+                <CurrentBuildIcon name="thread-command-terminal" />
+              ) : (
+                "▣"
+              )
+            }
           >
             Terminal
           </MenuItem>
-          <MenuItem disabled endIcon="⌘T" startIcon="◎">
+          <MenuItem
+            disabled
+            endIcon="⌘T"
+            startIcon={
+              currentTerminal26825Frame(activeFrame) ? (
+                <CurrentBuildIcon name="settings-browser" />
+              ) : (
+                "◎"
+              )
+            }
+          >
             Browser
           </MenuItem>
-          <MenuItem disabled endIcon="⌘P" startIcon="□">
+          <MenuItem
+            disabled
+            endIcon="⌘P"
+            startIcon={
+              currentTerminal26825Frame(activeFrame) ? (
+                <CurrentBuildIcon name="review-file-text" />
+              ) : (
+                "□"
+              )
+            }
+          >
             Files
           </MenuItem>
         </Menu>
@@ -13748,11 +13854,14 @@ export function App() {
           currentSidebarThreadLifecycle ||
           currentSidebarWorktreeLifecycle ||
           currentContext26825Replay ||
+          currentTerminal26825Frame(activeFrame) ||
           isCurrentRichMarkdownStreamingReplay ||
           isCurrentBasic26825Replay ||
           isCurrentCitations26825Replay ||
           isCurrentPullRequestRouteReplay
-            ? 321.875
+            ? activeFrame === "terminal-current-26-825-compact-sidebar"
+              ? 320.265625
+              : 321.875
             : currentHomeFrame || usesCurrent322SidebarWidth
               ? 322.90625
               : undefined
