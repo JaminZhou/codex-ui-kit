@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 42 groups have current-build runtime evidence, 38 have previous-build-only
+- 44 groups have current-build runtime evidence, 36 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current Composer-control follow-up re-observes the exact three-row
   permission overlay plus active Goal and Plan across 1180×820 and 720×680.
@@ -458,13 +458,15 @@ exit gates; it does not replace the inventory.
   16-second invalid-URL Fetch → Search → Fetch recovery inside one group. Five
   lifecycle states plus one compact variant pass Browser/CDP, native Electron,
   six internal baselines, and local-only current-product group/card pixel
-  gates. The current Composer queue/Stop
-  probe now locks its 710×39 tray, 28×28 Stop control, `You stopped after 2s`
-  summary, and automatic queued continuation in Browser, Electron, and two
-  regional pixel gates. A second current probe and independent public
-  components now lock four-line/20-line growth, all four permission choices,
-  and the 736×320 inline Add-resource picker through CDP, real Electron, and
-  three additional regional pixel gates. A third read-only probe locks active
+  gates. The historical Composer queue/Stop probe locks its 710×39 tray,
+  28×28 Stop control, `You stopped after 2s` summary, and automatic queued
+  continuation. The current 26.825 refresh now supersedes it with 710×37
+  pending and 710×72 paused trays, two Resume entry points, restarted-primary
+  → automatic queued continuation → settled transitions, exact icons, and
+  wide/compact Browser, Electron, and product-region pixel gates. The same
+  refresh locks four-line/20-line growth and the 736/687×320 inline
+  Add-resource picker. Earlier permission evidence remains historical. A
+  third read-only probe locks active
   Goal and Plan labels, prompts, 736×98 geometry, clear/focus restoration,
   and two sub-0.5% regional pixel gates. A fourth read-only slice locks the
   82-message compact navigation rail, seven-turn mounted window,
@@ -1052,8 +1054,10 @@ without confusing package readiness with full product reconstruction.
    delivered. The current post-picker text/image composition and immersive
    preview are additionally runtime-observed on `26.820.60940` and pass
    Browser/CDP, Electron, and local-only product-region pixels. Actual upload
-   failure/progress and plugin variants remain open;
-   retain queue pause/Resume only as a legacy compatibility fixture.
+   failure/progress and plugin variants remain open. Current queue
+   pause/Resume, resource-picker, and long-input paths are delivered on
+   `26.825.51511`; retain the older automatic-continuation-only path as
+   regression compatibility coverage.
 6. **Coding workspace entry**: current selected/no-project destination,
    project/Local/branch context, New worktree/environment-empty state, and
    720px layout are delivered; independent project → environment/worktree →

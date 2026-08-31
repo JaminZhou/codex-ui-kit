@@ -829,6 +829,32 @@ describe("AgentComposer", () => {
     expect(stop.querySelector("svg")).toBeNull();
   });
 
+  it("lets a paused host replace Send with an empty-value Resume action", () => {
+    const onResume = vi.fn();
+    const onSubmit = vi.fn();
+    render(
+      <AgentComposer
+        onResume={onResume}
+        onSubmit={onSubmit}
+        onValueChange={() => undefined}
+        value=""
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Send message" }),
+    ).toBeNull();
+    const resume = screen.getByRole("button", { name: "Resume" });
+    expect(resume.getAttribute("data-action")).toBe("resume");
+    expect(resume.querySelector("svg")?.getAttribute("viewBox")).toBe(
+      "0 0 20 20",
+    );
+    fireEvent.click(resume);
+
+    expect(onResume).toHaveBeenCalledOnce();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it("can route Enter to a host-owned queue while Stop remains primary", () => {
     const onStop = vi.fn();
     const onSubmit = vi.fn();

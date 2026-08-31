@@ -216,7 +216,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 42 have current-build runtime evidence, 38 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 38 groups and Electron verification covers 38.
+Current inventory: 91 surface groups; 44 have current-build runtime evidence, 36 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 40 groups and Electron verification covers 40.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -908,9 +908,11 @@ conversation replay contains 11 turns and covers multiline, disabled,
 attachment, running, queued, queue-paused, completed, scroll-away,
 message-navigation, and windowed-history frames. Its default interaction now
 drives submit → running → queue → Stop → automatic queued continuation, then
-message navigation and return-to-latest. The old paused/Resume frame remains
-an explicit compatibility fixture rather than a current-product claim. Real
-Electron repeats the current lifecycle in an 1180×820 `BrowserWindow`.
+message navigation and return-to-latest. The old paused/Resume frame initially
+remained an explicit compatibility fixture. The current 26.825 follow-up below
+supersedes that status with a newly observed two-stage paused/Resume contract.
+Real Electron repeats both the automatic-continuation regression and the
+current lifecycle.
 
 Optional 792×320 `26.727.40816` references are accepted through
 `CODEX_UI_KIT_COMPOSER_QUEUED_REFERENCE` and
@@ -1846,3 +1848,23 @@ and 3.6825% for Goal, and 2.9919% and 3.5062% for Plan under 5% limits. This
 promotes the sampled current paths of `composer.permissions` and
 `composer.modes`; custom permission policy, unavailable modes, persistence,
 and other host-owned variants keep their implementations `partial`.
+
+The next current Composer follow-up promotes `composer.queue` and
+`composer.resources` from previous-build evidence. The resource picker is
+736×320 wide and 687×320 compact, with 4px padding, 20px radius, 8px blur, a
+310px scroller, and 28.5625px rows. Its fixed top controls and sanitized plugin
+examples are keyboard reachable; Escape restores Add focus. Four-line editors
+measure 712/663×80 inside 736/687×134 Composer cards. Twenty lines clamp to
+712×205 inside 736×259 wide and 663×170 inside 687×224 compact, with local
+scrolling and 14/20px weight-400 typography.
+
+The pending queue is 710×37px. Stop exposes a current 710×72px paused tray,
+header Resume, queued row, and an independent empty-Composer Resume primary.
+Header Resume, Composer Resume, restarted primary completion, automatic queued
+continuation, and final settlement are all explicit public states. Ten
+wide/compact Browser/CDP frames and ten reviewed baselines pass; Electron
+repeats resource, multiline, and the real click-driven queue lifecycle. The
+ten local-only product ratios range from 0.6557% to 3.7314%. This promotes the
+sampled current paths of `composer.queue`, `composer.resources`, and long-input
+`composer.shell`; delete/reorder edge failures, resource-provider errors, and
+other host-owned plugin inventories keep their implementations `partial`.

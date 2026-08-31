@@ -4945,6 +4945,24 @@ for (const scene of selectedScenes) {
         const composerPermissionItems = Array.from(
           composerPermissionMenu?.querySelectorAll('[role="menuitem"]') ?? [],
         );
+        const composerResourcePicker = document.querySelector(
+          ".codex-ui-composer-resource-picker--current-26-825",
+        );
+        const composerResourceScroller = composerResourcePicker?.querySelector(
+          ".codex-ui-composer-resource-picker__scroller",
+        );
+        const composerQueueDock = document.querySelector(
+          ".demo-current-composer-queue-dock",
+        );
+        const composerQueue = composerQueueDock?.querySelector(
+          ".codex-ui-composer-dock__queue",
+        );
+        const composerQueueList = composerQueue?.querySelector(
+          ".codex-ui-composer-queue",
+        );
+        const composerQueueRows = Array.from(
+          composerQueue?.querySelectorAll(".codex-ui-composer-queue__row") ?? [],
+        );
         const heading = document.querySelector(
           ".demo-workspace-start .codex-ui-new-conversation-start__header h3",
         );
@@ -5088,8 +5106,11 @@ for (const scene of selectedScenes) {
             document.activeElement?.getAttribute("aria-label") ?? null,
           composer: rect(composer),
           composerInput: {
+            clientHeight: composerInput?.clientHeight ?? null,
             label: composerInput?.getAttribute("aria-label") ?? null,
             rect: rect(composerInput),
+            scrollHeight: composerInput?.scrollHeight ?? null,
+            scrollTop: composerInput?.scrollTop ?? null,
             style: style(composerInput),
           },
           composerMode: composerMode
@@ -5118,6 +5139,53 @@ for (const scene of selectedScenes) {
                 })),
                 rect: rect(composerPermissionMenu),
                 style: style(composerPermissionMenu),
+              }
+            : null,
+          composerQueue: composerQueue
+            ? {
+                interrupted: Boolean(
+                  composerQueue.querySelector(
+                    ".codex-ui-composer-queue__interrupted",
+                  ),
+                ),
+                labels: Array.from(
+                  composerQueue.querySelectorAll("button"),
+                  (button) =>
+                    button.getAttribute("aria-label") ??
+                    button.textContent?.trim() ??
+                    "",
+                ),
+                listRect: rect(composerQueueList),
+                rect: rect(composerQueue),
+                rowRects: composerQueueRows.map((row) => rect(row)),
+                statusText:
+                  composerQueue.querySelector(
+                    ".codex-ui-composer-queue__interrupted",
+                  )?.textContent?.trim() ?? null,
+                style: style(composerQueue),
+              }
+            : null,
+          composerResourcePicker: composerResourcePicker
+            ? {
+                groupCount: composerResourcePicker.querySelectorAll(
+                  ".codex-ui-composer-resource-picker__group",
+                ).length,
+                optionCount: composerResourcePicker.querySelectorAll(
+                  '[role="option"]',
+                ).length,
+                optionRects: Array.from(
+                  composerResourcePicker.querySelectorAll('[role="option"]'),
+                  (option) => rect(option),
+                ),
+                rect: rect(composerResourcePicker),
+                scroller: composerResourceScroller
+                  ? {
+                      clientHeight: composerResourceScroller.clientHeight,
+                      rect: rect(composerResourceScroller),
+                      scrollHeight: composerResourceScroller.scrollHeight,
+                    }
+                  : null,
+                style: style(composerResourcePicker),
               }
             : null,
           branchCreation: branchCreationDialog
@@ -5378,6 +5446,19 @@ for (const scene of selectedScenes) {
         scene.frame === "workspace-composer-current-26-825-plan";
       const composerPermissionsExpected =
         scene.frame === "workspace-composer-current-26-825-permissions";
+      const composerResourcesExpected =
+        scene.frame === "workspace-composer-current-26-825-resources";
+      const composerMultilineFourExpected =
+        scene.frame ===
+        "workspace-composer-current-26-825-multiline-four";
+      const composerMultilineLongExpected =
+        scene.frame ===
+        "workspace-composer-current-26-825-multiline-long";
+      const composerQueueExpected = scene.frame.startsWith(
+        "workspace-composer-current-26-825-queue-",
+      );
+      const composerQueuePausedExpected =
+        scene.frame === "workspace-composer-current-26-825-queue-paused";
       const currentHomeExpected = scene.frame.startsWith("current-home-");
       const currentHomeCompactExpected =
         currentHomeExpected && scene.frame.endsWith("-compact");
@@ -5402,6 +5483,15 @@ for (const scene of selectedScenes) {
             : 358;
       const expectedComposerBottom =
         compactExpected || currentHomeCompactExpected ? 664 : 804;
+      const expectedComposerHeight = composerGoalExpected
+        ? 134
+        : composerMultilineFourExpected
+          ? 134
+          : composerMultilineLongExpected
+            ? compactExpected
+              ? 224
+              : 259
+            : 98;
       const expectedHeadingTop = currentHomeCompactExpected
         ? 259.796875
         : currentContextExpected
@@ -5454,11 +5544,16 @@ for (const scene of selectedScenes) {
               "composer-clear-project",
             ]
           : []),
+        ...(composerResourcesExpected ? ["composer-project"] : []),
         "composer-add-files",
         "composer-permission",
         "composer-model-chevron",
         "composer-dictate",
-        "composer-voice",
+        ...(composerQueueExpected ||
+        composerMultilineFourExpected ||
+        composerMultilineLongExpected
+          ? []
+          : ["composer-voice"]),
       ];
       if (
         contract.view !== "workspace" ||
@@ -5470,8 +5565,7 @@ for (const scene of selectedScenes) {
         !contract.heading ||
         contract.contextButtons.length !== expectedContextButtonCount ||
         Math.abs(contract.composer.width - expectedComposerWidth) > 1 ||
-        Math.abs(contract.composer.height - (composerGoalExpected ? 134 : 98)) >
-          1 ||
+        Math.abs(contract.composer.height - expectedComposerHeight) > 1 ||
         Math.abs(contract.composer.left - expectedComposerLeft) > 1 ||
         Math.abs(contract.composer.bottom - expectedComposerBottom) > 1 ||
         Math.abs(contract.heading.top - expectedHeadingTop) > 1 ||
@@ -5555,29 +5649,139 @@ for (const scene of selectedScenes) {
         const expectedInputTop = compactExpected
           ? composerGoalExpected
             ? 544
-            : 580
+            : composerMultilineFourExpected
+              ? 544
+              : composerMultilineLongExpected
+                ? 454
+                : 580
           : composerGoalExpected
             ? 684
-            : 720;
+            : composerMultilineFourExpected
+              ? 684
+              : composerMultilineLongExpected
+                ? 559
+                : 720;
+        const expectedInputHeight = composerMultilineFourExpected
+          ? 80
+          : composerMultilineLongExpected
+            ? compactExpected
+              ? 170
+              : 205
+            : 44;
+        const currentMultilineExpected =
+          composerMultilineFourExpected || composerMultilineLongExpected;
+        const expectedInputLeft =
+          expectedComposerLeft + (currentMultilineExpected ? 12 : 0);
+        const expectedInputWidth =
+          expectedComposerWidth - (currentMultilineExpected ? 24 : 0);
         const expectedModeLeft = compactExpected ? 173.0625 : 540;
         const expectedModeTop = compactExpected ? 628 : 768;
         const permissionMenu = contract.composerPermissionMenu;
         if (
           contract.composerInput.label !== expectedInputLabel ||
           !contract.composerInput.rect ||
-          Math.abs(contract.composerInput.rect.left - expectedComposerLeft) >
+          Math.abs(contract.composerInput.rect.left - expectedInputLeft) >
             1 ||
           Math.abs(contract.composerInput.rect.top - expectedInputTop) > 1 ||
-          Math.abs(contract.composerInput.rect.width - expectedComposerWidth) >
+          Math.abs(contract.composerInput.rect.width - expectedInputWidth) >
             1 ||
-          Math.abs(contract.composerInput.rect.height - 44) > 1 ||
-          contract.composerInput.style.padding !== "12px 12px 0px" ||
+          Math.abs(contract.composerInput.rect.height - expectedInputHeight) >
+            1 ||
+          contract.composerInput.style.padding !==
+            (currentMultilineExpected ? "0px" : "12px 12px 0px") ||
           Boolean(permissionMenu) !== composerPermissionsExpected ||
           Boolean(contract.composerMode) !== Boolean(expectedMode)
         ) {
           throw new Error(
             `${scene.id}: current 26.825 Composer base contract failed: ${JSON.stringify(contract)}`,
           );
+        }
+        if (
+          composerMultilineLongExpected &&
+          (contract.composerInput.clientHeight !== expectedInputHeight ||
+            contract.composerInput.scrollHeight < 390 ||
+            contract.composerInput.scrollTop < 180)
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 long Composer clamp failed: ${JSON.stringify(contract.composerInput)}`,
+          );
+        }
+        if (
+          composerResourcesExpected &&
+          (!contract.composerResourcePicker ||
+            Math.abs(
+              contract.composerResourcePicker.rect.left -
+                expectedComposerLeft,
+            ) > 1 ||
+            Math.abs(
+              contract.composerResourcePicker.rect.top -
+                (compactExpected ? 242 : 382),
+            ) > 1 ||
+            Math.abs(
+              contract.composerResourcePicker.rect.width -
+                expectedComposerWidth,
+            ) > 1 ||
+            Math.abs(contract.composerResourcePicker.rect.height - 320) > 1 ||
+            contract.composerResourcePicker.style.backdropFilter !==
+              "blur(8px)" ||
+            contract.composerResourcePicker.style.borderRadius !== "20px" ||
+            contract.composerResourcePicker.style.padding !== "4px" ||
+            contract.composerResourcePicker.groupCount !== 2 ||
+            contract.composerResourcePicker.optionCount !== 11 ||
+            !contract.composerResourcePicker.scroller ||
+            contract.composerResourcePicker.scroller.clientHeight !== 310 ||
+            contract.composerResourcePicker.optionRects.some(
+              (value) => !value || Math.abs(value.height - 28.5625) > 0.2,
+            ))
+        ) {
+          throw new Error(
+            `${scene.id}: current 26.825 resource picker contract failed: ${JSON.stringify(contract.composerResourcePicker)}`,
+          );
+        }
+        if (composerQueueExpected) {
+          const expectedQueueHeight = composerQueuePausedExpected ? 72 : 37;
+          const expectedQueueTop = compactExpected
+            ? composerQueuePausedExpected
+              ? 498
+              : 533
+            : composerQueuePausedExpected
+              ? 638
+              : 673;
+          if (
+            !contract.composerQueue ||
+            Math.abs(
+              contract.composerQueue.rect.left -
+                (expectedComposerLeft + 13),
+            ) > 1 ||
+            Math.abs(
+              contract.composerQueue.rect.width -
+                (expectedComposerWidth - 26),
+            ) > 1 ||
+            Math.abs(contract.composerQueue.rect.top - expectedQueueTop) > 1 ||
+            Math.abs(
+              contract.composerQueue.rect.height - expectedQueueHeight,
+            ) > 1 ||
+            contract.composerQueue.interrupted !==
+              composerQueuePausedExpected ||
+            contract.composerQueue.rowRects.length !== 1 ||
+            Math.abs(contract.composerQueue.rowRects[0].height - 37) > 1 ||
+            !contract.composerQueue.labels.includes("Steer") ||
+            !contract.composerQueue.labels.includes(
+              "Delete queued message",
+            ) ||
+            !contract.composerQueue.labels.includes(
+              "Queued message actions",
+            ) ||
+            (composerQueuePausedExpected &&
+              (!contract.composerQueue.labels.includes("Resume") ||
+                !contract.composerQueue.statusText?.includes(
+                  "Queue paused because you interrupted",
+                )))
+          ) {
+            throw new Error(
+              `${scene.id}: current 26.825 queue contract failed: ${JSON.stringify(contract.composerQueue)}`,
+            );
+          }
         }
         if (
           composerPermissionsExpected &&
@@ -5689,6 +5893,43 @@ for (const scene of selectedScenes) {
           );
           await page.waitForFunction(
             () => document.activeElement?.getAttribute("aria-label") === "Do anything",
+          );
+        }
+        if (composerResourcesExpected) {
+          await page.getByRole("listbox", { name: "Composer resources" }).press(
+            "Escape",
+          );
+          await page.waitForSelector(
+            '.demo-root[data-frame="workspace-composer-current-26-825-ready"]:not([data-composer-overlay])',
+          );
+          await page.waitForFunction(
+            () => document.activeElement?.getAttribute("aria-label") === "Do anything",
+          );
+        }
+        if (composerQueuePausedExpected) {
+          await page.getByRole("button", { name: "Resume" }).first().click();
+          await page.waitForSelector(
+            '.demo-root[data-composer-phase="resume-ready"][data-queue-count="1"]',
+          );
+          const composerResume = page.locator(
+            '.codex-ui-composer__primary[data-action="resume"]',
+          );
+          if ((await composerResume.getAttribute("aria-label")) !== "Resume") {
+            throw new Error(
+              `${scene.id}: paused queue did not expose the Composer Resume action.`,
+            );
+          }
+          await composerResume.click();
+          await page.waitForSelector(
+            '.demo-root[data-composer-phase="queued"][data-status="running"][data-queue-count="1"] .codex-ui-composer__primary[data-action="stop"]',
+          );
+          await page.waitForSelector(
+            '.demo-root[data-composer-phase="continued"][data-status="running"][data-queue-count="0"]',
+            { timeout: 2_000 },
+          );
+          await page.waitForSelector(
+            '.demo-root[data-composer-phase="idle"][data-status="completed"][data-queue-count="0"]',
+            { timeout: 2_000 },
           );
         }
       }

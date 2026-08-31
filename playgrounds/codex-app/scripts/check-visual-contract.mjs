@@ -262,6 +262,30 @@ const currentComposer26825PlanReference =
   process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PLAN_REFERENCE;
 const currentComposer26825PlanCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_PLAN_COMPACT_REFERENCE;
+const currentComposer26825ResourcesReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_RESOURCES_REFERENCE;
+const currentComposer26825ResourcesCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_RESOURCES_COMPACT_REFERENCE;
+const currentComposer26825MultilineFourReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_FOUR_REFERENCE;
+const currentComposer26825MultilineFourCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_FOUR_COMPACT_REFERENCE;
+const currentComposer26825MultilineLongReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_LONG_REFERENCE;
+const currentComposer26825MultilineLongCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_LONG_COMPACT_REFERENCE;
+const currentComposer26825QueuePendingReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PENDING_REFERENCE;
+const currentComposer26825QueuePendingCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PENDING_COMPACT_REFERENCE;
+const currentComposer26825QueuePausedReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PAUSED_REFERENCE;
+const currentComposer26825QueuePausedCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PAUSED_COMPACT_REFERENCE;
 const currentBuildAttachmentReadyReference =
   process.env.CODEX_UI_KIT_ATTACHMENT_READY_REFERENCE;
 const currentBuildAttachmentCompletedReference =
@@ -1787,7 +1811,11 @@ for (const scene of selectedScenes) {
     if (scene.id.startsWith("workspace-composer-current-26-825-")) {
       const selector = scene.id.includes("permissions")
         ? ".codex-ui-composer-permission-menu--current-26-825"
-        : ".demo-workspace-start .codex-ui-composer";
+        : scene.id.includes("resources")
+          ? ".codex-ui-composer-resource-picker--current-26-825"
+          : scene.id.includes("queue-")
+            ? ".demo-current-composer-queue-dock"
+            : ".demo-workspace-start .codex-ui-composer";
       currentComposer26825Bounds = await page
         .locator(selector)
         .evaluate((element) => {
@@ -5577,6 +5605,104 @@ for (const scene of selectedScenes) {
     );
   }
 
+  const currentComposer26825AdditionalComparisons = {
+    "workspace-composer-current-26-825-resources": {
+      defaultMaximumRatio: 0.08,
+      masks: [{ height: 112, left: 0, top: 208, width: 736 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_RESOURCES_MAX_DIFF_RATIO",
+      referenceCrop: { height: 320, left: 383, top: 382, width: 736 },
+      referencePath: currentComposer26825ResourcesReference,
+    },
+    "workspace-composer-current-26-825-resources-compact": {
+      defaultMaximumRatio: 0.08,
+      masks: [{ height: 112, left: 0, top: 208, width: 688 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_RESOURCES_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 320, left: 16, top: 242, width: 688 },
+      referencePath: currentComposer26825ResourcesCompactReference,
+      referenceSize: { height: 680, width: 720 },
+    },
+    "workspace-composer-current-26-825-multiline-four": {
+      defaultMaximumRatio: 0.04,
+      masks: [{ height: 80, left: 12, top: 14, width: 712 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_FOUR_MAX_DIFF_RATIO",
+      referenceCrop: { height: 134, left: 383, top: 670, width: 736 },
+      referencePath: currentComposer26825MultilineFourReference,
+    },
+    "workspace-composer-current-26-825-multiline-four-compact": {
+      defaultMaximumRatio: 0.04,
+      masks: [{ height: 80, left: 12, top: 14, width: 664 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_FOUR_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 134, left: 16, top: 530, width: 688 },
+      referencePath: currentComposer26825MultilineFourCompactReference,
+      referenceSize: { height: 680, width: 720 },
+    },
+    "workspace-composer-current-26-825-multiline-long": {
+      defaultMaximumRatio: 0.04,
+      masks: [{ height: 205, left: 12, top: 14, width: 712 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_LONG_MAX_DIFF_RATIO",
+      referenceCrop: { height: 259, left: 383, top: 545, width: 736 },
+      referencePath: currentComposer26825MultilineLongReference,
+    },
+    "workspace-composer-current-26-825-multiline-long-compact": {
+      defaultMaximumRatio: 0.04,
+      masks: [{ height: 170, left: 12, top: 14, width: 664 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_MULTILINE_LONG_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 224, left: 16, top: 440, width: 688 },
+      referencePath: currentComposer26825MultilineLongCompactReference,
+      referenceSize: { height: 680, width: 720 },
+    },
+    "workspace-composer-current-26-825-queue-pending": {
+      defaultMaximumRatio: 0.05,
+      masks: [{ height: 37, left: 40, top: 0, width: 500 }],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PENDING_MAX_DIFF_RATIO",
+      referenceCrop: { height: 131, left: 383, top: 673, width: 736 },
+      referencePath: currentComposer26825QueuePendingReference,
+    },
+    "workspace-composer-current-26-825-queue-pending-compact": {
+      defaultMaximumRatio: 0.05,
+      masks: [
+        { height: 37, left: 40, top: 0, width: 452 },
+        // The captured product frame contains the transient Add tooltip and
+        // expanded hover hit-area, which reflows the bottom controls.
+        { height: 70, left: 0, top: 55, width: 640 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PENDING_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 131, left: 16, top: 533, width: 688 },
+      referencePath: currentComposer26825QueuePendingCompactReference,
+      referenceSize: { height: 680, width: 720 },
+    },
+    "workspace-composer-current-26-825-queue-paused": {
+      defaultMaximumRatio: 0.05,
+      masks: [
+        { height: 35, left: 40, top: 0, width: 470 },
+        { height: 37, left: 40, top: 35, width: 500 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PAUSED_MAX_DIFF_RATIO",
+      referenceCrop: { height: 166, left: 383, top: 638, width: 736 },
+      referencePath: currentComposer26825QueuePausedReference,
+    },
+    "workspace-composer-current-26-825-queue-paused-compact": {
+      defaultMaximumRatio: 0.05,
+      masks: [
+        { height: 35, left: 40, top: 0, width: 430 },
+        { height: 37, left: 40, top: 35, width: 452 },
+      ],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_COMPOSER_26_825_QUEUE_PAUSED_COMPACT_MAX_DIFF_RATIO",
+      referenceCrop: { height: 166, left: 16, top: 498, width: 688 },
+      referencePath: currentComposer26825QueuePausedCompactReference,
+      referenceSize: { height: 680, width: 720 },
+    },
+  };
   const currentComposer26825Comparison =
     scene.id === "workspace-composer-current-26-825-permissions"
       ? {
@@ -5647,7 +5773,7 @@ for (const scene of selectedScenes) {
                     referencePath: currentComposer26825PlanCompactReference,
                     referenceSize: { height: 680, width: 720 },
                   }
-                : null;
+                : currentComposer26825AdditionalComparisons[scene.id] ?? null;
   if (
     currentComposer26825Comparison?.referencePath &&
     currentComposer26825Bounds
@@ -5657,7 +5783,7 @@ for (const scene of selectedScenes) {
       actualBounds: currentComposer26825Bounds,
       defaultMaximumRatio:
         currentComposer26825Comparison.defaultMaximumRatio ?? 0.05,
-      masks: [],
+      masks: currentComposer26825Comparison.masks ?? [],
       maximumRatioName: currentComposer26825Comparison.maximumRatioName,
       referenceCrop: currentComposer26825Comparison.referenceCrop,
       referencePath: currentComposer26825Comparison.referencePath,

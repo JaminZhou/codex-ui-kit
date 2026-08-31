@@ -7,6 +7,10 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             {
+              name: "composer-components",
+              test: /src\/components\/(?:AgentComposer|ComposerAuxiliary)\.tsx/,
+            },
+            {
               name: "current-thread-assets",
               test: /(?:demo\/(?:currentBuildIcons\.tsx|current-thread-visual-assets\.json)|research\/visual-raster-assets\.json|playgrounds\/codex-app\/src\/VisualAssetIcon\.tsx)/,
             },

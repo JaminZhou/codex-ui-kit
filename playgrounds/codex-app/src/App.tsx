@@ -816,10 +816,17 @@ function initialComposerValue(frame: string | null) {
     return "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.";
   }
   if (frame === "context-compaction-command-menu") return "/compact";
+  if (frame === "workspace-composer-current-26-825-multiline-long") {
+    return Array.from(
+      { length: 20 },
+      (_, index) => `Current long Composer line ${index + 1}.`,
+    ).join("\n");
+  }
   if (
     frame === "composer-multiline" ||
     frame === "composer-permissions-menu" ||
-    frame === "composer-resources-menu"
+    frame === "composer-resources-menu" ||
+    frame === "workspace-composer-current-26-825-multiline-four"
   ) {
     return [
       "First current-build Composer line.",
@@ -844,8 +851,40 @@ function initialComposerOverlay(frame: string | null): ComposerOverlay {
   ) {
     return "permissions";
   }
-  if (frame === "composer-resources-menu") return "resources";
+  if (
+    frame === "composer-resources-menu" ||
+    frame === "workspace-composer-current-26-825-resources"
+  ) {
+    return "resources";
+  }
   return null;
+}
+
+type CurrentQueue26825Phase =
+  | "continued"
+  | "paused"
+  | "pending"
+  | "resume-ready"
+  | "resumed"
+  | "settled"
+  | null;
+
+function initialCurrentQueue26825Phase(
+  frame: string | null,
+): CurrentQueue26825Phase {
+  const prefix = "workspace-composer-current-26-825-queue-";
+  if (!frame?.startsWith(prefix)) return null;
+  const phase = frame.slice(prefix.length);
+  return [
+    "continued",
+    "paused",
+    "pending",
+    "resume-ready",
+    "resumed",
+    "settled",
+  ].includes(phase)
+    ? (phase as Exclude<CurrentQueue26825Phase, null>)
+    : "pending";
 }
 
 function initialComposerMode(frame: string | null): ComposerMode {
@@ -1058,6 +1097,74 @@ const currentComposerPermissionOptions: readonly ComposerPermissionOption[] = [
   },
 ];
 
+function CurrentComposerResourceIcon({
+  name,
+}: {
+  name: "files" | "goal" | "plan" | "skill";
+}) {
+  if (name === "files") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 21 21">
+        <path d="M4.43945 12.8041V7.68261C4.43945 7.30642 4.74446 7.00141 5.12066 7.00141C5.49685 7.00141 5.80186 7.30642 5.80186 7.68261V12.8041C5.80186 15.2565 7.78984 17.2445 10.2422 17.2445C12.6945 17.2445 14.6825 15.2565 14.6825 12.8041V5.9751C14.6823 4.46587 13.4589 3.24247 11.9497 3.24229C10.4403 3.24229 9.21606 4.46576 9.21588 5.9751V12.8041C9.21588 13.3708 9.67553 13.8304 10.2422 13.8304C10.8088 13.8304 11.2685 13.3708 11.2685 12.8041V7.68261C11.2685 7.30642 11.5735 7.00141 11.9497 7.00141C12.3257 7.00159 12.6309 7.30653 12.6309 7.68261V12.8041C12.6309 14.1232 11.5612 15.1929 10.2422 15.1929C8.92314 15.1929 7.85347 14.1232 7.85347 12.8041V5.9751C7.85365 3.71337 9.68791 1.87988 11.9497 1.87988C14.2113 1.88006 16.0447 3.71348 16.0449 5.9751V12.8041C16.0449 16.0089 13.4469 18.6069 10.2422 18.6069C7.03745 18.6069 4.43945 16.0089 4.43945 12.8041Z" />
+      </svg>
+    );
+  }
+  if (name === "goal") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path d="M9.96861 1.91681C10.3002 1.91681 10.569 2.18564 10.569 2.51722C10.5688 2.84865 10.3001 3.11764 9.96861 3.11764C6.14529 3.11779 3.04595 6.21713 3.04579 10.0404C3.04597 13.8637 6.14531 16.964 9.96861 16.9641C13.792 16.9641 16.8921 13.8638 16.8923 10.0404C16.8925 9.709 17.1612 9.44003 17.4927 9.44003C17.8241 9.44019 18.093 9.7091 18.0931 10.0404C18.0929 14.527 14.4552 18.165 9.96861 18.165C5.48215 18.1648 1.84515 14.5269 1.84497 10.0404C1.84513 5.55398 5.48214 1.91697 9.96861 1.91681Z" />
+        <path d="M8.73428 5.4417C9.05275 5.34987 9.38553 5.53321 9.47752 5.85167C9.56932 6.17 9.38575 6.50275 9.06755 6.59491C7.60672 7.01688 6.53899 8.36477 6.53894 9.96021C6.53907 11.8943 8.10685 13.4629 10.0409 13.4631C11.6106 13.463 12.9407 12.429 13.385 11.0041C13.4838 10.6877 13.8206 10.5114 14.1371 10.61C14.4536 10.7087 14.6308 11.0455 14.5321 11.3621C13.9357 13.2742 12.1509 14.663 10.0409 14.663C7.44369 14.6628 5.33824 12.5574 5.33812 9.96021C5.33816 7.81571 6.77345 6.00809 8.73428 5.4417Z" />
+        <path d="M13.8656 1.99087C14.3948 1.60393 15.1805 1.97721 15.1739 2.67063L15.1528 4.83776L17.319 4.8166L17.4539 4.82541C18.1023 4.92002 18.4014 5.73603 17.9115 6.22638L15.5046 8.63331C15.3075 8.83039 15.04 8.94171 14.7613 8.94189H12.2063L10.3936 10.7555C10.1591 10.9899 9.77811 10.9899 9.54364 10.7555C9.30989 10.521 9.30952 10.1407 9.54364 9.90643L11.0486 8.40144V5.22922C11.0486 4.95027 11.1591 4.68234 11.3563 4.48509L13.7633 2.07816L13.8656 1.99087ZM12.2495 5.29005V7.74107H14.6978L16.4136 6.02536L13.9414 6.05004L13.9643 3.57434L12.2495 5.29005Z" />
+      </svg>
+    );
+  }
+  if (name === "plan") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 16 16">
+        <path d="M8 3.52051C9.07134 3.52056 10.0951 3.86574 10.8574 4.54785C11.6273 5.23672 12.0976 6.24043 12.0977 7.48047C12.0977 8.72922 11.6209 9.58857 11.1914 10.2686C10.9702 10.6188 10.7891 10.8819 10.6494 11.1572C10.5171 11.4183 10.4482 11.6441 10.4482 11.877V12.4268C10.4482 13.1158 10.1861 13.7075 9.72559 14.1221C9.27069 14.5315 8.65733 14.7373 8 14.7373C7.34282 14.7373 6.73026 14.5313 6.27539 14.1221C5.81475 13.7075 5.55182 13.1159 5.55176 12.4268V11.877C5.55175 11.6441 5.48294 11.4183 5.35059 11.1572C5.21093 10.8818 5.02985 10.6189 4.80859 10.2686C4.37912 9.58855 3.90332 8.72928 3.90332 7.48047C3.90335 6.24047 4.37279 5.23672 5.14258 4.54785C5.90494 3.86581 6.9287 3.52055 8 3.52051ZM6.60156 12.4268C6.60162 12.8365 6.75133 13.1382 6.97754 13.3418C7.2095 13.5504 7.55861 13.6875 8 13.6875C8.44132 13.6874 8.79051 13.5504 9.02246 13.3418C9.24859 13.1382 9.39838 12.8364 9.39844 12.4268V12.2656H6.60156V12.4268ZM8 4.57129C7.14816 4.57133 6.38548 4.84457 5.84277 5.33008C5.30758 5.80896 4.95315 6.52253 4.95312 7.48047C4.95312 8.42985 5.30144 9.08283 5.69629 9.70801C5.88705 10.01 6.11776 10.3486 6.28711 10.6826C6.37163 10.8493 6.44704 11.0262 6.50293 11.2148H9.49707C9.55297 11.0262 9.62839 11.0262 9.71289 10.6826C9.88222 10.3487 10.113 10.01 10.3037 9.70801C10.6985 9.08286 11.0469 8.4298 11.0469 7.48047C11.0468 6.52258 10.6924 5.80896 10.1572 5.33008C9.61453 4.84459 8.8518 4.57134 8 4.57129Z" />
+        <path d="M2 6.85449C2.28995 6.85449 2.52539 7.08993 2.52539 7.37988C2.52539 7.66983 2.28995 7.90527 2 7.90527H0.833008C0.543208 7.9051 0.308594 7.66972 0.308594 7.37988C0.308594 7.09004 0.543208 6.85467 0.833008 6.85449H2Z" />
+        <path d="M15.167 6.85449C15.4568 6.85462 15.6924 7.09001 15.6924 7.37988C15.6924 7.66975 15.4568 7.90514 15.167 7.90527H14C13.7102 7.9051 13.4756 7.66972 13.4756 7.37988C13.4756 7.09004 13.7102 6.85467 14 6.85449H15.167Z" />
+        <path d="M2.56348 1.94141C2.7685 1.73639 3.10161 1.7364 3.30664 1.94141L4.08203 2.71777C4.28706 2.9228 4.28706 3.25494 4.08203 3.45996C3.877 3.66497 3.54486 3.66498 3.33984 3.45996L2.56348 2.68457C2.35847 2.47955 2.35847 2.14643 2.56348 1.94141Z" />
+        <path d="M12.6934 1.94141C12.8984 1.7364 13.2315 1.73643 13.4365 1.94141C13.6415 2.14643 13.6415 2.47955 13.4365 2.68457L12.6602 3.46094C12.4552 3.66539 12.1229 3.66538 11.918 3.46094C11.7129 3.25592 11.713 2.9228 11.918 2.71777L12.6934 1.94141Z" />
+        <path d="M8 0.1875C8.28995 0.1875 8.52539 0.422941 8.52539 0.712891V1.87988C8.52521 2.16968 8.28984 2.4043 8 2.4043C7.71016 2.4043 7.47479 2.16968 7.47461 1.87988V0.712891C7.47461 0.422941 7.71005 0.1875 8 0.1875Z" />
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <g transform="scale(1.25)">
+        <path d="M8.00195 4.1416C10.1326 4.14173 11.8602 5.86933 11.8604 8C11.8602 10.1307 10.1327 11.8583 8.00195 11.8584C5.87129 11.8582 4.14369 10.1307 4.14355 8C4.14373 5.86936 5.87131 4.14178 8.00195 4.1416Z" />
+        <path d="M8.00195 1.47461C11.6056 1.47461 14.5273 4.39634 14.5273 8C14.5273 11.6037 11.6056 14.5254 8.00195 14.5254C4.3983 14.5254 1.47656 11.6037 1.47656 8C1.47656 4.39634 4.3983 1.47461 8.00195 1.47461ZM8.00195 2.52539C4.97819 2.52539 2.52734 4.97624 2.52734 8C2.52734 11.0238 4.97819 13.4746 8.00195 13.4746C11.0257 13.4746 13.4766 11.0238 13.4766 8C13.4766 4.97624 11.0257 2.52539 8.00195 2.52539Z" />
+      </g>
+    </svg>
+  );
+}
+
+const currentComposerResourceGroups: readonly ComposerResourceGroup[] = [
+  {
+    id: "add",
+    options: [
+      { icon: <CurrentComposerResourceIcon name="files" />, id: "files", label: "Files and folders" },
+      { icon: <span aria-hidden="true" className="demo-current-chrome-icon" />, id: "chrome", label: "Attach Google Chrome" },
+      { description: "Choose project for new chats", icon: <CurrentBuildIcon name="composer-project" />, id: "project", label: "Work in a project" },
+      { description: "Set a goal to keep pursuing", icon: <CurrentComposerResourceIcon name="goal" />, id: "goal", label: "Goal" },
+      { description: "Turn plan mode on", icon: <CurrentComposerResourceIcon name="plan" />, id: "plan", label: "Plan mode" },
+      { icon: <CurrentComposerResourceIcon name="skill" />, id: "record-skill", label: "Record a skill" },
+    ],
+  },
+  {
+    id: "plugins",
+    label: "Plugins",
+    options: [
+      { icon: "◆", id: "figma", label: "Figma", description: "Figma design-to-code workflows" },
+      { icon: "▤", id: "documents", label: "Documents", description: "Create and edit documents" },
+      { icon: "▧", id: "pdf", label: "PDF", description: "Read, create, and verify PDFs" },
+      { icon: "▦", id: "spreadsheets", label: "Spreadsheets", description: "Create and edit spreadsheets" },
+      { icon: "▥", id: "presentations", label: "Presentations", description: "Create and edit presentations" },
+    ],
+  },
+];
+
 const composerResourceGroups: readonly ComposerResourceGroup[] = [
   {
     id: "add",
@@ -1168,7 +1275,15 @@ const composerResourceGroups: readonly ComposerResourceGroup[] = [
 ];
 
 function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
-  if (frame !== "composer-queued" && frame !== "composer-queue-paused") {
+  const currentQueuePhase = initialCurrentQueue26825Phase(frame);
+  if (
+    frame !== "composer-queued" &&
+    frame !== "composer-queue-paused" &&
+    !currentQueuePhase
+  ) {
+    return [];
+  }
+  if (currentQueuePhase === "continued" || currentQueuePhase === "settled") {
     return [];
   }
   return [
@@ -2190,6 +2305,13 @@ export function App() {
     initialSelection.frame?.startsWith(
       "workspace-composer-current-26-825-",
     );
+  const currentComposerMultiline26825Replay =
+    initialSelection.frame ===
+      "workspace-composer-current-26-825-multiline-four" ||
+    initialSelection.frame ===
+      "workspace-composer-current-26-825-multiline-long";
+  const currentComposerQueue26825Replay =
+    initialCurrentQueue26825Phase(initialSelection.frame) !== null;
   const currentContext26825Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
@@ -2721,6 +2843,10 @@ export function App() {
     useState<ComposerOverlay>(() =>
       initialComposerOverlay(initialSelection.frame),
     );
+  const [currentQueue26825Phase, setCurrentQueue26825Phase] =
+    useState<CurrentQueue26825Phase>(() =>
+      initialCurrentQueue26825Phase(initialSelection.frame),
+    );
   const [composerMode, setComposerMode] = useState<ComposerMode>(() =>
     initialComposerMode(initialSelection.frame),
   );
@@ -2748,7 +2874,8 @@ export function App() {
   );
   const [queueingEnabled, setQueueingEnabled] = useState(true);
   const [queueInterrupted, setQueueInterrupted] = useState(
-    initialSelection.frame === "composer-queue-paused",
+    initialSelection.frame === "composer-queue-paused" ||
+      initialCurrentQueue26825Phase(initialSelection.frame) === "paused",
   );
   const [replayComposerSubmitting, setReplayComposerSubmitting] = useState(
     initialSelection.frame === "composer-disabled",
@@ -2756,7 +2883,8 @@ export function App() {
   const [replayComposerFocusRequest, setReplayComposerFocusRequest] =
     useState(0);
   const [replayComposerStopped, setReplayComposerStopped] = useState(
-    initialSelection.frame === "composer-queue-paused",
+    initialSelection.frame === "composer-queue-paused" ||
+      initialCurrentQueue26825Phase(initialSelection.frame) === "paused",
   );
   const [threadSummaryOpen, setThreadSummaryOpen] = useState(
     initialSelection.frame === "context-summary-open" ||
@@ -3058,6 +3186,19 @@ export function App() {
   const liveApprovalSubmissionGateRef = useRef(
     new LiveApprovalSubmissionGate(),
   );
+  useLayoutEffect(() => {
+    if (
+      initialSelection.frame !==
+      "workspace-composer-current-26-825-multiline-long"
+    ) {
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => {
+      const input = composerInputRef.current;
+      if (input) input.scrollTop = input.scrollHeight;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [initialSelection.frame]);
   const scenarioEvents = useMemo(
     () =>
       scenario.id === "workspace-workflow"
@@ -4260,6 +4401,14 @@ export function App() {
   };
 
   const stopComposer = () => {
+    if (currentComposerQueue26825Replay) {
+      cancelReplaySubmitTimer();
+      setCurrentQueue26825Phase("paused");
+      setQueueInterrupted(true);
+      setReplayComposerStopped(true);
+      setActiveFrame("workspace-composer-current-26-825-queue-paused");
+      return;
+    }
     if (isCurrentContextCompactionReplay) {
       stopReplayCompaction();
       return;
@@ -4298,10 +4447,40 @@ export function App() {
   };
 
   const resumeQueue = () => {
+    if (currentComposerQueue26825Replay) {
+      setCurrentQueue26825Phase("resume-ready");
+      setQueueInterrupted(false);
+      setReplayComposerStopped(true);
+      setActiveFrame(
+        "workspace-composer-current-26-825-queue-resume-ready",
+      );
+      requestAnimationFrame(() => composerInputRef.current?.focus());
+      return;
+    }
     restoreConversationRunningReplay();
     setQueuedPrompts((items) =>
       items.map((item) => ({ ...item, status: "queued" })),
     );
+  };
+
+  const resumeCurrentQueuePrimary = () => {
+    if (!currentComposerQueue26825Replay) return;
+    cancelReplaySubmitTimer();
+    setCurrentQueue26825Phase("resumed");
+    setQueueInterrupted(false);
+    setReplayComposerStopped(false);
+    setActiveFrame("workspace-composer-current-26-825-queue-resumed");
+    replaySubmitTimerRef.current = window.setTimeout(() => {
+      setCurrentQueue26825Phase("continued");
+      setQueuedPrompts([]);
+      setActiveFrame("workspace-composer-current-26-825-queue-continued");
+      replaySubmitTimerRef.current = window.setTimeout(() => {
+        replaySubmitTimerRef.current = null;
+        setCurrentQueue26825Phase("settled");
+        setActiveFrame("workspace-composer-current-26-825-queue-settled");
+        requestAnimationFrame(() => composerInputRef.current?.focus());
+      }, 600);
+    }, 1_000);
   };
 
   const removeQueuedPrompt = (id: string) => {
@@ -4309,6 +4488,11 @@ export function App() {
     setQueuedPrompts(nextItems);
     if (nextItems.length === 0) {
       setQueueInterrupted(false);
+      if (currentComposerQueue26825Replay) {
+        setCurrentQueue26825Phase("settled");
+        setReplayComposerStopped(true);
+        setActiveFrame("workspace-composer-current-26-825-queue-settled");
+      }
     }
   };
 
@@ -4321,6 +4505,13 @@ export function App() {
   };
 
   const sendQueuedPromptNow = (id: string) => {
+    if (currentComposerQueue26825Replay) {
+      deleteQueuedPrompt(id);
+      setCurrentQueue26825Phase("continued");
+      setReplayComposerStopped(false);
+      setActiveFrame("workspace-composer-current-26-825-queue-continued");
+      return;
+    }
     deleteQueuedPrompt(id);
     restoreConversationRunningReplay();
   };
@@ -6884,7 +7075,14 @@ export function App() {
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : currentComposerControls26825Replay
-        ? composerOverlay === "permissions"
+        ? currentComposerQueue26825Replay
+          ? `workspace-composer-current-26-825-queue-${currentQueue26825Phase ?? "pending"}`
+          : currentComposerMultiline26825Replay
+            ? initialSelection.frame ??
+              "workspace-composer-current-26-825-multiline-four"
+          : composerOverlay === "resources"
+            ? "workspace-composer-current-26-825-resources"
+          : composerOverlay === "permissions"
           ? "workspace-composer-current-26-825-permissions"
           : composerMode === "goal"
             ? "workspace-composer-current-26-825-goal"
@@ -7806,11 +8004,23 @@ export function App() {
       ) : null}
     </>
   );
-  const workspaceComposer = (
+  const currentQueue26825Running =
+    currentQueue26825Phase === "pending" ||
+    currentQueue26825Phase === "resumed" ||
+    currentQueue26825Phase === "continued";
+  const workspaceComposerSurface = (
     <AgentComposer
       actions={
         <span className="demo-composer-controls">
-          <button aria-label="Add files and more" type="button">
+          <button
+            aria-label="Add files and more"
+            onClick={() =>
+              setComposerOverlay((current) =>
+                current === "resources" ? null : "resources",
+              )
+            }
+            type="button"
+          >
             <CurrentBuildIcon name="composer-add-files" />
           </button>
           {currentComposerControls26825Replay ? (
@@ -7882,7 +8092,7 @@ export function App() {
           <button aria-label="Dictate" type="button">
             <CurrentBuildIcon name="composer-dictate" />
           </button>
-          {!composerValue.trim() ? (
+          {!composerValue.trim() && !currentComposerQueue26825Replay ? (
             <button
               aria-label="Start new voice chat"
               className="demo-workspace-voice"
@@ -7893,8 +8103,34 @@ export function App() {
           ) : null}
         </span>
       }
+      isRunning={currentComposerQueue26825Replay && currentQueue26825Running}
       layout="multiline"
+      onResume={
+        currentComposerQueue26825Replay &&
+        (currentQueue26825Phase === "paused" ||
+          currentQueue26825Phase === "resume-ready")
+          ? resumeCurrentQueuePrimary
+          : undefined
+      }
+      onStop={
+        currentComposerQueue26825Replay && currentQueue26825Running
+          ? stopComposer
+          : undefined
+      }
       onSubmit={(prompt) => {
+        if (currentComposerQueue26825Replay) {
+          if (!currentQueue26825Running) return;
+          queuedPromptCounterRef.current += 1;
+          setQueuedPrompts((items) => [
+            ...items,
+            {
+              id: `current-queue-${queuedPromptCounterRef.current}`,
+              text: prompt,
+            },
+          ]);
+          setComposerValue("");
+          return;
+        }
         if (projectIndexChat) {
           const nextPrompt = prompt.trim();
           if (!nextPrompt) return;
@@ -7946,6 +8182,31 @@ export function App() {
             : "Do anything"
       }
       ref={composerInputRef}
+      suggestions={
+        currentComposerControls26825Replay &&
+        composerOverlay === "resources" ? (
+          <ComposerResourcePicker
+            activeId={composerResourceActiveId}
+            className="codex-ui-composer-resource-picker--current-26-825"
+            descriptionSeparator=""
+            groups={currentComposerResourceGroups}
+            onActiveIdChange={setComposerResourceActiveId}
+            onDismiss={() => {
+              setComposerOverlay(null);
+              requestAnimationFrame(() => composerInputRef.current?.focus());
+            }}
+            onSelect={(option) => {
+              setComposerResourceActiveId(option.id);
+              if (option.id === "goal" || option.id === "plan") {
+                setComposerMode(option.id);
+                setComposerValue("");
+              }
+              setComposerOverlay(null);
+              requestAnimationFrame(() => composerInputRef.current?.focus());
+            }}
+          />
+        ) : undefined
+      }
       textareaLabel={
         composerMode === "goal"
           ? "Describe your goal, define measurable outcomes for best results"
@@ -7955,6 +8216,29 @@ export function App() {
       }
       value={composerValue}
     />
+  );
+  const workspaceComposer = currentComposerQueue26825Replay ? (
+    <ComposerDock
+      className="demo-current-composer-queue-dock"
+      composer={workspaceComposerSurface}
+      queue={
+        queuedPrompts.length > 0 ? (
+          <QueuedPromptList
+            interrupted={queueInterrupted}
+            items={queuedPrompts}
+            onDelete={deleteQueuedPrompt}
+            onEdit={editQueuedPrompt}
+            onQueueingChange={setQueueingEnabled}
+            onReorder={reorderQueuedPrompts}
+            onResume={resumeQueue}
+            onSendNow={sendQueuedPromptNow}
+            queueingEnabled={queueingEnabled}
+          />
+        ) : undefined
+      }
+    />
+  ) : (
+    workspaceComposerSurface
   );
   const workspaceNewConversationRoute = (
     <div className="demo-workspace-route">
@@ -12365,7 +12649,17 @@ export function App() {
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
       data-composer-phase={
-        isConversationLifecycle ||
+        currentComposerQueue26825Replay
+          ? currentQueue26825Phase === "paused"
+            ? "queue-paused"
+            : currentQueue26825Phase === "resume-ready"
+              ? "resume-ready"
+              : currentQueue26825Phase === "continued"
+                ? "continued"
+                : currentQueue26825Running
+                  ? "queued"
+                  : "idle"
+        : isConversationLifecycle ||
         isCurrentAttachmentReplay ||
         isCurrentCommandInterruptionReplay ||
         isCurrentCommand26820Replay ||
@@ -12387,10 +12681,14 @@ export function App() {
           : undefined
       }
       data-queue-count={
-        isConversationLifecycle ? queuedPrompts.length : undefined
+        isConversationLifecycle || currentComposerQueue26825Replay
+          ? queuedPrompts.length
+          : undefined
       }
       data-queueing-enabled={
-        isConversationLifecycle ? queueingEnabled : undefined
+        isConversationLifecycle || currentComposerQueue26825Replay
+          ? queueingEnabled
+          : undefined
       }
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
@@ -12407,7 +12705,16 @@ export function App() {
           ? mcpSourceSummaryPinned
           : undefined
       }
-      data-status={displayedStatus}
+      data-status={
+        currentComposerQueue26825Replay
+          ? currentQueue26825Running
+            ? "running"
+            : currentQueue26825Phase === "paused" ||
+                currentQueue26825Phase === "resume-ready"
+              ? "interrupted"
+              : "completed"
+          : displayedStatus
+      }
       data-theme={appliedTheme}
       data-thread-following={
         isConversationLifecycle ? threadFollowing : undefined

@@ -10737,6 +10737,183 @@ for (const currentComposerMode26825 of [
   }
 }
 
+const currentComposerResources26825Scene = {
+  currentSidebar: true,
+  frame: "workspace-composer-current-26-825-resources",
+  id: "electron-workspace-composer-current-26-825-resources-compact",
+  scenario: "workspace-workflow",
+  sidebarState: "compact-collapsed",
+  theme: "dark",
+  view: "workspace",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: currentComposerResources26825App,
+  page: currentComposerResources26825Page,
+} = await launchScene(currentComposerResources26825Scene, { capture: false });
+try {
+  const contract = await currentComposerResources26825Page.evaluate(() => {
+    const picker = document.querySelector(
+      ".codex-ui-composer-resource-picker--current-26-825",
+    );
+    const scroller = picker?.querySelector(
+      ".codex-ui-composer-resource-picker__scroller",
+    );
+    const value = picker?.getBoundingClientRect();
+    return {
+      height: value?.height,
+      left: value?.left,
+      optionCount: picker?.querySelectorAll('[role="option"]').length,
+      optionHeights: Array.from(
+        picker?.querySelectorAll('[role="option"]') ?? [],
+        (option) => option.getBoundingClientRect().height,
+      ),
+      scrollerHeight: scroller?.clientHeight,
+      top: value?.top,
+      width: value?.width,
+    };
+  });
+  if (
+    Math.abs(contract.left - 16) > 1 ||
+    Math.abs(contract.top - 242) > 1 ||
+    Math.abs(contract.width - 688) > 1 ||
+    Math.abs(contract.height - 320) > 1 ||
+    contract.scrollerHeight !== 310 ||
+    contract.optionCount !== 11 ||
+    contract.optionHeights.some((height) => Math.abs(height - 28.5625) > 0.2)
+  ) {
+    throw new Error(
+      `Electron current 26.825 resource picker failed: ${JSON.stringify(contract)}.`,
+    );
+  }
+  await currentComposerResources26825Page
+    .getByRole("listbox", { name: "Composer resources" })
+    .press("Escape");
+  await currentComposerResources26825Page.waitForSelector(
+    '.demo-root[data-frame="workspace-composer-current-26-825-ready"]:not([data-composer-overlay])',
+  );
+} finally {
+  await currentComposerResources26825App.close();
+}
+
+for (const currentMultiline26825 of [
+  { frame: "multiline-four", height: 134, inputHeight: 80, top: 530 },
+  { frame: "multiline-long", height: 224, inputHeight: 170, top: 440 },
+]) {
+  const { app, page } = await launchScene(
+    {
+      currentSidebar: true,
+      frame: `workspace-composer-current-26-825-${currentMultiline26825.frame}`,
+      id: `electron-workspace-composer-current-26-825-${currentMultiline26825.frame}-compact`,
+      scenario: "workspace-workflow",
+      sidebarState: "compact-collapsed",
+      theme: "dark",
+      view: "workspace",
+      windowSize: { height: 680, width: 720 },
+    },
+    { capture: false },
+  );
+  try {
+    const contract = await page.evaluate(() => {
+      const measure = (selector) => {
+        const element = document.querySelector(selector);
+        const value = element?.getBoundingClientRect();
+        return value
+          ? {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            }
+          : null;
+      };
+      const input = document.querySelector(
+        ".demo-workspace-start .codex-ui-composer__input",
+      );
+      return {
+        input: measure(".demo-workspace-start .codex-ui-composer__input"),
+        scrollHeight: input?.scrollHeight,
+        scrollTop: input?.scrollTop,
+        surface: measure(".demo-workspace-start .codex-ui-composer"),
+      };
+    });
+    if (
+      Math.abs(contract.surface?.left - 16) > 1 ||
+      Math.abs(contract.surface?.top - currentMultiline26825.top) > 1 ||
+      Math.abs(contract.surface?.width - 688) > 1 ||
+      Math.abs(contract.surface?.height - currentMultiline26825.height) > 1 ||
+      Math.abs(contract.input?.left - 28) > 1 ||
+      Math.abs(contract.input?.height - currentMultiline26825.inputHeight) > 1 ||
+      (currentMultiline26825.frame === "multiline-long" &&
+        (contract.scrollHeight < 390 || contract.scrollTop < 200))
+    ) {
+      throw new Error(
+        `Electron current 26.825 ${currentMultiline26825.frame} Composer failed: ${JSON.stringify(contract)}.`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
+const currentQueue26825Scene = {
+  currentSidebar: true,
+  frame: "workspace-composer-current-26-825-queue-paused",
+  id: "electron-workspace-composer-current-26-825-queue-paused",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "workspace",
+};
+const { app: currentQueue26825App, page: currentQueue26825Page } =
+  await launchScene(currentQueue26825Scene, { capture: false });
+try {
+  const queue = currentQueue26825Page.locator(
+    ".demo-current-composer-queue-dock > .codex-ui-composer-dock__queue",
+  );
+  const queueRect = await queue.evaluate((element) => {
+    const value = element.getBoundingClientRect();
+    return {
+      height: value.height,
+      left: value.left,
+      top: value.top,
+      width: value.width,
+    };
+  });
+  if (
+    Math.abs(queueRect.left - 395.9375) > 1 ||
+    Math.abs(queueRect.top - 638) > 1 ||
+    Math.abs(queueRect.width - 710) > 1 ||
+    Math.abs(queueRect.height - 72) > 1
+  ) {
+    throw new Error(
+      `Electron current 26.825 paused queue geometry failed: ${JSON.stringify(queueRect)}.`,
+    );
+  }
+  await currentQueue26825Page
+    .getByRole("button", { name: "Resume" })
+    .first()
+    .click();
+  await currentQueue26825Page.waitForSelector(
+    '.demo-root[data-composer-phase="resume-ready"][data-queue-count="1"] .codex-ui-composer__primary[data-action="resume"]',
+  );
+  await currentQueue26825Page
+    .locator('.codex-ui-composer__primary[data-action="resume"]')
+    .click();
+  await currentQueue26825Page.waitForSelector(
+    '.demo-root[data-composer-phase="queued"][data-status="running"][data-queue-count="1"]',
+  );
+  await currentQueue26825Page.waitForSelector(
+    '.demo-root[data-composer-phase="continued"][data-status="running"][data-queue-count="0"]',
+    { timeout: 2_000 },
+  );
+  await currentQueue26825Page.waitForSelector(
+    '.demo-root[data-composer-phase="idle"][data-status="completed"][data-queue-count="0"]',
+    { timeout: 2_000 },
+  );
+} finally {
+  await currentQueue26825App.close();
+}
+
 const currentCheckoutGitDirectory = await mkdtemp(
   join(tmpdir(), "codex-ui-kit-electron-current-checkout-"),
 );
