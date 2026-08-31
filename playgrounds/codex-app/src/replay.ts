@@ -17,7 +17,7 @@ import currentSearch26825Trace from "../fixtures/traces/current-search-26-825.js
 import currentReviewRenameTrace from "../fixtures/traces/current-review-rename.jsonl?raw";
 import currentReviewFilesTrace from "../fixtures/traces/current-review-files.jsonl?raw";
 import currentReview26825FilesTrace from "../fixtures/traces/current-review-26-825-files.jsonl?raw";
-import commandCurrent26820FailureTrace from "../fixtures/traces/command-current-26-820-failure.jsonl?raw";
+import commandCurrent26825FailureTrace from "../fixtures/traces/command-current-26-825-failure.jsonl?raw";
 import commandCurrent26820InterruptionTrace from "../fixtures/traces/command-current-26-820-interruption.jsonl?raw";
 import commandCurrent26820SuccessTrace from "../fixtures/traces/command-current-26-820-success.jsonl?raw";
 import commandCurrent26825SuccessTrace from "../fixtures/traces/command-current-26-825-success.jsonl?raw";
@@ -64,7 +64,7 @@ export type ReplayScenarioId =
   | "approval-similar-commands"
   | "attachment-lifecycle"
   | "background-terminal"
-  | "command-current-26-820-failure"
+  | "command-current-26-825-failure"
   | "command-current-26-820-interruption"
   | "command-current-26-820-success"
   | "command-current-26-825-success"
@@ -219,11 +219,11 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "The runtime-observed 26.820 product keeps a successful long-running command as a regular-weight, noninteractive command row inside the expandable activity timeline while retaining protocol output outside the visible thread.",
     commandCurrent26820SuccessTrace,
   ),
-  "command-current-26-820-failure": scenario(
-    "command-current-26-820-failure",
-    "Observe command failure",
-    "The runtime-observed 26.820 product keeps an exit-7 command as a noninteractive Ran row without exposing stdout, stderr, or an exit-code card, then accepts a same-thread recovery.",
-    commandCurrent26820FailureTrace,
+  "command-current-26-825-failure": scenario(
+    "command-current-26-825-failure",
+    "Run 26.825 failure command",
+    "The runtime-observed 26.825 product keeps an exit-7 command as a noninteractive Ran row without exposing stdout, stderr, or an exit-code card, then accepts a same-thread recovery.",
+    commandCurrent26825FailureTrace,
   ),
   "command-current-26-820-interruption": scenario(
     "command-current-26-820-interruption",

@@ -3306,16 +3306,16 @@ export function App() {
     mode === "replay" && scenarioId === "interruption";
   const isCurrentCommand26820SuccessReplay =
     mode === "replay" && scenarioId === "command-current-26-820-success";
-  const isCurrentCommand26820FailureReplay =
-    mode === "replay" && scenarioId === "command-current-26-820-failure";
+  const isCurrentCommand26825FailureReplay =
+    mode === "replay" && scenarioId === "command-current-26-825-failure";
   const isCurrentCommand26820InterruptionReplay =
     mode === "replay" &&
     scenarioId === "command-current-26-820-interruption";
   const isCurrentCommand26825SuccessReplay =
     mode === "replay" && scenarioId === "command-current-26-825-success";
-  const isCurrentCommand26820Replay =
+  const isCurrentCommandReplay =
     isCurrentCommand26820SuccessReplay ||
-    isCurrentCommand26820FailureReplay ||
+    isCurrentCommand26825FailureReplay ||
     isCurrentCommand26820InterruptionReplay ||
     isCurrentCommand26825SuccessReplay;
   const isCurrentContextCompactionReplay =
@@ -4538,14 +4538,14 @@ export function App() {
     current26825LongFrame ||
     isCurrentApproval26820FileReplay ||
     isCurrentMcp26820Replay ||
-    isCurrentCommand26820Replay;
+    isCurrentCommandReplay;
   const currentWindowedFrame = legacyWindowedFrame || current26825LongFrame;
   const reverseOriginThread =
     currentWindowedFrame ||
     isCurrentLongCommandReplay ||
     isCurrentCommandFailureReplay ||
     isCurrentCommandInterruptionReplay ||
-    isCurrentCommand26820Replay ||
+    isCurrentCommandReplay ||
     isCurrentRichMarkdownStreamingReplay;
   const windowedHistorySize = current26825LongFrame
     ? current26825LongHistorySize
@@ -5640,7 +5640,7 @@ export function App() {
         (isCurrentPlan26825Replay && state.status === "running") ||
         (isCurrentTransportRecoveryReplay && isTurnActive(state.status)) ||
         ((isCurrentCommandInterruptionReplay ||
-          isCurrentCommand26820Replay ||
+          isCurrentCommandReplay ||
           isCurrentContextCompactionReplay ||
           isCurrentMixedToolReplay ||
           isCurrentSubagentReplay ||
@@ -5651,7 +5651,7 @@ export function App() {
     ((isConversationLifecycle ||
       isCurrentAttachmentReplay ||
       isCurrentCommandInterruptionReplay ||
-      isCurrentCommand26820Replay ||
+      isCurrentCommandReplay ||
       isCurrentContextCompactionReplay) &&
       replayComposerSubmitting);
   const displayedStatus =
@@ -5745,7 +5745,7 @@ export function App() {
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
-      isCurrentCommand26820Replay ||
+      isCurrentCommandReplay ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isAnyCurrentBasicMessageReplay ||
@@ -6216,7 +6216,7 @@ export function App() {
           : current26820HeaderFrame
           ? current26825LongFrame
             ? "LONG THREAD 01"
-            : isCurrentCommand26820Replay
+            : isCurrentCommandReplay
               ? scenario.label
               : isCurrentApproval26820FileReplay
                 ? scenario.label
@@ -6252,7 +6252,7 @@ export function App() {
       scenarioId === "long-command-output" ||
       scenarioId === "command-failure-recovery" ||
       scenarioId === "interruption" ||
-      isCurrentCommand26820Replay ||
+      isCurrentCommandReplay ||
       scenarioId === "compaction" ||
       scenarioId === "context-summary" ||
       isAnyCurrentBasicMessageReplay ||
@@ -10647,7 +10647,7 @@ export function App() {
                 (scenarioId === "interruption" &&
                   message.id ===
                     "assistant-command-interruption-recovery") ||
-                (isCurrentCommand26820Replay &&
+                (isCurrentCommandReplay &&
                   message.id.startsWith("assistant-command-current-26-8")) ||
                 (isCurrentSubagentReplay &&
                   message.id.startsWith("assistant-subagent-")) ||
@@ -10667,7 +10667,7 @@ export function App() {
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
                 scenarioId === "long-command-output" ||
-                isCurrentCommand26820Replay ||
+                isCurrentCommandReplay ||
                 isAnyCurrentBasicMessageReplay ||
                 isCurrentCitations26825Replay ||
                 isCurrentMarkdown26818Replay ||
@@ -11621,7 +11621,7 @@ export function App() {
         );
       }
       if (
-        isCurrentCommand26820Replay &&
+        isCurrentCommandReplay &&
         command.id.startsWith("command-current-26-8")
       ) {
         const running =
@@ -11670,6 +11670,8 @@ export function App() {
         }
         const turnDurationMs = isCurrentCommand26825SuccessReplay
           ? 8_000
+          : isCurrentCommand26825FailureReplay
+            ? 15_000
           : isCurrentCommand26820SuccessReplay
             ? 22_000
             : 12_000;
@@ -12684,7 +12686,7 @@ export function App() {
         : isConversationLifecycle ||
         isCurrentAttachmentReplay ||
         isCurrentCommandInterruptionReplay ||
-        isCurrentCommand26820Replay ||
+        isCurrentCommandReplay ||
         isCurrentContextCompactionReplay ||
         isCurrentSubagentReplay
           ? composerPhase

@@ -378,8 +378,8 @@ const currentCommandLifecycleReferenceSize = {
 };
 const currentCommand26820SuccessReference =
   process.env.CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_REFERENCE;
-const currentCommand26820FailureReference =
-  process.env.CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_820_REFERENCE;
+const currentCommand26825FailureReference =
+  process.env.CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_825_REFERENCE;
 const currentCommand26820InterruptionStoppedReference =
   process.env.CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_REFERENCE;
 const currentCommand26820InterruptionCompactReference =
@@ -3063,11 +3063,11 @@ for (const scene of selectedScenes) {
   }
 
   if (
-    scene.id === "command-current-26-820-failure-recovered" &&
-    currentCommand26820FailureReference
+    scene.id === "command-current-26-825-failure-recovered" &&
+    currentCommand26825FailureReference
   ) {
     const reference = PNG.sync.read(
-      await readFile(currentCommand26820FailureReference),
+      await readFile(currentCommand26825FailureReference),
     );
     if (
       reference.width !== currentCommand26820WideReferenceSize.width ||
@@ -3076,24 +3076,24 @@ for (const scene of selectedScenes) {
       actual.height !== reference.height
     ) {
       throw new Error(
-        `${scene.id}: current 26.820 command failure comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+        `${scene.id}: current 26.825 command failure comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
       );
     }
     const comparison = comparePng(
-      cropPng(reference, 206, 302, 736, 125),
-      cropPng(actual, 222, 303, 736, 125),
+      cropPng(reference, 222, 298, 736, 125),
+      cropPng(actual, 222, 298, 736, 125),
     );
     const maximumRatio = environmentRatio(
-      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_820_MAX_DIFF_RATIO",
+      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_825_MAX_DIFF_RATIO",
       0.02,
     );
     if (comparison.ratio > maximumRatio) {
       throw new Error(
-        `${scene.id}: current 26.820 command failure region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+        `${scene.id}: current 26.825 command failure region ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
       );
     }
     console.log(
-      `${scene.id}: current 26.820 command failure region pixel ratio ${comparison.ratio}`,
+      `${scene.id}: current 26.825 command failure region pixel ratio ${comparison.ratio}`,
     );
   }
 

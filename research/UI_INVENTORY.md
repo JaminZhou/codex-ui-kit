@@ -145,8 +145,9 @@ observation from a previous build remains historical evidence.
   control. Browser/CDP and Electron repeat both flows; local-only structural
   comparisons pass at 1.5731% and 1.3954% under 2% limits. The previous
   26.820 stale message-30 marker remains historical drift evidence.
-- The previous 26.820 command tasks revalidate a 12-second success, exact
-  exit-code-7 acknowledgement and same-thread recovery, plus a stopped
+- The current 26.825 command tasks revalidate an 8-second success and an exact
+  exit-code-7 acknowledgement with same-thread recovery; the previous 26.820
+  task retains a stopped
   120-second loop and second same-thread recovery. The current Renderer uses
   neutral noninteractive `Ran …` rows for both exit 0 and exit 7, hides Shell,
   output, and exit-code cards while the protocol retains output/exit code, and
@@ -154,7 +155,7 @@ observation from a previous build remains historical evidence.
   The sampled interruption changes from `You stopped after 0s` to a 16-second
   settled duration; that one timing is not generalized. Browser/CDP covers ten
   frames, Electron repeats wide/compact states, and unmasked current-product
-  regions pass at 1.5813% success, 1.5826% failure recovery, 5.4109% stopped,
+  regions pass at 1.2761% current failure recovery, 5.4109% stopped,
   and 2.3502% compact recovery under independent hard limits.
 - A fresh `26.818.41509` MCP slice reaches a real OpenAI Developer Docs
   Search → Fetch success and an invalid-URL Fetch → Search → Fetch recovery.
@@ -224,7 +225,7 @@ replay baselines, and seven local-only current-product comparisons gate the
 slice. The Usage comparisons exclude only the translucent 321.875px native
 Settings rail; plan comparisons are unmasked full-window frames.
 
-Current inventory: 91 surface groups; 47 have current-build runtime evidence, 33 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 42 groups and Electron verification covers 42.
+Current inventory: 91 surface groups; 48 have current-build runtime evidence, 32 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 43 groups and Electron verification covers 43.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1679,6 +1680,19 @@ reviewed baselines pass. Local-only activity, Composer, and header comparisons
 pass at 1.9196%–6.5485% under independent 2.3%/1.2%/7% ceilings. This promotes
 only `thread.command-execution`; failure, interruption, background-process,
 and direct Terminal-tab lifecycles remain previous-build P0 evidence.
+
+A second current `26.825.51511` command task independently re-observes an
+exit-code-7 failure followed by a successful no-tool turn in the same thread.
+The product exposes `Worked for 15s` and a neutral, noninteractive
+`Ran printf …; exit 7` row; it does not expose stdout, stderr, a Shell card, or
+an exit-code footer even though the replay retains the exact protocol output
+and exit code. Browser/CDP gates completed, recovered, and 720×680 frames;
+Electron repeats the lifecycle in native windows. Three reviewed baselines
+pass, and the unmasked 736×125 product/replay activity region differs by
+1.2761% under the independent 2% limit. This promotes
+`thread.command-failure-recovery` on the current build while interruption,
+background-process, direct Terminal-tab, and broader command-kind variants
+retain separate gates.
 
 A fourth `26.730.61309` disposable task entered `/compact` only after an exact
 no-tool baseline response. The current menu exposed `Compact this chat's

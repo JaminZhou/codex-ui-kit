@@ -1096,9 +1096,9 @@ describe("protocol lifecycle reducer", () => {
     ]);
   });
 
-  it("preserves current 26.820 command output while the thread uses compact rows", () => {
+  it("preserves current command output while the thread uses compact rows", () => {
     const success = replayScenarios["command-current-26-820-success"];
-    const failure = replayScenarios["command-current-26-820-failure"];
+    const failure = replayScenarios["command-current-26-825-failure"];
     const completedSuccess = reduceProtocolTrace(success.events);
     const completedFailure = reduceProtocolTrace(failure.events);
 
@@ -1116,16 +1116,16 @@ describe("protocol lifecycle reducer", () => {
     expect(completedFailure.commands[0]).toMatchObject({
       exitCode: 7,
       output:
-        "CURRENT 26.820 FAILURE STDOUT\nCURRENT 26.820 FAILURE STDERR\n",
+        "CURRENT 26.825 FAILURE STDOUT\nCURRENT 26.825 FAILURE STDERR\n",
       status: "failed",
     });
     expect(completedFailure.messages.at(-1)).toMatchObject({
-      id: "assistant-command-current-26-820-failure-recovery",
-      text: "CURRENT 26.820 COMMAND RECOVERY ACCEPTED",
+      id: "assistant-command-current-26-825-failure-recovery",
+      text: "CURRENT 26.825 COMMAND RECOVERY ACCEPTED",
     });
     expect(completedFailure.turnDurationsMs).toMatchObject({
-      "turn-command-current-26-820-failure": 12_000,
-      "turn-command-current-26-820-failure-recovery": 1_400,
+      "turn-command-current-26-825-failure": 15_000,
+      "turn-command-current-26-825-failure-recovery": 1_400,
     });
   });
 

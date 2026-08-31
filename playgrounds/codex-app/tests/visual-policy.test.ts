@@ -940,14 +940,14 @@ describe("lifecycle visual policy", () => {
     expect(contract.match(/masks: \[\]/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
   });
 
-  it("gates runtime-observed 26.820 command success, failure, and interruption without output cards", () => {
+  it("gates runtime-observed command success, failure, and interruption without output cards", () => {
     for (const scene of [
       "command-current-26-820-success-running",
       "command-current-26-820-success-completed",
       "command-current-26-820-success-compact",
-      "command-current-26-820-failure-completed",
-      "command-current-26-820-failure-recovered",
-      "command-current-26-820-failure-compact",
+      "command-current-26-825-failure-completed",
+      "command-current-26-825-failure-recovered",
+      "command-current-26-825-failure-compact",
       "command-current-26-820-interruption-running",
       "command-current-26-820-interruption-stopped-immediate",
       "command-current-26-820-interruption-recovered",
@@ -957,7 +957,7 @@ describe("lifecycle visual policy", () => {
     }
     for (const reference of [
       "CODEX_UI_KIT_CURRENT_COMMAND_SUCCESS_26_820_REFERENCE",
-      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_820_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_COMMAND_FAILURE_26_825_REFERENCE",
       "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_STOPPED_26_820_REFERENCE",
       "CODEX_UI_KIT_CURRENT_COMMAND_INTERRUPTION_RECOVERY_26_820_COMPACT_REFERENCE",
     ]) {
@@ -970,12 +970,12 @@ describe("lifecycle visual policy", () => {
       "current command evidence contract failed",
     );
     expect(electronContract).toContain(
-      "currentCommand26820ElectronCases",
+      "currentCommandElectronCases",
     );
     expect(electronContract).toContain(
-      "Electron current 26.820 command contract drifted",
+      "Electron current command contract drifted",
     );
-    expect(appSource).toContain("isCurrentCommand26820Replay");
+    expect(appSource).toContain("isCurrentCommandReplay");
     expect(appSource).toContain("hideRawCommand");
     expect(appStyles).toContain(
       '[data-scenario^="command-current-26-8"]',
