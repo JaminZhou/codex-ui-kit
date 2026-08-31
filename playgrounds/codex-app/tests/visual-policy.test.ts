@@ -560,11 +560,31 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("defaultMaximumRatio: 0.005");
     expect(contract).toContain("masks: []");
     expect(appSource).toContain(
-      "isAnyCurrentBasicMessageReplay ||\n                isCurrentMarkdown26818Replay",
+      "isAnyCurrentBasicMessageReplay ||\n                isCurrentCitations26825Replay ||\n                isCurrentMarkdown26818Replay",
     );
     expect(appSource).toContain(
-      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentMarkdown26818Replay",
+      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentCitations26825Replay &&\n                      !isCurrentMarkdown26818Replay",
     );
+  });
+
+  it("gates current inline citations and the Sources workspace", () => {
+    for (const sceneId of [
+      "current-citations-26-825-wide",
+      "current-citations-26-825-compact",
+      "current-citations-26-825-summary-wide",
+      "current-citations-26-825-summary-compact",
+      "current-citations-26-825-sources-wide",
+      "current-citations-26-825-sources-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${sceneId}"`);
+    }
+    expect(cdpContract).toContain('"current-citations-26-825"');
+    expect(electronContract).toContain(
+      'id: "electron-current-citations-26-825-sources-compact"',
+    );
+    expect(appSource).toContain("data-inline-mention-interactive");
+    expect(appSource).toContain("Close Sources tab");
+    expect(appSource).toContain("currentCitationQueries");
   });
 
   it("gates the current 26.825 basic thread across its responsive boundary", () => {

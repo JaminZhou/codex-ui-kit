@@ -738,3 +738,15 @@ URL, account value, or disposable profile is committed.
 Broader final visual optimization remains scheduled after the remaining
 inventory, page compositions, and state transitions stabilize. A passing
 thread scenario must not be generalized to unobserved routes or states.
+
+Inline citations and the Web Search Sources workspace are now independently
+current on `26.825.51511`. One real 24-second task produced three public
+OpenAI citations and five query rows. `CitationMention`, `SourceActivityList`,
+and controlled `SourceSearchActivity` compose the 300×313 summary and the
+wide/compact side workspace. Browser/CDP gates exact href/security/favicon,
+query order, 76px summary inset, 418.515625px wide panel, and the
+374.328125/345.671875px compact split; Electron repeats disclosure, close,
+`View all` reopen, and native compact geometry. Six reviewed baselines pass,
+and five local-only product comparisons gate summary, Sources, thread,
+Composer, and header regions at 1.1478%–4.6384%. Other providers, citation
+failures, empty/loading Sources, and live-media emission remain partial.

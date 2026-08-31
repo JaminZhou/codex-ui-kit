@@ -1,5 +1,6 @@
 import {
   Children,
+  type AnchorHTMLAttributes,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
@@ -25,6 +26,50 @@ export type ResourceKind =
   | "presentation"
   | "spreadsheet"
   | "website";
+
+export interface CitationMentionProps
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "children"> {
+  faviconSrc?: string;
+  icon?: ReactNode;
+  label: ReactNode;
+  openLabel?: string;
+}
+
+export function CitationMention({
+  className,
+  faviconSrc,
+  icon,
+  label,
+  openLabel,
+  rel = "noopener noreferrer",
+  target = "_blank",
+  ...props
+}: CitationMentionProps) {
+  return (
+    <a
+      {...props}
+      aria-label={openLabel}
+      className={["codex-ui-citation-mention", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-inline-mention-interactive=""
+      rel={rel}
+      target={target}
+    >
+      <span className="codex-ui-citation-mention__body">
+        {faviconSrc || icon ? (
+          <span
+            aria-hidden="true"
+            className="codex-ui-citation-mention__icon"
+          >
+            {faviconSrc ? <img alt="" src={faviconSrc} /> : icon}
+          </span>
+        ) : null}
+        <span className="codex-ui-citation-mention__label">{label}</span>
+      </span>
+    </a>
+  );
+}
 
 export interface ResourceCardProps {
   action?: ReactNode;
@@ -302,6 +347,106 @@ export function SourceList({
         })}
       </ol>
     </section>
+  );
+}
+
+export interface SourceActivityListProps {
+  children?: ReactNode;
+  className?: string;
+  label?: string;
+}
+
+export function SourceActivityList({
+  children,
+  className,
+  label = "Sources",
+}: SourceActivityListProps) {
+  return (
+    <section
+      aria-label={label}
+      className={["codex-ui-source-activity-list", className]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {children}
+    </section>
+  );
+}
+
+export interface SourceSearchActivityProps {
+  className?: string;
+  countLabel?: ReactNode;
+  defaultExpanded?: boolean;
+  expanded?: boolean;
+  leading?: ReactNode;
+  onExpandedChange?: (expanded: boolean) => void;
+  queries: readonly string[];
+  title?: ReactNode;
+}
+
+export function SourceSearchActivity({
+  className,
+  countLabel,
+  defaultExpanded = false,
+  expanded,
+  leading,
+  onExpandedChange,
+  queries,
+  title = "Web search",
+}: SourceSearchActivityProps) {
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const contentId = useId();
+  const isExpanded = expanded ?? internalExpanded;
+  const resolvedCountLabel =
+    countLabel ?? `Searched ${queries.length} ${queries.length === 1 ? "time" : "times"}`;
+  const setExpanded = (nextExpanded: boolean) => {
+    if (expanded === undefined) setInternalExpanded(nextExpanded);
+    onExpandedChange?.(nextExpanded);
+  };
+
+  return (
+    <div
+      className={["codex-ui-source-search-activity", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-leading={leading ? true : undefined}
+    >
+      {leading ? (
+        <span
+          aria-hidden="true"
+          className="codex-ui-source-search-activity__leading"
+        >
+          {leading}
+        </span>
+      ) : null}
+      <div className="codex-ui-source-search-activity__body">
+        <h3 className="codex-ui-source-search-activity__title">{title}</h3>
+        <button
+          aria-controls={contentId}
+          aria-expanded={isExpanded}
+          className="codex-ui-source-search-activity__trigger"
+          onClick={() => setExpanded(!isExpanded)}
+          type="button"
+        >
+          <span>{resolvedCountLabel}</span>
+          <svg
+            aria-hidden="true"
+            className="codex-ui-source-search-activity__chevron"
+            data-expanded={isExpanded || undefined}
+            viewBox="0 0 20 20"
+          >
+            <path d="m7.5 4.75 5.25 5.25-5.25 5.25" />
+          </svg>
+        </button>
+        {isExpanded ? (
+          <ol className="codex-ui-source-search-activity__queries" id={contentId}>
+            {queries.map((query, index) => (
+              <li key={`${query}:${index}`}>{query}</li>
+            ))}
+          </ol>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

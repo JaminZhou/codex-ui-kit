@@ -221,6 +221,26 @@
       "priority": "p0"
     },
     {
+      "id": "thread.inline-citations",
+      "area": "conversation",
+      "ownership": "turn",
+      "packageEvidence": [
+        "citation-mention",
+        "replay:current-26.825-three-inline-openai-citations-and-five-query-sources",
+        "browser-cdp:current-26.825-citation-hrefs-favicon-geometry-summary-and-sources-contract",
+        "electron:current-26.825-compact-citation-sources-disclosure-close-and-reopen",
+        "pixel:six-reviewed-current-26.825-citation-baselines-and-five-local-only-product-comparisons"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:real-three-inline-openai-citations-environment-sources-summary-and-five-query-sources-workspace-wide-compact"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p0"
+    },
+    {
       "id": "thread.activity-reasoning-plan",
       "area": "conversation",
       "ownership": "turn",
@@ -626,7 +646,15 @@
       "id": "thread.sources-panel",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["conversation-markdown", "thread-side-panel-tabs"],
+      "packageEvidence": [
+        "conversation-markdown",
+        "thread-side-panel-tabs",
+        "source-activity-list",
+        "source-search-activity",
+        "browser-cdp:current-26.825-summary-and-five-query-sources-workspace-wide-compact",
+        "electron:current-26.825-compact-sources-disclosure-close-and-view-all-reopen",
+        "pixel:current-26.825-summary-sources-workspace-and-thread-regions"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:source-summary-view-all-and-sources-tabpanel",
@@ -635,11 +663,12 @@
         "cdp-26.820.60940:pinned-sources-summary-300x189-offscreen-unpinned-and-repinned",
         "cdp-26.820.60940:current-sources-summary-computed-styles-and-unmasked-panel-pixel-gate",
         "cdp-26.825.51511:pinned-environment-sources-summary-300x313-closed-and-repinned",
-        "cdp-26.825.51511:current-environment-sources-summary-computed-styles-and-regional-pixel-gate"
+        "cdp-26.825.51511:current-environment-sources-summary-computed-styles-and-regional-pixel-gate",
+        "cdp-26.825.51511:real-five-query-web-search-sources-workspace-418.515625-wide-and-345.671875-compact"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

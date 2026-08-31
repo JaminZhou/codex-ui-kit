@@ -5,12 +5,15 @@ import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ArtifactList,
+  CitationMention,
   Dialog,
   GeneratedImageGallery,
   ImagePreviewDialog,
   ResourceCard,
   ResourceList,
   SourceList,
+  SourceActivityList,
+  SourceSearchActivity,
   type GeneratedImageItem,
 } from "../src";
 
@@ -25,6 +28,24 @@ const images: GeneratedImageItem[] = Array.from({ length: 6 }, (_, index) => ({
 }));
 
 describe("resource surfaces", () => {
+  it("renders current citation semantics with an optional favicon", () => {
+    render(
+      <CitationMention
+        faviconSrc="https://example.com/favicon.ico"
+        href="https://example.com/source"
+        label="Example"
+      />,
+    );
+
+    const citation = screen.getByRole("link", { name: "Example" });
+    expect(citation.getAttribute("target")).toBe("_blank");
+    expect(citation.getAttribute("rel")).toBe("noopener noreferrer");
+    expect(citation.hasAttribute("data-inline-mention-interactive")).toBe(true);
+    const icon = citation.querySelector("img");
+    expect(icon?.getAttribute("src")).toBe("https://example.com/favicon.ico");
+    expect(icon?.getAttribute("alt")).toBe("");
+  });
+
   it("exposes a semantic resource action and keeps its trailing action independent", () => {
     const onOpen = vi.fn();
     const onShare = vi.fn();
@@ -201,6 +222,51 @@ describe("resource surfaces", () => {
       }),
     );
     expect(onOpen).toHaveBeenCalledOnce();
+  });
+
+  it("expands an observed source-search activity in uncontrolled mode", () => {
+    render(
+      <SourceActivityList>
+        <SourceSearchActivity
+          leading={<svg data-testid="search-leading" />}
+          queries={["first query", "second query"]}
+        />
+      </SourceActivityList>,
+    );
+
+    expect(screen.getByRole("region", { name: "Sources" })).toBeTruthy();
+    expect(screen.getByTestId("search-leading").parentElement?.getAttribute("aria-hidden")).toBe("true");
+    const trigger = screen.getByRole("button", { name: "Searched 2 times" });
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByText("first query")).toBeNull();
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("first query")).toBeTruthy();
+    expect(screen.getByText("second query")).toBeTruthy();
+  });
+
+  it("reports controlled source-search expansion without mutating it", () => {
+    const onExpandedChange = vi.fn();
+    const { rerender } = render(
+      <SourceSearchActivity
+        expanded={false}
+        onExpandedChange={onExpandedChange}
+        queries={["controlled query"]}
+      />,
+    );
+    const trigger = screen.getByRole("button", { name: "Searched 1 time" });
+    fireEvent.click(trigger);
+    expect(onExpandedChange).toHaveBeenCalledWith(true);
+    expect(screen.queryByText("controlled query")).toBeNull();
+
+    rerender(
+      <SourceSearchActivity
+        expanded
+        onExpandedChange={onExpandedChange}
+        queries={["controlled query"]}
+      />,
+    );
+    expect(screen.getByText("controlled query")).toBeTruthy();
   });
 });
 
