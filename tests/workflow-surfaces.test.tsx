@@ -362,6 +362,37 @@ describe("pull request workspace surfaces", () => {
 
     rerender(
       <PullRequestQueryState
+        heading="No pull requests found"
+        placeholderRows={5}
+        status="loading"
+        variant="split-list"
+      />,
+    );
+    const splitLoading = screen.getByRole("status");
+    expect(splitLoading.textContent).toContain("Loading pull requests");
+    expect(
+      splitLoading.querySelectorAll(
+        ".codex-ui-pull-request-query-state__skeleton-copy",
+      ),
+    ).toHaveLength(5);
+
+    rerender(
+      <PullRequestQueryState
+        heading="No pull requests found"
+        status="empty"
+        variant="split-list"
+      />,
+    );
+    const splitEmpty = screen.getByRole("status");
+    expect(splitEmpty.textContent).toBe("No pull requests found");
+    expect(
+      splitEmpty.querySelector(
+        ".codex-ui-pull-request-query-state__indicator",
+      ),
+    ).toBeNull();
+
+    rerender(
+      <PullRequestQueryState
         action={<button type="button">Retry</button>}
         description="Check the connection and try again."
         status="error"

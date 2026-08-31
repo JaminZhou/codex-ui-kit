@@ -96,6 +96,7 @@ export function initialPullRequestLifecycleState(
   const state = { ...basePullRequestLifecycleState };
   switch (frame) {
     case "pr-index-loading":
+    case "pr-index-current-26-825-loading":
       return {
         ...state,
         indexStatus: "loading",
@@ -108,6 +109,7 @@ export function initialPullRequestLifecycleState(
         selectedId: null,
       };
     case "pr-index-empty":
+    case "pr-index-current-26-825-empty":
       return {
         ...state,
         indexStatus: "empty",

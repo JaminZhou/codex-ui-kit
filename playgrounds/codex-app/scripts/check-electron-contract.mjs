@@ -6676,6 +6676,87 @@ try {
   await pullRequestApp.close();
 }
 
+for (const currentPullRequestState of ["loading", "empty"]) {
+  const currentPullRequestScene = {
+    currentSidebar: true,
+    frame: `pr-index-current-26-825-${currentPullRequestState}`,
+    id: `electron-pr-index-current-26-825-${currentPullRequestState}`,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "pull-request",
+  };
+  const { app: currentPullRequestApp, page: currentPullRequestPage } =
+    await launchScene(currentPullRequestScene, {
+      capture: false,
+      layoutMode: "wide",
+    });
+
+  try {
+    await currentPullRequestPage.waitForSelector(
+      `.demo-current-pr-index [data-variant="split-list"][data-status="${currentPullRequestState}"]`,
+    );
+    const contract = await currentPullRequestPage.evaluate(() => {
+      const rect = (selector) =>
+        document.querySelector(selector)?.getBoundingClientRect().toJSON() ??
+        null;
+      const query = document.querySelector(
+        ".demo-current-pr-index .codex-ui-pull-request-query-state",
+      );
+      return {
+        busy: query?.getAttribute("aria-busy") ?? null,
+        heading:
+          query
+            ?.querySelector(
+              ".codex-ui-pull-request-query-state__copy strong",
+            )
+            ?.textContent?.trim() ?? null,
+        main: rect(".codex-ui-app-shell__main"),
+        panel: rect(".codex-ui-app-shell__side-panel"),
+        panelText:
+          document
+            .querySelector(".codex-ui-app-shell__side-panel")
+            ?.textContent?.trim() ?? null,
+        search: rect(
+          '.demo-current-pr-index input[aria-label="Search pull requests"]',
+        ),
+        sidebar: rect(".codex-ui-app-shell__sidebar"),
+        skeletons: query?.querySelectorAll(
+          ".codex-ui-pull-request-query-state__skeleton",
+        ).length,
+        tabs: document.querySelectorAll(
+          '.demo-current-pr-index [role="tab"]',
+        ).length,
+      };
+    });
+    const commonFailure =
+      !contract.main ||
+      !contract.panel ||
+      !contract.sidebar ||
+      contract.panelText !== "Select pull request to view" ||
+      Math.abs(contract.main.width - 438.53125) > 1 ||
+      Math.abs(contract.panel.width - 419.59375) > 1 ||
+      Math.abs(contract.sidebar.width - 321.875) > 1;
+    const stateFailure =
+      currentPullRequestState === "loading"
+        ? contract.busy !== "true" ||
+          contract.skeletons !== 5 ||
+          contract.search !== null ||
+          contract.tabs !== 0
+        : contract.busy !== null ||
+          contract.heading !== "No pull requests found" ||
+          contract.skeletons !== 0 ||
+          contract.search === null ||
+          contract.tabs !== 3;
+    if (commonFailure || stateFailure) {
+      throw new Error(
+        `Electron current pull request ${currentPullRequestState} contract failed: ${JSON.stringify(contract)}`,
+      );
+    }
+  } finally {
+    await currentPullRequestApp.close();
+  }
+}
+
 const compactScene = {
   frame: "review-open",
   id: "electron-multi-file-compact",

@@ -95,7 +95,14 @@ observation from a previous build remains historical evidence.
   Dark/Light and wide/compact states, the 22-row Settings rail, General,
   Appearance, and a naturally completed basic turn across 1180, 721, and
   720px widths. Other feature-state and lifecycle captures remain
-  previous-build evidence until recaptured.
+  previous-build evidence until recaptured. The current Pull requests route
+  follow-up separately reaches the initial loading state and the settled empty
+  state at 1180×820. It locks the 321.875px sidebar, 437.53125px list,
+  419.59375px fixed detail placeholder, five 56px skeleton rows, current tabs,
+  search and filter primitives, and the exact empty labels. Browser/CDP and
+  Electron repeat both states; reviewed pixels cover both deterministic
+  frames, while local-only product comparisons pass at 0.3508%/0.6348% for
+  the owned list region and 0.1339% for the detail region.
 - A previous 26.820 route-continuity probe locks Projects → Back → Forward
   location restoration, x=88/120/152 titlebar controls, `opacity: 0.4`
   unavailable navigation, 720px pinned continuity, explicit Hide/Show, and
@@ -238,7 +245,7 @@ dynamic-delta-masked 2.6918% product comparison gate the slice. The companion
 `Compacting context`, but the remote compact task failed and exposed Resume,
 so successful compaction/recovery remains previous-build evidence.
 
-Current inventory: 91 surface groups; 51 have current-build runtime evidence, 29 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 46 groups and Electron verification covers 46.
+Current inventory: 91 surface groups; 53 have current-build runtime evidence, 27 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 48 groups and Electron verification covers 48.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1178,6 +1185,16 @@ compact layout; and route restoration. Browser/CDP, real Electron, and
 reviewed pixels verify the resulting 61-frame matrix, so
 `workspace.pull-request-route` and `workspace.pull-request-review` are now
 independently Browser/Electron verified.
+
+The `26.825.51511` route refresh adds a semantic `split-list` query variant
+instead of restyling the legacy full-width list. Loading exposes a polite
+screen-reader status plus five avatar/title/subtitle/time skeleton rows; empty
+removes the progress indicator and shows the current tabs, search, exact
+search/filter SVGs, and `No pull requests found`. The wide shell persists the
+current list/detail split rather than using the legacy overlay, and the detail
+placeholder remains independently owned. Current Browser/CDP, Electron, two
+reviewed baselines, and two local-only product-region comparisons promote the
+route and its lifecycle feedback from previous-build-only verification.
 
 The `26.727.40816` product evidence covers the two-tab Summary/Code structure,
 Timeline integrated below the Summary comment composer, successful multi-file

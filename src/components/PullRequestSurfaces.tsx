@@ -673,7 +673,7 @@ export interface PullRequestQueryStateProps
   heading?: ReactNode;
   placeholderRows?: number;
   status: PullRequestQueryStatus;
-  variant?: "detail" | "list";
+  variant?: "detail" | "list" | "split-list";
 }
 
 export function PullRequestQueryState({
@@ -707,22 +707,48 @@ export function PullRequestQueryState({
       data-variant={variant}
       role={role}
     >
-      {variant === "list" && busy ? (
-        <div
-          aria-hidden="true"
-          className="codex-ui-pull-request-query-state__skeletons"
-        >
-          {Array.from({ length: Math.max(1, placeholderRows) }, (_, index) => (
-            <span
-              className="codex-ui-pull-request-query-state__skeleton"
-              key={index}
-            >
-              <span />
-              <span />
-              <span />
+      {(variant === "list" || variant === "split-list") && busy ? (
+        <>
+          {variant === "split-list" ? (
+            <span className="codex-ui-pull-request-query-state__sr-only">
+              {pullRequestQueryHeadings[status]}
             </span>
-          ))}
-        </div>
+          ) : null}
+          <div
+            aria-hidden="true"
+            className="codex-ui-pull-request-query-state__skeletons"
+          >
+            {Array.from({ length: Math.max(1, placeholderRows) }, (_, index) => (
+              <span
+                className="codex-ui-pull-request-query-state__skeleton"
+                key={index}
+              >
+                <span />
+                {variant === "split-list" ? (
+                  <span className="codex-ui-pull-request-query-state__skeleton-copy">
+                    <span />
+                    <span />
+                  </span>
+                ) : (
+                  <span />
+                )}
+                <span />
+              </span>
+            ))}
+          </div>
+        </>
+      ) : variant === "split-list" && status === "empty" ? (
+        <>
+          <div className="codex-ui-pull-request-query-state__copy">
+            <strong>{heading ?? pullRequestQueryHeadings[status]}</strong>
+            {description ? <span>{description}</span> : null}
+          </div>
+          {action ? (
+            <div className="codex-ui-pull-request-query-state__action">
+              {action}
+            </div>
+          ) : null}
+        </>
       ) : (
         <>
           <span
