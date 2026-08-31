@@ -317,8 +317,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "current-search-26-825": scenario(
     "current-search-26-825",
-    "Search Codex desktop page",
-    "The runtime-observed 26.825 Web Search lifecycle groups two completed public search actions under one expandable thread activity.",
+    "Search Codex desktop updates",
+    "The runtime-observed 26.825.51511 Web Search lifecycle groups two completed public search actions under one expandable thread activity.",
     currentSearch26825Trace,
   ),
   "current-review-rename": scenario(

@@ -380,18 +380,20 @@
       "packageEvidence": [
         "code-searching-icon",
         "web-search-icon",
-        "browser-cdp:current-26-825-search-disclosure-and-computed-styles",
-        "electron:current-26-825-search-disclosure-lifecycle",
-        "pixel:current-26-825-search-activity-region"
+        "replay:current-26.825.51511-two-query-web-search",
+        "browser-cdp:current-26.825.51511-search-disclosure-and-computed-styles",
+        "electron:current-26.825.51511-search-disclosure-lifecycle",
+        "pixel:current-26.825.51511-search-activity-region"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:synthetic-web-search-completed-expanded-compact-526x600",
-        "cdp-26.825.31414:real-two-query-web-search-worked-for-collapsed-expanded-and-result-rows"
+        "cdp-26.825.31414:real-two-query-web-search-worked-for-collapsed-expanded-and-result-rows",
+        "cdp-26.825.51511:real-two-query-web-search-worked-for-23s-collapsed-expanded-current-result-copy-and-exact-response"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
