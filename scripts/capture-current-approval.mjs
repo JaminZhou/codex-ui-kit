@@ -282,7 +282,12 @@ try {
         const labels = [...element.querySelectorAll("button")].map(
           (button) => button.textContent?.trim() ?? "",
         );
-        if (labels.includes("Deny") && labels.includes("Allow once")) break;
+        if (
+          labels.some((label) => label.startsWith("Deny")) &&
+          labels.some((label) => label.startsWith("Allow once"))
+        ) {
+          break;
+        }
         element = element.parentElement;
       }
       const style = getComputedStyle(element);
@@ -303,7 +308,7 @@ try {
 
   await openTask(pendingTaskTitleSha256);
   const pendingQuestion = page.getByText(
-    /Would you like to allow Codex to edit/,
+    /(?:Would you like to allow Codex to edit|Allow ChatGPT to edit the following file\?)/,
   );
   await pendingQuestion.last().waitFor({ state: "visible", timeout: 10_000 });
   const pendingRecords = [];
@@ -317,10 +322,9 @@ try {
       element.scrollIntoView({ block: "center", inline: "nearest" }),
     );
     await page.waitForTimeout(250);
-    const deny = page.getByRole("button", { exact: true, name: "Deny" });
+    const deny = page.getByRole("button", { name: /^Deny/ });
     const allowOnce = page.getByRole("button", {
-      exact: true,
-      name: "Allow once",
+      name: /^Allow once/,
     });
     const options = page.getByRole("button", {
       exact: true,
@@ -348,15 +352,27 @@ try {
     });
     if (viewportName === "compact") {
       await options.click();
-      const allowConversation = page.getByText("Allow this conversation", {
+      const allowConversation = page.getByText("Allow all edits", {
         exact: true,
       });
       await allowConversation.waitFor({ state: "visible" });
-      const labels = await page
-        .getByText(/^(Allow once|Allow this conversation)$/)
-        .allTextContents();
-      if (labels.join("|") !== "Allow once|Allow this conversation") {
-        throw new Error("The approval options labels do not match 26.820.");
+      const labels = await page.getByRole("menuitem").evaluateAll((elements) =>
+        elements
+          .filter(
+            (element) =>
+              element instanceof HTMLElement &&
+              element.checkVisibility({
+                checkOpacity: true,
+                checkVisibilityCSS: true,
+              }),
+          )
+          .map((element) => element.textContent?.trim() ?? "")
+          .filter((label) =>
+            ["Allow once", "Allow all edits"].includes(label),
+          ),
+      );
+      if (labels.join("|") !== "Allow once|Allow all edits") {
+        throw new Error("The approval options labels do not match 26.825.");
       }
       const screenshot = screenshotPath("options-compact");
       await page.screenshot({ path: screenshot });
@@ -377,10 +393,9 @@ try {
   await page.evaluate(async () => document.fonts.ready);
   await setSidebarVisible(false);
   await closePinnedPanels();
-  const permissionTrigger = page.getByRole("button", {
-    exact: true,
-    name: "Ask for approval",
-  });
+  const permissionTrigger = page
+    .getByRole("button", { name: "Change permissions" })
+    .filter({ hasText: "Ask for approval" });
   await permissionTrigger.waitFor({ state: "visible", timeout: 10_000 });
   await permissionTrigger.click();
   const expectedModes = ["Ask for approval", "Approve for me", "Full access"];

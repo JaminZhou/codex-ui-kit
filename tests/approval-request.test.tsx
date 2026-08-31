@@ -2,7 +2,11 @@
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ApprovalCommandPreview, ApprovalRequest } from "../src";
+import {
+  ApprovalCommandPreview,
+  ApprovalFilePreview,
+  ApprovalRequest,
+} from "../src";
 
 afterEach(() => {
   cleanup();
@@ -491,5 +495,31 @@ describe("ApprovalCommandPreview", () => {
     );
 
     expect(screen.queryByRole("button", { name: "Expand" })).toBeNull();
+  });
+});
+
+describe("ApprovalFilePreview", () => {
+  it("keeps the path and change counts independently addressable", () => {
+    render(
+      <ApprovalFilePreview
+        additions={1}
+        deletions={0}
+        directory="/Users/demo-user/Desktop/"
+        fileName="approval-probe.txt"
+      />,
+    );
+
+    expect(
+      screen.getByRole("group", { name: "File change preview" }),
+    ).toBeTruthy();
+    expect(screen.getByText("/Users/demo-user/Desktop/")).toBeTruthy();
+    expect(screen.getByText("approval-probe.txt")).toBeTruthy();
+    expect(
+      screen.getByLabelText("1 additions, 0 deletions"),
+    ).toBeTruthy();
+    expect(screen.getByText("+1").getAttribute("data-tone")).toBe("added");
+    expect(screen.getByText("-0").getAttribute("data-tone")).toBe(
+      "removed",
+    );
   });
 });

@@ -1049,6 +1049,25 @@ between 0.2708% and 1.7855% under a 2.5% hard limit.
 Runtime, package-structural, and independent replay evidence remain separately
 attributed. No product screenshot or bundled private asset is committed.
 
+## Current 26.825 external-file approval slice
+
+- A schema-validated 20-event trace independently replays one denied and one
+  allowed external-file edit while retaining exact file path and delta
+  semantics.
+- `ApprovalFilePreview` exposes the muted directory, file name, additions, and
+  deletions without coupling the public component to filesystem access.
+- The current card uses `Edit files`, `Allow ChatGPT to edit the following
+  file?`, Deny, Allow once, and the `Allow once`/`Allow all edits` split menu.
+- Browser/CDP gates six wide/compact pending, options, denied, allow-pending,
+  and allowed frames; Electron repeats the real decision transitions in native
+  windows.
+- Six reviewed baselines cover the lifecycle. Optional unmasked product-region
+  comparisons pass at 3.1787% wide pending, 3.3225% compact pending, and
+  1.3415% compact options.
+
+The external product screenshots, isolated profile, task identifiers, and
+probe file remain local-only and are never committed.
+
 ## Development
 
 From the repository root:
