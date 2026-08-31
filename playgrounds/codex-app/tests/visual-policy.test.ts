@@ -699,7 +699,53 @@ describe("lifecycle visual policy", () => {
       '.demo-root[data-scenario="markdown-current-26-820-media"]',
     );
     expect(appSource).toContain(
-      "allowWideMedia={isCurrentMarkdown26820MediaReplay}",
+      "isCurrentMarkdown26820MediaReplay ||\n                    isCurrentMarkdown26825MediaReplay",
+    );
+  });
+
+  it("gates current 26.825 Markdown loaded, unavailable, and immersive preview media", () => {
+    for (const scene of [
+      "markdown-current-26-825-media-loaded",
+      "markdown-current-26-825-media-loaded-compact",
+      "markdown-current-26-825-media-preview",
+      "markdown-current-26-825-media-unavailable",
+      "markdown-current-26-825-media-unavailable-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const scene of [
+      "electron-markdown-current-26-825-media-loaded",
+      "electron-markdown-current-26-825-media-loaded-compact",
+      "electron-markdown-current-26-825-media-preview",
+      "electron-markdown-current-26-825-media-unavailable",
+      "electron-markdown-current-26-825-media-unavailable-compact",
+    ]) {
+      expect(electronContract).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_LOADED_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_LOADED_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_PREVIEW_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_UNAVAILABLE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_UNAVAILABLE_COMPACT_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      'scene.scenario === "markdown-current-26-825-media"',
+    );
+    expect(cdpContract).toContain(
+      "current 26.825 Markdown loaded-media contract failed",
+    );
+    expect(electronContract).toContain(
+      "current 26.825 Markdown media preview Electron contract failed",
+    );
+    expect(appSource).toContain(
+      "expandWideMedia={isCurrentMarkdown26825MediaReplay}",
+    );
+    expect(appSource).toContain("imagePreviewSourceResolver={");
+    expect(appStyles).toContain(
+      '[data-scenario="markdown-current-26-825-media"]',
     );
   });
 

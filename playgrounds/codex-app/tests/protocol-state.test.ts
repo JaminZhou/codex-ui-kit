@@ -452,6 +452,35 @@ describe("protocol lifecycle reducer", () => {
     expect(assistant?.text).toContain("codex-ui-kit-missing.png");
   });
 
+  it("replays the current 26.825 loaded and unavailable Markdown media turns exactly", () => {
+    const scenario = replayScenarios["markdown-current-26-825-media"];
+    const loadedState = reduceProtocolTrace(
+      scenario.events.slice(
+        0,
+        scenario.frames["markdown-current-26-825-media-loaded"],
+      ),
+    );
+    const state = reduceProtocolTrace(scenario.events);
+
+    expect(scenario.frames).toEqual({
+      "markdown-current-26-825-media-loaded": 5,
+      "markdown-current-26-825-media-unavailable": scenario.events.length,
+    });
+    expect(loadedState.messages.at(-1)).toMatchObject({
+      id: "assistant-markdown-current-26-825-media-loaded",
+      status: "completed",
+      text: expect.stringContaining("https://openai.com/favicon.ico"),
+    });
+    expect(state.status).toBe("completed");
+    expect(state.messages.at(-1)).toMatchObject({
+      id: "assistant-markdown-current-26-825-media-unavailable",
+      status: "completed",
+      text: expect.stringContaining(
+        "https://example.invalid/codex-ui-kit-current-media.png",
+      ),
+    });
+  });
+
   it("preserves streaming Markdown mutations before a large completion", () => {
     const scenario = replayScenarios["markdown-streaming-large"];
     const linkState = reduceProtocolTrace(

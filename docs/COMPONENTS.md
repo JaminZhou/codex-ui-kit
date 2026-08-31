@@ -34,7 +34,13 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
   rendered HTML by default; `onCopyTable` can transfer that protocol-neutral
   payload to a host. `allowWideTables` opts a host into the measured
   horizontal overhang, hover/focus Copy and Expand rail, and full-screen table
-  preview. `stabilizeStreamingMarkdown` exposes the package's standalone
+  preview. `allowWideMedia` enables media-only paragraph composition and
+  `expandWideMedia` opts into the measured current-product overhang.
+  `imageStatus` controls loading/ready/unavailable semantics,
+  `imageSourceResolver` resolves the inline source, and
+  `imagePreviewSourceResolver` can independently model a source-owned preview
+  payload while preserving measured geometry, caption, zoom, and focus
+  behavior. `stabilizeStreamingMarkdown` exposes the package's standalone
   streaming helper; `CodeHighlighter` is the public contract for supplying a
   custom escaped-code highlighter.
 - `InlineCode`: standalone inline-code treatment.

@@ -3557,6 +3557,7 @@ textarea {
 
 .demo-root:is(
     [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-current-26-825-media"],
     [data-scenario="markdown-streaming-large"]
   ) {
   -webkit-font-smoothing: antialiased;
@@ -3564,10 +3565,12 @@ textarea {
 
 .demo-root:is(
     [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-current-26-825-media"],
     [data-scenario="markdown-streaming-large"]
   ),
 .demo-root:is(
     [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-current-26-825-media"],
     [data-scenario="markdown-streaming-large"]
   )
   *:not(code):not(kbd):not(pre) {
@@ -3576,6 +3579,7 @@ textarea {
 
 .demo-root:is(
     [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-current-26-825-media"],
     [data-scenario="markdown-streaming-large"]
   )
   .demo-turn-actions.demo-mcp-turn-actions {
@@ -3584,6 +3588,7 @@ textarea {
 
 .demo-root:is(
     [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-current-26-825-media"],
     [data-scenario="markdown-streaming-large"]
   )
   .codex-ui-thread-viewport {
@@ -3592,6 +3597,7 @@ textarea {
 
 .demo-root:is(
     [data-scenario="markdown-current-26-825"],
+    [data-scenario="markdown-current-26-825-media"],
     [data-scenario="markdown-streaming-large"]
   )
   .codex-ui-thread-viewport::-webkit-scrollbar {

@@ -140,21 +140,29 @@ Footnote reference.[^1]
     expect(html).toContain('aria-label="Loading preview"');
     expect(html).toContain('data-markdown-image-state="unavailable"');
     expect(html).toContain('aria-label="Unavailable preview"');
-    expect(html).toContain('href="https://example.com/missing.png"');
+    expect(html).not.toContain('href="https://example.com/missing.png"');
+    expect(html.match(/disabled=""/g)).toHaveLength(2);
   });
 
   it("opens an immersive preview from a rendered Markdown image", async () => {
     render(
-      <AgentMarkdown>
+      <AgentMarkdown imagePreviewSourceResolver={() => ""}>
         {"![Preview](https://example.com/preview.png)"}
       </AgentMarkdown>,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Preview" }));
     expect(
-      await screen.findByRole("dialog", { name: "Preview" }),
+      await screen.findByRole("dialog", { name: "Image preview" }),
     ).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Close image preview" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Close image preview" }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Download" })).toBeNull();
+    expect(screen.getByText("Preview")).toBeTruthy();
+    const dialog = screen.getByRole("dialog", { name: "Image preview" });
+    expect(dialog.getAttribute("data-image-source-empty")).toBe("true");
+    expect(dialog.querySelector("img")?.getAttribute("src")).toBeNull();
   });
 
   it("offers a retry boundary when a host Markdown component throws", async () => {

@@ -82,8 +82,9 @@ The authoritative current-build inventory is:
   controls, and the 122.75px table while eliminating an empty-fence
   `undefined` leak. Six Browser/CDP checkpoints, Electron code/table/scroll
   interaction, five reviewed baselines, and four local product regions pass;
-  the latter differ by 1.72–4.77% under 8%. Citations, live media,
-  table/error, and plugin Markdown variants remain open.
+  the latter differ by 1.72–4.77% under 8%. Citations and live media now have
+  separate current slices; table/error and plugin Markdown variants remain
+  open.
 - A current `26.825.51511` sidebar follow-up reaches one selected running task
   and one naturally completed background-unread task in an isolated profile.
   It keeps the sidebar at 321.875px at both 1180 and 720, locks the
@@ -556,8 +557,8 @@ completed regions differ by 2.4398%, 4.7698%, 2.7219%, and 1.7196% under 8%.
 
 The unchanged `26.803.41515` fingerprint adds source-structural evidence for
 inline-Markdown in-progress ownership, the latest-turn follow state machine,
-and dedicated Table container/scroller plus Copy/Expand/Preview controls. A
-The current replay now uses the exact sanitized 36-section stream and six
+and dedicated Table container/scroller plus Copy/Expand/Preview controls. The
+current replay now uses the exact sanitized 36-section stream and six
 checkpoints; the older twelve-section synthetic mutation remains historical
 regression evidence rather than the current product anchor.
 An isolated 18-column runtime follow-up then reaches Copy, Expand, and Table
@@ -566,9 +567,14 @@ and `allowWideTables` opts into the measured 1665.86px table, hover/focus rail,
 and viewport preview. Browser/CDP now covers 156 frames; Electron repeats copy,
 horizontal wheel, open/close, focus restoration, and 720×680 action
 reachability; three reviewed internal baselines pass. A local-only 1180×820 reference gates the owned preview and
-close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. Citations,
-live media emission, table error variants, and plugin-specific Markdown remain
-open. Plain-text streaming product reachability is now current on
+close regions at 3.9737% and 0.5929% under 4% and 1% ceilings. A separate
+`26.825.51511` slice now reaches a public favicon, an unavailable external
+image, and pointer-opened immersive preview at wide and compact widths. Five
+Browser/CDP frames, five Electron flows, five reviewed baselines, and five
+local-only product comparisons gate media geometry, disabled semantics, focus,
+caption, Close, zoom, and pixels. Citations are independently current;
+table-error and plugin-specific Markdown variants remain open. Plain-text
+streaming product reachability is now current on
 `26.803.61601`: one live 1180→720 resize proves reverse-origin follow,
 negative compact clipping, the exact Stop vector, and natural Send recovery in
 Browser/CDP with external wide/compact regional pixels. Rich Markdown mutation

@@ -72,6 +72,18 @@ const currentMarkdown26818CompactReference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_818_COMPACT_REFERENCE;
 const currentMarkdown26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_REFERENCE;
+const currentMarkdown26825MediaLoadedReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_LOADED_REFERENCE;
+const currentMarkdown26825MediaLoadedCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_LOADED_COMPACT_REFERENCE;
+const currentMarkdown26825MediaUnavailableReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_UNAVAILABLE_REFERENCE;
+const currentMarkdown26825MediaUnavailableCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_UNAVAILABLE_COMPACT_REFERENCE;
+const currentMarkdown26825MediaPreviewReference =
+  process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_PREVIEW_REFERENCE;
 const currentMarkdownStreamFenceReference =
   process.env.CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_FENCE_REFERENCE;
 const currentMarkdownStreamTableReference =
@@ -6933,6 +6945,164 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current 26.825 Markdown response pixel ratio ${comparison.ratio}`,
+    );
+  }
+
+  if (
+    scene.id.startsWith("markdown-current-26-825-media-loaded") &&
+    scene.id !== "markdown-current-26-825-media-preview"
+  ) {
+    const compact = scene.id.endsWith("-compact");
+    const referencePath = compact
+      ? currentMarkdown26825MediaLoadedCompactReference
+      : currentMarkdown26825MediaLoadedReference;
+    if (referencePath) {
+      const expected = compact
+        ? { height: 111, width: 687, x: 16, y: 251 }
+        : { height: 112, width: 737, x: 383, y: 229 };
+      const reference = PNG.sync.read(await readFile(referencePath));
+      if (
+        reference.width !== expected.width ||
+        reference.height !== expected.height
+      ) {
+        throw new Error(
+          `${scene.id}: current loaded-media reference must be exactly ${expected.width}x${expected.height}, received ${reference.width}x${reference.height}.`,
+        );
+      }
+      const response = cropPng(
+        actual,
+        expected.x,
+        expected.y,
+        expected.width,
+        expected.height,
+      );
+      const comparison = comparePng(reference, response);
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.png`),
+        PNG.sync.write(response),
+      );
+      if (comparison.pixels > 0) {
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+          PNG.sync.write(comparison.diff),
+        );
+      }
+      const maximumRatio = environmentRatio(
+        compact
+          ? "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_LOADED_COMPACT_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_LOADED_MAX_DIFF_RATIO",
+        0.03,
+      );
+      if (comparison.ratio > maximumRatio) {
+        throw new Error(
+          `${scene.id}: current 26.825 loaded-media pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+        );
+      }
+      console.log(
+        `${scene.id}: current 26.825 loaded-media pixel ratio ${comparison.ratio}`,
+      );
+    }
+  }
+
+  if (scene.id.startsWith("markdown-current-26-825-media-unavailable")) {
+    const compact = scene.id.endsWith("-compact");
+    const referencePath = compact
+      ? currentMarkdown26825MediaUnavailableCompactReference
+      : currentMarkdown26825MediaUnavailableReference;
+    if (referencePath) {
+      const expected = compact
+        ? { height: 157, width: 687, x: 16, y: 343 }
+        : { height: 157, width: 737, x: 383, y: 483 };
+      const reference = PNG.sync.read(await readFile(referencePath));
+      if (
+        reference.width !== expected.width ||
+        reference.height !== expected.height
+      ) {
+        throw new Error(
+          `${scene.id}: current unavailable-media reference must be exactly ${expected.width}x${expected.height}, received ${reference.width}x${reference.height}.`,
+        );
+      }
+      const response = cropPng(
+        actual,
+        expected.x,
+        expected.y,
+        expected.width,
+        expected.height,
+      );
+      const comparison = comparePng(reference, response);
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.png`),
+        PNG.sync.write(response),
+      );
+      if (comparison.pixels > 0) {
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+          PNG.sync.write(comparison.diff),
+        );
+      }
+      const maximumRatio = environmentRatio(
+        compact
+          ? "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_UNAVAILABLE_COMPACT_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_UNAVAILABLE_MAX_DIFF_RATIO",
+        0.03,
+      );
+      if (comparison.ratio > maximumRatio) {
+        throw new Error(
+          `${scene.id}: current 26.825 unavailable-media pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+        );
+      }
+      console.log(
+        `${scene.id}: current 26.825 unavailable-media pixel ratio ${comparison.ratio}`,
+      );
+    }
+  }
+
+  if (
+    scene.id === "markdown-current-26-825-media-preview" &&
+    currentMarkdown26825MediaPreviewReference
+  ) {
+    const reference = PNG.sync.read(
+      await readFile(currentMarkdown26825MediaPreviewReference),
+    );
+    if (
+      reference.width !== 1180 ||
+      reference.height !== 820 ||
+      actual.width !== 1180 ||
+      actual.height !== 820
+    ) {
+      throw new Error(
+        `${scene.id}: current preview reference and actual must both be 1180x820.`,
+      );
+    }
+    const regions = {
+      caption: { height: 39, left: 525, top: 695, width: 130 },
+      close: { height: 44, left: 1124, top: 10, width: 46 },
+      image: { height: 54, left: 563, top: 335, width: 54 },
+      toolbar: { height: 50, left: 511, top: 741, width: 158 },
+    };
+    const comparisons = Object.fromEntries(
+      Object.entries(regions).map(([name, region]) => [
+        name,
+        comparePng(
+          cropPng(reference, region.left, region.top, region.width, region.height),
+          cropPng(actual, region.left, region.top, region.width, region.height),
+        ),
+      ]),
+    );
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MARKDOWN_26_825_MEDIA_PREVIEW_MAX_DIFF_RATIO",
+      0.035,
+    );
+    const failing = Object.entries(comparisons).filter(
+      ([, comparison]) => comparison.ratio > maximumRatio,
+    );
+    if (failing.length > 0) {
+      throw new Error(
+        `${scene.id}: current 26.825 preview region ratios exceed ${maximumRatio}: ${JSON.stringify(Object.fromEntries(Object.entries(comparisons).map(([name, comparison]) => [name, comparison.ratio])))}`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 preview region ratios ${JSON.stringify(Object.fromEntries(Object.entries(comparisons).map(([name, comparison]) => [name, comparison.ratio])))}`,
     );
   }
 

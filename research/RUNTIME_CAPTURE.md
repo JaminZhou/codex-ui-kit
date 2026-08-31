@@ -1726,9 +1726,34 @@ flow, and three reviewed internal baselines pass. The 720×680 contract moves
 the action rail inward, keeps both controls fully visible and clickable, and
 preserves focus restoration without document-level horizontal overflow. A local-only current-build
 reference gates the preview and close regions at 3.9737% and 0.5929% under 4%
-and 1% ceilings; it is not committed. Streaming mutation reachability, images,
-math, citations/sources, plugin variants, table error variants, and Markdown
-error variants remain required captures.
+and 1% ceilings; it is not committed. Streaming mutation, media, and
+citations/sources now have separate current-build captures. Plugin variants,
+table error variants, and Markdown error variants remain required captures.
+
+### 26.825.51511 Markdown media capture
+
+An isolated profile submitted two no-tool prompts: one public OpenAI favicon
+and one deliberately unreachable `example.invalid` image. CDP captured loaded
+and unavailable responses at 1180×820 and 720×680, then opened the loaded image
+with a real pointer click and recorded the immersive preview at 1180×820.
+
+The loaded state uses a 50×74px preview trigger around a 48×48 image, 10px
+radius, one-pixel border, 12px vertical media margin, and 14px gap to the
+following paragraph. The unavailable state is a disabled 96×96 button with a
+28×28 placeholder; it exposes neither a link nor a retry action. The preview
+is a modal named `Image preview`, initially focuses Close, locks body scroll,
+restores trigger focus after dismissal, and exposes only Close plus 36×36 zoom
+controls. The sampled image slot is 48×48 at `566,338.71875`; its product
+payload is empty, while caption and toolbar remain visible.
+
+The public trace replaces dynamic timing with ten deterministic protocol
+events. Browser/CDP and Electron each gate five frames, including compact
+geometry and preview focus restoration. Five reviewed repository baselines
+cover the replay. Local-only product comparisons pass at 1.2369%, 0.0197%,
+0.8141%, and 0.6471% for the four response roots; preview caption, Close,
+empty-image, and toolbar regions pass at 3.4912%, 0.8893%, 0%, and 2.1772%.
+The public favicon source is recorded in code, but real screenshots and the
+isolated user-data directory are not committed.
 
 ## Current Appearance Settings sample
 

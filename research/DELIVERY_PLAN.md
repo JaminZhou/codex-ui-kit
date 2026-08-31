@@ -83,8 +83,11 @@ exit gates; it does not replace the inventory.
   Browser/CDP and Electron cover the six deterministic checkpoints, code copy,
   table focus, user scroll-away/return, native bounds, and zero overflow. Five
   reviewed baselines are committed; four local-only product regions pass at
-  2.4398%, 4.7698%, 2.7219%, and 1.7196% under 8%. Citations, live media,
-  table/Markdown errors, and plugin variants remain P0 work.
+  2.4398%, 4.7698%, 2.7219%, and 1.7196% under 8%. Citations now have an
+  independent current slice. A separate same-build media slice promotes real
+  loaded, unavailable, compact, and immersive-preview states through five
+  CDP, Electron, and pixel gates. Table/Markdown errors and plugin variants
+  remain P0 work.
   A second current `26.825.51511` sidebar follow-up promotes
   `app.sidebar-thread-history`, `app.sidebar-item-actions`, and
   `app.sidebar-status-indicators` for the sampled ordinary lifecycle. It locks
@@ -722,9 +725,8 @@ states, and completion. Reverse-origin follow, explicit scroll-away/return,
 code copy, table focus, current response actions, exact computed styles, five
 reviewed baselines, and four local-only product regions pass Browser/CDP,
 Electron, and pixel gates. Very-wide-table actions remain independently
-versioned current runtime evidence. Inline citations now have their own
-current slice; live media emission and table/Markdown error variants remain
-open.
+versioned current runtime evidence. Inline citations and live media now have
+their own current slices; table/Markdown error variants remain open.
 
 The previous-build completed conversation core was refreshed on `26.818.41509` with
 one fresh exact reply. Settled 1180×820 and 820×680 CDP/Electron evidence,
@@ -1083,8 +1085,10 @@ without confusing package readiness with full product reconstruction.
     The current 26.825.51511 rich-stream mutation is now delivered through
     link, empty-fence, task-list, code/table, long-tail, Stop, completion,
     reverse-origin scroll, Electron, and product-region pixel gates. Continue
-    with plugin attachment variants, citations, live media emission, and
-    table/Markdown error variants, populated
+    A separate current-media replay now locks real loaded and unavailable
+    images, wide/compact geometry, immersive caption/Close/zoom, focus
+    restoration, and five product-region pixel gates. Continue with plugin
+    attachment variants and table/Markdown error variants, populated
     artifact/source sections, real-product subagent
     recovery capture, real transport runtime reachability, and real global
     notification reachability. The independent transport state machine and

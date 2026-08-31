@@ -1231,6 +1231,46 @@ export const visualScenes = [
     windowSize: { height: 680, width: 720 },
   },
   {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-loaded",
+    id: "markdown-current-26-825-media-loaded",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-825-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-loaded",
+    id: "markdown-current-26-825-media-loaded-compact",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-825-media",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-loaded",
+    id: "markdown-current-26-825-media-preview",
+    markdownImagePreview: true,
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-825-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-unavailable",
+    id: "markdown-current-26-825-media-unavailable",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-825-media",
+  },
+  {
+    currentSidebar: true,
+    frame: "markdown-current-26-825-media-unavailable",
+    id: "markdown-current-26-825-media-unavailable-compact",
+    maxPixelRatio: 0.01,
+    scenario: "markdown-current-26-825-media",
+    sidebarState: "hidden",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "markdown-table-complete",
     id: "markdown-table-actions-hover",
     markdownTableState: "hover",
@@ -2867,6 +2907,12 @@ export async function launchScene(
     await page.evaluate(async () => {
       await document.fonts.ready;
     });
+  }
+  if (capture && scene.markdownImagePreview) {
+    await page.getByRole("button", { name: "OpenAI favicon" }).click();
+    await page
+      .getByRole("dialog", { name: "Image preview" })
+      .waitFor({ state: "visible" });
   }
   if (scene.sidebarSectionKind) {
     await page

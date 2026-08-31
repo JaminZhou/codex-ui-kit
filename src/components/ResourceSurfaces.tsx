@@ -732,11 +732,15 @@ export function GeneratedImageGallery({
 }
 
 export interface ImagePreviewDialogProps {
+  className?: string;
   closeLabel?: string;
+  downloadable?: boolean;
   downloadLabel?: string;
   editLabel?: string;
   imageId?: string | null;
   images: GeneratedImageItem[];
+  immersiveCaption?: ReactNode;
+  immersiveInitialFocus?: "close" | "dialog";
   nextLabel?: string;
   onDownload?: (image: GeneratedImageItem) => void;
   onEdit?: (image: GeneratedImageItem) => void;
@@ -794,11 +798,15 @@ function ImagePreviewZoomInIcon() {
 }
 
 export function ImagePreviewDialog({
+  className,
   closeLabel = "Close image preview",
+  downloadable = true,
   downloadLabel = "Download",
   editLabel = "Edit image",
   imageId,
   images,
+  immersiveCaption,
+  immersiveInitialFocus = "dialog",
   nextLabel = "Next image",
   onDownload,
   onEdit,
@@ -891,24 +899,30 @@ export function ImagePreviewDialog({
     const modalLock = acquireDocumentScrollLock({
       containsFocus: (target) => previewRef.current?.contains(target) ?? false,
       getInitialFocus: () =>
-        presentation === "immersive" ? previewRef.current : closeRef.current,
+        presentation === "immersive" && immersiveInitialFocus === "dialog"
+          ? previewRef.current
+          : closeRef.current,
       priority: 1200,
       returnFocus: returnFocusRef.current,
     });
     if (modalLock.isTop()) {
       (presentation === "immersive"
-        ? previewRef.current
+        ? immersiveInitialFocus === "dialog"
+          ? previewRef.current
+          : closeRef.current
         : closeRef.current
       )?.focus();
     }
     return () => {
       modalLock.release()?.focus();
     };
-  }, [presentation, visible]);
+  }, [immersiveInitialFocus, presentation, visible]);
 
   if (!visible || typeof document === "undefined") return null;
   const activeImage = images[Math.min(activeIndex, images.length - 1)];
   if (!activeImage) return null;
+  const displayedHeight = intrinsicSize.height || activeImage.height || 0;
+  const displayedWidth = intrinsicSize.width || activeImage.width || 0;
 
   const downloadActiveImage = () => {
     if (onDownload) {
@@ -966,9 +980,12 @@ export function ImagePreviewDialog({
       <div
         aria-labelledby={titleId}
         aria-modal="true"
-        className="codex-ui-image-preview"
+        className={["codex-ui-image-preview", className]
+          .filter(Boolean)
+          .join(" ")}
         data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
         data-codex-ui-overlay-layer={overlayEnvironment.layer}
+        data-image-source-empty={!activeImage.src || undefined}
         data-presentation="immersive"
         data-theme={portalTheme}
         onKeyDown={handleKeyDown}
@@ -998,7 +1015,7 @@ export function ImagePreviewDialog({
                 <span aria-hidden="true">⌁</span>
               </button>
             ) : null}
-            {activeImage.downloadSrc ?? activeImage.src ? (
+            {downloadable && (activeImage.downloadSrc ?? activeImage.src) ? (
               <button
                 aria-label={downloadLabel}
                 onClick={downloadActiveImage}
@@ -1045,17 +1062,22 @@ export function ImagePreviewDialog({
               }}
               ref={previewImageRef}
               referrerPolicy="no-referrer"
-              src={activeImage.src}
+              src={activeImage.src || undefined}
               style={
-                intrinsicSize.width > 0
+                displayedWidth > 0
                   ? {
-                      height: `${(intrinsicSize.height * zoomScale) / 100}px`,
-                      width: `${(intrinsicSize.width * zoomScale) / 100}px`,
+                      height: `${(displayedHeight * zoomScale) / 100}px`,
+                      width: `${(displayedWidth * zoomScale) / 100}px`,
                     }
                   : undefined
               }
             />
           </div>
+          {immersiveCaption ? (
+            <div className="codex-ui-image-preview__immersive-caption">
+              {immersiveCaption}
+            </div>
+          ) : null}
           <div className="codex-ui-image-preview__zoom-toolbar">
             <button
               aria-label={zoomOutLabel}

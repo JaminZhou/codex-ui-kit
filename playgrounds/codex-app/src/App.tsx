@@ -857,13 +857,17 @@ const currentAttachmentProductPreviewUrl = new URL(
 ).href;
 
 function currentMarkdownMediaSource(source: string) {
+  if (source.includes("openai.com/favicon.ico")) {
+    return currentMarkdownOpenAiMediaFavicon;
+  }
   return source.includes("current-markdown-preview.png")
     ? currentAttachmentProductPreviewUrl
     : source;
 }
 
 function currentMarkdownMediaStatus(source: string) {
-  return source.includes("codex-ui-kit-missing.png")
+  return source.includes("codex-ui-kit-missing.png") ||
+    source.includes("codex-ui-kit-current-media.png")
     ? ("unavailable" as const)
     : ("ready" as const);
 }
@@ -1443,6 +1447,11 @@ function McpResponseActions({
 // Codex external-link renderer so visual acceptance stays deterministic.
 const currentMarkdownOpenAiFavicon =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAIAAAC0D9CtAAABFWlDQ1BfAAB4nJWQsUoDQRCGPyUgioWCpcV1gqDGBEMCIsScBttEIbG73B2HJjmPy4m+gY29rQ9haWFhZStYW/gAVqn9N1dsQFJkhtn9dvZnZ2dgEWOFIgzjLG01j51O99JZ+mZBPjHPHyXMNqnGX7n2c4f5bTkIR772X0WWqrieDMQbUc73hns5Pxq+y5JM/Gw4PW81xC/itWiKe1PsJ6nRv4sPh4Nb3/6b1TC+aGvvKDZpciOPGBCyR5s+V3gilxpF9mnIXerimtYDTnWuUOWEsqIqNreu2JW6LlVFUTLzzEsGD1DeVukVm7v+gdcnWP+wua2+vn0Eb12bszNOvNSz0x8XZvTk/OvJ4YwYn11RadJR5Q9AT0aJf0or6QAAAn9JREFUeJyUUztoWgEUrZpPTZMGQkhCAhUsJORXMoWQkM8QMiVKpsTBQZxEsA6CKSKCiINOCg6ikwjiIDrooAiKg4Ko4CBGB3+oET8YFMG/PfaFFEqH9g3vXS7n3nvuOffNrK+vf/jPZ+Y9IpFIq6uru7u7V1dXCJCp1+t+vz+ZTCKYTCa/kcSc2dnZ29tbPp9Pp9MRI0Mmk4Hr9/uZTEan0zmdzsFgQNRQFhcXAXp4eFAoFJubm4VCweFwBAKB4XCIPN5bW1uY3Gg0MHA8Hk9rlpaWGAwGChCk02mtVntxcQFuYrE4Eon4fL5wOHxzc3N2doZ2qVRqyu3g4MBisezt7RWLRb1ez2QwXyovZrP5/v4eybW1NZvNVqlUZDIZOrJYrFqtRsbS2AE9JBLJc/J54dOCwWDAkFAoZDQahd+FtC80oFutFmAAT1cFV/D2er0cDof+lY5UqVRSq9Xlcvno6Ojpx5Pb4242m71eb25uDuCp1qAOfUDs+PgYG0OcjY0NjUYDBJvNdrlcXC735OQEokMnwgMyISu2isfj19fXmAB9UYDhyIMkZES7RCIxGo3ePIVf+Jyfn6Mr6IpEIgjF4/GoVGoul0MxhUJ5bb6urKzAdAJMxlA0pn6kLn9ePj09VavU+Xx+fn4elGg0GgrgjMFouLu7A22Ap3PgFJze2dk5/HYITVVqVbVaBQ7eM5lMrIpDEQqFEC3565l6CtLtdvvy8hKawAqP2xONRk0mk0Ag2N7ettvtj4+P+/v7nU5HqVTGYrG3eyNuRyqVglKtWuv1e5gcDAZxGVAFS3a7XblcbrVaiZP7y41ib6xLqARQNpv940ZJ7//Pv/8LPwEAAP//uhbiMQAAAAZJREFUAwCcbFyQ5jiGKgAAAABJRU5ErkJggg==";
+
+// Public source: https://openai.com/favicon.ico. This exact 48/32/16 ICO
+// response keeps the current Markdown media acceptance deterministic.
+const currentMarkdownOpenAiMediaFavicon =
+  "data:image/x-icon;base64,AAABAAMAMDAAAAEAIABoJgAANgAAACAgAAABACAAKBEAAJ4mAAAQEAAAAQAgAGgEAADGNwAAKAAAADAAAABgAAAAAQAgAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////I////5D////S////7f////r////9///////////////9////+v///+3////S////kP///yMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////EP///6D////v///////////////////////////////////////////////////////////////////////////////v////oP///xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xL///+7/////f////////////////////////////////////////////////////////////////////////////////////////////////////3///+7////EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////if////v/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+////4kAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xL////c///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////c////EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////Mf////f/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9////zEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///9F////+///////////////////////////////////////////////////////////////////////////n5+f/0BAQP8QEBD/AAAA/xAQEP9AQED/f39//+/v7/////////////////////////////////////////////////v///9FAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///zH////7/////////////////////////////////////////////////////////////////////8/Pz/8gICD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/xAQEP+Pj4/////////////////////////////////////////////////7////MQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////Ev////f/////////////////////////////////////39/f/2BgYP8wMDD/AAAA/wAAAP8gICD/UFBQ/wAAAP8AAAD/ICAg/6CgoP/Pz8///////+/v7/+/v7//YGBg/wAAAP8AAAD/X19f////////////////////////////////////////////////9////xIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////3P///////////////////////////////9/f3/9gYGD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8QEBD/v7+//////////////////////////////////8/Pz/8gICD/AAAA/39/f////////////////////////////////////////////////9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///+J////////////////////////////////39/f/yAgIP8AAAD/AAAA/2BgYP+/v7//7+/v///////f39//kJCQ/yAgIP8AAAD/AAAA/1BQUP/f39/////////////////////////////f39//EBAQ/wAAAP/f39////////////////////////////////////////////////+JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xL////7////////////////////////////////QEBA/wAAAP8gICD/39/f/////////////////////////////////+/v7/+AgID/EBAQ/wAAAP8QEBD/f39//+/v7///////////////////////kJCQ/wAAAP9gYGD////////////////////////////////////////////////7////EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///7v///////////////////////////////+Pj4//AAAA/yAgIP/f39//////////////////////////////////////////////////7+/v/2BgYP8AAAD/AAAA/yAgIP+fn5//////////////////39/f/wAAAP8gICD/7+/v////////////////////////////////////////////////uwAAAAAAAAAAAAAAAAAAAAAAAAAA////EP////3///////////////////////////////8wMDD/AAAA/6CgoP//////////////////////39/f/2BgYP9wcHD/39/f//////////////////////+/v7//QEBA/wAAAP8AAAD/QEBA/////////////////zAwMP8AAAD/AAAA/2BgYP/f39///////////////////////////////////////f///xAAAAAAAAAAAAAAAAAAAAAA////oP///////////////////////////////9/f3/8AAAD/EBAQ//////////////////////9/f3//AAAA/wAAAP8AAAD/EBAQ/39/f//v7+///////////////////////5+fn/8AAAD/AAAA/9/f3////////////0BAQP8AAAD/AAAA/wAAAP8QEBD/z8/P/////////////////////////////////////6AAAAAAAAAAAAAAAAAAAAAA////7////////////////////////////////5+fn/8AAAD/UFBQ////////////n5+f/yAgIP8AAAD/AAAA/2BgYP9AQED/AAAA/wAAAP8gICD/r6+v//////////////////////8gICD/AAAA/9/f3////////////0BAQP8AAAD/n5+f/0BAQP8AAAD/EBAQ/9/f3////////////////////////////////+8AAAAAAAAAAAAAAAD///8j/////////////////////////////////////5+fn/8AAAD/YGBg/9/f3/8wMDD/AAAA/wAAAP8gICD/z8/P////////////v7+//0BAQP8AAAD/AAAA/0BAQP+/v7////////////8gICD/AAAA/9/f3////////////0BAQP8AAAD/v7+///////9wcHD/AAAA/yAgIP////////////////////////////////////8jAAAAAAAAAAD///+Q/////////////////////////////////////7CwsP8AAAD/EBAQ/wAAAP8AAAD/ICAg/6CgoP///////////////////////////39/f/8AAAD/AAAA/wAAAP8AAAD/b29v/+/v7/8gICD/AAAA/9/f3////////////0BAQP8AAAD/v7+/////////////ICAg/wAAAP+fn5////////////////////////////////+QAAAAAAAAAAD////S/////////////////////////////////////7+/v/8AAAD/AAAA/wAAAP+AgID/7+/v//////////////////////+fn5//ICAg/wAAAP8AAAD/YGBg/4CAgP8QEBD/AAAA/xAQEP8QEBD/AAAA/9/f3////////////0BAQP8AAAD/v7+/////////////n5+f/wAAAP9AQED////////////////////////////////SAAAAAAAAAAD////t////////////////////////////////39/f/yAgIP8AAAD/MDAw/9/f3///////////////////////39/f/zAwMP8AAAD/AAAA/zAwMP/f39/////////////f39//YGBg/wAAAP8AAAD/AAAA/9/f3////////////0BAQP8AAAD/v7+/////////////7+/v/wAAAP8AAAD////////////////////////////////tAAAAAAAAAAD////6////////////////////////////////QEBA/wAAAP9AQED//////////////////////9/f3/9gYGD/AAAA/wAAAP8AAAD/kJCQ/////////////////////////////////7+/v/8QEBD/AAAA/9/f3////////////0BAQP8AAAD/v7+//////////////////yAgIP8AAAD/39/f///////////////////////////6AAAAAAAAAAD////9//////////////////////////+/v7//AAAA/xAQEP/v7+//////////////////j4+P/yAgIP8AAAD/AAAA/wAAAP8AAAD/39/f//////////////////////////////////////8gICD/AAAA/9/f3////////////0BAQP8AAAD/v7+//////////////////yAgIP8AAAD/39/f///////////////////////////9AAAAAAAAAAD///////////////////////////////9wcHD/AAAA/4CAgP////////////////9AQED/AAAA/wAAAP9gYGD/39/f/yAgIP8AAAD/39/f//////////////////////////////////////8gICD/AAAA/9/f3///////n5+f/xAQEP8AAAD/z8/P////////////7+/v/wAAAP8QEBD/////////////////////////////////AAAAAAAAAAD///////////////////////////////8gICD/AAAA/7+/v/////////////////8AAAD/AAAA/5CQkP///////////yAgIP8AAAD/39/f//////////////////////////////////////8gICD/AAAA/7+/v/8gICD/AAAA/wAAAP9AQED/7+/v////////////gICA/wAAAP9AQED/////////////////////////////////AAAAAAAAAAD////9//////////////////////////8QEBD/AAAA/9/f3/////////////////8AAAD/AAAA/////////////////yAgIP8AAAD/39/f//////////////////////////////////////8gICD/AAAA/wAAAP8AAAD/ICAg/6CgoP/////////////////v7+//EBAQ/wAAAP+/v7/////////////////////////////////9AAAAAAAAAAD////6//////////////////////////8QEBD/AAAA/9/f3/////////////////8AAAD/AAAA/////////////////yAgIP8AAAD/b29v/+/v7////////////////////////////5+fn/8QEBD/AAAA/wAAAP+AgID///////////////////////////9QUFD/AAAA/0BAQP/////////////////////////////////////6AAAAAAAAAAD////t//////////////////////////9AQED/AAAA/7+/v/////////////////8AAAD/AAAA/////////////////yAgIP8AAAD/AAAA/xAQEP+Pj4////////////+fn5//ICAg/wAAAP8AAAD/YGBg/9/f3///////////////////////39/f/yAgIP8AAAD/ICAg/9/f3//////////////////////////////////////tAAAAAAAAAAD////S//////////////////////////9wcHD/AAAA/2BgYP////////////////8AAAD/AAAA/////////////////yAgIP8AAAD/MDAw/wAAAP8AAAD/MDAw/1BQUP8AAAD/AAAA/yAgIP+vr6///////////////////////9/f3/9gYGD/AAAA/wAAAP8AAAD/oKCg///////////////////////////////////////////SAAAAAAAAAAD///+Q///////////////////////////f39//AAAA/wAAAP/f39////////////8AAAD/AAAA/////////////////yAgIP8AAAD/39/f/7+/v/8gICD/AAAA/wAAAP8AAAD/gICA////////////////////////////f39//yAgIP8AAAD/AAAA/yAgIP8AAAD/gICA//////////////////////////////////////////+QAAAAAAAAAAD///8j////////////////////////////////cHBw/wAAAP8gICD/39/f//////8AAAD/AAAA/////////////////yAgIP8AAAD/39/f////////////gICA/xAQEP8AAAD/AAAA/39/f//v7+///////5+fn/8gICD/AAAA/wAAAP9gYGD/39/f/4CAgP8AAAD/YGBg//////////////////////////////////////////8jAAAAAAAAAAAAAAAA////7////////////////////////////////zAwMP8AAAD/EBAQ/39/f/8AAAD/AAAA/////////////////yAgIP8AAAD/39/f/////////////////+/v7/9gYGD/AAAA/wAAAP8QEBD/QEBA/wAAAP8AAAD/ICAg/6CgoP///////////3BwcP8AAAD/gICA/////////////////////////////////////+8AAAAAAAAAAAAAAAAAAAAA////oP///////////////////////////////+/v7/9AQED/AAAA/wAAAP8AAAD/AAAA/////////////////zAwMP8AAAD/UFBQ/9/f3///////////////////////v7+//0BAQP8AAAD/AAAA/yAgIP+QkJD//////////////////////zAwMP8AAAD/r6+v/////////////////////////////////////6AAAAAAAAAAAAAAAAAAAAAA////EP////3/////////////////////////////////////n5+f/0BAQP8AAAD/AAAA/8/Pz////////////5CQkP8QEBD/AAAA/xAQEP9/f3//7+/v//////////////////////+fn5//cHBw/9/f3///////////////////////v7+//wAAAP8QEBD/7+/v/////////////////////////////////f///xAAAAAAAAAAAAAAAAAAAAAAAAAAAP///7v///////////////////////////////////////////////9gYGD/AAAA/5+fn//////////////////v7+//cHBw/wAAAP8AAAD/EBAQ/5+fn//////////////////////////////////////////////////f39//ICAg/wAAAP+AgID/////////////////////////////////////uwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xL////7//////////////////////////////////////////+wsLD/AAAA/yAgIP///////////////////////////7+/v/9AQED/AAAA/wAAAP9AQED/v7+//////////////////////////////////9/f3/8gICD/AAAA/zAwMP/v7+/////////////////////////////////7////EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///+J////////////////////////////////////////////////ICAg/wAAAP9/f3//////////////////////////////////n5+f/yAgIP8AAAD/AAAA/0BAQP+fn5//v7+//7+/v/+fn5//UFBQ/wAAAP8AAAD/ICAg/9/f3/////////////////////////////////////+JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////3P//////////////////////////////////////////39/f/xAQEP8AAAD/b29v/+/v7////////////////////////////8/Pz/8gICD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP9wcHD/7+/v/////////////////////////////////////9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////Ev////f//////////////////////////////////////////8/Pz/8QEBD/AAAA/xAQEP9wcHD/r6+v/7+/v/+vr6//YGBg/yAgIP8AAAD/AAAA/4CAgP9gYGD/QEBA/0BAQP9QUFD/kJCQ/9/f3///////////////////////////////////////////9////xIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///zH////7///////////////////////////////////////////f39//QEBA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8gICD/39/f///////////////////////////////////////////////////////////////////////////7////MQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///9F////+////////////////////////////////////////////////7+/v/9wcHD/UFBQ/0BAQP9AQED/cHBw/7+/v/////////////////////////////////////////////////////////////////////////////////v///9FAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////Mf////f/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9////zEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xL////c///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////c////EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////if////v/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////+////4kAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xL///+7/////f////////////////////////////////////////////////////////////////////////////////////////////////////3///+7////EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////EP///6D////v///////////////////////////////////////////////////////////////////////////////v////oP///xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////I////5D////S////7f////r////9///////////////9////+v///+3////S////kP///yMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAgAAAAQAAAAAEAIAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8V////J////yv///8s////LP///yv///8n////FQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wL///9e////mv///9f////5//////////////////////////n////X////mv///17///8CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wf///9S////zP////v/////////////////////////////////////////////////////////+////8z///9S////BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8h////tv////////////////////////////////////////////////////////////////////////////////////////+2////IQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////NP///9X///////////////////////////////////////////v7+//X19f/ysrK/9DQ0P/p6en////////////////////////////////V////NAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///zP////l///////////////////////////////////////////Gxsb/R0dH/wwMDP8AAAD/BAQE/ygoKP+AgID/8/Pz///////////////////////////l////MwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8e////1v////////////////v7+/+/v7//V1dX/xoaGv8UFBT/Pj4+/xAQEP8vLy//ra2t/9ra2v/Ozs7/fX19/xgYGP9PT0//8fHx///////////////////////////W////HgAAAAAAAAAAAAAAAAAAAAAAAAAA////Cf///7b////////////////19fX/Y2Nj/wMDA/8/Pz//iIiI/5eXl/9iYmL/DQ0N/zU1Nf+vr6//////////////////2NjY/x8fH/9ubm7///////////////////////////////+2////CQAAAAAAAAAAAAAAAAAAAAD///9S/////v///////////Pz8/35+fv8HBwf/n5+f//X19f/////////////////MzMz/UVFR/w4ODv9WVlb/zc3N////////////oKCg/xUVFf/k5OT///////////////////////////7///9SAAAAAAAAAAAAAAAA////BP///83////////////////c3Nz/ERER/4ODg////////////+7u7v+bm5v/0dHR////////////s7Oz/zk5Of8SEhL/e3t7//7+/v/n5+f/FhYW/0NDQ/+1tbX//////////////////////////83///8EAAAAAAAAAAD///9d////+v///////////////6Wlpf8NDQ3/7u7u//r6+v+zs7P/JSUl/w8PD/8PDw//d3d3/+fn5///////9vb2/3Fxcf8FBQX/6Ojo//T09P8qKir/ERER/wkJCf+Ojo7/////////////////////+v///10AAAAAAAAAAP///5r/////////////////////f39//zU1Nf/Dw8P/RERE/wQEBP9eXl7/xcXF/5aWlv8dHR3/KCgo/5SUlP/+/v7/vr6+/w0NDf/l5eX/8/Pz/yQkJP+Ojo7/lpaW/woKCv+fn5//////////////////////mgAAAAD///8V////1/////////////////////+YmJj/BQUF/wcHB/87Ozv/t7e3////////////09PT/z4+Pv8EBAT/ExMT/0hISP9+fn7/EBAQ/+Xl5f/z8/P/IyMj/5aWlv//////V1dX/y0tLf/u7u7////////////////X////Ff///yf////5////////////////8vLy/05OTv8UFBT/mJiY//n5+f//////6enp/2tra/8RERH/QUFB/8TExP/Ly8v/U1NT/wEBAf8RERH/5ubm//Pz8/8jIyP/k5OT///////IyMj/BAQE/83Nzf////////////////n///8n////K/////////////////////99fX3/CgoK/8TExP//////9fX1/5WVlf8WFhb/AAAA/2lpaf/5+fn////////////9/f3/ioqK/wsLC//m5ub/9/f3/yUlJf+SkpL//////+np6f8LCwv/srKy/////////////////////yv///8s////////////////7e3t/yoqKv9xcXH//////+Dg4P9AQED/Dw8P/3p6ev8VFRX/lpaW//////////////////////+2trb/Dg4O/+jo6P+7u7v/BQUF/5ycnP//////2tra/wMDA//ExMT/////////////////////LP///yz////////////////R0dH/BAQE/729vf//////v7+//wAAAP+wsLD//////x0dHf+VlZX//////////////////////7i4uP8MDAz/Wlpa/wYGBv9ERET/2dnZ//////90dHT/HBwc/+Xl5f////////////////////8s////K////////////////87Ozv8AAAD/zc3N//////+/v7//AAAA/+3t7f/8/Pz/ICAg/1paWv/r6+v////////////29vb/fX19/wAAAP8gICD/qqqq//n5+f//////x8fH/w4ODv9+fn7//////////////////////////yv///8n////+f//////////3d3d/xYWFv+ioqL//////7+/v/8AAAD/6enp//z8/P8nJyf/BAQE/x8fH/+lpaX/sbGx/y4uLv8UFBT/gYGB/+zs7P//////7+/v/5OTk/8ODg7/SUlJ//Ly8v/////////////////////5////J////xX////X///////////5+fn/SUlJ/zIyMv/+/v7/xsbG/wAAAP/p6en//Pz8/x4eHv9zc3P/dHR0/woKCv8AAAD/OTk5/9DQ0P///////Pz8/6qqqv81NTX/CAgI/w0NDf95eXn//////////////////////////9f///8VAAAAAP///5r////////////////Hx8f/Dw8P/2lpaf+goKD/AAAA/+np6f/8/Pz/Ghoa/5qamv//////v7+//0lJSf8GBgb/bGxs/7a2tv9MTEz/AgIC/1FRUf/R0dH/SUlJ/1xcXP//////////////////////////mgAAAAAAAAAA////Xf////r///////////////+urq7/FhYW/w0NDf8BAQH/6Ojo//7+/v8oKCj/QUFB/9zc3P///////v7+/6Ghof8mJib/BgYG/zc3N/+2trb/+fn5//X19f8eHh7/iIiI//////////////////////r///9dAAAAAAAAAAD///8E////zf/////////////////////Y2Nj/b29v/wkJCf/BwcH//////6ioqP8yMjL/FRUV/4eHh//t7e3//////+zs7P+srKz/7+/v////////////kZGR/woKCv/Ozs7/////////////////////zf///wQAAAAAAAAAAAAAAAD///9S/////v/////////////////////6+vr/MjIy/11dXf///////////+3t7f+AgID/Dw8P/ywsLP+np6f/9fX1////////////8/Pz/5+fn/8GBgb/cXFx//z8/P////////////////7///9SAAAAAAAAAAAAAAAAAAAAAP///wn///+2//////////////////////////+dnZ3/DAwM/6Ghof/////////////////Z2dn/S0tL/wAAAP80NDT/b29v/21tbf8zMzP/BgYG/2pqav/09PT/////////////////////tv///wkAAAAAAAAAAAAAAAAAAAAAAAAAAP///x7////W//////////////////////////+NjY3/Dw8P/0VFRf+dnZ3/tLS0/4eHh/8uLi7/FBQU/2RkZP9CQkL/Pz8//3BwcP/Dw8P//////////////////////////9b///8eAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///zP////l//////////////////////////+rq6v/Pz8//xsbG/8RERH/Hx8f/1FRUf/MzMz////////////////////////////////////////////////l////MwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///zT////V///////////////////////////4+Pj/4ODg/9ra2v/k5OT/////////////////////////////////////////////////////1f///zQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///yH///+2/////////////////////////////////////////////////////////////////////////////////////////7b///8hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wf///9S////zP////v/////////////////////////////////////////////////////////+////8z///9S////BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8C////Xv///5r////X////+f/////////////////////////5////1////5r///9e////AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xX///8n////K////yz///8s////K////yf///8VAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xD///9E////V////1f///9E////EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////D////4D////f/////////////////////////+H///+A////DwAAAAAAAAAAAAAAAAAAAAAAAAAA////H////8f////////////////d3d3/l5eX/6Wlpf/09PT//////////8f///8fAAAAAAAAAAAAAAAA////D////8n/////tbW1/2pqav9nZ2f/MDAw/52dnf+mpqb/Z2dn/+zs7P//////////yf///w8AAAAAAAAAAP///4H/////wsLC/2lpaf/h4eH/0NDQ/66urv9qamr/v7+//7e3t/93d3f/9/f3//////////+BAAAAAP///xH////j/////4CAgP+fn5//dnZ2/2VlZf+CgoL/zs7O/15eXv/Ly8v/OTk5/3Jycv/39/f/////5P///xH///9E//////////9iYmL/YWFh/8nJyf+fn5//SUlJ/2lpaf9FRUX/xsbG/4aGhv+YmJj/p6en//////////9E////WP/////FxcX/d3d3/9bW1v9hYWH/Pz8///r6+v/6+vr/ZGRk/6ampv98fHz/yMjI/4qKiv//////////WP///1j/////kpKS/76+vv+Dg4P/qqqq/2FhYf/t7e3/9/f3/0lJSf9fX1//1dXV/3h4eP/BwcH//////////1j///9E/////7a2tv+NjY3/iIiI/8TExP9OTk7/Y2Nj/z09Pf+dnZ3/yMjI/2BgYP9aWlr///////////////9E////Ef///+T6+vr/fX19/y4uLv/Jycn/YmJi/8nJyf+UlJT/YWFh/3Z2dv+pqan/d3d3///////////j////EQAAAAD///+B//////7+/v+Li4v/nZ2d/9LS0v9ra2v/nJyc/8rKyv/c3Nz/aWlp/7u7u///////////gQAAAAAAAAAA////D////8n/////9fX1/3BwcP+NjY3/mpqa/zMzM/9tbW3/cnJy/7i4uP//////////yf///w8AAAAAAAAAAAAAAAD///8f////x//////9/f3/s7Oz/6SkpP/h4eH/////////////////////x////x8AAAAAAAAAAAAAAAAAAAAAAAAAAP///w////+A////4P/////////////////////////f////gP///w8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///xD///9E////V////1f///9E////EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
 
 const currentCitationQueries = [
   'site:developers.openai.com/codex/guides "AGENTS.md"',
@@ -3141,10 +3150,14 @@ export function App() {
     mode === "replay" && scenarioId === "markdown-current-26-820-media";
   const isCurrentMarkdown26825Replay =
     mode === "replay" && scenarioId === "markdown-current-26-825";
+  const isCurrentMarkdown26825MediaReplay =
+    mode === "replay" && scenarioId === "markdown-current-26-825-media";
   const isCurrentRichMarkdownStreamingReplay =
     mode === "replay" && scenarioId === "markdown-streaming-large";
   const usesCurrentMarkdown26825Presentation =
-    isCurrentMarkdown26825Replay || isCurrentRichMarkdownStreamingReplay;
+    isCurrentMarkdown26825Replay ||
+    isCurrentMarkdown26825MediaReplay ||
+    isCurrentRichMarkdownStreamingReplay;
   const isCurrentMixedToolReplay =
     mode === "replay" && scenarioId === "current-mixed-tool-thread";
   const isCurrentPlan26825Replay =
@@ -5481,6 +5494,7 @@ export function App() {
       isCurrentSearch26825Replay ||
       isCurrentMarkdown26818Replay ||
       isCurrentMarkdown26825Replay ||
+      isCurrentMarkdown26825MediaReplay ||
       isCurrentTransportRecoveryReplay ||
       isCurrentSubagentReplay ||
       current26820LongFrame ||
@@ -5959,6 +5973,7 @@ export function App() {
       scenarioId === "markdown" ||
       isCurrentMarkdown26818Replay ||
       isCurrentMarkdown26825Replay ||
+      isCurrentMarkdown26825MediaReplay ||
       isCurrentMcpReplay ||
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
@@ -10037,6 +10052,10 @@ export function App() {
                   message.id === "assistant-markdown-media") ||
                 (isCurrentMarkdown26825Replay &&
                   message.id === "assistant-markdown-current-26-825") ||
+                (isCurrentMarkdown26825MediaReplay &&
+                  message.id.startsWith(
+                    "assistant-markdown-current-26-825-media-",
+                  )) ||
                 (scenarioId === "markdown-table-actions" &&
                   message.id === "assistant-markdown-table-actions") ||
                 (scenarioId === "markdown-streaming-large" &&
@@ -10118,6 +10137,7 @@ export function App() {
                 isCurrentCitations26825Replay ||
                 isCurrentMarkdown26818Replay ||
                 isCurrentMarkdown26820MediaReplay ||
+                isCurrentMarkdown26825MediaReplay ||
                 isCurrentMarkdown26825Replay ||
                 isCurrentRichMarkdownStreamingReplay ||
                 isCurrentSubagentReplay ? (
@@ -10127,6 +10147,7 @@ export function App() {
                       isCurrentCitations26825Replay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
+                      isCurrentMarkdown26825MediaReplay ||
                       usesCurrentMarkdown26825Presentation
                         ? "Copy"
                         : undefined
@@ -10136,6 +10157,7 @@ export function App() {
                       isCurrentCitations26825Replay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
+                      isCurrentMarkdown26825MediaReplay ||
                       usesCurrentMarkdown26825Presentation
                         ? null
                         : message.id === "assistant-workflow" ||
@@ -10156,6 +10178,7 @@ export function App() {
                       !isCurrentCitations26825Replay &&
                       !isCurrentMarkdown26818Replay &&
                       !isCurrentMarkdown26820MediaReplay &&
+                      !isCurrentMarkdown26825MediaReplay &&
                       !usesCurrentMarkdown26825Presentation
                     }
                   />
@@ -10255,7 +10278,10 @@ export function App() {
                 <CurrentCitationAnswer />
               ) : (
                 <AgentMarkdown
-                  allowWideMedia={isCurrentMarkdown26820MediaReplay}
+                  allowWideMedia={
+                    isCurrentMarkdown26820MediaReplay ||
+                    isCurrentMarkdown26825MediaReplay
+                  }
                   allowWideTables={scenarioId === "markdown-table-actions"}
                   codeBlockCopyAriaLabel={
                     usesCurrentMarkdown26825Presentation ? "Copy" : undefined
@@ -10292,13 +10318,19 @@ export function App() {
                   density={
                     usesCurrentMarkdown26825Presentation ? "compact" : "regular"
                   }
+                  expandWideMedia={isCurrentMarkdown26825MediaReplay}
                   imageSourceResolver={
-                    isCurrentMarkdown26820MediaReplay
+                    isCurrentMarkdown26820MediaReplay ||
+                    isCurrentMarkdown26825MediaReplay
                       ? currentMarkdownMediaSource
                       : undefined
                   }
+                  imagePreviewSourceResolver={
+                    isCurrentMarkdown26825MediaReplay ? () => "" : undefined
+                  }
                   imageStatus={
-                    isCurrentMarkdown26820MediaReplay
+                    isCurrentMarkdown26820MediaReplay ||
+                    isCurrentMarkdown26825MediaReplay
                       ? currentMarkdownMediaStatus
                       : undefined
                   }
@@ -12480,7 +12512,8 @@ export function App() {
             : currentHomeFrame ||
                 isCurrentBrowser26825Replay ||
                 isCurrentSearch26825Replay ||
-                isCurrentMarkdown26825Replay
+                isCurrentMarkdown26825Replay ||
+                isCurrentMarkdown26825MediaReplay
               ? 322.90625
               : undefined
         }
