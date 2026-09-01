@@ -401,8 +401,10 @@ The authoritative current-build inventory is:
   evidence. That build's project-named single Terminal tab and close/add
   controls independently passed Browser, Electron, and regional pixel gates;
   the broader current lifecycle is recorded above.
-  Offline/error/reconnecting/stale and global-notification runtime states
-  remain synthetic independent coverage, not current-build observations.
+  Offline/error/reconnecting/stale runtime states remain synthetic independent
+  coverage. The sampled top-center success notification and bounded four-item
+  stack are separately re-observed on `26.825.51511`; other notification tones
+  are still source-backed replay rather than current-build observations.
 - Renderer viewport probing exposed a narrow-layout gap: the thread and
   Composer shrink, but the fixed app sidebar remains and the right workspace
   panel can be laid out beyond the simulated viewport. The independently

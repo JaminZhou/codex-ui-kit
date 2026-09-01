@@ -13,6 +13,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertCurrentAccountMenuRecord,
   assertCurrentBaselineRecord,
+  assertCurrentGlobalNotificationsRecord,
   assertCurrentProjectsIndexObservation,
   assertCurrentSidebarLifecycle,
   assertCurrentSidebarRowsRecord,
@@ -449,6 +450,140 @@ const sidebarRowsRecord = () => ({
     candidates: [{ url: "app://-/index.html" }],
     selected: { url: "app://-/index.html" },
   },
+});
+
+const currentNotificationAlertStyle = {
+  backgroundColor: "rgb(1, 28, 11)",
+  borderColor: "oklab(0.742958 -0.14813 0.0758256 / 0.2)",
+  borderRadius: "15px",
+  boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px 0px",
+  color: "rgb(64, 201, 119)",
+  fontFamily: '-apple-system, "system-ui", "Segoe UI", sans-serif',
+  fontSize: "14px",
+  fontWeight: "400",
+  lineHeight: "21px",
+  padding: "8px",
+};
+const currentNotificationIconSha256s = [
+  "c9ae9916e10ed453334494746b90c8cf8b2a2303124c2b7d8961f9ca7cb06ceb",
+  "2a1c3c07a26d5833ac1225d35ceeedc42105e4124e1b37dfdba34199c8b746f7",
+];
+const currentNotification = (
+  index: number,
+  expanded: boolean,
+  top: number,
+  width: number,
+) => ({
+  alert: {
+    rect: { height: expanded ? 42 : 42 * (1 - index * 0.05), top, width },
+    style: { ...currentNotificationAlertStyle },
+  },
+  dismissible: true,
+  expanded,
+  front: index === 0,
+  iconSha256s: [...currentNotificationIconSha256s],
+  index,
+  mounted: true,
+  promise: false,
+  rect: {
+    bottom: top + (expanded ? 42 : 42 * (1 - index * 0.05)),
+    height: expanded ? 42 : 42 * (1 - index * 0.05),
+    left: 666,
+    right: 666 + width,
+    top,
+    width,
+  },
+  removed: false,
+  style: {
+    opacity: index < 3 ? "1" : "0",
+    pointerEvents: index < 3 ? "auto" : "none",
+    transform: expanded
+      ? "matrix(1, 0, 0, 1, 0, 0)"
+      : [
+          "matrix(1, 0, 0, 1, 0, 0)",
+          "matrix(0.95, 0, 0, 0.95, 0, 8)",
+          "matrix(0.9, 0, 0, 0.9, 0, 16)",
+          "matrix(0.85, 0, 0, 0.85, 0, 24)",
+        ][index],
+  },
+  swipeOut: false,
+  swiped: false,
+  swiping: false,
+  tabIndex: 0,
+  text: "Chat unpinned",
+  visible: index < 3,
+});
+const currentGlobalNotificationsRecord = () => ({
+  captureKind: "renderer_cdp",
+  collapsed: [170.4375, 161.9156, 153.3938, 144.8718].map(
+    (width, index) =>
+      currentNotification(index, false, [48, 57.05, 66.1, 75.15][index], width),
+  ),
+  expanded: [48, 98, 148, 198].map((top, index) =>
+    currentNotification(index, true, top, 170.4375),
+  ),
+  fingerprint: currentBaselineFingerprint,
+  privacyBoundary:
+    "four-disposable-task-title-hashes-and-notification-geometry-only",
+  profileOwnerPid: 12_345,
+  region: {
+    ariaAtomic: "false",
+    ariaLabel: "Notifications alt+T",
+    ariaLive: "polite",
+    ariaRelevant: "additions text",
+    frontToastHeight: "42px",
+    gap: "8px",
+    rect: { height: 0, top: 48 },
+    sonnerTheme: "light",
+    xPosition: "center",
+    yPosition: "top",
+  },
+  runtimeBundleIdentity: {
+    afterCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_351_000_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    beforeCapture: {
+      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
+      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      changedAtMs: 1_786_150_111_000,
+      checkedAtMs: 1_786_350_900_000,
+      device: "16777231",
+      inode: "346397970",
+    },
+    ownerPid: 12_345,
+    processStartedAtMs: 1_786_350_800_000,
+  },
+  schemaVersion: 1,
+  screenshots: {
+    collapsed: {
+      height: 64,
+      name: "notification-stack-collapsed.png",
+      sha256: "a".repeat(64),
+      width: 180,
+    },
+    expanded: {
+      height: 150,
+      name: "notification-stack-expanded.png",
+      sha256: "b".repeat(64),
+      width: 180,
+    },
+  },
+  targetSelection: {
+    candidates: [{ url: "app://-/index.html" }],
+    selected: { url: "app://-/index.html" },
+  },
+  taskState: {
+    initial: [false, false, false, false],
+    pinned: [true, true, true, true],
+    restored: [false, false, false, false],
+  },
+  taskTitleSha256s: ["1", "2", "3", "4"].map((value) => value.repeat(64)),
+  viewport: currentBaselineViewports.wide,
 });
 
 describe("current baseline capture contract", () => {
@@ -1740,6 +1875,65 @@ describe("current baseline capture contract", () => {
     expect(captureSource).not.toContain(
       "data-app-action-sidebar-thread-host-id",
     );
+    expect(captureSource).not.toContain("document.body.textContent");
+  });
+
+  it("rejects stale or private current global-notification evidence", () => {
+    const record = currentGlobalNotificationsRecord();
+    expect(() => assertCurrentGlobalNotificationsRecord(record)).not.toThrow();
+    expect(() =>
+      assertCurrentGlobalNotificationsRecord({
+        ...record,
+        taskState: {
+          ...record.taskState,
+          restored: [false, false, false, true],
+        },
+      }),
+    ).toThrow("reversible four-task Pin and Undo sequence");
+    expect(() =>
+      assertCurrentGlobalNotificationsRecord({
+        ...record,
+        taskTitle: "private task",
+      }),
+    ).toThrow("privacy boundary");
+    expect(() =>
+      assertCurrentGlobalNotificationsRecord({
+        ...record,
+        collapsed: record.collapsed.map((notification, index) =>
+          index === 0
+            ? {
+                ...notification,
+                alert: {
+                  ...notification.alert,
+                  style: { ...notification.alert.style, fontWeight: "500" },
+                },
+              }
+            : notification,
+        ),
+      }),
+    ).toThrow("collapsed global-notification stack");
+  });
+
+  it("keeps current global-notification capture reversible and regional", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-notifications.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(captureSource).toContain(
+      '"four-disposable-task-title-hashes-and-notification-geometry-only"',
+    );
+    expect(captureSource).toContain("beforeCapture: beforeCapture.bundle");
+    expect(captureSource).toContain("afterCapture: afterCapture.bundle");
+    expect(captureSource).toContain('await page.keyboard.press("Meta+z")');
+    expect(captureSource).toContain("await setTaskPinned(task, false)");
+    expect(captureSource).toContain("clip: {");
+    expect(
+      captureSource.indexOf("assertCurrentGlobalNotificationsRecord(record)"),
+    ).toBeLessThan(
+      captureSource.indexOf('join(outputDirectory, "notifications.json")'),
+    );
+    expect(captureSource).not.toContain('.press("Enter")');
     expect(captureSource).not.toContain("document.body.textContent");
   });
 });

@@ -1333,11 +1333,13 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.820.60940:chatgpt-pin-undo-success-notification-top-center",
-        "cdp-26.820.60940:four-reversible-pin-undo-success-notifications-three-visible-centered-stack"
+        "cdp-26.820.60940:four-reversible-pin-undo-success-notifications-three-visible-centered-stack",
+        "cdp-26.825.51511:reversible-pin-undo-success-notification-top-center-computed-style-and-regional-pixel",
+        "cdp-26.825.51511:four-reversible-pin-undo-success-notifications-three-visible-centered-stack"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
