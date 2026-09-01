@@ -1802,6 +1802,29 @@ function CurrentBrowserFailureLink() {
   );
 }
 
+function CurrentBrowserSuccessLink() {
+  return (
+    <span className="demo-current-browser-success-link">
+      <CurrentBuildIcon aria-hidden="true" name="thread-browser" />
+      <a href="https://developers.openai.com/codex/">
+        https://developers.openai.com/codex/
+      </a>
+    </span>
+  );
+}
+
+function CurrentBrowserSuccessPrompt() {
+  return (
+    <>
+      Temporary read-only Browser probe for codex-ui-kit. Use only the Browser
+      tool, not Web Search, shell, files, project tools, MCP, plugins, or any
+      other tool. Open <CurrentBrowserSuccessLink /> and verify that the page
+      has visible Codex documentation. Then reply with exactly: CURRENT BROWSER
+      SUCCESS 26.825
+    </>
+  );
+}
+
 function CurrentBrowserFailurePrompt({ retry = false }: { retry?: boolean }) {
   if (!retry) {
     return (
@@ -3253,7 +3276,7 @@ export function App() {
       initialSelection.frame === "current-review-26-825-open",
   );
   const [browserPanelOpen, setBrowserPanelOpen] = useState(
-    initialSelection.scenarioId === "current-browser-26-825",
+    false,
   );
   const [browserPanelWidth, setBrowserPanelWidth] = useState(419.59375);
   const [subagentPanelOpen, setSubagentPanelOpen] = useState(
@@ -11445,6 +11468,12 @@ export function App() {
             />
           ) : null}
           <AgentMessage
+            className={
+              isCurrentBrowser26825Replay &&
+              message.id === "assistant-current-browser-26-825"
+                ? "demo-current-browser-success-answer"
+                : undefined
+            }
             actions={
               mode === "replay" &&
               ((scenarioId === "markdown" &&
@@ -11516,6 +11545,8 @@ export function App() {
                   message.id.startsWith(
                     "assistant-current-browser-26-825-",
                   )) ||
+                (isCurrentBrowser26825Replay &&
+                  message.id === "assistant-current-browser-26-825") ||
                 (isCurrentCitations26825Replay &&
                   message.id === "assistant-current-citations-26-825") ||
                 (scenarioId === "command-failure-recovery" &&
@@ -11550,6 +11581,7 @@ export function App() {
                 isCurrentCommandReplay ||
                 isAnyCurrentBasicMessageReplay ||
                 isCurrentCitations26825Replay ||
+                isCurrentBrowser26825Replay ||
                 isCurrentMarkdown26818Replay ||
                 isCurrentBrowserFailure26825Replay ||
                 isCurrentMarkdown26820MediaReplay ||
@@ -11561,6 +11593,7 @@ export function App() {
                     copyLabel={
                       isAnyCurrentBasicMessageReplay ||
                       isCurrentCitations26825Replay ||
+                      isCurrentBrowser26825Replay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentBrowserFailure26825Replay ||
                       isCurrentMarkdown26820MediaReplay ||
@@ -11597,6 +11630,7 @@ export function App() {
                     toolbar={
                       !isAnyCurrentBasicMessageReplay &&
                       !isCurrentCitations26825Replay &&
+                      !isCurrentBrowser26825Replay &&
                       !isCurrentMarkdown26818Replay &&
                       !isCurrentBrowserFailure26825Replay &&
                       !isCurrentMarkdown26820MediaReplay &&
@@ -11763,7 +11797,9 @@ export function App() {
                 </AgentMarkdown>
               )
             ) : (
-              message.id ===
+              message.id === "user-current-browser-26-825" ? (
+                <CurrentBrowserSuccessPrompt />
+              ) : message.id ===
               "user-current-browser-26-825-chromium-error" ? (
                 <CurrentBrowserFailurePrompt />
               ) : message.id ===
@@ -11942,7 +11978,9 @@ export function App() {
         calls.some(({ browserUse }) => browserUse)
       ) {
         const browserActivityOpen =
-          activeFrame === "conversation-browser-current-26-825-open";
+          activeFrame === "conversation-browser-current-26-825-open" ||
+          activeFrame ===
+            "conversation-browser-current-26-825-open-compact";
         const timelineOpen =
           browserActivityOpen ||
           activeFrame ===
@@ -11953,7 +11991,7 @@ export function App() {
             icon: <CurrentBuildIcon name="thread-command-terminal" />,
             id: "browser-current-26-825-skill",
             kind: "instruction" as const,
-            label: "Read Control In App Browser skill",
+            label: "Load Browser instructions",
           },
           ...calls.map((call, index) => {
             const argumentsRecord =
@@ -11968,14 +12006,10 @@ export function App() {
                 : call.toolLabel;
             return {
               completed: call.status === "completed",
-              icon: (
-                <CurrentBuildIcon
-                  name={
-                    call.browserUse
-                      ? "thread-mcp-tool"
-                      : "thread-command-terminal"
-                  }
-                />
+              icon: call.browserUse ? (
+                <CurrentBuildIcon name="thread-browser" />
+              ) : (
+                <CurrentBuildIcon name="thread-browser-connect" />
               ),
               id: call.id,
               kind: (index === 0 ? "connection" : "navigation") as
@@ -12000,10 +12034,10 @@ export function App() {
             }
           >
             <BrowserActivity
-              completedLabel="Used the browser, loaded a tool"
+              completedLabel="Used the browser, ran a command"
               data-item-id={toolCall.id}
               defaultOpen={browserActivityOpen}
-              indicator={<CurrentBuildIcon name="thread-mcp-tool" />}
+              indicator={<CurrentBuildIcon name="thread-browser" />}
               open={
                 initialSelection.capture ? browserActivityOpen : undefined
               }
@@ -13916,7 +13950,7 @@ export function App() {
             : isCurrentCitations26825Replay
               ? citationSourcesPanel
             : isCurrentBrowser26825Replay
-              ? browserWorkspacePanel
+              ? null
             : backgroundTerminalPanelSelected
               ? backgroundTerminalSidePanel
             : subagentPanelSelected

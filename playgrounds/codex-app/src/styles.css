@@ -4525,6 +4525,71 @@ textarea {
   flex-direction: column;
 }
 
+.demo-current-browser-success-answer,
+.demo-current-browser-success-answer .codex-ui-agent-message__content {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+}
+
+.demo-root[data-scenario="current-browser-26-825"]
+  .codex-ui-thread-header__title,
+.demo-root[data-scenario="current-browser-26-825"]
+  [data-item-id="user-current-browser-26-825"],
+.demo-root[data-scenario="current-browser-26-825"]
+  [data-item-id="user-current-browser-26-825"]
+  .codex-ui-agent-message__content {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22.75px;
+}
+
+.demo-root[data-scenario="current-browser-26-825"]
+  [data-item-id="user-current-browser-26-825"]
+  .codex-ui-agent-message__content {
+  max-width: 70%;
+}
+
+.demo-root[data-scenario="current-browser-26-825"]
+  :is(.codex-ui-activity-timeline__toggle, .codex-ui-turn-duration) {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.demo-root[data-scenario="current-browser-26-825"]
+  .codex-ui-browser-activity
+  .codex-ui-activity__body {
+  margin-top: 6px;
+}
+
+.demo-root[data-scenario="current-browser-26-825"]
+  .codex-ui-browser-activity__steps
+  li
+  > div {
+  font-weight: 400;
+  min-height: 25px;
+}
+
+.demo-current-browser-success-link {
+  align-items: center;
+  display: inline-flex;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.demo-current-browser-success-link svg {
+  color: #5b9ff4;
+  flex: 0 0 16px;
+  height: 16px;
+  width: 16px;
+}
+
+.demo-current-browser-success-link a {
+  color: #5b9ff4;
+  text-decoration: none;
+}
+
 .demo-current-browser-failure-link {
   align-items: center;
   display: inline-flex;

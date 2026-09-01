@@ -664,10 +664,10 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("defaultMaximumRatio: 0.005");
     expect(contract).toContain("masks: []");
     expect(appSource).toContain(
-      "isAnyCurrentBasicMessageReplay ||\n                isCurrentCitations26825Replay ||\n                isCurrentMarkdown26818Replay",
+      "isAnyCurrentBasicMessageReplay ||\n                isCurrentCitations26825Replay ||\n                isCurrentBrowser26825Replay ||\n                isCurrentMarkdown26818Replay",
     );
     expect(appSource).toContain(
-      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentCitations26825Replay &&\n                      !isCurrentMarkdown26818Replay",
+      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentCitations26825Replay &&\n                      !isCurrentBrowser26825Replay &&\n                      !isCurrentMarkdown26818Replay",
     );
   });
 

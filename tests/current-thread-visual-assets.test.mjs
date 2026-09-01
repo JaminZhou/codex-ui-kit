@@ -23,7 +23,7 @@ describe("current-thread visual asset subset", () => {
     );
   });
 
-  it("includes every promoted MCP replay asset", () => {
+  it("includes every promoted current-thread replay asset", () => {
     expect(currentThreadVisualAssetIds).toEqual(
       expect.arrayContaining([
         "sidebar-explore",
@@ -31,8 +31,10 @@ describe("current-thread visual asset subset", () => {
         "thread-activity-chevron",
         "thread-header-share",
         "thread-reconnecting",
+        "thread-browser",
+        "thread-browser-connect",
       ]),
     );
-    expect(currentThreadVisualAssetIds).toHaveLength(45);
+    expect(currentThreadVisualAssetIds).toHaveLength(47);
   });
 });

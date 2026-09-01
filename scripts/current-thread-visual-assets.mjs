@@ -38,6 +38,8 @@ export const currentThreadVisualAssetIds = Object.freeze([
   "thread-header-project",
   "thread-header-side-panel",
   "thread-command-terminal",
+  "thread-browser",
+  "thread-browser-connect",
   "thread-mcp-tool",
   "thread-activity-chevron",
   "thread-reconnecting",

@@ -89,6 +89,8 @@ export type CurrentBuildIconName =
   | "thread-assistant-fork"
   | "thread-assistant-good"
   | "thread-command-terminal"
+  | "thread-browser"
+  | "thread-browser-connect"
   | "thread-mcp-tool"
   | "thread-activity-chevron"
   | "thread-reconnecting"

@@ -40,6 +40,7 @@ describe("protocol lifecycle reducer", () => {
     expect(browserScenario.frames).toEqual({
       "conversation-browser-current-26-825": 8,
       "conversation-browser-current-26-825-open": 10,
+      "conversation-browser-current-26-825-open-compact": 11,
       "conversation-browser-current-26-825-worked-open": 9,
     });
     expect(browser.mcpToolCalls).toEqual([
@@ -48,7 +49,7 @@ describe("protocol lifecycle reducer", () => {
         readOnlyHint: true,
       }),
       expect.objectContaining({
-        browserUrl: "https://openai.com/codex/",
+        browserUrl: "https://developers.openai.com/codex/",
         browserUse: true,
         readOnlyHint: true,
       }),

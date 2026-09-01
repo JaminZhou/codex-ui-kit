@@ -445,6 +445,8 @@ const currentSearch26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_SEARCH_26_825_REFERENCE;
 const currentBrowser26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_BROWSER_26_825_REFERENCE;
+const currentBrowser26825CompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_BROWSER_26_825_COMPACT_REFERENCE;
 const currentBrowserFailure26825Reference =
   process.env.CODEX_UI_KIT_CURRENT_BROWSER_FAILURE_26_825_REFERENCE;
 const currentBrowserFailure26825CompactReference =
@@ -1772,7 +1774,8 @@ for (const scene of selectedScenes) {
     }
     if (
       scene.id === "conversation-search-current-26-825-open" ||
-      scene.id === "conversation-browser-current-26-825-open"
+      scene.id === "conversation-browser-current-26-825-open" ||
+      scene.id === "conversation-browser-current-26-825-open-compact"
     ) {
       currentSearchBrowser26825Bounds = await page.evaluate(() => {
         const rect = (element) => {
@@ -2403,7 +2406,7 @@ for (const scene of selectedScenes) {
     }
     const maximumRatio = environmentRatio(
       "CODEX_UI_KIT_CURRENT_MARKDOWN_STREAM_MAX_DIFF_RATIO",
-      0.08,
+      0.065,
     );
     if (comparison.ratio > maximumRatio) {
       throw new Error(
@@ -2753,90 +2756,76 @@ for (const scene of selectedScenes) {
     );
   }
 
-  if (
-    scene.id === "conversation-browser-current-26-825-open" &&
-    currentBrowser26825Reference
-  ) {
+  const currentBrowserSuccessReference =
+    scene.id === "conversation-browser-current-26-825-open"
+      ? currentBrowser26825Reference
+      : scene.id === "conversation-browser-current-26-825-open-compact"
+        ? currentBrowser26825CompactReference
+        : undefined;
+  if (currentBrowserSuccessReference) {
+    const compact = scene.id.endsWith("-compact");
     const reference = PNG.sync.read(
-      await readFile(currentBrowser26825Reference),
+      await readFile(currentBrowserSuccessReference),
     );
-    const bounds = currentSearchBrowser26825Bounds?.activity;
-    const browserBounds = currentSearchBrowser26825Bounds?.browser;
+    const expectedSize = compact
+      ? { height: 820, width: 720 }
+      : { height: 820, width: 1180 };
     if (
-      reference.width !== 1180 ||
-      reference.height !== 820 ||
-      actual.width !== 1180 ||
-      actual.height !== 820 ||
-      !bounds ||
-      !browserBounds ||
-      browserBounds.left !== 760 ||
-      browserBounds.width !== 420
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
     ) {
       throw new Error(
-        `${scene.id}: current 26.825 Browser comparison requires exact 1180x820 frames, activity geometry, and a 420px Browser side panel.`,
+        `${scene.id}: current 26.825 Browser comparison requires exact ${expectedSize.width}x${expectedSize.height} frames.`,
       );
     }
-    const activityCrop = { height: 104, width: 413 };
-    const referenceActivity = cropPng(
+    const contentCrop = {
+      height: 205,
+      left: compact ? 13 : 380,
+      top: 250,
+      width: 500,
+    };
+    const referenceContent = cropPng(
       reference,
-      335,
-      322,
-      activityCrop.width,
-      activityCrop.height,
+      contentCrop.left,
+      contentCrop.top,
+      contentCrop.width,
+      contentCrop.height,
     );
-    const actualActivity = cropPng(
+    const actualContent = cropPng(
       actual,
-      bounds.left - 4,
-      bounds.top - 4,
-      activityCrop.width,
-      activityCrop.height,
+      contentCrop.left,
+      contentCrop.top,
+      contentCrop.width,
+      contentCrop.height,
     );
-    const activityComparison = comparePng(
-      foregroundMaskPng(referenceActivity, 12),
-      foregroundMaskPng(actualActivity, 12),
+    const contentComparison = comparePng(
+      foregroundMaskPng(referenceContent, 12),
+      foregroundMaskPng(actualContent, 12),
       0,
-    );
-    const referenceChrome = cropPng(reference, 760, 0, 420, 86);
-    const actualChrome = cropPng(actual, 760, 0, 420, 86);
-    const chromeComparison = comparePng(
-      referenceChrome,
-      actualChrome,
-      0.12,
     );
     await writeFile(
       join(artifactDirectory, `${scene.id}.current-product.png`),
-      PNG.sync.write(referenceActivity),
+      PNG.sync.write(referenceContent),
     );
     await writeFile(
       join(artifactDirectory, `${scene.id}.current-build.png`),
-      PNG.sync.write(actualActivity),
+      PNG.sync.write(actualContent),
     );
-    await writeFile(
-      join(artifactDirectory, `${scene.id}.current-product-chrome.png`),
-      PNG.sync.write(referenceChrome),
-    );
-    await writeFile(
-      join(artifactDirectory, `${scene.id}.current-build-chrome.png`),
-      PNG.sync.write(actualChrome),
-    );
-    const maximumActivityRatio = environmentRatio(
-      "CODEX_UI_KIT_CURRENT_BROWSER_26_825_ACTIVITY_MAX_DIFF_RATIO",
-      0.1,
-    );
-    const maximumChromeRatio = environmentRatio(
-      "CODEX_UI_KIT_CURRENT_BROWSER_26_825_CHROME_MAX_DIFF_RATIO",
+    const maximumContentRatio = environmentRatio(
+      compact
+        ? "CODEX_UI_KIT_CURRENT_BROWSER_26_825_COMPACT_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_BROWSER_26_825_MAX_DIFF_RATIO",
       0.08,
     );
-    if (
-      activityComparison.ratio > maximumActivityRatio ||
-      chromeComparison.ratio > maximumChromeRatio
-    ) {
+    if (contentComparison.ratio > maximumContentRatio) {
       throw new Error(
-        `${scene.id}: current 26.825 Browser pixel ratios exceed their gates: ${JSON.stringify({ activity: activityComparison.ratio, chrome: chromeComparison.ratio })}.`,
+        `${scene.id}: current 26.825 Browser content pixel ratio ${contentComparison.ratio} exceeds ${maximumContentRatio}.`,
       );
     }
     console.log(
-      `${scene.id}: current 26.825 Browser pixel ratios activity=${activityComparison.ratio}, chrome=${chromeComparison.ratio}`,
+      `${scene.id}: current 26.825 Browser content pixel ratio ${contentComparison.ratio}`,
     );
   }
 

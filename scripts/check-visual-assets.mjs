@@ -542,7 +542,7 @@ for (const id of [
   }
 }
 if (
-  manifest.icons.length !== 120 ||
+  manifest.icons.length !== 122 ||
   manifest.composerObservation?.topContextIconCount !== 3 ||
   manifest.composerObservation?.bottomActionIconCount !== 5 ||
   manifest.composerObservation?.exactSemanticIconCount !== 8 ||
@@ -579,7 +579,7 @@ if (
   manifest.reviewObservation?.splitDiffLabel !== "Switch to split diff"
 ) {
   throw new Error(
-    "current visual asset capture must retain 120 promoted icons plus the Composer, Project picker, and Review observations",
+    "current visual asset capture must retain 122 promoted icons plus the Composer, Project picker, and Review observations",
   );
 }
 const currentBasicThreadIconIds = [
