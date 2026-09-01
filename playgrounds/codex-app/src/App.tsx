@@ -13833,24 +13833,16 @@ export function App() {
       />
       {appServerCrashed ? (
         <AppServerCrashRecovery
-          configurationAction={{
-            label: "Open Config.toml",
-            onClick: () => setShellNotificationAction("configuration-opened"),
-          }}
-          documentationAction={{
-            label: "documentation",
-            onClick: () => setShellNotificationAction("documentation-opened"),
+          feedbackAction={{
+            label: "Send feedback",
+            onClick: () => setShellNotificationAction("feedback-opened"),
           }}
           restartAction={{
-            label: "Restart",
+            label: "Restart ChatGPT",
             onClick: () => {
               setAppServerCrashed(false);
               setActiveFrame("app-server-restarted");
             },
-          }}
-          updateAction={{
-            label: "Update ChatGPT",
-            onClick: () => setShellNotificationAction("update-opened"),
           }}
         />
       ) : (

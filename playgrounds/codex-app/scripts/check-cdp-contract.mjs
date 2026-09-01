@@ -6429,8 +6429,11 @@ for (const scene of selectedScenes) {
         const copy = recovery?.querySelector(
           ".codex-ui-app-server-crash-recovery__copy",
         );
-        const icon = recovery?.querySelector(
-          ".codex-ui-app-server-crash-recovery__icon",
+        const illustration = recovery?.querySelector(
+          ".codex-ui-app-server-crash-recovery__illustration",
+        );
+        const group = recovery?.querySelector(
+          ".codex-ui-app-server-crash-recovery__group",
         );
         const buttons = Array.from(
           recovery?.querySelectorAll("button") ?? [],
@@ -6453,7 +6456,10 @@ for (const scene of selectedScenes) {
           buttons,
           content: rect(content),
           copy: rect(copy),
-          description: text(content?.querySelector("p")),
+          descriptions: Array.from(
+            content?.querySelectorAll("p") ?? [],
+            (paragraph) => text(paragraph),
+          ),
           descriptionStyle: content?.querySelector("p")
             ? {
                 color: getComputedStyle(content.querySelector("p")).color,
@@ -6472,11 +6478,19 @@ for (const scene of selectedScenes) {
           horizontalOverflow:
             document.documentElement.scrollWidth -
             document.documentElement.clientWidth,
-          icon: rect(icon),
+          group: rect(group),
+          illustration: rect(illustration),
           mainCount: document.querySelectorAll(
             ".codex-ui-app-shell__main",
           ).length,
           recovery: rect(recovery),
+          recoveryStyle: recovery
+            ? {
+                backgroundColor: getComputedStyle(recovery).backgroundColor,
+                fontFamily: getComputedStyle(recovery).fontFamily,
+                fontWeight: getComputedStyle(recovery).fontWeight,
+              }
+            : null,
           role: content?.getAttribute("role"),
           shellCount: document.querySelectorAll(".codex-ui-app-shell").length,
         };
@@ -6484,67 +6498,64 @@ for (const scene of selectedScenes) {
       if (
         contract.appServerState !== "crashed" ||
         contract.role !== "alert" ||
-        contract.heading !== "ChatGPT stopped unexpectedly" ||
-        contract.description !==
-          "Restart ChatGPT to continue. If the problem persists, check your configuration or visit the documentation" ||
-        JSON.stringify(contract.buttons.map(({ label }) => label)) !==
+        contract.heading !== "ChatGPT hit a snag" ||
+        JSON.stringify(contract.descriptions) !==
           JSON.stringify([
-            "documentation",
-            "Update ChatGPT",
-            "Open Config.toml",
-            "Restart",
+            "Something went wrong. Restart ChatGPT to try again.",
+            "Send feedback to help us make the app better.",
           ]) ||
-        contract.buttons[0].kind !== null ||
-        JSON.stringify(contract.buttons.slice(1).map(({ kind }) => kind)) !==
-          JSON.stringify(["update", "configuration", "restart"]) ||
+        JSON.stringify(contract.buttons.map(({ label }) => label)) !==
+          JSON.stringify(["Restart ChatGPT", "Send feedback"]) ||
+        JSON.stringify(contract.buttons.map(({ kind }) => kind)) !==
+          JSON.stringify(["restart", "feedback"]) ||
         contract.shellCount !== 0 ||
         contract.mainCount !== 0 ||
         contract.horizontalOverflow > 1 ||
         !contract.recovery ||
         Math.abs(contract.recovery.width - (scene.windowSize?.width ?? 1180)) > 1 ||
         Math.abs(contract.recovery.height - (scene.windowSize?.height ?? 820)) > 1 ||
-        !contract.icon ||
-        Math.abs(contract.icon.width - 28) > 1 ||
-        Math.abs(contract.icon.height - 28) > 1 ||
+        contract.recoveryStyle?.backgroundColor !== "rgb(20, 20, 20)" ||
+        contract.recoveryStyle?.fontFamily !==
+          '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
+        contract.recoveryStyle?.fontWeight !== "400" ||
+        !contract.illustration ||
+        Math.abs(contract.illustration.width - 160) > 1 ||
+        Math.abs(contract.illustration.height - 160) > 1 ||
+        !contract.group ||
+        Math.abs(contract.group.height - 333.203125) > 1 ||
         !contract.content ||
         Math.abs(
           contract.content.width - Math.min(contract.recovery.width, 896)
         ) > 1 ||
         !contract.copy ||
-        Math.abs(contract.copy.width - Math.min(contract.recovery.width - 48, 448)) > 1 ||
-        contract.headingStyle?.fontSize !== "16px" ||
-        contract.headingStyle?.fontWeight !== "500" ||
-        contract.headingStyle?.lineHeight !== "24px" ||
-        contract.descriptionStyle?.fontSize !== "13px" ||
-        contract.descriptionStyle?.lineHeight !== "18.5714px" ||
-        JSON.stringify(contract.buttons.slice(1).map(({ rect }) => rect?.height)) !==
-          JSON.stringify([24, 24, 24]) ||
-        JSON.stringify(contract.buttons.slice(1).map(({ rect }) => rect?.width)) !==
-          JSON.stringify([141.21875, 125.453125, 62.25]) ||
-        JSON.stringify(contract.buttons.slice(1).map(({ style }) => style)) !==
+        Math.abs(contract.copy.width - 345.625) > 1 ||
+        Math.abs(contract.copy.height - 105.203125) > 1 ||
+        contract.headingStyle?.fontSize !== "28px" ||
+        contract.headingStyle?.fontWeight !== "600" ||
+        contract.headingStyle?.lineHeight !== "39.2px" ||
+        contract.descriptionStyle?.fontSize !== "14px" ||
+        contract.descriptionStyle?.color !== "color(srgb 1 1 1 / 0.65)" ||
+        contract.descriptionStyle?.lineHeight !== "21px" ||
+        JSON.stringify(contract.buttons.map(({ rect }) => rect?.height)) !==
+          JSON.stringify([36, 36]) ||
+        JSON.stringify(contract.buttons.map(({ rect }) => rect?.width)) !==
+          JSON.stringify([150.546875, 138.796875]) ||
+        JSON.stringify(contract.buttons.map(({ style }) => style)) !==
           JSON.stringify([
             {
               backgroundColor: "rgb(255, 255, 255)",
               border: "1px solid rgba(255, 255, 255, 0.082)",
               color: "rgb(45, 45, 45)",
-              fontSize: "13px",
-              fontWeight: "445",
+              fontSize: "14px",
+              fontWeight: "400",
               lineHeight: "18px",
             },
             {
               backgroundColor: "rgba(255, 255, 255, 0.03)",
               border: "1px solid rgba(255, 255, 255, 0.082)",
               color: "rgb(255, 255, 255)",
-              fontSize: "13px",
-              fontWeight: "445",
-              lineHeight: "18px",
-            },
-            {
-              backgroundColor: "rgb(255, 255, 255)",
-              border: "1px solid rgba(255, 255, 255, 0.082)",
-              color: "rgb(45, 45, 45)",
-              fontSize: "13px",
-              fontWeight: "445",
+              fontSize: "14px",
+              fontWeight: "400",
               lineHeight: "18px",
             },
           ])
@@ -6554,7 +6565,9 @@ for (const scene of selectedScenes) {
         );
       }
       if (scene.id === "app-server-crashed") {
-        await page.getByRole("button", { name: "Restart", exact: true }).click();
+        await page
+          .getByRole("button", { name: "Restart ChatGPT", exact: true })
+          .click();
         await page.waitForFunction(() => {
           const root = document.querySelector(".demo-root");
           return (

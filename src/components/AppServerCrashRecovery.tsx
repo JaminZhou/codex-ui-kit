@@ -14,36 +14,64 @@ export interface AppServerCrashRecoveryAction {
 export interface AppServerCrashRecoveryProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
   appName?: string;
-  configurationAction?: AppServerCrashRecoveryAction;
   description?: ReactNode;
-  documentationAction?: AppServerCrashRecoveryAction;
+  feedbackAction?: AppServerCrashRecoveryAction;
+  feedbackDescription?: ReactNode;
   heading?: ReactNode;
-  icon?: ReactNode;
+  illustration?: ReactNode;
   restartAction?: AppServerCrashRecoveryAction;
-  updateAction?: AppServerCrashRecoveryAction;
 }
 
-function AppServerErrorIcon() {
+function AppServerOfflineIllustration() {
   return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="8.25" stroke="currentColor" />
+    <svg
+      aria-hidden="true"
+      className="codex-ui-app-server-crash-recovery__fallback-illustration"
+      fill="none"
+      viewBox="0 0 160 160"
+    >
       <path
-        d="M12 7.5v6M12 16.55v.1"
+        d="M38 116c16-18 11-29 1-36-8-6-16 0-12 8 5 11 25 2 38 13 11 9 6 24-5 28-9 4-17-1-15-7"
         stroke="currentColor"
         strokeLinecap="round"
+        strokeWidth="4"
       />
-    </svg>
-  );
-}
-
-function AppServerUpdateIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" viewBox="0 0 16 16">
       <path
-        d="M8 2.75v7.5m0 0 2.5-2.5M8 10.25l-2.5-2.5M3.25 11.75v1.5h9.5v-1.5"
+        d="M97 117c7-17 23-22 36-13 12 8 2 25-10 18-8-4-5-14 4-18"
         stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="4"
+      />
+      <rect fill="#2269e8" height="64" rx="24" width="78" x="40" y="38" />
+      <rect
+        fill="#151c2c"
+        height="38"
+        rx="15"
+        stroke="#72a8ff"
+        strokeWidth="3"
+        transform="rotate(-8 51 54)"
+        width="58"
+        x="51"
+        y="54"
+      />
+      <path
+        d="m67 68 7 5-6 6m18-14 7 5-6 6"
+        stroke="#70f3ff"
         strokeLinecap="round"
         strokeLinejoin="round"
+        strokeWidth="4"
+      />
+      <path
+        d="M56 42c5-15 24-18 34-7 13-7 27 1 28 15M48 95l-9 13m66-11 12 12"
+        stroke="#4d87f3"
+        strokeLinecap="round"
+        strokeWidth="8"
+      />
+      <path
+        d="M117 109h13v9h-13zm-77-1h12v9H40z"
+        fill="#aaa"
+        stroke="#ddd"
+        strokeWidth="2"
       />
     </svg>
   );
@@ -54,7 +82,7 @@ function RecoveryButton({
   kind,
 }: {
   action: AppServerCrashRecoveryAction;
-  kind: "configuration" | "restart" | "update";
+  kind: "feedback" | "restart";
 }) {
   return (
     <button
@@ -64,7 +92,7 @@ function RecoveryButton({
       onClick={action.onClick}
       type="button"
     >
-      {action.icon ?? (kind === "update" ? <AppServerUpdateIcon /> : null)}
+      {action.icon}
       {action.label}
     </button>
   );
@@ -73,42 +101,22 @@ function RecoveryButton({
 export function AppServerCrashRecovery({
   appName = "ChatGPT",
   className,
-  configurationAction,
   description,
-  documentationAction,
+  feedbackAction,
+  feedbackDescription,
   heading,
-  icon,
+  illustration,
   restartAction,
-  updateAction,
   ...props
 }: AppServerCrashRecoveryProps) {
   const classes = ["codex-ui-app-server-crash-recovery", className]
     .filter(Boolean)
     .join(" ");
-  const resolvedHeading = heading ?? `${appName} stopped unexpectedly`;
+  const resolvedHeading = heading ?? `${appName} hit a snag`;
   const resolvedDescription =
-    description ?? (
-      <>
-        Restart {appName} to continue. If the problem persists, check your
-        configuration
-        {documentationAction ? (
-          <>
-            {" or visit the "}
-            <button
-              className="codex-ui-app-server-crash-recovery__documentation"
-              disabled={documentationAction.disabled}
-              onClick={documentationAction.onClick}
-              type="button"
-            >
-              {documentationAction.label}
-            </button>
-          </>
-        ) : null}
-      </>
-    );
-  const hasActions = Boolean(
-    updateAction || configurationAction || restartAction,
-  );
+    description ?? `Something went wrong. Restart ${appName} to try again.`;
+  const resolvedFeedbackDescription =
+    feedbackDescription ?? "Send feedback to help us make the app better.";
 
   return (
     <div className={classes} {...props}>
@@ -117,29 +125,26 @@ export function AppServerCrashRecovery({
         className="codex-ui-app-server-crash-recovery__content"
         role="alert"
       >
-        <span className="codex-ui-app-server-crash-recovery__icon">
-          {icon === undefined ? <AppServerErrorIcon /> : icon}
-        </span>
-        <div className="codex-ui-app-server-crash-recovery__copy">
-          <h1>{resolvedHeading}</h1>
-          <p>{resolvedDescription}</p>
-        </div>
-        {hasActions ? (
-          <div className="codex-ui-app-server-crash-recovery__actions">
-            {updateAction ? (
-              <RecoveryButton action={updateAction} kind="update" />
-            ) : null}
-            {configurationAction ? (
-              <RecoveryButton
-                action={configurationAction}
-                kind="configuration"
-              />
-            ) : null}
-            {restartAction ? (
-              <RecoveryButton action={restartAction} kind="restart" />
-            ) : null}
+        <div className="codex-ui-app-server-crash-recovery__group">
+          <div className="codex-ui-app-server-crash-recovery__illustration">
+            {illustration ?? <AppServerOfflineIllustration />}
           </div>
-        ) : null}
+          <div className="codex-ui-app-server-crash-recovery__copy">
+            <h1>{resolvedHeading}</h1>
+            <p>{resolvedDescription}</p>
+            <p>{resolvedFeedbackDescription}</p>
+          </div>
+          {restartAction || feedbackAction ? (
+            <div className="codex-ui-app-server-crash-recovery__actions">
+              {restartAction ? (
+                <RecoveryButton action={restartAction} kind="restart" />
+              ) : null}
+              {feedbackAction ? (
+                <RecoveryButton action={feedbackAction} kind="feedback" />
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       </section>
     </div>
   );

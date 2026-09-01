@@ -1228,6 +1228,174 @@ export function assertCurrentGlobalNotificationsRecord(record) {
   }
 }
 
+const currentAppServerButtonStyleMatches = (button, expected) =>
+  button?.kind === expected.kind &&
+  button?.label === expected.label &&
+  withinTolerance(button?.rect?.height, 36) &&
+  withinTolerance(button?.rect?.width, expected.width) &&
+  button?.style?.backgroundColor === expected.backgroundColor &&
+  button?.style?.border === "1px solid rgba(255, 255, 255, 0.082)" &&
+  button?.style?.color === expected.color &&
+  button?.style?.fontSize === "14px" &&
+  button?.style?.fontWeight === "400" &&
+  button?.style?.lineHeight === "18px";
+
+const currentAppServerFrameMatches = (frame, viewport) =>
+  frame?.viewport?.width === viewport.width &&
+  frame?.viewport?.height === viewport.height &&
+  frame?.heading === "ChatGPT hit a snag" &&
+  JSON.stringify(frame?.paragraphs) ===
+    JSON.stringify([
+      "Something went wrong. Restart ChatGPT to try again.",
+      "Send feedback to help us make the app better.",
+    ]) &&
+  frame?.backgroundColor === "rgb(20, 20, 20)" &&
+  frame?.fontFamily === '-apple-system, "system-ui", "Segoe UI", sans-serif' &&
+  frame?.fontWeight === "400" &&
+  withinTolerance(frame?.content?.width, Math.min(viewport.width, 896)) &&
+  withinTolerance(frame?.content?.height, viewport.height) &&
+  withinTolerance(frame?.illustration?.width, 160) &&
+  withinTolerance(frame?.illustration?.height, 160) &&
+  withinTolerance(
+    frame?.illustration?.top,
+    viewport.height === currentBaselineViewports.wide.height
+      ? 189.40625
+      : 119.40625,
+  ) &&
+  withinTolerance(frame?.copy?.width, 345.625) &&
+  withinTolerance(frame?.copy?.height, 105.1875) &&
+  frame?.headingStyle?.fontSize === "28px" &&
+  frame?.headingStyle?.fontWeight === "600" &&
+  frame?.headingStyle?.lineHeight === "39.2px" &&
+  frame?.paragraphStyle?.color === "color(srgb 1 1 1 / 0.65)" &&
+  frame?.paragraphStyle?.fontSize === "14px" &&
+  frame?.paragraphStyle?.lineHeight === "21px" &&
+  Array.isArray(frame?.buttons) &&
+  frame.buttons.length === 2 &&
+  currentAppServerButtonStyleMatches(frame.buttons[0], {
+    backgroundColor: "rgb(255, 255, 255)",
+    color: "rgb(45, 45, 45)",
+    kind: "restart",
+    label: "Restart ChatGPT",
+    width: 150.546875,
+  }) &&
+  currentAppServerButtonStyleMatches(frame.buttons[1], {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    color: "rgb(255, 255, 255)",
+    kind: "feedback",
+    label: "Send feedback",
+    width: 138.796875,
+  });
+
+export function assertCurrentAppServerCrashRecoveryRecord(record) {
+  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+    ([key, expected]) => record?.fingerprint?.[key] !== expected,
+  );
+  const runtimeIdentity = record?.runtimeBundleIdentity;
+  const before = record?.processTransition?.terminated;
+  const replacement = record?.processTransition?.replacement;
+  const postRestart = record?.processTransition?.postRestart;
+  const image = record?.assetReference;
+  const serialized = JSON.stringify(record);
+  if (
+    record?.schemaVersion !== 1 ||
+    record?.captureKind !== "renderer_cdp_app_server_recovery" ||
+    fingerprintMismatch ||
+    !Number.isSafeInteger(record?.profileOwnerPid) ||
+    record.profileOwnerPid <= 1 ||
+    runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
+    !provesRuntimeBundleIdentity(runtimeIdentity) ||
+    record?.privacyBoundary !==
+      "fatal-recovery-copy-style-geometry-process-and-local-asset-hash-only" ||
+    /"(?:profilePath|projectName|taskTitle|threadId|bodyText|assetBytes)"\s*:/.test(
+      serialized,
+    ) ||
+    record?.targetSelection?.selected?.url !== "app://-/index.html"
+  ) {
+    throw new Error(
+      "Current App Server recovery record does not prove the isolated current build and privacy boundary.",
+    );
+  }
+  const processMatches = (process, expectedPid) =>
+    process?.pid === expectedPid &&
+    process?.ppid === record.profileOwnerPid &&
+    process?.executablePath ===
+      "/Applications/ChatGPT.app/Contents/Resources/codex" &&
+    /^[a-f0-9]{64}$/.test(process?.argvSha256 ?? "");
+  if (
+    !Number.isSafeInteger(before?.pid) ||
+    !Number.isSafeInteger(replacement?.pid) ||
+    before.pid === replacement.pid ||
+    !processMatches(before, before.pid) ||
+    !processMatches(replacement, replacement.pid) ||
+    !processMatches(postRestart, postRestart?.pid) ||
+    postRestart.pid === replacement.pid ||
+    postRestart.pid === before.pid ||
+    record?.processTransition?.signal !== "SIGTERM" ||
+    !Number.isFinite(record?.processTransition?.fatalVisibleAfterMs) ||
+    record.processTransition.fatalVisibleAfterMs < 0 ||
+    !Number.isFinite(record?.processTransition?.shellVisibleAfterRestartMs) ||
+    record.processTransition.shellVisibleAfterRestartMs < 0
+  ) {
+    throw new Error(
+      `Current App Server recovery record does not prove the isolated three-process replacement and restart transition: ${JSON.stringify(record?.processTransition)}`,
+    );
+  }
+  if (
+    image?.distribution !== "local-only-not-committed" ||
+    image?.mimeType !== "image/png" ||
+    image?.naturalWidth !== 1358 ||
+    image?.naturalHeight !== 1159 ||
+    image?.byteLength !== 1_443_471 ||
+    image?.sha256 !==
+      "c9aab30680332edfff4fa8bcd90bec879a6809665dc06a83e110623f8a277768"
+  ) {
+    throw new Error(
+      "Current App Server recovery record does not prove the local-only illustration identity.",
+    );
+  }
+  if (
+    !currentAppServerFrameMatches(
+      record?.frames?.wide,
+      currentBaselineViewports.wide,
+    ) ||
+    !currentAppServerFrameMatches(
+      record?.frames?.compact,
+      currentBaselineViewports.compact,
+    )
+  ) {
+    throw new Error(
+      `Current App Server recovery record does not match the 26.825 recovery composition: ${JSON.stringify(record?.frames)}`,
+    );
+  }
+  for (const [name, viewport] of [
+    ["wide", currentBaselineViewports.wide],
+    ["compact", currentBaselineViewports.compact],
+  ]) {
+    const screenshot = record?.screenshots?.[name];
+    if (
+      screenshot?.name !== `app-server-crash-${name}.png` ||
+      screenshot?.width !== viewport.width ||
+      screenshot?.height !== viewport.height ||
+      !/^[a-f0-9]{64}$/.test(screenshot?.sha256 ?? "")
+    ) {
+      throw new Error(
+        `Current App Server recovery ${name} screenshot is incomplete.`,
+      );
+    }
+  }
+  if (
+    record?.restart?.headingCount !== 0 ||
+    record?.restart?.mainCount < 1 ||
+    record?.restart?.navigationCount < 1 ||
+    record?.restart?.textboxCount < 1
+  ) {
+    throw new Error(
+      "Current App Server recovery record does not prove the restored shell.",
+    );
+  }
+}
+
 export function assertCurrentBaselineRecord(record) {
   if (record?.schemaVersion !== 1) {
     throw new Error("Current baseline record must use schema version 1.");
