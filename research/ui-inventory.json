@@ -434,7 +434,11 @@
       "ownership": "turn",
       "packageEvidence": [
         "mcp-capability-view-page",
-        "mcp-tool-call-group"
+        "mcp-tool-call-group",
+        "replay:current-26.825-mcp-search-fetch-success-wide",
+        "browser-cdp:current-26.825-mcp-success-disclosure-and-computed-style",
+        "electron:current-26.825-mcp-success-disclosure-lifecycle",
+        "pixel:current-26.825-mcp-success-product-region"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -455,8 +459,8 @@
         "cdp-26.825.51511:current-mcp-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -465,7 +469,11 @@
       "ownership": "turn",
       "packageEvidence": [
         "mcp-capability-view-page",
-        "mcp-tool-call-group"
+        "mcp-tool-call-group",
+        "replay:current-26.825-mcp-failure-search-fetch-recovery-wide-compact",
+        "browser-cdp:current-26.825-mcp-failure-recovery-and-focus-lifecycle",
+        "electron:current-26.825-mcp-failure-recovery-and-sources-lifecycle",
+        "pixel:current-26.825-mcp-recovery-wide-compact-and-sources-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -485,8 +493,8 @@
         "cdp-26.825.51511:current-mcp-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -719,7 +727,15 @@
       "id": "thread.panel-system",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["thread-panel-toggle-button", "thread-side-panel-tabs", "thread-browser-panel-tabs"],
+      "packageEvidence": [
+        "thread-panel-toggle-button",
+        "thread-side-panel-tabs",
+        "thread-browser-panel-tabs",
+        "replay:current-26.825-pinned-environment-and-sources-summary",
+        "browser-cdp:current-26.825-summary-dismiss-repin-and-responsive-panel-lifecycle",
+        "electron:current-26.825-summary-and-side-panel-native-window-contract",
+        "pixel:current-26.825-sources-summary-product-region"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:right-review-panel-open-close-transition",
@@ -733,8 +749,8 @@
         "cdp-26.825.51511:pinned-environment-sources-summary-300x313-closed-and-repinned-thread-layout"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1035,7 +1051,14 @@
       "id": "app.sidebar-project-navigation",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "projects-index-page"],
+      "packageEvidence": [
+        "app-main",
+        "projects-index-page",
+        "replay:current-project-expansion-actions-section-submenu-and-responsive-continuity",
+        "browser-cdp:current-project-navigation-menu-focus-and-responsive-continuity",
+        "electron:current-project-navigation-menu-focus-and-responsive-continuity",
+        "pixel:current-project-navigation-collapsed-menu-and-submenu-scenes"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:projects-collapsible-section-long-name-and-nested-task",
@@ -1049,8 +1072,8 @@
         "cdp-26.825.51511:content-dependent-project-groups-30px-row-and-owned-scroll-baseline"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -2026,19 +2049,15 @@
       "priority": "p2"
     },
     {
-      "id": "cross-layer.overlays",
+      "id": "cross-layer.optional-package-dialogs",
       "area": "cross-layer",
       "ownership": "cross-layer",
-      "packageEvidence": ["business-checkout-switch-workspace-dialog", "stable-worktree-status-dialog", "debug-modal"],
-      "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": [
-        "cdp:project-permission-model-location-and-branch-portalled-menus",
-        "cdp:profile-menu-to-settings-transition"
-      ],
-      "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
-      "priority": "p0"
+      "packageEvidence": ["business-checkout-switch-workspace-dialog", "debug-modal"],
+      "runtimeStatus": "not_sampled",
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p2"
     },
     {
       "id": "cross-layer.oauth-connection",

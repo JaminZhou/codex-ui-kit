@@ -13,9 +13,9 @@ exit gates; it does not replace the inventory.
 - The installed package and machine-readable evidence baseline are Codex
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
-- The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 67 groups have current-build runtime evidence, 13 have previous-build-only
-  runtime evidence, and 11 have not been sampled.
+- The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
+- 67 groups have current-build runtime evidence, 12 have previous-build-only
+  runtime evidence, and 12 have not been sampled.
 - The current subagent refresh promotes `thread.subagent-delegation` and
   `thread.subagent-collaboration` from previous-build presentation evidence to
   `26.825.51511`. Three real tasks lock the active inline chip, completed-chip
