@@ -1630,4 +1630,25 @@ CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_REFERENCE=/absolute/path/to/image-previe
     -- --scenes=attachment-current-post-picker-compact,attachment-current-preview-compact
 ```
 
+The current `26.825.51511` attachment gate uses the exact synthetic
+`probe.png`/`probe.txt` pair observed through trusted CDP drag-and-drop. It
+compares the owned 736×154 wide and 688×154 compact Composer regions, then
+independently gates the Edit/Download/Close actions, fitted image, and 152×44
+zoom toolbar in both viewports. The completion gate separately compares the
+header, sent-attachment transcript, 98px Composer, and the wide-only
+Outputs/Sources summary. The committed fixture image is the public reviewed
+`attachment-current-ready.png` baseline; the six product screenshots remain
+local-only:
+
+```bash
+CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_WIDE_REFERENCE=/absolute/path/to/wide-post-drop.png \
+CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_COMPACT_REFERENCE=/absolute/path/to/compact-post-drop.png \
+CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_WIDE_REFERENCE=/absolute/path/to/wide-preview.png \
+CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_COMPACT_REFERENCE=/absolute/path/to/compact-preview.png \
+CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_WIDE_REFERENCE=/absolute/path/to/wide-completed.png \
+CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_COMPACT_REFERENCE=/absolute/path/to/compact-completed.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual \
+    -- --scenes=attachment-current-26-825-post-picker,attachment-current-26-825-post-picker-compact,attachment-current-26-825-preview,attachment-current-26-825-preview-compact,attachment-current-26-825-completed,attachment-current-26-825-completed-compact
+```
+
 See [docs/VALIDATION.md](docs/VALIDATION.md) for the evidence model.

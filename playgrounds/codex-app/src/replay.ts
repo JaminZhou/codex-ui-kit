@@ -6,6 +6,7 @@ import approvalForSessionTrace from "../fixtures/traces/approval-for-session.jso
 import approvalReviewTimeoutTrace from "../fixtures/traces/approval-review-timeout.jsonl?raw";
 import approvalSimilarCommandsTrace from "../fixtures/traces/approval-similar-commands.jsonl?raw";
 import attachmentLifecycleTrace from "../fixtures/traces/attachment-lifecycle.jsonl?raw";
+import currentAttachment26825Trace from "../fixtures/traces/current-attachment-26-825.jsonl?raw";
 import compactionTrace from "../fixtures/traces/compaction.jsonl?raw";
 import contextSummaryTrace from "../fixtures/traces/context-summary.jsonl?raw";
 import currentBasicMessageTrace from "../fixtures/traces/current-basic-message.jsonl?raw";
@@ -68,6 +69,7 @@ export type ReplayScenarioId =
   | "approval-review-timeout"
   | "approval-similar-commands"
   | "attachment-lifecycle"
+  | "current-attachment-26-825"
   | "background-terminal"
   | "command-current-26-825-failure"
   | "command-current-26-825-interruption"
@@ -196,6 +198,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Conversation and Composer lifecycle",
     "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, automatic continuation, and legacy paused-queue compatibility.",
     conversationLifecycleTrace,
+  ),
+  "current-attachment-26-825": scenario(
+    "current-attachment-26-825",
+    "Confirm attachment probe",
+    "The runtime-observed 26.825 mixed image/file selection can be previewed, zoomed, removed, submitted, rendered outside the user bubble, and completed in wide and compact windows.",
+    currentAttachment26825Trace,
   ),
   "approval-current-26-825-file": scenario(
     "approval-current-26-825-file",

@@ -272,7 +272,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 67 have current-build runtime evidence, 12 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 67 groups and Electron verification covers 67.
+Current inventory: 91 surface groups; 68 have current-build runtime evidence, 11 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 68 groups and Electron verification covers 68.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1717,6 +1717,22 @@ feature state but not a fresh profile. Browser/CDP covers four frames,
 Electron drives open/zoom/dismiss/remove, and local-only product regions pass
 at 1.6117%, 0%, 0.2811%, and 1.9288%. Actual upload failure/progress and plugin
 resources remain open.
+
+The current `26.825.51511` follow-up replaces that post-picker geometry with a
+trusted-CDP mixed-file sample. Wide/compact Composers are 736×154px and
+688×154px with a 70px tray, 54×54 image card, 156.484375×52.5 text card,
+24px document icon, 14/21px weight-500 title, 13/19.5px weight-400 metadata,
+and 16px Remove controls. The current preview exposes Edit/Download/Close,
+focuses Edit on open, fits at 56% compact and 82% wide, uses multiplicative
+1.2× zoom so the first compact step displays 67%, and restores the image-card
+focus after Escape. Removal preserves focus continuity; the fixed no-tool turn
+finishes with two sent attachments outside the user bubble and a focused empty
+98px Composer. Browser/CDP, Electron, six reviewed baselines, and six
+local-only product comparisons cover the same wide/compact boundary, including
+the wide-only Outputs/Sources summary. The
+sanitized observation lives in `research/current-attachment-26-825.json`.
+Native upload progress/failure and plugin-provided attachment variants remain
+open.
 
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests

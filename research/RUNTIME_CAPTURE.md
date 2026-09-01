@@ -2040,6 +2040,61 @@ Electron, reviewed internal rasters, and optional local-only product regions
 cover the same boundary. Actual upload failure/progress and plugin attachments
 remain unsampled product transitions.
 
+## Current `26.825.51511` mixed-attachment lifecycle
+
+One isolated process on loopback port `9918` used trusted CDP drag events to
+drop the real synthetic `probe.png` and `probe.txt` files into New chat. The
+image bytes are already the public reviewed `attachment-current-ready.png`
+fixture; no product-only raster was promoted. The existing user-owned Codex
+PID `13503` was not navigated, resized, or stopped.
+
+The post-picker Composer is 736×154px at x=222/y=650 wide and 688×154px at
+x=16/y=510 compact. Its 70px tray contains a 54×54 image card with a 52×52
+preview and a 156.484375×52.5 file card with a 24px document icon, 14/21px
+weight-500 title, 13/19.5px weight-400 `TXT` metadata, 17px radius, and 16px
+Remove controls. Both viewports have zero horizontal overflow.
+
+Opening `probe.png` produces a full-window preview focused on `Edit image`.
+The compact image is 656×455.859375px at x=32/y=88.0625 and starts at 56%;
+one multiplicative zoom step displays 67%, and Zoom out restores the exact fit.
+Wide starts at 82% with a 972.765625×676px image. Both sizes retain exact
+40/40/42px Edit, Download, and Close controls plus the 152×44 zoom toolbar;
+Escape restores the image-trigger focus. Removing `probe.txt` focuses the
+remaining image, then removing the image empties the tray and focuses the
+Composer.
+
+The exact fixed prompt completes with `CURRENT ATTACHMENT SUCCESS 26.825.`.
+Both sent attachments remain outside the user-text bubble, and the empty
+focused Composer returns to 98px. Browser/CDP and Electron repeat preview,
+zoom, focus, removal, submission, ownership, and completion. Six reviewed
+wide/compact baselines cover post-picker, preview, and completion. Local-only product
+regions pass at 1.4072%/1.3591% for the Composer; preview Edit/Download/Close,
+image, and toolbar pass at 5.1087%/0.2846%/1.2111% wide and
+4.8188%/0.3393%/1.1962% compact. Completed
+header/transcript/Composer/summary regions pass at
+4.2517%/0.8910%/1.2852%/2.7370% wide; compact
+header/transcript/Composer pass at 5.6147%/1.0095%/1.3497% with the summary
+removed from layout. Geometry and exact SVG paths remain separate hard gates,
+so the regional ratios do not conceal layout drift.
+
+The sanitized evidence is tracked in
+`research/current-attachment-26-825.json`. A future already-prepared isolated
+state can be sampled without mutation using:
+
+```sh
+CODEX_CURRENT_ATTACHMENT_CDP_PORT=<isolated-port> \
+CODEX_CURRENT_ATTACHMENT_PROFILE=<isolated-profile> \
+CODEX_CURRENT_ATTACHMENT_OUTPUT=<isolated-profile>/current-attachment-26-825-<state>.json \
+CODEX_CURRENT_ATTACHMENT_STATE=<post-picker|preview|completed> \
+CODEX_CURRENT_ATTACHMENT_ALLOW_CAPTURE=1 \
+pnpm capture:current-attachment-26-825
+```
+
+The exact disposable task was archived. Only the isolated process was stopped,
+port `9918` closed, and its profile plus local-only screenshots were moved
+recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-attachment-26-825-20260901-9918`.
+
 ## Previous `26.820.60940` thirty-turn sample
 
 Use one isolated, loopback-only second process and one disposable task. The

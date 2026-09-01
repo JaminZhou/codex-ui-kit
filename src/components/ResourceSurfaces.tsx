@@ -740,7 +740,7 @@ export interface ImagePreviewDialogProps {
   imageId?: string | null;
   images: GeneratedImageItem[];
   immersiveCaption?: ReactNode;
-  immersiveInitialFocus?: "close" | "dialog";
+  immersiveInitialFocus?: "close" | "dialog" | "first-action";
   nextLabel?: string;
   onDownload?: (image: GeneratedImageItem) => void;
   onEdit?: (image: GeneratedImageItem) => void;
@@ -758,6 +758,17 @@ function ImagePreviewDownloadIcon() {
     <svg aria-hidden="true" fill="none" viewBox="0 0 20 20">
       <path
         d="M2.66831 12.6664V12.5004C2.66831 12.1331 2.96607 11.8353 3.33334 11.8353C3.70061 11.8353 3.99838 12.1331 3.99838 12.5004V12.6664C3.99838 13.3773 3.99929 13.8708 4.03061 14.2543C4.0613 14.6299 4.11812 14.8414 4.19858 14.9994L4.26889 15.1263C4.4452 15.4138 4.69823 15.6482 5.00034 15.8021L5.13022 15.8578C5.27399 15.9092 5.4635 15.9471 5.74545 15.9701C6.12897 16.0014 6.62231 16.0013 7.33334 16.0013H12.6664C13.3772 16.0013 13.8708 16.0014 14.2542 15.9701C14.6296 15.9394 14.8414 15.8825 14.9994 15.8021L15.1263 15.7308C15.4137 15.5545 15.6482 15.3014 15.8021 14.9994L15.8578 14.8695C15.9092 14.7258 15.947 14.5361 15.9701 14.2543C16.0014 13.8708 16.0013 13.3772 16.0013 12.6664V12.5004C16.0013 12.1332 16.2992 11.8355 16.6664 11.8353C17.0336 11.8353 17.3314 12.1331 17.3314 12.5004V12.6664C17.3314 13.3554 17.332 13.9125 17.2953 14.3627C17.2625 14.7636 17.1975 15.1248 17.0531 15.4613L16.9867 15.6039C16.7212 16.1248 16.3173 16.5606 15.8216 16.8646L15.6039 16.9867C15.2271 17.1787 14.8206 17.2579 14.3626 17.2953C13.9124 17.3321 13.3554 17.3314 12.6664 17.3314H7.33334C6.64425 17.3314 6.0873 17.3321 5.63706 17.2953C5.23651 17.2626 4.87562 17.1982 4.5394 17.0541L4.39682 16.9867C3.8757 16.7212 3.4392 16.3175 3.1351 15.8217L3.01303 15.6039C2.82106 15.2271 2.74186 14.8207 2.70444 14.3627C2.66767 13.9125 2.66831 13.3554 2.66831 12.6664ZM9.3353 3.33337C9.3353 2.9661 9.63307 2.66833 10.0003 2.66833C10.3675 2.66851 10.6654 2.96621 10.6654 3.33337V10.8939L12.8626 8.69666L12.9671 8.61169C13.2253 8.44097 13.5767 8.4693 13.804 8.69666C14.0634 8.95633 14.0635 9.37748 13.804 9.63708L10.4701 12.9701C10.3454 13.0947 10.1766 13.1653 10.0003 13.1654C9.82397 13.1654 9.65434 13.0948 9.52963 12.9701L6.19663 9.63708L6.11166 9.53259C5.9411 9.27445 5.96934 8.92394 6.19663 8.69666C6.42392 8.46937 6.77442 8.44113 7.03256 8.61169L7.13705 8.69666L9.3353 10.8949V3.33337Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function ImagePreviewEditIcon() {
+  return (
+    <svg aria-hidden="true" fill="none" viewBox="0 0 21 21">
+      <path
+        d="M11.7313 4.20472C13.1489 2.92391 15.3377 2.96644 16.7039 4.33265L16.8318 4.46742C18.0713 5.8393 18.0713 7.93343 16.8318 9.30531L16.7039 9.44007L10.4119 15.7311C10.0884 16.0546 9.85387 16.2917 9.62188 16.4821L9.3875 16.6588C9.18236 16.799 8.96432 16.9196 8.73711 17.0192L8.50762 17.1119C8.32585 17.1785 8.13845 17.2266 7.92168 17.2711L7.15703 17.4069L4.76348 17.8053C4.62062 17.8291 4.46916 17.8552 4.34063 17.8649C4.24185 17.8723 4.10835 17.875 3.9627 17.8395L3.81426 17.7907C3.59124 17.695 3.40749 17.5271 3.2918 17.316L3.2459 17.2223C3.1596 17.0209 3.16176 16.8276 3.17168 16.6959C3.18138 16.5674 3.20744 16.4159 3.23125 16.2731L3.62969 13.8795L3.76445 13.1149C3.80902 12.898 3.85797 12.7108 3.92461 12.5289L4.01738 12.2985C4.11693 12.0715 4.23774 11.854 4.37774 11.6491L4.55352 11.4147C4.74395 11.1825 4.98173 10.9484 5.30547 10.6246L11.5965 4.33265L11.7313 4.20472ZM6.2459 11.5651C5.89673 11.9142 5.71261 12.0998 5.58672 12.2526L5.47539 12.3991C5.38197 12.5358 5.30159 12.6812 5.23516 12.8327L5.17363 12.9869C5.1333 13.0971 5.1025 13.2125 5.06817 13.3815L4.94121 14.0983L4.54277 16.4918L4.5418 16.4938H4.54473L6.93828 16.0944L7.65508 15.9684C7.82408 15.9341 7.93949 15.9033 8.04961 15.8629L8.20293 15.8014C8.35464 15.7349 8.49956 15.6538 8.63652 15.5602L8.78399 15.4498C8.93677 15.3239 9.12233 15.1398 9.47149 14.7907L14.4588 9.80238L11.2332 6.57679L6.2459 11.5651ZM15.7635 5.27308C14.9282 4.43776 13.6058 4.38573 12.7098 5.11683L12.5369 5.27308L12.1736 5.63636L15.4002 8.86195L15.7635 8.49964L15.9197 8.32581C16.6016 7.48961 16.6016 6.28311 15.9197 5.44691L15.7635 5.27308Z"
         fill="currentColor"
       />
     </svg>
@@ -821,6 +832,7 @@ export function ImagePreviewDialog({
   const titleId = useId();
   const overlayEnvironment = useContext(OverlayEnvironmentContext);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const firstActionRef = useRef<HTMLButtonElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const previewImageRef = useRef<HTMLImageElement>(null);
   const previewStageRef = useRef<HTMLDivElement>(null);
@@ -899,8 +911,12 @@ export function ImagePreviewDialog({
     const modalLock = acquireDocumentScrollLock({
       containsFocus: (target) => previewRef.current?.contains(target) ?? false,
       getInitialFocus: () =>
-        presentation === "immersive" && immersiveInitialFocus === "dialog"
-          ? previewRef.current
+        presentation === "immersive"
+          ? immersiveInitialFocus === "dialog"
+            ? previewRef.current
+            : immersiveInitialFocus === "first-action"
+              ? firstActionRef.current ?? closeRef.current
+              : closeRef.current
           : closeRef.current,
       priority: 1200,
       returnFocus: returnFocusRef.current,
@@ -909,9 +925,10 @@ export function ImagePreviewDialog({
       (presentation === "immersive"
         ? immersiveInitialFocus === "dialog"
           ? previewRef.current
-          : closeRef.current
-        : closeRef.current
-      )?.focus();
+          : immersiveInitialFocus === "first-action"
+            ? firstActionRef.current ?? closeRef.current
+            : closeRef.current
+        : closeRef.current)?.focus();
     }
     return () => {
       modalLock.release()?.focus();
@@ -1010,9 +1027,10 @@ export function ImagePreviewDialog({
                 aria-label={editLabel}
                 data-edit-action=""
                 onClick={() => onEdit(activeImage)}
+                ref={firstActionRef}
                 type="button"
               >
-                <span aria-hidden="true">⌁</span>
+                <ImagePreviewEditIcon />
               </button>
             ) : null}
             {downloadable && (activeImage.downloadSrc ?? activeImage.src) ? (
@@ -1082,7 +1100,9 @@ export function ImagePreviewDialog({
             <button
               aria-label={zoomOutLabel}
               disabled={zoomScale <= 10}
-              onClick={() => setZoomScale((current) => Math.max(10, current - 10))}
+              onClick={() =>
+                setZoomScale((current) => Math.max(10, current / 1.2))
+              }
               type="button"
             >
               <ImagePreviewZoomOutIcon />
@@ -1091,7 +1111,9 @@ export function ImagePreviewDialog({
             <button
               aria-label={zoomInLabel}
               disabled={zoomScale >= 400}
-              onClick={() => setZoomScale((current) => Math.min(400, current + 10))}
+              onClick={() =>
+                setZoomScale((current) => Math.min(400, current * 1.2))
+              }
               type="button"
             >
               <ImagePreviewZoomInIcon />

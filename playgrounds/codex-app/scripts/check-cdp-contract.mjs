@@ -49,6 +49,7 @@ if (requestedSceneIds && selectedScenes.length !== requestedSceneIds.size) {
 }
 const currentReplayComposerScenarios = new Set([
   "attachment-lifecycle",
+  "current-attachment-26-825",
   "approval-review-timeout",
   "command-current-26-825-failure",
   "command-current-26-825-interruption",
@@ -4751,9 +4752,9 @@ for (const scene of selectedScenes) {
           },
         ),
       );
-      const currentAttachmentPickerScene = scene.id.startsWith(
-        "attachment-current-post-picker",
-      ) || scene.id.startsWith("attachment-current-preview");
+      const currentAttachmentPickerScene =
+        scene.id.startsWith("attachment-current-post-picker") ||
+        scene.id.startsWith("attachment-current-preview");
       const expectedCurrentComposerIcons = [
         { height: 16, name: "composer-add-files", width: 16 },
         ...(currentAttachmentPickerScene
@@ -4765,6 +4766,7 @@ for (const scene of selectedScenes) {
                   scene.scenario.startsWith("mcp-") ||
                   scene.scenario.startsWith("command-current-26-8") ||
                   scene.scenario === "current-plan-26-825" ||
+                  scene.scenario === "current-attachment-26-825" ||
                   scene.scenario === "current-search-26-825" ||
                   scene.scenario === "current-browser-26-825" ||
                   scene.scenario === "current-browser-26-825-failure" ||
@@ -12051,8 +12053,8 @@ for (const scene of selectedScenes) {
       }
     }
     if (
-      scene.id.startsWith("attachment-current-post-picker") ||
-      scene.id.startsWith("attachment-current-preview")
+      scene.id.startsWith("attachment-current-26-825-post-picker") ||
+      scene.id.startsWith("attachment-current-26-825-preview")
     ) {
       const currentAttachmentPicker = await page.evaluate(() => {
         const rect = (element) => {
@@ -12103,10 +12105,42 @@ for (const scene of selectedScenes) {
             attachment
               ?.querySelector(".codex-ui-composer-attachment__label")
               ?.textContent?.trim() ?? null,
+          labelStyle: attachment?.querySelector(
+            ".codex-ui-composer-attachment__label",
+          )
+            ? (() => {
+                const style = getComputedStyle(
+                  attachment.querySelector(
+                    ".codex-ui-composer-attachment__label",
+                  ),
+                );
+                return {
+                  fontSize: style.fontSize,
+                  fontWeight: style.fontWeight,
+                  lineHeight: style.lineHeight,
+                };
+              })()
+            : null,
           metaText:
             attachment
               ?.querySelector(".codex-ui-composer-attachment__meta")
               ?.textContent?.trim() ?? null,
+          metaStyle: attachment?.querySelector(
+            ".codex-ui-composer-attachment__meta",
+          )
+            ? (() => {
+                const style = getComputedStyle(
+                  attachment.querySelector(
+                    ".codex-ui-composer-attachment__meta",
+                  ),
+                );
+                return {
+                  fontSize: style.fontSize,
+                  fontWeight: style.fontWeight,
+                  lineHeight: style.lineHeight,
+                };
+              })()
+            : null,
           rect: rect(attachment),
           remove: rect(
             attachment?.querySelector(
@@ -12139,8 +12173,13 @@ for (const scene of selectedScenes) {
             composer
               ?.querySelector(".demo-current-composer-model")
               ?.textContent?.trim() ?? null,
+          contextText:
+            document
+              .querySelector(".codex-ui-composer-dock__context")
+              ?.textContent?.trim() ?? null,
           preview: dialog
             ? {
+                activeLabel: document.activeElement?.getAttribute("aria-label"),
                 activeRole: document.activeElement?.getAttribute("role"),
                 buttons: Array.from(
                   dialog.querySelectorAll("button[aria-label]"),
@@ -12169,8 +12208,9 @@ for (const scene of selectedScenes) {
       const file = currentAttachmentPicker.file;
       const image = currentAttachmentPicker.image;
       const expectsPreview = scene.id.startsWith(
-        "attachment-current-preview",
+        "attachment-current-26-825-preview",
       );
+      const expectedComposerWidth = compact ? 688 : 736;
       if (
         !composer ||
         !row ||
@@ -12181,44 +12221,52 @@ for (const scene of selectedScenes) {
         !image.rect ||
         !image.image ||
         !image.remove ||
-        Math.abs(composer.width - 640) > 0.1 ||
-        Math.abs(composer.height - 178) > 0.1 ||
+        Math.abs(composer.width - expectedComposerWidth) > 0.1 ||
+        Math.abs(composer.height - 154) > 0.1 ||
         currentAttachmentPicker.composerRadius !== "25px" ||
         currentAttachmentPicker.composerBackground !==
-          "rgba(45, 45, 45, 0.867)" ||
-        Math.abs(row.width - 640) > 0.1 ||
-        Math.abs(row.height - 94) > 0.1 ||
+          "oklab(0.297161 0.0000135154 0.00000594556 / 0.864706)" ||
+        Math.abs(row.width - expectedComposerWidth) > 0.1 ||
+        Math.abs(row.height - 70) > 0.1 ||
         currentAttachmentPicker.rowPadding !== "8px 8px 6px" ||
-        Math.abs(file.rect.width - 224) > 0.1 ||
-        Math.abs(file.rect.height - 52) > 0.1 ||
+        Math.abs(file.rect.width - 156.484375) > 0.1 ||
+        Math.abs(file.rect.height - 52.5) > 0.1 ||
         file.radius !== "17px" ||
         Math.abs(file.icon.width - 24) > 0.1 ||
         Math.abs(file.icon.height - 24) > 0.1 ||
-        Math.abs(file.label.width - 128) > 0.1 ||
+        Math.abs(file.label.width - 60.484375) > 0.1 ||
         Math.abs(file.label.height - 21) > 0.1 ||
+        file.labelStyle?.fontSize !== "14px" ||
+        file.labelStyle?.fontWeight !== "500" ||
+        file.labelStyle?.lineHeight !== "21px" ||
+        file.metaStyle?.fontSize !== "13px" ||
+        file.metaStyle?.fontWeight !== "400" ||
+        file.metaStyle?.lineHeight !== "19.5px" ||
         Math.abs(file.remove.width - 16) > 0.1 ||
         Math.abs(file.remove.height - 16) > 0.1 ||
-        file.labelText !== "codex-ui-kit-attachment-evidence.txt" ||
+        file.labelText !== "probe.txt" ||
         file.metaText !== "TXT" ||
         !currentAttachmentPicker.documentPath?.startsWith(
           "M3.685 13.9927V7.82571",
         ) ||
-        Math.abs(image.rect.width - 80) > 0.1 ||
-        Math.abs(image.rect.height - 80) > 0.1 ||
+        Math.abs(image.rect.width - 54) > 0.1 ||
+        Math.abs(image.rect.height - 54) > 0.1 ||
         image.radius !== "17px" ||
-        Math.abs(image.image.width - 78) > 0.1 ||
-        Math.abs(image.image.height - 78) > 0.1 ||
+        Math.abs(image.image.width - 52) > 0.1 ||
+        Math.abs(image.image.height - 52) > 0.1 ||
         Math.abs(image.remove.width - 16) > 0.1 ||
         Math.abs(image.remove.height - 16) > 0.1 ||
-        Math.abs(image.rect.left - file.rect.right - 8) > 0.1 ||
+        Math.abs(file.rect.left - image.rect.right - 8) > 0.1 ||
         Math.abs(image.rect.bottom - file.rect.bottom) > 0.1 ||
-        currentAttachmentPicker.modelText !== "Instant" ||
+        currentAttachmentPicker.modelText !== "5.6 Sol Extra High" ||
+        currentAttachmentPicker.contextText !== "Choose project" ||
         JSON.stringify(currentAttachmentPicker.buttons) !==
           JSON.stringify([
-            "Remove codex-ui-kit-attachment-evidence.txt",
-            "shell-notification-success-stack.png",
-            "Remove shell-notification-success-stack.png",
+            "probe.png",
+            "Remove probe.png",
+            "Remove probe.txt",
             "Add files and more",
+            "Change permissions",
             "Dictate",
             "Send",
           ]) ||
@@ -12239,12 +12287,14 @@ for (const scene of selectedScenes) {
           : { left: 514, top: 744 };
         const expectedButtons = compact
           ? [
+              ["Edit image", 570, 12, 40, 40],
               ["Download image", 618, 12, 40, 40],
               ["Close image preview", 666, 12, 42, 40],
               ["Zoom out image", 288, 608, 36, 36],
               ["Zoom in image", 396, 608, 36, 36],
             ]
           : [
+              ["Edit image", 1030, 12, 40, 40],
               ["Download image", 1078, 12, 40, 40],
               ["Close image preview", 1126, 12, 42, 40],
               ["Zoom out image", 518, 748, 36, 36],
@@ -12255,7 +12305,8 @@ for (const scene of selectedScenes) {
           !preview.rect ||
           !preview.image ||
           !preview.toolbar ||
-          preview.activeRole !== "dialog" ||
+          preview.activeLabel !== "Edit image" ||
+          preview.activeRole !== null ||
           preview.rect.left !== 0 ||
           preview.rect.top !== 0 ||
           preview.rect.width !== currentAttachmentPicker.viewport.width ||
@@ -12288,6 +12339,140 @@ for (const scene of selectedScenes) {
         }
       }
       contract.currentAttachmentPicker = currentAttachmentPicker;
+    }
+    if (scene.id.startsWith("attachment-current-26-825-completed")) {
+      const completion = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!element) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const attachments = document.querySelector(
+          ".codex-ui-agent-message__attachments",
+        );
+        const file = attachments?.querySelector(
+          '.codex-ui-message-attachment[data-kind="file"]',
+        );
+        const image = attachments?.querySelector(
+          '.codex-ui-message-attachment[data-kind="image"]',
+        );
+        const summary = document.querySelector(
+          ".demo-current-attachment-26-825-summary-panel",
+        );
+        const summaryTrigger = document.querySelector(
+          'button[aria-label="Toggle summary"]',
+        );
+        return {
+          actions: Array.from(
+            document.querySelectorAll(
+              '.codex-ui-agent-message[data-role="assistant"] .codex-ui-agent-message__actions button[aria-label]',
+            ),
+            (button) => button.getAttribute("aria-label"),
+          ),
+          assistant: rect(
+            document.querySelector(
+              '.codex-ui-agent-message[data-role="assistant"] .codex-ui-agent-message__content',
+            ),
+          ),
+          attachments: {
+            alignItems: attachments
+              ? getComputedStyle(attachments).alignItems
+              : null,
+            direction: attachments
+              ? getComputedStyle(attachments).flexDirection
+              : null,
+            file: rect(file),
+            gap: attachments ? getComputedStyle(attachments).gap : null,
+            image: rect(image),
+          },
+          bubble: rect(
+            document.querySelector(
+              '.codex-ui-agent-message[data-role="user"] .codex-ui-agent-message__content',
+            ),
+          ),
+          composer: rect(document.querySelector(".codex-ui-composer")),
+          horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+          summary: {
+            display: summary ? getComputedStyle(summary).display : null,
+            labels: Array.from(
+              summary?.querySelectorAll(".codex-ui-thread-summary-item") ?? [],
+              (item) => item.textContent?.trim(),
+            ),
+            rect: rect(summary),
+            triggerPressed: summaryTrigger?.getAttribute("aria-pressed") ?? null,
+          },
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const compact = scene.id.endsWith("-compact");
+      const expectedComposer = compact
+        ? { height: 98, left: 16, top: 566, width: 688 }
+        : { height: 98, left: 64, top: 706, width: 736 };
+      const expectedBubble = compact
+        ? { left: 222, top: 210, width: 482 }
+        : { left: 284.8, top: 210, width: 515.2 };
+      const within = (actual, expected, tolerance = 1) =>
+        actual &&
+        Object.entries(expected).every(
+          ([key, value]) => Math.abs(actual[key] - value) <= tolerance,
+        );
+      if (
+        !within(completion.composer, expectedComposer) ||
+        !within(completion.bubble, expectedBubble) ||
+        !completion.assistant ||
+        Math.abs(completion.assistant.left - (compact ? 16 : 64)) > 1 ||
+        Math.abs(completion.assistant.top - 344.25) > 1 ||
+        completion.attachments.direction !== "column" ||
+        completion.attachments.alignItems !== "flex-end" ||
+        completion.attachments.gap !== "8px" ||
+        !within(completion.attachments.image, {
+          height: 80,
+          left: compact ? 624 : 720,
+          top: 80,
+          width: 80,
+        }) ||
+        !within(completion.attachments.file, {
+          height: 34,
+          left: compact ? 605.4 : 701.4,
+          top: 168,
+          width: 98.6,
+        }) ||
+        JSON.stringify(completion.actions) !==
+          JSON.stringify([
+            "Copy",
+            "Good response",
+            "Bad response",
+            "Fork chat from here",
+          ]) ||
+        completion.summary.triggerPressed !== "true" ||
+        JSON.stringify(completion.summary.labels) !==
+          JSON.stringify([
+            "Create a file or site",
+            "probe.txt",
+            "probe.png",
+            "View all",
+          ]) ||
+        (compact
+          ? (completion.summary.rect?.width ?? 0) !== 0 ||
+            (completion.summary.rect?.height ?? 0) !== 0
+          : !within(completion.summary.rect, {
+              height: 222,
+              left: 863,
+              top: 58,
+              width: 302,
+            })) ||
+        completion.horizontalOverflow !== 0
+      ) {
+        throw new Error(
+          `${scene.id}: current attachment completion contract failed: ${JSON.stringify(completion)}`,
+        );
+      }
+      contract.currentAttachmentCompletion = completion;
     }
     if (
       scene.id === "attachment-current-ready" ||
@@ -17159,6 +17344,7 @@ for (const scene of selectedScenes) {
       scene.id !== "approval-current-26-825-file-allow-pending-compact" &&
       !scene.id.startsWith("current-review-undo-failed") &&
       !scene.id.startsWith("attachment-current-preview") &&
+      !scene.id.startsWith("attachment-current-26-825-preview") &&
       !scene.markdownImagePreview
     ) {
       const expectedFocus = scene.surfaces?.includes("reviewPanel")
@@ -22261,6 +22447,148 @@ try {
   }
 } finally {
   await attachmentLifecycleApp.close();
+}
+
+const currentAttachment26825Scene = {
+  currentSidebar: true,
+  frame: "attachment-current-26-825-post-picker",
+  id: "current-attachment-26-825-interaction",
+  scenario: "current-attachment-26-825",
+  sidebarState: "hidden",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: currentAttachment26825App,
+  page: currentAttachment26825Page,
+} = await launchScene(currentAttachment26825Scene, { capture: false });
+try {
+  const imageTrigger = currentAttachment26825Page.getByRole("button", {
+    exact: true,
+    name: "probe.png",
+  });
+  await imageTrigger.click();
+  const preview = currentAttachment26825Page.getByRole("dialog", {
+    exact: true,
+    name: "Image preview",
+  });
+  await preview.waitFor();
+  const initialPreview = await currentAttachment26825Page.evaluate(() => ({
+    activeLabel: document.activeElement?.getAttribute("aria-label"),
+    zoom: document
+      .querySelector(".codex-ui-image-preview__zoom-toolbar span")
+      ?.textContent?.trim(),
+  }));
+  if (
+    initialPreview.activeLabel !== "Edit image" ||
+    initialPreview.zoom !== "56%"
+  ) {
+    throw new Error(
+      `Current 26.825 attachment preview initial state failed: ${JSON.stringify(initialPreview)}`,
+    );
+  }
+  await currentAttachment26825Page
+    .getByRole("button", { name: "Zoom in image" })
+    .click();
+  await currentAttachment26825Page.getByText("67%", { exact: true }).waitFor();
+  await currentAttachment26825Page
+    .getByRole("button", { name: "Zoom out image" })
+    .click();
+  await currentAttachment26825Page.getByText("56%", { exact: true }).waitFor();
+  await preview.press("Escape");
+  await preview.waitFor({ state: "detached" });
+  if (!(await imageTrigger.evaluate((element) => element === document.activeElement))) {
+    throw new Error(
+      "Current 26.825 attachment preview did not restore image-trigger focus.",
+    );
+  }
+
+  await currentAttachment26825Page
+    .getByRole("button", { name: "Remove probe.txt" })
+    .click();
+  await currentAttachment26825Page.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length === 1 &&
+      document.activeElement?.getAttribute("aria-label") === "probe.png",
+  );
+  await currentAttachment26825Page
+    .getByRole("button", { name: "Remove probe.png" })
+    .click();
+  await currentAttachment26825Page.waitForFunction(
+    () =>
+      document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length === 0 &&
+      document.activeElement?.getAttribute("aria-label") === "Message composer",
+  );
+} finally {
+  await currentAttachment26825App.close();
+}
+
+const {
+  app: currentAttachment26825CompletionApp,
+  page: currentAttachment26825CompletionPage,
+} = await launchScene(
+  {
+    ...currentAttachment26825Scene,
+    id: "current-attachment-26-825-completion-interaction",
+  },
+  { capture: false },
+);
+try {
+  const composer = currentAttachment26825CompletionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill(
+    "These are synthetic public test files for a codex-ui-kit attachment probe. Reply with exactly: CURRENT ATTACHMENT SUCCESS 26.825. Do not use tools.",
+  );
+  await composer.press("Enter");
+  await currentAttachment26825CompletionPage.waitForSelector(
+    '.demo-root[data-frame="attachment-current-26-825-completed"][data-composer-phase="idle"]',
+  );
+  await currentAttachment26825CompletionPage
+    .getByText("CURRENT ATTACHMENT SUCCESS 26.825.", { exact: true })
+    .waitFor();
+  await currentAttachment26825CompletionPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Message composer",
+  );
+  const completed = await currentAttachment26825CompletionPage.evaluate(() => ({
+    composerAttachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    composerHeight: document
+      .querySelector(".codex-ui-composer")
+      ?.getBoundingClientRect().height,
+    composerValue:
+      document.querySelector(
+        '.codex-ui-composer textarea[aria-label="Message composer"]',
+      )?.value ?? null,
+    messageAttachmentCount: document.querySelectorAll(
+      ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+    ).length,
+    messageAttachmentsInsideBubble: document.querySelectorAll(
+      ".codex-ui-agent-message__content .codex-ui-message-attachment",
+    ).length,
+    permissionLabel:
+      document
+        .querySelector(".demo-composer-permission-trigger")
+        ?.textContent?.trim() ?? null,
+  }));
+  if (
+    completed.composerAttachmentCount !== 0 ||
+    completed.composerValue !== "" ||
+    completed.messageAttachmentCount !== 2 ||
+    completed.messageAttachmentsInsideBubble !== 0 ||
+    completed.permissionLabel !== "Full access" ||
+    Math.abs((completed.composerHeight ?? 0) - 98) > 1
+  ) {
+    throw new Error(
+      `Current 26.825 attachment completion failed: ${JSON.stringify(completed)}`,
+    );
+  }
+} finally {
+  await currentAttachment26825CompletionApp.close();
 }
 
 const attachmentCompactScene = {

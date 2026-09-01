@@ -2388,9 +2388,9 @@ try {
 
 const currentAttachmentPickerScene = {
   currentSidebar: true,
-  frame: "attachment-current-post-picker",
+  frame: "attachment-current-26-825-post-picker",
   id: "electron-current-attachment-picker",
-  scenario: "attachment-lifecycle",
+  scenario: "current-attachment-26-825",
   sidebarState: "hidden",
   windowSize: { height: 680, width: 720 },
 };
@@ -2418,8 +2418,8 @@ try {
   });
   if (
     currentPickerGeometry.attachmentCount !== 2 ||
-    Math.abs((currentPickerGeometry.composer?.width ?? 0) - 640) > 1 ||
-    Math.abs((currentPickerGeometry.composer?.height ?? 0) - 178) > 1 ||
+    Math.abs((currentPickerGeometry.composer?.width ?? 0) - 688) > 1 ||
+    Math.abs((currentPickerGeometry.composer?.height ?? 0) - 154) > 1 ||
     (currentPickerGeometry.overflow ?? Infinity) > 1
   ) {
     throw new Error(
@@ -2429,7 +2429,7 @@ try {
 
   const imageTrigger = currentAttachmentPickerPage.getByRole("button", {
     exact: true,
-    name: "shell-notification-success-stack.png",
+    name: "probe.png",
   });
   await imageTrigger.click();
   const previewDialog = currentAttachmentPickerPage.getByRole("dialog", {
@@ -2438,13 +2438,13 @@ try {
   });
   await previewDialog.waitFor();
   const initialPreview = await currentAttachmentPickerPage.evaluate(() => ({
-    activeElementRole: document.activeElement?.getAttribute("role"),
+    activeElementLabel: document.activeElement?.getAttribute("aria-label"),
     zoom: document
       .querySelector(".codex-ui-image-preview__zoom-toolbar span")
       ?.textContent?.trim(),
   }));
   if (
-    initialPreview.activeElementRole !== "dialog" ||
+    initialPreview.activeElementLabel !== "Edit image" ||
     initialPreview.zoom !== "56%"
   ) {
     throw new Error(
@@ -2455,7 +2455,7 @@ try {
     .getByRole("button", { name: "Zoom in image" })
     .click();
   await currentAttachmentPickerPage
-    .getByText("66%", { exact: true })
+    .getByText("67%", { exact: true })
     .waitFor();
   await currentAttachmentPickerPage
     .getByRole("button", { name: "Zoom out image" })
@@ -2473,12 +2473,12 @@ try {
 
   await currentAttachmentPickerPage
     .getByRole("button", {
-      name: "Remove codex-ui-kit-attachment-evidence.txt",
+      name: "Remove probe.txt",
     })
     .click();
   await currentAttachmentPickerPage
     .getByRole("button", {
-      name: "Remove shell-notification-success-stack.png",
+      name: "Remove probe.png",
     })
     .click();
   if ((await currentAttachments.count()) !== 0) {
@@ -2488,6 +2488,112 @@ try {
   }
 } finally {
   await currentAttachmentPickerApp.close();
+}
+
+const {
+  app: currentAttachmentCompletionApp,
+  page: currentAttachmentCompletionPage,
+} = await launchScene(
+  {
+    ...currentAttachmentPickerScene,
+    id: "electron-current-attachment-completion",
+  },
+  { capture: false },
+);
+
+try {
+  const composer = currentAttachmentCompletionPage.getByRole("textbox", {
+    name: "Message composer",
+  });
+  await composer.fill(
+    "These are synthetic public test files for a codex-ui-kit attachment probe. Reply with exactly: CURRENT ATTACHMENT SUCCESS 26.825. Do not use tools.",
+  );
+  await composer.press("Enter");
+  await currentAttachmentCompletionPage.waitForSelector(
+    '.demo-root[data-frame="attachment-current-26-825-completed"][data-composer-phase="idle"]',
+  );
+  await currentAttachmentCompletionPage
+    .getByText("CURRENT ATTACHMENT SUCCESS 26.825.", { exact: true })
+    .waitFor();
+  await currentAttachmentCompletionPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Message composer",
+  );
+  const completion = await currentAttachmentCompletionPage.evaluate(() => ({
+    actionLabels: Array.from(
+      document.querySelectorAll(
+        '.codex-ui-agent-message[data-role="assistant"] .codex-ui-agent-message__actions button[aria-label]',
+      ),
+      (button) => button.getAttribute("aria-label"),
+    ),
+    attachmentLayout: (() => {
+      const group = document.querySelector(
+        ".codex-ui-agent-message__attachments",
+      );
+      const file = group?.querySelector(
+        '.codex-ui-message-attachment[data-kind="file"]',
+      );
+      const image = group?.querySelector(
+        '.codex-ui-message-attachment[data-kind="image"]',
+      );
+      const rect = (element) => {
+        if (!element) return null;
+        const value = element.getBoundingClientRect();
+        return { height: value.height, top: value.top, width: value.width };
+      };
+      return {
+        direction: group ? getComputedStyle(group).flexDirection : null,
+        file: rect(file),
+        gap: group ? getComputedStyle(group).gap : null,
+        image: rect(image),
+      };
+    })(),
+    composerAttachmentCount: document.querySelectorAll(
+      ".codex-ui-composer .codex-ui-composer-attachment",
+    ).length,
+    composerHeight: document
+      .querySelector(".codex-ui-composer")
+      ?.getBoundingClientRect().height,
+    messageAttachmentCount: document.querySelectorAll(
+      ".codex-ui-agent-message__attachments .codex-ui-message-attachment",
+    ).length,
+    messageAttachmentsInsideBubble: document.querySelectorAll(
+      ".codex-ui-agent-message__content .codex-ui-message-attachment",
+    ).length,
+    summaryDockDisplay: (() => {
+      const summaryDock = document.querySelector(
+        ".demo-current-attachment-26-825-summary-dock",
+      );
+      return summaryDock ? getComputedStyle(summaryDock).display : null;
+    })(),
+  }));
+  if (
+    JSON.stringify(completion.actionLabels) !==
+      JSON.stringify([
+        "Copy",
+        "Good response",
+        "Bad response",
+        "Fork chat from here",
+      ]) ||
+    completion.attachmentLayout.direction !== "column" ||
+    completion.attachmentLayout.gap !== "8px" ||
+    Math.abs((completion.attachmentLayout.image?.width ?? 0) - 80) > 1 ||
+    Math.abs((completion.attachmentLayout.image?.height ?? 0) - 80) > 1 ||
+    Math.abs((completion.attachmentLayout.image?.top ?? 0) - 80) > 1 ||
+    Math.abs((completion.attachmentLayout.file?.width ?? 0) - 98.6) > 1 ||
+    Math.abs((completion.attachmentLayout.file?.height ?? 0) - 34) > 1 ||
+    Math.abs((completion.attachmentLayout.file?.top ?? 0) - 168) > 1 ||
+    completion.composerAttachmentCount !== 0 ||
+    completion.messageAttachmentCount !== 2 ||
+    completion.messageAttachmentsInsideBubble !== 0 ||
+    completion.summaryDockDisplay !== "none" ||
+    Math.abs((completion.composerHeight ?? 0) - 98) > 1
+  ) {
+    throw new Error(
+      `Electron current attachment completion failed: ${JSON.stringify(completion)}`,
+    );
+  }
+} finally {
+  await currentAttachmentCompletionApp.close();
 }
 
 const repositoryRoot = resolve(process.cwd(), "../..");

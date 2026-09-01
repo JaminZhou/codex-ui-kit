@@ -664,10 +664,10 @@ describe("lifecycle visual policy", () => {
     expect(contract).toContain("defaultMaximumRatio: 0.005");
     expect(contract).toContain("masks: []");
     expect(appSource).toContain(
-      "isAnyCurrentBasicMessageReplay ||\n                isCurrentCitations26825Replay ||\n                isCurrentBrowser26825Replay ||\n                isCurrentMarkdown26818Replay",
+      "isAnyCurrentBasicMessageReplay ||\n                isCurrentAttachment26825Replay ||\n                isCurrentCitations26825Replay ||\n                isCurrentBrowser26825Replay ||\n                isCurrentMarkdown26818Replay",
     );
     expect(appSource).toContain(
-      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentCitations26825Replay &&\n                      !isCurrentBrowser26825Replay &&\n                      !isCurrentMarkdown26818Replay",
+      "!isAnyCurrentBasicMessageReplay &&\n                      !isCurrentAttachment26825Replay &&\n                      !isCurrentCitations26825Replay &&\n                      !isCurrentBrowser26825Replay &&\n                      !isCurrentMarkdown26818Replay",
     );
   });
 
@@ -1117,6 +1117,44 @@ describe("lifecycle visual policy", () => {
     expect(appSource).toContain('name="review-undo"');
     expect(appStyles).toContain(
       '[data-scenario="current-review-26-825-files"]',
+    );
+  });
+
+  it("gates the runtime-observed 26.825 mixed attachment lifecycle", () => {
+    for (const scene of [
+      "attachment-current-26-825-post-picker",
+      "attachment-current-26-825-post-picker-compact",
+      "attachment-current-26-825-preview",
+      "attachment-current-26-825-preview-compact",
+      "attachment-current-26-825-completed",
+      "attachment-current-26-825-completed-compact",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_WIDE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_WIDE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_WIDE_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_COMPACT_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      "current attachment completion contract failed",
+    );
+    expect(electronContract).toContain(
+      "Electron current attachment completion failed",
+    );
+    expect(contract).toContain(
+      "current 26.825 attachment completion product pixel ratios",
+    );
+    expect(appSource).toContain(
+      "demo-current-attachment-26-825-summary-dock",
+    );
+    expect(appStyles).toContain(
+      '[data-frame="attachment-current-26-825-completed"]',
     );
   });
 

@@ -141,8 +141,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   external queue state, and the input card in distinct ownership slots.
 - `ComposerContextBar` and `ComposerContextControl`: accessible project,
   environment, branch, or host-defined context controls above the Composer.
-- `ComposerAttachment`: pill, 64px file/folder card, and current-build 80px
-  image layouts with ready, bounded upload-progress, upload-error,
+- `ComposerAttachment`: pill, default card/image layouts, and the explicit
+  current-build compact 52.5px file-card / 54px image scale with ready,
+  bounded upload-progress, upload-error,
   preview-error, retry, open, and remove states.
 - `ComposerMentionMenu`: grouped file, skill, app, agent, or custom mentions with loading, empty, disabled, active, and keyboard-selection states.
 - `ComposerModeIndicator`: Plan, Goal, Review, or host-defined footer mode with a clear affordance.

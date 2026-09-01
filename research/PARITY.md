@@ -511,6 +511,15 @@ The authoritative current-build inventory is:
   under independent 1.5% limits. Native file-panel selection, non-image and
   multi-attachment states, upload/error, overflow, and plugin variants remain
   open.
+- The current `26.825.51511` mixed-attachment refresh supersedes the old
+  post-picker geometry with trusted-CDP `probe.png`/`probe.txt` selection. It
+  locks 736/688×154px Composers, 54px image and 156.484375×52.5px text cards,
+  Edit-first immersive preview, 56%→67% multiplicative compact zoom, 82% wide
+  fit, focus-preserving removal, two sent attachments outside the user bubble,
+  exact completion, and 98px Composer restoration. Browser/CDP and Electron
+  drive the lifecycle; six reviewed baselines and six local-only product
+  comparisons pass. Native upload failure/progress and plugin variants remain
+  open.
 - Three current `26.825.51511` subagent tasks now separate the single-success contract
   from collaboration. The original task covers one agent, summary, panel,
   transcript, and 820/720 reopen. A sibling Alpha/Beta task and a nested
@@ -721,6 +730,19 @@ while retaining the draft/sent attachment geometry, user-message silhouette,
 Composer boundary, actions, and spacing. The comparisons measure 0.39% and
 0.79% under independent 1.5% hard limits; CDP and Electron separately drive
 the ownership and full Remove → Add → Submit → completion lifecycle.
+
+The current `26.825.51511` mixed-attachment comparison adds exact wide and
+compact post-picker/preview references. Composer regions differ by 1.4072%
+and 1.3591%. Preview action/image/toolbar regions differ by
+5.1087%/0.2846%/1.2111% wide and 4.8188%/0.3393%/1.1962% compact; exact DOM
+geometry, focus, and SVG path contracts independently gate the higher-density
+action crop.
+
+The completed wide frame adds header/transcript/Composer/summary comparisons
+at 4.2517%/0.8910%/1.2852%/2.7370%; compact measures
+5.6147%/1.0095%/1.3497% for header/transcript/Composer and correctly removes
+the summary from layout. Sent image/file geometry and responsive ownership are
+separate exact CDP and Electron gates.
 
 The current `26.730.61639` Terminal comparison uses a clean 906×820 main-only
 reference. It reports the full main as a diagnostic, then gates only the

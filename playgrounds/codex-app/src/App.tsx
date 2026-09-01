@@ -797,7 +797,8 @@ function replayCountForSelection(
     return scenario.frames.recovered ?? scenario.events.length;
   }
   if (
-    scenario.id === "attachment-lifecycle" &&
+    (scenario.id === "attachment-lifecycle" ||
+      scenario.id === "current-attachment-26-825") &&
     frame?.startsWith("attachment-")
   ) {
     return 0;
@@ -1052,6 +1053,10 @@ const currentAttachmentProductPreviewUrl = new URL(
   "../tests/visual/baselines/shell-notification-success-stack.png",
   import.meta.url,
 ).href;
+const currentAttachment26825PreviewUrl = new URL(
+  "../tests/visual/baselines/attachment-current-ready.png",
+  import.meta.url,
+).href;
 
 function currentMarkdownMediaSource(source: string) {
   if (source.includes("openai.com/favicon.ico")) {
@@ -1089,6 +1094,29 @@ interface DemoComposerAttachmentItem {
 function attachmentItemsForFrame(
   frame: string | null,
 ): DemoComposerAttachmentItem[] {
+  if (
+    frame === "attachment-current-26-825-post-picker" ||
+    frame === "attachment-current-26-825-preview"
+  ) {
+    return [
+      {
+        id: "current-product-image-26-825",
+        kind: "image",
+        label: "probe.png",
+        layout: "image",
+        previewSrc: currentAttachment26825PreviewUrl,
+        status: "ready",
+      },
+      {
+        id: "current-product-text-26-825",
+        kind: "file",
+        label: "probe.txt",
+        layout: "card",
+        meta: "TXT",
+        status: "ready",
+      },
+    ];
+  }
   if (
     frame === "attachment-current-post-picker" ||
     frame === "attachment-current-preview"
@@ -1192,6 +1220,17 @@ function attachmentItemsForFrame(
     ];
   }
   return [];
+}
+
+const currentAttachment26825Prompt =
+  "These are synthetic public test files for a codex-ui-kit attachment probe. Reply with exactly: CURRENT ATTACHMENT SUCCESS 26.825. Do not use tools.";
+
+function submittedAttachmentItemsForFrame(
+  frame: string | null,
+): DemoComposerAttachmentItem[] {
+  return frame === "attachment-current-26-825-completed"
+    ? attachmentItemsForFrame("attachment-current-26-825-post-picker")
+    : [];
 }
 
 const composerPermissionOptions: readonly ComposerPermissionOption[] = [
@@ -3118,15 +3157,23 @@ export function App() {
   const [attachmentPreviewId, setAttachmentPreviewId] = useState<
     string | null
   >(
-    initialSelection.frame === "attachment-current-preview"
-      ? "current-product-image"
-      : null,
+    initialSelection.frame === "attachment-current-26-825-preview"
+      ? "current-product-image-26-825"
+      : initialSelection.frame === "attachment-current-preview"
+        ? "current-product-image"
+        : null,
   );
   const [submittedComposerAttachments, setSubmittedComposerAttachments] =
-    useState<DemoComposerAttachmentItem[]>([]);
+    useState<DemoComposerAttachmentItem[]>(() =>
+      submittedAttachmentItemsForFrame(initialSelection.frame),
+    );
   const [submittedComposerPrompt, setSubmittedComposerPrompt] = useState<
     string | null
-  >(null);
+  >(
+    initialSelection.frame === "attachment-current-26-825-completed"
+      ? currentAttachment26825Prompt
+      : null,
+  );
   const [queuedPrompts, setQueuedPrompts] = useState<QueuedPrompt[]>(() =>
     initialQueuedPrompts(initialSelection.frame),
   );
@@ -3574,7 +3621,11 @@ export function App() {
   const isCurrentAutomaticReviewReplay =
     mode === "replay" && scenarioId === "approval-review-timeout";
   const isCurrentAttachmentReplay =
-    mode === "replay" && scenarioId === "attachment-lifecycle";
+    mode === "replay" &&
+    (scenarioId === "attachment-lifecycle" ||
+      scenarioId === "current-attachment-26-825");
+  const isCurrentAttachment26825Replay =
+    mode === "replay" && scenarioId === "current-attachment-26-825";
   const isCurrentLongCommandReplay =
     mode === "replay" && scenarioId === "long-command-output";
   const isCurrentCommandFailureReplay =
@@ -3612,7 +3663,9 @@ export function App() {
   const isCurrentBasic26825Replay =
     mode === "replay" && scenarioId === "current-basic-message-26-825";
   const usesCurrent26825ThreadHeader =
-    isCurrentBasic26825Replay || isCurrentApproval26825FileReplay;
+    isCurrentBasic26825Replay ||
+    isCurrentApproval26825FileReplay ||
+    isCurrentAttachment26825Replay;
   const isAnyCurrentBasicMessageReplay =
     isCurrentBasicMessageReplay || isCurrentBasic26825Replay;
   const isCurrentBrowser26825Replay =
@@ -4193,10 +4246,18 @@ export function App() {
     setComposerResourceActiveId("files");
     setComposerAttachments(attachmentItemsForFrame(frame));
     setAttachmentPreviewId(
-      frame === "attachment-current-preview" ? "current-product-image" : null,
+      frame === "attachment-current-26-825-preview"
+        ? "current-product-image-26-825"
+        : frame === "attachment-current-preview"
+          ? "current-product-image"
+          : null,
     );
-    setSubmittedComposerAttachments([]);
-    setSubmittedComposerPrompt(null);
+    setSubmittedComposerAttachments(submittedAttachmentItemsForFrame(frame));
+    setSubmittedComposerPrompt(
+      frame === "attachment-current-26-825-completed"
+        ? currentAttachment26825Prompt
+        : null,
+    );
     setQueuedPrompts([]);
     setQueueingEnabled(true);
     setQueueInterrupted(false);
@@ -4584,11 +4645,19 @@ export function App() {
       setSubmittedComposerPrompt(prompt);
       setReplayComposerSubmitting(true);
       setComposerOverlay(null);
-      setActiveFrame("attachment-submitting");
+      setActiveFrame(
+        isCurrentAttachment26825Replay
+          ? "attachment-current-26-825-submitting"
+          : "attachment-submitting",
+      );
       replaySubmitTimerRef.current = window.setTimeout(() => {
         replaySubmitTimerRef.current = null;
         setReplayCount(scenario.events.length);
-        setActiveFrame("attachment-completed");
+        setActiveFrame(
+          isCurrentAttachment26825Replay
+            ? "attachment-current-26-825-completed"
+            : "attachment-completed",
+        );
         setComposerAttachments([]);
         completeReplayComposerSubmission();
         setComposerValue((current) => (current === prompt ? "" : current));
@@ -6097,6 +6166,7 @@ export function App() {
       scenarioId === "mcp-tool-call" ||
       scenarioId === "mcp-recovery-mixed-thread" ||
       scenarioId === "attachment-lifecycle" ||
+      scenarioId === "current-attachment-26-825" ||
       isCurrentApproval26820FileReplay ||
       isCurrentAutomaticReviewReplay ||
       scenarioId === "long-command-output" ||
@@ -6167,6 +6237,9 @@ export function App() {
               aria-pressed={
                 isCurrentCitations26825Replay
                   ? citationSummaryOpen
+                  : isCurrentAttachment26825Replay
+                    ? activeFrame ===
+                      "attachment-current-26-825-completed"
                   : isCurrentMcp26825Replay
                   ? mcpSourceSummaryPinned
                   : undefined
@@ -6464,7 +6537,9 @@ export function App() {
         )
       }
       navigation={
-        isCurrentMcp26825Replay || isCurrentApproval26825FileReplay ? (
+        isCurrentMcp26825Replay ||
+        isCurrentApproval26825FileReplay ||
+        isCurrentAttachment26825Replay ? (
           <div className="demo-current-mcp-26-825-header-navigation">
             <button
               aria-expanded={sidebarOpen}
@@ -6553,12 +6628,14 @@ export function App() {
         isCurrentCitations26825Replay
           ? (
               <>
-                <span
-                  aria-hidden="true"
-                  className="demo-current-basic-26-825-project-icon"
-                >
-                  <CurrentBuildIcon name="thread-header-project" />
-                </span>
+                {isCurrentAttachment26825Replay ? null : (
+                  <span
+                    aria-hidden="true"
+                    className="demo-current-basic-26-825-project-icon"
+                  >
+                    <CurrentBuildIcon name="thread-header-project" />
+                  </span>
+                )}
                 <button
                   className="demo-current-basic-26-825-header-title"
                   type="button"
@@ -6566,7 +6643,8 @@ export function App() {
                   <span>
                     {isCurrentMcp26825Replay ||
                     isCurrentCitations26825Replay ||
-                    isCurrentApproval26825FileReplay
+                    isCurrentApproval26825FileReplay ||
+                    isCurrentAttachment26825Replay
                       ? scenario.label
                       : "Reply with CURRENT BASIC MESSAGE"}
                   </span>
@@ -6629,8 +6707,9 @@ export function App() {
   const currentComposerComposition =
     currentHeaderReplay || showLifecycleComposer || isCurrentApprovalReplay;
   const currentProductAttachmentFrame =
-    activeFrame === "attachment-current-post-picker" ||
-    activeFrame === "attachment-current-preview";
+    activeFrame === "attachment-current-26-825-post-picker" ||
+    activeFrame === "attachment-current-26-825-preview";
+  const currentProductAttachmentComposer = isCurrentAttachment26825Replay;
   const removeComposerAttachment = (id: string) => {
     if (attachmentPreviewId === id) setAttachmentPreviewId(null);
     setComposerAttachments((items) => {
@@ -6638,9 +6717,22 @@ export function App() {
       if (next.length === 0) {
         setActiveFrame(isCurrentAttachmentReplay ? "attachment-empty" : null);
       }
+      requestAnimationFrame(() => {
+        const nextAttachment = next[0];
+        if (isCurrentAttachment26825Replay && nextAttachment) {
+          const root = document.querySelector(
+            `[data-composer-attachment-id="${CSS.escape(nextAttachment.id)}"]`,
+          );
+          const focusTarget = root?.querySelector<HTMLButtonElement>(
+            ".codex-ui-composer-attachment__open, .codex-ui-composer-attachment__remove",
+          );
+          focusTarget?.focus();
+          return;
+        }
+        composerInputRef.current?.focus();
+      });
       return next;
     });
-    requestAnimationFrame(() => composerInputRef.current?.focus());
   };
   const retryComposerAttachment = (id: string) => {
     cancelReplaySubmitTimer();
@@ -6757,6 +6849,7 @@ export function App() {
   }
   const composerAttachmentNodes = composerAttachments.map((attachment) => (
     <ComposerAttachment
+      data-composer-attachment-id={attachment.id}
       icon={
         currentProductAttachmentFrame ? undefined : attachment.kind === "folder" ? (
           <CurrentBuildIcon name="composer-project" />
@@ -6790,16 +6883,25 @@ export function App() {
       }
       previewSrc={attachment.previewSrc}
       progress={attachment.progress}
+      size={currentProductAttachmentFrame ? "compact" : "default"}
       status={attachment.status}
     />
   ));
   const composerSurface = (
     <AgentComposer
       actions={
-        currentProductAttachmentFrame ? (
+        currentProductAttachmentComposer ? (
           <span className="demo-composer-controls">
             <button aria-label="Add files and more" type="button">
               <CurrentBuildIcon name="composer-add-files" />
+            </button>
+            <button
+              aria-label="Change permissions"
+              className="demo-composer-permission-trigger"
+              type="button"
+            >
+              <CurrentBuildIcon name="composer-permission" />
+              <span>Full access</span>
             </button>
           </span>
         ) : showMeasuredComposer || showLifecycleComposer ? (
@@ -6906,10 +7008,10 @@ export function App() {
       aria-busy={composerIsDisabled || undefined}
       attachments={composerAttachmentNodes}
       controls={
-        currentProductAttachmentFrame ? (
+        currentProductAttachmentComposer ? (
           <span className="demo-composer-actions">
             <span className="demo-current-composer-model">
-              <span>Instant</span>
+              <span>5.6 Sol Extra High</span>
               <CurrentBuildIcon name="composer-model-chevron" />
             </span>
             <button aria-label="Dictate" type="button">
@@ -6949,7 +7051,9 @@ export function App() {
       disabled={composerIsDisabled}
       isRunning={composerIsRunning}
       layout={
-        showMeasuredComposer || showLifecycleComposer
+        showMeasuredComposer ||
+        showLifecycleComposer ||
+        currentProductAttachmentComposer
           ? "multiline"
           : "auto"
       }
@@ -6961,8 +7065,8 @@ export function App() {
           ? "Describe your goal, define measurable outcomes for best results"
           : composerMode === "plan"
             ? "Describe your task to generate a plan..."
-            : currentProductAttachmentFrame
-              ? "Message ChatGPT"
+            : currentProductAttachmentComposer
+              ? "Do anything"
             : showMeasuredComposer || showLifecycleComposer
               ? "Do anything"
               : mode === "live"
@@ -6981,7 +7085,7 @@ export function App() {
         isCurrentTransportRecoveryReplay ||
         isAnyCurrentBasicMessageReplay ||
         isCurrentCitations26825Replay ||
-        currentProductAttachmentFrame
+        currentProductAttachmentComposer
           ? "Send"
           : undefined
       }
@@ -7049,7 +7153,7 @@ export function App() {
           : composerMode === "plan"
             ? "Describe your task to generate a plan..."
             : currentProductAttachmentFrame
-              ? "Message ChatGPT"
+              ? "Message composer"
               : "Message composer"
       }
       ref={composerInputRef}
@@ -7059,11 +7163,19 @@ export function App() {
   const attachmentPreviewImage = attachmentPreviewId
     ? composerAttachments.find(({ id }) => id === attachmentPreviewId)
     : undefined;
-  const regularComposer = showLifecycleComposer ? (
+  const regularComposer = showLifecycleComposer || currentProductAttachmentFrame ? (
     <ComposerDock
       composer={composerSurface}
       context={
-        !current26825LongFrame &&
+        currentProductAttachmentFrame ? (
+          <ComposerContextBar>
+            <ComposerContextControl
+              icon={<CurrentBuildIcon name="composer-project" />}
+            >
+              Choose project
+            </ComposerContextControl>
+          </ComposerContextBar>
+        ) : !current26825LongFrame &&
         !composerIsRunning &&
         !queueInterrupted ? (
           <ComposerContextBar>
@@ -11303,7 +11415,8 @@ export function App() {
       const submittedMessageAttachments =
         isCurrentAttachmentReplay &&
         message.role === "user" &&
-        message.id === "user-attachment-lifecycle" &&
+        (message.id === "user-attachment-lifecycle" ||
+          message.id === "user-current-attachment-26-825") &&
         submittedComposerAttachments.length > 0
           ? submittedComposerAttachments
           : null;
@@ -11541,6 +11654,8 @@ export function App() {
                 (isAnyCurrentBasicMessageReplay &&
                   (message.id === "assistant-current-basic" ||
                     message.id === "assistant-current-basic-26-825")) ||
+                (isCurrentAttachment26825Replay &&
+                  message.id === "assistant-current-attachment-26-825") ||
                 (isCurrentBrowserFailure26825Replay &&
                   message.id.startsWith(
                     "assistant-current-browser-26-825-",
@@ -11580,6 +11695,7 @@ export function App() {
                 scenarioId === "long-command-output" ||
                 isCurrentCommandReplay ||
                 isAnyCurrentBasicMessageReplay ||
+                isCurrentAttachment26825Replay ||
                 isCurrentCitations26825Replay ||
                 isCurrentBrowser26825Replay ||
                 isCurrentMarkdown26818Replay ||
@@ -11592,6 +11708,7 @@ export function App() {
                   <McpResponseActions
                     copyLabel={
                       isAnyCurrentBasicMessageReplay ||
+                      isCurrentAttachment26825Replay ||
                       isCurrentCitations26825Replay ||
                       isCurrentBrowser26825Replay ||
                       isCurrentMarkdown26818Replay ||
@@ -11604,6 +11721,7 @@ export function App() {
                     }
                     label={
                       isAnyCurrentBasicMessageReplay ||
+                      isCurrentAttachment26825Replay ||
                       isCurrentCitations26825Replay ||
                       isCurrentMarkdown26818Replay ||
                       isCurrentMarkdown26820MediaReplay ||
@@ -11629,6 +11747,7 @@ export function App() {
                     }
                     toolbar={
                       !isAnyCurrentBasicMessageReplay &&
+                      !isCurrentAttachment26825Replay &&
                       !isCurrentCitations26825Replay &&
                       !isCurrentBrowser26825Replay &&
                       !isCurrentMarkdown26818Replay &&
@@ -11667,13 +11786,22 @@ export function App() {
                       alt={
                         attachment.kind === "image" ? attachment.label : ""
                       }
+                      className={
+                        isCurrentAttachment26825Replay
+                          ? "demo-current-attachment-26-825-message-attachment"
+                          : undefined
+                      }
                       icon={
                         attachment.kind === "folder" ? (
                           <CurrentBuildIcon name="composer-project" />
                         ) : attachment.kind === "file" ? (
-                          <span className="demo-current-file-type">
-                            {attachment.meta?.split(/\s|·/)[0] ?? "FILE"}
-                          </span>
+                          isCurrentAttachment26825Replay ? (
+                            <CurrentBuildIcon name="review-file-text" />
+                          ) : (
+                            <span className="demo-current-file-type">
+                              {attachment.meta?.split(/\s|·/)[0] ?? "FILE"}
+                            </span>
+                          )
                         ) : undefined
                       }
                       key={`${message.id}:submitted-attachment:${attachment.id}`}
@@ -13760,7 +13888,9 @@ export function App() {
           attachmentPreviewImage?.previewSrc
             ? [
                 {
-                  alt: attachmentPreviewImage.label,
+                  alt: currentProductAttachmentFrame
+                    ? "User attachment"
+                    : attachmentPreviewImage.label,
                   downloadSrc: attachmentPreviewImage.previewSrc,
                   id: attachmentPreviewImage.id,
                   src: attachmentPreviewImage.previewSrc,
@@ -13771,6 +13901,10 @@ export function App() {
         onOpenChange={(open) => {
           if (!open) setAttachmentPreviewId(null);
         }}
+        immersiveInitialFocus={
+          currentProductAttachmentFrame ? "first-action" : "dialog"
+        }
+        onEdit={currentProductAttachmentFrame ? () => undefined : undefined}
         open={Boolean(attachmentPreviewImage?.previewSrc)}
         presentation="immersive"
         title="Image preview"
@@ -14341,6 +14475,64 @@ export function App() {
 
               </AgentTurn>
             </ConversationThreadShell>
+
+            {isCurrentAttachment26825Replay &&
+            activeFrame === "attachment-current-26-825-completed" ? (
+              <ThreadSummaryDock
+                className="demo-current-attachment-26-825-summary-dock"
+                open
+                pinned
+              >
+                <ThreadSummaryPanel
+                  className="demo-current-attachment-26-825-summary-panel"
+                  label="Attachment summary"
+                >
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Create a file or site"
+                      />
+                    }
+                    title="Outputs"
+                  >
+                    <ThreadSummaryItem
+                      disabled
+                      label="Create a file or site"
+                    />
+                  </ThreadSummarySection>
+                  <ThreadSummarySection
+                    actions={
+                      <ThreadSummaryIconButton
+                        icon="+"
+                        label="Attach files or connect apps"
+                      />
+                    }
+                    title="Sources"
+                  >
+                    <ThreadSummaryItem
+                      label="probe.txt"
+                      leading={<CurrentBuildIcon name="review-file-text" />}
+                    />
+                    <ThreadSummaryItem
+                      label="probe.png"
+                      leading={
+                        <img
+                          alt=""
+                          className="demo-current-attachment-26-825-summary-thumbnail"
+                          src={currentAttachment26825PreviewUrl}
+                        />
+                      }
+                    />
+                    <ThreadSummaryItem
+                      label="View all"
+                      leading={<SummaryGlyph name="link" />}
+                      tone="muted"
+                    />
+                  </ThreadSummarySection>
+                </ThreadSummaryPanel>
+              </ThreadSummaryDock>
+            ) : null}
 
             {isCurrentMcp26818Replay || usesCurrentMcpFlatRows ? (
               <ThreadSummaryDock
