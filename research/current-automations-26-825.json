@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationsSubmitted": false
+  },
+  "page": {
+    "title": "Scheduled tasks",
+    "description": "Ask ChatGPT to schedule tasks, set reminders, or monitor for updates",
+    "heading": {
+      "top": 66,
+      "height": 33.59375,
+      "fontSize": 28,
+      "fontWeight": 400,
+      "lineHeight": 33.6
+    },
+    "descriptionRect": { "top": 107.59375, "height": 24 },
+    "search": {
+      "top": 151.59375,
+      "height": 32,
+      "wide": { "left": 387.4375, "width": 728 },
+      "compact": { "left": 21, "width": 679 },
+      "background": "rgb(45, 45, 45)",
+      "border": "1px solid rgba(255, 255, 255, 0.157)",
+      "borderRadius": 9999,
+      "paddingInline": 10
+    },
+    "filters": [
+      { "label": "All", "left": 399.4375, "width": 34.078125 },
+      { "label": "Active", "left": 435.515625, "width": 57.953125 },
+      { "label": "Paused", "left": 495.46875, "width": 65.546875 },
+      { "label": "Completed", "left": 563.015625, "width": 88.796875 }
+    ],
+    "filtersTop": 211.59375,
+    "observedTaskCount": 2,
+    "taskContentRecorded": false,
+    "suggestions": [
+      {
+        "title": "Daily brief",
+        "schedule": "Weekdays at 8:00 AM",
+        "description": "Start each weekday with a summary of your calendar, unread email, and priorities"
+      },
+      {
+        "title": "Weekly review",
+        "schedule": "Fridays at 4:00 PM",
+        "description": "Turn your recent work into a concise status update every Friday"
+      },
+      {
+        "title": "Follow-up monitor",
+        "schedule": "Weekdays at 9:00 AM",
+        "description": "Review recent email and calendar activity and flag anything that needs your attention"
+      }
+    ],
+    "horizontalOverflow": 0
+  },
+  "readOnlyStates": {
+    "active": { "selected": true, "observedTaskCount": 2 },
+    "paused": { "selected": true, "observedTaskCount": 0, "empty": "No scheduled tasks found" },
+    "completed": { "selected": true, "observedTaskCount": 0, "empty": "No scheduled tasks found" },
+    "searchNoMatch": {
+      "query": "no-match-26-825",
+      "observedTaskCount": 0,
+      "suggestionCount": 0,
+      "empty": "No scheduled tasks found",
+      "focusRetained": true
+    }
+  },
+  "createMenu": {
+    "compactOuter": { "left": 542, "top": 38, "width": 170, "height": 69.125 },
+    "items": ["Create with Codex", "Set up manually"]
+  },
+  "visibleIconProvenance": {
+    "source": "read-only current-renderer DOM capture",
+    "taskActionPathCount": 3,
+    "taskActionPathSha256": "d99b124f9461c9debb98882be9273398a00415d0a3473610ad9f7e86555a7d6f",
+    "suggestionPathSha256": {
+      "Daily brief": "9d90ec68f0f79c09f87a04f79d637b57af1f338ed2090383ac44e797d756885f",
+      "Weekly review": "ca3057b813b301198d501fe34e4f23e1399a07f7a30077192e27796a31b720a9",
+      "Follow-up monitor": "89f82b4d5a6f256cb320064f783b7dd2039488edbad1bd097415ac4c698de356"
+    }
+  },
+  "manualEditor": {
+    "wideColumns": { "navigator": 437.125, "editor": 420 },
+    "compactColumns": { "navigator": 374, "editor": 346 },
+    "fields": {
+      "details": [
+        { "label": "Runs on", "value": "This device", "options": ["This device", "Cloud"] },
+        { "label": "Runs in", "value": "Existing chat", "options": ["New chat", "Existing chat"] },
+        { "label": "Chat", "value": "New chat", "optionsRecorded": false }
+      ],
+      "frequency": [
+        { "label": "Repeat", "value": "Daily", "options": ["Interval", "Daily", "Weekdays", "Weekly", "Custom"] },
+        { "label": "At", "value": "9:00 AM", "optionCount": 96, "intervalMinutes": 15 },
+        { "label": "Notifications", "value": "Important updates", "options": ["Important updates", "Failed runs only"] }
+      ]
+    },
+    "chatMenuOpened": false,
+    "submitDisabled": true,
+    "submitted": false,
+    "horizontalOverflow": 0
+  },
+  "createWithCodex": {
+    "prefill": "Let's set up a scheduled task together. First, explain how scheduled tasks work in ChatGPT. Then interview me to figure out what I need scheduled and when it should run.",
+    "sent": false
+  },
+  "productPixelRatios": {
+    "wideMainMasked": 0.018130067328189496,
+    "compactMainMasked": 0.021900931885729894,
+    "manualWideMain": 0.012295761610569892,
+    "manualCompactMain": 0.012120264651234667
+  },
+  "localOnlyScreenshots": [
+    { "name": "scheduled-wide-1180x820.png", "sha256": "3c92ebe8c30ae6f211f4d297cf1e45f0cc7e7b37d9fa739868b7003a2f79390b" },
+    { "name": "scheduled-compact-720x820.png", "sha256": "68fe183550b4d8afb2bc729987f7f9188e19fad5971de81c9286413e7020bbb4" },
+    { "name": "scheduled-search-empty-compact.png", "sha256": "0dc8011acd1a5fde39fbaf52c16f7e63a9a50eae61ef11a61167318e1da132dd" },
+    { "name": "scheduled-create-menu-compact-pointer.png", "sha256": "261d37bb032a25374968d0bd2663a8ddb254fe3556c2f870c73cb8992a39cfd8" },
+    { "name": "scheduled-manual-create-wide.png", "sha256": "89b089ae2615679b5e7b48d5a3f21b53ca90c654428171aee274b0c9699ac5a0" },
+    { "name": "scheduled-manual-create-compact.png", "sha256": "fe1c5a940095049659dfc05f239e2d2fa20af26460281111353481a49b80e9fa" },
+    { "name": "scheduled-create-with-codex-wide.png", "sha256": "c75504b4c827880a3d2af84e08e98fece11fd9e050bb8b82ee9bc4186a1fb210" }
+  ]
+}

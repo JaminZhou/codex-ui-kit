@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 71 groups have current-build runtime evidence, 8 have previous-build-only
+- 72 groups have current-build runtime evidence, 7 have previous-build-only
   runtime evidence, and 12 have not been sampled.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
@@ -1342,7 +1342,12 @@ without confusing package readiness with full product reconstruction.
     delivered slice: plan/credits/reset cards, three meters, 5x/20x and
     annual/monthly selectors, host-owned checkout callbacks, wide/compact
     scrolling, CDP, Electron, and current-product pixel gates. Real purchase,
-    gifting, billing-provider, and remaining integration routes stay open.
+    gifting, and billing-provider flows stay open. The Scheduled tasks slice is
+    now delivered for wide/compact index layout, status/search empty states,
+    suggestions, split Create choices, navigator/manual editor, unavailable
+    recovery, Browser/CDP, Electron, and four local-only current-product pixel
+    comparisons. Real task creation, edit, pause/resume, detail, execution,
+    delivery, and permission/failure transitions remain open.
 12. **Full-app validation and global convergence**: replay/live App Server
     attribution, dark/light and wide/compact matrices, current-build regional
     pixels, public contract freeze, compatibility matrix, and release

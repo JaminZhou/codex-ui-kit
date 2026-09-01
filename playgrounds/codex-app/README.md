@@ -1089,6 +1089,29 @@ Exact third-party icons and every install/discovery side effect remain
 host-supplied. Reviewed replay baselines are committed; product screenshots
 and isolated profile data are not.
 
+## Current Scheduled tasks route
+
+The `26.825.51511` Scheduled route has deterministic wide/compact index and
+manual-editor scenes. CDP checks search, status filters, empty results, the
+Create split menu, controlled field menus, unavailable recovery, exact
+geometry, sidebar behavior, and overflow. Native Electron repeats the page,
+editor, Create/Cancel transition, and unavailable recovery. Product
+screenshots are optional local-only references; the task-copy region is masked
+because it is host-owned content:
+
+```bash
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_REFERENCE=/absolute/path/to/scheduled-wide.png \
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_COMPACT_REFERENCE=/absolute/path/to/scheduled-compact.png \
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MANUAL_REFERENCE=/absolute/path/to/scheduled-manual-wide.png \
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MANUAL_COMPACT_REFERENCE=/absolute/path/to/scheduled-manual-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=scheduled-current-26-825,scheduled-current-26-825-compact,scheduled-current-26-825-manual,scheduled-current-26-825-manual-compact
+```
+
+All actual task mutations, execution, notification delivery, and backend
+integration remain host-supplied. Reviewed replay baselines are committed;
+task content, product screenshots, and isolated profile data are not.
+
 ## Development
 
 From the repository root:

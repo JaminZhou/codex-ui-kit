@@ -557,7 +557,17 @@ The authoritative current-build inventory is:
   and unavailable recovery while keeping exact third-party icons and all
   install/discovery effects host-owned. Main-region local-only comparisons
   pass between 3.3067% and 5.1784%; plugin detail, installation, permission,
-  skill execution, MCP, and automations remain open.
+  skill execution and MCP remain open.
+- Current `26.825.51511` Scheduled tasks now has an independent public
+  component family for the index, status filters, search, suggestions, split
+  Create menu, task navigator, and controlled manual editor. Read-only product
+  observation covers wide/720 layout, Active/Paused/Completed empty behavior,
+  no-match search, the safe Create choices, editor geometry, and all fixed
+  field menus except the content-bearing Chat picker. Browser/CDP, native
+  Electron, four reviewed baselines, and four local-only main-region product
+  comparisons pass between 1.2120% and 2.1933%. Actual task pause/resume,
+  create/edit submission, task detail, notification delivery, and failure/
+  permission transitions remain host-owned and explicitly open.
 - A successful current Browser activity did not expose a mounted Browser
   workspace route in the sampled task. `workspace.browser` consequently
   remains `partial_legacy`; activity evidence is not promoted into workspace

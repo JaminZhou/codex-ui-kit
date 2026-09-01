@@ -2147,15 +2147,20 @@
       "ownership": "app",
       "packageEvidence": [
         "automations-page",
-        "use-plugin-scheduled-tasks"
+        "use-plugin-scheduled-tasks",
+        "scheduled-tasks-public-components",
+        "browser-cdp:current-26-825-scheduled-wide-compact-editor-search-filter-menu",
+        "electron:current-26-825-scheduled-page-editor-unavailable",
+        "pixel:current-26-825-scheduled-main-wide-compact-editor"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:scheduled-index-filters-search-suggestions"
+        "cdp:scheduled-index-filters-search-suggestions",
+        "cdp-26.825.51511:scheduled-wide-compact-filter-empty-create-menu-manual-editor"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {
