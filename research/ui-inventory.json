@@ -520,16 +520,22 @@
       "packageEvidence": [
         "local-conversation-thread",
         "subagent-panel",
-        "app-asar-26.803.41515:collaboration-status-set-active-done-classifier-and-4-10-panel-limits"
+        "app-asar-26.803.41515:collaboration-status-set-active-done-classifier-and-4-10-panel-limits",
+        "replay:current-26.825-single-subagent-running-completed-panel-and-transcript",
+        "browser-cdp:current-26.825-subagent-wide-820-and-720-contract",
+        "electron:current-26.825-subagent-panel-transcript-and-native-resize",
+        "pixel:reviewed-current-26.825-single-subagent-lifecycle"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.730.61639:real-single-subagent-running-completed-summary-panel-and-transcript",
-        "cdp-26.730.61639:subagent-panel-computed-styles-and-explicit-820x680-and-720x680-reopen-geometry"
+        "cdp-26.730.61639:subagent-panel-computed-styles-and-explicit-820x680-and-720x680-reopen-geometry",
+        "cdp-26.825.51511:real-single-subagent-inline-chip-active-done-panel-transcript-and-current-avatar",
+        "cdp-26.825.51511:subagent-panel-419.59375-wide-319-medium-and-345.671875-compact-geometry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -539,17 +545,24 @@
       "packageEvidence": [
         "local-conversation-thread",
         "subagent-panel",
-        "app-asar-26.803.41515:collaboration-status-set-active-done-classifier-and-4-10-panel-limits"
+        "app-asar-26.803.41515:collaboration-status-set-active-done-classifier-and-4-10-panel-limits",
+        "replay:current-26.825-concurrent-and-nested-subagent-lifecycles",
+        "browser-cdp:current-26.825-flat-active-done-panel-and-nested-transcript",
+        "electron:current-26.825-concurrent-nested-panel-and-transcript",
+        "pixel:reviewed-current-26.825-concurrent-and-nested-subagents"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.730.61639:real-concurrent-subagents-running-mixed-completed-summary-panel-and-independent-transcripts",
         "cdp-26.730.61639:real-nested-parent-child-agent-paths-flat-panel-mixed-lifecycle-and-independent-transcripts",
-        "cdp-26.730.61639:concurrent-and-nested-computed-styles-and-nine-regional-pixel-gates"
+        "cdp-26.730.61639:concurrent-and-nested-computed-styles-and-nine-regional-pixel-gates",
+        "cdp-26.825.51511:real-concurrent-alpha-beta-running-completed-flat-panel-and-transcripts",
+        "cdp-26.825.51511:real-nested-parent-child-main-parent-only-parent-child-drilldown-and-flat-global-list",
+        "cdp-26.825.51511:concurrent-and-nested-wide-compact-current-avatar-and-panel-geometry"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

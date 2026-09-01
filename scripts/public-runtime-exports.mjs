@@ -123,6 +123,7 @@ export const publicRuntimeExports = [
   "SubagentActivityGroup",
   "SubagentAvatar",
   "SubagentPanel",
+  "SubagentPanelIcon",
   "SubagentSummary",
   "SubagentTranscriptHeader",
   "SystemErrorNotice",

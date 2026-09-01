@@ -5459,7 +5459,7 @@ try {
       document
         .querySelector(".codex-ui-app-shell")
         ?.getAttribute("data-layout-mode") === "narrow" &&
-      document
+      !document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
     undefined,
@@ -5467,11 +5467,13 @@ try {
   );
   const compactState = await currentMixedToolPage.evaluate(() => {
     const composer = document.querySelector(".codex-ui-composer");
+    const shell = document.querySelector(".codex-ui-app-shell");
     return {
       composerWidth: composer?.getBoundingClientRect().width,
       horizontalOverflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
+      sidePanelOpen: shell?.hasAttribute("data-side-panel-open") ?? false,
       visibleNavigation: Array.from(document.querySelectorAll("nav")).some(
         (element) =>
           element instanceof HTMLElement &&
@@ -5507,9 +5509,10 @@ try {
     reviewState.path !== "research/MIXED_TOOL_THREAD.md" ||
     !transcript?.includes("Mixed audit") ||
     !transcript.includes("All listed mixed-tool surfaces are represented.") ||
-    !compactState.visibleNavigation ||
+    compactState.visibleNavigation ||
+    compactState.sidePanelOpen ||
     compactState.horizontalOverflow > 1 ||
-    Math.abs((compactState.composerWidth ?? 0) - 414) > 1
+    Math.abs((compactState.composerWidth ?? 0) - 688) > 1
   ) {
     throw new Error(
       `Current Electron mixed-tool workflow drifted: ${JSON.stringify({ compactState, mcpState, researchState, reviewState, transcript })}`,
@@ -15478,8 +15481,8 @@ try {
     wideSubagent.summary ||
     !wideSubagent.side ||
     !wideSubagent.panel ||
-    Math.abs(wideSubagent.side.left - 810.71875) > 1 ||
-    Math.abs(wideSubagent.side.width - 369.28125) > 1 ||
+    Math.abs(wideSubagent.side.left - 760.40625) > 1 ||
+    Math.abs(wideSubagent.side.width - 419.59375) > 1 ||
     Math.abs(wideSubagent.panel.top - 46) > 1 ||
     Math.abs(wideSubagent.panel.height - 774) > 1
   ) {
@@ -15494,8 +15497,10 @@ try {
     await subagentPage.getByTestId("subagent-transcript").textContent()
   )?.replace(/\s+/g, " ").trim();
   if (
-    !transcriptText?.includes("Long probe") ||
-    !transcriptText.includes("SUBAGENT LONG PROBE DONE") ||
+    !transcriptText?.includes("Verifier") ||
+    !transcriptText.includes(
+      "Verified 100 deterministic user-interface invariants.",
+    ) ||
     (await subagentPage
       .getByRole("toolbar", { name: "Subagent response actions" })
       .count()) !== 1
@@ -15561,7 +15566,7 @@ try {
   await subagentPage.waitForFunction(
     () =>
       window.innerWidth === 720 &&
-      document
+      !document
         .querySelector(".codex-ui-app-shell")
         ?.hasAttribute("data-sidebar-open"),
   );
@@ -15577,16 +15582,16 @@ try {
     )?.getBoundingClientRect();
     return (
       shell?.hasAttribute("data-side-panel-open") &&
-      Math.abs((side?.left ?? 0) - 420) <= 1 &&
-      Math.abs((side?.width ?? 0) - 300) <= 1
+      Math.abs((side?.left ?? 0) - 374.328125) <= 1 &&
+      Math.abs((side?.width ?? 0) - 345.671875) <= 1
     );
   });
   const compact720Subagent = await measureSubagentLayout();
   if (
-    !compact720Subagent.sidebarOpen ||
+    compact720Subagent.sidebarOpen ||
     !compact720Subagent.panelOverlay ||
-    compact720Subagent.sidebar?.right !== 274 ||
-    compact720Subagent.main?.width !== 446 ||
+    compact720Subagent.sidebar?.right !== 0 ||
+    compact720Subagent.main?.width !== 720 ||
     compact720Subagent.horizontalOverflow > 1
   ) {
     throw new Error(
@@ -15606,7 +15611,7 @@ for (const collaborationScene of [
     active: 1,
     done: 1,
     transcriptAgent: "Alpha",
-    transcriptMessage: "ALPHA SUBAGENT DONE",
+    transcriptMessage: "Produced 120 deterministic layout invariants.",
   },
   {
     frame: "subagent-nested-panel-mixed",
@@ -15616,7 +15621,8 @@ for (const collaborationScene of [
     active: 1,
     done: 1,
     transcriptAgent: "Child",
-    transcriptMessage: "CHILD SUBAGENT DONE",
+    transcriptMessage:
+      "Produced exactly 160 numbered nested-interface invariants.",
   },
 ]) {
   const { app, page } = await launchScene(collaborationScene, {
@@ -15671,7 +15677,6 @@ for (const recoveryScene of [
     active: 12,
     frame: "subagent-recovery-panel-streaming",
     initialRows: 4,
-    message: "Parsed 4 of 12 lifecycle events.",
     pageSize: 4,
   },
   {
@@ -15680,7 +15685,6 @@ for (const recoveryScene of [
     done: 12,
     frame: "subagent-recovery-panel-terminal",
     initialRows: 10,
-    message: "Validation failed: fixture mismatch.",
     pageSize: 2,
   },
 ]) {
@@ -15705,7 +15709,7 @@ for (const recoveryScene of [
       !panelText?.includes(`Active · ${recoveryScene.active}`) ||
       (recoveryScene.done !== undefined &&
         !panelText.includes(`Done · ${recoveryScene.done}`)) ||
-      !panelText.includes(recoveryScene.message) ||
+      (await panel.locator(".codex-ui-subagent-panel__preview").count()) !== 0 ||
       !timelineText?.endsWith(recoveryScene.activity) ||
       (await panel.locator(".codex-ui-subagent-panel__item").count()) !==
         recoveryScene.initialRows

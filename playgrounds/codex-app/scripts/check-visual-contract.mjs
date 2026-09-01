@@ -7045,11 +7045,11 @@ for (const scene of selectedScenes) {
   ) {
     await compareCurrentBuildOverlay({
       actual,
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       defaultMaximumRatio: 0.045,
       masks: [{ height: 32, left: 328, top: 170, width: 42 }],
       maximumRatioName: "CODEX_UI_KIT_SUBAGENT_PANEL_MAX_DIFF_RATIO",
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentPanelReference,
       sceneId: scene.id,
     });
@@ -7061,12 +7061,12 @@ for (const scene of selectedScenes) {
   ) {
     await compareCurrentBuildOverlay({
       actual,
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       defaultMaximumRatio: 0.045,
       masks: [],
       maximumRatioName:
         "CODEX_UI_KIT_SUBAGENT_TRANSCRIPT_MAX_DIFF_RATIO",
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentTranscriptReference,
       sceneId: scene.id,
     });
@@ -7084,55 +7084,55 @@ for (const scene of selectedScenes) {
       referencePath: currentBuildSubagentConcurrentMixedReference,
     },
     "subagent-concurrent-panel-mixed": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       masks: [{ height: 32, left: 328, top: 66, width: 42 }],
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentConcurrentMixedReference,
     },
     "subagent-concurrent-panel-completed": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       masks: [
         { height: 32, left: 328, top: 170, width: 42 },
         { height: 32, left: 328, top: 228, width: 42 },
       ],
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentConcurrentCompletedReference,
     },
     "subagent-concurrent-transcript-beta": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentConcurrentTranscriptReference,
     },
     "subagent-nested-panel-running": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       masks: [
         { height: 32, left: 328, top: 66, width: 42 },
         { height: 32, left: 328, top: 124, width: 42 },
       ],
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentNestedRunningReference,
     },
     "subagent-nested-panel-mixed": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       masks: [
         { height: 32, left: 328, top: 66, width: 42 },
         { height: 32, left: 328, top: 170, width: 42 },
       ],
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentNestedMixedReference,
     },
     "subagent-nested-panel-completed": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
       masks: [
         { height: 32, left: 328, top: 170, width: 42 },
         { height: 32, left: 328, top: 228, width: 42 },
       ],
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentNestedCompletedReference,
     },
     "subagent-nested-transcript-child": {
-      actualBounds: { height: 820, left: 810, top: 0, width: 370 },
-      referenceCrop: { height: 820, left: 810, top: 0, width: 370 },
+      actualBounds: { height: 820, left: 760, top: 0, width: 420 },
+      referenceCrop: { height: 820, left: 760, top: 0, width: 420 },
       referencePath: currentBuildSubagentNestedTranscriptReference,
     },
   }[scene.id];

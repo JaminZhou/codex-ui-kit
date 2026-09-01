@@ -271,20 +271,20 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "subagent-delegation": scenario(
     "subagent-delegation",
-    "Delegate single subagent probe",
-    "A current real subagent moves from working activity through the thread summary into the Subagents panel and nested transcript.",
+    "Verify single subagent acceptance",
+    "The runtime-observed 26.825 single Verifier moves from an inline working chip to the flat Subagents list and independent transcript, then disappears from the settled main timeline.",
     subagentDelegationTrace,
   ),
   "subagent-concurrency": scenario(
     "subagent-concurrency",
-    "Delegate concurrent subagents",
-    "Two current real sibling subagents aggregate across running, mixed, completed, summary, panel, and independent transcript states.",
+    "验证并发子代理约束",
+    "The runtime-observed 26.825 Alpha and Beta siblings aggregate as inline chips, sort by lifecycle time in the Active/Done list, and open independent transcripts.",
     subagentConcurrencyTrace,
   ),
   "subagent-nested": scenario(
     "subagent-nested",
-    "Run nested subagent probe",
-    "A current real Parent delegates Child; public agent paths preserve the hierarchy while the current panel presents both agents in one flat lifecycle list.",
+    "Validate nested subagent delegation",
+    "The runtime-observed 26.825 Parent delegates Child: the main timeline shows only Parent, Parent's transcript drills into Child, and the global panel keeps both agents in one flat lifecycle list.",
     subagentNestedTrace,
   ),
   "subagent-recovery": scenario(

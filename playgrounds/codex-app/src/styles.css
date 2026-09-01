@@ -2238,6 +2238,12 @@ textarea {
   min-width: 0;
 }
 
+.demo-subagent-panel-tab-label > svg {
+  flex: 0 0 auto;
+  height: 1.125rem;
+  width: 1rem;
+}
+
 .demo-subagent-panel-tab-label > span:last-child {
   min-width: 0;
   overflow: hidden;
@@ -2297,6 +2303,11 @@ textarea {
   width: 1.75rem;
 }
 
+.demo-subagent-panel-header-action svg {
+  height: 1rem;
+  width: 1rem;
+}
+
 .demo-subagent-panel-header-spacer {
   flex: 1 1 auto;
 }
@@ -2343,7 +2354,23 @@ textarea {
     [data-scenario="subagent-nested"],
     [data-scenario="subagent-recovery"]
   )
-  .codex-ui-subagent-panel__item-heading,
+  .codex-ui-subagent-panel__item-heading {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+.demo-root:is(
+    [data-scenario="subagent-delegation"],
+    [data-scenario="subagent-concurrency"],
+    [data-scenario="subagent-nested"],
+    [data-scenario="subagent-recovery"]
+  )
+  .codex-ui-subagent-panel__item-heading
+  time {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
 .demo-root:is(
     [data-scenario="subagent-delegation"],
     [data-scenario="subagent-concurrency"],
@@ -2360,15 +2387,28 @@ textarea {
   min-height: 0;
 }
 
-.demo-subagent-transcript > .codex-ui-agent-message {
+.demo-subagent-transcript-body {
   padding: 2rem 1rem 0;
 }
 
 .demo-subagent-transcript
-  > .codex-ui-agent-message
+  .codex-ui-agent-message
   .codex-ui-agent-message__actions {
   margin-top: 0.125rem;
   opacity: 1;
+}
+
+.demo-subagent-transcript-thinking {
+  color: var(--codex-ui-text-tertiary);
+  font-size: 0.875rem;
+  line-height: 1.3125rem;
+  margin: 1rem 0 0;
+}
+
+.demo-subagent-transcript-body
+  > .codex-ui-activity-timeline
+  + .codex-ui-agent-message {
+  margin-top: 1rem;
 }
 
 .demo-subagent-summary-panel {

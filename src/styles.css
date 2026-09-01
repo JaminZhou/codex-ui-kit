@@ -15654,7 +15654,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   width: 1.5rem;
 }
 
-.codex-ui-subagent-avatar svg {
+.codex-ui-subagent-avatar svg,
+.codex-ui-subagent-avatar img {
   display: block;
   height: 100%;
   overflow: visible;

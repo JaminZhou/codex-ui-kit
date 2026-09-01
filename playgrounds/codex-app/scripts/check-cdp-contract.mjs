@@ -7078,6 +7078,10 @@ for (const scene of selectedScenes) {
         const panelRow = panel?.querySelector(
           ".codex-ui-subagent-panel__item",
         );
+        const panelItemHeading = panel?.querySelector(
+          ".codex-ui-subagent-panel__item-heading",
+        );
+        const panelRowTime = panel?.querySelector("time");
         const transcript = document.querySelector(
           '[data-testid="subagent-transcript"]',
         );
@@ -7097,6 +7101,10 @@ for (const scene of selectedScenes) {
           panel: {
             heading: rect(panelHeading),
             headingStyle: style(panelHeading),
+            itemHeadingStyle: style(panelItemHeading),
+            previewCount:
+              panel?.querySelectorAll(".codex-ui-subagent-panel__preview")
+                .length ?? 0,
             rect: rect(panel),
             row: rect(panelRow),
             rowNames: panel
@@ -7113,6 +7121,7 @@ for (const scene of selectedScenes) {
                 }))
               : [],
             rowStyle: style(panelRow),
+            rowTimeStyle: style(panelRowTime),
             sectionCount:
               panel?.querySelectorAll(
                 ".codex-ui-subagent-panel__section",
@@ -7174,13 +7183,13 @@ for (const scene of selectedScenes) {
       const expectedSideWidth = compact820
         ? 319
         : compact720
-          ? 329.3125
-          : 369.28125;
+          ? 345.671875
+          : 419.59375;
       const expectedSideLeft = compact820
         ? 501
         : compact720
-          ? 390.6875
-          : 810.71875;
+          ? 374.328125
+          : 760.40625;
       const concurrent = scene.scenario === "subagent-concurrency";
       const nested = scene.scenario === "subagent-nested";
       const activeCount = recovery
@@ -7214,10 +7223,8 @@ for (const scene of selectedScenes) {
         : concurrent
           ? ["AlphaBetastarted working"]
           : nested
-            ? mixed
-              ? ["Child finished", "Parent started working"]
-              : ["Child started working", "Parent started working"]
-            : ["Long probe started working"];
+            ? ["Parentstarted working"]
+            : ["Verifierstarted working"];
       const recoveryRows = [
         "Planner",
         "Streamer",
@@ -7240,7 +7247,7 @@ for (const scene of selectedScenes) {
           ? mixed || !running
             ? ["Parent", "Child"]
             : ["Child", "Parent"]
-          : ["Long probe"];
+          : ["Verifier"];
       const expectedPanelTimes = recovery
         ? expectedPanelRows.map(() => (recoveryStreaming ? "0s" : "1m ago"))
         : !running
@@ -7249,10 +7256,10 @@ for (const scene of selectedScenes) {
           ? ["0s", "1m ago"]
           : expectedPanelRows.map(() => "0s");
       const expectedCompletedDuration = concurrent
-        ? "Worked for 1m 19s"
+        ? "Worked for 57s"
         : nested
-          ? "Worked for 1m 2s"
-          : "Worked for 45s";
+          ? "Worked for 1m 6s"
+          : "Worked for 38s";
       if (
         contract.frame !== scene.frame ||
         contract.status !== (running ? "running" : "completed") ||
@@ -7346,31 +7353,18 @@ for (const scene of selectedScenes) {
             `Active · ${activeCount}`,
           ) ||
           !contract.panel.text?.includes(
-            recovery
-              ? recoveryStreaming
-                ? "Parsed 4 of 12 lifecycle events."
-                : "Validation failed: fixture mismatch."
-              : concurrent
-              ? mixed
-                ? "clarifying command execution constraints"
-                : running
-                  ? "Working"
-                  : "BETA SUBAGENT DONE"
-              : nested
-                ? mixed
-                  ? "CHILD SUBAGENT DONE"
-                  : running
-                    ? "Working"
-                    : "PARENT SUBAGENT DONE."
-                : running
-                  ? "Working"
-                  : "SUBAGENT LONG PROBE DONE",
+            activeCount === 0 ? "No active subagents" : `Active · ${activeCount}`,
           ) ||
           (doneCount > 0 &&
             !contract.panel.text?.includes(`Done · ${doneCount}`)) ||
           contract.panel.headingStyle?.fontSize !== "13px" ||
           contract.panel.headingStyle?.lineHeight !== "18.5712px" ||
           contract.panel.headingStyle?.padding !== "0px 8px" ||
+          contract.panel.itemHeadingStyle?.fontSize !== "14px" ||
+          contract.panel.itemHeadingStyle?.lineHeight !== "24px" ||
+          contract.panel.rowTimeStyle?.fontSize !== "12px" ||
+          contract.panel.rowTimeStyle?.lineHeight !== "16px" ||
+          contract.panel.previewCount !== 0 ||
           contract.panel.rowStyle?.padding !== "8px" ||
           contract.panel.rowStyle?.gap !== "12px" ||
           contract.panel.rowStyle?.borderRadius !== "12.5px")
@@ -7394,20 +7388,20 @@ for (const scene of selectedScenes) {
                 ? scene.frame.endsWith("parent")
                   ? "Parent"
                   : "Child"
-                : "Long probe",
+                : "Verifier",
           ) ||
           !contract.transcript.text?.includes(
             recovery
               ? "Validation failed: fixture mismatch."
               : concurrent
               ? scene.frame.endsWith("alpha")
-                ? "ALPHA SUBAGENT DONE"
-                : "BETA SUBAGENT DONE"
+                ? "Produced 120 deterministic layout invariants."
+                : "Produced 120 deterministic interaction invariants."
               : nested
                 ? scene.frame.endsWith("parent")
-                  ? "PARENT SUBAGENT DONE."
-                  : "CHILD SUBAGENT DONE"
-                : "SUBAGENT LONG PROBE DONE",
+                  ? "Child completed the independently produced checklist. I verified it contains exactly 160 numbered items, continuously numbered 1 through 160."
+                  : "Produced exactly 160 numbered nested-interface invariants."
+                : "Verified 100 deterministic user-interface invariants.",
           ))
       ) {
         throw new Error(
@@ -8327,6 +8321,11 @@ for (const scene of selectedScenes) {
             : scene.subagentStatus !== undefined
               ? "subagent"
               : null;
+      if (scene.subagentStatus !== undefined) {
+        await page.waitForSelector(
+          `.demo-root[data-frame="${scene.frame}"] .codex-ui-subagent-activity-group`,
+        );
+      }
       const mixed = await page.evaluate((timelineSurface) => {
         const rect = (element) => {
           if (!(element instanceof Element)) return null;
@@ -8355,7 +8354,7 @@ for (const scene of selectedScenes) {
           ".codex-ui-approval-request",
         );
         const subagent = document.querySelector(
-          ".codex-ui-subagent-activity",
+          ".codex-ui-subagent-activity-group",
         );
         const timeline =
           timelineSurface === "search"
@@ -8496,7 +8495,14 @@ for (const scene of selectedScenes) {
             : null,
           subagent: subagent
             ? {
-                status: subagent.getAttribute("data-status"),
+                status:
+                  subagent
+                    .querySelector(
+                      ".codex-ui-subagent-activity-group__status",
+                    )
+                    ?.textContent?.trim() === "finished"
+                    ? "done"
+                    : "active",
                 text: subagent.textContent?.replace(/\s+/g, " ").trim(),
               }
             : null,

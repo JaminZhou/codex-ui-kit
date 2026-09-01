@@ -79,10 +79,10 @@ import {
   SettingsShell,
   StatusBanner,
   StreamNotice,
-  SubagentActivity,
   SubagentActivityGroup,
   SubagentAvatar,
   SubagentPanel,
+  SubagentPanelIcon,
   SubagentTranscriptHeader,
   SystemErrorNotice,
   TerminalPanel,
@@ -872,6 +872,10 @@ function currentSubagentPanelFrame(frame: string | null) {
   );
 }
 
+function currentSubagentCompact720Frame(frame: string | null) {
+  return frame?.endsWith("compact-720") ?? false;
+}
+
 function currentWorkspacePersistenceFrame(frame: string | null) {
   return (
     frame === "workspace-persisted-thread" ||
@@ -880,7 +884,7 @@ function currentWorkspacePersistenceFrame(frame: string | null) {
 }
 
 function initialSubagentId(frame: string | null) {
-  if (frame === "subagent-current-transcript") return "long-probe";
+  if (frame === "subagent-current-transcript") return "verifier";
   if (frame?.endsWith("transcript-alpha")) return "alpha";
   if (frame?.endsWith("transcript-beta")) return "beta";
   if (frame?.endsWith("transcript-parent")) return "parent";
@@ -3214,7 +3218,7 @@ export function App() {
         initialSelection.frame !== "mcp-current-integration-recovered" &&
         initialSelection.frame !== "mcp-current-recovery-completed" &&
         initialSelection.frame !== "current-mixed-completed" &&
-        initialSelection.frame !== "subagent-current-compact-720" &&
+        !currentSubagentCompact720Frame(initialSelection.frame) &&
         initialSelection.sidebarState !== "compact-collapsed") ||
         !isNarrowDemoWindow()),
   );
@@ -3269,8 +3273,8 @@ export function App() {
     initialSelection.frame === "subagent-current-compact-820"
       ? 319
       : initialSelection.frame === "subagent-current-compact-720"
-        ? 329.3125
-        : 369.28125,
+        ? 345.671875
+        : 419.59375,
   );
   const [terminalOpen, setTerminalOpen] = useState(
     initialSelection.scenarioId === "background-terminal" ||
@@ -3730,12 +3734,13 @@ export function App() {
   useEffect(() => {
     if (!hasSubagentSurface) return;
     const syncSubagentPanelWidth = () => {
+      if (window.innerWidth <= 720) setSidebarOpen(false);
       setSubagentPanelWidth(
         window.innerWidth <= 720
-          ? 329.3125
+          ? 345.671875
           : window.innerWidth <= 820
             ? 319
-            : 369.28125,
+            : 419.59375,
       );
     };
     syncSubagentPanelWidth();
@@ -4208,9 +4213,9 @@ export function App() {
     setSubagentPanelWidth(
       frame === "subagent-current-compact-820"
         ? 319
-        : frame === "subagent-current-compact-720"
-          ? 329.3125
-          : 369.28125,
+        : currentSubagentCompact720Frame(frame)
+          ? 345.671875
+          : 419.59375,
     );
     setTerminalOpen(
       nextId === "background-terminal" ||
@@ -5980,6 +5985,26 @@ export function App() {
   );
   const selectedSubagent =
     subagentItems.find(({ id }) => id === selectedSubagentId) ?? null;
+  const selectedSubagentRecord = selectedSubagent
+    ? state.subagents.find(({ id }) => id === selectedSubagent.id) ?? null
+    : null;
+  const selectedSubagentChildren = selectedSubagent
+    ? state.subagents.filter(
+        ({ senderThreadId }) => senderThreadId === selectedSubagent.id,
+      )
+    : [];
+  const selectedSubagentChildItems = selectedSubagentChildren.map((subagent) =>
+    presentSubagent(subagent, mode, subagentClockMs),
+  );
+  const selectedSubagentDurationMs = selectedSubagent
+    ? selectedSubagentChildren.length > 0
+      ? Math.max(
+          0,
+          (selectedSubagentRecord?.completedAtMs ?? 0) -
+            (selectedSubagentRecord?.startedAtMs ?? 0),
+        )
+      : 0
+    : 0;
   const summarySubagentItems = useMemo(
     () =>
       subagentItems
@@ -10026,7 +10051,7 @@ export function App() {
             className="demo-subagent-panel-header-action"
             type="button"
           >
-            +
+            <CurrentBuildIcon name="composer-add-files" />
           </button>
           <span className="demo-subagent-panel-header-spacer" />
           <button
@@ -10034,14 +10059,14 @@ export function App() {
             className="demo-subagent-panel-header-action"
             type="button"
           >
-            ⌜
+            <CurrentBuildIcon name="review-expand" />
           </button>
           <button
             aria-label="Toggle bottom panel"
             className="demo-subagent-panel-header-action"
             type="button"
           >
-            ▱
+            <CurrentBuildIcon name="thread-header-bottom-panel" />
           </button>
           <button
             aria-label="Toggle side panel"
@@ -10049,7 +10074,7 @@ export function App() {
             onClick={() => setSubagentPanelOpen(false)}
             type="button"
           >
-            ▯
+            <CurrentBuildIcon name="thread-header-side-panel" />
           </button>
         </>
       }
@@ -10071,17 +10096,53 @@ export function App() {
                 item={selectedSubagent}
                 onBack={() => setSelectedSubagentId(null)}
               />
-              <AgentMessage
-                actions={
-                  <McpResponseActions
-                    includeFork={false}
-                    label="Subagent response actions"
+              <div className="demo-subagent-transcript-body">
+                {selectedSubagent.status === "done" &&
+                selectedSubagentChildren.length > 0 ? (
+                  <ActivityTimeline
+                    open={false}
+                    summary={
+                      <TurnDuration
+                        durationMs={selectedSubagentDurationMs}
+                        status="worked"
+                      />
+                    }
                   />
-                }
-                role="assistant"
-              >
-                {selectedSubagent.lastMessage ?? "Working"}
-              </AgentMessage>
+                ) : null}
+                {selectedSubagent.status !== "done" ? (
+                  <>
+                    {selectedSubagentChildItems.filter(
+                      ({ status }) => status !== "done",
+                    ).length > 0 ? (
+                      <SubagentActivityGroup
+                        items={selectedSubagentChildItems
+                          .filter(({ status }) => status !== "done")
+                          .map((item) => ({
+                            activityStatus: "active",
+                            id: item.id,
+                            name: item.name,
+                          }))}
+                        onOpen={(item) => setSelectedSubagentId(item.id)}
+                      />
+                    ) : null}
+                    <p className="demo-subagent-transcript-thinking">
+                      Thinking
+                    </p>
+                  </>
+                ) : selectedSubagent.lastMessage ? (
+                  <AgentMessage
+                    actions={
+                      <McpResponseActions
+                        includeFork={false}
+                        label="Subagent response actions"
+                      />
+                    }
+                    role="assistant"
+                  >
+                    {selectedSubagent.lastMessage}
+                  </AgentMessage>
+                ) : null}
+              </div>
             </div>
           ) : (
             <SubagentPanel
@@ -10089,12 +10150,13 @@ export function App() {
               data-testid="subagent-panel"
               items={subagentItems}
               onSelect={(item) => setSelectedSubagentId(item.id)}
+              showPreviews={false}
             />
           ),
           id: "subagents",
           label: (
             <span className="demo-subagent-panel-tab-label">
-              <SubagentAvatar seed="long-probe" size="tiny" />
+              <SubagentPanelIcon />
               <span>Subagents</span>
             </span>
           ),
@@ -12297,6 +12359,12 @@ export function App() {
     if (entry.kind === "subagent") {
       const presentation = subagentTimelinePresentation(state, entry.id);
       if (!presentation || presentation.anchor.callId !== entry.id) return null;
+      if (
+        presentation.anchor.senderThreadId !== null &&
+        presentation.anchor.senderThreadId !== state.threadId
+      ) {
+        return null;
+      }
       const groupTurnId = presentation.turnId;
       const turnActive = presentation.active;
       const groupedSubagents = presentation.rows;
@@ -12352,7 +12420,13 @@ export function App() {
                 : {
                     durationMs:
                       working.length > 0
-                        ? 14_000
+                        ? scenarioId === "subagent-delegation"
+                          ? 25_000
+                          : scenarioId === "subagent-concurrency"
+                            ? 10_000
+                            : scenarioId === "subagent-nested"
+                              ? 31_000
+                              : 14_000
                         : settledTurnDurationMs !== undefined
                           ? settledTurnDurationMs
                           : turnActive &&
@@ -12365,7 +12439,7 @@ export function App() {
             />
           }
         >
-          {activityItems.length > 1 ? (
+          {activityItems.length > 0 ? (
             <SubagentActivityGroup
               items={activityItems.map((item) => ({
                 activityStatus: activityStatuses.get(item.id) ?? "active",
@@ -12374,21 +12448,7 @@ export function App() {
               }))}
               onOpen={(item) => openSubagentPanel(item.id)}
             />
-          ) : (
-            activityItems.map((item) => (
-              <SubagentActivity
-                item={{
-                  activityStatus: activityStatuses.get(item.id) ?? "active",
-                  id: item.id,
-                  name: item.name,
-                }}
-                key={item.id}
-                onOpen={() => {
-                  openSubagentPanel(item.id);
-                }}
-              />
-            ))
-          )}
+          ) : null}
         </ActivityTimeline>
       );
     }
@@ -13807,7 +13867,7 @@ export function App() {
             initialSelection.layoutMode !== "narrow" &&
             activeFrame !== "pr-compact-detail" &&
             initialSelection.frame !== "route-continuity-projects" &&
-            activeFrame !== "subagent-current-compact-720" &&
+            !currentSubagentCompact720Frame(activeFrame) &&
             ![
               "compact-collapsed",
               "compact-pinned",

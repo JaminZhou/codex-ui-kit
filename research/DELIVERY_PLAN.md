@@ -14,8 +14,17 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 62 groups have current-build runtime evidence, 18 have previous-build-only
+- 64 groups have current-build runtime evidence, 16 have previous-build-only
   runtime evidence, and 11 have not been sampled.
+- The current subagent refresh promotes `thread.subagent-delegation` and
+  `thread.subagent-collaboration` from previous-build presentation evidence to
+  `26.825.51511`. Three real tasks lock the active inline chip, completed-chip
+  removal, flat preview-free Active/Done panel, root-only Parent activity,
+  Parent → Child transcript drilldown, five exact observed avatars, and the
+  419.59375/319/345.671875px wide/820/720 panel widths. Twenty-one focused
+  CDP frames, native Electron interactions, and reviewed pixels gate the
+  deterministic replay; failure/interruption reachability remains a separate
+  product capture.
 - The current transport-recovery follow-up promotes
   `thread.error-retry-recovery`. A real response stream in one isolated
   per-process proxy instance keeps the standard `Reconnecting 1/5` row, emits
@@ -480,13 +489,17 @@ exit gates; it does not replace the inventory.
   project-labelled/global-indexed tabs, close-nearest and label reindexing,
   the four-item picker, three-tab 820×680 fit, independent transcript state,
   close/reopen while running, close-last collapse, and fresh terminal creation
-  from the top Toggle. The same refresh now also covers one real delegated
+  from the top Toggle. That previous refresh also covered one real delegated
   subagent through active work, completion, summary, panel, transcript, and
   explicit 820×680/720×680 reopen. Two more current tasks now cover concurrent
   siblings plus a Parent → Child delegation through active, mixed, completed,
   summary, flat-panel, live-progress, and independent transcript states while
-  retaining public `agentPath` hierarchy. Browser/CDP covers 156 lifecycle
-  frames; Electron repeats
+  retaining public `agentPath` hierarchy. The current `26.825.51511` refresh
+  supersedes the success presentation with root-only Parent activity, child
+  drilldown inside the Parent transcript, preview-free flat lists, current
+  avatars, and 419.59375/345.671875px wide/720 widths. Browser/CDP retains the
+  broader regression matrix while independently gating the focused current
+  lifecycle; Electron repeats
   the session, mismatch, input, picker, close, and resize interactions; the
   current 906×820 panel/content pixel ratios pass at 1.5120%/0.4004%.
   The single-subagent summary/panel/transcript regional ratios pass at

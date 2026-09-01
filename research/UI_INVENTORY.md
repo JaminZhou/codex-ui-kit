@@ -265,7 +265,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 62 have current-build runtime evidence, 18 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 57 groups and Electron verification covers 57.
+Current inventory: 91 surface groups; 64 have current-build runtime evidence, 16 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 59 groups and Electron verification covers 59.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1913,6 +1913,24 @@ text-heavy nested main-activity band passes at `0.11495227995758218` under its
 independent 0.125 limit, and three reviewed internal recovery baselines pass.
 Product runtime reachability for those recovery transitions and transport
 recovery remain separate gates.
+
+The `26.825.51511` refresh supersedes the sampled primary success and
+collaboration presentation. Three disposable real tasks cover Verifier,
+concurrent Alpha/Beta, and nested Parent → Child delegation. The current main
+timeline uses one inline avatar chip group while work is active, removes the
+chips after completion, and exposes only Parent at the root of the nested
+task; Child appears inside Parent's transcript. The global side panel remains
+flat, separates `Active · n` and `Done · n`, shows no message previews, and
+drills into each transcript without inventing a tree. The current wide panel
+is 419.59375px; the explicit 820px continuity remains 319px; the hidden-sidebar
+720px split is 374.328125/345.671875px. Exact runtime-rendered Verifier,
+Alpha, Beta, Parent, and Child SVG avatars are committed with explicit
+upstream provenance, while screenshots, task identifiers, and profile data
+remain local-only. Twenty-one focused Browser/CDP frames and native Electron
+interactions gate the current single, concurrent, nested, recovery, panel,
+transcript, and compact contracts. The broader waiting/failure/interruption
+matrix stays protocol-backed rather than being promoted as freshly reached
+product behavior.
 
 This is a measurement- and raster-backed basic thread/workspace slice, not a
 claim that the whole application or every lifecycle is pixel-perfect. Broader
