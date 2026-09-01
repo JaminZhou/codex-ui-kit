@@ -1760,7 +1760,8 @@
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.825.31414:real-one-tab-419.59375-browser-workspace-with-46px-tabs-40px-toolbar-and-external-content-boundary"
+        "cdp-26.825.31414:real-one-tab-419.59375-browser-workspace-with-46px-tabs-40px-toolbar-and-external-content-boundary",
+        "cdp-26.825.51511:public-browser-activity-succeeded-but-no-current-workspace-browser-route-or-mounted-panel-was-reachable"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -2102,15 +2103,20 @@
       "packageEvidence": [
         "plugins-page",
         "plugin-detail-page",
-        "plugins-settings"
+        "plugins-settings",
+        "integration-catalog",
+        "browser-cdp:current-26-825-plugin-catalog-wide-compact-search-scope-action",
+        "electron:current-26-825-plugin-catalog-wide-compact",
+        "pixel:current-26-825-plugin-main-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:plugins-index-search-categories-actions-and-settings"
+        "cdp:plugins-index-search-categories-actions-and-settings",
+        "cdp-26.825.51511:plugins-wide-compact-installed-public-personal-search-actions"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {
@@ -2119,15 +2125,20 @@
       "ownership": "app",
       "packageEvidence": [
         "skills-page",
-        "skills-settings"
+        "skills-settings",
+        "integration-catalog",
+        "browser-cdp:current-26-825-skill-catalog-wide-compact-search-scope-action",
+        "electron:current-26-825-skill-catalog-wide-compact",
+        "pixel:current-26-825-skill-main-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:skills-index-search-actions"
+        "cdp:skills-index-search-actions",
+        "cdp-26.825.51511:skills-wide-compact-installed-personal-system-project-recommended"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

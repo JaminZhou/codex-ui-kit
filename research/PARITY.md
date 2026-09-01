@@ -551,6 +551,17 @@ The authoritative current-build inventory is:
   [`visual-assets.json`](visual-assets.json) denominator keeps global parity
   ineligible while any visible element still uses an inferred or approximate
   source.
+- Current `26.825.51511` Plugins and Skills index routes now have independent
+  wide/720 Browser/CDP, native Electron, and reviewed regional-pixel gates.
+  The shared public catalog covers search, scopes, visible groups, actions,
+  and unavailable recovery while keeping exact third-party icons and all
+  install/discovery effects host-owned. Main-region local-only comparisons
+  pass between 3.3067% and 5.1784%; plugin detail, installation, permission,
+  skill execution, MCP, and automations remain open.
+- A successful current Browser activity did not expose a mounted Browser
+  workspace route in the sampled task. `workspace.browser` consequently
+  remains `partial_legacy`; activity evidence is not promoted into workspace
+  parity.
 
 ## Completion gate
 

@@ -272,7 +272,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 68 have current-build runtime evidence, 11 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 68 groups and Electron verification covers 68.
+Current inventory: 91 surface groups; 71 have current-build runtime evidence, 8 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 70 groups and Electron verification covers 70.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -2110,3 +2110,34 @@ is therefore narrowed to `cross-layer.optional-package-dialogs`, returned to
 accounted for by the independently verified worktree and sidebar-status rows.
 After this correction, only current Browser success and current attachment
 selection remain incomplete P0 evidence families.
+
+## Current Plugins and Skills catalog slice
+
+An isolated same-build `26.825.51511` Renderer on loopback port `9920`
+reached the current Plugins and Skills index routes at 1180×820 and 720×820.
+The captured contract records the 28/33.6px headings, 728px bounded search,
+28px content inset, current Installed/Public/Personal plugin grouping,
+Installed/Personal/System/Project/Recommended skill grouping, responsive
+two-column grids, search, scope selection, and item actions. The sanitized
+geometry, fixed labels, screenshot hashes, and pixel ratios are retained in
+`research/current-integrations-26-825.json`; raw product frames remain local.
+
+`IntegrationCatalogTabs` and `IntegrationCatalogPage` provide the controlled
+public surface. Browser/CDP and native Electron verify Plugins ↔ Skills
+routing, search, scope, actions, wide/compact geometry, zero horizontal
+overflow, and unavailable-to-retry recovery. Four reviewed replay baselines
+cover both routes and widths. Optional unmasked current-product main-region
+comparisons pass at 4.4911%/5.1784% for Plugins and 3.3067%/3.8461% for Skills.
+Exact third-party icons and install/discovery effects remain host-owned, so
+both inventory rows are `partial` rather than complete.
+
+The independent current Browser activity probe succeeded but exposed no
+mounted Browser workspace route in the sampled task. That negative boundary
+is recorded without borrowing activity evidence: `workspace.browser` remains
+`partial_legacy` pending a current reachable workspace sample.
+
+Cleanup stopped only isolated PID `86298` and its two profile-owned Crashpad
+handlers, closed port `9920`, and moved the exact profile and raw evidence
+recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-integrations-26-825-20260901-9920`.
+The user-owned Codex PID `13503` remained running.

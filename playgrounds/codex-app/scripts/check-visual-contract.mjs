@@ -713,6 +713,16 @@ const currentBuildSidebarShowMoreReference =
   process.env.CODEX_UI_KIT_CURRENT_SIDEBAR_SHOW_MORE_REFERENCE;
 const currentBuildWindowChromeReference =
   process.env.CODEX_UI_KIT_WINDOW_CHROME_REFERENCE;
+const currentIntegrationCatalogReferences = {
+  "integration-plugins-current-26-825":
+    process.env.CODEX_UI_KIT_CURRENT_PLUGINS_26_825_REFERENCE,
+  "integration-plugins-current-26-825-compact":
+    process.env.CODEX_UI_KIT_CURRENT_PLUGINS_26_825_COMPACT_REFERENCE,
+  "integration-skills-current-26-825":
+    process.env.CODEX_UI_KIT_CURRENT_SKILLS_26_825_REFERENCE,
+  "integration-skills-current-26-825-compact":
+    process.env.CODEX_UI_KIT_CURRENT_SKILLS_26_825_COMPACT_REFERENCE,
+};
 const defaultLifecycleMainPixelRatio = 0.0025;
 const defaultLifecycleSidebarPixelRatio = 0.05;
 const internalSidebarWidth = 274;
@@ -2332,6 +2342,80 @@ for (const scene of selectedScenes) {
   if (baseline.width !== actual.width || baseline.height !== actual.height) {
     throw new Error(
       `${scene.id}: image dimensions changed from ${baseline.width}x${baseline.height} to ${actual.width}x${actual.height}.`,
+    );
+  }
+
+  const currentIntegrationCatalogReference =
+    currentIntegrationCatalogReferences[scene.id];
+  if (currentIntegrationCatalogReference) {
+    const reference = PNG.sync.read(
+      await readFile(currentIntegrationCatalogReference),
+    );
+    const compact = scene.id.endsWith("-compact");
+    const expectedWidth = compact ? 720 : 1180;
+    if (
+      reference.width !== expectedWidth ||
+      reference.height !== 820 ||
+      actual.width !== expectedWidth ||
+      actual.height !== 820
+    ) {
+      throw new Error(
+        `${scene.id}: current integration comparison requires exact ${expectedWidth}x820 product and playground frames.`,
+      );
+    }
+    const region = compact
+      ? { height: 774, left: 1, top: 46, width: 719 }
+      : { height: 774, left: 323, top: 46, width: 857 };
+    const referenceCrop = cropPng(
+      reference,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const actualCrop = cropPng(
+      actual,
+      region.left,
+      region.top,
+      region.width,
+      region.height,
+    );
+    const comparison = comparePng(referenceCrop, actualCrop, 0.1);
+    const artifactId = `${scene.id}.current-product-main`;
+    await writeFile(
+      join(artifactDirectory, `${artifactId}.png`),
+      PNG.sync.write(referenceCrop),
+    );
+    await writeFile(
+      join(artifactDirectory, `${artifactId}.current-build.png`),
+      PNG.sync.write(actualCrop),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${artifactId}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    const defaultMaximumRatio = scene.id.includes("plugins")
+      ? compact
+        ? 0.065
+        : 0.055
+      : compact
+        ? 0.052
+        : 0.045;
+    const maximumRatio = environmentRatio(
+      compact
+        ? "CODEX_UI_KIT_CURRENT_INTEGRATION_26_825_COMPACT_MAX_DIFF_RATIO"
+        : "CODEX_UI_KIT_CURRENT_INTEGRATION_26_825_MAX_DIFF_RATIO",
+      defaultMaximumRatio,
+    );
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current integration main pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current integration main pixel ratio ${comparison.ratio}`,
     );
   }
 

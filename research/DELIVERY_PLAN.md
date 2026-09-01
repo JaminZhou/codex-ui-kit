@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 68 groups have current-build runtime evidence, 11 have previous-build-only
+- 71 groups have current-build runtime evidence, 8 have previous-build-only
   runtime evidence, and 12 have not been sampled.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
@@ -1072,6 +1072,20 @@ the optional credits preference. Eight reviewed frames extend the matrix to
 asset manifest to 78 icons; the later completed-thread slice raises it to 90.
 Remaining P1 families keep their existing open
 gates, so Stage 4 is still in progress.
+
+The current Plugins/Skills index slice now adds a shared controlled
+`IntegrationCatalogPage` without claiming plugin detail, installation,
+permission, or settings completion. An isolated `26.825.51511` Renderer
+records wide/720 navigation, 728px bounded search, Installed/Public/Personal
+plugin groups, Installed/Personal/System/Project/Recommended skill groups,
+two-column wrapping, and visible search/scope/action behavior. Browser/CDP and
+native Electron replay both routes and unavailable-to-retry recovery. Four
+reviewed wide/compact baselines are paired with optional local-only current
+product comparisons; their main-region differences range from 3.3067% to
+5.1784%, including host-owned third-party icon differences. The public
+component therefore keeps exact plugin artwork and installation effects
+host-supplied. MCP, automations, plugin detail/install, skill execution, and
+remaining Settings families stay open, so Stage 4 remains in progress.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

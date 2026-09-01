@@ -752,6 +752,137 @@ try {
   await app.close();
 }
 
+for (const integrationScene of [
+  {
+    currentSidebar: true,
+    frame: "integration-plugins-current-26-825",
+    id: "electron-current-integration-plugins",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "plugins",
+  },
+  {
+    currentSidebar: true,
+    frame: "integration-skills-current-26-825",
+    id: "electron-current-integration-skills-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "plugins",
+    windowSize: { height: 820, width: 720 },
+  },
+]) {
+  const { app: integrationApp, page: integrationPage } = await launchScene(
+    integrationScene,
+    { capture: false },
+  );
+  try {
+    const nativeBounds = await integrationApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const expectedKind = integrationScene.frame.includes("skills")
+      ? "skills"
+      : "plugins";
+    const compact = integrationScene.id.endsWith("compact");
+    const catalog = await integrationPage
+      .locator(".codex-ui-integration-catalog")
+      .evaluate((root) => {
+        const bounds = (selector) => {
+          const element = root.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const rect = element.getBoundingClientRect();
+          return {
+            height: rect.height,
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+          };
+        };
+        return {
+          heading: bounds("h1"),
+          installedCount:
+            root.getAttribute("data-kind") === "plugins"
+              ? root.querySelectorAll(
+                  ".codex-ui-integration-catalog__installed-icon",
+                ).length
+              : root.querySelectorAll(
+                  ".codex-ui-integration-catalog__installed .codex-ui-integration-catalog__item",
+                ).length,
+          kind: root.getAttribute("data-kind"),
+          search: bounds(".codex-ui-integration-catalog__search"),
+          status: root.getAttribute("data-status"),
+          title: root.querySelector("h1")?.textContent?.trim(),
+          width: root.getBoundingClientRect().width,
+        };
+      });
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== 820 ||
+      catalog.kind !== expectedKind ||
+      catalog.status !== "ready" ||
+      catalog.title !== (expectedKind === "plugins" ? "Plugins" : "Skills") ||
+      catalog.installedCount !== (expectedKind === "plugins" ? 13 : 6) ||
+      !catalog.heading ||
+      Math.abs(catalog.heading.left - (compact ? 29 : 395.4375)) > 1 ||
+      !catalog.search ||
+      Math.abs(catalog.search.left - (compact ? 21 : 387.4375)) > 1 ||
+      Math.abs(catalog.search.width - (compact ? 679 : 728)) > 1
+    ) {
+      throw new Error(
+        `${integrationScene.id}: Electron integration catalog geometry failed: ${JSON.stringify({ catalog, nativeBounds })}`,
+      );
+    }
+    if (!compact) {
+      await integrationPage.getByPlaceholder("Search plugins").fill("github");
+      await integrationPage
+        .locator(".codex-ui-integration-catalog-tabs")
+        .getByText("Skills", { exact: true })
+        .click();
+      await integrationPage.getByPlaceholder("Search skills").waitFor();
+      await integrationPage
+        .locator('.codex-ui-integration-catalog__scopes [role="tab"]')
+        .getByText("Recommended", { exact: true })
+        .click();
+      await integrationPage
+        .getByRole("button", { exact: true, name: "Install" })
+        .first()
+        .click();
+      await integrationPage.waitForFunction(
+        () =>
+          document
+            .querySelector(".codex-ui-integration-catalog")
+            ?.getAttribute("data-action") === "action:recommended-watch-pr",
+      );
+    }
+  } finally {
+    await integrationApp.close();
+  }
+}
+
+const integrationUnavailableScene = {
+  currentSidebar: true,
+  frame: "integration-plugins-current-26-825-unavailable",
+  id: "electron-current-integration-unavailable",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "plugins",
+};
+const {
+  app: integrationUnavailableApp,
+  page: integrationUnavailablePage,
+} = await launchScene(integrationUnavailableScene, { capture: false });
+try {
+  await integrationUnavailablePage
+    .locator('.codex-ui-integration-catalog[data-status="unavailable"]')
+    .waitFor();
+  await integrationUnavailablePage.getByRole("button", { name: "Retry" }).click();
+  await integrationUnavailablePage
+    .locator('.codex-ui-integration-catalog[data-status="ready"][data-action="retry"]')
+    .waitFor();
+} finally {
+  await integrationUnavailableApp.close();
+}
+
 const sidebarStatusScene = {
   currentSidebar: true,
   frame: "sidebar-current",

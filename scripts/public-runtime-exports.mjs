@@ -71,6 +71,8 @@ export const publicRuntimeExports = [
   "ImagePreviewDialog",
   "InlineCode",
   "InlineNotice",
+  "IntegrationCatalogPage",
+  "IntegrationCatalogTabs",
   "KeyboardShortcutsPage",
   "LoadingShimmer",
   "LocalEnvironmentDialog",

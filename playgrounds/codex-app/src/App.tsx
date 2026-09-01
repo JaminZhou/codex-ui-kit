@@ -49,6 +49,8 @@ import {
   HooksSettingsPage,
   IconButton,
   ImagePreviewDialog,
+  IntegrationCatalogPage,
+  IntegrationCatalogTabs,
   KeyboardShortcutsPage,
   LocalEnvironmentDialog,
   Menu,
@@ -122,6 +124,9 @@ import {
   type GeneralSettingsValue,
   type GitSettingsValue,
   type HookSettingsEntry,
+  type IntegrationCatalogItem,
+  type IntegrationCatalogSection,
+  type IntegrationCatalogStatus,
   type KeyboardShortcutCaptureTarget,
   type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
@@ -689,6 +694,8 @@ function querySelection() {
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
+      : params.get("view") === "plugins"
+        ? "plugins"
       : params.get("view") === "projects"
         ? "projects"
         : params.get("view") === "shell"
@@ -2500,6 +2507,161 @@ const currentSidebarWorktreeTasks = [
   "Restored worktree task",
 ];
 
+function CurrentIntegrationFixtureIcon({
+  label,
+  tone = "neutral",
+}: {
+  label: string;
+  tone?: "amber" | "blue" | "green" | "neutral" | "pink" | "violet";
+}) {
+  return (
+    <span
+      className={`demo-current-integration-icon demo-current-integration-icon--${tone}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+function CurrentIntegrationHeaderGlyph({
+  name,
+}: {
+  name: "chevron" | "manage" | "refresh";
+}) {
+  return name === "chevron" ? (
+    <svg aria-hidden="true" viewBox="0 0 12 12">
+      <path d="m3 4.5 3 3 3-3" />
+    </svg>
+  ) : name === "refresh" ? (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <path d="M15.5 7V3.75h-3.25M15 4.5A6.5 6.5 0 1 0 16.2 11" />
+    </svg>
+  ) : (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="2.25" />
+      <path d="M10 2.75v1.5M10 15.75v1.5M2.75 10h1.5M15.75 10h1.5M4.87 4.87l1.06 1.06M14.07 14.07l1.06 1.06M15.13 4.87l-1.06 1.06M5.93 14.07l-1.06 1.06" />
+    </svg>
+  );
+}
+
+function CurrentIntegrationMoreIcons() {
+  return (
+    <span aria-hidden="true" className="demo-current-integration-more-icons">
+      <CurrentIntegrationFixtureIcon label="O" />
+      <CurrentIntegrationFixtureIcon label="G" />
+      <CurrentIntegrationFixtureIcon label="G" />
+    </span>
+  );
+}
+
+const currentPluginInstalledItems: readonly IntegrationCatalogItem[] = [
+  { icon: <CurrentIntegrationFixtureIcon label="GH" />, id: "github", title: "GitHub" },
+  { icon: <CurrentIntegrationFixtureIcon label="D" tone="blue" />, id: "documents", title: "Documents" },
+  { icon: <CurrentIntegrationFixtureIcon label="PDF" tone="pink" />, id: "pdf", title: "PDF" },
+  { icon: <CurrentIntegrationFixtureIcon label="S" tone="green" />, id: "spreadsheets", title: "Spreadsheets" },
+  { icon: <CurrentIntegrationFixtureIcon label="P" tone="amber" />, id: "presentations", title: "Presentations" },
+  { icon: <CurrentIntegrationFixtureIcon label="T" tone="violet" />, id: "template-creator", title: "Template Creator" },
+  { icon: <CurrentIntegrationFixtureIcon label="▦" tone="blue" />, id: "sites", title: "Sites" },
+  { icon: <CurrentIntegrationFixtureIcon label="CU" tone="violet" />, id: "computer-use", title: "Computer Use" },
+  { icon: <CurrentIntegrationFixtureIcon label="V" tone="blue" />, id: "visualize", title: "Visualize" },
+  { icon: <CurrentIntegrationFixtureIcon label="PR" tone="pink" />, id: "watch-pr", title: "Watch PR" },
+  { icon: <CurrentIntegrationFixtureIcon label="A" />, id: "appkit-inspector", title: "AppKit Inspector" },
+  { icon: <CurrentIntegrationFixtureIcon label="DT" />, id: "default-templates", title: "Default templates" },
+  { icon: <CurrentIntegrationFixtureIcon label="PM" />, id: "plugin-management", title: "Plugin Management" },
+];
+
+const currentPluginSections: readonly IntegrationCatalogSection[] = [
+  {
+    id: "popular",
+    title: "Popular",
+    moreLabel: (
+      <>
+        <CurrentIntegrationMoreIcons />
+        <span>See Outlook Email, Granola, and more</span>
+      </>
+    ),
+    items: [
+      { actionLabel: "Install", description: "Read and manage Gmail", icon: <CurrentIntegrationFixtureIcon label="G" />, id: "gmail", title: "Gmail" },
+      { actionAriaLabel: "More actions for GitHub", actionLabel: "…", description: "Triage PRs, issues, CI, and publish flows", icon: <CurrentIntegrationFixtureIcon label="GH" />, id: "github", installed: true, title: "GitHub" },
+      { actionLabel: "Install", description: "Drive, Docs, Sheets or Slides", icon: <CurrentIntegrationFixtureIcon label="D" tone="pink" />, id: "google-drive", title: "Google Drive" },
+      { actionLabel: "Install", description: "Manage Google Calendar events", icon: <CurrentIntegrationFixtureIcon label="C" tone="blue" />, id: "google-calendar", title: "Google Calendar" },
+      { description: "Notion docs and workflows", icon: <CurrentIntegrationFixtureIcon label="N" />, id: "notion", title: "Notion" },
+      { actionLabel: "Install", description: "Read and manage Slack", icon: <CurrentIntegrationFixtureIcon label="S" tone="blue" />, id: "slack", title: "Slack" },
+    ],
+  },
+  {
+    id: "new",
+    title: "New & Noteworthy",
+    moreLabel: "See Wrike, Close, and more",
+    items: [
+      { actionLabel: "Install", description: "Search and act on your data", icon: <CurrentIntegrationFixtureIcon label="D" />, id: "datadog", title: "Datadog (Preview)" },
+      { description: "Query and manage BigQuery", icon: <CurrentIntegrationFixtureIcon label="BQ" tone="amber" />, id: "bigquery", title: "BigQuery" },
+      { actionLabel: "Install", description: "Stock quotes, financial data", icon: <CurrentIntegrationFixtureIcon label="L" tone="blue" />, id: "longbridge", title: "Longbridge" },
+      { actionLabel: "Install", description: "Manage your CRM with ChatGPT", icon: <CurrentIntegrationFixtureIcon label="A" tone="violet" />, id: "attio", title: "Attio" },
+      { description: "Manage Salesforce records", icon: <CurrentIntegrationFixtureIcon label="S" tone="blue" />, id: "salesforce", title: "Salesforce" },
+      { actionLabel: "Install", description: "Query and analyze Mixpanel", icon: <CurrentIntegrationFixtureIcon label="M" tone="pink" />, id: "mixpanel", title: "Mixpanel" },
+    ],
+  },
+];
+
+const currentPersonalPluginSections: readonly IntegrationCatalogSection[] = [
+  {
+    id: "personal",
+    title: "Personal",
+    items: [
+      { description: "Local plugin management", icon: <CurrentIntegrationFixtureIcon label="PM" />, id: "personal-plugin-management", installed: true, title: "Plugin Management" },
+      { description: "Inspect native AppKit interfaces", icon: <CurrentIntegrationFixtureIcon label="A" />, id: "personal-appkit-inspector", installed: true, title: "AppKit Inspector" },
+    ],
+  },
+];
+
+const currentSkillInstalledItems: readonly IntegrationCatalogItem[] = [
+  { description: "Use App Store Connect release workflows", icon: <CurrentIntegrationFixtureIcon label="A" tone="violet" />, id: "asc-tooling", title: "ASC Tooling" },
+  { description: "Generate or edit images for websites", icon: <CurrentIntegrationFixtureIcon label="I" tone="blue" />, id: "image-gen", title: "Image Gen" },
+  { description: "OpenAI and Codex docs for models", icon: <CurrentIntegrationFixtureIcon label="O" tone="amber" />, id: "openai-docs", title: "OpenAI Docs" },
+  { description: "Scaffold plugins and marketplace entries", icon: <CurrentIntegrationFixtureIcon label="P" tone="amber" />, id: "plugin-creator", title: "Plugin Creator" },
+  { description: "Read Red Rocket market context", icon: <CurrentIntegrationFixtureIcon label="R" tone="violet" />, id: "redrocket-market", title: "RedRocket Market" },
+  { description: "Find actionable bugs in code changes", icon: <CurrentIntegrationFixtureIcon label="RA" />, id: "review-agent", title: "Review Agent" },
+];
+
+const currentSkillSectionsByScope: Record<string, readonly IntegrationCatalogSection[]> = {
+  personal: [
+    {
+      id: "personal",
+      items: [
+        currentSkillInstalledItems[0],
+        currentSkillInstalledItems[4],
+      ],
+    },
+  ],
+  system: [
+    {
+      id: "system",
+      items: [
+        { description: "Create or update Codex skills", icon: <CurrentIntegrationFixtureIcon label="SC" tone="violet" />, id: "skill-creator", installed: true, title: "Skill Creator" },
+        { description: "Install skills from trusted sources", icon: <CurrentIntegrationFixtureIcon label="SI" tone="blue" />, id: "skill-installer", installed: true, title: "Skill Installer" },
+      ],
+    },
+  ],
+  trailglass: [
+    {
+      id: "trailglass",
+      items: [
+        { description: "Inspect Trailglass session evidence", icon: <CurrentIntegrationFixtureIcon label="T" tone="green" />, id: "trailglass-session", title: "Trailglass Session" },
+      ],
+    },
+  ],
+  recommended: [
+    {
+      id: "recommended",
+      items: [
+        { actionLabel: "Install", description: "Watch pull request review rounds", icon: <CurrentIntegrationFixtureIcon label="PR" tone="pink" />, id: "recommended-watch-pr", title: "Watch PR" },
+        { actionLabel: "Install", description: "Control the in-app Browser", icon: <CurrentIntegrationFixtureIcon label="B" tone="blue" />, id: "recommended-browser", title: "Browser" },
+      ],
+    },
+  ],
+};
+
 const currentWorktreeSetupFailureLog = `[info] Starting worktree creation
 Preparing worktree (detached HEAD COMMIT)
 fatal: could not create leading directories of '.git/worktrees/PROJECT': Not a directory
@@ -2632,6 +2794,30 @@ export function App() {
   const [theme, setTheme] = useState<DemoThemePreference>(
     initialSelection.theme,
   );
+  const [integrationCatalogKind, setIntegrationCatalogKind] = useState<
+    "plugins" | "skills"
+  >(
+    initialSelection.frame?.startsWith("integration-skills-current-26-825")
+      ? "skills"
+      : "plugins",
+  );
+  const [integrationCatalogQuery, setIntegrationCatalogQuery] = useState(
+    initialSelection.frame?.endsWith("-search") ? "github" : "",
+  );
+  const [pluginCatalogScope, setPluginCatalogScope] = useState("public");
+  const [skillCatalogScope, setSkillCatalogScope] = useState("personal");
+  const [integrationCatalogStatus, setIntegrationCatalogStatus] =
+    useState<IntegrationCatalogStatus>(
+      initialSelection.frame?.endsWith("-loading")
+        ? "loading"
+        : initialSelection.frame?.endsWith("-error")
+          ? "error"
+          : initialSelection.frame?.endsWith("-unavailable")
+            ? "unavailable"
+            : "ready",
+    );
+  const [integrationCatalogAction, setIntegrationCatalogAction] =
+    useState("");
   const [routeHistory, setRouteHistory] = useState(() =>
     createDemoRouteHistory(
       initialSelection.view,
@@ -5546,7 +5732,8 @@ export function App() {
       primaryNavigation={
         usesCurrent26825ThreadHeader ||
         isCurrentCitations26825Replay ||
-        isCurrentPullRequestRouteReplay ? (
+        isCurrentPullRequestRouteReplay ||
+        view === "plugins" ? (
           <>
             <AppSidebarItem
               leading={<SidebarGlyph name="pull-request" />}
@@ -5563,7 +5750,14 @@ export function App() {
             <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
               Scheduled
             </AppSidebarItem>
-            <AppSidebarItem leading={<SidebarGlyph name="plugins-current" />}>
+            <AppSidebarItem
+              leading={<SidebarGlyph name="plugins-current" />}
+              onClick={() => {
+                setView("plugins");
+                dismissSidebarAfterNavigation();
+              }}
+              selected={view === "plugins"}
+            >
               Plugins
             </AppSidebarItem>
             <AppSidebarItem leading={<SidebarGlyph name="explore-current" />}>
@@ -5590,7 +5784,13 @@ export function App() {
           <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
             Scheduled
           </AppSidebarItem>
-          <AppSidebarItem leading={<SidebarGlyph name="plugins-current" />}>
+          <AppSidebarItem
+            leading={<SidebarGlyph name="plugins-current" />}
+            onClick={() => {
+              setView("plugins");
+              dismissSidebarAfterNavigation();
+            }}
+          >
             Plugins
           </AppSidebarItem>
         </>
@@ -9887,6 +10087,88 @@ export function App() {
     </div>
   );
 
+  const activeIntegrationScope =
+    integrationCatalogKind === "plugins"
+      ? pluginCatalogScope
+      : skillCatalogScope;
+  const integrationCatalogRoute = (
+    <IntegrationCatalogPage
+      activeScope={activeIntegrationScope}
+      className="demo-current-integration-catalog"
+      data-action={integrationCatalogAction || undefined}
+      data-testid="current-integration-catalog"
+      description={
+        integrationCatalogKind === "plugins"
+          ? "Work with Codex across your favorite tools"
+          : "Extend Codex with task-specific skills"
+      }
+      installedItems={
+        integrationCatalogKind === "plugins"
+          ? currentPluginInstalledItems
+          : currentSkillInstalledItems
+      }
+      installedMoreLabel={
+        integrationCatalogKind === "skills"
+          ? "See Skill Creator, Skill Installer, and 1 more"
+          : undefined
+      }
+      kind={integrationCatalogKind}
+      onInstalledMore={() => setIntegrationCatalogAction("installed-more")}
+      onItemAction={(item) =>
+        setIntegrationCatalogAction(`action:${item.id}`)
+      }
+      onItemOpen={(item) =>
+        setIntegrationCatalogAction(`open:${item.id}`)
+      }
+      onManage={() => setIntegrationCatalogAction("manage")}
+      onMore={(section) =>
+        setIntegrationCatalogAction(`more:${section.id}`)
+      }
+      onQueryChange={setIntegrationCatalogQuery}
+      onRetry={() => {
+        setIntegrationCatalogAction("retry");
+        setIntegrationCatalogStatus("ready");
+      }}
+      onScopeChange={(scope) => {
+        if (integrationCatalogKind === "plugins") {
+          setPluginCatalogScope(scope.id);
+        } else {
+          setSkillCatalogScope(scope.id);
+        }
+      }}
+      query={integrationCatalogQuery}
+      scopes={
+        integrationCatalogKind === "plugins"
+          ? [
+              { id: "public", label: "Public" },
+              { id: "personal", label: "Personal" },
+            ]
+          : [
+              { id: "personal", label: "Personal" },
+              { id: "system", label: "System" },
+              { id: "trailglass", label: "Trailglass" },
+              { id: "recommended", label: "Recommended" },
+            ]
+      }
+      sections={
+        integrationCatalogKind === "plugins"
+          ? pluginCatalogScope === "public"
+            ? currentPluginSections
+            : currentPersonalPluginSections
+          : currentSkillSectionsByScope[skillCatalogScope] ?? []
+      }
+      status={integrationCatalogStatus}
+      statusDescription={
+        integrationCatalogStatus === "unavailable"
+          ? "Plugin and skill access is disabled by your organization."
+          : integrationCatalogStatus === "error"
+            ? "Check your connection and try again."
+            : undefined
+      }
+      title={integrationCatalogKind === "plugins" ? "Plugins" : "Skills"}
+    />
+  );
+
   const reviewableFileChanges = useMemo(
     () =>
       state.fileChanges.filter(
@@ -14179,6 +14461,7 @@ export function App() {
           currentSidebarWorktreeLifecycle ||
           currentContext26825Replay ||
           currentTerminal26825Frame(activeFrame) ||
+          view === "plugins" ||
           isCurrentRichMarkdownStreamingReplay ||
           usesCurrent26825ThreadHeader ||
           isCurrentCitations26825Replay ||
@@ -14200,9 +14483,17 @@ export function App() {
         sidebarOpen={sidebarOpen}
         sidebarResizable
         windowChrome={
-          view === "projects" || view === "shell" || view === "workspace" ? (
+          view === "projects" ||
+          view === "plugins" ||
+          view === "shell" ||
+          view === "workspace" ? (
             view === "workspace" && workspaceShowsSettings ? null : (
             <AppWindowChrome
+              className={
+                view === "plugins"
+                  ? "demo-current-integration-window-chrome"
+                  : undefined
+              }
               backAction={
                 view === "workspace" && workspacePage === "environments"
                   ? {
@@ -14238,6 +14529,32 @@ export function App() {
                       ? "Choosing…"
                       : "Create"}
                   </Button>
+                ) : view === "plugins" ? (
+                  <>
+                    <button
+                      aria-label="Refresh"
+                      className="demo-current-integration-header-action"
+                      onClick={() => setIntegrationCatalogAction("refresh")}
+                      type="button"
+                    >
+                      <CurrentIntegrationHeaderGlyph name="refresh" />
+                    </button>
+                    <button
+                      aria-label="Manage"
+                      className="demo-current-integration-header-action"
+                      onClick={() => setIntegrationCatalogAction("manage")}
+                      type="button"
+                    >
+                      <CurrentIntegrationHeaderGlyph name="manage" />
+                    </button>
+                    <Button
+                      className="demo-current-integration-add"
+                      onClick={() => setIntegrationCatalogAction("add")}
+                      size="small"
+                    >
+                      Add <CurrentIntegrationHeaderGlyph name="chevron" />
+                    </Button>
+                  </>
                 ) : undefined
               }
               forwardAction={
@@ -14256,6 +14573,19 @@ export function App() {
                 label: sidebarOpen ? "Hide sidebar" : "Show sidebar",
                 onClick: () => setSidebarOpen((open) => !open),
               }}
+              startActions={
+                view === "plugins" ? (
+                  <IntegrationCatalogTabs
+                    active={integrationCatalogKind}
+                    onChange={(kind) => {
+                      setIntegrationCatalogKind(kind);
+                      setIntegrationCatalogQuery("");
+                      setIntegrationCatalogStatus("ready");
+                      setIntegrationCatalogAction(`tab:${kind}`);
+                    }}
+                  />
+                ) : undefined
+              }
             />
             )
           ) : undefined
@@ -14265,6 +14595,8 @@ export function App() {
           pullRequestIndex
         ) : view === "projects" ? (
           projectsRoute
+        ) : view === "plugins" ? (
+          integrationCatalogRoute
         ) : view === "shell" ? (
           shellRoute
         ) : view === "workspace" ? (
