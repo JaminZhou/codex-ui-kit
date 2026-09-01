@@ -81,6 +81,7 @@ describe("composer auxiliary surfaces", () => {
         layout="card"
         onOpen={onOpen}
         onRemove={onRemove}
+        size="compact"
         status="uploading"
       />,
     );
@@ -90,6 +91,7 @@ describe("composer auxiliary surfaces", () => {
     ) as HTMLElement;
     expect(attachment.dataset.layout).toBe("card");
     expect(attachment.dataset.kind).toBe("pasted-text");
+    expect(attachment.dataset.size).toBe("compact");
     expect(screen.getByRole("status").textContent).toContain("Uploading…");
 
     fireEvent.click(screen.getByRole("button", { name: "Open Large paste" }));

@@ -418,11 +418,32 @@ describe("generated images", () => {
     fireEvent.click(screen.getByRole("button", { name: "Zoom in image" }));
     expect(onEdit).toHaveBeenCalledWith(images[0]);
     expect(onDownload).toHaveBeenCalledWith(images[0]);
-    expect(screen.getByText("110%")).toBeTruthy();
+    expect(screen.getByText("120%")).toBeTruthy();
     fireEvent.click(
       screen.getByRole("button", { name: "Close image preview" }),
     );
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("focuses the first immersive action and exposes the current edit glyph", () => {
+    render(
+      <ImagePreviewDialog
+        images={images.slice(0, 1)}
+        immersiveInitialFocus="first-action"
+        onEdit={() => undefined}
+        onOpenChange={() => undefined}
+        open
+        presentation="immersive"
+        title="Image preview"
+      />,
+    );
+
+    const edit = screen.getByRole("button", { name: "Edit image" });
+    expect(document.activeElement).toBe(edit);
+    expect(edit.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 21 21");
+    expect(edit.querySelector("path")?.getAttribute("d")).toContain(
+      "M11.7313 4.20472",
+    );
   });
 
   it("releases the modal lock when an open preview loses all images", async () => {

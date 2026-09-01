@@ -486,6 +486,7 @@ export interface ComposerAttachmentProps
   progress?: number;
   removeLabel?: string;
   retryLabel?: string;
+  size?: "compact" | "default";
   status?: "error" | "preview-error" | "ready" | "uploading";
   statusLabel?: string;
 }
@@ -527,6 +528,7 @@ export function ComposerAttachment({
   progress,
   removeLabel = `Remove ${label}`,
   retryLabel = `Retry ${label}`,
+  size = "default",
   status = "ready",
   statusLabel,
   ...props
@@ -617,6 +619,7 @@ export function ComposerAttachment({
       data-kind={kind}
       data-layout={layout}
       data-removable={Boolean(onRemove) || undefined}
+      data-size={size}
       data-status={status}
       {...props}
     >

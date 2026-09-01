@@ -327,6 +327,19 @@ const currentAttachmentPickerReference =
   process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_PICKER_REFERENCE;
 const currentAttachmentPreviewReference =
   process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_PREVIEW_REFERENCE;
+const currentAttachment26825PickerWideReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_WIDE_REFERENCE;
+const currentAttachment26825PickerCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_COMPACT_REFERENCE;
+const currentAttachment26825PreviewWideReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_WIDE_REFERENCE;
+const currentAttachment26825PreviewCompactReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_COMPACT_REFERENCE;
+const currentAttachment26825CompletedWideReference =
+  process.env.CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_WIDE_REFERENCE;
+const currentAttachment26825CompletedCompactReference =
+  process.env
+    .CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_COMPACT_REFERENCE;
 const currentBuildAttachmentReferenceSize = {
   height: 820,
   width: 906,
@@ -6432,6 +6445,239 @@ for (const scene of selectedScenes) {
     }
     console.log(
       `${scene.id}: current attachment preview product pixel ratios ${JSON.stringify({ actions: actionsComparison.ratio, image: imageComparison.ratio, toolbar: toolbarComparison.ratio })}`,
+    );
+  }
+  const currentAttachment26825PickerReference =
+    scene.id === "attachment-current-26-825-post-picker"
+      ? currentAttachment26825PickerWideReference
+      : scene.id === "attachment-current-26-825-post-picker-compact"
+        ? currentAttachment26825PickerCompactReference
+        : undefined;
+  if (currentAttachment26825PickerReference) {
+    const compact = scene.id.endsWith("-compact");
+    const expectedSize = compact
+      ? { height: 680, width: 720 }
+      : { height: 820, width: 1180 };
+    const composerRegion = compact
+      ? { height: 154, left: 16, top: 510, width: 688 }
+      : { height: 154, left: 222, top: 650, width: 736 };
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentAttachment26825PickerReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 attachment picker comparison requires exact ${expectedSize.width}x${expectedSize.height} reference and playground frames.`,
+      );
+    }
+    const referenceComposer = cropPng(
+      reference,
+      composerRegion.left,
+      composerRegion.top,
+      composerRegion.width,
+      composerRegion.height,
+    );
+    const actualComposer = cropPng(
+      flattenPng(clonePng(actual), { blue: 24, green: 24, red: 24 }),
+      composerRegion.left,
+      composerRegion.top,
+      composerRegion.width,
+      composerRegion.height,
+    );
+    const comparison = comparePng(referenceComposer, actualComposer, 0.1);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PICKER_MAX_DIFF_RATIO",
+      0.025,
+    );
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.current-product.png`),
+      PNG.sync.write(actualComposer),
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-product.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 attachment picker product pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 attachment picker product pixel ratio ${comparison.ratio}`,
+    );
+  }
+  const currentAttachment26825PreviewReference =
+    scene.id === "attachment-current-26-825-preview"
+      ? currentAttachment26825PreviewWideReference
+      : scene.id === "attachment-current-26-825-preview-compact"
+        ? currentAttachment26825PreviewCompactReference
+        : undefined;
+  if (currentAttachment26825PreviewReference) {
+    const compact = scene.id.endsWith("-compact");
+    const expectedSize = compact
+      ? { height: 680, width: 720 }
+      : { height: 820, width: 1180 };
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentAttachment26825PreviewReference)),
+      { blue: 0, green: 0, red: 0 },
+    );
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 attachment preview comparison requires exact ${expectedSize.width}x${expectedSize.height} reference and playground frames.`,
+      );
+    }
+    const flattenedActual = flattenPng(clonePng(actual), {
+      blue: 0,
+      green: 0,
+      red: 0,
+    });
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(flattenedActual, left, top, width, height),
+        0.1,
+      );
+    const actionsComparison = compareRegion(
+      compact
+        ? { height: 40, left: 570, top: 12, width: 138 }
+        : { height: 40, left: 1030, top: 12, width: 138 },
+    );
+    const imageComparison = compareRegion(
+      compact
+        ? { height: 456, left: 32, top: 88, width: 656 }
+        : { height: 676, left: 103, top: 48, width: 974 },
+    );
+    const toolbarComparison = compareRegion(
+      compact
+        ? { height: 44, left: 284, top: 604, width: 152 }
+        : { height: 44, left: 514, top: 744, width: 152 },
+    );
+    const maximumActionsRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_ACTIONS_MAX_DIFF_RATIO",
+      0.06,
+    );
+    const maximumImageRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_IMAGE_MAX_DIFF_RATIO",
+      0.01,
+    );
+    const maximumToolbarRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_PREVIEW_TOOLBAR_MAX_DIFF_RATIO",
+      0.03,
+    );
+    if (
+      actionsComparison.ratio > maximumActionsRatio ||
+      imageComparison.ratio > maximumImageRatio ||
+      toolbarComparison.ratio > maximumToolbarRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 attachment preview product pixel ratios exceed limits: ${JSON.stringify({ actions: actionsComparison.ratio, image: imageComparison.ratio, toolbar: toolbarComparison.ratio })}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 attachment preview product pixel ratios ${JSON.stringify({ actions: actionsComparison.ratio, image: imageComparison.ratio, toolbar: toolbarComparison.ratio })}`,
+    );
+  }
+  const currentAttachment26825CompletedReference =
+    scene.id === "attachment-current-26-825-completed"
+      ? currentAttachment26825CompletedWideReference
+      : scene.id === "attachment-current-26-825-completed-compact"
+        ? currentAttachment26825CompletedCompactReference
+        : undefined;
+  if (currentAttachment26825CompletedReference) {
+    const compact = scene.id.endsWith("-compact");
+    const expectedSize = compact
+      ? { height: 680, width: 720 }
+      : { height: 820, width: 1180 };
+    const reference = flattenPng(
+      PNG.sync.read(await readFile(currentAttachment26825CompletedReference)),
+      { blue: 24, green: 24, red: 24 },
+    );
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 attachment completion comparison requires exact ${expectedSize.width}x${expectedSize.height} reference and playground frames.`,
+      );
+    }
+    const flattenedActual = flattenPng(clonePng(actual), {
+      blue: 24,
+      green: 24,
+      red: 24,
+    });
+    const compareRegion = ({ height, left, top, width }) =>
+      comparePng(
+        cropPng(reference, left, top, width, height),
+        cropPng(flattenedActual, left, top, width, height),
+        0.1,
+      );
+    const headerComparison = compareRegion({
+      height: 47,
+      left: 0,
+      top: 0,
+      width: expectedSize.width,
+    });
+    const transcriptComparison = compareRegion(
+      compact
+        ? { height: 330, left: 16, top: 72, width: 688 }
+        : { height: 330, left: 64, top: 72, width: 736 },
+    );
+    const composerComparison = compareRegion(
+      compact
+        ? { height: 98, left: 16, top: 566, width: 688 }
+        : { height: 98, left: 64, top: 706, width: 736 },
+    );
+    const summaryComparison = compact
+      ? null
+      : compareRegion({ height: 222, left: 863, top: 58, width: 302 });
+    const ratios = {
+      composer: composerComparison.ratio,
+      header: headerComparison.ratio,
+      summary: summaryComparison?.ratio ?? null,
+      transcript: transcriptComparison.ratio,
+    };
+    const maximumHeaderRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_HEADER_MAX_DIFF_RATIO",
+      0.06,
+    );
+    const maximumTranscriptRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_TRANSCRIPT_MAX_DIFF_RATIO",
+      0.015,
+    );
+    const maximumComposerRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_COMPOSER_MAX_DIFF_RATIO",
+      0.02,
+    );
+    const maximumSummaryRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_ATTACHMENT_26_825_COMPLETED_SUMMARY_MAX_DIFF_RATIO",
+      0.03,
+    );
+    if (
+      headerComparison.ratio > maximumHeaderRatio ||
+      transcriptComparison.ratio > maximumTranscriptRatio ||
+      composerComparison.ratio > maximumComposerRatio ||
+      (summaryComparison?.ratio ?? 0) > maximumSummaryRatio
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 attachment completion product pixel ratios exceed limits: ${JSON.stringify(ratios)}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 attachment completion product pixel ratios ${JSON.stringify(ratios)}`,
     );
   }
   if (currentBuildApprovalReference) {

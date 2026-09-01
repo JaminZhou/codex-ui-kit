@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "cdpPort": 9918,
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true
+  },
+  "fixtures": [
+    {
+      "kind": "image",
+      "name": "probe.png",
+      "sha256": "181a65d87617df8be67a814d42d8bf07b2aa388d9155ad94588be6c29a601666"
+    },
+    {
+      "kind": "file",
+      "name": "probe.txt",
+      "sha256": "e9c02334af96f73869964dcf40292a3dc176b35df87e56ec4ad8fdd47c1624bd"
+    }
+  ],
+  "task": {
+    "titleSha256": "0d5017372e4a87ece28a025315af2f658dbec437c42915b21a2d07775a82b7dc",
+    "promptSha256": "97e3777d32f1b85d05d29e93e8c1e40bfa5b03d87d6d6c00b5278c261e2e149e",
+    "reply": "CURRENT ATTACHMENT SUCCESS 26.825.",
+    "replySha256": "3bc2efe6e799b5b80c516839458ad50716976ae26b2f2db9e081ad8bb104cb5f"
+  },
+  "postPicker": {
+    "wide": {
+      "viewport": { "height": 820, "width": 1180 },
+      "composer": { "height": 154, "left": 222, "top": 650, "width": 736 },
+      "tray": { "height": 70, "width": 736 }
+    },
+    "compact": {
+      "viewport": { "height": 680, "width": 720 },
+      "composer": { "height": 154, "left": 16, "top": 510, "width": 688 },
+      "tray": { "height": 70, "width": 688 }
+    },
+    "imageCard": { "height": 54, "imageSize": 52, "width": 54 },
+    "fileCard": { "height": 52.5, "iconSize": 24, "width": 156.484375 },
+    "fileCopy": {
+      "meta": { "fontSize": 13, "fontWeight": 400, "lineHeight": 19.5 },
+      "title": { "fontSize": 14, "fontWeight": 500, "lineHeight": 21 }
+    },
+    "removeControl": { "height": 16, "width": 16 },
+    "horizontalOverflow": 0
+  },
+  "preview": {
+    "initialFocus": "Edit image",
+    "compact": {
+      "viewport": { "height": 680, "width": 720 },
+      "image": { "height": 455.859375, "left": 32, "top": 88.0625, "width": 656 },
+      "initialZoom": "56%",
+      "zoomedImage": { "height": 549.391, "left": -35, "top": 41, "width": 790.578 },
+      "zoomedValue": "67%",
+      "toolbar": { "height": 44, "left": 284, "top": 604, "width": 152 },
+      "actions": [
+        { "height": 40, "label": "Edit image", "left": 570, "top": 12, "width": 40 },
+        { "height": 40, "label": "Download image", "left": 618, "top": 12, "width": 40 },
+        { "height": 40, "label": "Close image preview", "left": 666, "top": 12, "width": 42 }
+      ]
+    },
+    "wide": {
+      "viewport": { "height": 820, "width": 1180 },
+      "image": { "height": 676, "left": 103.625, "top": 48, "width": 972.765625 },
+      "initialZoom": "82%",
+      "toolbar": { "height": 44, "left": 514, "top": 744, "width": 152 },
+      "actions": [
+        { "height": 40, "label": "Edit image", "left": 1030, "top": 12, "width": 40 },
+        { "height": 40, "label": "Download image", "left": 1078, "top": 12, "width": 40 },
+        { "height": 40, "label": "Close image preview", "left": 1126, "top": 12, "width": 42 }
+      ]
+    },
+    "escapeRestoresImageTriggerFocus": true
+  },
+  "lifecycle": {
+    "fileRemovalFocusesRemainingImage": true,
+    "finalRemovalEmptiesTray": true,
+    "completionComposerHeight": 98,
+    "completionComposerFocused": true,
+    "sentAttachmentCount": 2,
+    "sentAttachmentsOutsideUserBubble": true,
+    "sentAttachmentLayout": {
+      "direction": "column",
+      "filePill": { "height": 34, "width": 98 },
+      "gap": 8,
+      "image": { "height": 80, "width": 80 }
+    },
+    "wideSummary": {
+      "height": 222,
+      "labels": ["Outputs", "Create a file or site", "Sources", "probe.txt", "probe.png", "View all"],
+      "left": 863,
+      "top": 58,
+      "width": 302
+    },
+    "compactSummaryInLayout": false,
+    "disposableTaskArchived": true
+  },
+  "productPixelRatios": {
+    "postPicker": {
+      "wide": 0.0140722049689441,
+      "compact": 0.01359106010268801
+    },
+    "previewWide": {
+      "actions": 0.051086956521739134,
+      "image": 0.002846190296830006,
+      "toolbar": 0.012111244019138757
+    },
+    "previewCompact": {
+      "actions": 0.04818840579710145,
+      "image": 0.0033931054771074026,
+      "toolbar": 0.011961722488038277
+    },
+    "completedWide": {
+      "composer": 0.01285215173025732,
+      "header": 0.0425171294626758,
+      "summary": 0.027370085317105185,
+      "transcript": 0.008909749670619235
+    },
+    "completedCompact": {
+      "composer": 0.013496677740863787,
+      "header": 0.05614657210401891,
+      "transcript": 0.010095137420718816
+    }
+  },
+  "localOnlyScreenshots": [
+    { "name": "wide-post-drop.png", "sha256": "cb6d43374f8637dfb5fa5954788c7d341f8173458b5cd89c9bd7d534adf092d9" },
+    { "name": "compact-post-drop.png", "sha256": "1b6b4d80ed0a6d368479e8b4ceb04c4a6296beb9ed206544be8d7880433ea831" },
+    { "name": "wide-preview.png", "sha256": "15731c3cf640a12b2d9e03d2b1a01620733fffc4748da711beac2a53a420fd75" },
+    { "name": "compact-preview.png", "sha256": "5a48b248f1442fb140ef21bc26203fa522aed528b304258f0990e27f96acd44c" },
+    { "name": "wide-completed.png", "sha256": "c18e8e0da8bf360aa3abe8e3f4e63553b9b159f1c3e2694cd01fd58893a3216c" },
+    { "name": "compact-completed.png", "sha256": "65256e0519a64cd4f042dae847823e66e5b2daa24bc76bf76f693938c0da9fe2" }
+  ]
+}

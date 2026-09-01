@@ -14,8 +14,13 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 67 groups have current-build runtime evidence, 12 have previous-build-only
+- 68 groups have current-build runtime evidence, 11 have previous-build-only
   runtime evidence, and 12 have not been sampled.
+- The current mixed-attachment refresh promotes `composer.attachments` to
+  `26.825.51511` Browser/Electron verification with trusted-CDP image/file
+  selection, wide/compact preview and pixels, focus-preserving removal, exact
+  completion, and sent-media ownership. Upload failure/progress and plugin
+  variants remain open.
 - The current subagent refresh promotes `thread.subagent-delegation` and
   `thread.subagent-collaboration` from previous-build presentation evidence to
   `26.825.51511`. Three real tasks lock the active inline chip, completed-chip
@@ -656,9 +661,13 @@ exit gates; it does not replace the inventory.
   1180×820 and 820×680. The `26.820.60940` follow-up now reaches real
   post-picker text/image cards and immersive image preview in isolated
   processes, then locks their wide/compact Browser/CDP, Electron, and
-  local-only product pixels. Actual failure/progress transitions, plugin
-  attachment variants, and a public non-image App Server input type remain
-  open.
+  local-only product pixels. The `26.825.51511` refresh supersedes those
+  measurements with 736/688×154px mixed-image/file Composers, Edit-first
+  preview, multiplicative zoom, focus-preserving removal, exact completion,
+  and sent-attachment ownership across Browser/CDP, Electron, reviewed
+  baselines, and local-only product pixels. Actual failure/progress
+  transitions, plugin attachment variants, and a public non-image App Server
+  input type remain open.
   The preceding `26.727.40816` results remain previous-build evidence.
   Attachment variants outside that sampled image path and Terminal
   multi-tab/process behavior remain historical regression evidence. Review
@@ -1208,9 +1217,10 @@ without confusing package readiness with full product reconstruction.
    an explicit evidence gap. File/folder/multi-item/upload/error/preview
    attachment variants and the independent Electron picker bridge are now
    delivered. The current post-picker text/image composition and immersive
-   preview are additionally runtime-observed on `26.820.60940` and pass
-   Browser/CDP, Electron, and local-only product-region pixels. Actual upload
-   failure/progress and plugin variants remain open. Current queue
+   preview are runtime-observed on `26.825.51511` and pass Browser/CDP,
+   Electron, reviewed wide/compact baselines, and local-only product-region
+   pixels through exact completion. Actual upload failure/progress and plugin
+   variants remain open. Current queue
    pause/Resume, resource-picker, and long-input paths are delivered on
    `26.825.51511`; retain the older automatic-continuation-only path as
    regression compatibility coverage.
