@@ -1089,6 +1089,32 @@ Exact third-party icons and every install/discovery side effect remain
 host-supplied. Reviewed replay baselines are committed; product screenshots
 and isolated profile data are not.
 
+## Current MCP Settings manager
+
+The `26.825.51511` Settings → Plugins → MCPs route has six deterministic
+wide/compact lifecycle scenes: list, STDIO create, HTTP create, compact HTTP,
+and update detail. CDP locks the five-tab counts, search/empty/Add-menu
+interactions, 4+2 row grouping, controlled switches, field order, disabled
+Save state, and exact wide/720 geometry. Native Electron repeats the
+wide/compact list, compact HTTP editor, and update detail. Product screenshots
+remain optional local-only references:
+
+```bash
+CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_REFERENCE=/absolute/path/to/mcp-list-wide.png \
+CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_COMPACT_REFERENCE=/absolute/path/to/mcp-list-compact.png \
+CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_STDIO_REFERENCE=/absolute/path/to/mcp-stdio-wide.png \
+CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_HTTP_REFERENCE=/absolute/path/to/mcp-http-wide.png \
+CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_HTTP_COMPACT_REFERENCE=/absolute/path/to/mcp-http-compact.png \
+CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_DETAIL_REFERENCE=/absolute/path/to/mcp-detail-wide.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=workspace-mcp-settings-current-26-825,workspace-mcp-settings-current-26-825-compact,workspace-mcp-settings-current-26-825-stdio-create,workspace-mcp-settings-current-26-825-http-create,workspace-mcp-settings-current-26-825-http-create-compact,workspace-mcp-settings-current-26-825-detail
+```
+
+The comparison crops only the Settings main region and masks only dynamic
+server/plugin names plus the update title name and real URL. Real save,
+toggle persistence, uninstall, OAuth/permissions, and failure effects remain
+host-owned follow-up work.
+
 ## Current Scheduled tasks route
 
 The `26.825.51511` Scheduled route has deterministic wide/compact index and

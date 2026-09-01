@@ -272,7 +272,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 72 have current-build runtime evidence, 7 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 71 groups and Electron verification covers 71.
+Current inventory: 91 surface groups; 73 have current-build runtime evidence, 7 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 72 groups and Electron verification covers 72.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -2141,3 +2141,28 @@ handlers, closed port `9920`, and moved the exact profile and raw evidence
 recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-integrations-26-825-20260901-9920`.
 The user-owned Codex PID `13503` remained running.
+
+## Current MCP Settings manager slice
+
+A separate isolated `26.825.51511` Renderer reached Settings → Plugins → MCPs
+at 1180×820 and 720×680. The current route keeps the five Plugin/App/MCP/
+Skills/Marketplace counts, Browse directory and Add actions, four standalone
+server rows, two plugin-provided rows, search/empty state, and the four-item
+Add menu. Search is intentionally unmounted at 720px. The sanitized fixed
+labels, geometry, screenshot hashes, and six regional product ratios are
+retained in `research/current-mcp-settings-26-825.json`; server names, raw
+screenshots, and the isolated profile remain local-only.
+
+`PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
+`McpServerEditor` expose the reusable public contract. The Codex playground
+adds deterministic list, STDIO/HTTP create, compact HTTP, and update-detail
+routes. Browser/CDP locks exact current geometry and controlled interactions
+across six frames; native Electron repeats the wide/compact list, compact HTTP
+create, and detail states. Six reviewed baselines pass. Local-only product
+main-region ratios are 1.3674%/3.4220% for the list, 2.0337% for STDIO,
+2.0939%/3.8928% for HTTP, and 2.2033% for detail under a 4% limit. Masks cover
+only content-dependent server names, the update title name, and its real URL.
+
+The implementation remains `partial`: real create/save, persisted enable or
+disable, uninstall, OAuth/permission prompts, and validation/transport failure
+effects were deliberately not executed by this read-only slice.

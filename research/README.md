@@ -33,6 +33,12 @@ visual checker through each scenario's named environment variable. A mask
 requires an explicit ownership reason and may exclude only a surface that is
 outside the scenario being verified.
 
+`current-mcp-settings-26-825.json` is the sanitized current-build evidence for
+the MCP manager list, empty/Add states, STDIO/HTTP create forms, and update
+detail. It retains only fixed labels, counts, geometry, screenshot hashes,
+regional pixel ratios, and the explicit read-only mutation boundary; server
+names, URLs, raw screenshots, and profile data remain local-only.
+
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.

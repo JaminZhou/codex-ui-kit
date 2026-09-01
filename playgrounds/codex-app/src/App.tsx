@@ -59,6 +59,8 @@ import {
   MenuSectionLabel,
   MenuSeparator,
   MenuSubmenu,
+  McpServerEditor,
+  McpServersPage,
   McpToolCallGroup,
   McpToolIcon,
   MessageAttachment,
@@ -135,6 +137,9 @@ import {
   type KeyboardShortcutCaptureTarget,
   type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
+  type McpServerEditorValue,
+  type McpServerItem,
+  type McpServerPageStatus,
   type PersonalizationSettingsValue,
   type PlanSelectionCard,
   type QueuedPrompt,
@@ -2870,6 +2875,40 @@ const currentScheduledRepeatOptions = [
   { label: "Custom", value: "custom" },
 ] as const;
 
+const currentMcpManagerTabs = [
+  { count: 13, id: "plugins", label: "Plugins" },
+  { count: 6, id: "apps", label: "Apps" },
+  { count: 6, id: "mcps", label: "MCPs" },
+  { count: 2, id: "skills", label: "Skills" },
+  { count: 2, id: "marketplace", label: "Marketplace" },
+] as const;
+
+const initialMcpServers: readonly McpServerItem[] = [
+  { enabled: false, id: "local-browser", name: "local-browser" },
+  { enabled: true, id: "design-reference", name: "design-reference" },
+  { enabled: true, id: "workspace-tools", name: "workspace-tools" },
+  { enabled: true, id: "docs-reference", name: "docs-reference" },
+];
+
+const currentPluginMcpServers: readonly McpServerItem[] = [
+  { id: "native-inspector", name: "native_inspector", source: "plugin" },
+  { id: "connected-apps", name: "connected_apps", source: "plugin" },
+];
+
+const blankMcpEditorValue: McpServerEditorValue = {
+  arguments: [""],
+  bearerTokenEnvironmentVariable: "",
+  command: "",
+  environmentPassthrough: [""],
+  environmentVariables: [],
+  headerEnvironmentVariables: [],
+  headers: [],
+  name: "",
+  type: "stdio",
+  url: "",
+  workingDirectory: "",
+};
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const currentComposerControls26825Replay =
@@ -2969,6 +3008,40 @@ export function App() {
     runsIn: "existing-chat",
     runsOn: "device",
   });
+  const [mcpServers, setMcpServers] = useState(initialMcpServers);
+  const [mcpQuery, setMcpQuery] = useState(
+    initialSelection.frame?.endsWith("-empty") ? "no-match-26-825" : "",
+  );
+  const [mcpStatus, setMcpStatus] = useState<McpServerPageStatus>(
+    initialSelection.frame?.endsWith("-unavailable")
+      ? "unavailable"
+      : "ready",
+  );
+  const [mcpEditorMode, setMcpEditorMode] = useState<
+    "create" | "update" | null
+  >(
+    initialSelection.frame?.includes("-create")
+      ? "create"
+      : initialSelection.frame?.endsWith("-detail")
+        ? "update"
+        : null,
+  );
+  const [mcpEditorValue, setMcpEditorValue] = useState<McpServerEditorValue>(
+    initialSelection.frame?.endsWith("-detail")
+      ? {
+          ...blankMcpEditorValue,
+          name: "workspace-tools",
+          type: "http",
+          url: "https://mcp.example.com/mcp",
+        }
+      : {
+          ...blankMcpEditorValue,
+          type: initialSelection.frame?.includes("-http-create")
+            ? "http"
+            : "stdio",
+        },
+  );
+  const [mcpSettingsAction, setMcpSettingsAction] = useState("");
   const [routeHistory, setRouteHistory] = useState(() =>
     createDemoRouteHistory(
       initialSelection.view,
@@ -3077,6 +3150,7 @@ export function App() {
     | "git-settings"
     | "hooks-settings"
     | "keyboard-shortcuts-settings"
+    | "mcp-settings"
     | "personalization-settings"
     | "plan-settings"
     | "usage-settings"
@@ -3110,6 +3184,11 @@ export function App() {
           initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
         ? "keyboard-shortcuts-settings"
       : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith(
+            "workspace-mcp-settings-current-26-825",
+          )
+        ? "mcp-settings"
+      : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-plan-settings")
         ? "plan-settings"
       : initialSelection.view === "workspace" &&
@@ -3132,6 +3211,10 @@ export function App() {
       ? "personalization"
       : initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
         ? "keyboard-shortcuts"
+      : initialSelection.frame?.startsWith(
+            "workspace-mcp-settings-current-26-825",
+          )
+        ? "plugins"
       : initialSelection.frame?.startsWith("workspace-voice-settings")
         ? "voice"
       : initialSelection.frame?.startsWith("workspace-general-settings")
@@ -7945,6 +8028,10 @@ export function App() {
         ? activeFrame?.startsWith("workspace-hooks-settings")
           ? activeFrame
           : "workspace-hooks-settings"
+      : workspacePage === "mcp-settings"
+        ? activeFrame?.startsWith("workspace-mcp-settings-current-26-825")
+          ? activeFrame
+          : "workspace-mcp-settings-current-26-825"
       : workspacePage === "worktree-settings"
         ? activeFrame?.startsWith("workspace-worktree-settings")
           ? activeFrame
@@ -8032,6 +8119,7 @@ export function App() {
         "git-settings",
         "hooks-settings",
         "keyboard-shortcuts-settings",
+        "mcp-settings",
         "personalization-settings",
         "usage-settings",
         "voice-settings",
@@ -9623,6 +9711,8 @@ export function App() {
           ? ["git", "github"]
           : id === "hooks" || id === "keyboard-shortcuts"
             ? ["git"]
+            : id === "plugins"
+              ? ["mcp", "mcps", "mcp servers"]
             : id === "browser" || id === "computer-use" || id === "connections" || id === "worktrees"
               ? ["git"]
               : undefined,
@@ -9655,6 +9745,7 @@ export function App() {
           itemId !== "git" &&
           itemId !== "hooks" &&
           itemId !== "keyboard-shortcuts" &&
+          itemId !== "plugins" &&
           itemId !== "personalization" &&
           itemId !== "usage-billing" &&
           itemId !== "voice" &&
@@ -9684,6 +9775,8 @@ export function App() {
                 ? "keyboard-shortcuts-settings"
               : itemId === "usage-billing"
                 ? "usage-settings"
+              : itemId === "plugins"
+                ? "mcp-settings"
               : itemId === "voice"
                 ? "voice-settings"
               : itemId === "hooks"
@@ -9703,6 +9796,8 @@ export function App() {
                 ? "workspace-keyboard-shortcuts"
               : itemId === "usage-billing"
                 ? "workspace-usage-settings"
+              : itemId === "plugins"
+                ? "workspace-mcp-settings-current-26-825"
               : itemId === "voice"
                 ? "workspace-voice-settings"
               : itemId === "hooks"
@@ -9717,7 +9812,107 @@ export function App() {
       sections={settingsNavigation}
       selectedId={selectedSettingsId}
     >
-      {workspacePage === "hooks-settings" ? (
+      {workspacePage === "mcp-settings" ? (
+        <>
+          <McpServersPage
+            activeCategory="mcps"
+            data-evidence="runtime-observed"
+            data-testid="current-mcp-settings-route"
+            onAddMarketplace={() =>
+              setMcpSettingsAction("Add marketplace requested")
+            }
+            onAddMcpServer={() => {
+              setMcpEditorValue(blankMcpEditorValue);
+              setMcpEditorMode("create");
+              setMcpSettingsAction("");
+              setActiveFrame("workspace-mcp-settings-current-26-825-stdio-create");
+            }}
+            onBrowseDirectory={() =>
+              setMcpSettingsAction("Browse directory requested")
+            }
+            onCategoryChange={(category) =>
+              setMcpSettingsAction(`${category} category requested`)
+            }
+            onCreatePlugin={() =>
+              setMcpSettingsAction("Create plugin requested")
+            }
+            onQueryChange={setMcpQuery}
+            onRecordSkill={() =>
+              setMcpSettingsAction("Record skill requested")
+            }
+            onRetry={() => {
+              setMcpStatus("ready");
+              setMcpSettingsAction("MCP servers reloaded");
+            }}
+            onServerEnabledChange={(item, enabled) => {
+              setMcpServers((servers) =>
+                servers.map((candidate) =>
+                  candidate.id === item.id
+                    ? { ...candidate, enabled }
+                    : candidate,
+                ),
+              );
+              setMcpSettingsAction(
+                `${String(item.name)} ${enabled ? "enabled" : "disabled"}`,
+              );
+            }}
+            onServerSettings={(item) => {
+              setMcpEditorValue({
+                ...blankMcpEditorValue,
+                name: String(item.name),
+                type: "http",
+                url: "https://mcp.example.com/mcp",
+              });
+              setMcpEditorMode("update");
+              setMcpSettingsAction("");
+              setActiveFrame("workspace-mcp-settings-current-26-825-detail");
+            }}
+            pluginServers={currentPluginMcpServers}
+            query={mcpQuery}
+            servers={mcpServers}
+            status={mcpStatus}
+            statusDescription="Check your MCP configuration and try again."
+            tabs={currentMcpManagerTabs}
+          >
+            {mcpEditorMode ? (
+              <McpServerEditor
+                data-evidence="runtime-observed"
+                mode={mcpEditorMode}
+                onBack={() => {
+                  setMcpEditorMode(null);
+                  setMcpSettingsAction("");
+                  setActiveFrame("workspace-mcp-settings-current-26-825");
+                }}
+                onChange={(value) => {
+                  setMcpEditorValue(value);
+                  if (mcpEditorMode === "create") {
+                    setActiveFrame(
+                      `workspace-mcp-settings-current-26-825-${value.type}-create`,
+                    );
+                  }
+                }}
+                onSave={() => setMcpSettingsAction("Save MCP requested")}
+                onUninstall={
+                  mcpEditorMode === "update"
+                    ? () => setMcpSettingsAction("Uninstall MCP requested")
+                    : undefined
+                }
+                saveDisabled={
+                  mcpEditorMode === "update" ||
+                  !mcpEditorValue.name.trim() ||
+                  (mcpEditorValue.type === "stdio"
+                    ? !mcpEditorValue.command.trim()
+                    : !mcpEditorValue.url.trim())
+                }
+                value={mcpEditorValue}
+              />
+            ) : null}
+          </McpServersPage>
+          <span aria-live="polite" className="demo-settings-action-status">
+            {mcpSettingsAction}
+          </span>
+        </>
+      ) : workspacePage === "hooks-settings" ? (
         <>
           <HooksSettingsPage
             data-evidence="runtime-observed"
@@ -10083,6 +10278,7 @@ export function App() {
           workspacePage === "appearance-settings" ||
           workspacePage === "general-settings" ||
           workspacePage === "keyboard-shortcuts-settings" ||
+          workspacePage === "mcp-settings" ||
           workspacePage === "personalization-settings" ||
           workspacePage === "usage-settings" ||
           workspacePage === "voice-settings" ||
@@ -10098,6 +10294,7 @@ export function App() {
     workspacePage === "code-review-settings" ||
     workspacePage === "general-settings" ||
     workspacePage === "keyboard-shortcuts-settings" ||
+    workspacePage === "mcp-settings" ||
     workspacePage === "personalization-settings" ||
     workspacePage === "plan-settings" ||
     workspacePage === "usage-settings" ||

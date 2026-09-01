@@ -22,19 +22,20 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
 - The authoritative full-surface inventory baseline is the installed
-  `26.825.51511` (`7377`) build. Its 90 candidate surface groups and
+  `26.825.51511` (`7377`) build. Its 91 candidate surface groups and
   build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  observation covers 36 groups; 43 previous-build groups remain regression
+  observation covers 73 groups; 7 previous-build groups remain regression
   evidence and 11 are still unsampled. The refresh revalidates the global
   shell, responsive Composer, primary navigation, project-group lifecycle,
   Help and Account menus, route restoration, Projects Index, current
   conversation/Markdown/MCP/Review slices, Settings through Usage & billing,
+  the read-only MCP Settings manager,
   and the Electron-native project action menu. The current slices combine
   Browser/CDP, Electron, reviewed replay baselines, and local-only
   current-product pixel gates. The
-  broader 115-asset visual manifest remains bound to the previous
-  `26.810.52044` evidence. This remains a partial UI foundation rather than a
+  visual-asset manifest remains separately build-scoped. This remains a
+  partial UI foundation rather than a
   global reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
@@ -73,6 +74,9 @@ review the [coverage policy](research/PARITY.md), or follow the
 - Composer attachments, mentions, modes, queued prompts, and running states.
 - A reusable thread-summary popover with collapsible sections, compact action
   rows, change deltas, disabled states, and controlled/uncontrolled behavior.
+- A controlled MCP Settings manager with Plugins/App/MCP/Skills/Marketplace
+  tabs, server and plugin-provided rows, search/empty/Add-menu states, and
+  STDIO/HTTP create and update editors.
 - A schema-valid current-style mixed thread that composes Web Search, Browser
   verification, MCP Search → Fetch, command approval, file Review, and a
   delegated audit across wide and 720px layouts. This is an independent
@@ -151,7 +155,7 @@ export function Example() {
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, sources, artifacts, generated images |
 | [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header, thread-summary panel, navigation rail, floating controls |
-| [Settings](docs/COMPONENTS.md#settings) | Full-page Settings shell/search, controlled preferences, Usage & billing, and embedded plan selection |
+| [Settings](docs/COMPONENTS.md#settings) | Full-page Settings shell/search, controlled preferences, Usage & billing, embedded plan selection, and MCP server management |
 | [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Terminal session primitives, project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.

@@ -14,8 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 72 groups have current-build runtime evidence, 7 have previous-build-only
-  runtime evidence, and 12 have not been sampled.
+- 73 groups have current-build runtime evidence, 7 have previous-build-only
+  runtime evidence, and 11 have not been sampled.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
   selection, wide/compact preview and pixels, focus-preserving removal, exact
@@ -1084,8 +1084,20 @@ reviewed wide/compact baselines are paired with optional local-only current
 product comparisons; their main-region differences range from 3.3067% to
 5.1784%, including host-owned third-party icon differences. The public
 component therefore keeps exact plugin artwork and installation effects
-host-supplied. MCP, automations, plugin detail/install, skill execution, and
+host-supplied. Automations, plugin detail/install, skill execution, and
 remaining Settings families stay open, so Stage 4 remains in progress.
+
+The current MCP Settings manager slice adds controlled
+`PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
+`McpServerEditor` primitives plus deterministic list, empty, Add-menu,
+STDIO/HTTP create, compact HTTP, and update-detail playground states. An
+isolated `26.825.51511` Renderer supplies the current five-tab counts, 4+2 row
+grouping, 52/42.5625px rows, wide/720 geometry, and create/update field
+contracts. Six CDP frames, four native Electron representatives, six reviewed
+baselines, and six local-only product main-region comparisons pass under a 4%
+limit. This delivers one read-only end-to-end `integrations.mcp` slice while
+keeping real save/toggle/uninstall, OAuth/permission, and failure effects open;
+Stage 4 therefore remains in progress.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

@@ -196,6 +196,8 @@ textarea {
   .codex-ui-app-shell__layout,
 .demo-root[data-frame^="workspace-general-settings"]
   .codex-ui-app-shell__layout,
+.demo-root[data-frame^="workspace-mcp-settings-current-26-825"]
+  .codex-ui-app-shell__layout,
 .demo-root[data-frame^="workspace-personalization-settings"]
   .codex-ui-app-shell__layout,
 .demo-root[data-frame^="workspace-hooks-settings"]
@@ -219,6 +221,10 @@ textarea {
 .demo-root[data-frame^="workspace-general-settings"]
   .codex-ui-app-shell__sidebar,
 .demo-root[data-frame^="workspace-general-settings"]
+  .codex-ui-app-shell__sidebar-resizer,
+.demo-root[data-frame^="workspace-mcp-settings-current-26-825"]
+  .codex-ui-app-shell__sidebar,
+.demo-root[data-frame^="workspace-mcp-settings-current-26-825"]
   .codex-ui-app-shell__sidebar-resizer,
 .demo-root[data-frame^="workspace-personalization-settings"]
   .codex-ui-app-shell__sidebar,
@@ -244,6 +250,8 @@ textarea {
 .demo-root[data-frame^="workspace-appearance-settings"]
   .codex-ui-app-shell__main,
 .demo-root[data-frame^="workspace-general-settings"]
+  .codex-ui-app-shell__main,
+.demo-root[data-frame^="workspace-mcp-settings-current-26-825"]
   .codex-ui-app-shell__main,
 .demo-root[data-frame^="workspace-personalization-settings"]
   .codex-ui-app-shell__main,
