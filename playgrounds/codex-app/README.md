@@ -1117,6 +1117,29 @@ suggestion brand icons. The page emits callbacks only; clipboard/navigation,
 installation, connection persistence, OAuth/permissions, external links, and
 failure effects remain host-owned.
 
+## Current Skill detail and Try now entry
+
+Five deterministic `26.825.51511` scenes cover the installed Skill modal,
+actions menu, bottom scroll, 720×680 compact modal, and the contenteditable
+unsent Try now draft. CDP and native Electron gate exact dialog, content,
+footer, control, menu, Composer, and mention geometry plus the two-step Escape
+order and host-controlled transition. Product screenshots remain optional
+local-only references:
+
+```bash
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_REFERENCE=/absolute/path/to/skill-installed-wide.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_ACTIONS_REFERENCE=/absolute/path/to/skill-actions-wide.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_BOTTOM_REFERENCE=/absolute/path/to/skill-bottom-wide.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE=/absolute/path/to/skill-installed-compact.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_TRY_NOW_REFERENCE=/absolute/path/to/skill-try-now-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=integration-skill-detail-current-26-825-installed,integration-skill-detail-current-26-825-actions,integration-skill-detail-current-26-825-bottom,integration-skill-detail-current-26-825-installed-compact,integration-skill-detail-current-26-825-try-now-compact
+```
+
+The regional gate masks host-owned artwork, instruction prose, background
+conversation content, inline mention content, and glyph interiors only. The
+playground never toggles, opens, reveals, copies, uninstalls, or submits.
+
 ## Current MCP Settings manager
 
 The `26.825.51511` Settings → Plugins → MCPs route has six deterministic

@@ -2155,6 +2155,28 @@ install/uninstall, reconnect/disconnect persistence, OAuth/permission prompts,
 external information links, and failure/retry effects were deliberately not
 executed by this read-only slice.
 
+## Current Skill detail and Try now entry slice
+
+An isolated same-build `26.825.51511` Renderer reached an installed Skill
+detail modal at 1180×820 and 720×680. The observed contract fixes the 600px
+dialog, 720/680px responsive height, 40px artwork slot, 20/28px title, current
+enabled switch, three-item Open/Reveal/Copy menu, 558px instruction frame,
+bottom scroll, footer actions, and menu-first/dialog-second Escape order.
+
+Try now closes the modal and creates a contenteditable, unsent 664×44px draft
+with a 109.140625×20px inline skill mention. The probe did not click Send.
+`SkillDetailDialog` and `SkillPromptMention` expose this as controlled public
+composition; every persistent or external effect remains host-owned. Five
+Browser/CDP scenes, five native Electron representatives, and five reviewed
+pixel baselines pass. Ten local-only product regions range from 0.0040% to
+0.8616%, below the explicit 8% ceiling. The sanitized record is
+`research/current-skill-detail-26-825.json`; raw frames and their account or
+project context remain local-only.
+
+The `integrations.skills` row remains `partial`: persisted enable/disable,
+Open/Reveal/Copy effects, uninstall, prompt submission, successful execution,
+and failure/retry states remain open.
+
 Cleanup stopped only isolated PID `88986` and its validated profile-owned
 processes, closed port `9924`, and moved the exact profile and raw evidence
 recoverably to

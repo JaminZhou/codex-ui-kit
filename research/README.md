@@ -45,6 +45,13 @@ menu labels, scroll extents, screenshot hashes, regional pixel ratios, and the
 read-only mutation boundary; plugin artwork, raw screenshots, account data,
 process IDs, ports, and profile data remain local-only.
 
+`current-skill-detail-26-825.json` is the sanitized current-build evidence for
+an installed Skill detail modal and the unsent Try now prefill. It retains
+fixed dialog, menu, scroll, composer, and mention geometry plus screenshot
+hashes and regional pixel ratios; skill instructions, artwork, account and
+project context, raw screenshots, process IDs, ports, and profile data remain
+local-only.
+
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.

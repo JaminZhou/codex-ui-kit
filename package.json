@@ -73,6 +73,7 @@
     "capture:current-attachment-26-825": "node scripts/capture-current-attachment.mjs",
     "capture:current-integrations-26-825": "node scripts/capture-current-integrations.mjs",
     "capture:current-plugin-detail-26-825": "node scripts/capture-current-plugin-detail.mjs",
+    "capture:current-skill-detail-26-825": "node scripts/capture-current-skill-detail.mjs",
     "capture:current-mcp-settings-26-825": "node scripts/capture-current-mcp-settings.mjs",
     "capture:current-automations-26-825": "node scripts/capture-current-automations.mjs",
     "capture:current-compaction-26-825": "node scripts/capture-current-compaction.mjs",

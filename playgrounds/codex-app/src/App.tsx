@@ -53,6 +53,8 @@ import {
   IntegrationCatalogTabs,
   PluginDetailBreadcrumb,
   PluginDetailPage,
+  SkillDetailDialog,
+  SkillPromptMention,
   KeyboardShortcutsPage,
   LocalEnvironmentDialog,
   Menu,
@@ -3070,7 +3072,10 @@ export function App() {
   const [integrationCatalogKind, setIntegrationCatalogKind] = useState<
     "plugins" | "skills"
   >(
-    initialSelection.frame?.startsWith("integration-skills-current-26-825")
+    initialSelection.frame?.startsWith("integration-skills-current-26-825") ||
+      initialSelection.frame?.startsWith(
+        "integration-skill-detail-current-26-825",
+      )
       ? "skills"
       : "plugins",
   );
@@ -3108,6 +3113,25 @@ export function App() {
   const [pluginDetailConnectionOpen, setPluginDetailConnectionOpen] =
     useState(initialSelection.frame?.endsWith("-connection") ?? false);
   const [pluginDetailAction, setPluginDetailAction] = useState("");
+  const isCurrentSkillDetailReplay =
+    initialSelection.frame?.startsWith(
+      "integration-skill-detail-current-26-825",
+    ) ?? false;
+  const isCurrentSkillTryNowReplay =
+    initialSelection.frame ===
+    "integration-skill-detail-current-26-825-try-now-compact";
+  const [skillDetailOpen, setSkillDetailOpen] = useState(
+    isCurrentSkillDetailReplay && !isCurrentSkillTryNowReplay,
+  );
+  const [skillDetailActionsOpen, setSkillDetailActionsOpen] = useState(
+    initialSelection.frame ===
+      "integration-skill-detail-current-26-825-actions",
+  );
+  const [skillDetailEnabled, setSkillDetailEnabled] = useState(true);
+  const [skillDetailAction, setSkillDetailAction] = useState("");
+  const [skillTryNowActive, setSkillTryNowActive] = useState(
+    isCurrentSkillTryNowReplay,
+  );
   const [scheduledFilter, setScheduledFilter] =
     useState<ScheduledTaskFilter>(
       initialSelection.frame?.endsWith("-paused")
@@ -3830,6 +3854,18 @@ export function App() {
       ? detail.scrollHeight
       : 0;
   }, [activeFrame, pluginDetailOpen]);
+  useLayoutEffect(() => {
+    if (
+      !skillDetailOpen ||
+      activeFrame !== "integration-skill-detail-current-26-825-bottom"
+    ) {
+      return;
+    }
+    const content = document.querySelector<HTMLElement>(
+      ".codex-ui-skill-detail__content",
+    );
+    if (content) content.scrollTop = content.scrollHeight;
+  }, [activeFrame, skillDetailOpen]);
   const [currentWorktreeSetupPhase, setCurrentWorktreeSetupPhase] =
     useState<WorktreeSetupPhase>(() =>
       initialCurrentWorktreeSetupPhase(initialSelection.frame),
@@ -7829,6 +7865,40 @@ export function App() {
         steps={state.plan}
       />
     ) : null;
+  const skillTryNowComposer = (
+    <form
+      aria-label="OpenAI Docs skill draft"
+      className="demo-current-skill-try-now"
+      data-action={skillDetailAction || undefined}
+      data-submitted="false"
+      data-testid="current-skill-try-now"
+      onSubmit={(event) => event.preventDefault()}
+    >
+      <div
+        aria-label="Do anything"
+        className="demo-current-skill-try-now__textbox"
+        contentEditable
+        role="textbox"
+        suppressContentEditableWarning
+      >
+        Use OpenAI Docs for official docs lookup, questions about Codex itself
+        or Codex surfaces, model selection, model migration, and prompt-upgrade
+        work. {" "}
+        <SkillPromptMention
+          artwork={<CurrentIntegrationFixtureIcon label="O" tone="amber" />}
+          label="OpenAI Docs"
+        />
+      </div>
+      <div className="demo-current-skill-try-now__actions">
+        <button aria-label="Add files and more" type="button">
+          <CurrentBuildIcon name="composer-add-files" />
+        </button>
+        <button aria-label="Send" type="submit">
+          <CurrentBuildIcon name="composer-send" />
+        </button>
+      </div>
+    </form>
+  );
   const currentPendingApproval = isCurrentApprovalReplay
     ? state.approvals.find(({ decision }) => decision === "pending")
     : undefined;
@@ -7950,6 +8020,8 @@ export function App() {
             : "Allow opening the requested local application?"
       }
     />
+  ) : skillTryNowActive ? (
+    skillTryNowComposer
   ) : (
     regularComposer
   );
@@ -10833,6 +10905,79 @@ export function App() {
     />
   );
 
+  const skillDetailDialog = (
+    <SkillDetailDialog
+      actionsMenuOpen={skillDetailActionsOpen}
+      artwork={<CurrentIntegrationFixtureIcon label="O" tone="amber" />}
+      className="demo-current-skill-detail"
+      data-action={skillDetailAction || undefined}
+      data-testid="current-skill-detail"
+      description="OpenAI and Codex docs for models, skills, tasks, and setup"
+      enabled={skillDetailEnabled}
+      onActionsMenuOpenChange={(open) => {
+        setSkillDetailActionsOpen(open);
+        setSkillDetailAction(open ? "actions:open" : "actions:close");
+      }}
+      onCopyMarkdown={() => setSkillDetailAction("copy-markdown-requested")}
+      onEnabledChange={(enabled) => {
+        setSkillDetailEnabled(enabled);
+        setSkillDetailAction(enabled ? "enable-requested" : "disable-requested");
+      }}
+      onOpen={() => setSkillDetailAction("open-requested")}
+      onOpenChange={(open) => {
+        setSkillDetailActionsOpen(false);
+        setSkillDetailOpen(open);
+        setSkillDetailAction(open ? "opened" : "closed");
+      }}
+      onReveal={() => setSkillDetailAction("reveal-requested")}
+      onTryNow={() => {
+        setSkillDetailActionsOpen(false);
+        setSkillDetailOpen(false);
+        setSkillTryNowActive(true);
+        setSkillDetailAction("try-now-prefill");
+        setActiveFrame(
+          "integration-skill-detail-current-26-825-try-now-compact",
+        );
+        setView("conversation");
+      }}
+      onUninstall={() => setSkillDetailAction("uninstall-requested")}
+      open={skillDetailOpen}
+      title="OpenAI Docs"
+    >
+      <p>
+        Use this skill when a task needs official product documentation or
+        help selecting a supported model and workflow.
+      </p>
+      <h3>What this skill covers</h3>
+      <ul>
+        <li>Official API and product documentation lookup.</li>
+        <li>Codex setup, skills, tasks, and model selection.</li>
+        <li>Migration notes and prompt-upgrade guidance.</li>
+      </ul>
+      <h3>Evidence rules</h3>
+      <p>
+        Prefer first-party documentation, distinguish verified behavior from
+        inference, and keep host account actions explicit.
+      </p>
+      <pre>
+        <code>{`Request\n  -> identify the official surface\n  -> inspect the relevant documentation\n  -> answer with scoped evidence`}</code>
+      </pre>
+      <h3>Safe execution boundary</h3>
+      <p>
+        Opening, revealing, copying, enabling, uninstalling, and running this
+        skill remain host-owned effects. The component only emits callbacks.
+      </p>
+      <h3>Example prompts</h3>
+      <ol>
+        <li>Explain the latest supported Codex settings.</li>
+        <li>Compare model choices for a long-running coding task.</li>
+        <li>Find the official migration guidance for an API upgrade.</li>
+        <li>Review a prompt against current product documentation.</li>
+        <li>Summarize the relevant skill and task constraints.</li>
+      </ol>
+    </SkillDetailDialog>
+  );
+
   const activeIntegrationScope =
     integrationCatalogKind === "plugins"
       ? pluginCatalogScope
@@ -10873,6 +11018,13 @@ export function App() {
           setPluginDetailActionsOpen(false);
           setPluginDetailConnectionOpen(false);
           setPluginDetailOpen(true);
+        }
+        if (
+          isCurrentSkillDetailReplay &&
+          item.id === "openai-docs"
+        ) {
+          setSkillDetailActionsOpen(false);
+          setSkillDetailOpen(true);
         }
       }}
       onManage={() => setIntegrationCatalogAction("manage")}
@@ -15399,7 +15551,14 @@ export function App() {
         ) : view === "automations" ? (
           scheduledTasksRoute
         ) : view === "plugins" ? (
-          pluginDetailOpen ? pluginDetailRoute : integrationCatalogRoute
+          pluginDetailOpen ? (
+            pluginDetailRoute
+          ) : (
+            <>
+              {integrationCatalogRoute}
+              {skillDetailDialog}
+            </>
+          )
         ) : view === "shell" ? (
           shellRoute
         ) : view === "workspace" ? (

@@ -9206,6 +9206,242 @@ for (const scene of selectedScenes) {
       continue;
     }
 
+    if (scene.id.startsWith("integration-skill-detail-current-26-825-")) {
+      const compact = scene.id.endsWith("-compact");
+      const tryNow = scene.id.endsWith("-try-now-compact");
+      const closeTo = (actual, expected, tolerance = 1) =>
+        typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
+      if (tryNow) {
+        const draft = await page.evaluate(() => {
+          const rect = (target) => {
+            if (!(target instanceof Element)) return null;
+            const bounds = target.getBoundingClientRect();
+            return {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            };
+          };
+          const root = document.querySelector(
+            '[data-testid="current-skill-try-now"]',
+          );
+          const textbox = root?.querySelector(
+            '[role="textbox"][aria-label="Do anything"]',
+          );
+          const mention = root?.querySelector(
+            ".codex-ui-skill-prompt-mention",
+          );
+          const button = (label) =>
+            Array.from(root?.querySelectorAll("button") ?? []).find(
+              (candidate) => candidate.getAttribute("aria-label") === label,
+            );
+          return {
+            addFiles: rect(button("Add files and more")),
+            dialogCount: document.querySelectorAll('[role="dialog"]').length,
+            draft: rect(root),
+            mention: rect(mention),
+            mentionEditable: mention?.getAttribute("contenteditable"),
+            send: rect(button("Send")),
+            submitted: root?.getAttribute("data-submitted"),
+            textIncludesSkill:
+              textbox?.textContent?.includes("OpenAI Docs") ?? false,
+            textbox: rect(textbox),
+            viewport: { height: innerHeight, width: innerWidth },
+          };
+        });
+        if (
+          draft.viewport.width !== 720 ||
+          draft.viewport.height !== 680 ||
+          draft.dialogCount !== 0 ||
+          draft.submitted !== "false" ||
+          !draft.textIncludesSkill ||
+          draft.mentionEditable !== "false" ||
+          !draft.draft ||
+          !closeTo(draft.draft.left, 24) ||
+          !closeTo(draft.draft.top, 576) ||
+          !closeTo(draft.draft.width, 672) ||
+          !closeTo(draft.draft.height, 84) ||
+          !draft.textbox ||
+          !closeTo(draft.textbox.left, 28) ||
+          !closeTo(draft.textbox.top, 580) ||
+          !closeTo(draft.textbox.width, 664) ||
+          !closeTo(draft.textbox.height, 44) ||
+          !draft.mention ||
+          !closeTo(draft.mention.left, 384) ||
+          !closeTo(draft.mention.top, 600, 1.5) ||
+          !closeTo(draft.mention.width, 109.140625) ||
+          !draft.addFiles ||
+          !closeTo(draft.addFiles.left, 24) ||
+          !closeTo(draft.addFiles.top, 628) ||
+          !draft.send ||
+          !closeTo(draft.send.left, 668) ||
+          !closeTo(draft.send.top, 628)
+        ) {
+          throw new Error(
+            `${scene.id}: current skill Try now draft failed: ${JSON.stringify(draft)}`,
+          );
+        }
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify(draft, null, 2)}\n`,
+        );
+        continue;
+      }
+
+      const bottom = scene.id.endsWith("-bottom");
+      const detail = await page
+        .locator('[data-testid="current-skill-detail"]')
+        .evaluate((root) => {
+          const rect = (target) => {
+            if (!(target instanceof Element)) return null;
+            const bounds = target.getBoundingClientRect();
+            return {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            };
+          };
+          const button = (label) =>
+            Array.from(root.querySelectorAll("button")).find(
+              (candidate) =>
+                (candidate.getAttribute("aria-label") ||
+                  candidate.textContent?.trim()) === label,
+            );
+          const content = root.querySelector(
+            ".codex-ui-skill-detail__content",
+          );
+          return {
+            actions: {
+              close: rect(button("Close dialog")),
+              more: rect(button("More actions")),
+              tryNow: rect(button("Try now")),
+              uninstall: rect(button("Uninstall")),
+            },
+            artwork: rect(
+              root.querySelector(".codex-ui-skill-detail__artwork"),
+            ),
+            content: content
+              ? {
+                  clientHeight: content.clientHeight,
+                  rect: rect(content),
+                  scrollHeight: content.scrollHeight,
+                  scrollTop: content.scrollTop,
+                }
+              : null,
+            dialog: rect(root),
+            document: rect(
+              root.querySelector(".codex-ui-skill-detail__document"),
+            ),
+            footer: rect(root.querySelector(".codex-ui-dialog__footer")),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            identity: rect(
+              root.querySelector(".codex-ui-skill-detail__identity"),
+            ),
+            menu: rect(root.querySelector('[role="menu"]')),
+            menuItems: Array.from(
+              root.querySelectorAll('[role="menuitem"]'),
+              (item) => item.textContent?.trim(),
+            ),
+            name: rect(root.querySelector(".codex-ui-skill-detail__name-row")),
+            switch: {
+              checked: button("Disable skill")?.getAttribute("aria-checked"),
+              rect: rect(button("Disable skill")),
+              role: button("Disable skill")?.getAttribute("role"),
+            },
+            viewport: { height: innerHeight, width: innerWidth },
+          };
+        });
+      const expectedDialog = compact
+        ? { height: 680, left: 60, top: 0, width: 600 }
+        : { height: 720, left: 290, top: 50, width: 600 };
+      const expectedInnerLeft = compact ? 80 : 310;
+      const expectedTopOffset = compact ? -50 : 0;
+      if (
+        detail.viewport.width !== (compact ? 720 : 1180) ||
+        detail.viewport.height !== (compact ? 680 : 820) ||
+        Math.abs(detail.horizontalOverflow) > 1 ||
+        !detail.dialog ||
+        !closeTo(detail.dialog.left, expectedDialog.left) ||
+        !closeTo(detail.dialog.top, expectedDialog.top) ||
+        !closeTo(detail.dialog.width, expectedDialog.width) ||
+        !closeTo(detail.dialog.height, expectedDialog.height) ||
+        !detail.identity ||
+        !closeTo(detail.identity.left, expectedInnerLeft) ||
+        !closeTo(detail.identity.top, 70 + expectedTopOffset) ||
+        !closeTo(detail.identity.width, 560) ||
+        !detail.artwork ||
+        !closeTo(detail.artwork.left, expectedInnerLeft) ||
+        !closeTo(detail.artwork.top, 82 + expectedTopOffset) ||
+        !closeTo(detail.artwork.width, 40) ||
+        !detail.name ||
+        !closeTo(detail.name.top, 134 + expectedTopOffset) ||
+        !detail.content ||
+        !detail.content.rect ||
+        !closeTo(detail.content.rect.left, expectedInnerLeft) ||
+        !closeTo(detail.content.rect.top, 202 + expectedTopOffset) ||
+        !closeTo(detail.content.rect.width, 560) ||
+        !closeTo(detail.content.clientHeight, compact ? 468 : 508) ||
+        (bottom ? detail.content.scrollTop <= 0 : detail.content.scrollTop !== 0) ||
+        !detail.footer ||
+        !closeTo(detail.footer.left, expectedInnerLeft) ||
+        !closeTo(detail.footer.top, compact ? 620 : 710) ||
+        detail.switch.role !== "switch" ||
+        detail.switch.checked !== "true" ||
+        !detail.switch.rect ||
+        !closeTo(detail.switch.rect.left, compact ? 544 : 774) ||
+        !closeTo(detail.actions.more?.left, compact ? 584 : 814) ||
+        !closeTo(detail.actions.close?.left, compact ? 616 : 846) ||
+        !closeTo(detail.actions.uninstall?.left, expectedInnerLeft) ||
+        !closeTo(detail.actions.uninstall?.top, compact ? 632 : 722) ||
+        !closeTo(detail.actions.tryNow?.left, compact ? 551.25 : 781.25) ||
+        (scene.id.endsWith("-actions") &&
+          (detail.menuItems.join("|") !==
+            "Open|Reveal in Finder|Copy Markdown" ||
+            !detail.menu ||
+            !closeTo(detail.menu.left, 719) ||
+            !closeTo(detail.menu.top, 100) ||
+            !closeTo(detail.menu.width, 121.6875) ||
+            !closeTo(detail.menu.height, 93.6875, 1.5)))
+      ) {
+        throw new Error(
+          `${scene.id}: current skill detail geometry failed: ${JSON.stringify(detail)}`,
+        );
+      }
+      if (scene.id.endsWith("-actions")) {
+        await page.keyboard.press("Escape");
+        if (
+          (await page.locator('[role="menu"]').count()) !== 0 ||
+          (await page.getByRole("dialog").count()) !== 1
+        ) {
+          throw new Error(`${scene.id}: first Escape did not dismiss only the menu.`);
+        }
+        await page.keyboard.press("Escape");
+        if ((await page.getByRole("dialog").count()) !== 0) {
+          throw new Error(`${scene.id}: second Escape did not dismiss the dialog.`);
+        }
+      }
+      if (scene.id.endsWith("-installed")) {
+        await page.getByRole("button", { exact: true, name: "Try now" }).click();
+        const draft = page.locator('[data-testid="current-skill-try-now"]');
+        await draft.waitFor();
+        if (
+          (await draft.getAttribute("data-submitted")) !== "false" ||
+          (await draft.getByRole("textbox", { name: "Do anything" }).count()) !== 1
+        ) {
+          throw new Error(`${scene.id}: Try now did not create an unsent draft.`);
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(detail, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.id.startsWith("integration-plugin-detail-current-26-825-")) {
       const compact = scene.id.endsWith("-compact");
       const installed = scene.id.includes("-installed") ||

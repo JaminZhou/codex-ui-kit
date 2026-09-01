@@ -1095,8 +1095,17 @@ representatives, and eight reviewed replay baselines pair with current-product
 regional comparisons below an 8% ceiling. Product artwork, hero artwork, and
 suggestion-brand icons stay host-supplied. Clipboard/navigation, real install
 or uninstall, connection persistence, OAuth/permissions, external links, and
-failure effects stay open. Automations detail/mutation, skill execution, and
-remaining Settings families also stay open, so Stage 4 remains in progress.
+failure effects stay open.
+
+The adjacent Skill detail/entry slice adds controlled `SkillDetailDialog` and
+`SkillPromptMention` primitives for the installed modal, enabled switch,
+three-item actions menu, long instruction scroll, footer actions, two-step
+Escape dismissal, and the unsent Try now draft. One isolated same-build
+Renderer supplies wide/720 geometry and five local-only product frames.
+Browser/CDP gates all five scenes, Electron repeats them, and regional chrome
+comparisons remain below 1%. Enable/uninstall/menu effects, prompt submission,
+successful skill execution, failure/retry, Automations detail/mutation, and
+remaining Settings families stay open, so Stage 4 remains in progress.
 
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
