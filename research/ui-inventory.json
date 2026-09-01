@@ -2109,14 +2109,19 @@
         "plugin-detail-page",
         "plugins-settings",
         "integration-catalog",
+        "component:PluginDetailPage-PluginDetailBreadcrumb",
         "browser-cdp:current-26-825-plugin-catalog-wide-compact-search-scope-action",
         "electron:current-26-825-plugin-catalog-wide-compact",
-        "pixel:current-26-825-plugin-main-wide-compact"
+        "pixel:current-26-825-plugin-main-wide-compact",
+        "browser-cdp:current-26-825-plugin-detail-installed-discovery-wide-compact-bottom-actions-connection",
+        "electron:current-26-825-plugin-detail-installed-actions-connection-discovery-compact",
+        "pixel:eight-reviewed-current-26-825-plugin-detail-scenes-and-eight-local-only-product-region-gates"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:plugins-index-search-categories-actions-and-settings",
-        "cdp-26.825.51511:plugins-wide-compact-installed-public-personal-search-actions"
+        "cdp-26.825.51511:plugins-wide-compact-installed-public-personal-search-actions",
+        "cdp-26.825.51511:plugin-detail-installed-discovery-actions-connection-information-wide-compact-bottom"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",

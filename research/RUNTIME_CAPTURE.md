@@ -2516,6 +2516,41 @@ Terminate only the exact validated isolated process tree, prove port `9920`
 closed, move the exact profile recoverably to Trash, and recheck that the
 primary Codex PID remains alive.
 
+## Current `26.825.51511` Plugin detail sample
+
+Use `pnpm capture:current-plugin-detail-26-825` only with an exact isolated
+profile and a loopback listener owned by the validated second Codex process.
+The helper fails closed unless version `26.825.51511`, build `7377`, Chromium
+`151.0.7922.174`, expected ASAR size/SHA-256, explicit profile, direct-child
+owner, listener, and profile-local output directory all match. It is
+read-only: it may open installed and discovery detail routes, scroll, resize,
+and open/dismiss the Uninstall or connection menu; it must not invoke Copy
+link, Try now, Install, Uninstall, Reconnect, Disconnect, or external links.
+
+Capture eight wide/720 states: installed, installed actions, installed
+connection, installed bottom, installed compact, discovery, discovery bottom,
+and discovery compact. Product screenshots and raw capture JSON remain inside
+the isolated profile. Promote only the sanitized record
+`research/current-plugin-detail-26-825.json` and reviewed replay baselines.
+Optional local-only product comparisons use:
+
+```bash
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_REFERENCE=/absolute/path/to/plugin-installed-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_ACTIONS_REFERENCE=/absolute/path/to/plugin-actions-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_CONNECTION_REFERENCE=/absolute/path/to/plugin-connection-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_BOTTOM_REFERENCE=/absolute/path/to/plugin-installed-bottom-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE=/absolute/path/to/plugin-installed-compact.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_REFERENCE=/absolute/path/to/plugin-discovery-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_BOTTOM_REFERENCE=/absolute/path/to/plugin-discovery-bottom-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_COMPACT_REFERENCE=/absolute/path/to/plugin-discovery-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=integration-plugin-detail-current-26-825-installed,integration-plugin-detail-current-26-825-actions,integration-plugin-detail-current-26-825-connection,integration-plugin-detail-current-26-825-installed-bottom,integration-plugin-detail-current-26-825-installed-compact,integration-plugin-detail-current-26-825-discovery,integration-plugin-detail-current-26-825-discovery-bottom,integration-plugin-detail-current-26-825-discovery-compact
+```
+
+Terminate only the exact validated isolated process tree, prove its loopback
+port closed, move the exact profile recoverably to Trash, and recheck that the
+primary Codex PID remains alive.
+
 ## Promotion rule
 
 After a capture:

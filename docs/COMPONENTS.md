@@ -309,6 +309,14 @@ All privileged behavior remains host-owned. The components never auto-approve co
   states. Hosts supply catalog data, exact third-party artwork, installation
   state, search persistence, discovery, permission checks, and every
   privileged action. The component does not fetch or install integrations.
+- `PluginDetailBreadcrumb`: controlled Plugins-to-detail breadcrumb with a
+  host-owned Back transition.
+- `PluginDetailPage`: responsive installed/discovery detail shell with
+  host-supplied artwork and hero backdrop, prompt suggestions, app rows,
+  information links, privacy disclosure, and controlled actions, uninstall,
+  reconnect, and disconnect menus. The component emits callbacks only; hosts
+  own clipboard, navigation, installation, connection, permission, OAuth, and
+  persistence effects.
 - `PluginManagerTabs`: controlled Plugins/Apps/MCPs/Skills/Marketplace tablist
   with count badges and host-owned route changes.
 - `IntegrationAddMenu`: controlled Create plugin, Add a marketplace, Add MCP

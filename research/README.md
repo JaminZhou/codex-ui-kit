@@ -39,6 +39,12 @@ detail. It retains only fixed labels, counts, geometry, screenshot hashes,
 regional pixel ratios, and the explicit read-only mutation boundary; server
 names, URLs, raw screenshots, and profile data remain local-only.
 
+`current-plugin-detail-26-825.json` is the sanitized current-build evidence
+for installed and discovery Plugin detail states. It retains fixed geometry,
+menu labels, scroll extents, screenshot hashes, regional pixel ratios, and the
+read-only mutation boundary; plugin artwork, raw screenshots, account data,
+process IDs, ports, and profile data remain local-only.
+
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.

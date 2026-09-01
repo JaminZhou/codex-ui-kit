@@ -1073,9 +1073,9 @@ asset manifest to 78 icons; the later completed-thread slice raises it to 90.
 Remaining P1 families keep their existing open
 gates, so Stage 4 is still in progress.
 
-The current Plugins/Skills index slice now adds a shared controlled
-`IntegrationCatalogPage` without claiming plugin detail, installation,
-permission, or settings completion. An isolated `26.825.51511` Renderer
+The current Plugins/Skills index slice adds a shared controlled
+`IntegrationCatalogPage` without claiming installation, permission, or
+settings completion. An isolated `26.825.51511` Renderer
 records wide/720 navigation, 728px bounded search, Installed/Public/Personal
 plugin groups, Installed/Personal/System/Project/Recommended skill groups,
 two-column wrapping, and visible search/scope/action behavior. Browser/CDP and
@@ -1084,8 +1084,19 @@ reviewed wide/compact baselines are paired with optional local-only current
 product comparisons; their main-region differences range from 3.3067% to
 5.1784%, including host-owned third-party icon differences. The public
 component therefore keeps exact plugin artwork and installation effects
-host-supplied. Automations, plugin detail/install, skill execution, and
-remaining Settings families stay open, so Stage 4 remains in progress.
+host-supplied.
+
+The follow-up Plugin detail slice adds controlled `PluginDetailPage` and
+`PluginDetailBreadcrumb` primitives for installed/discovery identity,
+suggestions, Apps, Information, disclosure, bottom scrolling, and the
+uninstall/connection menus. One isolated same-build Renderer supplies eight
+wide/720 read-only states; Browser/CDP gates all eight, Electron repeats four
+representatives, and eight reviewed replay baselines pair with current-product
+regional comparisons below an 8% ceiling. Product artwork, hero artwork, and
+suggestion-brand icons stay host-supplied. Clipboard/navigation, real install
+or uninstall, connection persistence, OAuth/permissions, external links, and
+failure effects stay open. Automations detail/mutation, skill execution, and
+remaining Settings families also stay open, so Stage 4 remains in progress.
 
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
@@ -1359,7 +1370,13 @@ without confusing package readiness with full product reconstruction.
     suggestions, split Create choices, navigator/manual editor, unavailable
     recovery, Browser/CDP, Electron, and four local-only current-product pixel
     comparisons. Real task creation, edit, pause/resume, detail, execution,
-    delivery, and permission/failure transitions remain open.
+    delivery, and permission/failure transitions remain open. Plugin detail
+    is now separately delivered for installed/discovery identity, suggestions,
+    Apps, Information, disclosure, bottom scrolling, controlled uninstall and
+    connection menus, wide/720 Browser/CDP, Electron, and eight local-only
+    current-product regional comparisons. Real clipboard/navigation, install
+    or uninstall, connection persistence, OAuth/permissions, external links,
+    and failure effects remain open.
 12. **Full-app validation and global convergence**: replay/live App Server
     attribution, dark/light and wide/compact matrices, current-build regional
     pixels, public contract freeze, compatibility matrix, and release

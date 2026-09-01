@@ -737,6 +737,28 @@ const currentIntegrationCatalogReferences = {
   "integration-skills-current-26-825-compact":
     process.env.CODEX_UI_KIT_CURRENT_SKILLS_26_825_COMPACT_REFERENCE,
 };
+const currentPluginDetailReferences = {
+  "integration-plugin-detail-current-26-825-actions":
+    process.env.CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_ACTIONS_REFERENCE,
+  "integration-plugin-detail-current-26-825-connection":
+    process.env.CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_CONNECTION_REFERENCE,
+  "integration-plugin-detail-current-26-825-discovery":
+    process.env.CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_REFERENCE,
+  "integration-plugin-detail-current-26-825-discovery-bottom":
+    process.env
+      .CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_BOTTOM_REFERENCE,
+  "integration-plugin-detail-current-26-825-discovery-compact":
+    process.env
+      .CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_COMPACT_REFERENCE,
+  "integration-plugin-detail-current-26-825-installed":
+    process.env.CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_REFERENCE,
+  "integration-plugin-detail-current-26-825-installed-bottom":
+    process.env
+      .CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_BOTTOM_REFERENCE,
+  "integration-plugin-detail-current-26-825-installed-compact":
+    process.env
+      .CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE,
+};
 const currentScheduledReferences = {
   "scheduled-current-26-825":
     process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_REFERENCE,
@@ -853,6 +875,171 @@ function environmentRatio(name, fallback) {
     throw new Error(`${name} must be a ratio between 0 and 1.`);
   }
   return value;
+}
+
+async function compareCurrentPluginDetail({
+  actual,
+  referencePath,
+  sceneId,
+}) {
+  const reference = PNG.sync.read(await readFile(referencePath));
+  if (
+    reference.width !== actual.width ||
+    reference.height !== actual.height
+  ) {
+    throw new Error(
+      `${sceneId}: current plugin-detail reference must match the ${actual.width}x${actual.height} scene, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  const compact = sceneId.endsWith("-compact");
+  const installed =
+    sceneId.includes("-installed") ||
+    sceneId.endsWith("-actions") ||
+    sceneId.endsWith("-connection");
+  const bottom = sceneId.includes("-bottom");
+  const regions = bottom
+    ? [
+        installed
+          ? { height: 600, left: 383, name: "content", top: 200, width: 736 }
+          : { height: 518, left: 383, name: "content", top: 282, width: 736 },
+      ]
+    : [
+        {
+          height: 130,
+          left: compact ? 16 : 383,
+          masks: [{ height: 60, left: 8, top: 0, width: 60 }],
+          name: "header",
+          top: 66,
+          width: compact ? 688 : 736,
+        },
+        ...(installed
+          ? compact
+            ? [79, 79, 58]
+            : [79, 58, 58]
+          : compact
+            ? [79, 58, 79]
+            : [79, 58, 58]
+        ).map((height, index) => ({
+          height,
+          left: compact ? 126 : 505,
+          masks: [{ height: 20, left: 6, top: 5, width: 20 }],
+          name: `suggestion-${index + 1}`,
+          top: (compact && installed
+            ? [251, 346, 441]
+            : [251, 346, 420])[index],
+          width: compact ? 468 : 493,
+        })),
+        {
+          height: compact ? (installed ? 33 : 55) : 216,
+          left: compact ? 16 : 383,
+          name: "apps",
+          top: compact
+            ? installed
+              ? 647
+              : 625
+            : 604,
+          width: compact ? 688 : 736,
+        },
+      ];
+  if (sceneId.endsWith("-actions")) {
+    regions.push({
+      height: 37,
+      left: 728,
+      name: "actions-menu",
+      top: 172,
+      width: 180,
+    });
+  }
+  if (sceneId.endsWith("-connection")) {
+    regions.push({
+      height: 66,
+      left: 950,
+      name: "connection-menu",
+      top: 700,
+      width: 160,
+    });
+  }
+  const maximumRatios = {
+    apps: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_APPS_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    content: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_CONTENT_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    header: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_HEADER_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    menu: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_MENU_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    suggestion: environmentRatio(
+      "CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_SUGGESTION_MAX_DIFF_RATIO",
+      0.08,
+    ),
+  };
+  for (const region of regions) {
+    const kind = region.name.startsWith("suggestion-")
+      ? "suggestion"
+      : region.name.endsWith("-menu")
+        ? "menu"
+        : region.name;
+    let referenceRegion = maskPng(
+      cropPng(
+        reference,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      ),
+      region.masks ?? [],
+    );
+    let actualRegion = maskPng(
+      cropPng(
+        actual,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      ),
+      region.masks ?? [],
+    );
+    if (kind === "suggestion") {
+      referenceRegion = foregroundMaskPng(referenceRegion, 20);
+      actualRegion = foregroundMaskPng(actualRegion, 20);
+    }
+    const comparison = comparePng(referenceRegion, actualRegion, 0.1);
+    const maximumRatio = maximumRatios[kind];
+    const artifactId = `${sceneId}.${region.name}.current-product`;
+    await writeFile(
+      join(artifactDirectory, `${artifactId}.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${artifactId}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    const diffPath = join(
+      artifactDirectory,
+      `${artifactId}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(diffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(diffPath, { force: true });
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${sceneId}: current plugin-detail ${region.name} pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${sceneId}: current plugin-detail ${region.name} pixel ratio ${comparison.ratio}`,
+    );
+  }
 }
 
 async function compareCurrentBuildOverlay({
@@ -2367,6 +2554,16 @@ for (const scene of selectedScenes) {
     throw new Error(
       `${scene.id}: image dimensions changed from ${baseline.width}x${baseline.height} to ${actual.width}x${actual.height}.`,
     );
+  }
+
+  const currentPluginDetailReference =
+    currentPluginDetailReferences[scene.id];
+  if (currentPluginDetailReference) {
+    await compareCurrentPluginDetail({
+      actual,
+      referencePath: currentPluginDetailReference,
+      sceneId: scene.id,
+    });
   }
 
   const currentIntegrationCatalogReference =

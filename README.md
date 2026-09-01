@@ -31,6 +31,7 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   Help and Account menus, route restoration, Projects Index, current
   conversation/Markdown/MCP/Review slices, Settings through Usage & billing,
   the read-only MCP Settings manager,
+  the read-only installed/discovery Plugin detail surface,
   and the Electron-native project action menu. The current slices combine
   Browser/CDP, Electron, reviewed replay baselines, and local-only
   current-product pixel gates. The
@@ -77,6 +78,10 @@ review the [coverage policy](research/PARITY.md), or follow the
 - A controlled MCP Settings manager with Plugins/App/MCP/Skills/Marketplace
   tabs, server and plugin-provided rows, search/empty/Add-menu states, and
   STDIO/HTTP create and update editors.
+- A responsive Plugin detail page with installed/discovery actions, suggested
+  prompts, Apps, Information, disclosure, and controlled uninstall and
+  connection menus; hosts supply exact artwork and own every privileged
+  effect.
 - A schema-valid current-style mixed thread that composes Web Search, Browser
   verification, MCP Search → Fetch, command approval, file Review, and a
   delegated audit across wide and 720px layouts. This is an independent
