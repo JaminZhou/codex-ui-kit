@@ -1080,6 +1080,20 @@ describe("protocol lifecycle reducer", () => {
         status: "active",
       }),
     ]);
+    expect(subagentRunning.threadId).toBe("thread-current-mixed-tools");
+    expect(
+      subagentTimelinePresentation(
+        subagentRunning,
+        "collab-current-mixed-audit",
+      ),
+    ).toMatchObject({
+      active: true,
+      anchor: {
+        callId: "collab-current-mixed-audit",
+        senderThreadId: "thread-current-mixed-tools",
+      },
+      rows: [expect.objectContaining({ id: "mixed-audit", status: "active" })],
+    });
     expect(hasActiveTurnWork(subagentRunning)).toBe(true);
     expect(completed.subagents).toEqual([
       expect.objectContaining({
@@ -2414,8 +2428,8 @@ describe("protocol lifecycle reducer", () => {
     expect(running.status).toBe("running");
     expect(running.subagents).toEqual([
       expect.objectContaining({
-        callId: "collab-subagent-long",
-        id: "long-probe",
+        callId: "collab-subagent-verifier",
+        id: "verifier",
         message: null,
         startedAtMs: 1100,
         status: "active",
@@ -2424,14 +2438,14 @@ describe("protocol lifecycle reducer", () => {
       }),
     ]);
     expect(running.timeline.at(-1)).toEqual({
-      id: "collab-subagent-long",
+      id: "collab-subagent-verifier",
       kind: "subagent",
     });
     expect(completed.status).toBe("completed");
     expect(completed.subagents).toEqual([
       expect.objectContaining({
-        message: "SUBAGENT LONG PROBE DONE",
-        completedAtMs: 46000,
+        message: "Verified 100 deterministic user-interface invariants.",
+        completedAtMs: 39000,
         startedAtMs: 1100,
         status: "done",
         threadStatus: "completed",
@@ -2440,7 +2454,7 @@ describe("protocol lifecycle reducer", () => {
     expect(completed.messages.at(-1)).toMatchObject({
       id: "assistant-subagent-delegation",
       status: "completed",
-      text: "SUBAGENT LONG PROBE COMPLETE.",
+      text: "CURRENT 26.825 SINGLE SUBAGENT ACCEPTED.",
     });
   });
 
@@ -2536,12 +2550,12 @@ describe("protocol lifecycle reducer", () => {
     expect(mixed.subagents).toEqual([
       expect.objectContaining({
         id: "alpha",
-        message: "ALPHA SUBAGENT DONE",
+        message: "Produced 120 deterministic layout invariants.",
         status: "done",
       }),
       expect.objectContaining({
         id: "beta",
-        message: "clarifying command execution constraints",
+        message: "Checking interaction invariants.",
         status: "active",
       }),
     ]);
@@ -2549,7 +2563,7 @@ describe("protocol lifecycle reducer", () => {
       expect.objectContaining({ id: "alpha", status: "done" }),
       expect.objectContaining({ id: "beta", status: "done" }),
     ]);
-    expect(completed.turnDurationMs).toBe(79_000);
+    expect(completed.turnDurationMs).toBe(57_000);
   });
 
   it("preserves spawn identity and start time when a wait call reports the agent", () => {
@@ -2784,7 +2798,7 @@ describe("protocol lifecycle reducer", () => {
       expect.objectContaining({
         callId: "collab-subagent-alpha",
         completedAtMs: 32_000,
-        message: "ALPHA SUBAGENT DONE",
+        message: "Produced 120 deterministic layout invariants.",
         turnId: "turn-subagent-concurrency",
       }),
       expect.objectContaining({
@@ -3953,7 +3967,7 @@ describe("protocol lifecycle reducer", () => {
       afterLateActivity.subagents.find(({ id }) => id === "alpha"),
     ).toMatchObject({
       completedAtMs: 32_000,
-      message: "ALPHA SUBAGENT DONE",
+      message: "Produced 120 deterministic layout invariants.",
       startedAtMs: 1_100,
       status: "done",
       threadStatus: "completed",
@@ -3999,7 +4013,7 @@ describe("protocol lifecycle reducer", () => {
       expect.objectContaining({ id: "parent", status: "active" }),
       expect.objectContaining({
         id: "child",
-        message: "CHILD SUBAGENT DONE",
+        message: "Produced exactly 160 numbered nested-interface invariants.",
         status: "done",
       }),
     ]);

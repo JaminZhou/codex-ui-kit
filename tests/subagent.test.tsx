@@ -13,6 +13,7 @@ import {
   SubagentActivity,
   SubagentActivityGroup,
   SubagentPanel,
+  SubagentPanelIcon,
   SubagentSummary,
   SubagentTranscriptHeader,
   type SubagentActivityItem,
@@ -334,6 +335,17 @@ describe("SubagentPanel", () => {
     ).toBeTruthy();
   });
 
+  it("can omit row previews for the current flat activity list", () => {
+    const { container } = render(
+      <SubagentPanel items={[activeAgent, doneAgent]} showPreviews={false} />,
+    );
+
+    expect(container.querySelectorAll(".codex-ui-subagent-panel__preview"))
+      .toHaveLength(0);
+    expect(screen.getByText("Researcher")).toBeTruthy();
+    expect(screen.getByText("Builder")).toBeTruthy();
+  });
+
   it("paginates active agents in four-item increments", () => {
     const items = Array.from({ length: 6 }, (_, index) => ({
       id: `agent-${index}`,
@@ -523,6 +535,17 @@ describe("SubagentPanel", () => {
 
     expect(replacementCallback).toHaveBeenCalledOnce();
     expect(replacementCallback).toHaveBeenCalledWith([activeAgent]);
+  });
+});
+
+describe("SubagentPanelIcon", () => {
+  it("renders the observed four-path panel glyph", () => {
+    const { container } = render(<SubagentPanelIcon />);
+
+    expect(container.querySelector("svg")?.getAttribute("aria-hidden")).toBe(
+      "true",
+    );
+    expect(container.querySelectorAll("path")).toHaveLength(4);
   });
 });
 

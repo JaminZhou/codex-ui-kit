@@ -509,14 +509,19 @@ The authoritative current-build inventory is:
   under independent 1.5% limits. Native file-panel selection, non-image and
   multi-attachment states, upload/error, overflow, and plugin variants remain
   open.
-- Three current-build subagent tasks now separate the single-success contract
+- Three current `26.825.51511` subagent tasks now separate the single-success contract
   from collaboration. The original task covers one agent, summary, panel,
   transcript, and 820/720 reopen. A sibling Alpha/Beta task and a nested
   Parent/Child task cover two-working, mixed active/done, two-done, live
-  progress preview, and independent transcripts. The nested reducer preserves
+  progress, and independent transcripts. The nested reducer preserves
   public `/root/parent/child` identity while the visual panel stays flat, as
-  observed, while the main conversation keeps Child and Parent activity as
-  separate hierarchy-ordered blocks. The unchanged `26.803.41515` package
+  observed. The current main conversation exposes only Parent at the root;
+  Child appears inside Parent's transcript. Completed root activity chips are
+  removed, and the Active/Done panel deliberately omits message previews. The
+  wide panel is 419.59375px, the 820px continuity is 319px, and the hidden-
+  sidebar 720px split is 374.328125/345.671875px. Five exact runtime-rendered
+  avatars are tracked with upstream provenance. The unchanged `26.803.41515`
+  package
   additionally confirms all seven public collaboration thread states plus the
   current Active/Done classifier and 4/10 list limits. A twelve-agent public
   replay now covers pending initialization, updated progress, errored,

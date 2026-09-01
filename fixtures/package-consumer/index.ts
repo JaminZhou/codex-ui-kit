@@ -145,6 +145,7 @@ import {
   SubagentActivity,
   SubagentActivityGroup,
   SubagentPanel,
+  SubagentPanelIcon,
   SubagentSummary,
   SubagentTranscriptHeader,
   TerminalPanel,
@@ -413,6 +414,7 @@ void StreamNotice;
 void SubagentActivity;
 void SubagentActivityGroup;
 void SubagentPanel;
+void SubagentPanelIcon;
 void SubagentSummary;
 void SubagentTranscriptHeader;
 void TerminalPanel;
