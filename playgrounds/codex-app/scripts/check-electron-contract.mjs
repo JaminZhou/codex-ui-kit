@@ -969,6 +969,102 @@ for (const pluginDetailScene of visualScenes.filter(({ id }) =>
   }
 }
 
+for (const overflowScene of visualScenes.filter(({ id }) =>
+  [
+    "thread-overflow-current-26-825-open",
+    "thread-overflow-current-26-825-open-compact",
+  ].includes(id),
+)) {
+  const { app: overflowApp, page: overflowPage } = await launchScene(
+    overflowScene,
+    { capture: false },
+  );
+  try {
+    const compact = overflowScene.id.endsWith("-compact");
+    const nativeBounds = await overflowApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const overflow = await overflowPage.evaluate(() => {
+      const rect = (target) => {
+        if (!(target instanceof Element)) return null;
+        const value = target.getBoundingClientRect();
+        return {
+          bottom: value.bottom,
+          height: value.height,
+          right: value.right,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const trigger = document.querySelector(
+        ".codex-ui-thread-overflow-menu__trigger",
+      );
+      const menu = document.querySelector(
+        '.codex-ui-thread-overflow-menu[role="menu"]',
+      );
+      return {
+        itemCount:
+          menu?.querySelectorAll(":scope > [role=menuitem]").length ?? 0,
+        menu: rect(menu),
+        separators:
+          menu?.querySelectorAll(":scope > [role=separator]").length ?? 0,
+        trigger: rect(trigger),
+      };
+    });
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      !overflow.trigger ||
+      Math.abs(overflow.trigger.top - 9) > 1 ||
+      Math.abs(overflow.trigger.width - 28) > 1 ||
+      Math.abs(overflow.trigger.height - 28) > 1 ||
+      !overflow.menu ||
+      Math.abs(overflow.menu.width - 244) > 1 ||
+      overflow.menu.height < 276 ||
+      overflow.menu.height > 284 ||
+      Math.abs(overflow.menu.top - (overflow.trigger.bottom + 4)) > 1 ||
+      Math.abs(overflow.menu.right - overflow.trigger.right) > 1 ||
+      overflow.itemCount !== 10 ||
+      overflow.separators !== 3
+    ) {
+      throw new Error(
+        `${overflowScene.id}: Electron thread overflow geometry failed: ${JSON.stringify({ nativeBounds, overflow })}`,
+      );
+    }
+
+    const trigger = overflowPage.getByRole("button", {
+      name: "Chat actions",
+    });
+    const rootMenu = overflowPage.getByRole("menu", {
+      name: "Chat actions",
+    });
+    await rootMenu.press("Escape");
+    await trigger.press("ArrowDown");
+    const copy = overflowPage.getByRole("menuitem", { name: "Copy" });
+    await copy.focus();
+    await copy.press("ArrowRight");
+    const copyMenu = overflowPage.getByRole("menu", {
+      name: "Copy options",
+    });
+    await copyMenu.waitFor();
+    await copyMenu.press("Escape");
+    if (
+      (await rootMenu.count()) !== 1 ||
+      (await copy.getAttribute("aria-expanded")) !== "false"
+    ) {
+      throw new Error(
+        `${overflowScene.id}: Electron submenu Escape contract failed.`,
+      );
+    }
+    await rootMenu.press("Escape");
+    await overflowPage.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "Chat actions",
+    );
+  } finally {
+    await overflowApp.close();
+  }
+}
+
 for (const skillDetailScene of visualScenes.filter(({ id }) =>
   [
     "integration-skill-detail-current-26-825-installed",

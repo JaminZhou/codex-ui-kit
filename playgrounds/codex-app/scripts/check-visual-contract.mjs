@@ -772,6 +772,12 @@ const currentSkillDetailReferences = {
   "integration-skill-detail-current-26-825-try-now-compact":
     process.env.CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_TRY_NOW_REFERENCE,
 };
+const currentThreadOverflowReferences = {
+  "thread-overflow-current-26-825-open":
+    process.env.CODEX_UI_KIT_CURRENT_THREAD_OVERFLOW_26_825_WIDE_REFERENCE,
+  "thread-overflow-current-26-825-open-compact":
+    process.env.CODEX_UI_KIT_CURRENT_THREAD_OVERFLOW_26_825_COMPACT_REFERENCE,
+};
 const currentScheduledReferences = {
   "scheduled-current-26-825":
     process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_REFERENCE,
@@ -1203,6 +1209,7 @@ async function compareCurrentBuildOverlay({
   referencePath,
   referenceSize = currentBuildWorkspaceReferenceSize,
   sceneId,
+  threshold = 0.05,
 }) {
   const referenceFull = flattenPng(
     PNG.sync.read(await readFile(referencePath)),
@@ -1251,6 +1258,7 @@ async function compareCurrentBuildOverlay({
   const comparison = comparePng(
     maskPng(reference, masks),
     maskPng(overlayActual, masks),
+    threshold,
   );
   const maximumRatio = environmentRatio(
     maximumRatioName,
@@ -1831,8 +1839,22 @@ for (const scene of selectedScenes) {
   let currentPlan26825Bounds;
   let currentSearchBrowser26825Bounds;
   let currentMarkdownStreamingBounds;
+  let currentThreadOverflowBounds;
 
   try {
+    if (scene.id.startsWith("thread-overflow-current-26-825-open")) {
+      currentThreadOverflowBounds = await page
+        .locator('.codex-ui-thread-overflow-menu[role="menu"]')
+        .evaluate((element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            height: Math.round(value.height),
+            left: Math.round(value.left),
+            top: Math.round(value.top),
+            width: Math.round(value.width),
+          };
+        });
+    }
     if (scene.id === "workspace-ready") {
       workspaceCurrentIconBounds = await page.evaluate(() =>
         Array.from(
@@ -2722,6 +2744,24 @@ for (const scene of selectedScenes) {
       actual,
       referencePath: currentSkillDetailReference,
       sceneId: scene.id,
+    });
+  }
+
+  const currentThreadOverflowReference =
+    currentThreadOverflowReferences[scene.id];
+  if (currentThreadOverflowReference) {
+    await compareCurrentBuildOverlay({
+      actual,
+      actualBounds: currentThreadOverflowBounds,
+      defaultMaximumRatio: 0.095,
+      masks: [],
+      maximumRatioName:
+        "CODEX_UI_KIT_CURRENT_THREAD_OVERFLOW_26_825_MAX_DIFF_RATIO",
+      referenceCrop: { height: 279, left: 0, top: 0, width: 244 },
+      referencePath: currentThreadOverflowReference,
+      referenceSize: { height: 279, width: 244 },
+      sceneId: scene.id,
+      threshold: 0.1,
     });
   }
 

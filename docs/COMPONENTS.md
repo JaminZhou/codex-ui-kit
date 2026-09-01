@@ -252,6 +252,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
   summaries and reopen requests. None of these components starts a shell,
   owns process persistence, or executes input.
 - `ThreadHeader`: draggable desktop header with truncating identity, navigation, and independently aligned action slots.
+- `ThreadOverflowMenu` and `ThreadOverflowMenuOption`: controlled current
+  thread actions composition with the observed ten-action grouping, three
+  separators, shortcuts, host-supplied icons and Copy/Fork/Open-in submenus.
+  Pin, rename, archive, share, side-chat, scheduling, and external-open effects
+  remain host-owned callbacks.
 - `ThreadSummaryPopover`, `ThreadSummaryPanel`, `ThreadSummarySection`,
   `ThreadSummaryItem`, `ThreadSummaryDelta`, and
   `ThreadSummaryIconButton`: controlled or uncontrolled thread-summary overlay

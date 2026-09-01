@@ -1164,6 +1164,7 @@ export function MenuSubmenu({
         onKeyDown={(event) => {
           if (event.key === "ArrowLeft" || event.key === "Escape") {
             event.preventDefault();
+            event.stopPropagation();
             setOpen(false);
             anchorRef.current?.focus();
             return;

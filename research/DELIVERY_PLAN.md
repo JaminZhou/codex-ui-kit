@@ -14,8 +14,8 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 73 groups have current-build runtime evidence, 7 have previous-build-only
-  runtime evidence, and 11 have not been sampled.
+- 74 groups have current-build runtime evidence, 7 have previous-build-only
+  runtime evidence, and 10 have not been sampled.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
   selection, wide/compact preview and pixels, focus-preserving removal, exact
@@ -1106,6 +1106,17 @@ Browser/CDP gates all five scenes, Electron repeats them, and regional chrome
 comparisons remain below 1%. Enable/uninstall/menu effects, prompt submission,
 successful skill execution, failure/retry, Automations detail/mutation, and
 remaining Settings families stay open, so Stage 4 remains in progress.
+
+The current thread-overflow slice closes the former unsampled P1 root menu.
+`ThreadOverflowMenu` exposes the observed ten actions, three separators, four
+shortcuts, and host-supplied Copy/Fork/Open-in submenus without performing any
+thread mutation. The product uses a native macOS menu, so the acceptance stack
+combines exact CDP trigger/computed-style evidence, Browser/Electron keyboard
+and focus contracts, reviewed wide/720 baselines, and an unmasked tight-menu
+comparison under a dedicated 9.5% native-vs-Renderer budget. Submenu contents,
+real effects, disabled variants, Light appearance, and keyboard-only native
+opening remain open; `thread.overflow-actions` is therefore `partial` rather
+than complete.
 
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and

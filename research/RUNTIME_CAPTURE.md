@@ -2583,6 +2583,50 @@ recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-skill-detail-26-825-20260901-9925`.
 Primary user-owned Codex PID `13503` remained alive.
 
+## Current `26.825.51511` thread overflow actions sample
+
+Use `pnpm capture:current-thread-overflow-26-825` only with an exact isolated
+profile, a loopback listener owned by the validated second Codex process, and
+the SHA-256 of one existing safe task title. The helper fails closed unless
+the promoted build fingerprint, profile, direct-child output, listener owner,
+title hash, and explicit capture flag all match. It may navigate to that task,
+resize to 1180×820 and 720×680, open `Chat actions`, confirm that zero Renderer
+menus mount, and dismiss the native menu. It must never select a native action
+or mutate, archive, share, fork, schedule, or externally open the thread.
+
+```bash
+CODEX_CURRENT_THREAD_OVERFLOW_CDP_PORT=<isolated-port> \
+CODEX_CURRENT_THREAD_OVERFLOW_PROFILE=<isolated-profile> \
+CODEX_CURRENT_THREAD_OVERFLOW_OUTPUT_DIR=<new-profile-child> \
+CODEX_CURRENT_THREAD_OVERFLOW_TASK_TITLE_SHA256=<sha256> \
+CODEX_CURRENT_THREAD_OVERFLOW_ALLOW_CAPTURE=1 \
+  pnpm capture:current-thread-overflow-26-825
+```
+
+The native menu is outside the Renderer screenshot surface. Capture its raw OS
+frame only as local evidence, crop it to the reviewed 244×279 menu surface,
+and keep both files untracked. Promote only
+`research/current-thread-overflow-26-825.json` and the two deterministic replay
+baselines. Optional local-only comparisons use:
+
+```bash
+CODEX_UI_KIT_CURRENT_THREAD_OVERFLOW_26_825_WIDE_REFERENCE=/absolute/path/to/native-menu-tight-crop.png \
+CODEX_UI_KIT_CURRENT_THREAD_OVERFLOW_26_825_COMPACT_REFERENCE=/absolute/path/to/native-menu-tight-crop.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=thread-overflow-current-26-825-open,thread-overflow-current-26-825-open-compact
+```
+
+Terminate only the exact validated isolated process tree, prove its loopback
+port closed, move the profile and raw OS screenshots recoverably to Trash, and
+recheck that the primary user-owned Codex PID remains alive.
+
+The accepted run terminated only validated isolated PID `24607` and its
+profile-owned processes, proved loopback port `9931` closed, and moved the
+exact profile plus raw OS evidence recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-thread-overflow-26-825-20260902-9931`
+and its `-evidence` sibling. Primary user-owned Codex PID `13503` remained
+alive.
+
 ## Promotion rule
 
 After a capture:
