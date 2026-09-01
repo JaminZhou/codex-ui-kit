@@ -67,10 +67,11 @@ observation from a previous build remains historical evidence.
   Explore is present and `Sites` is absent from the sampled fixed-route stack.
   Details are in
   [`26.825.51511.md`](26.825.51511.md). Rich Markdown streaming, Plan progress,
-  pure-reasoning cadence, long-thread navigation, Web Search, and the sampled
-  Browser failure/recovery terminal path are current on 26.825.51511;
-  successful Browser activity and workspace remain 26.825.31414 regression
-  evidence. The previous activity follow-up first re-observed the 14/21px
+  pure-reasoning cadence, long-thread navigation, Web Search, Browser success,
+  and the sampled Browser failure/recovery terminal path are current on
+  26.825.51511. Browser success is now current activity-only evidence; the
+  separate Browser workspace remains 26.825.31414 regression evidence. The
+  previous activity follow-up first re-observed the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
   previous-product `Thinking` comparison passes at 0.6%. The current Plan
@@ -100,8 +101,14 @@ observation from a previous build remains historical evidence.
   wide/720 geometry, and writable 736/688×98 Composer recovery through CDP,
   Electron, and three reviewed baselines. Local-only product comparisons pass
   at 1.9864%/1.0800% for wide content/Composer and 3.1108%/1.4832% for compact.
-  This promotes only the sampled unavailable-tool recovery; successful Browser
-  activity and workspace are not inferred from a failure path.
+  A later successful Browser-only task naturally settles as `Worked for 50s`
+  → `Used the browser, ran a command`, with exact `Load Browser instructions`,
+  `Connect to Browser`, and `Verify Codex documentation` rows, then
+  `CURRENT BROWSER SUCCESS 26.825`. It shows no Browser workspace at either
+  1180×820 or 720×820. Four CDP frames, wide/compact Electron interaction,
+  four reviewed baselines, and local-only foreground comparisons at
+  6.0517%/5.7941% under 6.5% promote `thread.browser-tool-events` for this
+  sampled success path. This does not promote `workspace.browser`.
   External page content is explicitly source-owned and excluded. Multi-tab,
   authentication, download, permission, history, and page error states remain
   incomplete.
@@ -265,7 +272,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 67 have current-build runtime evidence, 12 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 66 groups and Electron verification covers 66.
+Current inventory: 91 surface groups; 67 have current-build runtime evidence, 12 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 67 groups and Electron verification covers 67.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -1349,16 +1356,19 @@ mismatch, input, picker, close, and resizing interactions. Against the exact
 The compact tool/recovery slice splits the former combined
 `thread.search-tool-mcp-events` candidate into independent search, Browser, and
 MCP tool-event rows. `26.721.41059` CDP evidence previously verified completed
-web search and Browser activity in the Browser gate. Web Search has since been
-refreshed; successful Browser activity remains `partial_legacy`. The current
-26.825.51511 Browser-only failure sample now promotes
+web search and Browser activity in the Browser gate. Web Search and the
+sampled Browser success path have since been refreshed. Current
+`thread.browser-tool-events` is Browser/Electron verified for its activity-only
+success and failure slices, while the broader implementation remains partial.
+The current 26.825.51511 Browser-only failure sample promotes
 `thread.tool-unavailable-recovery`: it proves two naturally settled assistant
 errors, collapsed failed protocol calls, normal response actions, and restored
-Composer input, not a successful Browser call or workspace. `BrowserActivity`
-supplies a protocol-neutral
+Composer input. The independent successful task proves the 50-second Browser
+activity and exact public-docs answer without opening a workspace.
+`BrowserActivity` supplies a protocol-neutral
 completed/running/failed disclosure with ordered browser steps, and the
-Electron playground exercises that public component without claiming exact
-compact-window parity.
+Electron playground exercises that public component at both 1180×820 and
+720×820. The distinct `workspace.browser` row remains previous-build-only.
 
 Four external 526×600 main-only references now gate completed web search,
 expanded Browser steps, unavailable-MCP recovery, and a failed exit-code-7

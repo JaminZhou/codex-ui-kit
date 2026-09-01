@@ -319,8 +319,8 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
   ),
   "current-browser-26-825": scenario(
     "current-browser-26-825",
-    "查找 Codex 页面 desktop",
-    "The runtime-observed 26.825 Browser lifecycle groups read-only MCP activity in the thread and opens the one-tab in-app Browser workspace shell.",
+    "Verify Codex docs in browser",
+    "The runtime-observed 26.825.51511 Browser success lifecycle groups its exact read-only activity in the thread, settles with a public-docs answer, and does not open a Browser workspace.",
     currentBrowser26825Trace,
   ),
   "current-browser-26-825-failure": scenario(

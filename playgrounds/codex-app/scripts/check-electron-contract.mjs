@@ -13936,19 +13936,37 @@ for (const [frame, expected] of [
   }
 }
 
-for (const browserSurface of [false, true]) {
-  const frame = browserSurface
-    ? "conversation-browser-current-26-825-open"
-    : "conversation-search-current-26-825-open";
+for (const currentToolSurface of [
+  {
+    browserSurface: false,
+    frame: "conversation-search-current-26-825-open",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    browserSurface: true,
+    frame: "conversation-browser-current-26-825-open",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    browserSurface: true,
+    frame: "conversation-browser-current-26-825-open-compact",
+    layoutMode: "narrow",
+    sidebarState: "hidden",
+    windowSize: { height: 820, width: 720 },
+  },
+]) {
+  const { browserSurface, frame, windowSize } = currentToolSurface;
   const { app, page } = await launchScene(
     {
       currentSidebar: true,
       frame,
       id: `electron-${frame}`,
+      layoutMode: currentToolSurface.layoutMode,
       scenario: browserSurface
         ? "current-browser-26-825"
         : "current-search-26-825",
-      windowSize: { height: 820, width: 1180 },
+      sidebarState: currentToolSurface.sidebarState,
+      windowSize,
     },
     { capture: false },
   );
@@ -13982,7 +14000,32 @@ for (const browserSurface of [false, true]) {
       const browser = document.querySelector(
         '[data-testid="current-browser-workspace"]',
       );
+      const answer = document.querySelector(
+        '[data-item-id="assistant-current-browser-26-825"] .codex-ui-agent-message__content',
+      );
+      const answerStyle = answer ? getComputedStyle(answer) : null;
+      const prompt = document.querySelector(
+        '[data-item-id="user-current-browser-26-825"] .codex-ui-agent-message__content',
+      );
+      const promptStyle = prompt ? getComputedStyle(prompt) : null;
+      const duration = activity
+        ?.closest(".codex-ui-activity-timeline")
+        ?.querySelector(".codex-ui-activity-timeline__toggle");
+      const durationStyle = duration ? getComputedStyle(duration) : null;
       return {
+        answer: answer
+          ? {
+              rect: rect(answer),
+              style: answerStyle
+                ? {
+                    fontSize: answerStyle.fontSize,
+                    fontWeight: answerStyle.fontWeight,
+                    lineHeight: answerStyle.lineHeight,
+                  }
+                : null,
+              text: answer.textContent?.trim() ?? null,
+            }
+          : null,
         activityOpen:
           activity
             ?.querySelector(".codex-ui-activity__disclosure")
@@ -14028,9 +14071,51 @@ for (const browserSurface of [false, true]) {
           ) ?? [],
           (entry) => entry.textContent?.trim(),
         ),
+        durationStyle: durationStyle
+          ? {
+              fontSize: durationStyle.fontSize,
+              fontWeight: durationStyle.fontWeight,
+              lineHeight: durationStyle.lineHeight,
+            }
+          : null,
         horizontalOverflow:
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
+        sidebarVisible: (() => {
+          const sidebar = document.querySelector(
+            ".codex-ui-app-shell__sidebar",
+          );
+          const sidebarStyle = sidebar ? getComputedStyle(sidebar) : null;
+          return Boolean(
+            sidebar &&
+              sidebar.getBoundingClientRect().width > 0 &&
+              sidebarStyle?.display !== "none" &&
+              sidebarStyle?.visibility !== "hidden",
+          );
+        })(),
+        prompt: prompt
+          ? {
+              link: prompt.querySelector("a")?.getAttribute("href") ?? null,
+              rect: rect(prompt),
+              style: promptStyle
+                ? {
+                    fontSize: promptStyle.fontSize,
+                    fontWeight: promptStyle.fontWeight,
+                    lineHeight: promptStyle.lineHeight,
+                  }
+                : null,
+            }
+          : null,
+        stepIcons: Array.from(
+          activity?.querySelectorAll(
+            ".codex-ui-browser-activity__steps li svg",
+          ) ?? [],
+          (icon) => icon.getAttribute("data-current-build-icon"),
+        ),
+        summaryIcon:
+          activity
+            ?.querySelector(".codex-ui-activity__header svg")
+            ?.getAttribute("data-current-build-icon") ?? null,
         timelineExpanded:
           activity?.closest(".codex-ui-activity-timeline")?.hasAttribute(
             "data-expanded",
@@ -14039,46 +14124,54 @@ for (const browserSurface of [false, true]) {
     }, browserSurface);
     const expectedDetails = browserSurface
       ? [
-          "Read Control In App Browser skill",
-          "连接 Browser",
-          "打开页面并查找 desktop",
+          "Load Browser instructions",
+          "Connect to Browser",
+          "Verify Codex documentation",
         ]
       : [
           "Searched the web for Codex app desktop",
           'Searched the web for "desktop"',
         ];
-    const expectedToolbarLabels = [
-      "Back",
-      "Next",
-      "Reload",
-      "Site information",
-      "Site tools",
-      "Open in external browser",
-      "Annotate",
-      "Browser options",
-    ];
     if (
       !nativeWindow ||
       nativeWindow.destroyed ||
-      JSON.stringify(nativeWindow.size) !== JSON.stringify([1180, 820]) ||
+      JSON.stringify(nativeWindow.size) !==
+        JSON.stringify([windowSize.width, windowSize.height]) ||
       !contract.activityOpen ||
       !contract.timelineExpanded ||
       contract.composerCount !== 1 ||
       contract.horizontalOverflow > 1 ||
+      contract.sidebarVisible === (windowSize.width === 720) ||
       JSON.stringify(contract.details) !== JSON.stringify(expectedDetails) ||
       contract.activitySummary !==
         (browserSurface
-          ? "Used the browser, loaded a tool"
+          ? "Used the browser, ran a command"
           : "Searched the web") ||
       (browserSurface &&
-        (!contract.browser ||
-          Math.abs(contract.browser.rect.width - 418.59375) > 0.1 ||
-          Math.abs(contract.browser.tabs.height - 46) > 0.1 ||
-          Math.abs(contract.browser.toolbar.height - 40) > 0.1 ||
-          Math.abs(contract.browser.content.top - 86) > 0.1 ||
-          JSON.stringify(contract.browser.toolbarLabels) !==
-            JSON.stringify(expectedToolbarLabels))) ||
-      (!browserSurface && contract.browser !== null)
+        (contract.durationStyle?.fontSize !== "14px" ||
+          contract.durationStyle?.lineHeight !== "21px" ||
+          contract.durationStyle?.fontWeight !== "400" ||
+          contract.prompt?.link !==
+            "https://developers.openai.com/codex/" ||
+          contract.prompt?.style?.fontSize !== "14px" ||
+          contract.prompt?.style?.lineHeight !== "22.75px" ||
+          contract.prompt?.style?.fontWeight !== "400" ||
+          Math.abs(
+            (contract.prompt?.rect?.width ?? 0) -
+              (windowSize.width === 720 ? 481.59375 : 515.1875),
+          ) > 0.1 ||
+          contract.answer?.text !== "CURRENT BROWSER SUCCESS 26.825" ||
+          contract.answer?.style?.fontSize !== "14px" ||
+          contract.answer?.style?.lineHeight !== "22.75px" ||
+          contract.answer?.style?.fontWeight !== "400" ||
+          contract.summaryIcon !== "thread-browser" ||
+          JSON.stringify(contract.stepIcons) !==
+            JSON.stringify([
+              "thread-command-terminal",
+              "thread-browser-connect",
+              "thread-browser",
+            ]))) ||
+      contract.browser !== null
     ) {
       throw new Error(
         `Electron current 26.825 search/Browser contract failed: ${JSON.stringify({ browserSurface, contract, nativeWindow })}`,

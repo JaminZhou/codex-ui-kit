@@ -72,8 +72,14 @@ exit gates; it does not replace the inventory.
   only probe now naturally settles with exact missing-Chromium and unsupported-
   service errors. Its 12-event/two-turn replay, three wide/720 CDP and Electron
   frames, three reviewed baselines, and 1.08–3.11% owned-region comparisons
-  promote the sampled `thread.tool-unavailable-recovery` path. Successful
-  Browser activity/workspace remain 26.825.31414 regression evidence.
+  promote the sampled `thread.tool-unavailable-recovery` path. An independent
+  current success task now promotes `thread.browser-tool-events`: it settles
+  as `Worked for 50s`, expands to `Used the browser, ran a command` plus three
+  exact rows, returns `CURRENT BROWSER SUCCESS 26.825`, and mounts no Browser
+  workspace at wide or 720px. Four CDP frames, wide/compact Electron, four
+  reviewed baselines, and 6.0517%/5.7941% local-only foreground comparisons
+  under 6.5% cover the slice. `workspace.browser` remains 26.825.31414
+  regression evidence.
 - The current command-failure follow-up reaches a real exit-code-7 command and
   an exact same-thread no-tool recovery. The Renderer keeps the failure as a
   neutral `Ran …` row and hides stdout, stderr, Shell, and exit-code cards while
@@ -162,18 +168,20 @@ exit gates; it does not replace the inventory.
   `thread.search-tool-events`, `thread.browser-tool-events`, and
   `workspace.browser`. Web Search is now refreshed on 26.825.51511 with the
   two-level `Worked for 23s` → `Searched the web` disclosure and two 14/21px
-  current result rows. The successful Browser flow remains 26.825.31414
-  evidence and presents the generic read-only MCP sequence as `Used the
-  browser, loaded a tool`, retains the skill/connect/navigation steps, and
-  opens a 419.59375px one-tab workspace with a 46px tab strip and 40px
-  navigation toolbar. A current 26.825.51511 failure slice independently locks
+  current result rows. The current successful Browser flow now presents
+  `Used the browser, ran a command`, exact instructions/connect/verification
+  rows, and no Browser workspace in wide or compact layouts. The historical
+  26.825.31414 sample still preserves the 419.59375px one-tab workspace with a
+  46px tab strip and 40px navigation toolbar as regression-only evidence. A
+  current 26.825.51511 failure slice independently locks
   the naturally settled missing-Chromium and unsupported-service answers,
   3m46s/27s durations, terminal collapse, four response actions, and writable
   wide/720 Composer recovery without inferring successful navigation.
   Search Browser/CDP covers three collapsed/expanded frames, Electron repeats
   its open lifecycle, and its local-only foreground comparison passes at
-  4.0506% under 5%. The previous Browser activity and chrome comparisons pass
-  at 8.45% and 2.80%. External page
+  4.0506% under 5%. Browser success adds four current frames plus
+  6.0517%/5.7941% wide/compact foreground gates; the previous Browser chrome
+  comparison remains historical at 2.80%. External page
   pixels remain source-owned and are excluded behind an explicit content
   boundary. Multi-tab, authentication, downloads, permission prompts, and
   page-owned states remain incomplete.

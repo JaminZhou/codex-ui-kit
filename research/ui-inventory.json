@@ -28,7 +28,11 @@
       "id": "conversation.destination",
       "area": "conversation",
       "ownership": "app",
-      "packageEvidence": ["local-conversation-page", "remote-conversation-page", "chatgpt-conversation-page"],
+      "packageEvidence": [
+        "local-conversation-page",
+        "remote-conversation-page",
+        "chatgpt-conversation-page"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:new-chat-chatgpt-destination-and-worktree-prompt",
@@ -175,7 +179,10 @@
       "id": "thread.virtualized-timeline",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["thread-virtualizer", "thread-scroll-controller-context-value"],
+      "packageEvidence": [
+        "thread-virtualizer",
+        "thread-scroll-controller-context-value"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:ten-turn-reverse-scroll-windowed-thread",
@@ -197,25 +204,25 @@
         "app-asar-26.803.41515:inline-markdown-follow-state-machine-and-table-container-actions",
         "app-asar-26.818.41509:code-block-word-wrap-control-and-svg-path",
         "app-asar-26.820.60940:katex-0.16.45-image-preview-loading-unavailable-media-grid-and-render-error-retry",
-    "replay:current-26.825-link-open-fence-task-list-seven-column-table-thirty-six-section-tail-and-completion",
+        "replay:current-26.825-link-open-fence-task-list-seven-column-table-thirty-six-section-tail-and-completion",
         "replay:current-eighteen-column-markdown-table-copy-expand-and-preview",
         "replay:current-26.818-heading-inline-code-quote-list-full-width-table-code-block-and-source-owned-url-text",
         "replay:current-26.820-block-math-literal-unsupported-source-and-loaded-unavailable-media-grid",
         "replay:current-26.825-compact-density-inline-favicon-link-full-width-table-current-code-assets-and-block-math",
         "replay:current-26.825-loaded-and-unavailable-markdown-media-turns",
-    "browser-cdp:current-26.825-six-rich-markdown-streaming-checkpoints-reverse-origin-follow-and-zero-overflow",
+        "browser-cdp:current-26.825-six-rich-markdown-streaming-checkpoints-reverse-origin-follow-and-zero-overflow",
         "browser-cdp:wide-table-resting-hover-copy-preview-and-focus-contract",
         "browser-cdp:current-26.818-wide-and-720px-computed-style-geometry-response-action-and-zero-overflow-contract",
         "browser-cdp:current-26.820-wide-and-720px-katex-media-fallback-preview-focus-and-zero-overflow-contract",
         "browser-cdp:current-26.825-wide-and-720px-exact-semantic-computed-style-geometry-icon-link-math-action-and-zero-overflow-contract",
         "browser-cdp:current-26.825-loaded-unavailable-and-immersive-preview-media-wide-compact-contract",
-    "electron:current-26.825-rich-markdown-code-copy-table-focus-user-scroll-away-return-to-latest-and-native-window-contract",
+        "electron:current-26.825-rich-markdown-code-copy-table-focus-user-scroll-away-return-to-latest-and-native-window-contract",
         "electron:wide-table-copy-horizontal-wheel-preview-and-focus-restoration",
         "electron:current-26.818-wide-and-720px-markdown-contract",
         "electron:current-26.820-wide-and-720px-katex-media-fallback-preview-and-focus-restoration",
         "electron:current-26.825-wide-and-720px-markdown-copy-wrap-table-focus-and-native-window-contract",
         "electron:current-26.825-loaded-unavailable-preview-close-zoom-and-focus-restoration-media-contract",
-    "pixel:five-reviewed-current-26.825-rich-markdown-streaming-baselines-and-four-local-only-product-regions",
+        "pixel:five-reviewed-current-26.825-rich-markdown-streaming-baselines-and-four-local-only-product-regions",
         "pixel:three-reviewed-wide-table-baselines-including-720px-actions-and-current-build-preview-regions",
         "pixel:current-26.818-unmasked-wide-and-720px-markdown-root-regions",
         "pixel:two-reviewed-current-26.820-wide-and-720px-markdown-media-replay-baselines",
@@ -229,13 +236,13 @@
         "cdp-26.803.41515:real-eighteen-column-table-copy-expand-and-preview-1180x820",
         "cdp-26.818.41509:real-heading-strong-inline-code-quote-list-full-width-table-code-block-and-source-owned-external-url-text-1180x820-720x680",
         "cdp-26.820.60940:real-double-dollar-block-math-literal-single-dollar-heading-external-image-source-and-footnote-syntax",
-    "cdp-26.825.31414:real-heading-strong-inline-code-favicon-link-quote-list-full-width-table-current-code-assets-literal-inline-math-rendered-block-math-and-four-response-actions",
-    "cdp-26.825.51511:real-rich-markdown-link-open-empty-code-card-task-list-seven-column-table-thirty-six-section-stream-tail-and-completion",
+        "cdp-26.825.31414:real-heading-strong-inline-code-favicon-link-quote-list-full-width-table-current-code-assets-literal-inline-math-rendered-block-math-and-four-response-actions",
+        "cdp-26.825.51511:real-rich-markdown-link-open-empty-code-card-task-list-seven-column-table-thirty-six-section-stream-tail-and-completion",
         "cdp-26.825.51511:real-public-favicon-loaded-unavailable-external-image-and-immersive-preview-wide-compact"
       ],
       "implementationStatus": "partial",
-  "browserStatus": "verified",
-  "electronStatus": "verified",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -409,23 +416,29 @@
         "browser",
         "thread-browser-panel-tabs",
         "browser-activity-current-mcp-group",
-        "browser-cdp:current-26-825-browser-activity-and-workspace-shell",
-        "electron:current-26-825-browser-disclosure-lifecycle",
-        "pixel:current-26-825-browser-activity-and-chrome-regions",
-        "replay:current-26-825-browser-chromium-and-unsupported-service-failures",
-        "browser-cdp:current-26-825-browser-failure-terminal-collapse-and-composer-recovery",
-        "electron:current-26-825-browser-failure-terminal-collapse-and-composer-recovery",
-        "pixel:current-26-825-browser-failure-wide-compact-content-and-composer-regions"
+        "legacy-replay:26.825.31414-browser-activity-and-workspace-shell",
+        "legacy-browser-cdp:26.825.31414-browser-activity-and-workspace-shell",
+        "legacy-electron:26.825.31414-browser-disclosure-and-workspace-shell",
+        "legacy-pixel:26.825.31414-browser-activity-and-chrome-regions",
+        "replay:current-26.825.51511-browser-success-activity-without-workspace",
+        "browser-cdp:current-26.825.51511-browser-success-wide-compact-disclosure-and-computed-styles",
+        "electron:current-26.825.51511-browser-success-wide-compact-disclosure-lifecycle",
+        "pixel:current-26.825.51511-browser-success-wide-compact-content-regions",
+        "replay:current-26.825-browser-chromium-and-unsupported-service-failures",
+        "browser-cdp:current-26.825-browser-failure-terminal-collapse-and-composer-recovery",
+        "electron:current-26.825-browser-failure-terminal-collapse-and-composer-recovery",
+        "pixel:current-26.825-browser-failure-wide-compact-content-and-composer-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:synthetic-browser-completed-expanded-compact-526x600",
         "cdp-26.825.31414:real-read-only-browser-mcp-group-three-steps-and-workspace-panel",
-        "cdp-26.825.51511:real-browser-playwright-chromium-missing-and-unsupported-service-terminal-failures-wide-and-720"
+        "cdp-26.825.51511:real-browser-playwright-chromium-missing-and-unsupported-service-terminal-failures-wide-and-720",
+        "cdp-26.825.51511:real-read-only-browser-success-worked-for-50s-three-expanded-steps-public-docs-answer-wide-compact-and-no-workspace"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -669,7 +682,10 @@
       "id": "thread.context-summary",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["toggle-thread-summary-panel", "use-thread-summary-panel"],
+      "packageEvidence": [
+        "toggle-thread-summary-panel",
+        "use-thread-summary-panel"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.730.61309:real-thread-summary-toggle-environment-git-workflow-overlay-and-computed-styles",
@@ -711,7 +727,9 @@
       "id": "thread.message-navigation",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["thread-user-message-navigation-rail"],
+      "packageEvidence": [
+        "thread-user-message-navigation-rail"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:ten-user-message-36x10-navigation-rail",
@@ -786,7 +804,9 @@
       "id": "thread.overflow-actions",
       "area": "conversation",
       "ownership": "thread",
-      "packageEvidence": ["thread-overflow-menu"],
+      "packageEvidence": [
+        "thread-overflow-menu"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -964,7 +984,10 @@
       "id": "composer.attachments",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["composer-attachment", "message-attachment"],
+      "packageEvidence": [
+        "composer-attachment",
+        "message-attachment"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
@@ -982,7 +1005,10 @@
       "id": "composer.plugins",
       "area": "composer",
       "ownership": "thread",
-      "packageEvidence": ["composer-work-home-plugins-control", "connect-plugins-submenu-item"],
+      "packageEvidence": [
+        "composer-work-home-plugins-control",
+        "connect-plugins-submenu-item"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"
@@ -996,7 +1022,10 @@
       "id": "app.sidebar-shell",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "packageEvidence": [
+        "app-main",
+        "thread-app-shell-chrome"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:global-sidebar-and-top-controls",
@@ -1023,7 +1052,9 @@
       "id": "app.sidebar-primary-navigation",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:global-sidebar-and-top-controls",
@@ -1080,7 +1111,10 @@
       "id": "app.sidebar-project-group-lifecycle",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "projects-index-page"],
+      "packageEvidence": [
+        "app-main",
+        "projects-index-page"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.803.41515:six-project-groups-30px-rows-40px-task-bands-pointer-enter-space-collapse-and-wide-medium-720-pinned-restoration",
@@ -1100,7 +1134,9 @@
       "id": "app.sidebar-project-actions-menu",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.803.41515:project-actions-menu-six-items-214.05x179.38-current-icons",
@@ -1151,7 +1187,10 @@
       "id": "app.sidebar-item-actions",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "packageEvidence": [
+        "app-main",
+        "thread-app-shell-chrome"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:hover-focus-actions-and-sibling-status-indicators",
@@ -1199,7 +1238,10 @@
       "id": "app.sidebar-worktree-status-indicators",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "app-main-pending-worktrees"],
+      "packageEvidence": [
+        "app-main",
+        "app-main-pending-worktrees"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:sibling-running-queued-unread-error-status-indicators",
@@ -1248,7 +1290,9 @@
       "id": "app.sidebar-help-menu",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.803.41515:help-menu-whats-new-eight-items-200x272.06-current-icons-and-escape-return",
@@ -1268,7 +1312,10 @@
       "id": "app.window-chrome-navigation",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "thread-app-shell-chrome"],
+      "packageEvidence": [
+        "app-main",
+        "thread-app-shell-chrome"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:titlebar-46-sidebar-toggle-back-forward-at-88-120-152",
@@ -1313,7 +1360,9 @@
       "id": "app.route-selection-restoration",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:pull-requests-selection-through-1180-961-960-721-720-1080p-2k-resize-and-dialog-dismissal",
@@ -1335,7 +1384,10 @@
       "id": "app.app-server-crash-recovery",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main", "app-server-crash-recovery-page"],
+      "packageEvidence": [
+        "app-main",
+        "app-server-crash-recovery-page"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.803.61601:isolated-app-server-child-exit-dedicated-recovery-renderer-and-restart-restoration",
@@ -1370,7 +1422,9 @@
       "id": "app.projects-index",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["projects-index-page"],
+      "packageEvidence": [
+        "projects-index-page"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721:projects-entry-and-deidentified-list-structure",
@@ -1390,9 +1444,13 @@
       "id": "app.sites-index",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["app-main"],
+      "packageEvidence": [
+        "app-main"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:sites-index-search-refresh-create-actions"],
+      "runtimeEvidence": [
+        "cdp:sites-index-search-refresh-create-actions"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
@@ -1402,7 +1460,10 @@
       "id": "app.new-thread-workspace-selection",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["new-thread-panel-page", "select-workspace-page"],
+      "packageEvidence": [
+        "new-thread-panel-page",
+        "select-workspace-page"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:blank-new-chat-and-project-menu",
@@ -1427,7 +1488,11 @@
       "id": "app.onboarding-login",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["onboarding-page", "login-route", "first-run"],
+      "packageEvidence": [
+        "onboarding-page",
+        "login-route",
+        "first-run"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -1438,7 +1503,11 @@
       "id": "app.quick-hotkey-windows",
       "area": "app-shell",
       "ownership": "app",
-      "packageEvidence": ["quick-chat-window-page", "hotkey-window-home-page", "hotkey-window-thread-page"],
+      "packageEvidence": [
+        "quick-chat-window-page",
+        "hotkey-window-home-page",
+        "hotkey-window-thread-page"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -1681,9 +1750,9 @@
         "browser",
         "thread-browser-panel-tabs",
         "browser-workspace-panel",
-        "browser-cdp:current-26-825-one-tab-shell-and-toolbar",
-        "electron:current-26-825-browser-workspace-shell",
-        "pixel:current-26-825-browser-chrome-region"
+        "legacy-browser-cdp:26.825.31414-one-tab-shell-and-toolbar",
+        "legacy-electron:26.825.31414-browser-workspace-shell",
+        "legacy-pixel:26.825.31414-browser-chrome-region"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1698,7 +1767,10 @@
       "id": "workspace.artifact-shell",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["artifact-tab-content", "artifact-preview-status"],
+      "packageEvidence": [
+        "artifact-tab-content",
+        "artifact-preview-status"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1709,7 +1781,13 @@
       "id": "workspace.document-previews",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["notebook-preview-panel", "pdf-preview-panel", "docx-preview-panel", "PopcornElectronWorkbookPanel", "PopcornElectronPresentationPanel"],
+      "packageEvidence": [
+        "notebook-preview-panel",
+        "pdf-preview-panel",
+        "docx-preview-panel",
+        "PopcornElectronWorkbookPanel",
+        "PopcornElectronPresentationPanel"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -1720,7 +1798,10 @@
       "id": "workspace.media-generated-content",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["artifact-file-preview-icon", "home-prefill-artifact-preview"],
+      "packageEvidence": [
+        "artifact-file-preview-icon",
+        "home-prefill-artifact-preview"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1731,7 +1812,11 @@
       "id": "workspace.environments",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["local-environment-editor", "local-environments-settings-page", "cloud-environments-settings-page"],
+      "packageEvidence": [
+        "local-environment-editor",
+        "local-environments-settings-page",
+        "cloud-environments-settings-page"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:environment-side-panel-and-settings-project-index",
@@ -1748,7 +1833,12 @@
       "id": "workspace.worktrees",
       "area": "workspace",
       "ownership": "workspace",
-      "packageEvidence": ["worktrees-settings-page", "stable-worktree-status-dialog", "worktree-setup-auto-fix", "worktree-setup-status"],
+      "packageEvidence": [
+        "worktrees-settings-page",
+        "stable-worktree-status-dialog",
+        "worktree-setup-auto-fix",
+        "worktree-setup-status"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:worktree-settings-empty-state-and-retention-controls",
@@ -1930,7 +2020,10 @@
       "id": "settings.git-preferences",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["git-settings", "review-delivery-settings-row"],
+      "packageEvidence": [
+        "git-settings",
+        "review-delivery-settings-row"
+      ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:git-branch-pr-review-delivery-and-hooks-settings",
@@ -1970,9 +2063,15 @@
       "id": "settings.browser-computer-use",
       "area": "settings",
       "ownership": "app",
-      "packageEvidence": ["browser-use-settings", "computer-use-settings", "browser-profile-import-dialog"],
+      "packageEvidence": [
+        "browser-use-settings",
+        "computer-use-settings",
+        "browser-profile-import-dialog"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:browser-and-computer-use-settings"],
+      "runtimeEvidence": [
+        "cdp:browser-and-computer-use-settings"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
@@ -1982,7 +2081,10 @@
       "id": "integrations.mcp",
       "area": "integrations",
       "ownership": "app",
-      "packageEvidence": ["mcp-settings", "mcp-capability-view-page"],
+      "packageEvidence": [
+        "mcp-settings",
+        "mcp-capability-view-page"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -1993,9 +2095,15 @@
       "id": "integrations.plugins",
       "area": "integrations",
       "ownership": "app",
-      "packageEvidence": ["plugins-page", "plugin-detail-page", "plugins-settings"],
+      "packageEvidence": [
+        "plugins-page",
+        "plugin-detail-page",
+        "plugins-settings"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:plugins-index-search-categories-actions-and-settings"],
+      "runtimeEvidence": [
+        "cdp:plugins-index-search-categories-actions-and-settings"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
@@ -2005,9 +2113,14 @@
       "id": "integrations.skills",
       "area": "integrations",
       "ownership": "app",
-      "packageEvidence": ["skills-page", "skills-settings"],
+      "packageEvidence": [
+        "skills-page",
+        "skills-settings"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:skills-index-search-actions"],
+      "runtimeEvidence": [
+        "cdp:skills-index-search-actions"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
@@ -2017,9 +2130,14 @@
       "id": "integrations.automations",
       "area": "integrations",
       "ownership": "app",
-      "packageEvidence": ["automations-page", "use-plugin-scheduled-tasks"],
+      "packageEvidence": [
+        "automations-page",
+        "use-plugin-scheduled-tasks"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:scheduled-index-filters-search-suggestions"],
+      "runtimeEvidence": [
+        "cdp:scheduled-index-filters-search-suggestions"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
@@ -2029,9 +2147,14 @@
       "id": "integrations.remote-connections",
       "area": "integrations",
       "ownership": "app",
-      "packageEvidence": ["remote-connections-page", "remote-connections-settings"],
+      "packageEvidence": [
+        "remote-connections-page",
+        "remote-connections-settings"
+      ],
       "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": ["cdp:connections-device-ssh-and-connection-controls"],
+      "runtimeEvidence": [
+        "cdp:connections-device-ssh-and-connection-controls"
+      ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
@@ -2041,7 +2164,10 @@
       "id": "integrations.mobile-setup",
       "area": "integrations",
       "ownership": "app",
-      "packageEvidence": ["codex-mobile-page", "codex-mobile-setup-dialog"],
+      "packageEvidence": [
+        "codex-mobile-page",
+        "codex-mobile-setup-dialog"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -2052,7 +2178,10 @@
       "id": "cross-layer.optional-package-dialogs",
       "area": "cross-layer",
       "ownership": "cross-layer",
-      "packageEvidence": ["business-checkout-switch-workspace-dialog", "debug-modal"],
+      "packageEvidence": [
+        "business-checkout-switch-workspace-dialog",
+        "debug-modal"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -2063,7 +2192,10 @@
       "id": "cross-layer.oauth-connection",
       "area": "cross-layer",
       "ownership": "cross-layer",
-      "packageEvidence": ["app-connect-oauth-callback-page", "checkout-webview-page"],
+      "packageEvidence": [
+        "app-connect-oauth-callback-page",
+        "checkout-webview-page"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
       "browserStatus": "not_started",
@@ -2074,7 +2206,11 @@
       "id": "scope-candidate.appgen-and-artifact-creation",
       "area": "scope-candidate",
       "ownership": "app",
-      "packageEvidence": ["appgen-library-page", "appgen-page", "artifact-creation-prompts"],
+      "packageEvidence": [
+        "appgen-library-page",
+        "appgen-page",
+        "artifact-creation-prompts"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "scope_pending",
       "browserStatus": "not_started",
@@ -2085,7 +2221,11 @@
       "id": "scope-candidate.device-pets-and-avatar",
       "area": "scope-candidate",
       "ownership": "app",
-      "packageEvidence": ["codex-micro-settings", "pets-settings", "avatar-overlay-page"],
+      "packageEvidence": [
+        "codex-micro-settings",
+        "pets-settings",
+        "avatar-overlay-page"
+      ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "scope_pending",
       "browserStatus": "not_started",

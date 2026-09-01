@@ -1255,8 +1255,46 @@ Cleanup terminated only validated isolated PID `70709`, verified port `9892`
 closed, and moved the unique profile plus screenshots recoverably to
 `/Users/JaminZhou/.Trash/codex-ui-kit-browser-26-825-20260901-9892-evidence`.
 PID `13503` remained running. This capture promotes only the sampled current
-unavailable-tool recovery; successful Browser activity/workspace and external
-page states remain previous-build or unsampled evidence.
+unavailable-tool recovery; it does not establish successful Browser activity,
+workspace rendering, or external page states.
+
+### 26.825.51511 Browser success capture
+
+After network recovery, a new isolated process used exact PID `21412`,
+loopback-only CDP port `9917`, and unique profile
+`/private/tmp/codex-ui-kit-browser-success-26-825.B6JBim`. It matched version
+`26.825.51511` (`7377`) and the current fingerprint. PID `13503` remained
+excluded from all process and profile operations.
+
+The task was deliberately projectless and limited to Browser against the
+public `https://developers.openai.com/codex/` page. It completed naturally as
+`Worked for 50s`, expanded to `Used the browser, ran a command`, showed exact
+instructions/connect/verification rows, and returned
+`CURRENT BROWSER SUCCESS 26.825`. CDP captured 1180×820 and 720×820 expanded
+states with zero horizontal overflow, exact computed typography, the public
+source, and zero Browser workspaces. The two current Browser glyphs were
+serialized from their exact SVG primitives and computed styles into the
+playground-only visual asset manifest.
+
+The deterministic public replay covers collapsed, timeline-open,
+fully-expanded, and compact-expanded states. Browser/CDP and native Electron
+gate disclosure behavior at both widths; four reviewed baselines cover the
+same frames. Optional local-only 500×205 foreground comparisons pass at
+6.0517% wide and 5.7941% compact under 6.5%. Raw screenshots, the isolated
+profile, and task data remain local-only. This evidence promotes only
+`thread.browser-tool-events`; the absent current workspace cannot promote
+`workspace.browser`, whose one-tab shell remains previous-build regression
+evidence.
+
+Cleanup archived only the exact disposable task, terminated validated PID
+`21412` and every exact-profile child, verified port `9917` closed, and moved
+the profile plus raw captures recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-browser-success-26-825-20260901-9917-evidence`.
+The wide/compact PNG SHA-256 values are respectively
+`968b55ffa7b5b63447336cc24dc16f316f6007864d996af8d7f95bb1be83ef35`
+and
+`2c6a9ed427b92dde6b053c6b0e5d6d38605171af3601a2e69fa88d4fe0627de5`.
+PID `13503` remained running.
 
 ### 26.810.52044 MCP success, failure, and reconnect capture
 

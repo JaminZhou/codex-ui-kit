@@ -13191,8 +13191,6 @@ for (const scene of selectedScenes) {
     const expectedSidebarMax =
       scene.id === "current-basic-26-825-boundary-open"
         ? "481"
-      : scene.scenario === "current-browser-26-825"
-        ? "454"
       : scene.id === "current-citations-26-825-sources-wide"
         ? "486"
       : scene.id === "current-sidebar-thread-lifecycle-compact" ||
@@ -13670,7 +13668,47 @@ for (const scene of selectedScenes) {
         const browser = document.querySelector(
           '[data-testid="current-browser-workspace"]',
         );
+        const answerRoot = document.querySelector(
+          '[data-item-id="assistant-current-browser-26-825"]',
+        );
+        const answer = answerRoot?.querySelector(
+          ".codex-ui-agent-message__content",
+        );
+        const answerStyle = answer ? getComputedStyle(answer) : null;
+        const duration = timeline?.querySelector(
+          ".codex-ui-activity-timeline__toggle",
+        );
+        const durationStyle = duration ? getComputedStyle(duration) : null;
+        const prompt = document.querySelector(
+          '[data-item-id="user-current-browser-26-825"] .codex-ui-agent-message__content',
+        );
+        const promptStyle = prompt ? getComputedStyle(prompt) : null;
         return {
+          answer: answer
+            ? {
+                rect: rect(answer),
+                style: answerStyle
+                  ? {
+                      fontSize: answerStyle.fontSize,
+                      fontWeight: answerStyle.fontWeight,
+                      lineHeight: answerStyle.lineHeight,
+                    }
+                  : null,
+                text: answer.textContent?.trim() ?? null,
+              }
+            : null,
+          duration: duration
+            ? {
+                rect: rect(duration),
+                style: durationStyle
+                  ? {
+                      fontSize: durationStyle.fontSize,
+                      fontWeight: durationStyle.fontWeight,
+                      lineHeight: durationStyle.lineHeight,
+                    }
+                  : null,
+              }
+            : null,
           activity: activity
             ? {
                 open:
@@ -13736,6 +13774,62 @@ for (const scene of selectedScenes) {
             ) ?? [],
             (entry) => entry.textContent?.trim(),
           ),
+          stepDetails: Array.from(
+            timeline?.querySelectorAll(
+              ".codex-ui-browser-activity__steps li",
+            ) ?? [],
+            (entry) => {
+              const label = entry.querySelector("span");
+              const labelStyle = label ? getComputedStyle(label) : null;
+              return {
+                icon:
+                  entry
+                    .querySelector("svg")
+                    ?.getAttribute("data-current-build-icon") ?? null,
+                rect: rect(entry),
+                style: labelStyle
+                  ? {
+                      fontSize: labelStyle.fontSize,
+                      fontWeight: labelStyle.fontWeight,
+                      lineHeight: labelStyle.lineHeight,
+                    }
+                  : null,
+              };
+            },
+          ),
+          summaryIcon:
+            activity
+              ?.querySelector(".codex-ui-activity__header svg")
+              ?.getAttribute("data-current-build-icon") ?? null,
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          sidebarVisible: (() => {
+            const sidebar = document.querySelector(
+              ".codex-ui-app-shell__sidebar",
+            );
+            const sidebarStyle = sidebar ? getComputedStyle(sidebar) : null;
+            return Boolean(
+              sidebar &&
+                sidebar.getBoundingClientRect().width > 0 &&
+                sidebarStyle?.display !== "none" &&
+                sidebarStyle?.visibility !== "hidden",
+            );
+          })(),
+          prompt: prompt
+            ? {
+                link:
+                  prompt.querySelector("a")?.getAttribute("href") ?? null,
+                rect: rect(prompt),
+                style: promptStyle
+                  ? {
+                      fontSize: promptStyle.fontSize,
+                      fontWeight: promptStyle.fontWeight,
+                      lineHeight: promptStyle.lineHeight,
+                    }
+                  : null,
+              }
+            : null,
           timelineExpanded: timeline?.hasAttribute("data-expanded") ?? false,
           timelineSummary:
             timeline
@@ -13744,14 +13838,14 @@ for (const scene of selectedScenes) {
         };
       });
       const activityOpen =
-        scene.id.endsWith("-open") &&
+        (scene.id.endsWith("-open") || scene.id.endsWith("-open-compact")) &&
         !scene.id.endsWith("-worked-open");
       const timelineOpen =
         activityOpen || scene.id.endsWith("-worked-open");
       const expectedDuration =
         scene.scenario === "current-search-26-825"
           ? "Worked for 23s"
-          : "Worked for 56s";
+          : "Worked for 50s";
       if (
         currentSearchBrowser.timelineExpanded !== timelineOpen ||
         currentSearchBrowser.timelineSummary !== expectedDuration ||
@@ -13782,42 +13876,72 @@ for (const scene of selectedScenes) {
         );
       }
       if (scene.scenario === "current-browser-26-825") {
-        const expectedToolbarLabels = [
-          "Back",
-          "Next",
-          "Reload",
-          "Site information",
-          "Site tools",
-          "Open in external browser",
-          "Annotate",
-          "Browser options",
-        ];
+        const compact = scene.id.endsWith("-compact");
+        const expectedContentWidth = compact ? 688 : 736;
+        const expectedPromptWidth = compact ? 481.59375 : 515.1875;
+        const stepTopDeltas = currentSearchBrowser.stepDetails
+          .slice(1)
+          .map(
+            (step, index) =>
+              step.rect.top -
+              currentSearchBrowser.stepDetails[index].rect.top,
+          );
         if (
-          !currentSearchBrowser.browser ||
-          Math.abs(currentSearchBrowser.browser.rect.width - 418.59375) >
-            0.1 ||
-          Math.abs(currentSearchBrowser.browser.tabs.height - 46) > 0.1 ||
-          Math.abs(currentSearchBrowser.browser.toolbar.height - 40) > 0.1 ||
-          Math.abs(currentSearchBrowser.browser.content.top - 86) > 0.1 ||
-          currentSearchBrowser.browser.externalContentBoundary !==
-            "external-web-content" ||
-          !currentSearchBrowser.browser.tabTitle?.startsWith(
-            "◉Codex in ChatGPT | AI Coding Agents",
-          ) ||
-          JSON.stringify(currentSearchBrowser.browser.toolbarLabels) !==
-            JSON.stringify(expectedToolbarLabels) ||
+          currentSearchBrowser.browser !== null ||
+          currentSearchBrowser.horizontalOverflow > 1 ||
+          currentSearchBrowser.sidebarVisible === compact ||
+          currentSearchBrowser.duration?.style?.fontSize !== "14px" ||
+          currentSearchBrowser.duration?.style?.lineHeight !== "21px" ||
+          currentSearchBrowser.duration?.style?.fontWeight !== "400" ||
+          currentSearchBrowser.prompt?.link !==
+            "https://developers.openai.com/codex/" ||
+          currentSearchBrowser.prompt?.style?.fontSize !== "14px" ||
+          currentSearchBrowser.prompt?.style?.lineHeight !== "22.75px" ||
+          currentSearchBrowser.prompt?.style?.fontWeight !== "400" ||
+          Math.abs(
+            (currentSearchBrowser.prompt?.rect?.width ?? 0) -
+              expectedPromptWidth,
+          ) > 0.1 ||
+          Math.abs(
+            (currentSearchBrowser.answer?.rect?.width ?? 0) -
+              expectedContentWidth,
+          ) > 0.1 ||
+          currentSearchBrowser.answer?.text !==
+            "CURRENT BROWSER SUCCESS 26.825" ||
+          currentSearchBrowser.answer?.style?.fontSize !== "14px" ||
+          currentSearchBrowser.answer?.style?.lineHeight !== "22.75px" ||
+          currentSearchBrowser.answer?.style?.fontWeight !== "400" ||
           (timelineOpen &&
             (currentSearchBrowser.activity?.summary !==
-              "Used the browser, loaded a tool" ||
+              "Used the browser, ran a command" ||
+              currentSearchBrowser.summaryIcon !== "thread-browser" ||
               JSON.stringify(currentSearchBrowser.steps) !==
                 JSON.stringify([
-                  "Read Control In App Browser skill",
-                  "连接 Browser",
-                  "打开页面并查找 desktop",
-                ])))
+                  "Load Browser instructions",
+                  "Connect to Browser",
+                  "Verify Codex documentation",
+                ]) ||
+              JSON.stringify(
+                currentSearchBrowser.stepDetails.map(({ icon }) => icon),
+              ) !==
+                JSON.stringify([
+                  "thread-command-terminal",
+                  "thread-browser-connect",
+                  "thread-browser",
+                ]) ||
+              (activityOpen &&
+                (currentSearchBrowser.stepDetails.some(
+                  ({ rect: stepRect, style }) =>
+                    Math.abs(stepRect.height - 25) > 0.1 ||
+                    style?.fontSize !== "14px" ||
+                    style?.lineHeight !== "21px" ||
+                    style?.fontWeight !== "400",
+                ) ||
+                  JSON.stringify(stepTopDeltas) !==
+                    JSON.stringify([25, 25])))))
         ) {
           throw new Error(
-            `${scene.id}: current Browser workspace contract failed: ${JSON.stringify(currentSearchBrowser)}`,
+            `${scene.id}: current Browser success contract failed: ${JSON.stringify(currentSearchBrowser)}`,
           );
         }
       }

@@ -803,7 +803,6 @@ export const visualScenes = [
     id: "conversation-browser-current-26-825",
     maxPixelRatio: 0.0225,
     scenario: "current-browser-26-825",
-    surfaces: ["browserWorkspace"],
     windowSize: { height: 820, width: 1180 },
   },
   {
@@ -812,7 +811,6 @@ export const visualScenes = [
     id: "conversation-browser-current-26-825-worked-open",
     maxPixelRatio: 0.0225,
     scenario: "current-browser-26-825",
-    surfaces: ["browserWorkspace"],
     windowSize: { height: 820, width: 1180 },
   },
   {
@@ -821,8 +819,17 @@ export const visualScenes = [
     id: "conversation-browser-current-26-825-open",
     maxPixelRatio: 0.0225,
     scenario: "current-browser-26-825",
-    surfaces: ["browserWorkspace"],
     windowSize: { height: 820, width: 1180 },
+  },
+  {
+    currentSidebar: true,
+    frame: "conversation-browser-current-26-825-open-compact",
+    id: "conversation-browser-current-26-825-open-compact",
+    layoutMode: "narrow",
+    maxPixelRatio: 0.0225,
+    scenario: "current-browser-26-825",
+    sidebarState: "hidden",
+    windowSize: { height: 820, width: 720 },
   },
   {
     currentSidebar: true,
