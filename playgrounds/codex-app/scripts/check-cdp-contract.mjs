@@ -911,6 +911,313 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.id.startsWith("workspace-mcp-settings-current-26-825")) {
+      const compact = scene.id.endsWith("-compact");
+      const create = scene.id.includes("-create");
+      const detail = scene.id.endsWith("-detail");
+      const mcp = await page.evaluate(() => {
+        const rect = (target) => {
+          const element =
+            typeof target === "string"
+              ? document.querySelector(target)
+              : target;
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const search = document.querySelector(
+          ".codex-ui-mcp-settings__search",
+        );
+        return {
+          actions: rect(".codex-ui-plugin-manager__actions"),
+          back: rect(".codex-ui-mcp-editor__back"),
+          cards: Array.from(
+            document.querySelectorAll(".codex-ui-mcp-editor__card"),
+            rect,
+          ),
+          description: rect(".codex-ui-mcp-editor__description"),
+          editorHeading: rect(".codex-ui-mcp-editor__header h1"),
+          fieldLabels: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-mcp-editor__field > span, .codex-ui-mcp-editor__field-group > p, .codex-ui-mcp-editor__type > span:first-child",
+            ),
+            (element) => element.textContent?.trim(),
+          ),
+          heading: rect(".codex-ui-plugin-manager__intro h1"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          inputs: Array.from(
+            document.querySelectorAll(".codex-ui-mcp-editor input"),
+            (input) => ({
+              placeholder: input.getAttribute("placeholder"),
+              rect: rect(input),
+            }),
+          ),
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          pluginCards: Array.from(
+            document.querySelectorAll(".codex-ui-mcp-settings__rows"),
+            rect,
+          ),
+          pluginRows: Array.from(
+            document.querySelectorAll(".codex-ui-mcp-settings__row"),
+            (row) => ({
+              rect: rect(row),
+              source: row.getAttribute("data-source"),
+            }),
+          ),
+          root: rect(".codex-ui-mcp-settings"),
+          saveDisabled: document
+            .querySelector(".codex-ui-mcp-editor__save")
+            ?.hasAttribute("disabled"),
+          search: search
+            ? {
+                display: getComputedStyle(search).display,
+                rect: rect(search),
+              }
+            : null,
+          selected: document
+            .querySelector(
+              '.codex-ui-settings-shell__item[aria-current="page"]',
+            )
+            ?.getAttribute("aria-label"),
+          settingsButtonCount: document.querySelectorAll(
+            ".codex-ui-mcp-settings__settings",
+          ).length,
+          switches: Array.from(
+            document.querySelectorAll(".codex-ui-mcp-settings__switch"),
+            (control) => control.getAttribute("aria-checked"),
+          ),
+          tabs: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-plugin-manager-tabs > button",
+            ),
+            (tab) => ({
+              rect: rect(tab),
+              text: tab.textContent?.trim(),
+            }),
+          ),
+          viewport: { height: window.innerHeight, width: window.innerWidth },
+        };
+      });
+      const expectedRoot = compact
+        ? { left: 341.875, width: 358.125 }
+        : { left: 366.9375, width: 768 };
+      const expectedTabWidths = [
+        86.03125,
+        66.015625,
+        70.453125,
+        65.8125,
+        111.9375,
+      ];
+      if (
+        Math.abs(mcp.horizontalOverflow) > 1 ||
+        mcp.viewport.width !== (compact ? 720 : 1180) ||
+        mcp.viewport.height !== (compact ? 680 : 820) ||
+        mcp.selected !== "Plugins" ||
+        !mcp.navigation ||
+        Math.abs(mcp.navigation.left) > 0.1 ||
+        Math.abs(mcp.navigation.top - 46) > 0.1 ||
+        Math.abs(mcp.navigation.width - 321.875) > 0.1 ||
+        Math.abs(mcp.navigation.height - (mcp.viewport.height - 46)) > 0.1 ||
+        !mcp.root ||
+        Math.abs(mcp.root.left - expectedRoot.left) > 0.1 ||
+        Math.abs(mcp.root.top - 46) > 0.1 ||
+        Math.abs(mcp.root.width - expectedRoot.width) > 0.1 ||
+        !mcp.heading ||
+        Math.abs(mcp.heading.top - 66) > 0.1 ||
+        Math.abs(mcp.heading.height - 28.796875) > 0.1 ||
+        mcp.tabs.length !== 5 ||
+        mcp.tabs.some(
+          ({ rect: tab }, index) =>
+            !tab ||
+            Math.abs(tab.top - (compact ? 197.796875 : 155.796875)) > 0.1 ||
+            Math.abs(tab.width - expectedTabWidths[index]) > 0.1 ||
+            Math.abs(tab.height - 28) > 0.1,
+        ) ||
+        JSON.stringify(mcp.tabs.map(({ text }) => text)) !==
+          JSON.stringify([
+            "Plugins13",
+            "Apps6",
+            "MCPs6",
+            "Skills2",
+            "Marketplace2",
+          ]) ||
+        (compact
+          ? mcp.search?.display !== "none"
+          : !mcp.search?.rect ||
+            Math.abs(mcp.search.rect.left - 910.9375) > 0.1 ||
+            Math.abs(mcp.search.rect.top - 153.796875) > 0.1 ||
+            Math.abs(mcp.search.rect.width - 224) > 0.1 ||
+            Math.abs(mcp.search.rect.height - 32) > 0.1)
+      ) {
+        throw new Error(
+          `${scene.id}: current MCP manager shell contract failed: ${JSON.stringify(mcp)}`,
+        );
+      }
+      if (!create && !detail) {
+        const expectedCards = compact
+          ? [
+              { height: 210, left: 341.875, top: 311.796875, width: 358.125 },
+              { height: 87.125, left: 341.875, top: 587.796875, width: 358.125 },
+            ]
+          : [
+              { height: 210, left: 366.9375, top: 271.796875, width: 768 },
+              { height: 87.125, left: 366.9375, top: 547.796875, width: 768 },
+            ];
+        if (
+          mcp.pluginCards.length !== 2 ||
+          mcp.pluginCards.some((card, index) =>
+            Object.entries(expectedCards[index]).some(
+              ([key, expected]) =>
+                Math.abs((card?.[key] ?? Number.NaN) - expected) > 0.1,
+            ),
+          ) ||
+          mcp.pluginRows.length !== 6 ||
+          JSON.stringify(mcp.pluginRows.map(({ source }) => source)) !==
+            JSON.stringify([
+              "server",
+              "server",
+              "server",
+              "server",
+              "plugin",
+              "plugin",
+            ]) ||
+          mcp.settingsButtonCount !== 4 ||
+          JSON.stringify(mcp.switches) !==
+            JSON.stringify(["false", "true", "true", "true"])
+        ) {
+          throw new Error(
+            `${scene.id}: current MCP list geometry failed: ${JSON.stringify(mcp)}`,
+          );
+        }
+        if (scene.id === "workspace-mcp-settings-current-26-825") {
+          const query = page.getByPlaceholder("Search MCP servers");
+          await query.fill("no-match-26-825");
+          await page.getByText("No MCP servers found", { exact: true }).waitFor();
+          await query.fill("");
+          await page.getByRole("button", { name: "Add" }).click();
+          const addMenuItems = await page
+            .getByRole("menu", { name: "Add integration" })
+            .getByRole("menuitem")
+            .allTextContents();
+          if (
+            JSON.stringify(addMenuItems) !==
+            JSON.stringify([
+              "Create plugin",
+              "Add a marketplace",
+              "Add MCP server",
+              "Record a skill",
+            ])
+          ) {
+            throw new Error(
+              `Current MCP Add menu drifted: ${JSON.stringify(addMenuItems)}`,
+            );
+          }
+          await page.keyboard.press("Escape");
+          const firstSwitch = page.getByRole("switch").first();
+          await firstSwitch.click();
+          if ((await firstSwitch.getAttribute("aria-checked")) !== "true") {
+            throw new Error("Current MCP controlled switch did not enable.");
+          }
+          await firstSwitch.click();
+          await page
+            .getByRole("button", { name: "Settings for workspace-tools" })
+            .click();
+          await page
+            .getByRole("heading", { name: "Update workspace-tools MCP" })
+            .waitFor();
+          await page
+            .getByRole("button", { exact: true, name: "Back" })
+            .click();
+          await page
+            .getByRole("heading", { name: "Servers", exact: true })
+            .waitFor();
+        }
+      } else {
+        const http = scene.id.includes("-http-") || detail;
+        const expectedLabels = detail
+          ? [
+              "URL",
+              "Bearer token env var",
+              "Headers",
+              "Headers from environment variables",
+            ]
+          : http
+            ? [
+                "Name",
+                "Type",
+                "URL",
+                "Bearer token env var",
+                "Headers",
+                "Headers from environment variables",
+              ]
+            : [
+                "Name",
+                "Type",
+                "Command to launch",
+                "Arguments",
+                "Environment variables",
+                "Environment variable passthrough",
+                "Working directory",
+              ];
+        if (
+          !mcp.back ||
+          Math.abs(mcp.back.left - expectedRoot.left) > 0.1 ||
+          Math.abs(
+            mcp.back.top - (compact ? 265.796875 : 225.796875),
+          ) > 0.1 ||
+          Math.abs(mcp.back.width - 69.765625) > 0.1 ||
+          Math.abs(mcp.back.height - 28) > 0.1 ||
+          !mcp.editorHeading ||
+          Math.abs(
+            mcp.editorHeading.top - (compact ? 313.796875 : 273.796875),
+          ) > 0.1 ||
+          Math.abs(mcp.editorHeading.height - 26.59375) > 0.1 ||
+          JSON.stringify(mcp.fieldLabels) !== JSON.stringify(expectedLabels) ||
+          mcp.saveDisabled !== true ||
+          mcp.cards.length !== (detail ? 1 : 2) ||
+          (detail &&
+            (!mcp.description ||
+              Math.abs(mcp.description.top - 321.796875) > 0.1 ||
+              Math.abs(mcp.description.height - 18.5625) > 0.1 ||
+              Math.abs(mcp.cards[0]?.top - 346.359375) > 0.1 ||
+              Math.abs(mcp.cards[0]?.height - 414) > 0.1)) ||
+          (!detail &&
+            (Math.abs(
+              mcp.cards[0]?.top - (compact ? 387.390625 : 347.390625),
+            ) > 0.1 ||
+              Math.abs(mcp.cards[0]?.height - 135) > 0.1 ||
+              Math.abs(
+                mcp.cards[1]?.top - (compact ? 528.390625 : 488.390625),
+              ) > 0.1 ||
+              Math.abs(mcp.cards[1]?.height - (http ? 414 : 539)) > 0.1))
+        ) {
+          throw new Error(
+            `${scene.id}: current MCP editor contract failed: ${JSON.stringify(mcp)}`,
+          );
+        }
+        if (scene.id === "workspace-mcp-settings-current-26-825-http-create") {
+          await page.getByPlaceholder("MCP server name").fill("sample-http");
+          await page
+            .getByPlaceholder("https://mcp.example.com/mcp")
+            .fill("https://example.test/mcp");
+          if (await page.getByRole("button", { name: "Save" }).isDisabled()) {
+            throw new Error("Current MCP HTTP editor did not enable Save.");
+          }
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(mcp, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-personalization-settings")) {
       const bottom = scene.id.endsWith("-bottom");
       const menuFrame = scene.id.endsWith("-menu");

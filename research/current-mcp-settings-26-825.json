@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01T10:28:13.447Z",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "navigation-and-read-only-form-inspection"
+  },
+  "route": {
+    "settingsItem": "Plugins",
+    "title": "Plugins",
+    "description": "Manage plugins, skills, and MCPs",
+    "tabs": [
+      { "label": "Plugins", "count": 13, "width": 86.03125 },
+      { "label": "Apps", "count": 6, "width": 66.015625 },
+      { "label": "MCPs", "count": 6, "width": 70.453125 },
+      { "label": "Skills", "count": 2, "width": 65.8125 },
+      { "label": "Marketplace", "count": 2, "width": 111.9375 }
+    ],
+    "actions": ["Browse directory", "Add"],
+    "addMenu": [
+      "Create plugin",
+      "Add a marketplace",
+      "Add MCP server",
+      "Record a skill"
+    ]
+  },
+  "list": {
+    "serverRows": 4,
+    "fromPluginRows": 2,
+    "serverToggleStates": [false, true, true, true],
+    "settingsButtonCount": 4,
+    "wide": {
+      "viewport": { "width": 1180, "height": 820 },
+      "root": { "left": 366.9375, "top": 46, "width": 768 },
+      "tabsTop": 155.796875,
+      "search": {
+        "left": 910.9375,
+        "top": 153.796875,
+        "width": 224,
+        "height": 32
+      },
+      "cards": [
+        { "top": 271.796875, "width": 768, "height": 210 },
+        { "top": 547.796875, "width": 768, "height": 87.125 }
+      ]
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "root": { "left": 341.875, "top": 46, "width": 358.125 },
+      "tabsTop": 197.796875,
+      "searchMounted": false,
+      "cards": [
+        { "top": 311.796875, "width": 358.125, "height": 210 },
+        { "top": 587.796875, "width": 358.125, "height": 87.125 }
+      ]
+    },
+    "serverRowHeight": 52,
+    "fromPluginRowHeight": 42.5625,
+    "emptyMessage": "No MCP servers found"
+  },
+  "editor": {
+    "create": {
+      "title": "Connect to a custom MCP",
+      "back": { "width": 69.765625, "height": 28 },
+      "wide": {
+        "backTop": 225.796875,
+        "headingTop": 273.796875,
+        "cards": [
+          { "top": 347.390625, "height": 135 },
+          { "top": 488.390625, "stdioHeight": 539, "httpHeight": 414 }
+        ]
+      },
+      "compact": {
+        "backTop": 265.796875,
+        "headingTop": 313.796875,
+        "cards": [
+          { "top": 387.390625, "height": 135 },
+          { "top": 528.390625, "httpHeight": 414 }
+        ]
+      },
+      "stdioFields": [
+        "Name",
+        "Type",
+        "Command to launch",
+        "Arguments",
+        "Environment variables",
+        "Environment variable passthrough",
+        "Working directory"
+      ],
+      "httpFields": [
+        "Name",
+        "Type",
+        "URL",
+        "Bearer token env var",
+        "Headers",
+        "Headers from environment variables"
+      ],
+      "saveInitiallyDisabled": true
+    },
+    "update": {
+      "titlePattern": "Update <server> MCP",
+      "uninstallVisible": true,
+      "headingTop": 273.796875,
+      "descriptionTop": 321.796875,
+      "descriptionHeight": 18.5625,
+      "card": { "top": 346.359375, "height": 414 },
+      "fields": [
+        "URL",
+        "Bearer token env var",
+        "Headers",
+        "Headers from environment variables"
+      ],
+      "saveInitiallyDisabled": true
+    }
+  },
+  "productPixelRatios": {
+    "listWideMain": 0.01367368290925318,
+    "listCompactMain": 0.03421958060850702,
+    "stdioWideMain": 0.02033715352214172,
+    "httpWideMain": 0.02093867496434591,
+    "httpCompactMain": 0.03892760371556389,
+    "detailWideMain": 0.022033172626100904,
+    "maximum": 0.04,
+    "dynamicMasks": [
+      "server names",
+      "plugin-provided server names",
+      "update title server name",
+      "update URL value"
+    ]
+  },
+  "localOnlyScreenshots": [
+    {
+      "name": "mcp-list-wide.png",
+      "sha256": "2e7ce26392dad612c2ffc9179a516c9a06a3757ab7e391ae2b8b88d5fd6b2760"
+    },
+    {
+      "name": "mcp-list-compact.png",
+      "sha256": "4b534d4cbfe029da7b8a924e8ef8132815954a7cb197b623c9e2cf076d325f16"
+    },
+    {
+      "name": "mcp-editor-stdio-wide.png",
+      "sha256": "bcebb9407956849add392a4319ab1916c585c64c712eb96c72ef948cb991c3eb"
+    },
+    {
+      "name": "mcp-editor-http-wide.png",
+      "sha256": "2809fdebc07ddd5631d4b5d7c33f32996fee46bed94fd23e66b4e1628c4e12ca"
+    },
+    {
+      "name": "mcp-editor-http-compact.png",
+      "sha256": "189a2f2a0d547a1b6b757945e776e415af41490d5a7df53b47b2f94b5c32fd60"
+    },
+    {
+      "name": "mcp-detail-wide.png",
+      "sha256": "a9cd47d0962022c839a4e971e852fcd954e41137eb660f6fe8f92ad618b8cc3a"
+    }
+  ],
+  "remainingBoundary": [
+    "real create and save",
+    "enable and disable persistence",
+    "uninstall",
+    "OAuth and permission prompts",
+    "transport and validation failures"
+  ]
+}

@@ -1,4 +1,4 @@
-import { launchScene } from "./electron-harness.mjs";
+import { launchScene, visualScenes } from "./electron-harness.mjs";
 import { execFile } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -19236,6 +19236,231 @@ try {
   }
 } finally {
   await currentCitationsElectronApp.close();
+}
+
+const currentMcpSettingsElectronSceneIds = [
+  "workspace-mcp-settings-current-26-825",
+  "workspace-mcp-settings-current-26-825-compact",
+  "workspace-mcp-settings-current-26-825-http-create-compact",
+  "workspace-mcp-settings-current-26-825-detail",
+];
+for (const sceneId of currentMcpSettingsElectronSceneIds) {
+  const currentMcpSettingsScene = visualScenes.find(
+    (candidate) => candidate.id === sceneId,
+  );
+  if (!currentMcpSettingsScene) {
+    throw new Error(`Missing Electron MCP Settings scene ${sceneId}.`);
+  }
+  const { app: currentMcpSettingsApp, page: currentMcpSettingsPage } =
+    await launchScene(currentMcpSettingsScene, { capture: true });
+  try {
+    const compact = sceneId.endsWith("-compact");
+    const detail = sceneId.endsWith("-detail");
+    const create = sceneId.includes("-create");
+    const expectedViewport = compact
+      ? { height: 680, width: 720 }
+      : { height: 820, width: 1180 };
+    const nativeBounds = await currentMcpSettingsApp.evaluate(
+      ({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    await currentMcpSettingsPage.evaluate(async () => document.fonts.ready);
+    await currentMcpSettingsPage.waitForFunction(
+      ({ compact, expectedFrame }) => {
+        const root = document.querySelector(".codex-ui-mcp-settings");
+        const firstTab = document.querySelector(
+          ".codex-ui-plugin-manager-tabs > button",
+        );
+        const frame = document
+          .querySelector(".demo-root")
+          ?.getAttribute("data-frame");
+        if (!(root instanceof HTMLElement) || !(firstTab instanceof HTMLElement)) {
+          return false;
+        }
+        const rootRect = root.getBoundingClientRect();
+        const tabRect = firstTab.getBoundingClientRect();
+        return (
+          frame === expectedFrame &&
+          Math.abs(rootRect.width - (compact ? 358.125 : 768)) <= 0.1 &&
+          Math.abs(tabRect.top - (compact ? 197.796875 : 155.796875)) <= 0.1
+        );
+      },
+      { compact, expectedFrame: currentMcpSettingsScene.frame },
+    );
+    const contract = await currentMcpSettingsPage.evaluate(() => {
+      const rect = (selector) => {
+        const element = document.querySelector(selector);
+        const value = element?.getBoundingClientRect();
+        return value
+          ? {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            }
+          : null;
+      };
+      const search = document.querySelector(".codex-ui-mcp-settings__search");
+      return {
+        back: rect(".codex-ui-mcp-editor__back"),
+        cards: Array.from(
+          document.querySelectorAll(".codex-ui-mcp-editor__card"),
+          (card) => {
+            const value = card.getBoundingClientRect();
+            return { height: value.height, top: value.top, width: value.width };
+          },
+        ),
+        description: rect(".codex-ui-mcp-editor__description"),
+        editorHeading: rect(".codex-ui-mcp-editor__header h1"),
+        fieldLabels: Array.from(
+          document.querySelectorAll(
+            ".codex-ui-mcp-editor__field > span, .codex-ui-mcp-editor__field-group > p, .codex-ui-mcp-editor__type > span:first-child",
+          ),
+          (label) => label.textContent?.trim(),
+        ),
+        frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        pluginCards: Array.from(
+          document.querySelectorAll(".codex-ui-mcp-settings__rows"),
+          (card) => {
+            const value = card.getBoundingClientRect();
+            return { height: value.height, top: value.top, width: value.width };
+          },
+        ),
+        root: rect(".codex-ui-mcp-settings"),
+        saveDisabled: document
+          .querySelector(".codex-ui-mcp-editor__save")
+          ?.hasAttribute("disabled"),
+        searchDisplay: search ? getComputedStyle(search).display : null,
+        selected: document
+          .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+          ?.getAttribute("aria-label"),
+        tabs: Array.from(
+          document.querySelectorAll(".codex-ui-plugin-manager-tabs > button"),
+          (tab) => {
+            const value = tab.getBoundingClientRect();
+            return { height: value.height, top: value.top, width: value.width };
+          },
+        ),
+        viewport: { height: innerHeight, width: innerWidth },
+      };
+    });
+    const expectedRoot = compact
+      ? { left: 341.875, width: 358.125 }
+      : { left: 366.9375, width: 768 };
+    const expectedTabTop = compact ? 197.796875 : 155.796875;
+    if (
+      nativeBounds?.width !== expectedViewport.width ||
+      nativeBounds?.height !== expectedViewport.height ||
+      contract.viewport.width !== expectedViewport.width ||
+      contract.viewport.height !== expectedViewport.height ||
+      contract.frame !== currentMcpSettingsScene.frame ||
+      contract.selected !== "Plugins" ||
+      Math.abs(contract.horizontalOverflow) > 1 ||
+      !contract.root ||
+      Math.abs(contract.root.left - expectedRoot.left) > 0.1 ||
+      Math.abs(contract.root.width - expectedRoot.width) > 0.1 ||
+      contract.tabs.length !== 5 ||
+      contract.tabs.some(
+        (tab) =>
+          Math.abs(tab.top - expectedTabTop) > 0.1 ||
+          Math.abs(tab.height - 28) > 0.1,
+      ) ||
+      contract.searchDisplay !== (compact ? "none" : "flex")
+    ) {
+      throw new Error(
+        `Electron current MCP Settings shell drifted: ${JSON.stringify({ contract, nativeBounds, sceneId })}`,
+      );
+    }
+    if (!create && !detail) {
+      const expectedCards = compact
+        ? [
+            { height: 210, top: 311.796875, width: 358.125 },
+            { height: 87.125, top: 587.796875, width: 358.125 },
+          ]
+        : [
+            { height: 210, top: 271.796875, width: 768 },
+            { height: 87.125, top: 547.796875, width: 768 },
+          ];
+      if (
+        JSON.stringify(contract.pluginCards) !== JSON.stringify(expectedCards)
+      ) {
+        throw new Error(
+          `Electron current MCP Settings list drifted: ${JSON.stringify(contract.pluginCards)}.`,
+        );
+      }
+      if (!compact) {
+        const search = currentMcpSettingsPage.getByPlaceholder(
+          "Search MCP servers",
+        );
+        await search.fill("electron-no-match-26-825");
+        await currentMcpSettingsPage
+          .getByText("No MCP servers found", { exact: true })
+          .waitFor();
+        await search.fill("");
+        await currentMcpSettingsPage
+          .getByRole("button", { name: "Add", exact: true })
+          .click();
+        const addItems = await currentMcpSettingsPage
+          .getByRole("menu", { name: "Add integration" })
+          .getByRole("menuitem")
+          .allTextContents();
+        if (
+          JSON.stringify(addItems) !==
+          JSON.stringify([
+            "Create plugin",
+            "Add a marketplace",
+            "Add MCP server",
+            "Record a skill",
+          ])
+        ) {
+          throw new Error(
+            `Electron current MCP Add menu drifted: ${JSON.stringify(addItems)}.`,
+          );
+        }
+        await currentMcpSettingsPage.keyboard.press("Escape");
+      }
+    } else if (create) {
+      if (
+        contract.back?.top !== 265.796875 ||
+        contract.editorHeading?.top !== 313.796875 ||
+        JSON.stringify(contract.cards) !==
+          JSON.stringify([
+            { height: 135, top: 387.390625, width: 358.125 },
+            { height: 414, top: 528.390625, width: 358.125 },
+          ]) ||
+        contract.saveDisabled !== true ||
+        JSON.stringify(contract.fieldLabels) !==
+          JSON.stringify([
+            "Name",
+            "Type",
+            "URL",
+            "Bearer token env var",
+            "Headers",
+            "Headers from environment variables",
+          ])
+      ) {
+        throw new Error(
+          `Electron compact MCP editor drifted: ${JSON.stringify(contract)}.`,
+        );
+      }
+    } else if (
+      contract.back?.top !== 225.796875 ||
+      contract.editorHeading?.top !== 273.796875 ||
+      contract.description?.top !== 321.796875 ||
+      contract.description?.height !== 18.5625 ||
+      JSON.stringify(contract.cards) !==
+        JSON.stringify([{ height: 414, top: 346.359375, width: 768 }]) ||
+      contract.saveDisabled !== true
+    ) {
+      throw new Error(
+        `Electron MCP detail editor drifted: ${JSON.stringify(contract)}.`,
+      );
+    }
+  } finally {
+    await currentMcpSettingsApp.close();
+  }
 }
 
 const appServerCrashScene = {

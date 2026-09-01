@@ -231,6 +231,20 @@ const currentMcp26825RecoveryCompactReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_825_COMPACT_REFERENCE;
 const currentMcp26825SourcesReference =
   process.env.CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_825_REFERENCE;
+const currentMcpSettings26825References = {
+  "workspace-mcp-settings-current-26-825":
+    process.env.CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_REFERENCE,
+  "workspace-mcp-settings-current-26-825-compact":
+    process.env.CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_COMPACT_REFERENCE,
+  "workspace-mcp-settings-current-26-825-detail":
+    process.env.CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_DETAIL_REFERENCE,
+  "workspace-mcp-settings-current-26-825-http-create":
+    process.env.CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_HTTP_REFERENCE,
+  "workspace-mcp-settings-current-26-825-http-create-compact":
+    process.env.CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_HTTP_COMPACT_REFERENCE,
+  "workspace-mcp-settings-current-26-825-stdio-create":
+    process.env.CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_STDIO_REFERENCE,
+};
 const currentTransport26825WaitingReference =
   process.env.CODEX_UI_KIT_CURRENT_TRANSPORT_26_825_WAITING_REFERENCE;
 const currentMcp26820WideReferenceSize = {
@@ -3360,6 +3374,90 @@ for (const scene of selectedScenes) {
       regions,
       sceneId: scene.id,
     });
+  }
+
+  const currentMcpSettings26825Reference =
+    currentMcpSettings26825References[scene.id];
+  if (currentMcpSettings26825Reference) {
+    const reference = PNG.sync.read(
+      await readFile(currentMcpSettings26825Reference),
+    );
+    const compact = scene.id.endsWith("-compact");
+    const expectedSize = compact
+      ? { height: 680, width: 720 }
+      : { height: 820, width: 1180 };
+    if (
+      reference.width !== expectedSize.width ||
+      reference.height !== expectedSize.height ||
+      actual.width !== expectedSize.width ||
+      actual.height !== expectedSize.height
+    ) {
+      throw new Error(
+        `${scene.id}: current 26.825 MCP Settings comparison requires exact ${expectedSize.width}x${expectedSize.height} product and playground frames, received reference ${reference.width}x${reference.height} and actual ${actual.width}x${actual.height}.`,
+      );
+    }
+    const region = compact
+      ? { height: 634, left: 323, top: 46, width: 397 }
+      : { height: 774, left: 323, top: 46, width: 857 };
+    const listMasks = compact
+      ? [
+          { height: 34, left: 32, top: 276, width: 230 },
+          { height: 34, left: 32, top: 328, width: 230 },
+          { height: 34, left: 32, top: 380, width: 230 },
+          { height: 34, left: 32, top: 432, width: 230 },
+          { height: 34, left: 32, top: 549, width: 230 },
+          { height: 34, left: 32, top: 591, width: 230 },
+        ]
+      : [
+          { height: 34, left: 55, top: 236, width: 360 },
+          { height: 34, left: 55, top: 288, width: 360 },
+          { height: 34, left: 55, top: 340, width: 360 },
+          { height: 34, left: 55, top: 392, width: 360 },
+          { height: 34, left: 55, top: 506, width: 360 },
+          { height: 34, left: 55, top: 549, width: 360 },
+        ];
+    const masks = scene.id.endsWith("-detail")
+      ? [
+          { height: 36, left: 40, top: 222, width: 500 },
+          { height: 28, left: 60, top: 342, width: 650 },
+        ]
+      : scene.id === "workspace-mcp-settings-current-26-825" ||
+          scene.id === "workspace-mcp-settings-current-26-825-compact"
+        ? listMasks
+        : [];
+    const maskedReference = maskPng(
+      cropPng(
+        reference,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      ),
+      masks,
+    );
+    const maskedActual = maskPng(
+      cropPng(actual, region.left, region.top, region.width, region.height),
+      masks,
+    );
+    const comparison = comparePng(maskedReference, maskedActual);
+    const maximumRatio = environmentRatio(
+      "CODEX_UI_KIT_CURRENT_MCP_SETTINGS_26_825_MAX_DIFF_RATIO",
+      0.04,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.current-build.diff.png`),
+        PNG.sync.write(comparison.diff),
+      );
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${scene.id}: current 26.825 MCP Settings ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${scene.id}: current 26.825 MCP Settings pixel ratio ${comparison.ratio}`,
+    );
   }
 
   const currentCommand26825Reference =

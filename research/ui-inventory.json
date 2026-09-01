@@ -2088,12 +2088,16 @@
       "ownership": "app",
       "packageEvidence": [
         "mcp-settings",
-        "mcp-capability-view-page"
+        "mcp-capability-view-page",
+        "component:McpServersPage-McpServerEditor-PluginManagerTabs-IntegrationAddMenu"
       ],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:plugins-mcps-manager-wide-compact-empty-add-stdio-http-detail"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

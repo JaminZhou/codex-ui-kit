@@ -557,7 +557,16 @@ The authoritative current-build inventory is:
   and unavailable recovery while keeping exact third-party icons and all
   install/discovery effects host-owned. Main-region local-only comparisons
   pass between 3.3067% and 5.1784%; plugin detail, installation, permission,
-  skill execution and MCP remain open.
+  and skill execution remain open.
+- Current `26.825.51511` MCP Settings now has an independent read-only
+  vertical slice. The public manager covers five counted tabs, wide-only
+  search, standalone/plugin-provided rows, empty/Add-menu states, and
+  controlled STDIO/HTTP create/update editors. Six Browser/CDP frames, four
+  native Electron representatives, six reviewed baselines, and six
+  current-product main-region gates pass between 1.3674% and 3.8928% under a
+  4% limit. Real save/toggle/uninstall persistence, OAuth/permission prompts,
+  and failure effects remain host-owned and open, so this is not complete MCP
+  configuration parity.
 - Current `26.825.51511` Scheduled tasks now has an independent public
   component family for the index, status filters, search, suggestions, split
   Create menu, task navigator, and controlled manual editor. Read-only product

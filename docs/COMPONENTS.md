@@ -309,6 +309,19 @@ All privileged behavior remains host-owned. The components never auto-approve co
   states. Hosts supply catalog data, exact third-party artwork, installation
   state, search persistence, discovery, permission checks, and every
   privileged action. The component does not fetch or install integrations.
+- `PluginManagerTabs`: controlled Plugins/Apps/MCPs/Skills/Marketplace tablist
+  with count badges and host-owned route changes.
+- `IntegrationAddMenu`: controlled Create plugin, Add a marketplace, Add MCP
+  server, and Record a skill menu with outside-pointer and Escape dismissal.
+- `McpServersPage`: responsive MCP manager shell with wide-only search,
+  standalone and plugin-provided server groups, controlled enable switches,
+  Settings callbacks, empty/loading/error states, and an editor slot that
+  preserves the manager header and tabs.
+- `McpServerEditor`: controlled STDIO or Streamable HTTP create/update form
+  with list and key/value editors, type selection, disabled-save state,
+  documentation, Back, and optional Uninstall callbacks. Hosts own persisted
+  configuration, validation, credentials, OAuth, transport, and destructive
+  effects.
 
 ## Workspace and pull-request workflow
 

@@ -72,6 +72,7 @@
     "capture:current-browser-success-26-825": "node scripts/capture-current-browser-success.mjs",
     "capture:current-attachment-26-825": "node scripts/capture-current-attachment.mjs",
     "capture:current-integrations-26-825": "node scripts/capture-current-integrations.mjs",
+    "capture:current-mcp-settings-26-825": "node scripts/capture-current-mcp-settings.mjs",
     "capture:current-automations-26-825": "node scripts/capture-current-automations.mjs",
     "capture:current-compaction-26-825": "node scripts/capture-current-compaction.mjs",
     "capture:current-transport-proxy-26-825": "node scripts/current-transport-proxy.mjs",
