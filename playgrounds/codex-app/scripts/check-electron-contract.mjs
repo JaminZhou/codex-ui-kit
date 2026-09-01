@@ -18798,6 +18798,14 @@ try {
     heading: document
       .querySelector(".codex-ui-app-server-crash-recovery h1")
       ?.textContent?.trim(),
+    illustration: (() => {
+      const element = document.querySelector(
+        ".codex-ui-app-server-crash-recovery__illustration",
+      );
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      return { height: rect.height, width: rect.width };
+    })(),
     mainCount: document.querySelectorAll(".codex-ui-app-shell__main").length,
     state: document
       .querySelector(".demo-root")
@@ -18808,14 +18816,11 @@ try {
     crashBounds?.height !== 820 ||
     crashContract.state !== "crashed" ||
     crashContract.mainCount !== 0 ||
-    crashContract.heading !== "ChatGPT stopped unexpectedly" ||
+    crashContract.heading !== "ChatGPT hit a snag" ||
+    crashContract.illustration?.width !== 160 ||
+    crashContract.illustration?.height !== 160 ||
     JSON.stringify(crashContract.buttons) !==
-      JSON.stringify([
-        "documentation",
-        "Update ChatGPT",
-        "Open Config.toml",
-        "Restart",
-      ])
+      JSON.stringify(["Restart ChatGPT", "Send feedback"])
   ) {
     throw new Error(
       `Electron app-server crash contract failed: ${JSON.stringify({ crashBounds, crashContract })}`,
@@ -18841,7 +18846,7 @@ try {
     );
   }
   await appServerCrashPage
-    .getByRole("button", { name: "Restart", exact: true })
+    .getByRole("button", { name: "Restart ChatGPT", exact: true })
     .click();
   await appServerCrashPage.waitForSelector(
     '.demo-root[data-app-server-state="running"][data-frame="app-server-restarted"] .codex-ui-app-shell',

@@ -75,6 +75,7 @@
     "capture:current-approval": "node scripts/capture-current-approval.mjs",
     "capture:current-sidebar-rows": "node scripts/capture-current-sidebar-rows.mjs",
     "capture:current-notifications": "node scripts/capture-current-notifications.mjs",
+    "capture:current-app-server-crash": "node scripts/capture-current-app-server-crash.mjs",
     "update:visual-assets": "node scripts/update-current-visual-assets.mjs --write",
     "update:visual-assets:review": "node scripts/update-current-visual-assets.mjs --review-only --write",
     "update:current-thread-visual-assets": "node scripts/update-current-thread-visual-assets.mjs --write",

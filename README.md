@@ -210,6 +210,16 @@ diff images remain outside the package by default. Set
 `CODEX_UI_KIT_THREAD_COMPACT_REFERENCE` alongside the wide reference to gate
 the 720×680 completed-thread scene in the same command.
 
+The current App Server fatal page has a separate local-only gate. It compares
+the full 1180×820 frame and text/button core while masking only the
+non-distributed 160×160 product illustration:
+
+```bash
+CODEX_UI_KIT_APP_SERVER_CRASH_REFERENCE=/absolute/path/to/app-server-crash-wide.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=app-server-crashed
+```
+
 The current command gate accepts any combination of untracked 1180×820
 success, failure, and stable-interruption references. It compares only the
 owned command/summary and Composer regions; Browser and Electron separately

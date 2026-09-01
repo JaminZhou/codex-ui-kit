@@ -265,7 +265,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 65 have current-build runtime evidence, 15 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 60 groups and Electron verification covers 60.
+Current inventory: 91 surface groups; 67 have current-build runtime evidence, 13 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 62 groups and Electron verification covers 62.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -640,14 +640,20 @@ Browser and Electron are therefore current-build verified for the sampled
 success/stack contract while implementation stays partial for other tones and
 triggers.
 
-A separate current-build probe safely terminates only one isolated process's
-validated App Server child and reaches the dedicated 408×400 fatal recovery
-Renderer. Restart creates a new child and restores the app in about 1.4
-seconds. `AppServerCrashRecovery` exposes the observed copy and host callbacks;
-Browser/CDP and Electron gate 1180×820 and 720×680 geometry plus Restart. Its
-local-only product comparison passes at 0.1101% full-frame and 1.1993% in the
-owned core. This new `app.app-server-crash-recovery` row is current-runtime
-verified and remains separate from `thread.error-retry-recovery`.
+The earlier current-build probe safely terminated only one isolated process's
+validated App Server child and reached the former 408×400 fatal recovery
+Renderer. The `26.825.51511` refresh supersedes that layout with a full-window
+`ChatGPT hit a snag` page, a 160×160 host-supplied illustration slot, two
+14/21px paragraphs, and 36px `Restart ChatGPT` / `Send feedback` actions.
+The fingerprinted capture proves three unique direct-child phases—terminated,
+fatal-page replacement, and post-Restart App Server—before the full shell
+returns. Browser/CDP and Electron gate 1180×820 and 720×680 geometry plus
+Restart. The local-only product comparison masks only the proprietary
+illustration and passes at 0.0978% full-frame and 1.3754% in the text/button
+core. The accepted record SHA is
+`46c398bc3f8dbca5212deab48bc4aecb79c63a2a847d8a1fc498f42dae4fefcd`.
+`app.app-server-crash-recovery` is therefore current-runtime verified and
+remains separate from `thread.error-retry-recovery`.
 
 The current `26.825.51511` transport probe now reaches a real response-stream
 disconnect without touching the user-owned process. One exact isolated app
@@ -2023,9 +2029,10 @@ Environment → Local → Branches lifecycle and a separate compact native
 window. Seven reviewed baselines pass; seven local-only product-region ratios
 are 0.7909%, 2.9154%, 2.9108%, 11.1381%, 1.7372%, 1.3736%, and 4.1699%
 under independent ceilings. This promotes the sampled paths of
-`conversation.context-controls`, `conversation.project-picker`, and
-`composer.project-worktree-selection` to current Browser/Electron
-verification. Their implementation remains partial because populated
+`conversation.context-controls`, `conversation.project-picker`,
+`composer.project-worktree-selection`, and
+`app.new-thread-workspace-selection` to current Browser/Electron verification.
+Their implementation remains partial because populated
 environment creation/editing, Remote, branch-operation failures, and other
 provider-specific states are still open.
 

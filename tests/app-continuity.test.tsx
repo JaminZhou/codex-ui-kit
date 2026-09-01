@@ -64,35 +64,29 @@ describe("AppWindowChrome", () => {
 
 describe("AppServerCrashRecovery", () => {
   it("exposes the observed fatal recovery copy and host actions", () => {
-    const onDocumentation = vi.fn();
-    const onUpdate = vi.fn();
-    const onConfiguration = vi.fn();
+    const onFeedback = vi.fn();
     const onRestart = vi.fn();
     render(
       <AppServerCrashRecovery
-        configurationAction={{
-          label: "Open Config.toml",
-          onClick: onConfiguration,
+        feedbackAction={{
+          label: "Send feedback",
+          onClick: onFeedback,
         }}
-        documentationAction={{
-          label: "documentation",
-          onClick: onDocumentation,
-        }}
-        restartAction={{ label: "Restart", onClick: onRestart }}
-        updateAction={{ label: "Update ChatGPT", onClick: onUpdate }}
+        restartAction={{ label: "Restart ChatGPT", onClick: onRestart }}
       />,
     );
 
     const alert = screen.getByRole("alert");
-    expect(alert.textContent).toContain("ChatGPT stopped unexpectedly");
-    expect(alert.textContent).toContain("Restart ChatGPT to continue");
-    fireEvent.click(screen.getByRole("button", { name: "documentation" }));
-    fireEvent.click(screen.getByRole("button", { name: "Update ChatGPT" }));
-    fireEvent.click(screen.getByRole("button", { name: "Open Config.toml" }));
-    fireEvent.click(screen.getByRole("button", { name: "Restart" }));
-    expect(onDocumentation).toHaveBeenCalledOnce();
-    expect(onUpdate).toHaveBeenCalledOnce();
-    expect(onConfiguration).toHaveBeenCalledOnce();
+    expect(alert.textContent).toContain("ChatGPT hit a snag");
+    expect(alert.textContent).toContain(
+      "Something went wrong. Restart ChatGPT to try again.",
+    );
+    expect(alert.textContent).toContain(
+      "Send feedback to help us make the app better.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Send feedback" }));
+    fireEvent.click(screen.getByRole("button", { name: "Restart ChatGPT" }));
+    expect(onFeedback).toHaveBeenCalledOnce();
     expect(onRestart).toHaveBeenCalledOnce();
   });
 
@@ -100,6 +94,7 @@ describe("AppServerCrashRecovery", () => {
     render(
       <AppServerCrashRecovery
         description="Restart the host service."
+        feedbackDescription="Report this problem to the host."
         heading="Service unavailable"
       />,
     );
@@ -108,6 +103,7 @@ describe("AppServerCrashRecovery", () => {
       "Service unavailable",
     );
     expect(screen.getByText("Restart the host service.")).toBeTruthy();
+    expect(screen.getByText("Report this problem to the host.")).toBeTruthy();
     expect(screen.queryByRole("button")).toBeNull();
   });
 });

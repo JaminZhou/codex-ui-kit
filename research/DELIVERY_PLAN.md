@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 65 groups have current-build runtime evidence, 15 have previous-build-only
+- 67 groups have current-build runtime evidence, 13 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current subagent refresh promotes `thread.subagent-delegation` and
   `thread.subagent-collaboration` from previous-build presentation evidence to
@@ -816,6 +816,13 @@ The `26.825.51511` same-contract refresh now promotes the sampled success and
 bounded stack to the active baseline through title-hash-only CDP evidence,
 exact computed styles, two regional screenshots, reversible Pin/Undo state,
 and precise disposable-task cleanup; other notification tones remain open.
+The same build now also supersedes the legacy App Server recovery card with
+the full-window fatal page. A fail-closed isolated capture proves the exact
+terminated → fatal replacement → post-Restart three-process transition,
+wide/compact styles and geometry, Browser/CDP, native Electron, and a
+local-only product comparison that masks only the non-distributed
+illustration. Broader route failures remain separate, but the sampled fatal
+recovery surface is current-build verified.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -898,6 +905,9 @@ Project search and fixed actions, Local/New local worktree selection,
 No environment, starting branch, the current Branches search/roles, Escape
 focus return, exact overlay geometry/style, and the 720px boundary pass
 Browser/CDP, Electron, and seven reviewed/product-region pixel gates.
+This same evidence also promotes `app.new-thread-workspace-selection`; its
+remaining gaps are populated environment editing, Remote providers, and
+branch-operation failure/recovery rather than the sampled entry composition.
 Populated environments, Remote, and branch-operation failures remain Stage 3
 work rather than blockers for this sampled Stage 2 context path.
 

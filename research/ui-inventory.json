@@ -1315,11 +1315,12 @@
       "packageEvidence": ["app-main", "app-server-crash-recovery-page"],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.803.61601:isolated-app-server-child-exit-dedicated-recovery-renderer-and-restart-restoration"
+        "cdp-26.803.61601:isolated-app-server-child-exit-dedicated-recovery-renderer-and-restart-restoration",
+        "cdp-26.825.51511:isolated-app-server-three-process-fatal-recovery-and-restart-restoration"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {
@@ -1391,11 +1392,12 @@
         "cdp-26.803.61601:new-chat-branch-create-dialog-and-git-settings-prefix-entry",
         "cdp-26.818.41509:new-local-worktree-success-controlled-failure-retry-and-recovery",
         "cdp-26.818.41509:current-home-four-wide-two-compact-suggestion-cards-selection-project-portal-focus-and-unmasked-main-pixels",
-        "cdp-26.820.60940:new-local-worktree-selection-real-submit-exact-response-and-archived-cleanup"
+        "cdp-26.820.60940:new-local-worktree-selection-real-submit-exact-response-and-archived-cleanup",
+        "cdp-26.825.51511:new-chat-project-run-location-new-worktree-environment-and-branch-context"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "partial_legacy",
-      "electronStatus": "partial_legacy",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p0"
     },
     {

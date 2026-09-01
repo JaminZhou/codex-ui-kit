@@ -3102,8 +3102,15 @@ for (const scene of selectedScenes) {
         `${scene.id}: current-build App Server crash comparison requires exact 1180x820 product and playground frames, received reference ${reference.width}x${reference.height} and actual ${flattenedActual.width}x${flattenedActual.height}.`,
       );
     }
-    const fullComparison = comparePng(reference, flattenedActual, 0.1);
-    const core = { height: 185, left: 350, top: 320, width: 480 };
+    const illustrationMask = [
+      { height: 164, left: 500, top: 187, width: 164 },
+    ];
+    const fullComparison = comparePng(
+      maskPng(clonePng(reference), illustrationMask),
+      maskPng(clonePng(flattenedActual), illustrationMask),
+      0.1,
+    );
+    const core = { height: 181, left: 400, top: 350, width: 380 };
     const coreComparison = comparePng(
       cropPng(reference, core.left, core.top, core.width, core.height),
       cropPng(

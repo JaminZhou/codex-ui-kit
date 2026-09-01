@@ -54,16 +54,16 @@ describe("notice visual contract", () => {
 
   it("locks the current fatal App Server recovery composition", () => {
     expect(styles).toMatch(
-      /\.codex-ui-app-server-crash-recovery__content \{[\s\S]*?gap: 1rem;[\s\S]*?max-width: 56rem;[\s\S]*?padding: 1\.5rem/,
+      /\.codex-ui-app-server-crash-recovery \{[\s\S]*?background: #141414;[\s\S]*?font-weight: 400/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-app-server-crash-recovery__icon \{[\s\S]*?color: #ff6764;[\s\S]*?height: 1\.75rem;[\s\S]*?width: 1\.75rem/,
+      /\.codex-ui-app-server-crash-recovery__illustration \{[\s\S]*?height: 10rem;[\s\S]*?margin-bottom: 0\.5rem;[\s\S]*?transform: translateX\(-0\.5rem\);[\s\S]*?width: 10rem/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-app-server-crash-recovery__copy \{[\s\S]*?gap: 0\.5rem;[\s\S]*?max-width: 28rem/,
+      /\.codex-ui-app-server-crash-recovery__copy \{[\s\S]*?gap: 0\.75rem;[\s\S]*?max-width: 28rem/,
     );
     expect(styles).toMatch(
-      /\.codex-ui-app-server-crash-recovery__action \{[\s\S]*?background: #fff;[\s\S]*?font-size: 0\.8125rem;[\s\S]*?height: 1\.5rem;[\s\S]*?padding: 0\.125rem 0\.5rem/,
+      /\.codex-ui-app-server-crash-recovery__action \{[\s\S]*?background: #fff;[\s\S]*?font-size: 0\.875rem;[\s\S]*?height: 2\.25rem;[\s\S]*?padding: 0\.5rem 1\.25rem/,
     );
   });
 

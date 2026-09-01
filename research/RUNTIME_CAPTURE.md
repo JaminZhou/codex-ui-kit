@@ -2234,6 +2234,46 @@ comparisons use seven external full-window references but crop only the owned
 context or overlay region; they write outputs only to ignored artifacts. Raw
 product screenshots and the isolated profile are never committed.
 
+## Current `26.825.51511` App Server fatal recovery sample
+
+Launch only a disposable Codex process with a unique profile under
+`/private/tmp/codex-ui-kit-*` and a loopback-only CDP port. Resolve its single
+direct App Server child, then pass that exact PID with the explicit mutation
+opt-in:
+
+```bash
+CODEX_CURRENT_APP_SERVER_CRASH_CDP_PORT=<isolated-port> \
+CODEX_CURRENT_APP_SERVER_CRASH_PROFILE=<isolated-profile> \
+CODEX_CURRENT_APP_SERVER_CRASH_OUTPUT_DIR=<new-profile-child> \
+CODEX_CURRENT_APP_SERVER_CRASH_EXPECTED_CHILD_PID=<exact-direct-child-pid> \
+CODEX_CURRENT_APP_SERVER_CRASH_ALLOW_CAPTURE=1 \
+  pnpm capture:current-app-server-crash
+```
+
+The helper fails closed unless the installed fingerprint, loopback listener,
+exact profile owner, output boundary, and one direct App Server child all
+match. It signals only the supplied child, waits for the full-window
+`ChatGPT hit a snag` Renderer, records wide/compact geometry and computed
+styles, hashes the local illustration without exporting it, clicks `Restart
+ChatGPT`, and requires the complete shell plus a third unique direct-child
+process. If capture fails after reaching the fatal page, its cleanup path makes
+one best-effort Restart attempt before disconnecting.
+
+The optional product pixel gate accepts the untracked 1180×820 screenshot and
+masks only the proprietary 160×160 illustration:
+
+```bash
+CODEX_UI_KIT_APP_SERVER_CRASH_REFERENCE=/absolute/path/to/app-server-crash-wide.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=app-server-crashed
+```
+
+After capture, terminate only the validated isolated root, prove its loopback
+port is closed, move the exact profile and screenshots recoverably to Trash,
+and recheck the user-owned Codex PID. Never commit the product illustration,
+raw screenshots, profile contents, process arguments, task metadata, or private
+transport details.
+
 ## Current `26.825.51511` external-file approval sample
 
 Use one loopback-only isolated process, three disposable tasks, and three exact

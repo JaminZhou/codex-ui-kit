@@ -12,6 +12,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   assertCurrentAccountMenuRecord,
+  assertCurrentAppServerCrashRecoveryRecord,
   assertCurrentBaselineRecord,
   assertCurrentGlobalNotificationsRecord,
   assertCurrentProjectsIndexObservation,
@@ -585,6 +586,122 @@ const currentGlobalNotificationsRecord = () => ({
   taskTitleSha256s: ["1", "2", "3", "4"].map((value) => value.repeat(64)),
   viewport: currentBaselineViewports.wide,
 });
+
+const currentAppServerRecoveryFrame = (
+  viewport: { height: number; width: number },
+) => ({
+  backgroundColor: "rgb(20, 20, 20)",
+  buttons: [
+    {
+      kind: "restart",
+      label: "Restart ChatGPT",
+      rect: { height: 36, width: 150.546875 },
+      style: {
+        backgroundColor: "rgb(255, 255, 255)",
+        border: "1px solid rgba(255, 255, 255, 0.082)",
+        color: "rgb(45, 45, 45)",
+        fontSize: "14px",
+        fontWeight: "400",
+        lineHeight: "18px",
+      },
+    },
+    {
+      kind: "feedback",
+      label: "Send feedback",
+      rect: { height: 36, width: 138.796875 },
+      style: {
+        backgroundColor: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid rgba(255, 255, 255, 0.082)",
+        color: "rgb(255, 255, 255)",
+        fontSize: "14px",
+        fontWeight: "400",
+        lineHeight: "18px",
+      },
+    },
+  ],
+  content: { height: viewport.height, width: Math.min(viewport.width, 896) },
+  copy: { height: 105.1875, width: 345.625 },
+  fontFamily: '-apple-system, "system-ui", "Segoe UI", sans-serif',
+  fontWeight: "400",
+  heading: "ChatGPT hit a snag",
+  headingStyle: { fontSize: "28px", fontWeight: "600", lineHeight: "39.2px" },
+  illustration: {
+    height: 160,
+    top: viewport.height === 820 ? 189.40625 : 119.40625,
+    width: 160,
+  },
+  paragraphs: [
+    "Something went wrong. Restart ChatGPT to try again.",
+    "Send feedback to help us make the app better.",
+  ],
+  paragraphStyle: {
+    color: "color(srgb 1 1 1 / 0.65)",
+    fontSize: "14px",
+    lineHeight: "21px",
+  },
+  viewport,
+});
+
+const currentAppServerCrashRecoveryRecord = () => {
+  const notifications = currentGlobalNotificationsRecord();
+  const processRecord = (pid: number) => ({
+    argvSha256: String(pid).repeat(64).slice(0, 64),
+    executablePath: "/Applications/ChatGPT.app/Contents/Resources/codex",
+    pid,
+    ppid: 12_345,
+  });
+  return {
+    assetReference: {
+      byteLength: 1_443_471,
+      distribution: "local-only-not-committed",
+      mimeType: "image/png",
+      naturalHeight: 1159,
+      naturalWidth: 1358,
+      sha256:
+        "c9aab30680332edfff4fa8bcd90bec879a6809665dc06a83e110623f8a277768",
+    },
+    captureKind: "renderer_cdp_app_server_recovery",
+    fingerprint: currentBaselineFingerprint,
+    frames: {
+      compact: currentAppServerRecoveryFrame(currentBaselineViewports.compact),
+      wide: currentAppServerRecoveryFrame(currentBaselineViewports.wide),
+    },
+    privacyBoundary:
+      "fatal-recovery-copy-style-geometry-process-and-local-asset-hash-only",
+    processTransition: {
+      fatalVisibleAfterMs: 500,
+      postRestart: processRecord(23_457),
+      replacement: processRecord(23_456),
+      shellVisibleAfterRestartMs: 400,
+      signal: "SIGTERM",
+      terminated: processRecord(23_455),
+    },
+    profileOwnerPid: 12_345,
+    restart: {
+      headingCount: 0,
+      mainCount: 1,
+      navigationCount: 1,
+      textboxCount: 1,
+    },
+    runtimeBundleIdentity: notifications.runtimeBundleIdentity,
+    schemaVersion: 1,
+    screenshots: {
+      compact: {
+        height: 680,
+        name: "app-server-crash-compact.png",
+        sha256: "b".repeat(64),
+        width: 720,
+      },
+      wide: {
+        height: 820,
+        name: "app-server-crash-wide.png",
+        sha256: "a".repeat(64),
+        width: 1180,
+      },
+    },
+    targetSelection: { selected: { url: "app://-/index.html" } },
+  };
+};
 
 describe("current baseline capture contract", () => {
   const projectsObservation = () => ({
@@ -1935,5 +2052,66 @@ describe("current baseline capture contract", () => {
     );
     expect(captureSource).not.toContain('.press("Enter")');
     expect(captureSource).not.toContain("document.body.textContent");
+  });
+
+  it("rejects stale or unproven current App Server recovery evidence", () => {
+    const record = currentAppServerCrashRecoveryRecord();
+    expect(() =>
+      assertCurrentAppServerCrashRecoveryRecord(record),
+    ).not.toThrow();
+    expect(() =>
+      assertCurrentAppServerCrashRecoveryRecord({
+        ...record,
+        processTransition: {
+          ...record.processTransition,
+          postRestart: record.processTransition.terminated,
+        },
+      }),
+    ).toThrow("three-process replacement and restart transition");
+    expect(() =>
+      assertCurrentAppServerCrashRecoveryRecord({
+        ...record,
+        frames: {
+          ...record.frames,
+          wide: { ...record.frames.wide, heading: "ChatGPT stopped unexpectedly" },
+        },
+      }),
+    ).toThrow("26.825 recovery composition");
+    expect(() =>
+      assertCurrentAppServerCrashRecoveryRecord({
+        ...record,
+        assetBytes: "private",
+      }),
+    ).toThrow("privacy boundary");
+  });
+
+  it("keeps current App Server recovery capture isolated and self-healing", () => {
+    const captureSource = readFileSync(
+      new URL(
+        "../scripts/capture-current-app-server-crash.mjs",
+        import.meta.url,
+      ),
+      "utf8",
+    );
+
+    expect(captureSource).toContain(
+      "CODEX_CURRENT_APP_SERVER_CRASH_EXPECTED_CHILD_PID",
+    );
+    expect(captureSource).toContain(
+      "CODEX_CURRENT_APP_SERVER_CRASH_ALLOW_CAPTURE=1",
+    );
+    expect(captureSource).toContain(
+      'process.kill(expectedAppServerPid, "SIGTERM")',
+    );
+    expect(captureSource).toContain(
+      'getByRole("button", { name: "Restart ChatGPT", exact: true })',
+    );
+    expect(
+      captureSource.indexOf("assertCurrentAppServerCrashRecoveryRecord(record)"),
+    ).toBeLessThan(
+      captureSource.indexOf('join(outputDirectory, "app-server-crash.json")'),
+    );
+    expect(captureSource).not.toContain("document.body.textContent");
+    expect(captureSource).not.toContain("rm(");
   });
 });
