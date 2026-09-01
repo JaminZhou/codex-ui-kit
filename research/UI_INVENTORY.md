@@ -265,7 +265,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 67 have current-build runtime evidence, 13 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 62 groups and Electron verification covers 62.
+Current inventory: 91 surface groups; 67 have current-build runtime evidence, 12 have previous-build-only runtime evidence, 12 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 66 groups and Electron verification covers 66.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -2071,3 +2071,16 @@ ten local-only product ratios range from 0.6557% to 3.7314%. This promotes the
 sampled current paths of `composer.queue`, `composer.resources`, and long-input
 `composer.shell`; delete/reorder edge failures, resource-provider errors, and
 other host-owned plugin inventories keep their implementations `partial`.
+
+The inventory reconciliation that follows the 26.825 App-shell recovery closes
+four stale bookkeeping gaps without inventing new product states. Existing
+current-build Browser/CDP, native Electron, and regional-pixel contracts now
+explicitly verify MCP success, MCP same-thread failure/recovery, the pinned
+Environment/Sources panel lifecycle, and sidebar project expansion/actions/
+submenu continuity. The former catch-all `cross-layer.overlays` row mixed
+those already-owned surfaces with package-only checkout and debug dialogs. It
+is therefore narrowed to `cross-layer.optional-package-dialogs`, returned to
+`not_sampled`, and moved to P2. The stable worktree-status candidate remains
+accounted for by the independently verified worktree and sidebar-status rows.
+After this correction, only current Browser success and current attachment
+selection remain incomplete P0 evidence families.
