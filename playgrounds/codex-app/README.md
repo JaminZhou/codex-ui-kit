@@ -1068,6 +1068,27 @@ attributed. No product screenshot or bundled private asset is committed.
 The external product screenshots, isolated profile, task identifiers, and
 probe file remain local-only and are never committed.
 
+## Current Plugins and Skills catalogs
+
+The `26.825.51511` Plugins and Skills routes have four deterministic wide and
+compact scenes. CDP checks tab routing, search, scope selection, item actions,
+unavailable recovery, grid geometry, sidebar behavior, and overflow. Native
+Electron repeats both routes and their interaction contract. Product
+screenshots are optional local-only references:
+
+```bash
+CODEX_UI_KIT_CURRENT_PLUGINS_26_825_REFERENCE=/absolute/path/to/plugins-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGINS_26_825_COMPACT_REFERENCE=/absolute/path/to/plugins-compact.png \
+CODEX_UI_KIT_CURRENT_SKILLS_26_825_REFERENCE=/absolute/path/to/skills-wide.png \
+CODEX_UI_KIT_CURRENT_SKILLS_26_825_COMPACT_REFERENCE=/absolute/path/to/skills-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=integration-plugins-current-26-825,integration-plugins-current-26-825-compact,integration-skills-current-26-825,integration-skills-current-26-825-compact
+```
+
+Exact third-party icons and every install/discovery side effect remain
+host-supplied. Reviewed replay baselines are committed; product screenshots
+and isolated profile data are not.
+
 ## Development
 
 From the repository root:

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true
+  },
+  "sharedGeometry": {
+    "heading": {
+      "top": 66,
+      "height": 33.59375,
+      "fontSize": 28,
+      "fontWeight": 400,
+      "lineHeight": 33.6
+    },
+    "description": { "top": 107.59375, "height": 24 },
+    "search": {
+      "top": 151.59375,
+      "height": 32,
+      "wide": { "left": 387.4375, "width": 728 },
+      "compact": { "left": 21, "width": 679 },
+      "border": "1px solid rgba(255, 255, 255, 0.157)",
+      "borderRadius": 9999,
+      "paddingInline": 10
+    },
+    "content": {
+      "top": 211.59375,
+      "wide": { "left": 387.4375, "width": 728 },
+      "compact": { "left": 21, "width": 679 }
+    },
+    "horizontalOverflow": 0
+  },
+  "plugins": {
+    "title": "Plugins",
+    "description": "Work with Codex across your favorite tools",
+    "installedIconCount": 13,
+    "scopeLabels": ["Public", "Personal"],
+    "visibleSections": ["Installed", "Popular", "New & Noteworthy"],
+    "popularItems": [
+      "Gmail",
+      "GitHub",
+      "Google Drive",
+      "Google Calendar",
+      "Notion",
+      "Slack"
+    ],
+    "grid": {
+      "wideColumns": [352, 352],
+      "compactColumns": [327.5, 327.5],
+      "height": 196.375
+    }
+  },
+  "skills": {
+    "title": "Skills",
+    "description": "Extend Codex with task-specific skills",
+    "installedItemCount": 6,
+    "scopeLabels": ["Personal", "System", "Trailglass", "Recommended"],
+    "installedItems": [
+      "ASC Tooling",
+      "Image Gen",
+      "OpenAI Docs",
+      "Plugin Creator",
+      "RedRocket Market",
+      "Review Agent"
+    ],
+    "installedGrid": {
+      "top": 264.59375,
+      "wideColumns": [360, 360],
+      "compactColumns": [335.5, 335.5],
+      "height": 196.375
+    },
+    "personalGrid": {
+      "top": 600.09375,
+      "wideColumns": [356, 356],
+      "compactColumns": [331.5, 331.5],
+      "height": 60.125
+    }
+  },
+  "productPixelRatios": {
+    "pluginsWideMain": 0.04491058587283927,
+    "pluginsCompactMain": 0.051783808260827374,
+    "skillsWideMain": 0.033067096023325165,
+    "skillsCompactMain": 0.038461400236475436
+  },
+  "localOnlyScreenshots": [
+    {
+      "name": "plugins-wide-1180x820.png",
+      "sha256": "93de2192fff1dda4b822f5f76d9f22b9ee51c665ae3897fc7246cfd79ee18e5e"
+    },
+    {
+      "name": "plugins-compact-720x820.png",
+      "sha256": "691fafd655116650ed4ccc11e5a61565174aabc56d4c493789e28d018bbe3879"
+    },
+    {
+      "name": "skills-wide-1180x820.png",
+      "sha256": "98c20ca1239df608cd66853ebbc510b0f9287dd82914a95c30621e68fdc39b3b"
+    },
+    {
+      "name": "skills-compact-720x820.png",
+      "sha256": "dbc87445417d60186a25cd0ce1d666054d277e489f398fc75235f3640bb3a259"
+    }
+  ]
+}

@@ -98,6 +98,7 @@ const currentApprovalComposerScenes = new Set([
   "approval-current-session-repeated-completed",
 ]);
 const currentReplayComposerContracts = [];
+const currentIntegrationCatalogContracts = [];
 
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
@@ -8694,6 +8695,205 @@ for (const scene of selectedScenes) {
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
         `${JSON.stringify(compactSidebar, null, 2)}\n`,
+      );
+      continue;
+    }
+
+    if (scene.id.startsWith("integration-")) {
+      const expectedKind = scene.id.includes("skills") ? "skills" : "plugins";
+      const compact = scene.id.endsWith("-compact");
+      const integrationCatalog = await page
+        .locator(".codex-ui-integration-catalog")
+        .evaluate((catalog) => {
+          const rect = (selector) => {
+            const target = catalog.querySelector(selector);
+            if (!(target instanceof Element)) return null;
+            const bounds = target.getBoundingClientRect();
+            return {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            };
+          };
+          const grids = Array.from(
+            catalog.querySelectorAll(".codex-ui-integration-catalog__grid"),
+            (grid) => ({
+              columns: getComputedStyle(grid).gridTemplateColumns,
+              rect: (() => {
+                const bounds = grid.getBoundingClientRect();
+                return {
+                  height: bounds.height,
+                  left: bounds.left,
+                  top: bounds.top,
+                  width: bounds.width,
+                };
+              })(),
+            }),
+          );
+          const sidebar = document.querySelector(
+            ".codex-ui-app-shell__sidebar",
+          );
+          const sidebarBounds = sidebar?.getBoundingClientRect();
+          return {
+            body: rect(".codex-ui-integration-catalog__body"),
+            description: catalog
+              .querySelector(".codex-ui-integration-catalog__intro p")
+              ?.textContent?.trim(),
+            grids,
+            heading: rect(".codex-ui-integration-catalog__intro h1"),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            installedCount:
+              catalog.getAttribute("data-kind") === "plugins"
+                ? catalog.querySelectorAll(
+                    ".codex-ui-integration-catalog__installed-icon",
+                  ).length
+                : catalog.querySelectorAll(
+                    ".codex-ui-integration-catalog__installed .codex-ui-integration-catalog__item",
+                  ).length,
+            kind: catalog.getAttribute("data-kind"),
+            search: rect(".codex-ui-integration-catalog__search"),
+            searchPlaceholder: catalog
+              .querySelector("input[type=search]")
+              ?.getAttribute("placeholder"),
+            sectionHeadings: Array.from(
+              catalog.querySelectorAll(
+                ".codex-ui-integration-catalog__section-heading h2",
+              ),
+              (heading) => heading.textContent?.trim(),
+            ),
+            sidebar: sidebarBounds
+              ? {
+                  left: sidebarBounds.left,
+                  width: sidebarBounds.width,
+                }
+              : null,
+            status: catalog.getAttribute("data-status"),
+            title: catalog
+              .querySelector(".codex-ui-integration-catalog__intro h1")
+              ?.textContent?.trim(),
+            viewport: { height: innerHeight, width: innerWidth },
+          };
+        });
+      const expectedTitle = expectedKind === "plugins" ? "Plugins" : "Skills";
+      const expectedDescription =
+        expectedKind === "plugins"
+          ? "Work with Codex across your favorite tools"
+          : "Extend Codex with task-specific skills";
+      const expectedInstalledCount = expectedKind === "plugins" ? 13 : 6;
+      const expectedSearchLeft = compact ? 21 : 387.4375;
+      const expectedHeadingLeft = compact ? 29 : 395.4375;
+      if (
+        integrationCatalog.kind !== expectedKind ||
+        integrationCatalog.status !== "ready" ||
+        integrationCatalog.title !== expectedTitle ||
+        integrationCatalog.description !== expectedDescription ||
+        integrationCatalog.searchPlaceholder !== `Search ${expectedKind}` ||
+        integrationCatalog.installedCount !== expectedInstalledCount ||
+        integrationCatalog.sectionHeadings[0] !== "Installed" ||
+        (expectedKind === "plugins" &&
+          !integrationCatalog.sectionHeadings.includes("Popular")) ||
+        !integrationCatalog.heading ||
+        Math.abs(integrationCatalog.heading.left - expectedHeadingLeft) > 1 ||
+        Math.abs(integrationCatalog.heading.top - 66) > 1 ||
+        !integrationCatalog.search ||
+        Math.abs(integrationCatalog.search.left - expectedSearchLeft) > 1 ||
+        Math.abs(integrationCatalog.search.top - 151.59375) > 1 ||
+        Math.abs(integrationCatalog.search.width - (compact ? 679 : 728)) > 1 ||
+        integrationCatalog.grids.length < (expectedKind === "plugins" ? 2 : 2) ||
+        integrationCatalog.grids.some(
+          ({ columns }) => columns.trim().split(/\s+/).length !== 2,
+        ) ||
+        Math.abs(integrationCatalog.horizontalOverflow) > 1 ||
+        integrationCatalog.viewport.width !== (compact ? 720 : 1180) ||
+        integrationCatalog.viewport.height !== 820 ||
+        (compact
+          ? integrationCatalog.sidebar !== null &&
+            integrationCatalog.sidebar.width > 1
+          : !integrationCatalog.sidebar ||
+            Math.abs(integrationCatalog.sidebar.width - 321.875) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: current integration catalog geometry failed: ${JSON.stringify(integrationCatalog)}`,
+        );
+      }
+
+      if (scene.id === "integration-plugins-current-26-825") {
+        const search = page.getByPlaceholder("Search plugins");
+        await search.fill("github");
+        const searchState = await page
+          .locator(".codex-ui-integration-catalog")
+          .evaluate((catalog) => ({
+            installed: catalog.querySelectorAll(
+              ".codex-ui-integration-catalog__installed-icon",
+            ).length,
+            rows: Array.from(
+              catalog.querySelectorAll(".codex-ui-integration-catalog__item-title"),
+              (item) => item.textContent?.trim(),
+            ),
+          }));
+        if (
+          searchState.installed !== 1 ||
+          JSON.stringify(searchState.rows) !== JSON.stringify(["GitHub"])
+        ) {
+          throw new Error(
+            `${scene.id}: search filtering failed: ${JSON.stringify(searchState)}`,
+          );
+        }
+        await search.fill("");
+        await page
+          .locator('.codex-ui-integration-catalog__scopes [role="tab"]')
+          .getByText("Personal", { exact: true })
+          .click();
+        await page.getByText("Plugin Management", { exact: true }).last().waitFor();
+        await page
+          .locator('.codex-ui-integration-catalog__scopes [role="tab"]')
+          .getByText("Public", { exact: true })
+          .click();
+        await page
+          .getByRole("button", { exact: true, name: "Install" })
+          .first()
+          .click();
+        await page.waitForFunction(
+          () =>
+            document
+              .querySelector(".codex-ui-integration-catalog")
+              ?.getAttribute("data-action") === "action:gmail",
+        );
+        await page
+          .locator(".codex-ui-integration-catalog-tabs")
+          .getByText("Skills", { exact: true })
+          .click();
+        await page.getByPlaceholder("Search skills").waitFor();
+        await page
+          .locator('.codex-ui-integration-catalog__scopes [role="tab"]')
+          .getByText("Recommended", { exact: true })
+          .click();
+        await page
+          .getByRole("button", { exact: true, name: "Install" })
+          .first()
+          .click();
+        await page.waitForFunction(
+          () =>
+            document
+              .querySelector(".codex-ui-integration-catalog")
+              ?.getAttribute("data-action") === "action:recommended-watch-pr",
+        );
+        integrationCatalog.interactions = {
+          finalAction: "action:recommended-watch-pr",
+          finalKind: "skills",
+          search: searchState,
+        };
+      }
+      currentIntegrationCatalogContracts.push({
+        id: scene.id,
+        ...integrationCatalog,
+      });
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(integrationCatalog, null, 2)}\n`,
       );
       continue;
     }
@@ -17510,6 +17710,55 @@ for (const scene of selectedScenes) {
   }
 }
 
+const currentIntegrationUnavailableScene = {
+  currentSidebar: true,
+  frame: "integration-plugins-current-26-825-unavailable",
+  id: "integration-plugins-current-26-825-unavailable",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "plugins",
+};
+const {
+  app: currentIntegrationUnavailableApp,
+  page: currentIntegrationUnavailablePage,
+} = await launchScene(currentIntegrationUnavailableScene, { capture: false });
+try {
+  const unavailable = await currentIntegrationUnavailablePage
+    .locator(".codex-ui-integration-catalog")
+    .evaluate((catalog) => ({
+      description: catalog
+        .querySelector(".codex-ui-integration-catalog__status p")
+        ?.textContent?.trim(),
+      heading: catalog
+        .querySelector(".codex-ui-integration-catalog__status h2")
+        ?.textContent?.trim(),
+      status: catalog.getAttribute("data-status"),
+    }));
+  await currentIntegrationUnavailablePage
+    .getByRole("button", { name: "Retry" })
+    .click();
+  await currentIntegrationUnavailablePage.waitForSelector(
+    '.codex-ui-integration-catalog[data-status="ready"][data-action="retry"]',
+  );
+  if (
+    unavailable.status !== "unavailable" ||
+    unavailable.heading !== "Integrations unavailable" ||
+    unavailable.description !==
+      "Plugin and skill access is disabled by your organization."
+  ) {
+    throw new Error(
+      `Current integration unavailable/retry contract failed: ${JSON.stringify(unavailable)}`,
+    );
+  }
+  currentIntegrationCatalogContracts.push({
+    id: currentIntegrationUnavailableScene.id,
+    retryStatus: "ready",
+    ...unavailable,
+  });
+} finally {
+  await currentIntegrationUnavailableApp.close();
+}
+
 const currentReviewInteractionScene = {
   frame: "review-open",
   id: "current-review-rename-interaction",
@@ -22904,6 +23153,11 @@ try {
 } finally {
   await contextSummaryCompactApp.close();
 }
+
+await writeFile(
+  join(artifactDirectory, "current-integration-catalogs.json"),
+  `${JSON.stringify(currentIntegrationCatalogContracts, null, 2)}\n`,
+);
 
 await writeFile(
   join(artifactDirectory, "current-replay-composer-icons.json"),

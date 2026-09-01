@@ -2487,6 +2487,35 @@ closed, move the exact profile recoverably to Trash, and confirm the user's
 primary Codex process is still alive. Never commit product screenshots, task
 contents, navigation metadata, or profile data.
 
+## Current `26.825.51511` Plugins and Skills index sample
+
+Use `pnpm capture:current-integrations-26-825` only with an exact isolated
+profile and a loopback listener owned by the validated second Codex process.
+The helper fails closed unless version `26.825.51511`, build `7377`, Chromium
+`151.0.7922.174`, expected ASAR size/SHA-256, explicit profile, direct-child
+owner, listener, and profile-local output directory all match. It is
+capture-only: it may select Plugins or Skills, resize the viewport, and record
+fixed labels, geometry, computed styles, catalog item names, and screenshot
+hashes, but it must not install, uninstall, enable, or mutate integrations.
+
+Capture all four wide/720 route combinations. Product screenshots and raw
+capture JSON remain inside the isolated profile. Promote only the sanitized
+record `research/current-integrations-26-825.json` and independently reviewed
+replay baselines. Optional local-only product comparisons use:
+
+```bash
+CODEX_UI_KIT_CURRENT_PLUGINS_26_825_REFERENCE=/absolute/path/to/plugins-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGINS_26_825_COMPACT_REFERENCE=/absolute/path/to/plugins-compact.png \
+CODEX_UI_KIT_CURRENT_SKILLS_26_825_REFERENCE=/absolute/path/to/skills-wide.png \
+CODEX_UI_KIT_CURRENT_SKILLS_26_825_COMPACT_REFERENCE=/absolute/path/to/skills-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=integration-plugins-current-26-825,integration-plugins-current-26-825-compact,integration-skills-current-26-825,integration-skills-current-26-825-compact
+```
+
+Terminate only the exact validated isolated process tree, prove port `9920`
+closed, move the exact profile recoverably to Trash, and recheck that the
+primary Codex PID remains alive.
+
 ## Promotion rule
 
 After a capture:

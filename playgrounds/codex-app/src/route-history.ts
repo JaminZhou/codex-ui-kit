@@ -1,6 +1,7 @@
 export type DemoView =
   | "conversation"
   | "projects"
+  | "plugins"
   | "pull-request"
   | "shell"
   | "workspace";

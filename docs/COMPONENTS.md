@@ -300,6 +300,16 @@ All privileged behavior remains host-owned. The components never auto-approve co
   and host-owned plan actions. It does not load an embedded webview or perform
   a purchase.
 
+## Integration catalogs
+
+- `IntegrationCatalogTabs`: controlled Plugins/Skills tablist with a
+  host-owned route transition.
+- `IntegrationCatalogPage`: controlled catalog shell for search, scopes,
+  sections, installed icon rows, public cards, loading, error, and unavailable
+  states. Hosts supply catalog data, exact third-party artwork, installation
+  state, search persistence, discovery, permission checks, and every
+  privileged action. The component does not fetch or install integrations.
+
 ## Workspace and pull-request workflow
 
 - `ProjectConversationPage`: bounded split/stacked page composition connecting
