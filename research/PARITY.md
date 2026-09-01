@@ -558,6 +558,16 @@ The authoritative current-build inventory is:
   install/discovery effects host-owned. Main-region local-only comparisons
   pass between 3.3067% and 5.1784%; plugin detail, installation, permission,
   and skill execution remain open.
+- Current `26.825.51511` Plugin detail now has an independent read-only
+  vertical slice for installed and discovery states. The public page covers
+  breadcrumb, identity/actions, three prompt suggestions, Apps, Information,
+  privacy disclosure, bottom scrolling, and controlled uninstall and
+  connection menus at 1180×820 and 720×680. Eight Browser/CDP frames, four
+  native Electron representatives, eight reviewed baselines, and current-
+  product region gates pass below the explicit 8% ceiling; host artwork and
+  suggestion brand icons are masked. Clipboard/navigation, real install or
+  uninstall, connection persistence, OAuth/permissions, external links, and
+  failure effects remain host-owned and open.
 - Current `26.825.51511` MCP Settings now has an independent read-only
   vertical slice. The public manager covers five counted tabs, wide-only
   search, standalone/plugin-provided rows, empty/Add-menu states, and

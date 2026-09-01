@@ -94,6 +94,8 @@ export const publicRuntimeExports = [
   "NewConversationStart",
   "PersonalizationSettingsPage",
   "PlanSelectionPage",
+  "PluginDetailBreadcrumb",
+  "PluginDetailPage",
   "PluginManagerTabs",
   "Popover",
   "ProjectConversationPage",

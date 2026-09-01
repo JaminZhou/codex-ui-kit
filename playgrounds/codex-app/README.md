@@ -1089,6 +1089,34 @@ Exact third-party icons and every install/discovery side effect remain
 host-supplied. Reviewed replay baselines are committed; product screenshots
 and isolated profile data are not.
 
+## Current Plugin detail
+
+The `26.825.51511` Plugin detail route has eight deterministic installed and
+discovery scenes covering wide, 720px compact, bottom-scroll, Uninstall-menu,
+and connected-app menu states. CDP checks the scroller, identity/actions,
+suggestion rows, Apps, Information, disclosure, scroll extents, menu geometry,
+Escape dismissal, and zero overflow. Native Electron repeats installed,
+actions, connection, and compact discovery representatives. Product
+screenshots are optional local-only references:
+
+```bash
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_REFERENCE=/absolute/path/to/plugin-installed-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_ACTIONS_REFERENCE=/absolute/path/to/plugin-actions-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_CONNECTION_REFERENCE=/absolute/path/to/plugin-connection-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_BOTTOM_REFERENCE=/absolute/path/to/plugin-installed-bottom-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE=/absolute/path/to/plugin-installed-compact.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_REFERENCE=/absolute/path/to/plugin-discovery-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_BOTTOM_REFERENCE=/absolute/path/to/plugin-discovery-bottom-wide.png \
+CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_COMPACT_REFERENCE=/absolute/path/to/plugin-discovery-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=integration-plugin-detail-current-26-825-installed,integration-plugin-detail-current-26-825-actions,integration-plugin-detail-current-26-825-connection,integration-plugin-detail-current-26-825-installed-bottom,integration-plugin-detail-current-26-825-installed-compact,integration-plugin-detail-current-26-825-discovery,integration-plugin-detail-current-26-825-discovery-bottom,integration-plugin-detail-current-26-825-discovery-compact
+```
+
+The comparison masks only host-supplied plugin artwork, hero artwork, and
+suggestion brand icons. The page emits callbacks only; clipboard/navigation,
+installation, connection persistence, OAuth/permissions, external links, and
+failure effects remain host-owned.
+
 ## Current MCP Settings manager
 
 The `26.825.51511` Settings → Plugins → MCPs route has six deterministic

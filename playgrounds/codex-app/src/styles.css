@@ -8221,6 +8221,91 @@ textarea {
   margin-inline-start: 0;
 }
 
+.demo-current-plugin-detail-window-chrome {
+  padding-inline-end: 1rem;
+}
+
+.demo-current-plugin-detail-window-chrome
+  .codex-ui-app-window-chrome__navigation {
+  gap: 0.125rem;
+}
+
+.demo-current-plugin-detail-window-chrome
+  .codex-ui-plugin-detail-breadcrumb {
+  margin-inline-start: 10.5625rem;
+}
+
+.demo-current-plugin-detail {
+  -webkit-font-smoothing: antialiased;
+  min-height: 0;
+}
+
+.demo-current-plugin-detail-backdrop {
+  background:
+    radial-gradient(
+      90% 80% at 46% 12%,
+      rgb(241 229 200 / 0.5),
+      transparent 52%
+    ),
+    radial-gradient(
+      70% 100% at 82% 52%,
+      rgb(103 67 194 / 0.78),
+      transparent 72%
+    ),
+    radial-gradient(
+      90% 100% at 2% 88%,
+      rgb(4 47 103 / 0.92),
+      transparent 74%
+    ),
+    linear-gradient(110deg, #073270 0%, #244783 42%, #362274 100%);
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.demo-current-plugin-detail-backdrop::before,
+.demo-current-plugin-detail-backdrop::after {
+  border-radius: 50%;
+  content: "";
+  filter: blur(1.25rem);
+  position: absolute;
+  transform: rotate(-16deg);
+}
+
+.demo-current-plugin-detail-backdrop::before {
+  background: rgb(255 244 217 / 0.24);
+  height: 12rem;
+  left: 7rem;
+  top: -5rem;
+  width: 28rem;
+}
+
+.demo-current-plugin-detail-backdrop::after {
+  background: rgb(82 76 175 / 0.35);
+  bottom: -4rem;
+  height: 10rem;
+  right: -1rem;
+  width: 24rem;
+}
+
+.demo-current-plugin-detail
+  :is(
+    .codex-ui-plugin-detail__artwork,
+    .codex-ui-plugin-detail__app-icon,
+    .codex-ui-plugin-detail__suggestion-icon
+  )
+  > svg {
+  display: block;
+}
+
+.demo-current-plugin-detail
+  .codex-ui-plugin-detail__app-list
+  article[data-status="locked"] {
+  opacity: 0.48;
+}
+
 .demo-current-scheduled-route {
   border-inline-start: 1px solid var(--codex-ui-border);
   height: 100%;
@@ -8280,6 +8365,10 @@ textarea {
 }
 
 @media (max-width: 45rem) {
+  .demo-current-plugin-detail {
+    border-inline-start: 0;
+  }
+
   .demo-current-integration-window-chrome .codex-ui-integration-catalog-tabs {
     margin-inline-start: 0.875rem;
   }
@@ -8287,6 +8376,11 @@ textarea {
   .demo-current-integration-window-chrome
     .demo-current-integration-header-action[aria-label="Refresh"] {
     display: none;
+  }
+
+  .demo-current-plugin-detail-window-chrome
+    .codex-ui-plugin-detail-breadcrumb {
+    margin-inline-start: 1.5rem;
   }
 }
 

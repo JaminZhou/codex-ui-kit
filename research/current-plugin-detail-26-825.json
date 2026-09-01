@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01T12:05:42.608Z",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "navigation-and-read-only-menu-inspection"
+  },
+  "sharedGeometry": {
+    "wideViewport": { "width": 1180, "height": 820 },
+    "compactViewport": { "width": 720, "height": 680 },
+    "wideScroller": {
+      "left": 322.875,
+      "top": 46,
+      "width": 857.125,
+      "height": 774
+    },
+    "compactScroller": {
+      "left": 0,
+      "top": 46,
+      "width": 720,
+      "height": 634
+    },
+    "wideHeader": {
+      "left": 383.4375,
+      "top": 66,
+      "width": 736,
+      "height": 129.59375
+    },
+    "compactHeader": {
+      "left": 16,
+      "top": 66,
+      "width": 688,
+      "height": 129.59375
+    },
+    "artwork": { "width": 58, "height": 58 },
+    "title": {
+      "top": 142,
+      "height": 26.59375,
+      "fontSize": 20,
+      "fontWeight": 500,
+      "lineHeight": 26.6
+    },
+    "actions": {
+      "height": 28,
+      "copyLinkWidth": 97.53125,
+      "tryNowWidth": 88.75,
+      "installPluginWidth": 119.328125
+    },
+    "suggestions": {
+      "count": 3,
+      "wide": { "left": 505.03125, "width": 492.796875 },
+      "compact": { "left": 125.921875, "width": 468.15625 }
+    },
+    "informationLabels": [
+      "Capabilities",
+      "Developer",
+      "Category",
+      "Version",
+      "Website",
+      "Privacy Policy",
+      "Terms of Service"
+    ],
+    "horizontalOverflow": 0
+  },
+  "installed": {
+    "actions": ["More actions", "Copy link", "Try now"],
+    "actionsMenu": {
+      "items": ["Uninstall"],
+      "width": 180,
+      "height": 36.5625
+    },
+    "connectionMenu": {
+      "items": ["Reconnect", "Disconnect"],
+      "width": 160,
+      "height": 65.125
+    },
+    "appCount": 2,
+    "wideSuggestionHeights": [79, 58, 58],
+    "compactSuggestionHeights": [79, 79, 58],
+    "wideScrollHeight": 1178,
+    "compactScrollHeight": 1242,
+    "wideBottomScrollTop": 404
+  },
+  "discovery": {
+    "actions": ["Copy link", "Install plugin"],
+    "appCount": 1,
+    "wideSuggestionHeights": [79, 58, 58],
+    "compactSuggestionHeights": [79, 58, 79],
+    "wideScrollHeight": 1096,
+    "compactScrollHeight": 1137,
+    "wideBottomScrollTop": 322
+  },
+  "productPixelRatios": {
+    "maximum": 0.08,
+    "installedHeader": 0.0146216555,
+    "installedSuggestionRows": [0.0101419878, 0.0217528153, 0.0130446947],
+    "installedApps": 0.0273877818,
+    "actionsHeader": 0.0178302676,
+    "actionsMenu": 0.0475975976,
+    "connectionApps": 0.0324074074,
+    "connectionMenu": 0.0522727273,
+    "installedBottomContent": 0.043910779,
+    "installedCompactHeader": 0.0155299642,
+    "installedCompactSuggestionRows": [0.0104944282, 0.0154170724, 0.0082891247],
+    "installedCompactApps": 0.0005285412,
+    "discoveryHeader": 0.0119774247,
+    "discoverySuggestionRows": [0.0101419878, 0.0185703294, 0.0130446947],
+    "discoveryApps": 0.0103286031,
+    "discoveryBottomContent": 0.0350323149,
+    "discoveryCompactHeader": 0.0130366726,
+    "discoveryCompactSuggestionRows": [0.0104944282, 0.0174255821, 0.0110353781],
+    "discoveryCompactApps": 0.0003699789,
+    "dynamicMasks": [
+      "host-supplied plugin artwork",
+      "host-supplied hero backdrop",
+      "host-supplied suggestion brand icons"
+    ]
+  },
+  "localOnlyScreenshots": [
+    {
+      "name": "plugin-installed-wide.png",
+      "sha256": "171ba4bd7cc2265895e621ac923fd8c5bdbaadfe9ca48aae6cac635d0fb7521a"
+    },
+    {
+      "name": "plugin-actions-wide.png",
+      "sha256": "669eab3dc95eae1138ad23552d2e96ce9cc4cf4383c003f484a636d1da1c6821"
+    },
+    {
+      "name": "plugin-connection-wide.png",
+      "sha256": "400ce8aaf9c7abe798ab4ac1adf76fce86f0d0825188c967dda243fe16e30c1f"
+    },
+    {
+      "name": "plugin-installed-bottom-wide.png",
+      "sha256": "0be7759fc3036e23136d142c46d0463c731f5bfcc2d91c54e9c3cc950b163fef"
+    },
+    {
+      "name": "plugin-installed-compact.png",
+      "sha256": "70daf49b2380afe740d935d592ea11f7b6762e58e10bbbd91619d8d9a4fc4884"
+    },
+    {
+      "name": "plugin-discovery-wide.png",
+      "sha256": "393e44f651766c7bb56bca824e80113c9be3004ca6f536830f3058be338d972b"
+    },
+    {
+      "name": "plugin-discovery-bottom-wide.png",
+      "sha256": "2982a026ca4152b6f01486f1f30077010e25e1509324c9e2ed886e25e53e8432"
+    },
+    {
+      "name": "plugin-discovery-compact.png",
+      "sha256": "0e1aa80897fb006c0b873b7d51b6aea0ebb787de014e9998f18375e3d64b8fa1"
+    }
+  ],
+  "remainingBoundary": [
+    "copy-link clipboard effect",
+    "Try now navigation and prompt submission",
+    "real install and uninstall",
+    "reconnect and disconnect persistence",
+    "OAuth and permission prompts",
+    "external information-link navigation",
+    "failure and retry effects"
+  ]
+}

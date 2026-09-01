@@ -51,6 +51,8 @@ import {
   ImagePreviewDialog,
   IntegrationCatalogPage,
   IntegrationCatalogTabs,
+  PluginDetailBreadcrumb,
+  PluginDetailPage,
   KeyboardShortcutsPage,
   LocalEnvironmentDialog,
   Menu,
@@ -134,6 +136,9 @@ import {
   type IntegrationCatalogItem,
   type IntegrationCatalogSection,
   type IntegrationCatalogStatus,
+  type PluginDetailAppItem,
+  type PluginDetailInformationItem,
+  type PluginDetailSuggestion,
   type KeyboardShortcutCaptureTarget,
   type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
@@ -2571,6 +2576,122 @@ function CurrentIntegrationMoreIcons() {
   );
 }
 
+function CurrentPluginBrandIcon({ name }: { name: "github" | "gmail" }) {
+  return name === "github" ? (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" fill="#fff" r="11" />
+      <path
+        d="M12 3.25a8.95 8.95 0 0 0-2.83 17.44c.45.08.61-.2.61-.43v-1.7c-2.5.54-3.02-1.06-3.02-1.06-.41-1.04-1-1.32-1-1.32-.81-.56.06-.55.06-.55.9.06 1.37.92 1.37.92.8 1.37 2.09.98 2.6.75.08-.58.31-.98.57-1.21-2-.23-4.1-1-4.1-4.43 0-.98.35-1.78.92-2.41-.09-.23-.4-1.14.09-2.38 0 0 .75-.24 2.46.92A8.5 8.5 0 0 1 12 7.49c.76 0 1.5.1 2.2.3 1.7-1.15 2.45-.92 2.45-.92.5 1.24.19 2.15.1 2.38.58.63.92 1.43.92 2.41 0 3.44-2.1 4.2-4.1 4.42.32.28.61.83.61 1.68v2.5c0 .24.16.52.62.43A8.95 8.95 0 0 0 12 3.25Z"
+        fill="#111"
+      />
+    </svg>
+  ) : (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M3 5.25 6 7.5v11.25H3Z" fill="#4285f4" />
+      <path d="M21 5.25 18 7.5v11.25h3Z" fill="#34a853" />
+      <path d="M3 5.25 5.35 3.5 12 8.6 18.65 3.5 21 5.25 12 12Z" fill="#ea4335" />
+      <path d="M3 5.25 6 7.5v3.75L3 9Z" fill="#c5221f" />
+      <path d="M21 5.25 18 7.5v3.75L21 9Z" fill="#fbbc04" />
+    </svg>
+  );
+}
+
+const currentInstalledPluginSuggestions: readonly PluginDetailSuggestion[] = [
+  {
+    content:
+      "Explain this repo's authentication using code and docs: components, request flow, and how credentials and tokens are handled",
+    icon: <CurrentPluginBrandIcon name="github" />,
+    id: "github-authentication",
+    title: "GitHub",
+  },
+  {
+    content:
+      "Summarize this pull request like a senior reviewer: what changed, what could break, and what tests are missing or weak",
+    icon: <CurrentPluginBrandIcon name="github" />,
+    id: "github-review",
+    title: "GitHub",
+  },
+  {
+    content:
+      "Turn the last 7 days of commits and merged PRs into a stakeholder update: shipped work, risks, and next steps",
+    icon: <CurrentPluginBrandIcon name="github" />,
+    id: "github-update",
+    title: "GitHub",
+  },
+];
+
+const currentDiscoveryPluginSuggestions: readonly PluginDetailSuggestion[] = [
+  {
+    content:
+      "Summarize the last 5 messages in [subject line] and capture decisions, open questions, and what I should follow up on next",
+    icon: <CurrentPluginBrandIcon name="gmail" />,
+    id: "gmail-summary",
+    title: "Gmail",
+  },
+  {
+    content:
+      "Draft a polite, firm reply to our auditor's latest email, with a short bullet list of exactly what we'll provide",
+    icon: <CurrentPluginBrandIcon name="gmail" />,
+    id: "gmail-draft",
+    title: "Gmail",
+  },
+  {
+    content:
+      "Turn my latest customer escalation thread into an action tracker with owners, deadlines, and an email reference for each item",
+    icon: <CurrentPluginBrandIcon name="gmail" />,
+    id: "gmail-tracker",
+    title: "Gmail",
+  },
+];
+
+const currentInstalledPluginApps: readonly PluginDetailAppItem[] = [
+  {
+    description:
+      "Access repositories, issues, and pull requests. Required for some features such as Codex",
+    icon: <CurrentPluginBrandIcon name="github" />,
+    id: "github",
+    status: "connected",
+    title: "GitHub",
+  },
+  {
+    description: "Workspace-specific GitHub connector for a GitHub Enterprise host.",
+    icon: <CurrentPluginBrandIcon name="github" />,
+    id: "github-enterprise",
+    status: "locked",
+    statusLabel: "Workspace connection unavailable",
+    title: "GitHub Enterprise",
+  },
+];
+
+const currentDiscoveryPluginApps: readonly PluginDetailAppItem[] = [
+  {
+    description: "Find and reference emails from your inbox.",
+    icon: <CurrentPluginBrandIcon name="gmail" />,
+    id: "gmail",
+    title: "Gmail",
+  },
+];
+
+const currentInstalledPluginInformation: readonly PluginDetailInformationItem[] = [
+  { id: "capabilities", label: "Capabilities", value: "Interactive, Write" },
+  { id: "developer", label: "Developer", value: "OpenAI" },
+  { id: "category", label: "Category", value: "Developer Tools" },
+  { id: "version", label: "Version", value: "0.1.12-5f7cd798dc99" },
+  { href: "https://github.com/", id: "website", label: "Website", linkLabel: "Website" },
+  { href: "https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement", id: "privacy", label: "Privacy Policy", linkLabel: "Privacy Policy" },
+  { href: "https://docs.github.com/site-policy/github-terms/github-terms-of-service", id: "terms", label: "Terms of Service", linkLabel: "Terms of Service" },
+];
+
+const currentDiscoveryPluginInformation: readonly PluginDetailInformationItem[] = [
+  { id: "capabilities", label: "Capabilities", value: "Interactive, Write" },
+  { id: "developer", label: "Developer", value: "OpenAI" },
+  { id: "category", label: "Category", value: "Communication" },
+  { id: "version", label: "Version", value: "0.1.10" },
+  { href: "https://mail.google.com/", id: "website", label: "Website", linkLabel: "Website" },
+  { href: "https://policies.google.com/privacy", id: "privacy", label: "Privacy Policy", linkLabel: "Privacy Policy" },
+  { href: "https://policies.google.com/terms", id: "terms", label: "Terms of Service", linkLabel: "Terms of Service" },
+];
+
 const currentPluginInstalledItems: readonly IntegrationCatalogItem[] = [
   { icon: <CurrentIntegrationFixtureIcon label="GH" />, id: "github", title: "GitHub" },
   { icon: <CurrentIntegrationFixtureIcon label="D" tone="blue" />, id: "documents", title: "Documents" },
@@ -2970,6 +3091,23 @@ export function App() {
     );
   const [integrationCatalogAction, setIntegrationCatalogAction] =
     useState("");
+  const isCurrentPluginDetailReplay =
+    initialSelection.view === "plugins" &&
+    initialSelection.frame?.startsWith(
+      "integration-plugin-detail-current-26-825",
+    );
+  const [pluginDetailOpen, setPluginDetailOpen] = useState(
+    isCurrentPluginDetailReplay,
+  );
+  const [pluginDetailInstalled, setPluginDetailInstalled] = useState(
+    !initialSelection.frame?.includes("-discovery"),
+  );
+  const [pluginDetailActionsOpen, setPluginDetailActionsOpen] = useState(
+    initialSelection.frame?.endsWith("-actions") ?? false,
+  );
+  const [pluginDetailConnectionOpen, setPluginDetailConnectionOpen] =
+    useState(initialSelection.frame?.endsWith("-connection") ?? false);
+  const [pluginDetailAction, setPluginDetailAction] = useState("");
   const [scheduledFilter, setScheduledFilter] =
     useState<ScheduledTaskFilter>(
       initialSelection.frame?.endsWith("-paused")
@@ -3677,6 +3815,21 @@ export function App() {
       !current26825LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  useLayoutEffect(() => {
+    if (
+      !pluginDetailOpen ||
+      !activeFrame?.startsWith("integration-plugin-detail-current-26-825")
+    ) {
+      return;
+    }
+    const detail = document.querySelector<HTMLElement>(
+      '[data-testid="current-plugin-detail"]',
+    );
+    if (!detail) return;
+    detail.scrollTop = activeFrame.endsWith("-bottom")
+      ? detail.scrollHeight
+      : 0;
+  }, [activeFrame, pluginDetailOpen]);
   const [currentWorktreeSetupPhase, setCurrentWorktreeSetupPhase] =
     useState<WorktreeSetupPhase>(() =>
       initialCurrentWorktreeSetupPhase(initialSelection.frame),
@@ -10586,6 +10739,100 @@ export function App() {
     />
   );
 
+  const currentPluginDetailTitle = pluginDetailInstalled ? "GitHub" : "Gmail";
+  const pluginDetailRoute = (
+    <PluginDetailPage
+      actionsMenuOpen={pluginDetailActionsOpen}
+      apps={
+        pluginDetailInstalled
+          ? currentInstalledPluginApps
+          : currentDiscoveryPluginApps
+      }
+      artwork={
+        <CurrentPluginBrandIcon
+          name={pluginDetailInstalled ? "github" : "gmail"}
+        />
+      }
+      className="demo-current-plugin-detail"
+      connectionMenuOpen={pluginDetailConnectionOpen}
+      data-action={pluginDetailAction || undefined}
+      data-testid="current-plugin-detail"
+      description={
+        pluginDetailInstalled
+          ? "Triage PRs, issues, CI, and publish flows"
+          : "Read and manage Gmail"
+      }
+      disclosure={
+        pluginDetailInstalled ? (
+          <p>
+            This plugin may contain one or more apps, as listed above. When
+            connected to an app, ChatGPT may share relevant chats and memories
+            with the app to help provide context for your requests. An app’s
+            use of this data is subject to their terms and privacy policy,
+            which can be found on the app’s page. If you have <a href="#memory">Memory</a>{" "}
+            enabled, data from the app may be used to proactively provide
+            helpful information or suggestions. ChatGPT always respects your
+            training data preferences, including for data from connected apps.
+            Use of apps may come with <a href="#risk">elevated risk</a>. You can
+            manage your preferences or disconnect from apps anytime in your
+            settings. <a href="#learn-more">Learn more</a>
+          </p>
+        ) : (
+          <p>
+            When connected to Gmail, ChatGPT may share relevant chats and
+            memories with this app to help provide context for your requests.
+            Gmail’s use of this data is subject to their <a href="#terms">terms</a>{" "}
+            and <a href="#privacy">privacy policy</a>. If you have <a href="#memory">Memory</a>{" "}
+            enabled, data from the app may be used to proactively provide
+            helpful information or suggestions. ChatGPT always respects your
+            training data preferences, including for data from connected apps.
+            Use of apps may come with <a href="#risk">elevated risk</a>. You can
+            manage your preferences or disconnect from apps anytime in your
+            settings. <a href="#learn-more">Learn more</a>
+          </p>
+        )
+      }
+      heroBackdrop={<span className="demo-current-plugin-detail-backdrop" />}
+      information={
+        pluginDetailInstalled
+          ? currentInstalledPluginInformation
+          : currentDiscoveryPluginInformation
+      }
+      installed={pluginDetailInstalled}
+      onActionsMenuOpenChange={(open) => {
+        setPluginDetailActionsOpen(open);
+        if (open) setPluginDetailConnectionOpen(false);
+        setPluginDetailAction(open ? "actions:open" : "actions:close");
+      }}
+      onAppOpen={(app) => setPluginDetailAction(`app:${app.id}`)}
+      onConnectionMenuOpenChange={(open) => {
+        setPluginDetailConnectionOpen(open);
+        if (open) setPluginDetailActionsOpen(false);
+        setPluginDetailAction(open ? "connection:open" : "connection:close");
+      }}
+      onCopyLink={() => setPluginDetailAction("copy-link")}
+      onDisconnect={() => setPluginDetailAction("disconnect-requested")}
+      onInstall={() => setPluginDetailAction("install-requested")}
+      onReconnect={() => setPluginDetailAction("reconnect-requested")}
+      onSuggestionOpen={(suggestion) =>
+        setPluginDetailAction(`suggestion:${suggestion.id}`)
+      }
+      onTryNow={() => setPluginDetailAction("try-now")}
+      onUninstall={() => setPluginDetailAction("uninstall-requested")}
+      suggestions={
+        pluginDetailInstalled
+          ? currentInstalledPluginSuggestions
+          : currentDiscoveryPluginSuggestions
+      }
+      summary={
+        pluginDetailInstalled
+          ? "Use GitHub to inspect repositories, review pull requests, address feedback, debug failing Actions checks, and prepare code changes for review through a connector-first workflow with targeted CLI fallbacks."
+          : "Use Gmail to summarize inbox activity, draft replies, and organize email threads through the connected Gmail app."
+      }
+      title={currentPluginDetailTitle}
+    />
+  );
+
   const activeIntegrationScope =
     integrationCatalogKind === "plugins"
       ? pluginCatalogScope
@@ -10616,9 +10863,18 @@ export function App() {
       onItemAction={(item) =>
         setIntegrationCatalogAction(`action:${item.id}`)
       }
-      onItemOpen={(item) =>
-        setIntegrationCatalogAction(`open:${item.id}`)
-      }
+      onItemOpen={(item) => {
+        setIntegrationCatalogAction(`open:${item.id}`);
+        if (
+          isCurrentPluginDetailReplay &&
+          (item.id === "github" || item.id === "gmail")
+        ) {
+          setPluginDetailInstalled(item.id === "github");
+          setPluginDetailActionsOpen(false);
+          setPluginDetailConnectionOpen(false);
+          setPluginDetailOpen(true);
+        }
+      }}
       onManage={() => setIntegrationCatalogAction("manage")}
       onMore={(section) =>
         setIntegrationCatalogAction(`more:${section.id}`)
@@ -14956,22 +15212,23 @@ export function App() {
         }
         sidebar={sidebar}
         sidebarWidth={
-          currentSidebarThreadLifecycle ||
-          currentSidebarWorktreeLifecycle ||
-          currentContext26825Replay ||
-          currentTerminal26825Frame(activeFrame) ||
-          view === "automations" ||
-          view === "plugins" ||
-          isCurrentRichMarkdownStreamingReplay ||
-          usesCurrent26825ThreadHeader ||
-          isCurrentCitations26825Replay ||
-          isCurrentPullRequestRouteReplay
-            ? activeFrame === "terminal-current-26-825-compact-sidebar"
-              ? 320.265625
-              : 321.875
-            : currentHomeFrame || usesCurrent322SidebarWidth
-              ? 322.90625
-              : undefined
+          view === "plugins"
+            ? 322.875
+            : currentSidebarThreadLifecycle ||
+                currentSidebarWorktreeLifecycle ||
+                currentContext26825Replay ||
+                currentTerminal26825Frame(activeFrame) ||
+                view === "automations" ||
+                isCurrentRichMarkdownStreamingReplay ||
+                usesCurrent26825ThreadHeader ||
+                isCurrentCitations26825Replay ||
+                isCurrentPullRequestRouteReplay
+              ? activeFrame === "terminal-current-26-825-compact-sidebar"
+                ? 320.265625
+                : 321.875
+              : currentHomeFrame || usesCurrent322SidebarWidth
+                ? 322.90625
+                : undefined
         }
         sidebarMinMainWidth={
           subagentPanelSelected
@@ -14992,7 +15249,9 @@ export function App() {
             <AppWindowChrome
               className={
                 view === "plugins"
-                  ? "demo-current-integration-window-chrome"
+                  ? pluginDetailOpen
+                    ? "demo-current-plugin-detail-window-chrome"
+                    : "demo-current-integration-window-chrome"
                   : view === "automations"
                     ? "demo-current-scheduled-window-chrome"
                   : undefined
@@ -15032,7 +15291,7 @@ export function App() {
                       ? "Choosing…"
                       : "Create"}
                   </Button>
-                ) : view === "plugins" ? (
+                ) : view === "plugins" && !pluginDetailOpen ? (
                   <>
                     <button
                       aria-label="Refresh"
@@ -15101,7 +15360,17 @@ export function App() {
                 onClick: () => setSidebarOpen((open) => !open),
               }}
               startActions={
-                view === "plugins" ? (
+                view === "plugins" && pluginDetailOpen ? (
+                  <PluginDetailBreadcrumb
+                    onBack={() => {
+                      setPluginDetailActionsOpen(false);
+                      setPluginDetailConnectionOpen(false);
+                      setPluginDetailAction("back");
+                      setPluginDetailOpen(false);
+                    }}
+                    title={currentPluginDetailTitle}
+                  />
+                ) : view === "plugins" ? (
                   <IntegrationCatalogTabs
                     active={integrationCatalogKind}
                     onChange={(kind) => {
@@ -15130,7 +15399,7 @@ export function App() {
         ) : view === "automations" ? (
           scheduledTasksRoute
         ) : view === "plugins" ? (
-          integrationCatalogRoute
+          pluginDetailOpen ? pluginDetailRoute : integrationCatalogRoute
         ) : view === "shell" ? (
           shellRoute
         ) : view === "workspace" ? (

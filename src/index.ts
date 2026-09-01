@@ -15,6 +15,7 @@ export * from "./components/BrowserActivity.js";
 export * from "./components/BrowserWorkspacePanel.js";
 export * from "./components/IntegrationCatalog.js";
 export * from "./components/McpSettings.js";
+export * from "./components/PluginDetail.js";
 export * from "./components/ScheduledTasks.js";
 export * from "./components/BranchCreationDialog.js";
 export * from "./components/CommandExecution.js";

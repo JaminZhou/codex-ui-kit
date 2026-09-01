@@ -2131,6 +2131,36 @@ comparisons pass at 4.4911%/5.1784% for Plugins and 3.3067%/3.8461% for Skills.
 Exact third-party icons and install/discovery effects remain host-owned, so
 both inventory rows are `partial` rather than complete.
 
+## Current Plugin detail slice
+
+A second isolated same-build `26.825.51511` Renderer reached one installed and
+one discovery Plugin detail route at 1180×820 and 720×680. Read-only capture
+records the fixed breadcrumb and 129.59375px header, 58px artwork, three prompt
+suggestions, Apps and Information sections, disclosure, exact bottom scroll,
+the installed Uninstall menu, and the connected-app Reconnect/Disconnect menu.
+The sanitized geometry, screenshot hashes, explicit mutation boundary, and
+regional ratios are retained in `research/current-plugin-detail-26-825.json`;
+raw product frames remain local-only.
+
+`PluginDetailPage` and `PluginDetailBreadcrumb` expose the controlled public
+surface. Browser/CDP verifies all eight installed/discovery, menu, bottom, and
+compact scenes; native Electron repeats installed, actions, connection, and
+compact discovery. Eight reviewed replay baselines pass. Optional current-
+product comparisons split the page into header, suggestion rows, Apps, menus,
+and bottom content; all pass below the explicit 8% ceiling. Masks cover only
+host-supplied plugin artwork, hero artwork, and suggestion brand icons.
+
+The inventory row remains `partial`: clipboard and Try-now navigation, real
+install/uninstall, reconnect/disconnect persistence, OAuth/permission prompts,
+external information links, and failure/retry effects were deliberately not
+executed by this read-only slice.
+
+Cleanup stopped only isolated PID `88986` and its validated profile-owned
+processes, closed port `9924`, and moved the exact profile and raw evidence
+recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-plugin-detail-26-825-20260901-9924`.
+The user-owned Codex PID `13503` remained running.
+
 The independent current Browser activity probe succeeded but exposed no
 mounted Browser workspace route in the sampled task. That negative boundary
 is recorded without borrowing activity evidence: `workspace.browser` remains

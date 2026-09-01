@@ -859,6 +859,116 @@ for (const integrationScene of [
   }
 }
 
+for (const pluginDetailScene of visualScenes.filter(({ id }) =>
+  [
+    "integration-plugin-detail-current-26-825-installed",
+    "integration-plugin-detail-current-26-825-actions",
+    "integration-plugin-detail-current-26-825-connection",
+    "integration-plugin-detail-current-26-825-discovery-compact",
+  ].includes(id),
+)) {
+  const { app: pluginDetailApp, page: pluginDetailPage } = await launchScene(
+    pluginDetailScene,
+    { capture: false },
+  );
+  try {
+    const compact = pluginDetailScene.id.endsWith("-compact");
+    const installed = !pluginDetailScene.id.includes("-discovery");
+    const nativeBounds = await pluginDetailApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const detail = await pluginDetailPage
+      .locator(".codex-ui-plugin-detail")
+      .evaluate((root) => {
+        const rect = (target) => {
+          if (!(target instanceof Element)) return null;
+          const value = target.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        return {
+          apps: root.querySelectorAll(
+            ".codex-ui-plugin-detail__app-list article",
+          ).length,
+          artwork: rect(
+            root.querySelector(".codex-ui-plugin-detail__artwork"),
+          ),
+          header: rect(root.querySelector(".codex-ui-plugin-detail__header")),
+          information: Array.from(
+            root.querySelectorAll(".codex-ui-plugin-detail__information dt"),
+            (item) => item.textContent?.trim(),
+          ),
+          menuItems: Array.from(
+            root.querySelectorAll('[role="menuitem"]'),
+            (item) => item.textContent?.trim(),
+          ),
+          scrollHeight: root.scrollHeight,
+          suggestions: root.querySelectorAll(
+            ".codex-ui-plugin-detail__suggestions > button",
+          ).length,
+          title: root.querySelector("h1")?.textContent?.trim(),
+          width: root.getBoundingClientRect().width,
+        };
+      });
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820) ||
+      detail.title !== (installed ? "GitHub" : "Gmail") ||
+      detail.apps !== (installed ? 2 : 1) ||
+      detail.suggestions !== 3 ||
+      detail.information.join("|") !==
+        "Capabilities|Developer|Category|Version|Website|Privacy Policy|Terms of Service" ||
+      detail.scrollHeight !==
+        (compact ? (installed ? 1242 : 1137) : 1178) ||
+      !detail.header ||
+      Math.abs(detail.header.width - (compact ? 688 : 736)) > 1 ||
+      !detail.artwork ||
+      Math.abs(detail.artwork.width - 58) > 1 ||
+      (pluginDetailScene.id.endsWith("-actions") &&
+        detail.menuItems.join("|") !== "Uninstall") ||
+      (pluginDetailScene.id.endsWith("-connection") &&
+        detail.menuItems.join("|") !== "Reconnect|Disconnect")
+    ) {
+      throw new Error(
+        `${pluginDetailScene.id}: Electron plugin detail geometry failed: ${JSON.stringify({ detail, nativeBounds })}`,
+      );
+    }
+    if (detail.menuItems.length > 0) {
+      const trigger = pluginDetailPage.getByRole("button", {
+        exact: true,
+        name: pluginDetailScene.id.endsWith("-actions")
+          ? "More actions"
+          : "Connected",
+      });
+      await trigger.click();
+      await trigger.click();
+      await pluginDetailPage.keyboard.press("Escape");
+      if ((await pluginDetailPage.locator('[role="menuitem"]').count()) !== 0) {
+        throw new Error(
+          `${pluginDetailScene.id}: Electron plugin detail menu did not dismiss.`,
+        );
+      }
+    }
+    if (!installed) {
+      await pluginDetailPage
+        .getByRole("button", { exact: true, name: "Install plugin" })
+        .click();
+      await pluginDetailPage.waitForFunction(
+        () =>
+          document
+            .querySelector('[data-testid="current-plugin-detail"]')
+            ?.getAttribute("data-action") === "install-requested",
+      );
+    }
+  } finally {
+    await pluginDetailApp.close();
+  }
+}
+
 for (const scheduledScene of [
   {
     currentSidebar: true,

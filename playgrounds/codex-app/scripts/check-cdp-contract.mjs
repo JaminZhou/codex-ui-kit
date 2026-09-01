@@ -99,6 +99,7 @@ const currentApprovalComposerScenes = new Set([
 ]);
 const currentReplayComposerContracts = [];
 const currentIntegrationCatalogContracts = [];
+const currentPluginDetailContracts = [];
 
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
@@ -9201,6 +9202,183 @@ for (const scene of selectedScenes) {
       await writeFile(
         join(artifactDirectory, `${scene.id}.json`),
         `${JSON.stringify(scheduled, null, 2)}\n`,
+      );
+      continue;
+    }
+
+    if (scene.id.startsWith("integration-plugin-detail-current-26-825-")) {
+      const compact = scene.id.endsWith("-compact");
+      const installed = scene.id.includes("-installed") ||
+        scene.id.endsWith("-actions") ||
+        scene.id.endsWith("-connection");
+      const bottom = scene.id.includes("-bottom");
+      const pluginDetail = await page
+        .locator(".codex-ui-plugin-detail")
+        .evaluate((root) => {
+          const rect = (target) => {
+            if (!(target instanceof Element)) return null;
+            const bounds = target.getBoundingClientRect();
+            return {
+              height: bounds.height,
+              left: bounds.left,
+              top: bounds.top,
+              width: bounds.width,
+            };
+          };
+          const bySelector = (selector) => rect(root.querySelector(selector));
+          const action = (label) => {
+            const target = Array.from(root.querySelectorAll("button")).find(
+              (button) =>
+                (button.getAttribute("aria-label") ??
+                  button.textContent?.trim()) === label ||
+                button.textContent?.trim().endsWith(label),
+            );
+            return rect(target);
+          };
+          return {
+            actions: {
+              copyLink: action("Copy link"),
+              installPlugin: action("Install plugin"),
+              more: action("More actions"),
+              tryNow: action("Try now"),
+            },
+            apps: bySelector(".codex-ui-plugin-detail__apps h2"),
+            appsCount: root.querySelectorAll(
+              ".codex-ui-plugin-detail__app-list article",
+            ).length,
+            artwork: bySelector(".codex-ui-plugin-detail__artwork"),
+            breadcrumb: rect(
+              document.querySelector(".codex-ui-plugin-detail-breadcrumb"),
+            ),
+            disclosure: bySelector(".codex-ui-plugin-detail__disclosure"),
+            header: bySelector(".codex-ui-plugin-detail__header"),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            information: bySelector(
+              ".codex-ui-plugin-detail__information h2",
+            ),
+            informationLabels: Array.from(
+              root.querySelectorAll(".codex-ui-plugin-detail__information dt"),
+              (item) => item.textContent?.trim(),
+            ),
+            menuItems: Array.from(
+              root.querySelectorAll('[role="menuitem"]'),
+              (item) => item.textContent?.trim(),
+            ),
+            scroller: {
+              clientHeight: root.clientHeight,
+              rect: rect(root),
+              scrollHeight: root.scrollHeight,
+              scrollTop: root.scrollTop,
+            },
+            suggestions: Array.from(
+              root.querySelectorAll(
+                ".codex-ui-plugin-detail__suggestions > button",
+              ),
+              rect,
+            ),
+            title: bySelector(".codex-ui-plugin-detail__title-row h1"),
+            viewport: { height: innerHeight, width: innerWidth },
+          };
+        });
+      const expectedViewport = compact
+        ? { height: 680, width: 720 }
+        : { height: 820, width: 1180 };
+      const expectedScrollHeight = compact
+        ? installed
+          ? 1242
+          : 1137
+        : installed
+          ? 1178
+          : 1096;
+      const expectedSuggestionHeights = compact
+        ? installed
+          ? [79, 79, 58]
+          : [79, 58, 79]
+        : [79, 58, 58];
+      const closeTo = (actual, expected, tolerance = 1) =>
+        typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
+      if (
+        pluginDetail.viewport.width !== expectedViewport.width ||
+        pluginDetail.viewport.height !== expectedViewport.height ||
+        !pluginDetail.scroller.rect ||
+        !closeTo(pluginDetail.scroller.rect.left, compact ? 0 : 322.875) ||
+        !closeTo(pluginDetail.scroller.rect.top, 46) ||
+        !closeTo(pluginDetail.scroller.rect.width, compact ? 720 : 857.125) ||
+        !closeTo(pluginDetail.scroller.rect.height, compact ? 634 : 774) ||
+        !closeTo(pluginDetail.scroller.scrollHeight, expectedScrollHeight) ||
+        (bottom
+          ? pluginDetail.scroller.scrollTop <= 0
+          : pluginDetail.scroller.scrollTop !== 0) ||
+        !pluginDetail.header ||
+        !closeTo(pluginDetail.header.width, compact ? 688 : 736) ||
+        !pluginDetail.artwork ||
+        !closeTo(pluginDetail.artwork.width, 58) ||
+        !pluginDetail.title ||
+        !closeTo(pluginDetail.title.height, 26.59375) ||
+        !pluginDetail.breadcrumb ||
+        !closeTo(pluginDetail.breadcrumb.left, compact ? 142 : 347) ||
+        pluginDetail.suggestions.length !== 3 ||
+        pluginDetail.suggestions.some(
+          (suggestion, index) =>
+            !suggestion ||
+            !closeTo(suggestion.width, compact ? 468.15625 : 492.796875) ||
+            !closeTo(suggestion.height, expectedSuggestionHeights[index]),
+        ) ||
+        pluginDetail.appsCount !== (installed ? 2 : 1) ||
+        !pluginDetail.apps ||
+        !pluginDetail.information ||
+        !pluginDetail.disclosure ||
+        JSON.stringify(pluginDetail.informationLabels) !==
+          JSON.stringify([
+            "Capabilities",
+            "Developer",
+            "Category",
+            "Version",
+            "Website",
+            "Privacy Policy",
+            "Terms of Service",
+          ]) ||
+        !pluginDetail.actions.copyLink ||
+        !closeTo(pluginDetail.actions.copyLink.width, 97.53125) ||
+        (installed
+          ? !pluginDetail.actions.more ||
+            !pluginDetail.actions.tryNow ||
+            pluginDetail.actions.installPlugin !== null ||
+            !closeTo(pluginDetail.actions.tryNow.width, 88.75)
+          : pluginDetail.actions.more !== null ||
+            pluginDetail.actions.tryNow !== null ||
+            !pluginDetail.actions.installPlugin ||
+            !closeTo(pluginDetail.actions.installPlugin.width, 119.328125)) ||
+        Math.abs(pluginDetail.horizontalOverflow) > 1 ||
+        (scene.id.endsWith("-actions") &&
+          JSON.stringify(pluginDetail.menuItems) !==
+            JSON.stringify(["Uninstall"])) ||
+        (scene.id.endsWith("-connection") &&
+          JSON.stringify(pluginDetail.menuItems) !==
+            JSON.stringify(["Reconnect", "Disconnect"]))
+      ) {
+        throw new Error(
+          `${scene.id}: current plugin detail geometry failed: ${JSON.stringify(pluginDetail)}`,
+        );
+      }
+      if (scene.id.endsWith("-actions") || scene.id.endsWith("-connection")) {
+        const trigger = page.getByRole("button", {
+          exact: true,
+          name: scene.id.endsWith("-actions") ? "More actions" : "Connected",
+        });
+        await trigger.click();
+        await trigger.click();
+        await page.keyboard.press("Escape");
+        if ((await page.locator('[role="menuitem"]').count()) !== 0) {
+          throw new Error(`${scene.id}: Escape did not dismiss the plugin menu.`);
+        }
+      }
+      currentPluginDetailContracts.push({ id: scene.id, ...pluginDetail });
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(pluginDetail, null, 2)}\n`,
       );
       continue;
     }
@@ -23707,6 +23885,11 @@ try {
 await writeFile(
   join(artifactDirectory, "current-integration-catalogs.json"),
   `${JSON.stringify(currentIntegrationCatalogContracts, null, 2)}\n`,
+);
+
+await writeFile(
+  join(artifactDirectory, "current-plugin-details.json"),
+  `${JSON.stringify(currentPluginDetailContracts, null, 2)}\n`,
 );
 
 await writeFile(
