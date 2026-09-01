@@ -1,4 +1,5 @@
 export type DemoView =
+  | "automations"
   | "conversation"
   | "projects"
   | "plugins"

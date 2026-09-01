@@ -859,6 +859,116 @@ for (const integrationScene of [
   }
 }
 
+for (const scheduledScene of [
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-825",
+    id: "electron-current-scheduled-wide",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-825-manual",
+    id: "electron-current-scheduled-manual-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
+]) {
+  const { app: scheduledApp, page: scheduledPage } = await launchScene(
+    scheduledScene,
+    { capture: false },
+  );
+  try {
+    const compact = scheduledScene.id.endsWith("compact");
+    const manual = scheduledScene.frame.includes("manual");
+    const nativeBounds = await scheduledApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const scheduled = await scheduledPage.evaluate(({ manual }) => {
+      const rect = (target) => {
+        if (!(target instanceof Element)) return null;
+        const value = target.getBoundingClientRect();
+        return {
+          height: value.height,
+          left: value.left,
+          top: value.top,
+          width: value.width,
+        };
+      };
+      const pageRoot = document.querySelector(".codex-ui-scheduled-tasks");
+      const editor = document.querySelector(".codex-ui-scheduled-task-editor");
+      const navigator = document.querySelector(
+        ".codex-ui-scheduled-task-navigator",
+      );
+      return {
+        editor: rect(editor),
+        heading: rect(pageRoot?.querySelector("h1")),
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        manual,
+        navigator: rect(navigator),
+        search: rect(
+          (manual ? navigator : pageRoot)?.querySelector(
+            ".codex-ui-scheduled-tasks__search",
+          ),
+        ),
+        suggestionCount: pageRoot?.querySelectorAll(
+          ".codex-ui-scheduled-tasks__suggestion",
+        ).length,
+        taskCount: pageRoot?.querySelectorAll(
+          ".codex-ui-scheduled-tasks__task",
+        ).length,
+      };
+    }, { manual });
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== 820 ||
+      Math.abs(scheduled.horizontalOverflow) > 1 ||
+      (manual
+        ? !scheduled.navigator ||
+          !scheduled.editor ||
+          Math.abs(scheduled.navigator.width - 374) > 1 ||
+          Math.abs(scheduled.editor.width - 346) > 1 ||
+          !scheduled.search ||
+          Math.abs(scheduled.search.left - 21) > 1
+        : !scheduled.heading ||
+          Math.abs(scheduled.heading.left - 395.4375) > 1 ||
+          !scheduled.search ||
+          Math.abs(scheduled.search.left - 387.4375) > 1 ||
+          Math.abs(scheduled.search.width - 728) > 1 ||
+          scheduled.taskCount !== 2 ||
+          scheduled.suggestionCount !== 3)
+    ) {
+      throw new Error(
+        `${scheduledScene.id}: Electron scheduled geometry failed: ${JSON.stringify({ nativeBounds, scheduled })}`,
+      );
+    }
+    if (!manual) {
+      await scheduledPage
+        .getByRole("button", { name: "Create scheduled task options" })
+        .click();
+      await scheduledPage
+        .getByRole("menuitem", { name: "Set up manually" })
+        .click();
+      await scheduledPage
+        .getByRole("region", { name: "Scheduled task editor" })
+        .waitFor();
+      await scheduledPage.getByRole("button", { name: "Cancel" }).click();
+      await scheduledPage
+        .getByRole("heading", { name: "Scheduled tasks" })
+        .waitFor();
+    }
+  } finally {
+    await scheduledApp.close();
+  }
+}
+
 const integrationUnavailableScene = {
   currentSidebar: true,
   frame: "integration-plugins-current-26-825-unavailable",
@@ -881,6 +991,30 @@ try {
     .waitFor();
 } finally {
   await integrationUnavailableApp.close();
+}
+
+const scheduledUnavailableScene = {
+  currentSidebar: true,
+  frame: "scheduled-current-26-825-unavailable",
+  id: "electron-current-scheduled-unavailable",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "automations",
+};
+const {
+  app: scheduledUnavailableApp,
+  page: scheduledUnavailablePage,
+} = await launchScene(scheduledUnavailableScene, { capture: false });
+try {
+  await scheduledUnavailablePage
+    .locator('.codex-ui-scheduled-tasks[data-status="unavailable"]')
+    .waitFor();
+  await scheduledUnavailablePage.getByRole("button", { name: "Retry" }).click();
+  await scheduledUnavailablePage
+    .locator('.codex-ui-scheduled-tasks[data-status="ready"][data-action="retry"]')
+    .waitFor();
+} finally {
+  await scheduledUnavailableApp.close();
 }
 
 const sidebarStatusScene = {

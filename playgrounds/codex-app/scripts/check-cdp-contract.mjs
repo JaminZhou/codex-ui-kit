@@ -8699,6 +8699,205 @@ for (const scene of selectedScenes) {
       continue;
     }
 
+    if (scene.id.startsWith("scheduled-current-26-825")) {
+      const compact = scene.id.endsWith("-compact");
+      const manual = scene.id.includes("-manual");
+      const scheduled = await page.evaluate(({ manual }) => {
+        const rect = (target) => {
+          if (!(target instanceof Element)) return null;
+          const bounds = target.getBoundingClientRect();
+          return {
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          };
+        };
+        const sidebar = document.querySelector(".codex-ui-app-shell__sidebar");
+        if (manual) {
+          const editor = document.querySelector(".codex-ui-scheduled-task-editor");
+          const navigator = document.querySelector(
+            ".codex-ui-scheduled-task-navigator",
+          );
+          return {
+            editor: rect(editor),
+            fieldLabels: Array.from(
+              editor?.querySelectorAll(
+                ".codex-ui-scheduled-task-editor__field > span:first-child",
+              ) ?? [],
+              (label) => label.textContent?.trim(),
+            ),
+            horizontalOverflow:
+              document.documentElement.scrollWidth -
+              document.documentElement.clientWidth,
+            name: rect(editor?.querySelector('input[aria-label="Name"]')),
+            navigator: rect(navigator),
+            prompt: rect(
+              editor?.querySelector('textarea[aria-label="Instructions"]'),
+            ),
+            search: rect(
+              navigator?.querySelector(
+                ".codex-ui-scheduled-tasks__search",
+              ),
+            ),
+            sidebar: rect(sidebar),
+            submitDisabled:
+              editor
+                ?.querySelector(
+                  ".codex-ui-scheduled-task-editor__footer button",
+                )
+                ?.hasAttribute("disabled") ?? null,
+            viewport: { height: innerHeight, width: innerWidth },
+          };
+        }
+        const root = document.querySelector(".codex-ui-scheduled-tasks");
+        return {
+          description: root
+            ?.querySelector(".codex-ui-scheduled-tasks__intro p")
+            ?.textContent?.trim(),
+          filters: Array.from(
+            root?.querySelectorAll(
+              ".codex-ui-scheduled-task-filters [role=tab]",
+            ) ?? [],
+            (tab) => tab.textContent?.trim(),
+          ),
+          heading: rect(root?.querySelector("h1")),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          search: rect(
+            root?.querySelector(".codex-ui-scheduled-tasks__search"),
+          ),
+          sidebar: rect(sidebar),
+          status: root?.getAttribute("data-status"),
+          suggestionCount: root?.querySelectorAll(
+            ".codex-ui-scheduled-tasks__suggestion",
+          ).length,
+          suggestionTitles: Array.from(
+            root?.querySelectorAll(
+              ".codex-ui-scheduled-tasks__suggestion-title",
+            ) ?? [],
+            (title) => title.firstChild?.textContent?.trim(),
+          ),
+          taskCount: root?.querySelectorAll(
+            ".codex-ui-scheduled-tasks__task",
+          ).length,
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      }, { manual });
+      if (
+        Math.abs(scheduled.horizontalOverflow) > 1 ||
+        scheduled.viewport.width !== (compact ? 720 : 1180) ||
+        scheduled.viewport.height !== 820 ||
+        (compact
+          ? scheduled.sidebar !== null && scheduled.sidebar.width > 1
+          : !scheduled.sidebar ||
+            Math.abs(scheduled.sidebar.width - 321.875) > 1)
+      ) {
+        throw new Error(
+          `${scene.id}: scheduled shell geometry failed: ${JSON.stringify(scheduled)}`,
+        );
+      }
+      if (manual) {
+        if (
+          !scheduled.navigator ||
+          !scheduled.editor ||
+          !scheduled.search ||
+          !scheduled.name ||
+          !scheduled.prompt ||
+          Math.abs(scheduled.navigator.width - (compact ? 374 : 437.125)) > 1.5 ||
+          Math.abs(scheduled.editor.width - (compact ? 346 : 420)) > 1.5 ||
+          Math.abs(scheduled.search.left - (compact ? 21 : 342.875)) > 1 ||
+          Math.abs(scheduled.search.top - 66) > 1 ||
+          Math.abs(scheduled.name.top - 46) > 1 ||
+          scheduled.submitDisabled !== true ||
+          JSON.stringify(scheduled.fieldLabels) !==
+            JSON.stringify([
+              "Runs on",
+              "Runs in",
+              "Chat",
+              "Repeat",
+              "At",
+              "Notifications",
+            ])
+        ) {
+          throw new Error(
+            `${scene.id}: scheduled editor geometry failed: ${JSON.stringify(scheduled)}`,
+          );
+        }
+      } else {
+        if (
+          scheduled.status !== "ready" ||
+          scheduled.description !==
+            "Ask ChatGPT to schedule tasks, set reminders, or monitor for updates" ||
+          JSON.stringify(scheduled.filters) !==
+            JSON.stringify(["All", "Active", "Paused", "Completed"]) ||
+          scheduled.taskCount !== 2 ||
+          scheduled.suggestionCount !== 3 ||
+          JSON.stringify(scheduled.suggestionTitles) !==
+            JSON.stringify(["Daily brief", "Weekly review", "Follow-up monitor"]) ||
+          !scheduled.heading ||
+          Math.abs(scheduled.heading.left - (compact ? 29 : 395.4375)) > 1 ||
+          Math.abs(scheduled.heading.top - 66) > 1 ||
+          !scheduled.search ||
+          Math.abs(scheduled.search.left - (compact ? 21 : 387.4375)) > 1 ||
+          Math.abs(scheduled.search.top - 151.59375) > 1 ||
+          Math.abs(scheduled.search.width - (compact ? 679 : 728)) > 1
+        ) {
+          throw new Error(
+            `${scene.id}: scheduled page geometry failed: ${JSON.stringify(scheduled)}`,
+          );
+        }
+        if (!compact) {
+          const search = page.getByPlaceholder("Search scheduled tasks");
+          await search.fill("no-match-26-825");
+          await page.getByText("No scheduled tasks found", { exact: true }).waitFor();
+          await search.fill("");
+          await page.getByRole("tab", { name: "Active" }).click();
+          if ((await page.locator(".codex-ui-scheduled-tasks__task").count()) !== 2) {
+            throw new Error(`${scene.id}: active filter did not retain active rows.`);
+          }
+          await page
+            .getByRole("button", { name: "Create scheduled task options" })
+            .click();
+          const createChoices = await page
+            .getByRole("menu", { name: "Create scheduled task" })
+            .getByRole("menuitem")
+            .allTextContents();
+          if (
+            JSON.stringify(createChoices.map((value) => value.trim())) !==
+            JSON.stringify(["Create with Codex", "Set up manually"])
+          ) {
+            throw new Error(
+              `${scene.id}: create menu contract failed: ${JSON.stringify(createChoices)}`,
+            );
+          }
+          await page.getByRole("menuitem", { name: "Set up manually" }).click();
+          await page.getByRole("region", { name: "Scheduled task editor" }).waitFor();
+          await page.getByRole("button", { name: "Runs on: device" }).click();
+          await page.getByRole("menuitemradio", { name: "Cloud" }).click();
+          await page.waitForFunction(
+            () =>
+              document
+                .querySelector('[data-testid="current-scheduled-route"]')
+                ?.getAttribute("data-action") === "field:runs-on:cloud",
+          );
+          await page.getByRole("button", { name: "Cancel" }).click();
+          await page.getByRole("heading", { name: "Scheduled tasks" }).waitFor();
+          scheduled.interactions = {
+            createChoices: createChoices.map((value) => value.trim()),
+            finalAction: "cancel-editor",
+            searchEmpty: true,
+          };
+        }
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(scheduled, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.id.startsWith("integration-")) {
       const expectedKind = scene.id.includes("skills") ? "skills" : "plugins";
       const compact = scene.id.endsWith("-compact");
@@ -17757,6 +17956,50 @@ try {
   });
 } finally {
   await currentIntegrationUnavailableApp.close();
+}
+
+const currentScheduledUnavailableScene = {
+  currentSidebar: true,
+  frame: "scheduled-current-26-825-unavailable",
+  id: "scheduled-current-26-825-unavailable",
+  scenario: "workspace-workflow",
+  theme: "dark",
+  view: "automations",
+};
+const {
+  app: currentScheduledUnavailableApp,
+  page: currentScheduledUnavailablePage,
+} = await launchScene(currentScheduledUnavailableScene, { capture: false });
+try {
+  const unavailable = await currentScheduledUnavailablePage
+    .locator(".codex-ui-scheduled-tasks")
+    .evaluate((root) => ({
+      description: root
+        .querySelector(".codex-ui-scheduled-tasks__status p")
+        ?.textContent?.trim(),
+      heading: root
+        .querySelector(".codex-ui-scheduled-tasks__status h2")
+        ?.textContent?.trim(),
+      status: root.getAttribute("data-status"),
+    }));
+  await currentScheduledUnavailablePage
+    .getByRole("button", { name: "Retry" })
+    .click();
+  await currentScheduledUnavailablePage.waitForSelector(
+    '.codex-ui-scheduled-tasks[data-status="ready"][data-action="retry"]',
+  );
+  if (
+    unavailable.status !== "unavailable" ||
+    unavailable.heading !== "Scheduled tasks unavailable" ||
+    unavailable.description !==
+      "Scheduled tasks are disabled by your organization."
+  ) {
+    throw new Error(
+      `Current scheduled unavailable/retry contract failed: ${JSON.stringify(unavailable)}`,
+    );
+  }
+} finally {
+  await currentScheduledUnavailableApp.close();
 }
 
 const currentReviewInteractionScene = {

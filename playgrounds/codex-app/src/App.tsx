@@ -76,6 +76,11 @@ import {
   QueuedPromptList,
   ProjectIndex,
   SearchActivity,
+  ScheduledTaskCreateMenu,
+  ScheduledTaskEditor,
+  ScheduledTaskFilterTabs,
+  ScheduledTaskNavigator,
+  ScheduledTasksPage,
   SourceActivityList,
   SourceSearchActivity,
   SettingsShell,
@@ -133,6 +138,11 @@ import {
   type PersonalizationSettingsValue,
   type PlanSelectionCard,
   type QueuedPrompt,
+  type ScheduledTaskEditorField,
+  type ScheduledTaskFilter,
+  type ScheduledTaskItem,
+  type ScheduledTaskPageStatus,
+  type ScheduledTaskSuggestion,
   type SubagentItem,
   type WorktreeSetupPhase,
   type WorktreeSettingsValue,
@@ -694,6 +704,8 @@ function querySelection() {
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
+      : params.get("view") === "automations"
+        ? "automations"
       : params.get("view") === "plugins"
         ? "plugins"
       : params.get("view") === "projects"
@@ -2757,6 +2769,107 @@ const initialPersonalizationSettings: PersonalizationSettingsValue = {
   toolAssistedMemoryGeneration: true,
 };
 
+function CurrentScheduledGlyph({
+  name,
+}: {
+  name: "brief" | "follow-up" | "pause" | "review";
+}) {
+  if (name === "pause") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path d="M10 2.9032C14.3713 2.9032 17.915 6.4469 17.915 10.8182C17.915 15.1896 14.3713 18.7333 10 18.7333C5.62867 18.7333 2.08496 15.1896 2.08496 10.8182C2.08496 6.4469 5.62867 2.9032 10 2.9032ZM10 4.23328C6.3632 4.23328 3.41504 7.18144 3.41504 10.8182C3.41504 14.455 6.3632 17.4032 10 17.4032C13.6368 17.4032 16.585 14.455 16.585 10.8182C16.585 7.18144 13.6368 4.23328 10 4.23328Z" />
+        <path d="M10.625 7.91667C10.625 7.57149 10.9048 7.29167 11.25 7.29167H12.0833C12.4285 7.29167 12.7083 7.57149 12.7083 7.91667V12.0833C12.7083 12.4285 12.4285 12.7083 12.0833 12.7083H11.25C10.9048 12.7083 10.625 12.4285 10.625 12.0833V7.91667Z" />
+        <path d="M7.91667 7.29167C7.57149 7.29167 7.29167 7.57149 7.29167 7.91667V12.0833C7.29167 12.4285 7.57149 12.7083 7.91667 12.7083H8.75001C9.09518 12.7083 9.37501 12.4285 9.37501 12.0833V7.91667C9.37501 7.57149 9.09518 7.29167 8.75001 7.29167H7.91667Z" />
+      </svg>
+    );
+  }
+  if (name === "brief") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path d="M10.0004 2.04327C13.4217 2.04346 16.2944 4.61966 16.6655 8.02081L17.227 13.1712L17.2358 13.3353C17.2361 14.1509 16.5738 14.8312 15.7377 14.8314H13.9018C13.5034 16.6195 11.9085 17.9562 10.0004 17.9564C8.09213 17.9564 6.49643 16.6196 6.09808 14.8314H4.26214C3.37065 14.8311 2.67643 14.0575 2.77288 13.1712L3.3344 8.02081L3.37737 7.70441C3.88652 4.46108 6.68591 2.04327 10.0004 2.04327ZM7.48089 14.8314C7.8428 15.8758 8.83285 16.6263 10.0004 16.6263C11.1678 16.6261 12.1571 15.8756 12.519 14.8314H7.48089ZM10.0004 3.37335C7.34338 3.37335 5.09898 5.31146 4.69085 7.91144L4.65667 8.16534L4.09515 13.3148C4.08429 13.4142 4.16215 13.501 4.26214 13.5013H15.7377C15.8252 13.5012 15.8956 13.4351 15.9047 13.3519V13.3148L15.3432 8.16534C15.0458 5.43887 12.743 3.37354 10.0004 3.37335Z" />
+      </svg>
+    );
+  }
+  if (name === "review") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 20 20">
+        <path d="M15.5847 6.59094C15.5847 5.8799 15.5847 5.38657 15.5534 5.00305C15.5304 4.7211 15.4926 4.53159 15.4411 4.38782L15.3854 4.25794C15.2315 3.95582 14.9971 3.7028 14.7097 3.52649L14.5827 3.45618C14.4247 3.37572 14.2132 3.3189 13.8376 3.28821C13.4541 3.25689 12.9606 3.25598 12.2497 3.25598H7.74969C7.03883 3.25598 6.54527 3.25688 6.1618 3.28821C5.8805 3.31121 5.69117 3.34822 5.54755 3.39954L5.41669 3.45618C5.11465 3.61015 4.86247 3.84453 4.68622 4.13196L4.61493 4.25794C4.53444 4.41594 4.47766 4.6274 4.44696 5.00305C4.42353 5.28987 4.4193 5.63813 4.41766 6.0929H4.58368C4.9508 6.09307 5.24872 6.39077 5.24872 6.75794C5.24854 7.12495 4.95069 7.4228 4.58368 7.42297H4.41473V9.4259H4.58368L4.71747 9.43958C5.02044 9.50163 5.24872 9.76962 5.24872 10.0909C5.24872 10.4123 5.02044 10.6803 4.71747 10.7423L4.58368 10.756H4.41473V12.7589H4.58368C4.95069 12.7591 5.24854 13.0569 5.24872 13.424C5.24872 13.7911 4.9508 14.0888 4.58368 14.089H4.41766C4.4193 14.5438 4.42353 14.892 4.44696 15.1788C4.47766 15.5545 4.53444 15.766 4.61493 15.924L4.68622 16.0499C4.86247 16.3374 5.11465 16.5717 5.41669 16.7257L5.54755 16.7823C5.69117 16.8337 5.8805 16.8707 6.1618 16.8937C6.54526 16.925 7.03883 16.9259 7.74969 16.9259H12.2497C12.9606 16.9259 13.4541 16.925 13.8376 16.8937C14.2132 16.863 14.4247 16.8062 14.5827 16.7257L14.7097 16.6554C14.9971 16.4791 15.2315 16.2261 15.3854 15.924L15.4411 15.7941C15.4926 15.6503 15.5304 15.4608 15.5534 15.1788C15.5847 14.7953 15.5847 14.302 15.5847 13.5909V6.59094ZM10.4997 9.1759C10.867 9.1759 11.1647 9.47368 11.1647 9.84094C11.1647 10.2082 10.867 10.506 10.4997 10.506H7.99969C7.63254 10.5058 7.33466 10.2081 7.33466 9.84094C7.33466 9.47376 7.63254 9.17604 7.99969 9.1759H10.4997ZM11.9997 6.0929L12.1335 6.10657C12.4367 6.16843 12.6647 6.43644 12.6647 6.75794C12.6646 7.07933 12.4367 7.34751 12.1335 7.4093L11.9997 7.42297H7.99969C7.63265 7.42284 7.33483 7.12497 7.33466 6.75794C7.33466 6.39075 7.63254 6.09303 7.99969 6.0929H11.9997ZM16.9147 13.5909C16.9147 14.28 16.9154 14.837 16.8786 15.2872C16.8459 15.6879 16.7807 16.0486 16.6364 16.3849L16.57 16.5275C16.3045 17.0486 15.9008 17.4851 15.405 17.7892L15.1872 17.9113C14.8104 18.1032 14.404 18.1824 13.946 18.2198C13.4958 18.2566 12.9387 18.256 12.2497 18.256H7.74969C7.06075 18.256 6.50358 18.2566 6.05341 18.2198C5.65278 18.1871 5.29203 18.1219 4.95575 17.9777L4.81317 17.9113C4.29224 17.6458 3.85652 17.2418 3.55243 16.7462L3.43036 16.5275C3.23846 16.1508 3.15919 15.7451 3.12177 15.2872C3.09429 14.9509 3.0892 14.555 3.08759 14.089H2.91669C2.54942 14.089 2.25165 13.7912 2.25165 13.424C2.25182 13.0568 2.54953 12.7589 2.91669 12.7589H3.08466V10.756H2.91669C2.54942 10.756 2.25165 10.4582 2.25165 10.0909C2.25165 9.72367 2.54942 9.4259 2.91669 9.4259H3.08466V7.42297H2.91669C2.54953 7.42297 2.25182 7.12506 2.25165 6.75794C2.25165 6.39067 2.54942 6.0929 2.91669 6.0929H3.08759C3.0892 5.62692 3.09429 5.23098 3.12177 4.89465C3.15919 4.43678 3.23846 4.03109 3.43036 3.65442L3.55243 3.43567C3.85652 2.94009 4.29224 2.53606 4.81317 2.27063L4.95575 2.20422C5.29203 2.05994 5.65278 1.9948 6.05341 1.96204C6.50358 1.92526 7.06075 1.9259 7.74969 1.9259H12.2497C12.9387 1.9259 13.4958 1.92527 13.946 1.96204C14.404 1.99946 14.8104 2.07866 15.1872 2.27063L15.405 2.3927C15.9008 2.6968 16.3045 3.1333 16.57 3.65442L16.6364 3.797C16.7807 4.13332 16.8459 4.49397 16.8786 4.89465C16.9154 5.3449 16.9147 5.90185 16.9147 6.59094V13.5909Z" />
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20">
+      <path d="M13.75 10.76c.707 0 1.357.177 1.95.53.6.347 1.073.82 1.42 1.42.353.593.53 1.243.53 1.95 0 .713-.177 1.37-.53 1.97l-.012.018L18.4 17.94c.087.08.144.18.17.3.034.12.034.24 0 .36a.62.62 0 0 1-.49.48.625.625 0 0 1-.35 0 .622.622 0 0 1-.31-.17l-1.217-1.217a4.007 4.007 0 0 1-.503.347 3.741 3.741 0 0 1-1.95.53c-.713 0-1.37-.177-1.97-.53a3.942 3.942 0 0 1-1.42-1.41 3.868 3.868 0 0 1-.52-1.97 3.8 3.8 0 0 1 .52-1.95 3.92 3.92 0 0 1 1.42-1.42c.6-.353 1.257-.53 1.97-.53Zm0 1.37a2.521 2.521 0 0 0-2.2 1.26c-.227.387-.34.81-.34 1.27a2.52 2.52 0 0 0 1.26 2.2c.386.227.813.34 1.28.34a2.538 2.538 0 0 0 2.19-1.26c.227-.393.34-.823.34-1.29 0-.453-.113-.873-.34-1.26a2.538 2.538 0 0 0-2.19-1.26Z" />
+      <path d="M12.06 2.26c.406 0 .766.067 1.08.2.313.127.61.333.89.62l2.08 2.08c.287.28.494.577.62.89.134.313.2.673.2 1.08v2.15a.648.648 0 0 1-.1.35.749.749 0 0 1-.25.25.705.705 0 0 1-.69 0 .896.896 0 0 1-.25-.25.702.702 0 0 1-.09-.35V8.07h-2.41c-.407 0-.763-.083-1.07-.25a1.735 1.735 0 0 1-.71-.71 2.207 2.207 0 0 1-.25-1.07V3.63H6.23c-.34 0-.647.077-.92.23a1.641 1.641 0 0 0-.64.64c-.147.267-.22.57-.22.91v9.18c0 .34.073.647.22.92.153.267.366.477.64.63.273.154.58.23.92.23h2.13c.127 0 .24.03.34.09a.64.64 0 0 1 .25.25.631.631 0 0 1 0 .68.644.644 0 0 1-.25.25c-.1.067-.213.1-.34.1H6.23c-.613 0-1.16-.133-1.64-.4a2.828 2.828 0 0 1-1.12-1.12c-.267-.48-.4-1.023-.4-1.63V5.41c0-.606.133-1.15.4-1.63a2.83 2.83 0 0 1 1.12-1.12c.48-.267 1.027-.4 1.64-.4h5.83Zm.42 3.78c0 .2.06.36.18.48s.28.18.48.18h2.354a1.044 1.044 0 0 0-.044-.12c-.06-.16-.164-.31-.31-.45l-2.08-2.08a1.44 1.44 0 0 0-.58-.363V6.04Z" />
+    </svg>
+  );
+}
+
+const currentScheduledTasks: readonly ScheduledTaskItem[] = [
+  {
+    actionIcon: <CurrentScheduledGlyph name="pause" />,
+    id: "workspace-brief",
+    nextRun: "Tomorrow",
+    schedule: "Weekdays at 8:00 AM",
+    status: "active",
+    title: "Workspace brief",
+  },
+  {
+    actionIcon: <CurrentScheduledGlyph name="pause" />,
+    id: "dependency-monitor",
+    nextRun: "Tomorrow",
+    schedule: "Weekdays at 9:00 AM",
+    status: "active",
+    title: "Dependency monitor",
+  },
+];
+
+const currentScheduledSuggestions: readonly ScheduledTaskSuggestion[] = [
+  {
+    description:
+      "Start each weekday with a summary of your calendar, unread email, and priorities",
+    icon: <CurrentScheduledGlyph name="brief" />,
+    id: "daily-brief",
+    schedule: "Weekdays at 8:00 AM",
+    title: "Daily brief",
+  },
+  {
+    description:
+      "Turn your recent work into a concise status update every Friday",
+    icon: <CurrentScheduledGlyph name="review" />,
+    id: "weekly-review",
+    schedule: "Fridays at 4:00 PM",
+    title: "Weekly review",
+  },
+  {
+    description:
+      "Review recent email and calendar activity and flag anything that needs your attention",
+    icon: <CurrentScheduledGlyph name="follow-up" />,
+    id: "follow-up-monitor",
+    schedule: "Weekdays at 9:00 AM",
+    title: "Follow-up monitor",
+  },
+];
+
+const currentScheduledTimeOptions = Array.from({ length: 96 }, (_, index) => {
+  const hour = Math.floor(index / 4);
+  const minute = (index % 4) * 15;
+  const value = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  const displayHour = hour % 12 || 12;
+  return {
+    label: `${displayHour}:${String(minute).padStart(2, "0")} ${hour < 12 ? "AM" : "PM"}`,
+    value,
+  };
+});
+
+const currentScheduledRepeatOptions = [
+  { label: "Interval", value: "interval" },
+  { label: "Daily", value: "daily" },
+  { label: "Weekdays", value: "weekdays" },
+  { label: "Weekly", value: "weekly" },
+  { label: "Custom", value: "custom" },
+] as const;
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const currentComposerControls26825Replay =
@@ -2818,6 +2931,44 @@ export function App() {
     );
   const [integrationCatalogAction, setIntegrationCatalogAction] =
     useState("");
+  const [scheduledFilter, setScheduledFilter] =
+    useState<ScheduledTaskFilter>(
+      initialSelection.frame?.endsWith("-paused")
+        ? "paused"
+        : initialSelection.frame?.endsWith("-completed")
+          ? "completed"
+          : "all",
+    );
+  const [scheduledQuery, setScheduledQuery] = useState(
+    initialSelection.frame?.includes("-empty") ||
+      initialSelection.frame?.includes("-manual")
+      ? "no-match-26-825"
+      : "",
+  );
+  const [scheduledStatus, setScheduledStatus] =
+    useState<ScheduledTaskPageStatus>(
+      initialSelection.frame?.endsWith("-loading")
+        ? "loading"
+        : initialSelection.frame?.endsWith("-error")
+          ? "error"
+          : initialSelection.frame?.endsWith("-unavailable")
+            ? "unavailable"
+            : "ready",
+    );
+  const [scheduledEditorOpen, setScheduledEditorOpen] = useState(
+    initialSelection.frame?.includes("-manual") ?? false,
+  );
+  const [scheduledAction, setScheduledAction] = useState("");
+  const [scheduledName, setScheduledName] = useState("");
+  const [scheduledPrompt, setScheduledPrompt] = useState("");
+  const [scheduledFieldValues, setScheduledFieldValues] = useState({
+    at: "09:00",
+    chat: "new-chat",
+    notifications: "important",
+    repeat: "daily",
+    runsIn: "existing-chat",
+    runsOn: "device",
+  });
   const [routeHistory, setRouteHistory] = useState(() =>
     createDemoRouteHistory(
       initialSelection.view,
@@ -5733,7 +5884,8 @@ export function App() {
         usesCurrent26825ThreadHeader ||
         isCurrentCitations26825Replay ||
         isCurrentPullRequestRouteReplay ||
-        view === "plugins" ? (
+        view === "plugins" ||
+        view === "automations" ? (
           <>
             <AppSidebarItem
               leading={<SidebarGlyph name="pull-request" />}
@@ -5747,7 +5899,14 @@ export function App() {
             >
               Pull requests
             </AppSidebarItem>
-            <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
+            <AppSidebarItem
+              leading={<SidebarGlyph name="automation" />}
+              onClick={() => {
+                setView("automations");
+                dismissSidebarAfterNavigation();
+              }}
+              selected={view === "automations"}
+            >
               Scheduled
             </AppSidebarItem>
             <AppSidebarItem
@@ -5781,7 +5940,13 @@ export function App() {
           <AppSidebarItem leading={<SidebarGlyph name="sites" />}>
             Sites
           </AppSidebarItem>
-          <AppSidebarItem leading={<SidebarGlyph name="automation" />}>
+          <AppSidebarItem
+            leading={<SidebarGlyph name="automation" />}
+            onClick={() => {
+              setView("automations");
+              dismissSidebarAfterNavigation();
+            }}
+          >
             Scheduled
           </AppSidebarItem>
           <AppSidebarItem
@@ -10085,6 +10250,143 @@ export function App() {
         }
       />
     </div>
+  );
+
+  const scheduledDetailsFields: readonly ScheduledTaskEditorField[] = [
+    {
+      id: "runs-on",
+      label: "Runs on",
+      options: [
+        { label: "This device", value: "device" },
+        { label: "Cloud", value: "cloud" },
+      ],
+      value: scheduledFieldValues.runsOn === "device" ? "This device" : "Cloud",
+      valueText: scheduledFieldValues.runsOn,
+    },
+    {
+      id: "runs-in",
+      label: "Runs in",
+      options: [
+        { label: "New chat", value: "new-chat" },
+        { label: "Existing chat", value: "existing-chat" },
+      ],
+      value:
+        scheduledFieldValues.runsIn === "new-chat" ? "New chat" : "Existing chat",
+      valueText: scheduledFieldValues.runsIn,
+    },
+    {
+      id: "chat",
+      label: "Chat",
+      value: "New chat",
+      valueText: scheduledFieldValues.chat,
+    },
+  ];
+  const scheduledFrequencyFields: readonly ScheduledTaskEditorField[] = [
+    {
+      id: "repeat",
+      label: "Repeat",
+      options: currentScheduledRepeatOptions,
+      value:
+        currentScheduledRepeatOptions.find(
+          ({ value }) => value === scheduledFieldValues.repeat,
+        )?.label ?? "Daily",
+      valueText: scheduledFieldValues.repeat,
+    },
+    {
+      id: "at",
+      label: "At",
+      options: currentScheduledTimeOptions,
+      value:
+        currentScheduledTimeOptions.find(
+          ({ value }) => value === scheduledFieldValues.at,
+        )?.label ?? "9:00 AM",
+      valueText: scheduledFieldValues.at,
+    },
+    {
+      id: "notifications",
+      label: "Notifications",
+      options: [
+        { label: "Important updates", value: "important" },
+        { label: "Failed runs only", value: "failed-only" },
+      ],
+      value:
+        scheduledFieldValues.notifications === "important"
+          ? "Important updates"
+          : "Failed runs only",
+      valueText: scheduledFieldValues.notifications,
+    },
+  ];
+  const scheduledTasksRoute = scheduledEditorOpen ? (
+    <div
+      className="demo-current-scheduled-route demo-current-scheduled-route--editor"
+      data-action={scheduledAction || undefined}
+      data-testid="current-scheduled-route"
+    >
+      <div className="demo-current-scheduled-split">
+        <ScheduledTaskNavigator
+          activeFilter={scheduledFilter}
+          onQueryChange={setScheduledQuery}
+          onTaskOpen={(task) => setScheduledAction(`open:${task.id}`)}
+          onTaskToggle={(task) => setScheduledAction(`toggle:${task.id}`)}
+          query={scheduledQuery}
+          tasks={currentScheduledTasks}
+        />
+        <ScheduledTaskEditor
+          detailsFields={scheduledDetailsFields}
+          frequencyFields={scheduledFrequencyFields}
+          name={scheduledName}
+          onFieldChange={(field, value) => {
+            const fieldKey =
+              field.id === "runs-on"
+                ? "runsOn"
+                : field.id === "runs-in"
+                  ? "runsIn"
+                  : field.id;
+            setScheduledFieldValues((current) => ({
+              ...current,
+              [fieldKey]: value,
+            }));
+            setScheduledAction(`field:${field.id}:${value}`);
+          }}
+          onNameChange={setScheduledName}
+          onPromptChange={setScheduledPrompt}
+          onSubmit={() => setScheduledAction("submit")}
+          prompt={scheduledPrompt}
+        />
+      </div>
+    </div>
+  ) : (
+    <ScheduledTasksPage
+      activeFilter={scheduledFilter}
+      className="demo-current-scheduled-route"
+      data-action={scheduledAction || undefined}
+      data-testid="current-scheduled-route"
+      onFilterChange={setScheduledFilter}
+      onQueryChange={setScheduledQuery}
+      onRetry={() => {
+        setScheduledAction("retry");
+        setScheduledStatus("ready");
+      }}
+      onSuggestionAdd={(suggestion) =>
+        setScheduledAction(`add:${suggestion.id}`)
+      }
+      onSuggestionOpen={(suggestion) =>
+        setScheduledAction(`suggestion:${suggestion.id}`)
+      }
+      onTaskOpen={(task) => setScheduledAction(`open:${task.id}`)}
+      onTaskToggle={(task) => setScheduledAction(`toggle:${task.id}`)}
+      query={scheduledQuery}
+      status={scheduledStatus}
+      statusDescription={
+        scheduledStatus === "unavailable"
+          ? "Scheduled tasks are disabled by your organization."
+          : scheduledStatus === "error"
+            ? "Check your connection and try again."
+            : undefined
+      }
+      suggestions={currentScheduledSuggestions}
+      tasks={currentScheduledTasks}
+    />
   );
 
   const activeIntegrationScope =
@@ -14461,6 +14763,7 @@ export function App() {
           currentSidebarWorktreeLifecycle ||
           currentContext26825Replay ||
           currentTerminal26825Frame(activeFrame) ||
+          view === "automations" ||
           view === "plugins" ||
           isCurrentRichMarkdownStreamingReplay ||
           usesCurrent26825ThreadHeader ||
@@ -14484,6 +14787,7 @@ export function App() {
         sidebarResizable
         windowChrome={
           view === "projects" ||
+          view === "automations" ||
           view === "plugins" ||
           view === "shell" ||
           view === "workspace" ? (
@@ -14492,6 +14796,8 @@ export function App() {
               className={
                 view === "plugins"
                   ? "demo-current-integration-window-chrome"
+                  : view === "automations"
+                    ? "demo-current-scheduled-window-chrome"
                   : undefined
               }
               backAction={
@@ -14555,6 +14861,30 @@ export function App() {
                       Add <CurrentIntegrationHeaderGlyph name="chevron" />
                     </Button>
                   </>
+                ) : view === "automations" ? (
+                  scheduledEditorOpen ? (
+                    <button
+                      aria-label="Cancel"
+                      className="demo-current-scheduled-cancel"
+                      onClick={() => {
+                        setScheduledEditorOpen(false);
+                        setScheduledAction("cancel-editor");
+                      }}
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  ) : (
+                    <ScheduledTaskCreateMenu
+                      onCreateWithCodex={() =>
+                        setScheduledAction("create-with-codex")
+                      }
+                      onManualSetup={() => {
+                        setScheduledAction("manual-setup");
+                        setScheduledEditorOpen(true);
+                      }}
+                    />
+                  )
                 ) : undefined
               }
               forwardAction={
@@ -14584,6 +14914,11 @@ export function App() {
                       setIntegrationCatalogAction(`tab:${kind}`);
                     }}
                   />
+                ) : view === "automations" && scheduledEditorOpen ? (
+                  <ScheduledTaskFilterTabs
+                    active={scheduledFilter}
+                    onChange={setScheduledFilter}
+                  />
                 ) : undefined
               }
             />
@@ -14595,6 +14930,8 @@ export function App() {
           pullRequestIndex
         ) : view === "projects" ? (
           projectsRoute
+        ) : view === "automations" ? (
+          scheduledTasksRoute
         ) : view === "plugins" ? (
           integrationCatalogRoute
         ) : view === "shell" ? (

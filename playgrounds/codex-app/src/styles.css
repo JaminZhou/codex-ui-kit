@@ -8213,6 +8213,64 @@ textarea {
   margin-inline-start: 0;
 }
 
+.demo-current-scheduled-route {
+  border-inline-start: 1px solid var(--codex-ui-border);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.demo-current-scheduled-route--editor {
+  overflow: hidden;
+}
+
+.demo-current-scheduled-split {
+  display: grid;
+  grid-template-columns: minmax(23.375rem, 1fr) minmax(21.625rem, 26.25rem);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.demo-current-scheduled-window-chrome
+  .codex-ui-scheduled-task-filters {
+  margin-block-start: 0;
+  padding-inline: 0;
+}
+
+.demo-current-scheduled-cancel {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.78125rem;
+  color: color-mix(in srgb, var(--codex-ui-text) 50%, transparent);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 1.125rem;
+  height: 1.75rem;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.demo-current-scheduled-route .codex-ui-scheduled-tasks__suggestion-icon {
+  color: #83a9ff;
+}
+
+.demo-current-scheduled-route
+  .codex-ui-scheduled-tasks__suggestion:nth-child(2)
+  .codex-ui-scheduled-tasks__suggestion-icon {
+  color: #b79cff;
+}
+
+.demo-current-scheduled-route
+  .codex-ui-scheduled-tasks__suggestion:nth-child(3)
+  .codex-ui-scheduled-tasks__suggestion-icon {
+  color: #61bc8b;
+}
+
 @media (max-width: 45rem) {
   .demo-current-integration-window-chrome .codex-ui-integration-catalog-tabs {
     margin-inline-start: 0.875rem;
