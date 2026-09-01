@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01T16:05:06.606Z",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "existing-thread-navigation-and-native-menu-open-dismiss-only"
+  },
+  "threadOverflow": {
+    "menuLayer": "native-macos-menu",
+    "rendererMenuCountAfterOpen": 0,
+    "wide": {
+      "viewport": { "width": 1180, "height": 820 },
+      "trigger": { "left": 515.109375, "top": 9, "width": 28, "height": 28 },
+      "triggerBackground": "transparent",
+      "triggerBorderRadius": 10,
+      "triggerPadding": 4
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "trigger": { "left": 406.515625, "top": 9, "width": 28, "height": 28 },
+      "triggerBackground": "transparent",
+      "triggerBorderRadius": 10,
+      "triggerPadding": 4
+    },
+    "nativeMenu": {
+      "approximateVisibleBounds": { "width": 243, "height": 282 },
+      "reviewedTightCrop": { "width": 244, "height": 279 },
+      "items": [
+        { "label": "Pin", "shortcut": "⌥⌘P" },
+        { "label": "Rename", "shortcut": "⌥⌘R" },
+        { "label": "Archive", "shortcut": "⇧⌘A" },
+        { "separator": true },
+        { "label": "Share" },
+        { "label": "Copy", "submenu": true },
+        { "separator": true },
+        { "label": "New side chat", "shortcut": "⌥⌘S" },
+        { "label": "Fork", "submenu": true },
+        { "label": "Add scheduled task…" },
+        { "separator": true },
+        { "label": "Open in", "submenu": true },
+        { "label": "Open in new window" }
+      ]
+    }
+  },
+  "productPixelRatios": {
+    "maximum": 0.095,
+    "comparisonThreshold": 0.1,
+    "wideNativeMenuTightCrop": 0.09028145014395675,
+    "compactNativeMenuTightCrop": 0.08964980316117281,
+    "dynamicMasks": []
+  },
+  "localOnlyScreenshots": [
+    {
+      "name": "thread-actions-wide-desktop.png",
+      "sha256": "8247576f133536bf49801ad4e5ba36ee75d8fcfe0224d75addd3d8f5e887ca8b"
+    },
+    {
+      "name": "thread-actions-native-menu-crop.png",
+      "sha256": "9de35eb6f290749cecb961c0aee122b3953a74a1edc659128bfe63241d7157a3"
+    },
+    {
+      "name": "thread-actions-compact-desktop.png",
+      "sha256": "9652ba75dd4dce1a2afa39af822eb96b65e9eb77961e00a968b87c13456e40a5"
+    },
+    {
+      "name": "thread-actions-native-menu-tight-crop.png",
+      "sha256": "4b0f984a51ac0e550f57ac0ee163f107aba4043fe48d6e1297f90029c1ade837"
+    },
+    {
+      "name": "thread-trigger-wide.png",
+      "sha256": "4fcdcb0fb48b727d700cbd0994ce007271054d9414185c1837f1b27aedb69856"
+    },
+    {
+      "name": "thread-trigger-compact.png",
+      "sha256": "a4dfdff02a44990bddddb88ad277bbc373bdb6b6147fd9ecddbc63973299622a"
+    }
+  ],
+  "remainingBoundary": [
+    "native Copy Fork and Open in submenu contents",
+    "real pin rename archive share fork schedule and open effects",
+    "disabled action variants",
+    "light theme native menu",
+    "keyboard-only native menu opening"
+  ]
+}

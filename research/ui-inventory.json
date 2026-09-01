@@ -805,12 +805,19 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": [
-        "thread-overflow-menu"
+        "thread-overflow-menu",
+        "replay:current-26.825-controlled-thread-overflow-menu-host-owned-submenus-and-effects",
+        "browser-cdp:current-26.825-wide-compact-menu-geometry-accessible-root-keyboard-focus-and-submenu-escape",
+        "electron:current-26.825-native-window-wide-compact-menu-geometry-and-keyboard-lifecycle",
+        "pixel:current-26.825-wide-compact-native-menu-tight-crop-under-9.5-percent"
       ],
-      "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.825.51511:native-macos-chat-actions-menu-wide-and-720-trigger-geometry-ten-actions-three-separators-and-zero-renderer-menu"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
       "priority": "p1"
     },
     {

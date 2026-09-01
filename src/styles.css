@@ -7780,6 +7780,74 @@
   margin-left: auto;
 }
 
+.codex-ui-thread-overflow-menu__trigger {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0.625rem;
+  color: var(--codex-ui-text-tertiary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 1.75rem;
+  justify-content: center;
+  padding: 0.25rem;
+  width: 1.75rem;
+}
+
+.codex-ui-thread-overflow-menu__trigger:hover,
+.codex-ui-thread-overflow-menu__trigger:focus-visible,
+.codex-ui-thread-overflow-menu__trigger[data-state="open"] {
+  background: var(--codex-ui-background-button-secondary-hover);
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-thread-overflow-menu__trigger:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.codex-ui-thread-overflow-menu__trigger > svg {
+  height: 1.3125rem;
+  width: 1.3125rem;
+}
+
+.codex-ui-thread-overflow-menu {
+  border-radius: 0.75rem;
+  min-width: 15.25rem;
+  padding: 0.25rem;
+  width: 15.25rem;
+}
+
+.codex-ui-thread-overflow-menu > .codex-ui-menu-item,
+.codex-ui-thread-overflow-menu > .codex-ui-menu-submenu-trigger {
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.3125rem;
+  min-height: 1.4375rem;
+  padding: 0.0625rem 0.625rem;
+}
+
+.codex-ui-thread-overflow-menu .codex-ui-menu-item__shortcut {
+  font-family: var(--codex-ui-font-sans);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.codex-ui-thread-overflow-menu
+  > .codex-ui-menu-submenu-trigger
+  > .codex-ui-menu-submenu-trigger__chevron {
+  margin-right: 0.25rem;
+}
+
+.codex-ui-thread-overflow-menu > .codex-ui-menu-separator {
+  margin: 0.25rem 0;
+}
+
+.codex-ui-thread-overflow-menu__submenu {
+  min-width: 12rem;
+}
+
 .codex-ui-menu__submenu > div {
   display: flex;
   flex-direction: column;

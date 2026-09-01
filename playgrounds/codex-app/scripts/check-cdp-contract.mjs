@@ -9206,6 +9206,173 @@ for (const scene of selectedScenes) {
       continue;
     }
 
+    if (scene.id.startsWith("thread-overflow-current-26-825-open")) {
+      const compact = scene.id.endsWith("-compact");
+      const closeTo = (actual, expected, tolerance = 1) =>
+        typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
+      const trigger = page.getByRole("button", { name: "Chat actions" });
+      const rootMenu = page.getByRole("menu", { name: "Chat actions" });
+      const overflow = await page.evaluate(() => {
+        const rect = (target) => {
+          if (!(target instanceof Element)) return null;
+          const bounds = target.getBoundingClientRect();
+          return {
+            bottom: bounds.bottom,
+            height: bounds.height,
+            left: bounds.left,
+            right: bounds.right,
+            top: bounds.top,
+            width: bounds.width,
+          };
+        };
+        const triggerNode = document.querySelector(
+          ".codex-ui-thread-overflow-menu__trigger",
+        );
+        const menuNode = document.querySelector(
+          '.codex-ui-thread-overflow-menu[role="menu"]',
+        );
+        const triggerStyle = triggerNode
+          ? getComputedStyle(triggerNode)
+          : null;
+        const menuStyle = menuNode ? getComputedStyle(menuNode) : null;
+        return {
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          itemLabels: menuNode
+            ? Array.from(
+                menuNode.querySelectorAll(":scope > [role=menuitem]"),
+                (item) =>
+                  item.querySelector(".codex-ui-menu-item__label")
+                    ?.textContent?.trim() ??
+                  item
+                    .querySelector(".codex-ui-menu-item__copy")
+                    ?.textContent?.trim(),
+              )
+            : [],
+          menu: rect(menuNode),
+          menuBackground: menuStyle?.backgroundColor,
+          menuBorderRadius: menuStyle?.borderRadius,
+          separators:
+            menuNode?.querySelectorAll(":scope > [role=separator]").length ??
+            0,
+          submenuLabels: menuNode
+            ? Array.from(
+                menuNode.querySelectorAll(
+                  ':scope > [role=menuitem][aria-haspopup="menu"]',
+                ),
+                (item) => item.textContent?.trim(),
+              )
+            : [],
+          trigger: rect(triggerNode),
+          triggerBackground: triggerStyle?.backgroundColor,
+          triggerBorderRadius: triggerStyle?.borderRadius,
+          triggerExpanded: triggerNode?.getAttribute("aria-expanded"),
+          triggerPadding: triggerStyle?.padding,
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const expectedItems = [
+        "Pin",
+        "Rename",
+        "Archive",
+        "Share",
+        "Copy",
+        "New side chat",
+        "Fork",
+        "Add scheduled task…",
+        "Open in",
+        "Open in new window",
+      ];
+      if (
+        overflow.viewport.width !== (compact ? 720 : 1180) ||
+        overflow.viewport.height !== (compact ? 680 : 820) ||
+        Math.abs(overflow.horizontalOverflow) > 1 ||
+        overflow.triggerExpanded !== "true" ||
+        !overflow.trigger ||
+        !closeTo(overflow.trigger.top, 9) ||
+        !closeTo(overflow.trigger.width, 28) ||
+        !closeTo(overflow.trigger.height, 28) ||
+        overflow.triggerBorderRadius !== "10px" ||
+        overflow.triggerPadding !== "4px" ||
+        !overflow.triggerBackground?.endsWith("/ 0.08)") ||
+        !overflow.menu ||
+        !closeTo(overflow.menu.width, 244) ||
+        overflow.menu.height < 276 ||
+        overflow.menu.height > 284 ||
+        !closeTo(overflow.menu.top, overflow.trigger.bottom + 4) ||
+        !closeTo(overflow.menu.right, overflow.trigger.right) ||
+        overflow.menuBorderRadius !== "12px" ||
+        overflow.separators !== 3 ||
+        JSON.stringify(overflow.itemLabels) !== JSON.stringify(expectedItems) ||
+        JSON.stringify(overflow.submenuLabels) !==
+          JSON.stringify(["Copy›", "Fork›", "Open in›"])
+      ) {
+        throw new Error(
+          `${scene.id}: current thread overflow geometry failed: ${JSON.stringify(overflow)}`,
+        );
+      }
+
+      await rootMenu.press("Escape");
+      await page.waitForFunction(
+        () =>
+          document.querySelectorAll(
+            '.codex-ui-thread-overflow-menu[role="menu"]',
+          ).length === 0,
+      );
+      await trigger.press("ArrowDown");
+      const pin = page.getByRole("menuitem", { name: /^Pin\s+⌥⌘P$/ });
+      await pin.waitFor();
+      await page.waitForFunction(
+        (element) => document.activeElement === element,
+        await pin.elementHandle(),
+      );
+      const copy = page.getByRole("menuitem", { name: "Copy" });
+      await copy.focus();
+      await copy.press("ArrowRight");
+      const copyMenu = page.getByRole("menu", { name: "Copy options" });
+      await copyMenu.waitFor();
+      if (
+        (await copyMenu.getByRole("menuitem").allTextContents())
+          .map((value) => value.trim())
+          .join("|") !== "Copy task link|Copy Markdown"
+      ) {
+        throw new Error(`${scene.id}: Copy submenu contract failed.`);
+      }
+      await copyMenu.press("Escape");
+      if (
+        (await rootMenu.count()) !== 1 ||
+        (await copy.getAttribute("aria-expanded")) !== "false"
+      ) {
+        throw new Error(
+          `${scene.id}: submenu Escape dismissed the root menu unexpectedly.`,
+        );
+      }
+      await rootMenu.press("Escape");
+      await page.waitForFunction(
+        () => document.activeElement?.getAttribute("aria-label") === "Chat actions",
+      );
+      await trigger.click();
+      await page.getByRole("menuitem", { name: /^Pin\s+⌥⌘P$/ }).click();
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector(".demo-current-thread-overflow-anchor")
+            ?.getAttribute("data-thread-overflow-action") === "pin",
+      );
+      overflow.interactions = {
+        action: "pin",
+        copySubmenu: ["Copy task link", "Copy Markdown"],
+        rootEscapeRestoredFocus: true,
+        submenuEscapeKeptRootOpen: true,
+      };
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(overflow, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (scene.id.startsWith("integration-skill-detail-current-26-825-")) {
       const compact = scene.id.endsWith("-compact");
       const tryNow = scene.id.endsWith("-try-now-compact");

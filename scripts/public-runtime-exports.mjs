@@ -157,6 +157,8 @@ export const publicRuntimeExports = [
   "ThreadLoadingState",
   "ThreadMessageNavigationRail",
   "ThreadNavigationControls",
+  "ThreadOverflowMenu",
+  "ThreadOverflowMenuOption",
   "ThreadRenderError",
   "ThreadSkeleton",
   "ThreadSummaryDelta",

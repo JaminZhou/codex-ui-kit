@@ -107,6 +107,8 @@ import {
   ThreadInterruptionSummary,
   ThreadFloatingButton,
   ThreadMessageNavigationRail,
+  ThreadOverflowMenu,
+  ThreadOverflowMenuOption,
   ThreadSummaryDelta,
   ThreadSummaryDock,
   ThreadSummaryIconButton,
@@ -3132,6 +3134,13 @@ export function App() {
   const [skillTryNowActive, setSkillTryNowActive] = useState(
     isCurrentSkillTryNowReplay,
   );
+  const isCurrentThreadOverflowReplay =
+    initialSelection.frame?.startsWith("thread-overflow-current-26-825") ??
+    false;
+  const [threadOverflowOpen, setThreadOverflowOpen] = useState(
+    initialSelection.frame === "thread-overflow-current-26-825-open",
+  );
+  const [threadOverflowAction, setThreadOverflowAction] = useState("");
   const [scheduledFilter, setScheduledFilter] =
     useState<ScheduledTaskFilter>(
       initialSelection.frame?.endsWith("-paused")
@@ -7239,7 +7248,85 @@ export function App() {
           : state.threadId ?? "Local app-server"
       }
       startActions={
-        usesCurrent26825ThreadHeader ||
+        isCurrentThreadOverflowReplay ? (
+          <span
+            className="demo-current-thread-overflow-anchor"
+            data-thread-overflow-action={threadOverflowAction || undefined}
+          >
+            <ThreadOverflowMenu
+              copySubmenu={
+                <>
+                  <ThreadOverflowMenuOption
+                    onSelect={() => setThreadOverflowAction("copy-task-link")}
+                  >
+                    Copy task link
+                  </ThreadOverflowMenuOption>
+                  <ThreadOverflowMenuOption
+                    onSelect={() => setThreadOverflowAction("copy-markdown")}
+                  >
+                    Copy Markdown
+                  </ThreadOverflowMenuOption>
+                </>
+              }
+              forkSubmenu={
+                <>
+                  <ThreadOverflowMenuOption
+                    onSelect={() => setThreadOverflowAction("fork-local")}
+                  >
+                    Local
+                  </ThreadOverflowMenuOption>
+                  <ThreadOverflowMenuOption
+                    onSelect={() => setThreadOverflowAction("fork-worktree")}
+                  >
+                    New worktree
+                  </ThreadOverflowMenuOption>
+                </>
+              }
+              icons={{
+                archive: <CurrentBuildIcon name="sidebar-archive" />,
+                copy: <CurrentBuildIcon name="thread-assistant-copy" />,
+                fork: <CurrentBuildIcon name="thread-assistant-fork" />,
+                newSideChat: <CurrentBuildIcon name="sidebar-quick-chat" />,
+                openIn: <CurrentBuildIcon name="review-open-in" />,
+                openInNewWindow: <CurrentBuildIcon name="review-open-tab" />,
+                pin: <CurrentBuildIcon name="sidebar-pin" />,
+                rename: <CurrentBuildIcon name="sidebar-project-menu-edit" />,
+                scheduledTask: <CurrentBuildIcon name="sidebar-scheduled" />,
+                share: <CurrentBuildIcon name="thread-header-share" />,
+                trigger: <CurrentBuildIcon name="thread-header-actions" />,
+              }}
+              onAddScheduledTask={() =>
+                setThreadOverflowAction("add-scheduled-task")
+              }
+              onArchive={() => setThreadOverflowAction("archive")}
+              onNewSideChat={() => setThreadOverflowAction("new-side-chat")}
+              onOpenChange={setThreadOverflowOpen}
+              onOpenInNewWindow={() =>
+                setThreadOverflowAction("open-in-new-window")
+              }
+              onPinChange={(pinned) =>
+                setThreadOverflowAction(pinned ? "pin" : "unpin")
+              }
+              onRename={() => setThreadOverflowAction("rename")}
+              onShare={() => setThreadOverflowAction("share")}
+              open={threadOverflowOpen}
+              openInSubmenu={
+                <>
+                  <ThreadOverflowMenuOption
+                    onSelect={() => setThreadOverflowAction("open-in-finder")}
+                  >
+                    Finder
+                  </ThreadOverflowMenuOption>
+                  <ThreadOverflowMenuOption
+                    onSelect={() => setThreadOverflowAction("open-in-terminal")}
+                  >
+                    Terminal
+                  </ThreadOverflowMenuOption>
+                </>
+              }
+            />
+          </span>
+        ) : usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
         isCurrentCitations26825Replay ? (
           <button

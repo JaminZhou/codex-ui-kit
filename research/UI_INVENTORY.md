@@ -272,7 +272,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 73 have current-build runtime evidence, 7 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 72 groups and Electron verification covers 72.
+Current inventory: 91 surface groups; 74 have current-build runtime evidence, 7 have previous-build-only runtime evidence, 10 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 73 groups and Electron verification covers 73.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -2176,6 +2176,36 @@ project context remain local-only.
 The `integrations.skills` row remains `partial`: persisted enable/disable,
 Open/Reveal/Copy effects, uninstall, prompt submission, successful execution,
 and failure/retry states remain open.
+
+## Current thread overflow actions slice
+
+An isolated same-build `26.825.51511` process reached the completed-thread
+`Chat actions` trigger at 1180×820 and 720×680. CDP records a transparent
+28×28 trigger at y=9 with 10px radius and 4px padding. Opening it mounts zero
+Renderer menus: the ten actions, three separators, three submenu indicators,
+and four observed shortcuts are owned by a native macOS menu. The reviewed
+native crop is 244×279px; its visible surface is approximately 243×282px.
+
+`ThreadOverflowMenu` and `ThreadOverflowMenuOption` reproduce the root
+composition while leaving icons, submenu contents, and every thread mutation
+host-controlled. Browser/CDP and native Electron verify wide/compact geometry,
+the accessible root menu, ArrowDown entry, ArrowRight submenu opening,
+submenu-only Escape, root Escape focus restoration, and callback-only Pin.
+Two reviewed replay baselines pass, and the unmasked native-menu tight-crop
+comparisons pass at 9.0281%/8.9650% under the explicit 9.5% native-vs-Renderer
+ceiling. Sanitized evidence is in
+`research/current-thread-overflow-26-825.json`; desktop frames, task content,
+and native-menu screenshots remain local-only.
+
+The `thread.overflow-actions` row is `partial`: native Copy/Fork/Open-in
+submenu contents, real effects, disabled variants, Light appearance, and
+keyboard-only native opening remain open.
+
+Cleanup stopped only isolated PID `24607` and its validated profile-owned
+processes, proved loopback port `9931` closed, and moved the exact profile plus
+raw OS evidence recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-thread-overflow-26-825-20260902-9931`
+and its `-evidence` sibling. User-owned Codex PID `13503` remained running.
 
 Cleanup stopped only isolated PID `88986` and its validated profile-owned
 processes, closed port `9924`, and moved the exact profile and raw evidence

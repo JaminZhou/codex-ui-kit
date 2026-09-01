@@ -3815,6 +3815,16 @@ textarea {
   width: 28px;
 }
 
+.demo-current-thread-overflow-anchor {
+  display: inline-flex;
+  transform: translateY(-0.5px);
+}
+
+.demo-current-thread-overflow-anchor
+  .codex-ui-thread-overflow-menu__trigger {
+  color: inherit;
+}
+
 .demo-current-basic-26-825-header-actions {
   align-items: center;
   display: flex;
