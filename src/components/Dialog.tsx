@@ -27,6 +27,7 @@ export interface DialogProps
   closeOnEscape?: boolean;
   description?: ReactNode;
   footer?: ReactNode;
+  headerActions?: ReactNode;
   initialFocusSelector?: string;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -92,6 +93,7 @@ export function Dialog({
   closeOnEscape = true,
   description,
   footer,
+  headerActions,
   initialFocusSelector,
   onOpenChange,
   open,
@@ -272,16 +274,21 @@ export function Dialog({
                   </div>
                 ) : null}
               </div>
-              {showClose ? (
-                <button
-                  aria-label={closeLabel}
-                  className="codex-ui-dialog__close"
-                  disabled={closeDisabled}
-                  onClick={() => onOpenChange(false)}
-                  type="button"
-                >
-                  {closeIcon ?? <span aria-hidden="true">×</span>}
-                </button>
+              {headerActions || showClose ? (
+                <div className="codex-ui-dialog__header-actions">
+                  {headerActions}
+                  {showClose ? (
+                    <button
+                      aria-label={closeLabel}
+                      className="codex-ui-dialog__close"
+                      disabled={closeDisabled}
+                      onClick={() => onOpenChange(false)}
+                      type="button"
+                    >
+                      {closeIcon ?? <span aria-hidden="true">×</span>}
+                    </button>
+                  ) : null}
+                </div>
               ) : null}
             </header>
             <div className="codex-ui-dialog__body">{children}</div>

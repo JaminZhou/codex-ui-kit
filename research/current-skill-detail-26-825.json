@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-01T14:13:40.627Z",
+  "baseline": {
+    "appAsarBytes": 284032150,
+    "appAsarSha256": "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+    "appVersion": "26.825.51511",
+    "buildNumber": "7377",
+    "chromiumVersion": "151.0.7922.174",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "navigation-menu-scroll-and-unsent-try-now-prefill-only"
+  },
+  "dialog": {
+    "wideViewport": { "width": 1180, "height": 820 },
+    "compactViewport": { "width": 720, "height": 680 },
+    "wide": { "left": 290, "top": 50, "width": 600, "height": 720 },
+    "compact": { "left": 60, "top": 0, "width": 600, "height": 680 },
+    "artwork": { "leftInset": 20, "topInset": 32, "width": 40, "height": 40 },
+    "title": {
+      "leftInset": 20,
+      "topInset": 84,
+      "height": 28,
+      "fontSize": 20,
+      "fontWeight": 600,
+      "lineHeight": 28
+    },
+    "wideInstructionScroller": {
+      "left": 311,
+      "top": 219,
+      "width": 558,
+      "height": 490,
+      "scrollHeight": 1527,
+      "bottomScrollTop": 1037
+    },
+    "compactInstructionScroller": {
+      "left": 81,
+      "top": 169,
+      "width": 558,
+      "height": 450,
+      "scrollHeight": 1527
+    },
+    "actions": {
+      "switch": { "role": "switch", "checked": true, "width": 32, "height": 28 },
+      "more": { "width": 28, "height": 28 },
+      "close": { "width": 24, "height": 24 },
+      "uninstall": { "width": 73.921875, "height": 28 },
+      "tryNow": { "width": 88.75, "height": 28 }
+    },
+    "actionsMenu": {
+      "left": 719,
+      "top": 100,
+      "width": 121.6875,
+      "height": 93.6875,
+      "items": ["Open", "Reveal in Finder", "Copy Markdown"]
+    },
+    "escapeOrder": ["dismiss-actions-menu", "dismiss-dialog"]
+  },
+  "tryNowDraft": {
+    "viewport": { "width": 720, "height": 680 },
+    "textbox": { "left": 28, "top": 580, "width": 664, "height": 44 },
+    "mention": { "left": 384.015625, "top": 600, "width": 109.140625, "height": 20 },
+    "addFiles": { "left": 24, "top": 628, "width": 28, "height": 28 },
+    "send": { "left": 668, "top": 628, "width": 28, "height": 28 },
+    "contentEditable": true,
+    "sendEnabled": true,
+    "submitted": false
+  },
+  "productPixelRatios": {
+    "maximum": 0.08,
+    "installedDialogChrome": 0.0064652778,
+    "installedContentFrame": 0.0013495721,
+    "actionsDialogChrome": 0.0086157407,
+    "actionsContentFrame": 0.0013495721,
+    "actionsMenu": 0.0011335891,
+    "bottomDialogChrome": 0.0081134259,
+    "bottomContentFrame": 0.0016714213,
+    "compactDialogChrome": 0.0055367647,
+    "compactContentFrame": 0.0000398248,
+    "tryNowComposerChrome": 0.007599915,
+    "dynamicMasks": [
+      "host-supplied skill artwork",
+      "host-supplied instruction prose",
+      "host-owned conversation content",
+      "inline mention artwork and text",
+      "control glyph interiors"
+    ]
+  },
+  "localOnlyScreenshots": [
+    {
+      "name": "skill-installed-wide.png",
+      "sha256": "9e36e2e7959882c2af40a26edbceddba0699cd8bcae760c199774642c622fd80"
+    },
+    {
+      "name": "skill-actions-wide.png",
+      "sha256": "e8760d0660d891e520b94203bc8d9ed84d29294a0a82cc4a99ae735821a02e4b"
+    },
+    {
+      "name": "skill-bottom-wide.png",
+      "sha256": "faac6e8343bfdf5c8c1b240e2271946a1c820319ecbe1b412d9ee558eca1da80"
+    },
+    {
+      "name": "skill-installed-compact.png",
+      "sha256": "e31e40115a7e7460469984cd3c16aafb0b5489f54114794f7ee0feb738a1a93f"
+    },
+    {
+      "name": "skill-try-now-compact.png",
+      "sha256": "9a55e5aa7fecef099c8d6a73b24a72140eea7acb0b6cbb0333427ff5007dee1a"
+    }
+  ],
+  "remainingBoundary": [
+    "persisted enable or disable",
+    "Open Reveal in Finder and Copy Markdown effects",
+    "real uninstall",
+    "prompt submission",
+    "successful skill execution and response",
+    "execution failure and retry states"
+  ]
+}

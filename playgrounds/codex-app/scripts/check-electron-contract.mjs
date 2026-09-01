@@ -969,6 +969,201 @@ for (const pluginDetailScene of visualScenes.filter(({ id }) =>
   }
 }
 
+for (const skillDetailScene of visualScenes.filter(({ id }) =>
+  [
+    "integration-skill-detail-current-26-825-installed",
+    "integration-skill-detail-current-26-825-actions",
+    "integration-skill-detail-current-26-825-bottom",
+    "integration-skill-detail-current-26-825-installed-compact",
+    "integration-skill-detail-current-26-825-try-now-compact",
+  ].includes(id),
+)) {
+  const { app: skillDetailApp, page: skillDetailPage } = await launchScene(
+    skillDetailScene,
+    { capture: false },
+  );
+  try {
+    const compact = skillDetailScene.id.endsWith("-compact");
+    const tryNow = skillDetailScene.id.endsWith("-try-now-compact");
+    const nativeBounds = await skillDetailApp.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+    );
+    const closeTo = (actual, expected, tolerance = 1) =>
+      typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
+    if (
+      nativeBounds?.width !== (compact ? 720 : 1180) ||
+      nativeBounds?.height !== (compact ? 680 : 820)
+    ) {
+      throw new Error(
+        `${skillDetailScene.id}: Electron native bounds failed: ${JSON.stringify(nativeBounds)}`,
+      );
+    }
+
+    if (tryNow) {
+      const draft = await skillDetailPage
+        .locator('[data-testid="current-skill-try-now"]')
+        .evaluate((root) => {
+          const rect = (target) => {
+            if (!(target instanceof Element)) return null;
+            const value = target.getBoundingClientRect();
+            return {
+              height: value.height,
+              left: value.left,
+              top: value.top,
+              width: value.width,
+            };
+          };
+          const textbox = root.querySelector(
+            '[role="textbox"][aria-label="Do anything"]',
+          );
+          return {
+            dialogCount: document.querySelectorAll('[role="dialog"]').length,
+            draft: rect(root),
+            mention: rect(root.querySelector(".codex-ui-skill-prompt-mention")),
+            submitted: root.getAttribute("data-submitted"),
+            textIncludesSkill:
+              textbox?.textContent?.includes("OpenAI Docs") ?? false,
+            textbox: rect(textbox),
+          };
+        });
+      if (
+        draft.dialogCount !== 0 ||
+        draft.submitted !== "false" ||
+        !draft.textIncludesSkill ||
+        !draft.draft ||
+        !closeTo(draft.draft.left, 24) ||
+        !closeTo(draft.draft.top, 576) ||
+        !closeTo(draft.draft.width, 672) ||
+        !closeTo(draft.draft.height, 84) ||
+        !draft.textbox ||
+        !closeTo(draft.textbox.left, 28) ||
+        !closeTo(draft.textbox.top, 580) ||
+        !closeTo(draft.textbox.height, 44) ||
+        !draft.mention ||
+        !closeTo(draft.mention.left, 384) ||
+        !closeTo(draft.mention.top, 600, 1.5)
+      ) {
+        throw new Error(
+          `${skillDetailScene.id}: Electron Try now draft failed: ${JSON.stringify(draft)}`,
+        );
+      }
+      continue;
+    }
+
+    const detail = await skillDetailPage
+      .locator('[data-testid="current-skill-detail"]')
+      .evaluate((root) => {
+        const rect = (target) => {
+          if (!(target instanceof Element)) return null;
+          const value = target.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const button = (label) =>
+          Array.from(root.querySelectorAll("button")).find(
+            (candidate) =>
+              (candidate.getAttribute("aria-label") ||
+                candidate.textContent?.trim()) === label,
+          );
+        const content = root.querySelector(".codex-ui-skill-detail__content");
+        return {
+          actions: {
+            close: rect(button("Close dialog")),
+            more: rect(button("More actions")),
+            tryNow: rect(button("Try now")),
+            uninstall: rect(button("Uninstall")),
+          },
+          artwork: rect(root.querySelector(".codex-ui-skill-detail__artwork")),
+          content: content
+            ? {
+                clientHeight: content.clientHeight,
+                rect: rect(content),
+                scrollHeight: content.scrollHeight,
+                scrollTop: content.scrollTop,
+              }
+            : null,
+          dialog: rect(root),
+          footer: rect(root.querySelector(".codex-ui-dialog__footer")),
+          menu: rect(root.querySelector('[role="menu"]')),
+          menuItems: Array.from(
+            root.querySelectorAll('[role="menuitem"]'),
+            (item) => item.textContent?.trim(),
+          ),
+          name: rect(root.querySelector(".codex-ui-skill-detail__name-row")),
+          switchChecked: button("Disable skill")?.getAttribute("aria-checked"),
+        };
+      });
+    if (
+      !detail.dialog ||
+      !closeTo(detail.dialog.left, compact ? 60 : 290) ||
+      !closeTo(detail.dialog.top, compact ? 0 : 50) ||
+      !closeTo(detail.dialog.width, 600) ||
+      !closeTo(detail.dialog.height, compact ? 680 : 720) ||
+      !detail.artwork ||
+      !closeTo(detail.artwork.left, compact ? 80 : 310) ||
+      !closeTo(detail.artwork.top, compact ? 32 : 82) ||
+      !detail.name ||
+      !closeTo(detail.name.top, compact ? 84 : 134) ||
+      !detail.content ||
+      !closeTo(detail.content.clientHeight, compact ? 468 : 508) ||
+      (skillDetailScene.id.endsWith("-bottom")
+        ? detail.content.scrollTop <= 0
+        : detail.content.scrollTop !== 0) ||
+      !detail.footer ||
+      !closeTo(detail.footer.top, compact ? 620 : 710) ||
+      detail.switchChecked !== "true" ||
+      !closeTo(detail.actions.tryNow?.left, compact ? 551.25 : 781.25) ||
+      (skillDetailScene.id.endsWith("-actions") &&
+        (detail.menuItems.join("|") !==
+          "Open|Reveal in Finder|Copy Markdown" ||
+          !detail.menu ||
+          !closeTo(detail.menu.left, 719) ||
+          !closeTo(detail.menu.top, 100)))
+    ) {
+      throw new Error(
+        `${skillDetailScene.id}: Electron skill detail geometry failed: ${JSON.stringify(detail)}`,
+      );
+    }
+    if (skillDetailScene.id.endsWith("-actions")) {
+      await skillDetailPage.keyboard.press("Escape");
+      if (
+        (await skillDetailPage.locator('[role="menu"]').count()) !== 0 ||
+        (await skillDetailPage.getByRole("dialog").count()) !== 1
+      ) {
+        throw new Error(
+          `${skillDetailScene.id}: Electron first Escape did not dismiss only the menu.`,
+        );
+      }
+      await skillDetailPage.keyboard.press("Escape");
+      if ((await skillDetailPage.getByRole("dialog").count()) !== 0) {
+        throw new Error(
+          `${skillDetailScene.id}: Electron second Escape did not dismiss the dialog.`,
+        );
+      }
+    }
+    if (skillDetailScene.id.endsWith("-installed")) {
+      await skillDetailPage
+        .getByRole("button", { exact: true, name: "Try now" })
+        .click();
+      const draft = skillDetailPage.locator(
+        '[data-testid="current-skill-try-now"]',
+      );
+      await draft.waitFor();
+      if ((await draft.getAttribute("data-submitted")) !== "false") {
+        throw new Error(
+          `${skillDetailScene.id}: Electron Try now draft was submitted.`,
+        );
+      }
+    }
+  } finally {
+    await skillDetailApp.close();
+  }
+}
+
 for (const scheduledScene of [
   {
     currentSidebar: true,

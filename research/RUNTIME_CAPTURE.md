@@ -2551,6 +2551,38 @@ Terminate only the exact validated isolated process tree, prove its loopback
 port closed, move the exact profile recoverably to Trash, and recheck that the
 primary Codex PID remains alive.
 
+## Current `26.825.51511` Skill detail and Try now entry sample
+
+Use `pnpm capture:current-skill-detail-26-825` only with an exact isolated
+profile and a loopback listener owned by the validated second Codex process.
+The helper fails closed unless the promoted build fingerprint, profile,
+direct-child owner, listener, output directory, and explicit capture flag all
+match. It may navigate to Skills, open one installed detail, open/dismiss the
+actions menu, scroll instructions, resize, and invoke Try now only far enough
+to capture the unsent draft. It must not toggle, execute Open/Reveal/Copy,
+uninstall, click Send, or observe a submitted execution.
+
+Capture installed wide, actions wide, bottom wide, installed compact, and Try
+now compact. Keep raw product screenshots and profile data local. Promote only
+`research/current-skill-detail-26-825.json` and reviewed replay baselines.
+Optional local-only product comparisons use:
+
+```bash
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_REFERENCE=/absolute/path/to/skill-installed-wide.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_ACTIONS_REFERENCE=/absolute/path/to/skill-actions-wide.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_BOTTOM_REFERENCE=/absolute/path/to/skill-bottom-wide.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE=/absolute/path/to/skill-installed-compact.png \
+CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_TRY_NOW_REFERENCE=/absolute/path/to/skill-try-now-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=integration-skill-detail-current-26-825-installed,integration-skill-detail-current-26-825-actions,integration-skill-detail-current-26-825-bottom,integration-skill-detail-current-26-825-installed-compact,integration-skill-detail-current-26-825-try-now-compact
+```
+
+The accepted run terminated only validated isolated main PID `75875` and its
+owned children, proved loopback port `9925` closed, and moved the exact profile
+recoverably to
+`/Users/JaminZhou/.Trash/codex-ui-kit-skill-detail-26-825-20260901-9925`.
+Primary user-owned Codex PID `13503` remained alive.
+
 ## Promotion rule
 
 After a capture:

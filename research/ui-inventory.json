@@ -2136,14 +2136,21 @@
         "skills-page",
         "skills-settings",
         "integration-catalog",
+        "skill-detail-dialog",
+        "skill-try-now-prefill",
+        "component:SkillDetailDialog-SkillPromptMention",
         "browser-cdp:current-26-825-skill-catalog-wide-compact-search-scope-action",
         "electron:current-26-825-skill-catalog-wide-compact",
-        "pixel:current-26-825-skill-main-wide-compact"
+        "pixel:current-26-825-skill-main-wide-compact",
+        "browser-cdp:current-26-825-skill-detail-wide-compact-actions-bottom-try-now",
+        "electron:current-26-825-skill-detail-wide-compact-actions-bottom-try-now",
+        "pixel:five-reviewed-current-26-825-skill-detail-and-try-now-scenes"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:skills-index-search-actions",
-        "cdp-26.825.51511:skills-wide-compact-installed-personal-system-project-recommended"
+        "cdp-26.825.51511:skills-wide-compact-installed-personal-system-project-recommended",
+        "cdp-26.825.51511:skill-detail-dialog-actions-scroll-and-unsent-try-now-prefill"
       ],
       "implementationStatus": "partial",
       "browserStatus": "verified",

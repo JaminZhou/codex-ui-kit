@@ -759,6 +759,19 @@ const currentPluginDetailReferences = {
     process.env
       .CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE,
 };
+const currentSkillDetailReferences = {
+  "integration-skill-detail-current-26-825-actions":
+    process.env.CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_ACTIONS_REFERENCE,
+  "integration-skill-detail-current-26-825-bottom":
+    process.env.CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_BOTTOM_REFERENCE,
+  "integration-skill-detail-current-26-825-installed":
+    process.env.CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_REFERENCE,
+  "integration-skill-detail-current-26-825-installed-compact":
+    process.env
+      .CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE,
+  "integration-skill-detail-current-26-825-try-now-compact":
+    process.env.CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_TRY_NOW_REFERENCE,
+};
 const currentScheduledReferences = {
   "scheduled-current-26-825":
     process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_REFERENCE,
@@ -1038,6 +1051,143 @@ async function compareCurrentPluginDetail({
     }
     console.log(
       `${sceneId}: current plugin-detail ${region.name} pixel ratio ${comparison.ratio}`,
+    );
+  }
+}
+
+async function compareCurrentSkillDetail({ actual, referencePath, sceneId }) {
+  const reference = PNG.sync.read(await readFile(referencePath));
+  if (reference.width !== actual.width || reference.height !== actual.height) {
+    throw new Error(
+      `${sceneId}: current skill-detail reference must match the ${actual.width}x${actual.height} scene, received ${reference.width}x${reference.height}.`,
+    );
+  }
+  const tryNow = sceneId.endsWith("-try-now-compact");
+  const compact = sceneId.endsWith("-compact");
+  const regions = tryNow
+    ? [
+        {
+          height: 84,
+          left: 24,
+          masks: [
+            { height: 40, left: 6, top: 6, width: 660 },
+            { height: 16, left: 6, top: 58, width: 16 },
+            { height: 16, left: 650, top: 58, width: 16 },
+          ],
+          name: "composer-chrome",
+          top: 576,
+          width: 672,
+        },
+      ]
+    : [
+        {
+          height: compact ? 680 : 720,
+          left: compact ? 60 : 290,
+          masks: [
+            { height: 40, left: 20, top: 32, width: 40 },
+            {
+              height: compact ? 446 : 486,
+              left: 22,
+              top: 170,
+              width: 556,
+            },
+          ],
+          name: "dialog-chrome",
+          top: compact ? 0 : 50,
+          width: 600,
+        },
+        {
+          height: compact ? 450 : 490,
+          left: compact ? 81 : 311,
+          masks: [
+            {
+              height: compact ? 446 : 486,
+              left: 2,
+              top: 2,
+              width: 554,
+            },
+          ],
+          name: "content-frame",
+          top: compact ? 169 : 219,
+          width: 558,
+        },
+      ];
+  if (sceneId.endsWith("-actions")) {
+    regions.push({
+      height: 94,
+      left: 719,
+      masks: [{ height: 80, left: 8, top: 7, width: 106 }],
+      name: "actions-menu",
+      top: 100,
+      width: 122,
+    });
+  }
+  const maximumRatios = {
+    "actions-menu": environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_MENU_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    "composer-chrome": environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_COMPOSER_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    "content-frame": environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_CONTENT_MAX_DIFF_RATIO",
+      0.08,
+    ),
+    "dialog-chrome": environmentRatio(
+      "CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_DIALOG_MAX_DIFF_RATIO",
+      0.08,
+    ),
+  };
+  for (const region of regions) {
+    const referenceRegion = maskPng(
+      cropPng(
+        reference,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      ),
+      region.masks,
+    );
+    const actualRegion = maskPng(
+      cropPng(
+        actual,
+        region.left,
+        region.top,
+        region.width,
+        region.height,
+      ),
+      region.masks,
+    );
+    const comparison = comparePng(referenceRegion, actualRegion, 0.1);
+    const maximumRatio = maximumRatios[region.name];
+    const artifactId = `${sceneId}.${region.name}.current-product`;
+    await writeFile(
+      join(artifactDirectory, `${artifactId}.png`),
+      PNG.sync.write(referenceRegion),
+    );
+    await writeFile(
+      join(artifactDirectory, `${artifactId}.current-build.png`),
+      PNG.sync.write(actualRegion),
+    );
+    const diffPath = join(
+      artifactDirectory,
+      `${artifactId}.current-build.diff.png`,
+    );
+    if (comparison.pixels > 0) {
+      await writeFile(diffPath, PNG.sync.write(comparison.diff));
+    } else {
+      await rm(diffPath, { force: true });
+    }
+    if (comparison.ratio > maximumRatio) {
+      throw new Error(
+        `${sceneId}: current skill-detail ${region.name} pixel ratio ${comparison.ratio} exceeds ${maximumRatio}.`,
+      );
+    }
+    console.log(
+      `${sceneId}: current skill-detail ${region.name} pixel ratio ${comparison.ratio}`,
     );
   }
 }
@@ -2562,6 +2712,15 @@ for (const scene of selectedScenes) {
     await compareCurrentPluginDetail({
       actual,
       referencePath: currentPluginDetailReference,
+      sceneId: scene.id,
+    });
+  }
+
+  const currentSkillDetailReference = currentSkillDetailReferences[scene.id];
+  if (currentSkillDetailReference) {
+    await compareCurrentSkillDetail({
+      actual,
+      referencePath: currentSkillDetailReference,
       sceneId: scene.id,
     });
   }
