@@ -37,6 +37,8 @@ export function assertCurrentAccountMenuRecord(record: any): void;
 
 export function assertCurrentSidebarRowsRecord(record: any): void;
 
+export function assertCurrentGlobalNotificationsRecord(record: any): void;
+
 export function assertCurrentProjectsIndexObservation(observation: any): void;
 
 export function assertCurrentSidebarLifecycle(lifecycle: any): void;

@@ -14,7 +14,7 @@ exit gates; it does not replace the inventory.
   Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
   previous-build regression evidence rather than current verification.
 - The inventory contains 91 surface groups: 60 P0, 21 P1, and 10 P2.
-- 64 groups have current-build runtime evidence, 16 have previous-build-only
+- 65 groups have current-build runtime evidence, 15 have previous-build-only
   runtime evidence, and 11 have not been sampled.
 - The current subagent refresh promotes `thread.subagent-delegation` and
   `thread.subagent-collaboration` from previous-build presentation evidence to
@@ -802,8 +802,8 @@ tones. Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
 independent Browser/Electron route stack additionally preserves a selected
 project chat through Back/Forward, closing the previous selection-continuity
-gap beyond New chat. The sampled previous 26.820 success
-path is now reached through reversible Pin chat → `⌘Z`; its exact top-center
+gap beyond New chat. The sampled 26.820 success path is reached through
+reversible Pin chat → `⌘Z`; its exact top-center
 Sonner structure, live-region semantics, SVG paths, geometry, Browser/CDP,
 Electron, and 0.8029% product crop pass. The previous 26.820 ASAR
 source also locks the exact info, warning, and danger notification icons used
@@ -812,6 +812,10 @@ the exact ordinary-error paths and loading accessibility/skeleton structure,
 but isolated app-server termination
 and blocked/latency-injected ChatGPT loading did not reach either row-level
 state; those negative probes do not satisfy the runtime gate.
+The `26.825.51511` same-contract refresh now promotes the sampled success and
+bounded stack to the active baseline through title-hash-only CDP evidence,
+exact computed styles, two regional screenshots, reversible Pin/Undo state,
+and precise disposable-task cleanup; other notification tones remain open.
 
 The same workstream also covers shell gaps that otherwise distort every
 feature:
@@ -1145,7 +1149,9 @@ without confusing package readiness with full product reconstruction.
    geometry, and local-only full/core pixels. The bounded four-item global
    notification queue now matches the real top-center three-visible Sonner
    contract and a reversible current success transition in Browser/CDP,
-   Electron, and product pixels. Four reversible Pin/Undo transitions now also
+   Electron, and product pixels. A fingerprint-verified `26.825.51511` refresh
+   repeats the single success and four-item stack with computed-style and
+   notification-only screenshot evidence. Four reversible Pin/Undo transitions also
    lock simultaneous same-tone stacking, centered 5%/8px layer geometry, hover
    expansion, and a 0.2907% product crop. Other notification tones and the
    complete response-stream retry/failure/follow-up state machine retain their

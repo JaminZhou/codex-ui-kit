@@ -265,7 +265,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 64 have current-build runtime evidence, 16 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 59 groups and Electron verification covers 59.
+Current inventory: 91 surface groups; 65 have current-build runtime evidence, 15 have previous-build-only runtime evidence, 11 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 60 groups and Electron verification covers 60.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -616,7 +616,7 @@ restoring only auto-collapsed surfaces. Four deterministic App shell pixel
 frames pass. The 3.93% 120×46 window-chrome comparison is retained as a
 `26.721.81911` regression result. Offline/error/reconnecting/stale and global
 notification variants remain incomplete, so the implementation remains
-`partial`. A previous 26.820 isolated ChatGPT task now reaches the reversible
+`partial`. A 26.820 isolated ChatGPT task reaches the reversible
 Pin chat → `⌘Z` success path and emits `Chat unpinned`. The public region
 matches its top-center Sonner structure, polite `Notifications alt+T` section,
 focusable unstyled list item, exact success/Close paths, computed 170.4375×42px
@@ -629,7 +629,16 @@ success items, restores every chat, and locks the real three-visible/four-
 mounted stack, 1/0.95/0.90/0.85 scales, 0/8/16/24px offsets, centered transform
 origin, hover expansion, Browser/Electron contracts, and a 0.2907% unmasked
 172×64 product crop. The unsampled info, warning, and danger replays reuse exact
-current-source icon paths but are not promoted to runtime evidence.
+current-source icon paths but are not promoted to runtime evidence. A
+same-contract `26.825.51511` refresh then repeats one single success and the
+four-item stack in one fingerprint-verified isolated Renderer. Its sanitized
+record locks the same live-region semantics, exact glyph hashes, computed
+styles, widths, tops, visibility, pointer behavior, and hover expansion while
+restoring and archiving all four disposable tasks. The accepted record SHA is
+`e6c5fe0d412b14c8e5e930ce94c70daf747ea93d894e9bd39b55dbf5a4b23215`;
+Browser and Electron are therefore current-build verified for the sampled
+success/stack contract while implementation stays partial for other tones and
+triggers.
 
 A separate current-build probe safely terminates only one isolated process's
 validated App Server child and reaches the dedicated 408×400 fatal recovery

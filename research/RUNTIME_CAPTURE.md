@@ -301,6 +301,23 @@ and danger tones remain unsampled. The exact isolated process was terminated,
 its profile moved recoverably to Trash, port `9884` closed, and the original app
 process remained running.
 
+The 2026-09-01 `26.825.51511` refresh repeats the same reversible boundary in
+one loopback-only isolated process. Four safe no-tool tasks are pinned first,
+then four rapid `⌘Z` operations create a genuine four-item `Chat unpinned`
+stack while restoring every task. A new capture-only
+`capture:current-notifications` contract accepts only four supplied task-title
+hashes, verifies the installed archive and process/profile ownership, and
+records no task titles or identifiers. The current front alert remains
+170.4375×42px at y=48 with the same Dark success tokens and exact SVGs; the
+four collapsed widths, tops, scales, offsets, visibility, pointer behavior,
+and hover expansion match the 26.820 observation exactly. Two local-only
+notification crops and record SHA
+`e6c5fe0d412b14c8e5e930ce94c70daf747ea93d894e9bd39b55dbf5a4b23215`
+close the current-build evidence gap. All four exact tasks were archived, only
+isolated PID `20272`/port `9914` were stopped, the profile moved recoverably to
+Trash, and the user-owned Codex PID `13503` remained running. Other tones are
+still replay/source evidence rather than current runtime observations.
+
 The route-continuity follow-up uses another unique profile on loopback port
 `9883`. The fresh profile initially entered the unified ChatGPT source, where
 the current fixed stack omitted Pull requests despite the identical installed

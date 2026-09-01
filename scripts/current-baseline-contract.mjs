@@ -1040,6 +1040,194 @@ export function selectCurrentMainCandidate(candidates) {
   return eligible[0];
 }
 
+const currentNotificationIconSha256 = Object.freeze([
+  "c9ae9916e10ed453334494746b90c8cf8b2a2303124c2b7d8961f9ca7cb06ceb",
+  "2a1c3c07a26d5833ac1225d35ceeedc42105e4124e1b37dfdba34199c8b746f7",
+]);
+
+const currentNotificationAlertStyleMatches = (style) =>
+  style?.backgroundColor === "rgb(1, 28, 11)" &&
+  style?.borderColor === "oklab(0.742958 -0.14813 0.0758256 / 0.2)" &&
+  style?.borderRadius === "15px" &&
+  style?.boxShadow === "rgba(0, 0, 0, 0.1) 0px 4px 12px 0px" &&
+  style?.color === "rgb(64, 201, 119)" &&
+  style?.fontFamily === '-apple-system, "system-ui", "Segoe UI", sans-serif' &&
+  style?.fontSize === "14px" &&
+  style?.fontWeight === "400" &&
+  style?.lineHeight === "21px" &&
+  style?.padding === "8px";
+
+const currentNotificationScreenshotMatches = (screenshot, name) =>
+  screenshot?.name === name &&
+  Number.isInteger(screenshot?.width) &&
+  screenshot.width > 0 &&
+  screenshot.width <= 256 &&
+  Number.isInteger(screenshot?.height) &&
+  screenshot.height > 0 &&
+  screenshot.height <= 256 &&
+  /^[a-f0-9]{64}$/.test(screenshot?.sha256 ?? "");
+
+export function assertCurrentGlobalNotificationsRecord(record) {
+  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+    ([key, expected]) => record?.fingerprint?.[key] !== expected,
+  );
+  const titleHashes = record?.taskTitleSha256s;
+  const runtimeIdentity = record?.runtimeBundleIdentity;
+  const candidateUrls = record?.targetSelection?.candidates?.map(
+    (candidate) => candidate?.url,
+  );
+  const allowedCandidateUrls = new Set([
+    "app://-/index.html",
+    "app://-/index.html?initialRoute=%2Favatar-overlay",
+    "app://-/index.html?redacted",
+    "non-app-page",
+  ]);
+  const serialized = JSON.stringify(record);
+  if (
+    record?.schemaVersion !== 1 ||
+    record?.captureKind !== "renderer_cdp" ||
+    fingerprintMismatch ||
+    !Number.isSafeInteger(record?.profileOwnerPid) ||
+    record.profileOwnerPid <= 1 ||
+    runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
+    !provesRuntimeBundleIdentity(runtimeIdentity) ||
+    record?.privacyBoundary !==
+      "four-disposable-task-title-hashes-and-notification-geometry-only" ||
+    !Array.isArray(titleHashes) ||
+    titleHashes.length !== 4 ||
+    new Set(titleHashes).size !== 4 ||
+    titleHashes.some((hash) => !/^[a-f0-9]{64}$/.test(hash)) ||
+    /"(?:profilePath|projectName|taskTitle|threadId|title)"\s*:/.test(
+      serialized,
+    ) ||
+    !Array.isArray(candidateUrls) ||
+    candidateUrls.length < 1 ||
+    candidateUrls.some((url) => !allowedCandidateUrls.has(url)) ||
+    record?.targetSelection?.selected?.url !== "app://-/index.html"
+  ) {
+    throw new Error(
+      "Current global-notification record does not prove the isolated current build and privacy boundary.",
+    );
+  }
+
+  const expectedTaskState = JSON.stringify([false, false, false, false]);
+  if (
+    record?.viewport?.width !== currentBaselineViewports.wide.width ||
+    record?.viewport?.height !== currentBaselineViewports.wide.height ||
+    JSON.stringify(record?.taskState?.initial) !== expectedTaskState ||
+    JSON.stringify(record?.taskState?.pinned) !==
+      JSON.stringify([true, true, true, true]) ||
+    JSON.stringify(record?.taskState?.restored) !== expectedTaskState
+  ) {
+    throw new Error(
+      "Current global-notification record does not prove the reversible four-task Pin and Undo sequence.",
+    );
+  }
+
+  const region = record.region;
+  if (
+    region?.ariaLabel !== "Notifications alt+T" ||
+    region?.ariaLive !== "polite" ||
+    region?.ariaRelevant !== "additions text" ||
+    region?.ariaAtomic !== "false" ||
+    region?.sonnerTheme !== "light" ||
+    region?.xPosition !== "center" ||
+    region?.yPosition !== "top" ||
+    region?.frontToastHeight !== "42px" ||
+    region?.gap !== "8px" ||
+    !withinTolerance(region?.rect?.top, 48) ||
+    !withinTolerance(region?.rect?.height, 0)
+  ) {
+    throw new Error(
+      `Current global-notification region does not match the current contract: ${JSON.stringify(region)}`,
+    );
+  }
+
+  const collapsed = record.collapsed;
+  const expectedWidths = [170.4375, 161.9156, 153.3938, 144.8718];
+  const expectedTops = [48, 57.05, 66.1, 75.15];
+  const expectedTransforms = [
+    "matrix(1, 0, 0, 1, 0, 0)",
+    "matrix(0.95, 0, 0, 0.95, 0, 8)",
+    "matrix(0.9, 0, 0, 0.9, 0, 16)",
+    "matrix(0.85, 0, 0, 0.85, 0, 24)",
+  ];
+  if (
+    !Array.isArray(collapsed) ||
+    collapsed.length !== 4 ||
+    collapsed.some(
+      (notification, index) =>
+        notification?.text !== "Chat unpinned" ||
+        notification?.index !== index ||
+        notification?.front !== (index === 0) ||
+        notification?.visible !== (index < 3) ||
+        notification?.expanded !== false ||
+        notification?.dismissible !== true ||
+        notification?.mounted !== true ||
+        notification?.promise !== false ||
+        notification?.removed !== false ||
+        notification?.swipeOut !== false ||
+        notification?.swiped !== false ||
+        notification?.swiping !== false ||
+        notification?.tabIndex !== 0 ||
+        !withinTolerance(notification?.rect?.top, expectedTops[index]) ||
+        !withinTolerance(notification?.rect?.width, expectedWidths[index]) ||
+        notification?.style?.opacity !== (index < 3 ? "1" : "0") ||
+        notification?.style?.pointerEvents !== (index < 3 ? "auto" : "none") ||
+        notification?.style?.transform !== expectedTransforms[index] ||
+        !currentNotificationAlertStyleMatches(notification?.alert?.style) ||
+        JSON.stringify(notification?.iconSha256s) !==
+          JSON.stringify(currentNotificationIconSha256),
+    )
+  ) {
+    throw new Error(
+      `Current collapsed global-notification stack does not match the current contract: ${JSON.stringify(collapsed)}`,
+    );
+  }
+
+  const expanded = record.expanded;
+  if (
+    !Array.isArray(expanded) ||
+    expanded.length !== 4 ||
+    expanded.some(
+      (notification, index) =>
+        notification?.text !== "Chat unpinned" ||
+        notification?.index !== index ||
+        notification?.front !== (index === 0) ||
+        notification?.visible !== (index < 3) ||
+        notification?.expanded !== true ||
+        notification?.style?.opacity !== (index < 3 ? "1" : "0") ||
+        notification?.style?.pointerEvents !== (index < 3 ? "auto" : "none") ||
+        !currentNotificationAlertStyleMatches(notification?.alert?.style),
+    ) ||
+    expanded.slice(0, 3).some(
+      (notification, index, notifications) =>
+        index > 0 &&
+        (notification.rect?.top - notifications[index - 1].rect?.top < 40 ||
+          notification.rect?.top - notifications[index - 1].rect?.top > 55),
+    )
+  ) {
+    throw new Error(
+      `Current expanded global-notification stack does not match the current contract: ${JSON.stringify(expanded)}`,
+    );
+  }
+
+  if (
+    !currentNotificationScreenshotMatches(
+      record?.screenshots?.collapsed,
+      "notification-stack-collapsed.png",
+    ) ||
+    !currentNotificationScreenshotMatches(
+      record?.screenshots?.expanded,
+      "notification-stack-expanded.png",
+    )
+  ) {
+    throw new Error(
+      "Current global-notification record requires two sanitized regional screenshots.",
+    );
+  }
+}
+
 export function assertCurrentBaselineRecord(record) {
   if (record?.schemaVersion !== 1) {
     throw new Error("Current baseline record must use schema version 1.");

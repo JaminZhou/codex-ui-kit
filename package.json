@@ -74,6 +74,7 @@
     "capture:current-review-26-825": "node scripts/capture-current-review-anchor.mjs",
     "capture:current-approval": "node scripts/capture-current-approval.mjs",
     "capture:current-sidebar-rows": "node scripts/capture-current-sidebar-rows.mjs",
+    "capture:current-notifications": "node scripts/capture-current-notifications.mjs",
     "update:visual-assets": "node scripts/update-current-visual-assets.mjs --write",
     "update:visual-assets:review": "node scripts/update-current-visual-assets.mjs --review-only --write",
     "update:current-thread-visual-assets": "node scripts/update-current-thread-visual-assets.mjs --write",
