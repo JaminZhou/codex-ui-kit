@@ -11330,7 +11330,12 @@ const currentContext26825Scene = {
 const {
   app: currentContext26825App,
   page: currentContext26825Page,
-} = await launchScene(currentContext26825Scene, { capture: false });
+} = await launchScene(currentContext26825Scene, {
+  capture: false,
+  // This is a fixed current-build UI contract, not the native Git integration
+  // test. A detached CI checkout has no local branches to match its 7-row fixture.
+  environment: { CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE: "1" },
+});
 try {
   const initialContract = await currentContext26825Page.evaluate(() => {
     const rect = (selector) => {
@@ -11627,7 +11632,10 @@ const currentContext26825CompactScene = {
 const {
   app: currentContext26825CompactApp,
   page: currentContext26825CompactPage,
-} = await launchScene(currentContext26825CompactScene, { capture: false });
+} = await launchScene(currentContext26825CompactScene, {
+  capture: false,
+  environment: { CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE: "1" },
+});
 try {
   const compactProjectContract = await currentContext26825CompactPage.evaluate(
     () => {
