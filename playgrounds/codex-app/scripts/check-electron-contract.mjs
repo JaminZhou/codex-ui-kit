@@ -18219,7 +18219,13 @@ try {
   await personalizationSettingsApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
-  await personalizationSettingsPage.waitForFunction(() => innerWidth === 720);
+  // BrowserWindow resize reaches innerWidth before the responsive sidebar's
+  // resize observer has necessarily committed the available content width.
+  await personalizationSettingsPage.waitForFunction(() => {
+    const root = document.querySelector(".codex-ui-personalization-settings");
+    return innerWidth === 720 && innerHeight === 680 && root &&
+      Math.abs(root.getBoundingClientRect().width - 358.125) <= 1;
+  });
   const compactContract = await personalizationSettingsPage.evaluate(() => {
     const root = document.querySelector(
       ".codex-ui-personalization-settings",
