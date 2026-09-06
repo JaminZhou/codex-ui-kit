@@ -11070,8 +11070,6 @@ summary.codex-ui-activity__header::after {
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  /* Keep the centered catalog independent of the host's scrollbar preference. */
-  scrollbar-width: none;
 }
 
 .codex-ui-integration-catalog,

@@ -76,6 +76,12 @@ jobs:
     name: Codex app Electron acceptance
     runs-on: macos-15
     steps:
+      - name: Match baseline overlay scrollbar preference
+        # Baselines use overlay scrollbars. Runner images may default to Always,
+        # which reserves 15px and changes centered layouts and line wrapping.
+        run: |
+          defaults write NSGlobalDomain AppleShowScrollBars -string WhenScrolling
+          test "$(defaults read NSGlobalDomain AppleShowScrollBars)" = WhenScrolling
       - uses: actions/checkout@v7
       - name: Isolate pnpm store
         run: echo "pnpm_config_store_dir=$RUNNER_TEMP/pnpm-store" >> "$GITHUB_ENV"

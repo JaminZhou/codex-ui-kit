@@ -9841,7 +9841,6 @@ for (const scene of selectedScenes) {
                     ".codex-ui-integration-catalog__installed .codex-ui-integration-catalog__item",
                   ).length,
             kind: catalog.getAttribute("data-kind"),
-            scrollbarWidth: getComputedStyle(catalog).scrollbarWidth,
             search: rect(".codex-ui-integration-catalog__search"),
             searchPlaceholder: catalog
               .querySelector("input[type=search]")
@@ -9875,7 +9874,6 @@ for (const scene of selectedScenes) {
       const expectedHeadingLeft = compact ? 29 : 395.4375;
       if (
         integrationCatalog.kind !== expectedKind ||
-        integrationCatalog.scrollbarWidth !== "none" ||
         integrationCatalog.status !== "ready" ||
         integrationCatalog.title !== expectedTitle ||
         integrationCatalog.description !== expectedDescription ||
