@@ -2606,6 +2606,13 @@ for (const scene of selectedScenes) {
       // These baselines show the native overlay scrollbar while active. A slow
       // runner can reach this point after its OS fade-out; exercise real wheel
       // input, then restore the exact prepared scroll position before capture.
+      await app.evaluate(({ app, BrowserWindow }) => {
+        const window = BrowserWindow.getAllWindows()[0];
+        window?.show();
+        app.focus({ steal: true });
+        window?.focus();
+      });
+      await page.waitForFunction(() => document.hasFocus());
       const viewport = page.locator(".codex-ui-thread-viewport");
       const position = await viewport.evaluate((element) => ({
         top: element.scrollTop,
