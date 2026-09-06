@@ -3184,6 +3184,19 @@ try {
   await currentAttachmentCompletionPage.waitForFunction(
     () => document.activeElement?.getAttribute("aria-label") === "Message composer",
   );
+  // Composer focus and the completed frame can precede the viewport's final
+  // scroll/layout update. Require the same geometry before taking the snapshot.
+  await currentAttachmentCompletionPage.waitForFunction(() => {
+    const image = document.querySelector(
+      '.codex-ui-agent-message__attachments .codex-ui-message-attachment[data-kind="image"]',
+    );
+    const file = document.querySelector(
+      '.codex-ui-agent-message__attachments .codex-ui-message-attachment[data-kind="file"]',
+    );
+    return image && file &&
+      Math.abs(image.getBoundingClientRect().top - 80) <= 1 &&
+      Math.abs(file.getBoundingClientRect().top - 168) <= 1;
+  });
   const completion = await currentAttachmentCompletionPage.evaluate(() => ({
     actionLabels: Array.from(
       document.querySelectorAll(
