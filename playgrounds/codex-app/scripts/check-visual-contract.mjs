@@ -2615,6 +2615,16 @@ for (const scene of selectedScenes) {
         window?.setPosition(0, 0);
         window?.setContentSize(size.width, size.height);
       }, captureSize);
+      console.log("Native capture display diagnostics", JSON.stringify({
+        expected: captureSize,
+        native: await app.evaluate(({ BrowserWindow, screen }) => ({
+          displays: screen.getAllDisplays().map(({ size, workArea, scaleFactor }) => ({ size, workArea, scaleFactor })),
+          bounds: BrowserWindow.getAllWindows()[0]?.getBounds(),
+          contentBounds: BrowserWindow.getAllWindows()[0]?.getContentBounds(),
+          focused: BrowserWindow.getAllWindows()[0]?.isFocused(),
+        })),
+        renderer: await page.evaluate(() => ({ width: innerWidth, height: innerHeight, focus: document.hasFocus() })),
+      }));
       await page.waitForFunction((size) => document.hasFocus() &&
         innerWidth === size.width && innerHeight === size.height, captureSize);
       const viewport = page.locator(".codex-ui-thread-viewport");
