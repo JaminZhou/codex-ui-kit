@@ -2602,6 +2602,24 @@ for (const scene of selectedScenes) {
         };
       });
     }
+    if (["current-worktree-setup-failed-compact", "current-review-26-825-file-card-compact"].includes(scene.id)) {
+      // These baselines show the native overlay scrollbar while active. A slow
+      // runner can reach this point after its OS fade-out; exercise real wheel
+      // input, then restore the exact prepared scroll position before capture.
+      const viewport = page.locator(".codex-ui-thread-viewport");
+      const position = await viewport.evaluate((element) => ({
+        top: element.scrollTop,
+        left: element.scrollLeft,
+        x: element.getBoundingClientRect().right - 20,
+        y: element.getBoundingClientRect().top + 20,
+      }));
+      await page.mouse.move(position.x, position.y);
+      await page.mouse.wheel(0, 1);
+      await page.waitForTimeout(100);
+      await viewport.evaluate((element, saved) => {
+        element.scrollTo({ top: saved.top, left: saved.left, behavior: "instant" });
+      }, position);
+    }
     await page.screenshot({
       animations: "disabled",
       path: actualPath,
