@@ -14359,7 +14359,7 @@ try {
     currentThinking.lineHeight !== "21px" ||
     currentThinking.role !== "status" ||
     currentThinking.shimmerCount !== 1 ||
-    !currentThinking.shimmerColor?.includes("0.385") ||
+    !currentThinking.shimmerColor?.includes("0.5") ||
     currentThinking.shimmerDuplicateCount !== 1 ||
     Math.abs((currentThinking.shimmerHeight ?? 0) - 21) > 0.1 ||
     !currentThinking.shimmerHighlightColor?.includes("0.75") ||

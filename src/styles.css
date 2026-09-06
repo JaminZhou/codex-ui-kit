@@ -9535,7 +9535,7 @@
   );
   --codex-ui-loading-shimmer-muted: color-mix(
     in srgb,
-    var(--codex-ui-text-foreground) 38.5%,
+    var(--codex-ui-text-foreground) var(--codex-ui-thinking-muted-opacity, 65%),
     transparent
   );
   color: color-mix(
