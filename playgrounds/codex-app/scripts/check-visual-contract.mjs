@@ -2607,6 +2607,35 @@ for (const scene of selectedScenes) {
       path: actualPath,
       type: "png",
     });
+    if (["current-worktree-setup-failed-compact", "current-review-26-825-file-card-compact"].includes(scene.id)) {
+      const native = await app.evaluate(({ app, BrowserWindow, nativeTheme, systemPreferences }) => ({
+        argv: process.argv,
+        versions: process.versions,
+        scrollbarPreference: systemPreferences.getUserDefault("AppleShowScrollBars", "string"),
+        themeSource: nativeTheme.themeSource,
+        dark: nativeTheme.shouldUseDarkColors,
+        highContrast: nativeTheme.shouldUseHighContrastColors,
+        reducedTransparency: systemPreferences.getUserDefault("reduceTransparency", "boolean"),
+        focused: BrowserWindow.getAllWindows()[0]?.isFocused(),
+        visible: BrowserWindow.getAllWindows()[0]?.isVisible(),
+        features: app.commandLine.getSwitchValue("enable-features"),
+      }));
+      const renderer = await page.evaluate(() => Array.from(
+        document.querySelectorAll(".codex-ui-thread-viewport"),
+        (element) => ({
+          clientWidth: element.clientWidth,
+          offsetWidth: element.offsetWidth,
+          scrollTop: element.scrollTop,
+          scrollHeight: element.scrollHeight,
+          colorScheme: getComputedStyle(element).colorScheme,
+          scrollbarColor: getComputedStyle(element).scrollbarColor,
+          scrollbarWidth: getComputedStyle(element).scrollbarWidth,
+        }),
+      ));
+      await writeFile(join(artifactDirectory, `${scene.id}.environment.json`), JSON.stringify({ native, renderer }, null, 2));
+      await page.waitForTimeout(1000);
+      await page.screenshot({ animations: "disabled", path: join(artifactDirectory, `${scene.id}.delayed.png`) });
+    }
     if (
       scene.id === "current-sidebar-status-lifecycle" &&
       currentBuildSidebarTaskActionsReference
