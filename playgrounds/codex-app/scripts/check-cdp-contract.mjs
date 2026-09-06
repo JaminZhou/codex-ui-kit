@@ -7245,7 +7245,13 @@ for (const scene of selectedScenes) {
             region?.getAttribute("data-hidden-count") === "0"
           );
         });
-        await page.waitForTimeout(20);
+        // Focus is restored on requestAnimationFrame, which can be delayed on CI.
+        // Wait for the required state, not an assumed frame duration.
+        await page.waitForFunction(() =>
+          document.activeElement?.matches(
+            ".codex-ui-app-notification__action",
+          ) && document.activeElement.textContent?.trim() === "Open",
+        );
         const focus = await page.evaluate(() => ({
           action: document
             .querySelector(".demo-root")

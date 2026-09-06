@@ -20278,7 +20278,11 @@ try {
       region?.getAttribute("data-hidden-count") === "0"
     );
   });
-  await notificationQueuePage.waitForTimeout(20);
+  // Queue focus restoration runs on requestAnimationFrame, not a 20ms deadline.
+  await notificationQueuePage.waitForFunction(() =>
+    document.activeElement?.matches(".codex-ui-app-notification__action") &&
+    document.activeElement.textContent?.trim() === "Open",
+  );
   if (
     (await notificationQueuePage.evaluate(
       () => document.activeElement?.textContent?.trim(),
