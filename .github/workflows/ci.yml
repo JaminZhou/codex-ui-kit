@@ -77,9 +77,15 @@ jobs:
     # Native scrollbar rendering is part of the macOS 26 visual baseline.
     runs-on: macos-26
     steps:
-      - name: Inspect hosted display modes
+      - name: Configure hosted display for native capture
         run: |
           brew install displayplacer
+          displayplacer list > "$RUNNER_TEMP/capture-display-modes.txt"
+          cat "$RUNNER_TEMP/capture-display-modes.txt"
+          test "$(grep -c '^Persistent screen id:' "$RUNNER_TEMP/capture-display-modes.txt")" -eq 1
+          grep -q 'res:1920x1080 ' "$RUNNER_TEMP/capture-display-modes.txt"
+          capture_display_id=$(awk '/^Persistent screen id:/ { print $4 }' "$RUNNER_TEMP/capture-display-modes.txt")
+          displayplacer "id:${capture_display_id} res:1920x1080 scaling:off origin:(0,0) degree:0"
           displayplacer list
       - name: Match baseline overlay scrollbar preference
         # Baselines use overlay scrollbars. Runner images may default to Always,
