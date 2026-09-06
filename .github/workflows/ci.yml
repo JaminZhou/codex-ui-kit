@@ -77,6 +77,10 @@ jobs:
     # Native scrollbar rendering is part of the macOS 26 visual baseline.
     runs-on: macos-26
     steps:
+      - name: Inspect hosted display modes
+        run: |
+          brew install displayplacer
+          displayplacer list
       - name: Match baseline overlay scrollbar preference
         # Baselines use overlay scrollbars. Runner images may default to Always,
         # which reserves 15px and changes centered layouts and line wrapping.
