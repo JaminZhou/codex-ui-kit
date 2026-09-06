@@ -93,5 +93,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: codex-app-visual-failure-${{ github.run_id }}
-          path: playgrounds/codex-app/artifacts/visual
+          path: |
+            playgrounds/codex-app/artifacts/visual
+            playgrounds/codex-app/artifacts/cdp
           retention-days: 7
