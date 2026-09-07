@@ -10,9 +10,13 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The installed package and machine-readable evidence baseline are Codex
-  Desktop `26.825.51511` (`7377`). Unsampled earlier-build surfaces remain
-  previous-build regression evidence rather than current verification.
+- Installed-package discovery on 2026-09-07 found Codex Desktop
+  `26.901.51231` (`8109`); see [the pending refresh](26.901.51231.md).
+  The machine-readable evidence baseline is still `26.825.51511` (`7377`).
+  Its verified statuses are relative to that recorded baseline, not proof of
+  parity with the newly installed build. Stage 0 must re-observe the new
+  runtime before any surface is promoted; existing fixtures remain regression
+  evidence.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
 - 74 groups have current-build runtime evidence, 7 have previous-build-only
   runtime evidence, and 10 have not been sampled.

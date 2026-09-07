@@ -72,3 +72,10 @@ Read [`SOURCES.md`](SOURCES.md) and [`research/README.md`](research/README.md) b
 ## Commit style
 
 Use a lowercase conventional prefix such as `feat:`, `fix:`, `docs:`, `test:`, `refactor:`, or `ci:` followed by a concise summary.
+
+## Release preparation
+
+Use [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md) for the separate
+first-publication decision. Keep the package private until a specific release
+candidate is approved. Passing replay tests or merging a contribution does not
+authorize publication or establish current-product visual parity.
