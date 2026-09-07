@@ -23,9 +23,9 @@ The declared peer range is `react >=18` and `react-dom >=18`. New major React ve
 
 The stylesheet and interaction primitives target current evergreen Chromium, Safari, and Firefox releases. Exact historical browser versions are not pinned before the first npm release.
 
-The component Electron playground uses Electron 42 and validates the same
+The component Electron playground uses Electron 43.2.0 and validates the same
 public package in an isolated, sandboxed Renderer. The private Codex app
-playground uses Electron 43 with a pinned public App Server client to validate
+playground uses Electron 43.2.0 with a pinned public App Server client to validate
 protocol lifecycle, CDP geometry, native host behavior, and pixel baselines.
 Electron is not a package dependency.
 
@@ -78,3 +78,9 @@ changing the package exports or runtime dependencies.
 ## Pre-1.0 policy
 
 Compatibility claims apply to the current `main` revision until the first npm release. Public APIs may change before 1.0, with changes recorded in pull requests and eventual release notes.
+
+For registry releases before 1.0, breaking public prop, state, export, or token
+changes require a minor version and migration notes. Backward-compatible fixes
+use a patch version. The first publication remains a separate approval; follow
+[`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md), not the reconstruction
+inventory, to assemble its evidence.
