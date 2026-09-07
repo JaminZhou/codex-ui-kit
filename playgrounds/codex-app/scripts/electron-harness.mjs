@@ -3776,6 +3776,11 @@ export async function launchScene(
     await page
       .locator(".codex-ui-conversation-thread-shell__viewport")
       .evaluate((element, scrollTop) => {
+        // A fixed capture position represents user scroll-away. Cancel any
+        // pending automatic follow before dispatching the resulting scroll;
+        // otherwise AgentThreadViewport can treat it as an intermediate
+        // programmatic frame and a later resize pins the viewport again.
+        element.dispatchEvent(new Event("wheel", { bubbles: true }));
         element.scrollTop = scrollTop;
         element.dispatchEvent(new Event("scroll", { bubbles: true }));
       }, scene.scrollTop);
