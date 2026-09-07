@@ -32,6 +32,7 @@ import {
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
+import { liveWorkspacePolicy } from "./live-workspace-policy.js";
 import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
@@ -48,8 +49,10 @@ const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const rendererDirectory = join(currentDirectory, "..", "dist");
 const rendererEntryPath = join(rendererDirectory, "index.html");
 const preloadPath = join(currentDirectory, "preload.cjs");
-const workspaceDirectory =
-  process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../..");
+const workspaceDirectory = resolve(
+  process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../.."),
+);
+const liveWriteOptIn = process.env.CODEX_UI_KIT_LIVE_WORKSPACE_WRITE;
 process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH = workspaceDirectory;
 const startupWorkspaceProjectToken = "startup-workspace";
 const trustedProjectDirectories = new Map<string, string>([
@@ -309,24 +312,22 @@ async function startLive(
 ): Promise<{ threadId: string; turnId: string }> {
   assertTrustedIpc(event);
   const { directory, prompt } = resolveLiveProject(rawInput, trustedProjectDirectories);
+  const policy = liveWorkspacePolicy(directory, liveWriteOptIn);
   return liveTurnStartGate.run(() => activeTurn !== null, async () => {
     const connectedClient = await ensureClient();
     const thread = await liveSession.select(directory, () =>
       connectedClient.createThread({
-        approvalPolicy: "on-request",
+        approvalPolicy: policy.approvalPolicy,
         cwd: directory,
         ephemeral: true,
         historyMode: "paginated",
-        sandbox: "read-only",
+        sandbox: policy.sandbox,
       }),
     );
     const turn = await thread.startTurn(prompt, {
-      approvalPolicy: "on-request",
+      approvalPolicy: policy.approvalPolicy,
       cwd: directory,
-      sandboxPolicy: {
-        networkAccess: false,
-        type: "readOnly",
-      },
+      sandboxPolicy: policy.sandboxPolicy,
     });
     activeTurn = turn;
     void turn

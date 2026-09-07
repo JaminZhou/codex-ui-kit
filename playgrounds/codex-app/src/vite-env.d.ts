@@ -4,6 +4,7 @@ import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 interface CodexDemoBridge {
+  liveWorkspaceWritable: boolean;
   useRendererAttachmentFixture: boolean;
   useWorkspaceBranchFixture: boolean;
   startupWorkspaceProjectToken: string;

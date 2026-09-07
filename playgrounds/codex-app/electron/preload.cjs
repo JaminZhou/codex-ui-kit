@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("codexDemo", {
+  liveWorkspaceWritable: process.env.CODEX_UI_KIT_LIVE_WORKSPACE_WRITE === "1",
   useRendererAttachmentFixture:
     process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE === "1",
   useWorkspaceBranchFixture:

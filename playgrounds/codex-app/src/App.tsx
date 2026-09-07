@@ -7618,7 +7618,14 @@ export function App() {
   const composerSurface = (
     <AgentComposer
       actions={
-        currentProductAttachmentComposer ? (
+        mode === "live" ? (
+          <span className="demo-composer-controls" aria-label="Live workspace permissions">
+            <span>
+              {window.codexDemo?.liveWorkspaceWritable ? "Workspace write" : "Read only"}
+              {" · Network off"}
+            </span>
+          </span>
+        ) : currentProductAttachmentComposer ? (
           <span className="demo-composer-controls">
             <button aria-label="Add files and more" type="button">
               <CurrentBuildIcon name="composer-add-files" />

@@ -23,10 +23,22 @@ switching projects starts a fresh ephemeral thread and resets the transcript
 through the public `thread/started` event. Returning to a previous project
 also starts fresh; this is not persistent multi-project history.
 
-This routing does not grant write access: live turns still use read-only
-sandboxing, disabled network access, and on-request approval. A complete live
-coding workflow remains an open delivery gate; replay file changes are not
-evidence of real workspace edits.
+This routing does not itself grant write access. Live turns default to read-only
+sandboxing, disabled network access, and on-request approval. To intentionally
+enable real edits for host-selected projects, start Electron with
+`CODEX_UI_KIT_LIVE_WORKSPACE_WRITE=1` (for example,
+`CODEX_UI_KIT_LIVE_WORKSPACE_WRITE=1 pnpm --filter @codex-ui-kit/codex-app-playground dev:electron`).
+Use a disposable project for initial validation. The host then supplies a
+`workspaceWrite` turn policy with only the selected directory in writable roots,
+network disabled, and implicit temporary-directory writes excluded. Approval
+requests remain explicit; do not approve an expansion outside the intended
+workspace. The renderer cannot enable this mode through the live-start IPC.
+Restart without the flag to return to read-only mode. The live Composer displays
+the host mode and disabled network rather than the replay permission choices.
+
+A complete live coding workflow remains an open delivery gate; replay file
+changes are not evidence of real workspace edits. The independent Terminal input
+still records non-executing replay history, not live shell execution.
 
 ## First vertical slice
 
