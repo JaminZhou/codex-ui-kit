@@ -3556,14 +3556,7 @@ export async function launchScene(
   const resolvedLayoutMode = layoutMode ?? scene.layoutMode;
   const resolvedTheme = theme ?? scene.theme ?? "dark";
   const app = await electron.launch({
-    // NSArgumentDomain takes precedence over runner application preferences.
-    // Global defaults alone do not reliably select the baseline scrollbar style.
-    args: [
-      ".",
-      ...(process.platform === "darwin"
-        ? ["-AppleShowScrollBars", "WhenScrolling"]
-        : []),
-    ],
+    args: ["."],
     executablePath: electronPath,
     env: {
       ...process.env,

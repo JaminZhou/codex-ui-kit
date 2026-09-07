@@ -2602,79 +2602,19 @@ for (const scene of selectedScenes) {
         };
       });
     }
-    if (["current-worktree-setup-failed-compact", "current-review-26-825-file-card-compact"].includes(scene.id)) {
-      // These baselines show the native overlay scrollbar while active. A slow
-      // runner can reach this point after its OS fade-out; exercise real wheel
-      // input, then restore the exact prepared scroll position before capture.
-      const captureSize = await page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
-      await app.evaluate(({ app, BrowserWindow }, size) => {
-        const window = BrowserWindow.getAllWindows()[0];
-        window?.show();
-        app.focus({ steal: true });
-        window?.focus();
-        window?.setPosition(0, 0);
-        window?.setContentSize(size.width, size.height);
-      }, captureSize);
-      console.log("Native capture display diagnostics", JSON.stringify({
-        expected: captureSize,
-        native: await app.evaluate(({ BrowserWindow, screen }) => ({
-          displays: screen.getAllDisplays().map(({ size, workArea, scaleFactor }) => ({ size, workArea, scaleFactor })),
-          bounds: BrowserWindow.getAllWindows()[0]?.getBounds(),
-          contentBounds: BrowserWindow.getAllWindows()[0]?.getContentBounds(),
-          focused: BrowserWindow.getAllWindows()[0]?.isFocused(),
-        })),
-        renderer: await page.evaluate(() => ({ width: innerWidth, height: innerHeight, focus: document.hasFocus() })),
-      }));
-      await page.waitForFunction((size) => document.hasFocus() &&
-        innerWidth === size.width && innerHeight === size.height, captureSize);
-      const viewport = page.locator(".codex-ui-thread-viewport");
-      const position = await viewport.evaluate((element) => ({
-        top: element.scrollTop,
-        left: element.scrollLeft,
-        x: element.getBoundingClientRect().right - 20,
-        y: element.getBoundingClientRect().top + 20,
-      }));
-      await page.mouse.move(position.x, position.y);
-      await page.mouse.wheel(0, 1);
-      await page.waitForTimeout(100);
-      await viewport.evaluate((element, saved) => {
-        element.scrollTo({ top: saved.top, left: saved.left, behavior: "instant" });
-      }, position);
+    if (
+      ["current-worktree-setup-failed-compact", "current-review-26-825-file-card-compact"].includes(scene.id)
+    ) {
+      // Capture the stable idle state, not the native overlay scrollbar's
+      // transient active phase. Playwright cannot disable the OS fade animation.
+      // Local and hosted captures must allow it to finish after scene setup.
+      await page.waitForTimeout(1500);
     }
     await page.screenshot({
       animations: "disabled",
       path: actualPath,
       type: "png",
     });
-    if (["current-worktree-setup-failed-compact", "current-review-26-825-file-card-compact"].includes(scene.id)) {
-      const native = await app.evaluate(({ app, BrowserWindow, nativeTheme, systemPreferences }) => ({
-        argv: process.argv,
-        versions: process.versions,
-        scrollbarPreference: systemPreferences.getUserDefault("AppleShowScrollBars", "string"),
-        themeSource: nativeTheme.themeSource,
-        dark: nativeTheme.shouldUseDarkColors,
-        highContrast: nativeTheme.shouldUseHighContrastColors,
-        reducedTransparency: systemPreferences.getUserDefault("reduceTransparency", "boolean"),
-        focused: BrowserWindow.getAllWindows()[0]?.isFocused(),
-        visible: BrowserWindow.getAllWindows()[0]?.isVisible(),
-        features: app.commandLine.getSwitchValue("enable-features"),
-      }));
-      const renderer = await page.evaluate(() => Array.from(
-        document.querySelectorAll(".codex-ui-thread-viewport"),
-        (element) => ({
-          clientWidth: element.clientWidth,
-          offsetWidth: element.offsetWidth,
-          scrollTop: element.scrollTop,
-          scrollHeight: element.scrollHeight,
-          colorScheme: getComputedStyle(element).colorScheme,
-          scrollbarColor: getComputedStyle(element).scrollbarColor,
-          scrollbarWidth: getComputedStyle(element).scrollbarWidth,
-        }),
-      ));
-      await writeFile(join(artifactDirectory, `${scene.id}.environment.json`), JSON.stringify({ native, renderer }, null, 2));
-      await page.waitForTimeout(1000);
-      await page.screenshot({ animations: "disabled", path: join(artifactDirectory, `${scene.id}.delayed.png`) });
-    }
     if (
       scene.id === "current-sidebar-status-lifecycle" &&
       currentBuildSidebarTaskActionsReference
