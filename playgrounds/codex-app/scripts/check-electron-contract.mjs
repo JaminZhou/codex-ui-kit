@@ -8959,7 +8959,13 @@ for (const currentHomeScene of currentHomeElectronScenes) {
     await projectSearch.waitFor();
     await projectSearch.press("Escape");
     await projectDialog.waitFor({ state: "hidden" });
-    await currentHomePage.waitForTimeout(20);
+    // Dismissal restores focus asynchronously; a hidden portal does not mean
+    // the restoration callback has run on a slower hosted runner.
+    await currentHomePage.waitForFunction(
+      () => document.activeElement?.id === "demo-workspace-destination-trigger",
+      undefined,
+      { timeout: 5000 },
+    );
     if (
       (await currentHomePage.evaluate(
         () => document.activeElement?.id,
