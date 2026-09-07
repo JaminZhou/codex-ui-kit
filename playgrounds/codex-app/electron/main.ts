@@ -31,6 +31,7 @@ import {
 } from "./attachment-dialog.js";
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
+import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
@@ -82,7 +83,7 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 let mainWindow: BrowserWindow | null = null;
 let client: CodexAppServerClient | null = null;
-let liveThread: CodexThread | null = null;
+const liveSession = new LiveProjectSession<CodexThread>();
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
@@ -92,10 +93,6 @@ let gitBranchOperationActive = false;
 const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
-
-interface StartLiveInput {
-  prompt: string;
-}
 
 interface ApprovalResponseInput {
   decision: "accept" | "acceptForSession" | "decline";
@@ -132,17 +129,6 @@ type BranchListResponse =
       unbornBranch: string | null;
     }
   | { code: string; message: string; ok: false };
-
-function assertStartInput(value: unknown): asserts value is StartLiveInput {
-  if (
-    typeof value !== "object" ||
-    value === null ||
-    typeof (value as StartLiveInput).prompt !== "string" ||
-    !(value as StartLiveInput).prompt.trim()
-  ) {
-    throw new TypeError("A non-empty prompt is required.");
-  }
-}
 
 function assertApprovalResponseInput(
   value: unknown,
@@ -283,7 +269,7 @@ function openAllowedExternalUrl(url: string) {
 
 async function ensureClient() {
   if (client?.state === "connected") return client;
-  liveThread = null;
+  liveSession.clear();
   if (client) {
     unsubscribeNotifications?.();
     unsubscribeNotifications = null;
@@ -322,22 +308,21 @@ async function startLive(
   rawInput: unknown,
 ): Promise<{ threadId: string; turnId: string }> {
   assertTrustedIpc(event);
-  assertStartInput(rawInput);
+  const { directory, prompt } = resolveLiveProject(rawInput, trustedProjectDirectories);
   return liveTurnStartGate.run(() => activeTurn !== null, async () => {
     const connectedClient = await ensureClient();
-    const thread =
-      liveThread ??
-      (await connectedClient.createThread({
+    const thread = await liveSession.select(directory, () =>
+      connectedClient.createThread({
         approvalPolicy: "on-request",
-        cwd: workspaceDirectory,
+        cwd: directory,
         ephemeral: true,
         historyMode: "paginated",
         sandbox: "read-only",
-      }));
-    liveThread = thread;
-    const turn = await thread.startTurn(rawInput.prompt, {
+      }),
+    );
+    const turn = await thread.startTurn(prompt, {
       approvalPolicy: "on-request",
-      cwd: workspaceDirectory,
+      cwd: directory,
       sandboxPolicy: {
         networkAccess: false,
         type: "readOnly",
@@ -380,7 +365,7 @@ async function handleApprovalResponse(
 
 async function closeLive() {
   activeTurn = null;
-  liveThread = null;
+  liveSession.clear();
   unsubscribeNotifications?.();
   unsubscribeNotifications = null;
   unsubscribeServerRequests.forEach((unsubscribe) => unsubscribe());

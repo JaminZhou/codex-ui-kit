@@ -5161,12 +5161,16 @@ export function App() {
       return;
     }
     if (liveStartPendingRef.current) return;
+    if (!workspaceProjectToken) {
+      setLiveError("Select a local project before starting a live turn.");
+      return;
+    }
     liveStartPendingRef.current = true;
     setLiveStartPending(true);
     setMode("live");
     setLiveError(null);
     try {
-      await window.codexDemo.startLive({ prompt });
+      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken });
       setComposerValue((current) => (current === prompt ? "" : current));
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));

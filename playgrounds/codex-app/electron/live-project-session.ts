@@ -1,0 +1,41 @@
+/** The caller serializes starts and rejects them while a turn is active. */
+export class LiveProjectSession<T> {
+  private current: { directory: string; thread: T } | null = null;
+  private generation = 0;
+
+  clear() {
+    this.generation += 1;
+    this.current = null;
+  }
+
+  async select(directory: string, create: () => Promise<T>): Promise<T> {
+    if (this.current?.directory === directory) return this.current.thread;
+    const generation = this.generation;
+    const thread = await create();
+    if (generation !== this.generation) {
+      throw new Error("The live session was closed before the thread started.");
+    }
+    this.current = { directory, thread };
+    return thread;
+  }
+}
+
+export function resolveLiveProject(
+  input: unknown,
+  projects: ReadonlyMap<string, string>,
+): { directory: string; prompt: string } {
+  if (typeof input !== "object" || input === null) {
+    throw new TypeError("A live prompt and host-selected project are required.");
+  }
+  const { prompt, projectToken } = input as Record<string, unknown>;
+  if (typeof prompt !== "string" || !prompt.trim()) {
+    throw new TypeError("A non-empty prompt is required.");
+  }
+  const directory = typeof projectToken === "string"
+    ? projects.get(projectToken)
+    : undefined;
+  if (!directory) {
+    throw new TypeError("Select a local project before starting a live turn.");
+  }
+  return { directory, prompt };
+}
