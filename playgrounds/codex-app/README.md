@@ -13,6 +13,21 @@ The React-only UI Kit remains the root package. Electron and App Server
 dependencies are isolated in this private workspace and are never published
 with `codex-ui-kit`.
 
+### Live project ownership
+
+Live submissions use the selected local project's host-issued token, not a
+renderer-supplied path or an implicit fallback to the startup directory.
+Select a directory through the project picker before using a fixture-only
+project in live mode. Consecutive turns in the same project reuse their thread;
+switching projects starts a fresh ephemeral thread and resets the transcript
+through the public `thread/started` event. Returning to a previous project
+also starts fresh; this is not persistent multi-project history.
+
+This routing does not grant write access: live turns still use read-only
+sandboxing, disabled network access, and on-request approval. A complete live
+coding workflow remains an open delivery gate; replay file changes are not
+evidence of real workspace edits.
+
 ## First vertical slice
 
 The first slice covers:
