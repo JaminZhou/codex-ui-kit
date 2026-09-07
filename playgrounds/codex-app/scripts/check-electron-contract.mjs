@@ -7575,6 +7575,15 @@ try {
   await pullRequestPage.waitForSelector(
     '.demo-root[data-view="conversation"][data-mode="live"]',
   );
+  const liveWorkspacePermissions = await pullRequestPage
+    .getByLabel("Live workspace permissions", { exact: true })
+    .innerText();
+  const liveWorkspaceWritable = await pullRequestPage.evaluate(
+    () => window.codexDemo.liveWorkspaceWritable,
+  );
+  if (liveWorkspacePermissions !== `${liveWorkspaceWritable ? "Workspace write" : "Read only"} · Network off`) {
+    throw new Error("Live Composer permissions do not match the host policy.");
+  }
   if (
     (await pullRequestPage
       .getByRole("button", { name: "Live local" })
