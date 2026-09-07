@@ -15416,6 +15416,15 @@ try {
   await current26825LongThreadPage.waitForSelector(
     '.demo-root[data-windowed-timeline="current-26-825"][data-thread-following="false"] [data-selected-message-index="15"][data-mounted-turn-count="12"]',
   );
+  // Mounted turns precede the frame-scheduled initial scroll positioning.
+  await current26825LongThreadPage.waitForFunction(() => {
+    const viewport = document.querySelector(
+      ".codex-ui-conversation-thread-shell__viewport",
+    );
+    return viewport instanceof HTMLElement &&
+      Math.abs(viewport.scrollTop + 2_394) <= 1 &&
+      Math.abs(viewport.scrollHeight - 4_687) <= 2;
+  }, undefined, { timeout: 5000 });
   const current26825Geometry =
     await current26825LongThreadPage.evaluate(() => {
       const rect = (selector) => {
