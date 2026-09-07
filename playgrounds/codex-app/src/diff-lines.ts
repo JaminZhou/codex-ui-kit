@@ -13,6 +13,16 @@ const conflictMarkerPatterns = [
 ] as const;
 
 export function diffLines(change: DemoFileUpdateChange): FileDiffLine[] {
+  if (change.diffFormat === "content" && change.kind === "added") {
+    if (!change.diff) return [];
+    const lines = change.diff.split(/\r?\n/);
+    if (lines.at(-1) === "") lines.pop();
+    return lines.map((content, index) => ({
+      content,
+      kind: "addition" as const,
+      newLineNumber: index + 1,
+    }));
+  }
   let oldLine = 0;
   let newLine = 0;
   let inHunk = false;
@@ -83,6 +93,9 @@ export function changeStats(change: DemoFileUpdateChange) {
 export function reviewContent(
   change: DemoFileUpdateChange,
 ): FileReviewContent {
+  if (change.diffFormat === "content" && change.kind === "added") {
+    return { kind: "diff", lines: diffLines(change) };
+  }
   if (binaryDiffPattern.test(change.diff)) {
     return {
       description: "Text preview is unavailable for this binary patch.",

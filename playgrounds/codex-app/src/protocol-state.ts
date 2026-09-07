@@ -155,6 +155,8 @@ export interface DemoAutomaticApprovalReview {
 
 export interface DemoFileUpdateChange {
   diff: string;
+  /** Historical replay uses unified patches; live additions carry full text. */
+  diffFormat?: "unified" | "content";
   kind: "added" | "deleted" | "modified" | "renamed";
   path: string;
   previousPath?: string;
@@ -1174,6 +1176,23 @@ export function hasActiveTurnWork(state: DemoProtocolState) {
         turnId === state.currentTurnId && status !== "done",
     )
   );
+}
+
+export function reduceLiveProtocolNotification(
+  state: DemoProtocolState,
+  notification: Parameters<typeof reduceProtocolNotification>[1],
+): DemoProtocolState {
+  const next = reduceProtocolNotification(state, notification);
+  if (next.fileChanges === state.fileChanges) return next;
+  return {
+    ...next,
+    fileChanges: next.fileChanges.map((item) => ({
+      ...item,
+      changes: item.changes.map((change) => change.kind === "added"
+        ? { ...change, diffFormat: "content" as const }
+        : change),
+    })),
+  };
 }
 
 export function reduceProtocolNotification(

@@ -192,6 +192,7 @@ import {
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
+  reduceLiveProtocolNotification,
   settleApprovedCommandReplay,
   settleRejectedFileReplay,
   subagentTimelinePresentation,
@@ -3064,7 +3065,7 @@ export function App() {
   );
   const [replayCount, setReplayCount] = useState(initialCount);
   const [liveState, dispatchLive] = useReducer(
-    reduceProtocolNotification,
+    reduceLiveProtocolNotification,
     initialProtocolState,
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
