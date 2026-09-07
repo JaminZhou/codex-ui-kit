@@ -18314,7 +18314,16 @@ try {
   await keyboardShortcutsSettingsApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
-  await keyboardShortcutsSettingsPage.waitForFunction(() => innerWidth === 720);
+  // Native resize can precede the responsive settings layout update.
+  await keyboardShortcutsSettingsPage.waitForFunction(() => {
+    const root = document.querySelector(".codex-ui-keyboard-shortcuts");
+    const bindings = document.querySelector(
+      ".codex-ui-keyboard-shortcuts__bindings",
+    );
+    return innerWidth === 720 && innerHeight === 680 &&
+      Math.abs((root?.getBoundingClientRect().width ?? Infinity) - 358.125) <= 1 &&
+      Math.abs((bindings?.getBoundingClientRect().width ?? Infinity) - 324.125) <= 1;
+  }, undefined, { timeout: 5000 });
   const compactKeyboard = await keyboardShortcutsSettingsPage.evaluate(() => {
     const root = document.querySelector(".codex-ui-keyboard-shortcuts");
     const copy = document.querySelector(".codex-ui-keyboard-shortcuts__copy");
