@@ -98,7 +98,7 @@ jobs:
       - name: Build acceptance app
         run: pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground build
       - name: Check native scrollbar pixel parity first
-        run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-worktree-setup-failed-compact,current-review-26-825-file-card-compact
+        run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-worktree-setup-failed-compact,current-review-26-825-file-card-compact,integration-skill-detail-current-26-825-try-now-compact
       - name: Run full acceptance contracts
         run: |
           pnpm --filter @codex-ui-kit/codex-app-playground check:cdp

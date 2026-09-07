@@ -2603,7 +2603,11 @@ for (const scene of selectedScenes) {
       });
     }
     if (
-      ["current-worktree-setup-failed-compact", "current-review-26-825-file-card-compact"].includes(scene.id)
+      [
+        "current-worktree-setup-failed-compact",
+        "current-review-26-825-file-card-compact",
+        "integration-skill-detail-current-26-825-try-now-compact",
+      ].includes(scene.id)
     ) {
       // Capture the stable idle state, not the native overlay scrollbar's
       // transient active phase. Playwright cannot disable the OS fade animation.
