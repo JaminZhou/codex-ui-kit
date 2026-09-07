@@ -1,10 +1,29 @@
 # Validation model
 
+## Evidence scope
+
+The contracts below span multiple recorded product builds. Words such as
+"current" inside a historical scenario describe that scenario's capture, not
+the installed application's latest version. Consult
+[`research/DELIVERY_PLAN.md`](../../../research/DELIVERY_PLAN.md) and the
+inventory before making current-build parity claims.
+
+Replay, native Electron host execution, and live App Server execution are
+separate gates. The default acceptance command runs deterministic replay; it
+does not prove a signed-in live coding workflow. A live result must record the
+client/runtime versions, workspace, ordered user actions, observed protocol
+completion and UI settlement, and host/protocol/UI failure attribution, with
+credentials and private content excluded from committed evidence.
+
+## Deterministic layers
+
 Every deterministic scenario has one ID and produces four evidence layers:
 
 1. **Protocol** — ordered App Server notifications, server requests, and
-   request responses checked against the pinned generated schemas. The current
-   deterministic set contains 33 fixtures and 406 events.
+   request responses checked against the pinned generated schemas. Run
+   `pnpm --filter @codex-ui-kit/codex-app-playground check:protocol` for the
+   candidate's actual fixture/event totals rather than relying on a historical
+   count in documentation.
 2. **CDP** — DOM identity, computed layout, focus, scrolling, and named-surface
    geometry, including the current 274px sidebar, 46px titlebar inset, 70px
    header, 30px rows, fixed footer, collapsible groups, focusable row actions,
