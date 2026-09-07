@@ -538,6 +538,19 @@ async function addAxe(page) {
 }
 
 async function runAxe(page, wcagSelectors = []) {
+  // Audit the muted phase: a passing highlight frame must not conceal low
+  // contrast in the persistent text underneath the decorative shimmer.
+  const mutedPhase = await page.addStyleTag({
+    content: ".codex-ui-loading-shimmer__sweep { visibility: hidden !important; }",
+  });
+  try {
+    return await runAxeAtMutedPhase(page, wcagSelectors);
+  } finally {
+    await mutedPhase.evaluate((element) => element.remove());
+  }
+}
+
+async function runAxeAtMutedPhase(page, wcagSelectors) {
   return page.evaluate(async ({ rules, tags, wcagSelectors }) => {
     const simplify = (entry) => ({
       id: entry.id,

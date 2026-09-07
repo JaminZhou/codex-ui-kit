@@ -7245,7 +7245,13 @@ for (const scene of selectedScenes) {
             region?.getAttribute("data-hidden-count") === "0"
           );
         });
-        await page.waitForTimeout(20);
+        // Focus is restored on requestAnimationFrame, which can be delayed on CI.
+        // Wait for the required state, not an assumed frame duration.
+        await page.waitForFunction(() =>
+          document.activeElement?.matches(
+            ".codex-ui-app-notification__action",
+          ) && document.activeElement.textContent?.trim() === "Open",
+        );
         const focus = await page.evaluate(() => ({
           action: document
             .querySelector(".demo-root")
@@ -18792,6 +18798,19 @@ for (const scene of selectedScenes) {
       join(artifactDirectory, `${scene.id}.json`),
       `${JSON.stringify(contract, null, 2)}\n`,
     );
+  } catch (error) {
+    await writeFile(
+      join(artifactDirectory, `${scene.id}-failure.txt`),
+      String(error?.stack ?? error),
+    );
+    await page
+      .screenshot({
+        path: join(artifactDirectory, `${scene.id}-failure.png`),
+      })
+      .catch((captureError) =>
+        console.error("Failure screenshot unavailable", captureError),
+      );
+    throw error;
   } finally {
     await app.close();
   }
@@ -22304,7 +22323,7 @@ try {
     currentThinking.lineHeight !== "21px" ||
     currentThinking.role !== "status" ||
     currentThinking.shimmerCount !== 1 ||
-    !currentThinking.shimmerColor?.includes("0.385") ||
+    !currentThinking.shimmerColor?.includes("0.5") ||
     currentThinking.shimmerDuplicateCount !== 1 ||
     Math.abs((currentThinking.shimmerHeight ?? 0) - 21) > 0.1 ||
     !currentThinking.shimmerHighlightColor?.includes("0.75") ||

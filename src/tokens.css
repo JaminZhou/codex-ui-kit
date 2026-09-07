@@ -331,6 +331,7 @@
   --codex-ui-background-status-warning: var(--codex-ui-orange-50);
   --codex-ui-background-status-error: var(--codex-ui-red-50);
   --codex-ui-loading-shimmer-muted: var(--codex-ui-text-secondary);
+  --codex-ui-thinking-muted-opacity: 65%;
   --codex-ui-loading-shimmer-highlight: var(--codex-ui-text-foreground);
 
   --codex-ui-text-foreground: #1a1c1f;
@@ -451,6 +452,7 @@
   --codex-ui-background-status-warning: var(--codex-ui-orange-900);
   --codex-ui-background-status-error: var(--codex-ui-red-900);
   --codex-ui-loading-shimmer-muted: var(--codex-ui-gray-300);
+  --codex-ui-thinking-muted-opacity: 50%;
   --codex-ui-loading-shimmer-highlight: var(--codex-ui-text-foreground);
 
   --codex-ui-text-foreground: var(--codex-ui-gray-0);
@@ -580,6 +582,7 @@
     --codex-ui-background-status-warning: var(--codex-ui-orange-900);
     --codex-ui-background-status-error: var(--codex-ui-red-900);
     --codex-ui-loading-shimmer-muted: var(--codex-ui-gray-300);
+    --codex-ui-thinking-muted-opacity: 50%;
     --codex-ui-loading-shimmer-highlight: var(--codex-ui-text-foreground);
     --codex-ui-text-foreground: var(--codex-ui-gray-0);
     --codex-ui-text-secondary: color-mix(

@@ -74,8 +74,16 @@ jobs:
 
   codex-app-acceptance:
     name: Codex app Electron acceptance
-    runs-on: macos-15
+    # Native scrollbar rendering is part of the macOS 26 visual baseline.
+    runs-on: macos-26
     steps:
+      - name: Match baseline overlay scrollbar preference
+        # Baselines use overlay scrollbars. Runner images may default to Always,
+        # which reserves 15px and changes centered layouts and line wrapping.
+        run: |
+          sw_vers
+          defaults write NSGlobalDomain AppleShowScrollBars -string WhenScrolling
+          test "$(defaults read NSGlobalDomain AppleShowScrollBars)" = WhenScrolling
       - uses: actions/checkout@v7
       - name: Isolate pnpm store
         run: echo "pnpm_config_store_dir=$RUNNER_TEMP/pnpm-store" >> "$GITHUB_ENV"
@@ -87,11 +95,21 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check:codex-app:acceptance
+      - name: Build acceptance app
+        run: pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground build
+      - name: Check native scrollbar pixel parity first
+        run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-worktree-setup-failed-compact,current-review-26-825-file-card-compact,integration-skill-detail-current-26-825-try-now-compact
+      - name: Run full acceptance contracts
+        run: |
+          pnpm --filter @codex-ui-kit/codex-app-playground check:cdp
+          pnpm --filter @codex-ui-kit/codex-app-playground check:electron
+          pnpm --filter @codex-ui-kit/codex-app-playground check:visual
       - name: Upload visual failure evidence
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: codex-app-visual-failure-${{ github.run_id }}
-          path: playgrounds/codex-app/artifacts/visual
+          path: |
+            playgrounds/codex-app/artifacts/visual
+            playgrounds/codex-app/artifacts/cdp
           retention-days: 7
