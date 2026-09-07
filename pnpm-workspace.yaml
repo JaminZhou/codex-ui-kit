@@ -2,7 +2,7 @@ packages:
   - playgrounds/*
 
 overrides:
-  "fast-uri@>=3.0.0 <3.1.5": 3.1.5
+  "fast-uri@>=3.0.0 <3.1.6": 3.1.6
   "undici@>=7.0.0 <7.29.0": 7.29.0
 
 allowBuilds:

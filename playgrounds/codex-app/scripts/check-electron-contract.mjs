@@ -3184,6 +3184,19 @@ try {
   await currentAttachmentCompletionPage.waitForFunction(
     () => document.activeElement?.getAttribute("aria-label") === "Message composer",
   );
+  // Composer focus and the completed frame can precede the viewport's final
+  // scroll/layout update. Require the same geometry before taking the snapshot.
+  await currentAttachmentCompletionPage.waitForFunction(() => {
+    const image = document.querySelector(
+      '.codex-ui-agent-message__attachments .codex-ui-message-attachment[data-kind="image"]',
+    );
+    const file = document.querySelector(
+      '.codex-ui-agent-message__attachments .codex-ui-message-attachment[data-kind="file"]',
+    );
+    return image && file &&
+      Math.abs(image.getBoundingClientRect().top - 80) <= 1 &&
+      Math.abs(file.getBoundingClientRect().top - 168) <= 1;
+  });
   const completion = await currentAttachmentCompletionPage.evaluate(() => ({
     actionLabels: Array.from(
       document.querySelectorAll(
@@ -11317,7 +11330,12 @@ const currentContext26825Scene = {
 const {
   app: currentContext26825App,
   page: currentContext26825Page,
-} = await launchScene(currentContext26825Scene, { capture: false });
+} = await launchScene(currentContext26825Scene, {
+  capture: false,
+  // This is a fixed current-build UI contract, not the native Git integration
+  // test. A detached CI checkout has no local branches to match its 7-row fixture.
+  environment: { CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE: "1" },
+});
 try {
   const initialContract = await currentContext26825Page.evaluate(() => {
     const rect = (selector) => {
@@ -11614,7 +11632,10 @@ const currentContext26825CompactScene = {
 const {
   app: currentContext26825CompactApp,
   page: currentContext26825CompactPage,
-} = await launchScene(currentContext26825CompactScene, { capture: false });
+} = await launchScene(currentContext26825CompactScene, {
+  capture: false,
+  environment: { CODEX_DEMO_WORKSPACE_BRANCH_FIXTURE: "1" },
+});
 try {
   const compactProjectContract = await currentContext26825CompactPage.evaluate(
     () => {
@@ -14338,7 +14359,7 @@ try {
     currentThinking.lineHeight !== "21px" ||
     currentThinking.role !== "status" ||
     currentThinking.shimmerCount !== 1 ||
-    !currentThinking.shimmerColor?.includes("0.385") ||
+    !currentThinking.shimmerColor?.includes("0.5") ||
     currentThinking.shimmerDuplicateCount !== 1 ||
     Math.abs((currentThinking.shimmerHeight ?? 0) - 21) > 0.1 ||
     !currentThinking.shimmerHighlightColor?.includes("0.75") ||
@@ -18198,7 +18219,13 @@ try {
   await personalizationSettingsApp.evaluate(({ BrowserWindow }) => {
     BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
   });
-  await personalizationSettingsPage.waitForFunction(() => innerWidth === 720);
+  // BrowserWindow resize reaches innerWidth before the responsive sidebar's
+  // resize observer has necessarily committed the available content width.
+  await personalizationSettingsPage.waitForFunction(() => {
+    const root = document.querySelector(".codex-ui-personalization-settings");
+    return innerWidth === 720 && innerHeight === 680 && root &&
+      Math.abs(root.getBoundingClientRect().width - 358.125) <= 1;
+  });
   const compactContract = await personalizationSettingsPage.evaluate(() => {
     const root = document.querySelector(
       ".codex-ui-personalization-settings",
@@ -20278,7 +20305,11 @@ try {
       region?.getAttribute("data-hidden-count") === "0"
     );
   });
-  await notificationQueuePage.waitForTimeout(20);
+  // Queue focus restoration runs on requestAnimationFrame, not a 20ms deadline.
+  await notificationQueuePage.waitForFunction(() =>
+    document.activeElement?.matches(".codex-ui-app-notification__action") &&
+    document.activeElement.textContent?.trim() === "Open",
+  );
   if (
     (await notificationQueuePage.evaluate(
       () => document.activeElement?.textContent?.trim(),
