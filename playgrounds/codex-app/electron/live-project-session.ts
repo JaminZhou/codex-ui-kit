@@ -8,15 +8,19 @@ export class LiveProjectSession<T> {
     this.threads.clear();
   }
 
-  async select(directory: string, create: () => Promise<T>): Promise<T> {
-    if (this.threads.has(directory)) return this.threads.get(directory)!;
+  get(directory: string): T | undefined { return this.threads.get(directory); }
+
+  async replace(directory: string, create: () => Promise<T>): Promise<T> {
     const generation = this.generation;
     const thread = await create();
-    if (generation !== this.generation) {
-      throw new Error("The live session was closed before the thread started.");
-    }
+    if (generation !== this.generation) throw new Error("The live session was closed before the thread started.");
     this.threads.set(directory, thread);
     return thread;
+  }
+
+  async select(directory: string, create: () => Promise<T>): Promise<T> {
+    if (this.threads.has(directory)) return this.threads.get(directory)!;
+    return this.replace(directory, create);
   }
 }
 

@@ -1,7 +1,10 @@
 import { initialProtocolState, reduceLiveProtocolNotification, type DemoProtocolState } from "./protocol-state";
+import { hydrateLiveHistory, type StoredLiveTurn } from "./live-history-state";
 
 export type LiveSessionEvent =
   | { kind: "live-reset" }
+  | { kind: "live-unbind"; projectToken: string }
+  | { kind: "live-history"; projectToken: string; threadId: string; turns: StoredLiveTurn[] }
   | { kind: "live-bind"; projectToken: string; threadId: string };
 type ProtocolEvent = Parameters<typeof reduceLiveProtocolNotification>[1];
 export interface LiveProjectState {
@@ -24,6 +27,15 @@ export function liveProjectState(store: LiveProjectState, projectToken?: string)
  * is allowed to select the visible project or replace its transcript. */
 export function reduceLiveProjectState(store: LiveProjectState, event: ProtocolEvent | LiveSessionEvent): LiveProjectState {
   if ("kind" in event && event.kind === "live-reset") return initialLiveProjectState;
+  if ("kind" in event && event.kind === "live-unbind") {
+    const projects = { ...store.projects };
+    delete projects[event.projectToken];
+    return { ...store, projects };
+  }
+  if ("kind" in event && event.kind === "live-history") {
+    return { ...store, projects: { ...store.projects, [event.projectToken]: event.threadId }, currentThread: event.threadId,
+      threads: { ...store.threads, [event.threadId]: store.threads[event.threadId] ?? hydrateLiveHistory(event.threadId, event.turns) } };
+  }
   if ("kind" in event && event.kind === "live-bind") {
     return { ...store, projects: { ...store.projects, [event.projectToken]: event.threadId }, currentThread: event.threadId };
   }

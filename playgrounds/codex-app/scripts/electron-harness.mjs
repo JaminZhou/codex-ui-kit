@@ -1,4 +1,7 @@
 import electronPath from "electron";
+import { randomUUID } from "node:crypto";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { _electron as electron } from "playwright-core";
 
 // These six dense scenes use the system font to match Codex. Their limits are
@@ -3560,6 +3563,8 @@ export async function launchScene(
     executablePath: electronPath,
     env: {
       ...process.env,
+      CODEX_UI_KIT_LIVE_HISTORY_PATH: join(tmpdir(), `ui-kit-history-${randomUUID()}.json`),
+      CODEX_UI_KIT_LIVE_EPHEMERAL: "1",
       ...environment,
       CODEX_DEMO_CAPTURE: capture ? "1" : "0",
       CODEX_DEMO_CURRENT_SIDEBAR: scene.currentSidebar ? "1" : "0",

@@ -76,7 +76,9 @@ interface CodexDemoBridge {
     threadId: string;
     answers: Record<string, string[]>;
   }): Promise<void>;
-  startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan" }): Promise<{
+  listLiveThreads(input: { projectToken: string; cursor?: string }): Promise<{ threads: Array<{ id: string; title: string; updatedAt: number }>; nextCursor: string | null }>;
+  readLiveThread(input: { projectToken: string; threadId: string }): Promise<{ threadId: string; turns: import("./live-history-state").StoredLiveTurn[] }>;
+  startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan"; threadId?: string | null }): Promise<{
     threadId: string;
     turnId: string;
   }>;

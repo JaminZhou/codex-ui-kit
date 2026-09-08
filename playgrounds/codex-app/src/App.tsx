@@ -204,6 +204,7 @@ import { changeStats, reviewContent } from "./diff-lines";
 import { initialLiveProjectState, liveProjectState, reduceLiveProjectState } from "./live-project-state";
 import { reduceLiveInputs } from "./live-input-state";
 import { LiveUserInput } from "./LiveUserInput";
+import { LiveThreadList } from "./LiveThreadList";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -3068,6 +3069,8 @@ export function App() {
   );
   const [replayCount, setReplayCount] = useState(initialCount);
   const [liveInputs, dispatchLiveInput] = useReducer(reduceLiveInputs, []);
+  const [liveHistoryLoading, setLiveHistoryLoading] = useState(false);
+  const liveHistoryReadId = useRef(0);
   const [liveProjects, dispatchLive] = useReducer(
     reduceLiveProjectState,
     initialLiveProjectState,
@@ -3690,6 +3693,8 @@ export function App() {
   const [workspaceBranchCheckoutPending, setWorkspaceBranchCheckoutPending] =
     useState(false);
   const updateWorkspaceProjectId = (projectId: string | null) => {
+    liveHistoryReadId.current += 1;
+    setLiveHistoryLoading(false);
     workspaceProjectIdRef.current = projectId;
     setWorkspaceBranchSwitchError(undefined);
     setWorkspaceProjectId(projectId);
@@ -5039,6 +5044,8 @@ export function App() {
   };
 
   const selectMode = (nextMode: "live" | "replay") => {
+    liveHistoryReadId.current += 1;
+    setLiveHistoryLoading(false);
     if (nextMode === "live" && composerMode === "goal") setComposerMode(null);
     if (nextMode === "live" && mode !== "live") {
       // A replay terminal is not a live process and must not retain its
@@ -5236,7 +5243,44 @@ export function App() {
     }
   };
 
+  const newLiveChat = () => {
+    if (liveStartPending) return;
+    liveHistoryReadId.current += 1;
+    setLiveHistoryLoading(false);
+    if (workspaceProjectToken) dispatchLive({ kind: "live-unbind", projectToken: workspaceProjectToken });
+    setView("conversation");
+    setComposerValue("");
+    setComposerAttachments([]);
+    setSubmittedComposerAttachments([]);
+    setSubmittedComposerPrompt(null);
+    setComposerOverlay(null);
+    setLiveError(null);
+    dismissSidebarAfterNavigation();
+  };
+  const openLiveHistory = async (threadId: string) => {
+    if (!workspaceProjectToken || !window.codexDemo) return;
+    const projectId = workspaceProjectId;
+    const projectToken = workspaceProjectToken;
+    const requestId = ++liveHistoryReadId.current;
+    setLiveHistoryLoading(true);
+    setLiveError(null);
+    try {
+      const history = await window.codexDemo.readLiveThread({ projectToken, threadId });
+      if (requestId !== liveHistoryReadId.current || workspaceProjectIdRef.current !== projectId) return;
+      dispatchLive({ kind: "live-history", projectToken, ...history });
+      setView("conversation");
+      setComposerValue("");
+      setComposerAttachments([]);
+      setComposerOverlay(null);
+      dismissSidebarAfterNavigation();
+    } catch {
+      if (requestId === liveHistoryReadId.current && workspaceProjectIdRef.current === projectId) setLiveError("Couldn’t open this chat. Select it again to retry.");
+    } finally {
+      if (requestId === liveHistoryReadId.current) setLiveHistoryLoading(false);
+    }
+  };
   const submitLive = async (prompt: string) => {
+    if (liveHistoryLoading) return;
     if (!window.codexDemo) {
       setLiveError("Live mode is available in the Electron app.");
       return;
@@ -5251,7 +5295,7 @@ export function App() {
     setMode("live");
     setLiveError(null);
     try {
-      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken, collaborationMode: composerMode === "plan" ? "plan" : "default" });
+      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken, collaborationMode: composerMode === "plan" ? "plan" : "default", threadId: liveState.threadId ?? null });
       setComposerValue((current) => (current === prompt ? "" : current));
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
@@ -6203,7 +6247,8 @@ export function App() {
                   : undefined
               }
               className="demo-sidebar-new-chat"
-              onClick={() => openWorkspace()}
+              disabled={mode === "live" && liveStartPending}
+              onClick={() => mode === "live" ? newLiveChat() : openWorkspace()}
               type="button"
             >
               <SidebarGlyph name="new" />
@@ -6240,7 +6285,8 @@ export function App() {
           </div>
           <AppSidebarItem
             leading={<SidebarGlyph name="new" />}
-            onClick={() => openWorkspace()}
+            disabled={mode === "live" && liveStartPending}
+            onClick={() => mode === "live" ? newLiveChat() : openWorkspace()}
           >
             New chat
           </AppSidebarItem>
@@ -6337,7 +6383,7 @@ export function App() {
         />
       ) : (
         <>
-      <AppSidebarSection
+      {mode === "replay" && <AppSidebarSection
         collapsible
         kind={currentSidebarWorktreeLifecycle ? "projects" : "pinned"}
         title={currentSidebarWorktreeLifecycle ? "Projects" : "Pinned"}
@@ -6670,7 +6716,7 @@ export function App() {
             </AppSidebarItem>
           </>
         )}
-      </AppSidebarSection>
+      </AppSidebarSection>}
       {currentSidebarWorktreeLifecycle ? null : (
       <AppSidebarSection
         actions={
@@ -6718,14 +6764,13 @@ export function App() {
         >
           codex-ui-kit
         </AppSidebarItem>
-        <AppSidebarItem
+        {mode === "replay" && <><AppSidebarItem
           leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("app-server-client")}
           selected={
             view === "workspace" &&
             workspaceProjectId === "app-server-client"
           }
-          aria-pressed={mode === "live" ? workspaceProjectId === "app-server-client" : undefined}
         >
           codex-app-server-client
         </AppSidebarItem>
@@ -6735,7 +6780,7 @@ export function App() {
           statusLabel="Project task queued"
         >
           protocol-client-with-an-intentionally-long-worktree-name
-        </AppSidebarItem>
+        </AppSidebarItem></>}
       </AppSidebarSection>
       )}
       {projectCreationStatus === "error" &&
@@ -6750,7 +6795,10 @@ export function App() {
         title="Recents"
         toggleLabel="Toggle recent tasks"
       >
-        {currentSidebarThreadLifecycle
+        {mode === "live" ? <LiveThreadList projectToken={workspaceProjectToken} selectedId={liveState.threadId}
+          refreshKey={`${liveState.threadId}:${liveState.status}`} busy={liveHistoryLoading}
+          runningIds={Object.entries(liveProjects.threads).filter(([, thread]) => isTurnActive(thread.status)).map(([id]) => id)}
+          onSelect={(id) => void openLiveHistory(id)} /> : currentSidebarThreadLifecycle
           ? null
           : initialSelection.sidebarState === "collection-long-list"
             ? (
@@ -6796,6 +6844,7 @@ export function App() {
           usesCurrentMcpFlatRows) &&
           state.status === "running");
   const composerIsDisabled =
+    liveHistoryLoading ||
     liveStartPending ||
     ((isConversationLifecycle ||
       isCurrentAttachmentReplay ||
