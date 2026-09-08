@@ -7,6 +7,7 @@ export interface OwnedLiveThread {
   directory: string;
   title: string;
   updatedAt: number;
+  archived?: boolean;
 }
 
 export interface OwnedLiveProject {
@@ -40,7 +41,8 @@ export class LiveThreadRegistry {
     for (const thread of value.threads) {
       if (!thread || typeof thread.id !== "string" || !thread.id || ids.has(thread.id) ||
           typeof thread.directory !== "string" || !isAbsolute(thread.directory) ||
-          typeof thread.title !== "string" || typeof thread.updatedAt !== "number" || !Number.isFinite(thread.updatedAt)) {
+          typeof thread.title !== "string" || typeof thread.updatedAt !== "number" || !Number.isFinite(thread.updatedAt) ||
+          (thread.archived !== undefined && typeof thread.archived !== "boolean")) {
         throw new Error("Invalid live history registry.");
       }
       ids.add(thread.id);
@@ -76,8 +78,8 @@ export class LiveThreadRegistry {
     return next;
   }
 
-  list(directory: string): Promise<OwnedLiveThread[]> {
-    return this.serialize(async () => (await this.read()).threads.filter(thread => thread.directory === directory)
+  list(directory: string, archived = false): Promise<OwnedLiveThread[]> {
+    return this.serialize(async () => (await this.read()).threads.filter(thread => thread.directory === directory && Boolean(thread.archived) === archived)
       .sort((a, b) => b.updatedAt - a.updatedAt || a.id.localeCompare(b.id)));
   }
 
@@ -101,8 +103,8 @@ export class LiveThreadRegistry {
     });
   }
 
-  async require(directory: string, id: string): Promise<OwnedLiveThread> {
-    const thread = (await this.list(directory)).find(thread => thread.id === id);
+  async require(directory: string, id: string, archived = false): Promise<OwnedLiveThread> {
+    const thread = (await this.list(directory, archived)).find(thread => thread.id === id);
     if (!thread) throw new Error("This thread does not belong to the selected playground project.");
     return thread;
   }
@@ -126,7 +128,7 @@ export class LiveThreadRegistry {
     return this.serialize(async () => {
       if (typeof name !== "string" || !name.trim() || name.trim().length > 200) throw new TypeError("A chat name between 1 and 200 characters is required.");
       const data = await this.read();
-      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
+      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory && !entry.archived);
       if (!thread) throw new Error("This thread does not belong to the selected playground project.");
       const title = name.trim();
       await apply(title);
@@ -140,12 +142,41 @@ export class LiveThreadRegistry {
     return this.serialize(async () => {
       if (!Number.isFinite(updatedAt)) throw new TypeError("Invalid update time.");
       const data = await this.read();
-      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
+      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory && !entry.archived);
       if (!thread) throw new Error("This thread does not belong to the selected playground project.");
       thread.updatedAt = Math.max(thread.updatedAt, updatedAt);
       const project = data.projects.find(project => project.path === directory);
       if (project) project.updatedAt = Math.max(project.updatedAt, updatedAt);
       await this.write(data);
+    });
+  }
+
+  /** Returned IDs are actual remote notifications, not guessed descendants.
+   * Only already-owned IDs can be updated; unarchive never implies subtree restore. */
+  setArchived(directory: string, id: string, archived: boolean, apply: () => Promise<string[]>): Promise<string[]> {
+    return this.serialize(async () => {
+      const data = await this.read();
+      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
+      if (!thread) throw new Error("This thread does not belong to the selected playground project.");
+      const changed = await apply();
+      const targets = new Set(archived ? [id, ...changed] : [id]);
+      const owned = data.threads.filter(entry => targets.has(entry.id));
+      for (const entry of owned) entry.archived = archived;
+      await this.write(data);
+      return owned.map(entry => entry.id);
+    });
+  }
+
+  observeArchived(id: string, archived: boolean): Promise<boolean> {
+    return this.serialize(async () => {
+      const data = await this.read();
+      const thread = data.threads.find(entry => entry.id === id);
+      if (!thread) return false;
+      if (Boolean(thread.archived) !== archived) {
+        thread.archived = archived;
+        await this.write(data);
+      }
+      return true;
     });
   }
 }

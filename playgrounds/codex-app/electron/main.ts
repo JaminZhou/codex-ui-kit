@@ -115,7 +115,7 @@ function historyRegistry() {
 
 function resolveHistoryProject(raw: unknown) {
   if (!raw || typeof raw !== "object") throw new TypeError("A selected project is required.");
-  const input = raw as { projectToken?: unknown; threadId?: unknown; cursor?: unknown };
+  const input = raw as { projectToken?: unknown; threadId?: unknown; cursor?: unknown; archived?: unknown };
   const directory = typeof input.projectToken === "string" ? trustedProjectDirectories.get(input.projectToken) : undefined;
   if (!directory) throw new Error("Select a host-owned local project.");
   return { input, directory };
@@ -247,6 +247,15 @@ async function delayGitBranchOperationForFixture(
 }
 
 function broadcastNotification(notification: JsonRpcNotification) {
+  if (notification.method === "thread/archived" || notification.method === "thread/unarchived") {
+    const params = notification.params as { threadId?: unknown } | undefined;
+    if (typeof params?.threadId === "string") {
+      const threadId = params.threadId;
+      void historyRegistry().observeArchived(threadId, notification.method === "thread/archived").then(owned => {
+        if (owned) liveSession.removeWhere(session => session.thread.id === threadId);
+      }).catch(() => { console.error("Could not persist an owned thread archive notification."); });
+    }
+  }
   if (notification.method === "turn/completed") {
     const params = notification.params as { threadId?: unknown; turn?: { id?: unknown } } | undefined;
     if (typeof params?.threadId === "string" && typeof params.turn?.id === "string") {
@@ -896,7 +905,8 @@ ipcMain.handle("demo:live:threads", async (event, raw: unknown) => {
   if (input.cursor !== undefined && (typeof input.cursor !== "string" || !/^\d+$/.test(input.cursor))) throw new TypeError("Invalid thread-list cursor.");
   const offset = input.cursor === undefined ? 0 : Number(input.cursor);
   if (!Number.isSafeInteger(offset)) throw new TypeError("Invalid thread-list cursor.");
-  const threads = await historyRegistry().list(directory);
+  if (input.archived !== undefined && typeof input.archived !== "boolean") throw new TypeError("Invalid archived filter.");
+  const threads = await historyRegistry().list(directory, input.archived === true);
   return { threads: threads.slice(offset, offset + 20).map(({ id, title, updatedAt }) => ({ id, title, updatedAt })), nextCursor: offset + 20 < threads.length ? String(offset + 20) : null };
 });
 ipcMain.handle("demo:live:thread:read", async (event, raw: unknown) => {
@@ -925,6 +935,31 @@ ipcMain.handle("demo:live:thread:rename", async (event, raw: unknown) => {
     await connectedClient.threadSetName({ threadId, name });
   });
   return { threadId, title };
+});
+ipcMain.handle("demo:live:thread:archive", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  if (typeof input.threadId !== "string" || typeof input.archived !== "boolean") throw new TypeError("A thread and archive state are required.");
+  const { threadId, archived } = input;
+  // Use the same lock as turn/start: do not race an archive with a new turn.
+  return liveTurnStartGate.run(() => activeTurn !== null, async () => {
+    const changed = await historyRegistry().setArchived(directory, threadId, archived, async () => {
+      const connectedClient = await ensureClient();
+      const { thread } = await connectedClient.threadRead({ threadId, includeTurns: false });
+      if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed.");
+      if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
+      if (thread.status.type === "active") throw new Error("Wait for this chat to finish before archiving or restoring it.");
+      const observed: string[] = [];
+      const stop = connectedClient.onNotification("thread/archived", params => { observed.push(params.threadId); });
+      try {
+        if (archived) await connectedClient.threadArchive({ threadId });
+        else await connectedClient.threadUnarchive({ threadId });
+      } finally { stop(); }
+      return observed;
+    });
+    liveSession.removeWhere(session => changed.includes(session.thread.id));
+    return { threadId, archived, changedThreadIds: changed };
+  });
 });
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {

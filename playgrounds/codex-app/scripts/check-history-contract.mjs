@@ -22,6 +22,12 @@ try {
     catch { return true; }
   });
   assert.equal(denied, true, "Unowned IDs must fail before contacting App Server");
+  for (const archived of [true, false]) {
+    assert.equal(await page.evaluate(async archived => {
+      try { await window.codexDemo.setLiveThreadArchived({ projectToken: "startup-workspace", threadId: "foreign-thread", archived }); return false; }
+      catch { return true; }
+    }, archived), true, "Archive and restore must reject unowned IDs before contacting App Server");
+  }
   await writeFile(registry, JSON.stringify({ version: 1, threads: Array.from({ length: 25 }, (_, i) => ({ id: `owned-${i}`, title: `Owned chat ${i}`, directory, updatedAt: 100 - i })) }));
   await page.getByRole("button", { name: "Refresh chats", exact: true }).click();
   await page.getByRole("button", { name: "Owned chat 19", exact: true }).waitFor();
@@ -67,6 +73,48 @@ try {
   await page.getByRole("button", { name: "Owned chat 0", exact: true }).click();
   await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
   assert.equal(await page.getByRole("button", { name: "Owned chat 0", exact: true }).getAttribute("aria-pressed"), "true");
+  await page.getByRole("button", { name: "Owned chat 0", exact: true }).hover();
+  await page.getByRole("button", { name: "Archive Owned chat 0", exact: true }).click();
+  await page.getByText("Archive this chat and its spawned child chats. This does not permanently delete them.", { exact: true }).waitFor();
+  for (const width of [1180, 720]) {
+    await app.evaluate(({ BrowserWindow }, width) => BrowserWindow.getAllWindows()[0].setContentSize(width, 820), width);
+    await page.waitForFunction(width => innerWidth === width, width);
+    const bounds = await page.getByRole("dialog", { name: "Archive chat", exact: true }).boundingBox();
+    assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= width && bounds.y >= 0 && bounds.y + bounds.height <= 820);
+    await page.screenshot({ path: join(directory, `archive-confirm-${width}.png`) });
+  }
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
+  await app.evaluate(({ ipcMain }) => {
+    ipcMain.removeHandler("demo:live:thread:archive");
+    let calls = 0;
+    ipcMain.handle("demo:live:thread:archive", (_event, input) => {
+      if (++calls === 1) throw new Error("synthetic archive transport failure");
+      return { threadId: input.threadId, archived: input.archived, changedThreadIds: [input.threadId] };
+    });
+  });
+  await page.getByRole("button", { name: "Archive Owned chat 0", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm archive", exact: true }).click();
+  await page.getByText("Couldn’t update chat archive. Try again.", { exact: true }).waitFor();
+  const archiveFixture = JSON.parse(await readFile(registry, "utf8"));
+  archiveFixture.threads.find(row => row.id === "owned-0").archived = true;
+  await writeFile(registry, JSON.stringify(archiveFixture));
+  await page.getByRole("button", { name: "Confirm archive", exact: true }).click();
+  await page.getByRole("dialog", { name: "Archive chat", exact: true }).waitFor({ state: "hidden" });
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor({ state: "hidden" });
+  await page.getByRole("button", { name: "Show archived chats", exact: true }).click();
+  await page.getByRole("button", { name: "Owned chat 0", exact: true }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Owned chat 0", exact: true }).isDisabled(), true);
+  await page.getByRole("button", { name: "Owned chat 0", exact: true }).hover();
+  await page.getByRole("button", { name: "Restore Owned chat 0", exact: true }).click();
+  await page.getByText("Restore this chat only. Archived child chats are not restored automatically.", { exact: true }).waitFor();
+  archiveFixture.threads.find(row => row.id === "owned-0").archived = false;
+  await writeFile(registry, JSON.stringify(archiveFixture));
+  await page.getByRole("button", { name: "Confirm restore", exact: true }).click();
+  await page.getByText("No archived chats in this project.", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "Show active chats", exact: true }).click();
+  await page.getByRole("button", { name: "Owned chat 0", exact: true }).click();
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
   await page.getByRole("button", { name: "New chat", exact: true }).first().click();
   assert.equal(await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).count(), 0);
   await page.getByRole("button", { name: "Owned chat 1", exact: true }).click();

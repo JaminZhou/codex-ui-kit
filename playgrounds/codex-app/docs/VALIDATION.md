@@ -606,7 +606,7 @@ The fixed runtime supports full reads/resume of the sampled paginated history,
 despite the current public documentation's unsupported-mode note. Its thread
 source was `vscode`, not `appServer`; source labels are therefore not used as an
 ownership boundary. See [public thread APIs](https://learn.chatgpt.com/docs/app-server).
-Archive/delete UI and installed-product
+Permanent-delete UI and installed-product
 pixel parity remain separate delivery work.
 
 ## Live project discovery
@@ -637,3 +637,22 @@ exact disposable threads. This signed-in probe is distinct from deterministic
 acceptance and must pass before claiming the live rename lifecycle.
 The implementation follows the public `thread/name/set` contract in
 [OpenAI App Server documentation](https://learn.chatgpt.com/docs/app-server).
+
+## Live archive and restore
+
+`check:history` covers confirmation and Cancel, synthetic remote failure/Retry,
+active/archived filtering, selection invalidation, restore and fresh history.
+Archive confirmation is captured and bounded at 1180/720px. Host IPC rejects
+unowned IDs before server access; archive/restore shares the start-turn gate.
+Unit tests cover owned descendant notifications, delayed cache invalidation,
+restore-one semantics, and failed remote operations preserving local state.
+
+`check:live-history` performs three actual turns on two isolated owned threads.
+It renames A, archives A via the UI, verifies the real archive notification,
+restarts Electron, restores A from archived history, verifies the real restore
+notification, loads its prior messages, and continues the exact same ID. The
+public stored name is checked before exact fixture-thread cleanup. This passed
+after fixing an empty-cache entry created by the unarchive metadata event;
+the failed probe receipt remains in its temporary evidence directory. No global
+Codex history or permanent deletion is used. Real multi-descendant archive and
+current-product pixel parity remain separate evidence requirements.
