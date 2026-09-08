@@ -3275,6 +3275,12 @@ export function App() {
   const [liveProjectsError, setLiveProjectsError] = useState(false);
   const [liveProjectsRefresh, setLiveProjectsRefresh] = useState(0);
   useEffect(() => {
+    if (mode !== "live") return;
+    const refresh = () => setLiveProjectsRefresh(value => value + 1);
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, [mode]);
+  useEffect(() => {
     if (mode !== "live" || !window.codexDemo) return;
     let active = true;
     setLiveProjectsError(false);
