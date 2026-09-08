@@ -17,6 +17,21 @@ for (const width of [1180, 720]) {
       globalThis.__prEdited = null;
       globalThis.__prEditCalls = [];
       globalThis.__prEditLosesResponse = true;
+      globalThis.__prMergeCalls = [];
+      globalThis.__prMerged = false;
+      globalThis.__prMergeStatusFails = false;
+      ipcMain.removeHandler("demo:git:pr-merge");
+      ipcMain.removeHandler("demo:git:pr-merge-status");
+      ipcMain.handle("demo:git:pr-merge", async (_event, input) => {
+        globalThis.__prMergeCalls.push(input);
+        await new Promise(resolve => { globalThis.__prMergeRelease = resolve; });
+        globalThis.__prMerged = true;
+        throw new Error("synthetic merged but reconciliation failed");
+      });
+      ipcMain.handle("demo:git:pr-merge-status", (_event, input) => {
+        if (globalThis.__prMergeStatusFails) throw new Error("synthetic status read failure");
+        return { number: input.number, url: "https://github.com/owner/repo/pull/1", state: globalThis.__prMerged ? "MERGED" : "OPEN", head: input.head, branch: "feat/example", baseRefName: "main", baseRefOid: "b".repeat(40), mergeable: "UNKNOWN", mergeCommit: globalThis.__prMerged ? "c".repeat(40) : null };
+      });
       ipcMain.removeHandler("demo:git:pr-edit");
       ipcMain.handle("demo:git:pr-edit", (_event, input) => {
         globalThis.__prEditCalls.push(input);
@@ -147,6 +162,39 @@ for (const width of [1180, 720]) {
     await editor.getByRole("button", { name: "Cancel PR edit", exact: true }).click();
     assert.equal((await app.evaluate(() => globalThis.__prEditCalls)).length, 2);
     assert.equal(await dialog.getByLabel("PR description", { exact: true }).inputValue(), "Preserve this draft");
+    await dialog.getByRole("button", { name: "Prepare admin squash merge", exact: true }).click();
+    const mergePanel = dialog.getByRole("region", { name: "Confirm PR merge", exact: true });
+    const merge = mergePanel.getByRole("button", { name: "Confirm admin squash merge", exact: true });
+    assert.equal(await merge.isDisabled(), true);
+    await mergePanel.getByLabel("Authorize admin merge after local validation", { exact: true }).check();
+    await mergePanel.getByLabel("Confirm merge head", { exact: true }).fill("wrong");
+    assert.equal(await merge.isDisabled(), true);
+    await mergePanel.getByLabel("Confirm merge head", { exact: true }).fill("a".repeat(40));
+    assert.equal((await app.evaluate(() => globalThis.__prMergeCalls)).length, 0);
+    await mergePanel.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: join(directory, `merge-confirm-${width}.png`) });
+    await merge.click();
+    await dialog.getByText("Merging pull request…", { exact: true }).waitFor();
+    assert.equal(await dialog.getByRole("button", { name: "Close", exact: true }).isDisabled(), true);
+    await app.evaluate(() => { globalThis.__prMergeRelease(); });
+    await mergePanel.getByRole("alert").waitFor();
+    assert.equal(await merge.isDisabled(), true, "Uncertain merge must not allow a blind retry");
+    const mergeCalls = await app.evaluate(() => globalThis.__prMergeCalls);
+    assert.equal(mergeCalls.length, 1);
+    assert.equal(mergeCalls[0].head, "a".repeat(40));
+    assert.equal(mergeCalls[0].adminConfirmed, true);
+    await app.evaluate(() => { globalThis.__prMergeStatusFails = true; });
+    await mergePanel.getByRole("button", { name: "Check merge result", exact: true }).click();
+    await mergePanel.getByRole("alert").waitFor();
+    await app.evaluate(() => { globalThis.__prMergeStatusFails = false; });
+    await mergePanel.getByRole("button", { name: "Check merge result", exact: true }).click();
+    await mergePanel.getByText(/^Merged PR #1 at/).waitFor();
+    assert.equal(await merge.count(), 0);
+    assert.equal(await detail.count(), 0);
+    assert.equal((await app.evaluate(() => globalThis.__prMergeCalls)).length, 1);
+    const mergeFooter = await dialog.getByRole("button", { name: "Close", exact: true }).boundingBox();
+    assert.ok(mergeFooter && mergeFooter.y >= 0 && mergeFooter.y + mergeFooter.height <= 820);
+    await page.screenshot({ path: join(directory, `merged-${width}.png`) });
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
     await page.waitForFunction(() => document.activeElement?.textContent === "Prepare pull request");
   } finally { await app.close(); }
