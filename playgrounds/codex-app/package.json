@@ -21,6 +21,7 @@
     "check:live-policy": "node scripts/check-live-policy.mjs",
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
     "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
+    "check:live-approval": "node scripts/check-live-approval.mjs",
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
