@@ -14,8 +14,13 @@ export interface TerminalExecutionRequest {
   processId: string;
   streamStdin: true;
   streamStdoutStderr: true;
-  timeoutMs: number;
-  outputBytesCap: number;
+  timeoutMs?: number;
+  outputBytesCap?: number;
+  disableTimeout?: true;
+  disableOutputCap?: true;
+  tty?: true;
+  size?: { cols: number; rows: number };
+  env?: Record<string, string>;
   sandboxPolicy: ReturnType<typeof liveWorkspacePolicy>["sandboxPolicy"];
 }
 
@@ -23,6 +28,7 @@ export interface TerminalTransport {
   execute(input: TerminalExecutionRequest): Promise<TerminalExecutionResult>;
   write(processId: string, deltaBase64: string): Promise<unknown>;
   terminate(processId: string): Promise<unknown>;
+  resize(processId: string, size: { cols: number; rows: number }): Promise<unknown>;
 }
 
 export type LiveTerminalEvent =
@@ -34,6 +40,7 @@ export type LiveTerminalEvent =
 interface RunningTerminal {
   sessionId: string;
   processId: string;
+  tty: boolean;
   decoders: Record<"stdout" | "stderr", StringDecoder>;
 }
 
@@ -52,9 +59,20 @@ export class LiveTerminalManager {
   ) {}
 
   start(input: unknown): { processId: string } {
+    return this.launch(input, false);
+  }
+
+  openShell(input: unknown): { processId: string } {
+    return this.launch(input, true);
+  }
+
+  private launch(input: unknown, tty: boolean): { processId: string } {
     if (this.closed) throw new Error("The terminal connection is closed.");
     if (!input || typeof input !== "object") throw new TypeError("Terminal input is required.");
-    const { sessionId, projectToken, command } = input as Record<string, unknown>;
+    const options = input as Record<string, unknown>;
+    const { sessionId, projectToken } = options;
+    const command = tty ? "zsh" : options.command;
+    const size = tty ? this.validateSize(options.size) : undefined;
     if (typeof sessionId !== "string" || !sessionId || sessionId.length > 200) {
       throw new TypeError("A terminal session id is required.");
     }
@@ -67,7 +85,7 @@ export class LiveTerminalManager {
     const sandboxPolicy = liveWorkspacePolicy(cwd, this.writeOptIn).sandboxPolicy;
     const processId = randomUUID();
     const running: RunningTerminal = {
-      sessionId, processId,
+      sessionId, processId, tty,
       decoders: { stdout: new StringDecoder("utf8"), stderr: new StringDecoder("utf8") },
     };
     this.running.set(sessionId, running);
@@ -76,9 +94,12 @@ export class LiveTerminalManager {
     let completion: Promise<TerminalExecutionResult>;
     try {
       completion = this.transport.execute({
-        command: ["/bin/zsh", "-c", command], cwd, processId,
+        command: tty ? ["/bin/zsh", "-f", "-i"] : ["/bin/zsh", "-c", command], cwd, processId,
         streamStdin: true, streamStdoutStderr: true,
-        timeoutMs: 120000, outputBytesCap: 1024 * 1024, sandboxPolicy,
+        ...(tty
+          ? { tty: true as const, size, env: { TERM: "xterm-256color" }, disableTimeout: true as const, disableOutputCap: true as const }
+          : { timeoutMs: 120000, outputBytesCap: 1024 * 1024 }),
+        sandboxPolicy,
       });
     } catch (error) {
       completion = Promise.reject(error);
@@ -117,6 +138,22 @@ export class LiveTerminalManager {
 
   async stop(sessionId: string) {
     await this.transport.terminate(this.requireRunning(sessionId).processId);
+  }
+
+  async resize(sessionId: string, size: unknown) {
+    const running = this.requireRunning(sessionId);
+    if (!running.tty) throw new Error("This terminal is not a PTY.");
+    await this.transport.resize(running.processId, this.validateSize(size));
+  }
+
+  private validateSize(input: unknown): { cols: number; rows: number } {
+    if (!input || typeof input !== "object") throw new TypeError("Terminal size is required.");
+    const { cols, rows } = input as Record<string, unknown>;
+    if (typeof cols !== "number" || !Number.isInteger(cols) || cols < 2 || cols > 500 ||
+        typeof rows !== "number" || !Number.isInteger(rows) || rows < 1 || rows > 300) {
+      throw new TypeError("Invalid terminal size.");
+    }
+    return { cols, rows };
   }
 
   /** Invalidate callbacks before closing the owning App Server connection.

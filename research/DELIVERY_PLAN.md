@@ -1160,9 +1160,11 @@ assertion, and raw-added-file Review now pass at 1180/720px. The command-oriente
 Terminal follow-up reaches real success/failure, stdin, stop and mode-change
 process cleanup through Electron using sandboxed App Server execution. See
 the explicit local gate and limitations in
-[`VALIDATION.md`](../playgrounds/codex-app/docs/VALIDATION.md). Persistent shell
-state, full PTY UI behavior and model-background-process integration remain
-open; this does not close the complete-workflow exit gate.
+[`VALIDATION.md`](../playgrounds/codex-app/docs/VALIDATION.md). The persistent
+PTY follow-up now retains shell state and emulator output independently of
+panel mounting and adds raw input, resize and tab-close ownership checks.
+Model-background-process integration and current-product PTY visual evidence
+remain open; this does not close the complete-workflow exit gate.
 
 ### 6. Perform global visual convergence
 

@@ -54,6 +54,8 @@ interface CodexDemoBridge {
   >;
   closeLive(): Promise<void>;
   startTerminal(input: { sessionId: string; projectToken: string; command: string }): Promise<{ processId: string }>;
+  openTerminalShell(input: { sessionId: string; projectToken: string; size: { cols: number; rows: number } }): Promise<{ processId: string }>;
+  resizeTerminal(input: { sessionId: string; size: { cols: number; rows: number } }): Promise<void>;
   writeTerminal(input: { sessionId: string; text: string }): Promise<void>;
   stopTerminal(input: { sessionId: string }): Promise<void>;
   closeTerminals(): Promise<void>;

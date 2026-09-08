@@ -16,6 +16,17 @@ import {
 afterEach(cleanup);
 
 describe("terminal panel", () => {
+  it("accepts host terminal content without mounting a second input or transcript", () => {
+    render(<TerminalPanel
+      activeSessionId="pty"
+      onActiveSessionChange={() => undefined}
+      sessions={[{ id: "pty", label: "Persistent shell", entries: [], value: "", terminalContent: <div role="region" aria-label="PTY screen">screen</div> }]}
+    />);
+    expect(screen.getByRole("region", { name: "PTY screen" })).toBeTruthy();
+    expect(screen.queryByRole("textbox", { name: "Terminal input" })).toBeNull();
+    expect(screen.queryByRole("log")).toBeNull();
+  });
+
   it("renders typed transcript entries as an accessible log", () => {
     render(
       <TerminalTranscript

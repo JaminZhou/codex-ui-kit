@@ -5,7 +5,7 @@ function setup(writeOptIn?: string) {
   let finish!: (result: TerminalExecutionResult) => void;
   let fail!: (error: Error) => void;
   const completion = new Promise<TerminalExecutionResult>((resolve, reject) => { finish = resolve; fail = reject; });
-  const transport: TerminalTransport = { execute: vi.fn(() => completion), write: vi.fn(async () => ({})), terminate: vi.fn(async () => ({})) };
+  const transport: TerminalTransport = { execute: vi.fn(() => completion), write: vi.fn(async () => ({})), terminate: vi.fn(async () => ({})), resize: vi.fn(async () => ({})) };
   const events: LiveTerminalEvent[] = [];
   const manager = new LiveTerminalManager(transport, new Map([["selected", "/projects/selected"]]), event => events.push(event), writeOptIn);
   const input = { sessionId: "terminal-1", projectToken: "selected", command: "echo hello" };
@@ -13,6 +13,37 @@ function setup(writeOptIn?: string) {
 }
 
 describe("live terminal host ownership", () => {
+  it("opens a persistent host-owned PTY and routes validated resize and raw control input", async () => {
+    const { manager, transport, input } = setup();
+    const { processId } = manager.openShell({ ...input, command: "forged", size: { cols: 80, rows: 24 } });
+    expect(transport.execute).toHaveBeenCalledWith({
+      command: ["/bin/zsh", "-f", "-i"], cwd: "/projects/selected", processId,
+      streamStdin: true, streamStdoutStderr: true, tty: true,
+      size: { cols: 80, rows: 24 }, env: { TERM: "xterm-256color" },
+      disableTimeout: true, disableOutputCap: true,
+      sandboxPolicy: { type: "readOnly", networkAccess: false },
+    });
+    await manager.resize(input.sessionId, { cols: 100, rows: 30 });
+    expect(transport.resize).toHaveBeenCalledWith(processId, { cols: 100, rows: 30 });
+    await manager.write(input.sessionId, "\u0003");
+    expect(transport.write).toHaveBeenCalledWith(processId, "Aw==");
+    for (const size of [null, {}, { cols: 0, rows: 24 }, { cols: 80.5, rows: 24 }, { cols: 80, rows: 301 }]) {
+      await expect(manager.resize(input.sessionId, size)).rejects.toThrow();
+    }
+    await expect(manager.resize("foreign", { cols: 80, rows: 24 })).rejects.toThrow();
+    manager.dispose();
+  });
+
+  it("rejects invalid initial sizes without launching and refuses resize for non-PTY commands", async () => {
+    const { manager, transport, input } = setup();
+    expect(() => manager.openShell(input)).toThrow("size");
+    expect(transport.execute).not.toHaveBeenCalled();
+    manager.start(input);
+    await expect(manager.resize(input.sessionId, { cols: 80, rows: 24 })).rejects.toThrow("not a PTY");
+    expect(transport.resize).not.toHaveBeenCalled();
+    manager.dispose();
+  });
+
   it("uses the trusted path, generated process id and host policy, ignoring injected options", () => {
     const { manager, transport, input } = setup();
     const { processId } = manager.start({ ...input, cwd: "/elsewhere", processId: "forged", sandboxPolicy: { type: "dangerFullAccess" } });

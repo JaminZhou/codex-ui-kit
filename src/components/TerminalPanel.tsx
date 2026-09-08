@@ -165,6 +165,8 @@ const terminalSessionStatusLabel: Record<
 export interface TerminalSessionProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   entries: readonly TerminalEntry[];
+  /** Host-provided terminal emulator; replaces the transcript and line prompt. */
+  terminalContent?: ReactNode;
   followOutput?: boolean;
   inputDisabled?: boolean;
   inputLabel?: string;
@@ -185,6 +187,7 @@ export interface TerminalSessionProps
 export function TerminalSession({
   className,
   entries,
+  terminalContent,
   followOutput = true,
   inputDisabled = false,
   inputLabel = "Terminal input",
@@ -219,7 +222,7 @@ export function TerminalSession({
           reloadLabel={reloadLabel}
           title={reloadTitle}
         />
-      ) : (
+      ) : terminalContent !== undefined ? terminalContent : (
         <>
           <TerminalTranscript
             entries={entries}
@@ -280,6 +283,7 @@ export function TerminalReloadNotice({
 export interface TerminalPanelSession {
   closeLabel?: string;
   entries: readonly TerminalEntry[];
+  terminalContent?: ReactNode;
   icon?: ReactNode;
   id: string;
   inputDisabled?: boolean;
@@ -389,6 +393,7 @@ export function TerminalPanel({
           content: (
             <TerminalSession
               entries={session.entries}
+              terminalContent={session.terminalContent}
               inputDisabled={session.inputDisabled}
               inputLabel={session.inputLabel}
               label={session.label}

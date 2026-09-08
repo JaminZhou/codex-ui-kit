@@ -396,6 +396,7 @@ async function ensureTerminalHost() {
       execute: input => terminalClient.call("command/exec", input),
       write: (processId, deltaBase64) => terminalClient.call("command/exec/write", { processId, deltaBase64 }),
       terminate: processId => terminalClient.call("command/exec/terminate", { processId }),
+      resize: (processId, size) => terminalClient.call("command/exec/resize", { processId, size }),
     }, trustedProjectDirectories, terminalEvent => {
       if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("demo:terminal:event", terminalEvent);
     }, liveWriteOptIn);
@@ -789,6 +790,20 @@ ipcMain.handle("demo:terminal:write", async (event, input) => {
   assertTrustedIpc(event);
   if (!terminalHost || typeof input?.sessionId !== "string" || typeof input?.text !== "string") throw new Error("Invalid terminal input.");
   await terminalHost.manager.write(input.sessionId, input.text);
+});
+ipcMain.handle("demo:terminal:open-shell", async (event, input) => {
+  assertTrustedIpc(event);
+  if (!input || typeof input.projectToken !== "string" || !trustedProjectDirectories.has(input.projectToken)) {
+    throw new Error("Select a host-owned local project.");
+  }
+  const manager = await ensureTerminalHost();
+  assertTrustedIpc(event);
+  return manager.openShell(input);
+});
+ipcMain.handle("demo:terminal:resize", async (event, input) => {
+  assertTrustedIpc(event);
+  if (!terminalHost || typeof input?.sessionId !== "string") throw new Error("Invalid terminal session.");
+  await terminalHost.manager.resize(input.sessionId, input.size);
 });
 ipcMain.handle("demo:terminal:stop", async (event, input) => {
   assertTrustedIpc(event);
