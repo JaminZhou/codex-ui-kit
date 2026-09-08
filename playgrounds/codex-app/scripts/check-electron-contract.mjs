@@ -7600,6 +7600,15 @@ try {
     .getByRole("button", { name: "Pull requests" })
     .click();
   await pullRequestPage.waitForSelector(
+    '.demo-root[data-view="pull-request"][data-mode="live"] [aria-label="Live pull requests"]',
+  );
+  if (await pullRequestPage.locator('[data-testid="pull-request-panel"]').count()) {
+    throw new Error("Electron Live PR navigation substituted replay detail.");
+  }
+  await pullRequestPage.getByRole("button", { name: "Live local", exact: true }).click();
+  await pullRequestPage.getByRole("button", { name: "Replay", exact: true }).click();
+  await pullRequestPage.getByRole("button", { name: "Pull requests", exact: true }).click();
+  await pullRequestPage.waitForSelector(
     '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
   );
   if (

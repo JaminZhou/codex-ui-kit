@@ -58,5 +58,21 @@ try {
   await dialog.getByText(`Updated PR #${number}.`, { exact: true }).waitFor({ timeout: 180000 });
   assert.ok((await detail.textContent()).includes(editedBody));
   await page.screenshot({ path: join(directory, "real-edited.png") });
+  await dialog.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Pull requests", exact: true }).click();
+  const route = page.getByRole("region", { name: "Live pull requests", exact: true });
+  await route.getByRole("button", { name: `Open live PR #${number}`, exact: true }).click({ timeout: 120000 });
+  const panel = page.getByRole("region", { name: "Live pull request", exact: true });
+  const summary = panel.getByRole("region", { name: "Live PR summary", exact: true });
+  await summary.waitFor({ timeout: 120000 });
+  assert.equal(await page.locator("[data-mode]").getAttribute("data-mode"), "live");
+  assert.ok((await summary.textContent()).includes(editedBody));
+  await page.screenshot({ path: join(directory, "real-route-summary.png") });
+  await panel.getByRole("tab", { name: "Code", exact: true }).click();
+  await panel.getByRole("button", { name: "Read live PR diff", exact: true }).click();
+  const routeDiff = panel.getByLabel("Live PR diff", { exact: true });
+  await routeDiff.waitFor({ timeout: 180000 });
+  assert.ok((await routeDiff.textContent()).includes("diff --git "));
+  await page.screenshot({ path: join(directory, "real-route-code.png") });
   console.log(JSON.stringify({ passed: true, directory, expectedHead, expectedBranch, result, realGitHubWrite: true }));
 } finally { await app.close(); }
