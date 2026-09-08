@@ -16,6 +16,7 @@ interface CodexDemoBridge {
   editPullRequest(input: { projectToken: string } & import("../electron/git-pr-detail").EditPullRequestInput): Promise<import("../electron/git-pr-detail").GitPullRequestDetail>;
   mergePullRequest(input: { projectToken: string; adminConfirmed: boolean } & import("../electron/git-pr-merge").PullRequestMergeTarget): Promise<import("../electron/git-pr-merge").PullRequestMergeStatus>;
   readPullRequestMergeStatus(input: { projectToken: string } & import("../electron/git-pr-merge").PullRequestMergeTarget): Promise<import("../electron/git-pr-merge").PullRequestMergeStatus>;
+  cleanupMergedPullRequest(input: { projectToken: string; cleanupConfirmed: boolean } & import("../electron/git-pr-merge").PullRequestMergeTarget): Promise<import("../electron/git-pr-cleanup").PullRequestCleanupResult>;
   liveWorkspaceWritable: boolean;
   useRendererAttachmentFixture: boolean;
   useWorkspaceBranchFixture: boolean;

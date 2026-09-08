@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   editPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-edit", input),
   mergePullRequest: (input) => ipcRenderer.invoke("demo:git:pr-merge", input),
   readPullRequestMergeStatus: (input) => ipcRenderer.invoke("demo:git:pr-merge-status", input),
+  cleanupMergedPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-cleanup", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   startTerminal: (input) => ipcRenderer.invoke("demo:terminal:start", input),
   openTerminalShell: (input) => ipcRenderer.invoke("demo:terminal:open-shell", input),
