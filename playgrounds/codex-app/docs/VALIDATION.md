@@ -640,6 +640,26 @@ pixel parity remain separate delivery work.
 
 ## Live project discovery
 
+### Real Git checkout failure and recovery
+
+`pnpm --filter @codex-ui-kit/codex-app-playground check:branch-recovery` is part
+of full acceptance. It creates a disposable repository with divergent main and
+target file contents, introduces a conflicting uncommitted draft, and uses the
+rendered branch menu at 1180/720px to verify failure leaves HEAD and the exact
+draft unchanged. The harness commits that draft to the original fixture branch
+without discarding content; a second UI checkout succeeds, and switching back
+restores the exact draft with clean Git status. Recovery is external preservation
+followed by a UI retry, not a newly implemented in-app conflict resolver.
+
+No remote repository, model turn, user project branch, or force checkout is
+involved. Screenshots and a JSON receipt live beside (not inside) the disposable
+repository. These are real Git/own-playground functional observations, not
+installed Codex pixel parity. The initial probe correctly failed its clean-tree
+assertion because its screenshot was inside the repository; the corrected gate
+keeps all evidence outside and does not weaken that assertion.
+
+### Owned project discovery and persistence
+
 `pnpm --filter @codex-ui-kit/codex-app-playground check:project-discovery`
 is part of complete acceptance. It seeds only its own temporary history registry,
 restarts Electron at 1180/720px, restores a non-startup project, verifies scoped
