@@ -1227,8 +1227,19 @@ older snapshot. Deterministic contracts cover cancellation, failure/retry and
 unowned-ID rejection. The explicit three-turn live-history probe now verifies
 UI rename, application restart, same-thread continuation and the public stored
 thread name at 1180/720px. Its two disposable threads are archived afterward.
-Current-product pixels, archive/delete actions and cross-process registry
-coordination remain open.
+The archive/restore follow-up adds an explicit subtree-scope confirmation,
+project-scoped archived list, restore-one confirmation, cancellation and retry.
+The host shares the turn-start lock, rejects active roots and foreign IDs, and
+updates only registered IDs from actual archive notifications. Archived caches
+are invalidated; unarchive metadata does not fabricate an empty transcript that
+could mask a later history read. A real three-turn probe now archives its own
+renamed chat, restarts the application, restores it and continues the same ID
+with the original history and name intact at 1180/720px. The two disposable
+threads are archived after verification. Synthetic tests separately cover
+descendant notification bookkeeping and restore-one semantics; an actual
+multi-descendant archive lifecycle is not yet claimed.
+Current-product pixels, permanent deletion, real descendant-archive coverage
+and cross-process registry coordination remain open.
 
 ### 6. Perform global visual convergence
 

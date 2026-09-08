@@ -6826,6 +6826,7 @@ export function App() {
         toggleLabel="Toggle recent tasks"
       >
         {mode === "live" ? <LiveThreadList projectToken={workspaceProjectToken} selectedId={liveState.threadId}
+          onArchived={threadIds => dispatchLive({ kind: "live-archived", threadIds })}
           refreshKey={`${liveState.threadId}:${liveState.status}`} busy={liveHistoryLoading}
           runningIds={Object.entries(liveProjects.threads).filter(([, thread]) => isTurnActive(thread.status)).map(([id]) => id)}
           onSelect={(id) => void openLiveHistory(id)} /> : currentSidebarThreadLifecycle

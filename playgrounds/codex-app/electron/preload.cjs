@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   selectProjectDirectory: () => ipcRenderer.invoke("demo:project:select"),
   listLiveProjects: () => ipcRenderer.invoke("demo:live:projects"),
   renameLiveThread: (input) => ipcRenderer.invoke("demo:live:thread:rename", input),
+  setLiveThreadArchived: (input) => ipcRenderer.invoke("demo:live:thread:archive", input),
   createAndCheckoutBranch: (input) =>
     ipcRenderer.invoke("demo:git:create-branch", input),
   checkoutBranch: (input) =>

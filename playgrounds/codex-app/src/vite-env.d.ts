@@ -46,6 +46,7 @@ interface CodexDemoBridge {
   >;
   listLiveProjects(): Promise<Array<{ label: string; path: string; projectToken?: string }>>;
   renameLiveThread(input: { projectToken: string; threadId: string; name: string }): Promise<{ threadId: string; title: string }>;
+  setLiveThreadArchived(input: { projectToken: string; threadId: string; archived: boolean }): Promise<{ threadId: string; archived: boolean; changedThreadIds: string[] }>;
   selectProjectDirectory(): Promise<
     | {
         label: string;
@@ -78,7 +79,7 @@ interface CodexDemoBridge {
     threadId: string;
     answers: Record<string, string[]>;
   }): Promise<void>;
-  listLiveThreads(input: { projectToken: string; cursor?: string }): Promise<{ threads: Array<{ id: string; title: string; updatedAt: number }>; nextCursor: string | null }>;
+  listLiveThreads(input: { projectToken: string; cursor?: string; archived?: boolean }): Promise<{ threads: Array<{ id: string; title: string; updatedAt: number }>; nextCursor: string | null }>;
   readLiveThread(input: { projectToken: string; threadId: string }): Promise<{ threadId: string; turns: import("./live-history-state").StoredLiveTurn[] }>;
   startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan"; threadId?: string | null }): Promise<{
     threadId: string;

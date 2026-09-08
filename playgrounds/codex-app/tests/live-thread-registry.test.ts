@@ -10,6 +10,37 @@ async function fixture() {
   return { path, registry: new LiveThreadRegistry(path) };
 }
 describe("playground-owned thread registry", () => {
+  it("persists archived ownership and restores only the requested thread", async () => {
+    const { path, registry } = await fixture();
+    for (const id of ["parent", "child", "other"]) {
+      await registry.remember({ id, directory: "/a", title: id, updatedAt: 1 });
+    }
+    expect(await registry.setArchived("/a", "parent", true, async () => ["parent", "child", "unowned"])).toEqual(["parent", "child"]);
+    const restarted = new LiveThreadRegistry(path);
+    expect((await restarted.list("/a")).map(row => row.id)).toEqual(["other"]);
+    expect((await restarted.list("/a", true)).map(row => row.id)).toEqual(["child", "parent"]);
+    await expect(restarted.require("/a", "parent")).rejects.toThrow();
+    await expect(restarted.touch("/a", "parent", 5)).rejects.toThrow();
+    await expect(restarted.rename("/a", "parent", "New", async () => undefined)).rejects.toThrow();
+    expect(await restarted.setArchived("/a", "parent", false, async () => ["parent", "child"])).toEqual(["parent"]);
+    expect((await restarted.require("/a", "parent")).title).toBe("parent");
+    expect((await restarted.list("/a", true)).map(row => row.id)).toEqual(["child"]);
+  });
+  it("does not mutate local archive state before remote success or for foreign ownership", async () => {
+    const { registry } = await fixture();
+    await registry.remember({ id: "a", directory: "/a", title: "A", updatedAt: 1 });
+    let calls = 0;
+    await expect(registry.setArchived("/b", "a", true, async () => { calls++; return []; })).rejects.toThrow();
+    expect(calls).toBe(0);
+    await expect(registry.setArchived("/a", "a", true, async () => { throw new Error("remote failure"); })).rejects.toThrow("remote failure");
+    expect(await registry.list("/a", true)).toEqual([]);
+    expect((await registry.require("/a", "a")).archived).toBeUndefined();
+    expect(await registry.observeArchived("foreign", true)).toBe(false);
+    expect(await registry.observeArchived("a", true)).toBe(true);
+    expect(await registry.list("/a")).toEqual([]);
+    expect(await registry.observeArchived("a", false)).toBe(true);
+    expect((await registry.require("/a", "a")).title).toBe("A");
+  });
   it("renames only owned chats after remote success, preserving ordering and project labels", async () => {
     const { path, registry } = await fixture();
     await registry.remember({ id: "a", directory: "/a", title: "Before", updatedAt: 5 });

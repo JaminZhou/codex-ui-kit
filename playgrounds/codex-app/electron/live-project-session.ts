@@ -10,6 +10,14 @@ export class LiveProjectSession<T> {
 
   get(directory: string): T | undefined { return this.threads.get(directory); }
 
+  removeWhere(matches: (thread: T) => boolean): void {
+    // A delayed notification must not allow an in-flight resume to refill cache.
+    this.generation += 1;
+    for (const [directory, thread] of this.threads) {
+      if (matches(thread)) this.threads.delete(directory);
+    }
+  }
+
   async replace(directory: string, create: () => Promise<T>): Promise<T> {
     const generation = this.generation;
     const thread = await create();

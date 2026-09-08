@@ -3,6 +3,7 @@ import { hydrateLiveHistory, type StoredLiveTurn } from "./live-history-state";
 
 export type LiveSessionEvent =
   | { kind: "live-reset" }
+  | { kind: "live-archived"; threadIds: string[] }
   | { kind: "live-unbind"; projectToken: string }
   | { kind: "live-history"; projectToken: string; threadId: string; turns: StoredLiveTurn[] }
   | { kind: "live-bind"; projectToken: string; threadId: string };
@@ -26,6 +27,19 @@ export function liveProjectState(store: LiveProjectState, projectToken?: string)
 /** Notifications may arrive for a background project or a child thread. Neither
  * is allowed to select the visible project or replace its transcript. */
 export function reduceLiveProjectState(store: LiveProjectState, event: ProtocolEvent | LiveSessionEvent): LiveProjectState {
+  const archivedIds = "kind" in event && event.kind === "live-archived" ? event.threadIds
+    : "method" in event && event.method === "thread/archived" && typeof object(event.params).threadId === "string"
+      ? [object(event.params).threadId as string] : [];
+  if (archivedIds.length) {
+    const threads = { ...store.threads };
+    for (const id of archivedIds) delete threads[id];
+    return { projects: Object.fromEntries(Object.entries(store.projects).filter(([, id]) => !archivedIds.includes(id))),
+      threads, currentThread: store.currentThread && archivedIds.includes(store.currentThread) ? null : store.currentThread };
+  }
+  if ("kind" in event && event.kind === "live-archived") return store;
+  // Restoration is metadata, not a hydrated transcript. Do not create an empty
+  // cache entry that would shadow the subsequent explicit stored-history read.
+  if ("method" in event && event.method === "thread/unarchived") return store;
   if ("kind" in event && event.kind === "live-reset") return initialLiveProjectState;
   if ("kind" in event && event.kind === "live-unbind") {
     const projects = { ...store.projects };

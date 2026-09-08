@@ -57,11 +57,32 @@ try {
   await page.getByRole("button", { name: "Save name", exact: true }).click();
   await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).waitFor();
   Object.assign(result, { renamedThreadId: a, renamedTitle: "Restored renamed chat A" });
+  await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).hover();
+  await page.getByRole("button", { name: "Archive Restored renamed chat A", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm archive", exact: true }).click();
+  await page.getByRole("dialog", { name: "Archive chat", exact: true }).waitFor({ state: "hidden" });
+  await page.getByText("HISTORY_A_ONE", { exact: true }).waitFor({ state: "hidden" });
+  await page.waitForFunction(id => window.__historyEvents.some(event => event.method === "thread/archived" && event.params.threadId === id), a);
+  assert.equal(await page.evaluate(async id => {
+    try { await window.codexDemo.readLiveThread({ projectToken: "startup-workspace", threadId: id }); return false; }
+    catch { return true; }
+  }, a), true, "Archived history must not be read as an active chat");
   await collect();
   await page.evaluate(() => window.codexDemo.closeLive());
   await app.close();
   app = null;
   await launch();
+  await page.getByRole("button", { name: "Reply exactly HISTORY_B_ONE. Do not use tools or delegate.", exact: true }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).count(), 0);
+  await page.getByRole("button", { name: "Show archived chats", exact: true }).click();
+  await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).isDisabled(), true);
+  await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).hover();
+  await page.getByRole("button", { name: "Restore Restored renamed chat A", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm restore", exact: true }).click();
+  await page.getByText("No archived chats in this project.", { exact: true }).waitFor();
+  await page.waitForFunction(id => window.__historyEvents.some(event => event.method === "thread/unarchived" && event.params.threadId === id), a);
+  await page.getByRole("button", { name: "Show active chats", exact: true }).click();
   await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).click();
   await page.getByText("HISTORY_A_ONE", { exact: true }).waitFor();
   assert.equal(await page.getByText("HISTORY_B_ONE", { exact: true }).count(), 0);
@@ -76,7 +97,7 @@ try {
     assert.ok(renameBounds && renameBounds.width <= 30 && renameBounds.height <= 30, "Rename must fit the sidebar action slot");
     await page.screenshot({ path: join(directory, `restored-${width}.png`) });
   }
-  Object.assign(result, { passed: true, modelTurns: 3, threads: [a, b], restarted: true, restoredAndContinued: true });
+  Object.assign(result, { passed: true, modelTurns: 3, threads: [a, b], restarted: true, restoredAndContinued: true, archivedAndRestored: true });
 } catch (error) {
   result.error = String(error);
   process.exitCode = 1;

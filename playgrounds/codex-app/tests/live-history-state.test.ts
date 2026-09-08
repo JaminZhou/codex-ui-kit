@@ -7,6 +7,23 @@ const turns = [{ id: "one", status: "completed", items: [
   { type: "agentMessage", id: "a", text: "Answer" },
 ] }];
 describe("stored live history", () => {
+  it("unbinds archived chats and reloads fresh history after restoration", () => {
+    let state = reduceLiveProjectState(initialLiveProjectState, { kind: "live-history", projectToken: "project", threadId: "thread", turns });
+    state = reduceLiveProjectState(state, { kind: "live-history", projectToken: "other", threadId: "other-thread", turns });
+    state = reduceLiveProjectState(state, { method: "thread/archived", params: { threadId: "thread" } });
+    expect(state.projects.project).toBeUndefined();
+    expect(state.threads.thread).toBeUndefined();
+    expect(state.projects.other).toBe("other-thread");
+    state = reduceLiveProjectState(state, { method: "thread/unarchived", params: { threadId: "thread" } });
+    expect(state.threads.thread).toBeUndefined();
+    state = reduceLiveProjectState(state, { kind: "live-history", projectToken: "project", threadId: "thread", turns });
+    expect(state.threads.thread.messages.map(message => message.text)).toEqual(["Question", "Answer"]);
+    state = reduceLiveProjectState(state, { kind: "live-archived", threadIds: ["thread"] });
+    state = reduceLiveProjectState(state, { kind: "live-history", projectToken: "project", threadId: "thread", turns: [] });
+    expect(state.threads.thread.messages).toEqual([]);
+    state = reduceLiveProjectState(state, { kind: "live-archived", threadIds: ["thread"] });
+    expect(state.currentThread).toBeNull();
+  });
   it("hydrates real stored items without treating them as a new live request", () => {
     const state = hydrateLiveHistory("thread", turns);
     expect(state.messages.map(message => message.text)).toEqual(["Question", "Answer"]);
