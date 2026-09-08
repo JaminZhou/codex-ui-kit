@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
@@ -29,6 +29,33 @@ try {
   await page.getByRole("button", { name: "Load more chats", exact: true }).click();
   await page.getByRole("button", { name: "Owned chat 24", exact: true }).waitFor();
   assert.equal(await page.getByRole("button", { name: "Load more chats", exact: true }).count(), 0);
+  assert.equal(await page.evaluate(async () => {
+    try { await window.codexDemo.renameLiveThread({ projectToken: "startup-workspace", threadId: "foreign-thread", name: "No" }); return false; }
+    catch { return true; }
+  }), true, "Rename must reject unowned threads before contacting the server");
+  await page.getByRole("button", { name: "Owned chat 19", exact: true }).hover();
+  await page.getByRole("button", { name: "Rename Owned chat 19", exact: true }).click();
+  await page.getByRole("textbox", { name: "Chat name", exact: true }).fill("   ");
+  assert.equal(await page.getByRole("button", { name: "Save name", exact: true }).isDisabled(), true);
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await app.evaluate(({ ipcMain }) => {
+    ipcMain.removeHandler("demo:live:thread:rename");
+    let attempts = 0;
+    ipcMain.handle("demo:live:thread:rename", async (_event, input) => {
+      if (++attempts === 1) throw new Error("synthetic transport failure");
+      return { threadId: input.threadId, title: input.name.trim() };
+    });
+  });
+  await page.getByRole("button", { name: "Rename Owned chat 19", exact: true }).click();
+  await page.getByRole("textbox", { name: "Chat name", exact: true }).fill("Renamed fixture chat");
+  await page.getByRole("button", { name: "Save name", exact: true }).click();
+  await page.getByText("Couldn’t rename chat. Try again.", { exact: true }).waitFor();
+  // Seed the successful remote result from the harness, outside Electron's eval context.
+  const renamedFixture = JSON.parse(await readFile(registry, "utf8"));
+  renamedFixture.threads.find(row => row.id === "owned-19").title = "Renamed fixture chat";
+  await writeFile(registry, JSON.stringify(renamedFixture));
+  await page.getByRole("button", { name: "Save name", exact: true }).click();
+  await page.getByRole("button", { name: "Renamed fixture chat", exact: true }).waitFor();
   await app.evaluate(({ ipcMain }) => {
     ipcMain.removeHandler("demo:live:thread:read");
     ipcMain.handle("demo:live:thread:read", (_event, input) => {

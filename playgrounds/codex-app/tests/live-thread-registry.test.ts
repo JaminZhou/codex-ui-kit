@@ -10,6 +10,26 @@ async function fixture() {
   return { path, registry: new LiveThreadRegistry(path) };
 }
 describe("playground-owned thread registry", () => {
+  it("renames only owned chats after remote success, preserving ordering and project labels", async () => {
+    const { path, registry } = await fixture();
+    await registry.remember({ id: "a", directory: "/a", title: "Before", updatedAt: 5 });
+    let remoteCalls = 0;
+    const apply = async () => { remoteCalls++; };
+    await expect(registry.rename("/b", "a", "Other", apply)).rejects.toThrow("does not belong");
+    await expect(registry.rename("/a", "a", "  ", apply)).rejects.toThrow();
+    await expect(registry.rename("/a", "a", "x".repeat(201), apply)).rejects.toThrow();
+    expect(remoteCalls).toBe(0);
+    await expect(registry.rename("/a", "a", "Failed", async () => { throw new Error("remote"); })).rejects.toThrow("remote");
+    expect((await registry.require("/a", "a")).title).toBe("Before");
+    expect(await registry.rename("/a", "a", "  Renamed  ", apply)).toBe("Renamed");
+    expect(await new LiveThreadRegistry(path).require("/a", "a")).toEqual({ id: "a", directory: "/a", title: "Renamed", updatedAt: 5 });
+    expect(remoteCalls).toBe(1);
+    await Promise.all([
+      registry.rename("/a", "a", "Final", apply),
+      registry.touch("/a", "a", 9),
+    ]);
+    expect(await registry.require("/a", "a")).toEqual({ id: "a", directory: "/a", title: "Final", updatedAt: 9 });
+  });
   it("retains empty selected projects and labels alongside later thread writes", async () => {
     const { path, registry } = await fixture();
     await registry.rememberProject({ path: "/empty", label: "My project", updatedAt: 1 });

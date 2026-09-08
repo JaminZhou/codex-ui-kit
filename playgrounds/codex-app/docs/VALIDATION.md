@@ -606,7 +606,7 @@ The fixed runtime supports full reads/resume of the sampled paginated history,
 despite the current public documentation's unsupported-mode note. Its thread
 source was `vscode`, not `appServer`; source labels are therefore not used as an
 ownership boundary. See [public thread APIs](https://learn.chatgpt.com/docs/app-server).
-Archive/rename/delete UI and installed-product
+Archive/delete UI and installed-product
 pixel parity remain separate delivery work.
 
 ## Live project discovery
@@ -624,3 +624,16 @@ Registry version 2 stores projects independently of threads; version 1 history
 is migrated on the next successful write, retaining thread ownership. Invalid
 project data fails closed without replacing the file. Cross-process registry
 coordination remains open.
+
+## Live conversation rename
+
+`check:history` covers Rename/Cancel, whitespace rejection, a synthetic transport
+failure and retry, row refresh, and real host rejection of unowned IDs. Registry
+unit tests ensure rejected or failed remote changes retain the old title, and
+serialized turn timestamp updates preserve the new title. `check:live-history`
+now also renames its own test thread through the UI, restarts and continues that
+same thread, then checks the public stored `thread.name` before archiving the
+exact disposable threads. This signed-in probe is distinct from deterministic
+acceptance and must pass before claiming the live rename lifecycle.
+The implementation follows the public `thread/name/set` contract in
+[OpenAI App Server documentation](https://learn.chatgpt.com/docs/app-server).

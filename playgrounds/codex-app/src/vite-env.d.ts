@@ -45,6 +45,7 @@ interface CodexDemoBridge {
     }[]
   >;
   listLiveProjects(): Promise<Array<{ label: string; path: string; projectToken?: string }>>;
+  renameLiveThread(input: { projectToken: string; threadId: string; name: string }): Promise<{ threadId: string; title: string }>;
   selectProjectDirectory(): Promise<
     | {
         label: string;
