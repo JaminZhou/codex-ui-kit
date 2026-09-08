@@ -906,8 +906,12 @@ ipcMain.handle("demo:live:threads", async (event, raw: unknown) => {
   const offset = input.cursor === undefined ? 0 : Number(input.cursor);
   if (!Number.isSafeInteger(offset)) throw new TypeError("Invalid thread-list cursor.");
   if (input.archived !== undefined && typeof input.archived !== "boolean") throw new TypeError("Invalid archived filter.");
-  const threads = await historyRegistry().list(directory, input.archived === true);
-  return { threads: threads.slice(offset, offset + 20).map(({ id, title, updatedAt }) => ({ id, title, updatedAt })), nextCursor: offset + 20 < threads.length ? String(offset + 20) : null };
+  const snapshot = await historyRegistry().list(directory, "all");
+  const archivedThreadIds = snapshot.filter(thread => thread.archived).map(thread => thread.id);
+  const cached = liveSession.get(directory);
+  if (cached && archivedThreadIds.includes(cached.thread.id)) liveSession.removeWhere(session => session.thread.id === cached.thread.id);
+  const threads = snapshot.filter(thread => Boolean(thread.archived) === (input.archived === true));
+  return { threads: threads.slice(offset, offset + 20).map(({ id, title, updatedAt }) => ({ id, title, updatedAt })), nextCursor: offset + 20 < threads.length ? String(offset + 20) : null, archivedThreadIds };
 });
 ipcMain.handle("demo:live:thread:read", async (event, raw: unknown) => {
   assertTrustedIpc(event);
