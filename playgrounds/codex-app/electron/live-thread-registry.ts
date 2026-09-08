@@ -121,4 +121,31 @@ export class LiveThreadRegistry {
       await this.write(data);
     });
   }
+
+  rename(directory: string, id: string, name: string, apply: (name: string) => Promise<unknown>): Promise<string> {
+    return this.serialize(async () => {
+      if (typeof name !== "string" || !name.trim() || name.trim().length > 200) throw new TypeError("A chat name between 1 and 200 characters is required.");
+      const data = await this.read();
+      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
+      if (!thread) throw new Error("This thread does not belong to the selected playground project.");
+      const title = name.trim();
+      await apply(title);
+      thread.title = title;
+      await this.write(data);
+      return title;
+    });
+  }
+
+  touch(directory: string, id: string, updatedAt: number): Promise<void> {
+    return this.serialize(async () => {
+      if (!Number.isFinite(updatedAt)) throw new TypeError("Invalid update time.");
+      const data = await this.read();
+      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
+      if (!thread) throw new Error("This thread does not belong to the selected playground project.");
+      thread.updatedAt = Math.max(thread.updatedAt, updatedAt);
+      const project = data.projects.find(project => project.path === directory);
+      if (project) project.updatedAt = Math.max(project.updatedAt, updatedAt);
+      await this.write(data);
+    });
+  }
 }

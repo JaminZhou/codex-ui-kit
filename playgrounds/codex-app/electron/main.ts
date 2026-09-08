@@ -405,8 +405,7 @@ async function startLive(
       return selected ?? await create();
     });
     const { thread } = session;
-    const record = await registry.require(directory, thread.id);
-    await registry.remember({ ...record, updatedAt: Date.now() });
+    await registry.touch(directory, thread.id, Date.now());
     if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed before the thread started.");
     mainWindow?.webContents.send("demo:live:session", {
       kind: "live-bind",
@@ -910,6 +909,22 @@ ipcMain.handle("demo:live:thread:read", async (event, raw: unknown) => {
   if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed while reading history.");
   if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
   return { threadId: thread.id, turns: thread.turns };
+});
+ipcMain.handle("demo:live:thread:rename", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  if (typeof input.threadId !== "string") throw new TypeError("A thread is required.");
+  const threadId = input.threadId;
+  const name = (raw as { name?: unknown }).name;
+  if (typeof name !== "string") throw new TypeError("A chat name is required.");
+  const title = await historyRegistry().rename(directory, threadId, name, async name => {
+    const connectedClient = await ensureClient();
+    const { thread } = await connectedClient.threadRead({ threadId, includeTurns: false });
+    if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed.");
+    if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
+    await connectedClient.threadSetName({ threadId, name });
+  });
+  return { threadId, title };
 });
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {

@@ -50,12 +50,19 @@ try {
   await page.getByRole("button", { name: "Reply exactly HISTORY_A_ONE. Do not use tools or delegate.", exact: true }).click();
   await page.getByText("HISTORY_A_ONE", { exact: true }).waitFor();
   assert.equal(await page.getByText("HISTORY_B_ONE", { exact: true }).count(), 0);
+  const oldName = "Reply exactly HISTORY_A_ONE. Do not use tools or delegate.";
+  await page.getByRole("button", { name: oldName, exact: true }).hover();
+  await page.getByRole("button", { name: `Rename ${oldName}`, exact: true }).click();
+  await page.getByRole("textbox", { name: "Chat name", exact: true }).fill("Restored renamed chat A");
+  await page.getByRole("button", { name: "Save name", exact: true }).click();
+  await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).waitFor();
+  Object.assign(result, { renamedThreadId: a, renamedTitle: "Restored renamed chat A" });
   await collect();
   await page.evaluate(() => window.codexDemo.closeLive());
   await app.close();
   app = null;
   await launch();
-  await page.getByRole("button", { name: "Reply exactly HISTORY_A_ONE. Do not use tools or delegate.", exact: true }).click();
+  await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).click();
   await page.getByText("HISTORY_A_ONE", { exact: true }).waitFor();
   assert.equal(await page.getByText("HISTORY_B_ONE", { exact: true }).count(), 0);
   assert.equal(await run("HISTORY_A_TWO"), a);
@@ -64,6 +71,9 @@ try {
     await app.evaluate(({ BrowserWindow }, width) => BrowserWindow.getAllWindows()[0].setContentSize(width, 820), width);
     await page.waitForFunction(width => innerWidth === width, width);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).hover();
+    const renameBounds = await page.getByRole("button", { name: "Rename Restored renamed chat A", exact: true }).boundingBox();
+    assert.ok(renameBounds && renameBounds.width <= 30 && renameBounds.height <= 30, "Rename must fit the sidebar action slot");
     await page.screenshot({ path: join(directory, `restored-${width}.png`) });
   }
   Object.assign(result, { passed: true, modelTurns: 3, threads: [a, b], restarted: true, restoredAndContinued: true });
@@ -84,6 +94,7 @@ try {
     for (const id of owned) {
       const { thread } = await client.threadRead({ threadId: id, includeTurns: false });
       assert.equal(thread.cwd, directory, "Never archive outside the disposable test project");
+      if (id === result.renamedThreadId) assert.equal(thread.name, result.renamedTitle, "Public stored thread name must match the renamed UI after restart and continuation");
       await client.threadArchive({ threadId: id });
       result.archived.push(id);
     }

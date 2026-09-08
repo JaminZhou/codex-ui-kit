@@ -1218,8 +1218,17 @@ exists. Registry version 2 preserves these independently of threads and migrates
 version 1 ownership records on write. The Electron gate now selects an empty
 project, restarts and restores its empty history with an enabled Composer, without
 creating a model thread. It does not import a global Codex project index.
-Current-product pixels, archive/rename/
-delete actions and cross-process registry coordination remain open.
+The rename follow-up adds a keyboard-accessible row action and confirmation form,
+with empty-name validation, Cancel, pending state and retryable failure. The host
+checks registry ownership and the public thread cwd before `thread/name/set`;
+only a successful remote response updates the local title. Timestamp updates are
+serialized independently so new turns cannot overwrite a renamed title with an
+older snapshot. Deterministic contracts cover cancellation, failure/retry and
+unowned-ID rejection. The explicit three-turn live-history probe now verifies
+UI rename, application restart, same-thread continuation and the public stored
+thread name at 1180/720px. Its two disposable threads are archived afterward.
+Current-product pixels, archive/delete actions and cross-process registry
+coordination remain open.
 
 ### 6. Perform global visual convergence
 
