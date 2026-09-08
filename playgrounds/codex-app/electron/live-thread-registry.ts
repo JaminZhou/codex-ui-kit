@@ -97,8 +97,8 @@ export class LiveThreadRegistry {
     return next;
   }
 
-  list(directory: string, archived = false): Promise<OwnedLiveThread[]> {
-    return this.serialize(async () => (await this.read()).threads.filter(thread => thread.directory === directory && Boolean(thread.archived) === archived)
+  list(directory: string, archived: boolean | "all" = false): Promise<OwnedLiveThread[]> {
+    return this.serialize(async () => (await this.read()).threads.filter(thread => thread.directory === directory && (archived === "all" || Boolean(thread.archived) === archived))
       .sort((a, b) => b.updatedAt - a.updatedAt || a.id.localeCompare(b.id)));
   }
 

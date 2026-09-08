@@ -115,6 +115,39 @@ try {
   await page.getByRole("button", { name: "Show active chats", exact: true }).click();
   await page.getByRole("button", { name: "Owned chat 0", exact: true }).click();
   await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
+  // Simulate another writer changing only this fixture registry. Focus reads
+  // the real host registry; no synthetic notification is sent to the renderer.
+  const external = JSON.parse(await readFile(registry, "utf8"));
+  await page.getByRole("button", { name: "Rename Owned chat 0", exact: true }).click();
+  await page.getByRole("textbox", { name: "Chat name", exact: true }).fill("Unsaved draft");
+  external.threads.find(row => row.id === "owned-0").title = "External rename";
+  await writeFile(registry, JSON.stringify(external));
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  assert.equal(await page.getByRole("textbox", { name: "Chat name", exact: true }).inputValue(), "Unsaved draft");
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "External rename", exact: true }).waitFor();
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
+  await writeFile(registry, "broken external registry");
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.getByText("Couldn’t load chats.", { exact: true }).waitFor();
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
+  // More archived records than one page: selection invalidation must not be
+  // inferred from absence in the active page or limited to the archived page.
+  for (const row of external.threads) if (row.id !== "owned-1") row.archived = true;
+  external.threads.find(row => row.id === "owned-0").updatedAt = -1;
+  await writeFile(registry, JSON.stringify(external));
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor({ state: "hidden" });
+  const snapshot = await page.evaluate(() => window.codexDemo.listLiveThreads({ projectToken: "startup-workspace", archived: true }));
+  assert.equal(snapshot.archivedThreadIds.length, 24);
+  assert.ok(!snapshot.threads.some(row => row.id === "owned-0"));
+  assert.ok(snapshot.archivedThreadIds.includes("owned-0"));
+  for (const row of external.threads) row.archived = false;
+  external.threads.find(row => row.id === "owned-0").updatedAt = 100;
+  await writeFile(registry, JSON.stringify(external));
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.getByRole("button", { name: "External rename", exact: true }).click();
+  await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).waitFor();
   await page.getByRole("button", { name: "New chat", exact: true }).first().click();
   assert.equal(await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).count(), 0);
   await page.getByRole("button", { name: "Owned chat 1", exact: true }).click();
@@ -122,5 +155,5 @@ try {
   await app.evaluate(() => globalThis.__historyRead);
   await page.evaluate(() => new Promise(requestAnimationFrame));
   assert.equal(await page.getByText("STORED_FIXTURE_ANSWER", { exact: true }).count(), 0, "Late history must not replace Replay");
-  console.log(JSON.stringify({ passed: true, modelTurns: 0, directory, registryRecovery: true, pagination: true, unownedRejected: true, staleReadIgnored: true }));
+  console.log(JSON.stringify({ passed: true, modelTurns: 0, directory, registryRecovery: true, pagination: true, unownedRejected: true, staleReadIgnored: true, externalFocusRefresh: true, offPageArchiveInvalidation: true }));
 } finally { await app.close(); }

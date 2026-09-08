@@ -1246,7 +1246,14 @@ release their lock. Crash-orphaned locks deliberately fail closed and require
 explicit recovery with all playground instances closed, rather than age-based
 lock stealing. See the recovery instructions in `VALIDATION.md`.
 Current-product pixels, permanent deletion, real descendant-archive coverage,
-automatic orphan-lock recovery and cross-instance UI refresh remain open.
+automatic orphan-lock recovery and continuous cross-instance UI synchronization
+remain open. A focus-refresh follow-up now reloads the selected project's chats
+when its window regains focus, deferring while a draft/dialog or request is open.
+Same-snapshot complete archived IDs invalidate host and renderer caches without
+mistaking a missing paginated row for an archive. The deterministic Electron
+gate covers external rename, draft preservation, corrupt-read recovery and
+selected archive beyond the first archived page. Project-discovery refresh and
+background synchronization remain separate work.
 
 ### 6. Perform global visual convergence
 

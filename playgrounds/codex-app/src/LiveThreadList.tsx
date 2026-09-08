@@ -17,6 +17,7 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const generation = useRef(0);
+  const observedArchives = useRef(new Set<string>());
   const [editing, setEditing] = useState<ThreadRow | null>(null);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -77,6 +78,10 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
     try {
       const page = await window.codexDemo.listLiveThreads({ projectToken, archived: showArchived, ...(append && cursor ? { cursor } : {}) });
       if (id !== generation.current) return;
+      const archived = new Set(page.archivedThreadIds ?? []);
+      const newlyArchived = [...archived].filter(threadId => !observedArchives.current.has(threadId));
+      observedArchives.current = archived;
+      if (newlyArchived.length) onArchived(newlyArchived);
       setRows(previous => append ? [...previous, ...page.threads.filter(row => !previous.some(old => old.id === row.id))] : page.threads);
       setCursor(page.nextCursor);
     } catch {
@@ -91,6 +96,21 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
     void load();
     return () => { generation.current += 1; };
   }, [projectToken, refreshKey, showArchived]);
+  useEffect(() => { observedArchives.current = new Set(); }, [projectToken]);
+  const [focusRequest, setFocusRequest] = useState(0);
+  const handledFocus = useRef(0);
+  useEffect(() => {
+    const refresh = () => setFocusRequest(value => value + 1);
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, []);
+  useEffect(() => {
+    // Coalesce focus events; defer refresh until pagination or an open editor
+    // settles instead of discarding a user's draft or losing the refresh.
+    if (focusRequest === handledFocus.current || saving || editing || archiveTarget || loading) return;
+    handledFocus.current = focusRequest;
+    void load();
+  }, [focusRequest, saving, editing, archiveTarget, loading]);
   return <div aria-label="Live conversations" aria-busy={loading || busy}>
     {rows.map(row => <AppSidebarItem key={row.id} disabled={busy || showArchived}
       actions={<>{!showArchived && <button type="button" aria-label={`Rename ${row.title || "Untitled chat"}`}

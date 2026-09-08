@@ -600,8 +600,23 @@ slow live operation. If a process crashes while holding the lock, close **all**
 playground instances, verify that no registry writer is running, then remove
 only the empty `live-threads.json.lock` directory beside the configured registry
 using `rmdir`. Preserve `live-threads.json` and any temporary data files. Do not
-remove the lock while another instance is active. Automatic crash recovery and
-cross-instance UI refresh remain open.
+remove the lock while another instance is active. Automatic crash recovery
+remains open.
+
+Live conversation lists refresh when the window regains focus. Focus events
+coalesce and wait for an open rename/archive dialog or page request to settle,
+preserving drafts. Each host response carries the project's complete archived
+ID set from the same locked snapshot as its paginated rows. Newly observed
+archives invalidate renderer selection/history caches; the host also drops a
+matching cached session. Missing entries on a single page never imply archive.
+Read failures retain the current transcript and offer retry. This is focus-based
+conversation refresh, not continuous multi-window synchronization or automatic
+refresh of project-directory discovery.
+
+`check:history` externally edits only its disposable registry, verifies focus
+rename refresh and draft preservation, corrupt-read recovery, and a selected
+archived thread beyond the first 20 archived rows. No installed Codex session or
+remote model turn is used for this deterministic cross-writer contract.
 
 `check:history` is a deterministic Electron contract included in acceptance. It
 checks corrupted-registry Retry, empty state, 20+5 row pagination, rejection of
