@@ -1009,6 +1009,16 @@ Current-product create submission is still pending the isolated native
 directory selection, so this is not yet a claim that branch mutation/
 persistence is complete in the product runtime.
 
+The playground's real dirty-checkout recovery gate now uses an isolated Git
+repository at 1180/720px. Switching through the rendered branch menu fails on
+conflicting uncommitted content without changing HEAD or the file. The harness
+preserves that exact draft as a commit on its original branch, then the same UI
+successfully switches to the target and back; the preserved content and clean
+Git status are checked independently of the UI. Error and recovered screenshots
+are retained outside the repository. `check:branch-recovery` is included in full
+acceptance. This closes the sampled host dirty-checkout/retry path, not current
+installed-product evidence, user-facing conflict repair, or the full PR workflow.
+
 Exit: a protocol-backed coding task can travel from project selection through
 command, approval, file review, terminal, and PR review without fixture-only
 state jumps.
