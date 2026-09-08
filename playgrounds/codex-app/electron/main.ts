@@ -16,6 +16,7 @@ import {
 import { randomUUID } from "node:crypto";
 import { stat } from "node:fs/promises";
 import {
+  basename,
   dirname,
   extname,
   isAbsolute,
@@ -879,6 +880,11 @@ function createWindow() {
 }
 
 ipcMain.handle("demo:live:start", startLive);
+ipcMain.handle("demo:live:projects", async (event) => {
+  assertTrustedIpc(event);
+  const directories = await historyRegistry().directories();
+  return Promise.all(directories.map(path => describeProjectSelection({ path, label: basename(path) || path })));
+});
 ipcMain.handle("demo:live:threads", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { input, directory } = resolveHistoryProject(raw);

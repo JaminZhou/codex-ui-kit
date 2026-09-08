@@ -44,6 +44,7 @@ interface CodexDemoBridge {
       meta: string;
     }[]
   >;
+  listLiveProjects(): Promise<Array<{ label: string; path: string; projectToken?: string }>>;
   selectProjectDirectory(): Promise<
     | {
         label: string;

@@ -49,6 +49,13 @@ export class LiveThreadRegistry {
       .sort((a, b) => b.updatedAt - a.updatedAt || a.id.localeCompare(b.id)));
   }
 
+  /** Discover only directories for threads this playground has recorded. */
+  directories(): Promise<string[]> {
+    return this.serialize(async () => [...new Set((await this.read())
+      .sort((a, b) => b.updatedAt - a.updatedAt || a.id.localeCompare(b.id))
+      .map(thread => thread.directory))]);
+  }
+
   async require(directory: string, id: string): Promise<OwnedLiveThread> {
     const thread = (await this.list(directory)).find(thread => thread.id === id);
     if (!thread) throw new Error("This thread does not belong to the selected playground project.");

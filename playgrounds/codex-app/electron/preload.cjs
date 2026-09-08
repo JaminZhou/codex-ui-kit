@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
     process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH ?? "",
   selectAttachments: () => ipcRenderer.invoke("demo:attachments:select"),
   selectProjectDirectory: () => ipcRenderer.invoke("demo:project:select"),
+  listLiveProjects: () => ipcRenderer.invoke("demo:live:projects"),
   createAndCheckoutBranch: (input) =>
     ipcRenderer.invoke("demo:git:create-branch", input),
   checkoutBranch: (input) =>
