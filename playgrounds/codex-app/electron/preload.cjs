@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld("codexDemo", {
   checkoutBranch: (input) =>
     ipcRenderer.invoke("demo:git:checkout-branch", input),
   listBranches: (input) => ipcRenderer.invoke("demo:git:list-branches", input),
+  previewCommit: (input) => ipcRenderer.invoke("demo:git:commit-preview", input),
+  commitPreview: (input) => ipcRenderer.invoke("demo:git:commit", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   startTerminal: (input) => ipcRenderer.invoke("demo:terminal:start", input),
   openTerminalShell: (input) => ipcRenderer.invoke("demo:terminal:open-shell", input),

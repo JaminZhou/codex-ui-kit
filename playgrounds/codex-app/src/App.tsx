@@ -205,6 +205,7 @@ import { initialLiveProjectState, liveProjectState, reduceLiveProjectState } fro
 import { reduceLiveInputs } from "./live-input-state";
 import { LiveUserInput } from "./LiveUserInput";
 import { LiveThreadList } from "./LiveThreadList";
+import { LiveCommitPreview } from "./LiveCommitPreview";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -6831,6 +6832,7 @@ export function App() {
         title="Recents"
         toggleLabel="Toggle recent tasks"
       >
+        {mode === "live" && <LiveCommitPreview projectToken={workspaceProjectToken} />}
         {mode === "live" ? <LiveThreadList projectToken={workspaceProjectToken} selectedId={liveState.threadId}
           onArchived={threadIds => dispatchLive({ kind: "live-archived", threadIds })}
           refreshKey={`${liveState.threadId}:${liveState.status}`} busy={liveHistoryLoading}

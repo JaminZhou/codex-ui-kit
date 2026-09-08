@@ -5,6 +5,8 @@ import type { ProtocolEventRecord } from "./protocol-state";
 import type { LiveTerminalEvent } from "../electron/live-terminal";
 
 interface CodexDemoBridge {
+  previewCommit(input: { projectToken: string }): Promise<import("../electron/git-commit-preview").GitCommitPreview>;
+  commitPreview(input: { projectToken: string; fingerprint: string; message: string }): Promise<{ head: string }>;
   liveWorkspaceWritable: boolean;
   useRendererAttachmentFixture: boolean;
   useWorkspaceBranchFixture: boolean;

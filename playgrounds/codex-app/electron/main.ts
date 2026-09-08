@@ -33,6 +33,7 @@ import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
 import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
 import { LiveThreadRegistry } from "./live-thread-registry.js";
+import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -894,6 +895,19 @@ function createWindow() {
 }
 
 ipcMain.handle("demo:live:start", startLive);
+ipcMain.handle("demo:git:commit-preview", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  return gitBranchOperationQueue.run(() => readGitCommitPreview(directory));
+});
+ipcMain.handle("demo:git:commit", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const input = raw as { fingerprint?: unknown; message?: unknown };
+  if (typeof input.fingerprint !== "string" || typeof input.message !== "string") throw new TypeError("A reviewed preview and commit message are required.");
+  const { fingerprint, message } = input;
+  return gitBranchOperationQueue.run(() => commitGitPreview(directory, fingerprint, message));
+});
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);
   const projects = await historyRegistry().projects();
