@@ -38,6 +38,7 @@ import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
 import { editGitPullRequest, readGitPullRequestDetail, readGitPullRequestDiff, type EditPullRequestInput } from "./git-pr-detail.js";
 import { mergePullRequest, readPullRequestMergeStatus, type PullRequestMergeTarget } from "./git-pr-merge.js";
+import { cleanupMergedPullRequest } from "./git-pr-cleanup.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -972,6 +973,11 @@ ipcMain.handle("demo:git:pr-merge-status", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);
   return gitBranchOperationQueue.run(() => readPullRequestMergeStatus(directory, raw as PullRequestMergeTarget));
+});
+ipcMain.handle("demo:git:pr-cleanup", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  return gitBranchOperationQueue.run(() => cleanupMergedPullRequest(directory, raw as PullRequestMergeTarget & { cleanupConfirmed: boolean }));
 });
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);

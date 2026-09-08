@@ -4567,6 +4567,7 @@ export function App() {
     };
   }, []);
 
+  const [workspaceBranchRefreshEpoch, setWorkspaceBranchRefreshEpoch] = useState(0);
   useEffect(() => {
     if (
       !workspaceUsesHostBranches ||
@@ -4643,6 +4644,7 @@ export function App() {
     workspaceProjectId,
     workspaceProjectToken,
     workspaceUsesHostBranches,
+    workspaceBranchRefreshEpoch,
   ]);
 
   useEffect(() => {
@@ -6836,7 +6838,7 @@ export function App() {
       >
         {mode === "live" && <LiveCommitPreview projectToken={workspaceProjectToken} />}
         {mode === "live" && <LivePushPreview projectToken={workspaceProjectToken} />}
-        {mode === "live" && <LivePullRequest projectToken={workspaceProjectToken} />}
+        {mode === "live" && <LivePullRequest projectToken={workspaceProjectToken} onWorkspaceChanged={() => setWorkspaceBranchRefreshEpoch(value => value + 1)} />}
         {mode === "live" ? <LiveThreadList projectToken={workspaceProjectToken} selectedId={liveState.threadId}
           onArchived={threadIds => dispatchLive({ kind: "live-archived", threadIds })}
           refreshKey={`${liveState.threadId}:${liveState.status}`} busy={liveHistoryLoading}

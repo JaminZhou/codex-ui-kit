@@ -1663,8 +1663,37 @@ never acceptance. It requires a clean expected head/branch and a receipt proving
 both complete local gates exited zero for that head before clicking the UI merge.
 The UI checkbox itself is an acknowledgement, not execution of local validation.
 After a real merge, the agent still synchronizes main and removes only that PR's
-branch. Normal non-admin/queue/rebase merge modes, integrated local cleanup,
+branch. Normal non-admin/queue/rebase merge modes, cleanup beyond the explicit slice below,
 closed-PR history and current installed-product pixels remain open.
+
+## Confirmed post-merge main synchronization and cleanup
+
+The verified-merged panel now offers a separate explicit cleanup confirmation.
+It re-reads the exact PR from the selected project's GitHub remote, requires a
+merge into main, and refuses dirty/untracked files, changed local/tracking/remote
+heads, unrelated checkouts, divergent main and branches occupied by another
+worktree. One explicit base ref is fetched without tags or broad pruning, and
+main is fast-forwarded only after it is proven to contain the merge commit.
+Ignored local files are not overwritten; no reset, autostash, force checkout or
+recursive submodule update is used. Remote branch deletion uses an exact-head
+lease; local and remote-tracking refs use expected-object atomic deletion.
+Only the verified PR branch is removed. Unused branch config may remain; the
+cleanup does not broadly rewrite Git configuration.
+
+The operation is not a transaction across GitHub and local Git. Failures may
+leave safe partial progress, so the UI says incomplete, clears confirmation and
+refreshes host branch state rather than claiming rollback. Reconfirmation safely
+revalidates already-removed refs and already-synchronized main. Six real Git
+tests cover dirty/divergent/advanced refs, remote deletion races, ignored files,
+another worktree and idempotence. The 1180/720 Electron gate runs the actual Git
+cleanup against disposable bare remotes with synthetic provider identity, checks
+dirty-file preservation and lost-response recovery, and is part of acceptance.
+
+The separate real development-PR merge script now also confirms cleanup through
+the UI and independently checks clean main, main/origin-main equality and exact
+local/remote branch absence. It still requires both complete local gates for the
+final head before any real merge. Closed history, other merge modes and current
+installed-product pixel convergence remain incomplete.
 
 ## Planning rules
 

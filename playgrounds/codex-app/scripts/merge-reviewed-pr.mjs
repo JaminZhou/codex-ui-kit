@@ -48,5 +48,16 @@ try {
   const result = panel.getByText(new RegExp(`^Merged PR #${number} at`));
   await result.waitFor({ timeout: 180000 });
   await page.screenshot({ path: join(directory, "merged.png") });
-  console.log(JSON.stringify({ passed: true, directory, expectedHead, expectedBranch, number, result: await result.textContent(), realGitHubMerge: true, localCleanupStillRequired: true }));
+  const mergeResult = await result.textContent();
+  await panel.getByLabel("Authorize merged branch cleanup", { exact: true }).check();
+  await panel.getByRole("button", { name: "Confirm main sync and cleanup", exact: true }).click();
+  const cleanup = panel.getByText(/^Cleanup complete:/);
+  await cleanup.waitFor({ timeout: 180000 });
+  await page.screenshot({ path: join(directory, "cleaned.png") });
+  assert.equal(await git("branch", "--show-current"), "main");
+  assert.equal(await git("rev-parse", "HEAD"), await git("rev-parse", "origin/main"));
+  assert.equal(await git("status", "--porcelain"), "");
+  assert.equal(await git("for-each-ref", "--format=%(refname)", `refs/heads/${expectedBranch}`, `refs/remotes/origin/${expectedBranch}`), "");
+  assert.equal(await git("ls-remote", "--heads", "origin", `refs/heads/${expectedBranch}`), "");
+  console.log(JSON.stringify({ passed: true, directory, expectedHead, expectedBranch, number, result: mergeResult, cleanup: await cleanup.textContent(), realGitHubMerge: true, localCleanupStillRequired: false }));
 } finally { await app.close(); }
