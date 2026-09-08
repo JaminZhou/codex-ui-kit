@@ -50,5 +50,13 @@ try {
   assert.ok((await patch.textContent()).includes("diff --git "));
   await patch.scrollIntoViewIfNeeded();
   await page.screenshot({ path: join(directory, "real-diff.png") });
+  await detail.getByRole("button", { name: "Edit title and description", exact: true }).click();
+  const editor = dialog.getByRole("region", { name: "Edit existing PR", exact: true });
+  const editedBody = `${body}\n\nReal playground verification: PR creation, detail, diff and this explicit description update completed through the Electron UI.`;
+  await editor.getByLabel("Existing PR description", { exact: true }).fill(editedBody);
+  await editor.getByRole("button", { name: "Confirm update PR", exact: true }).click();
+  await dialog.getByText(`Updated PR #${number}.`, { exact: true }).waitFor({ timeout: 180000 });
+  assert.ok((await detail.textContent()).includes(editedBody));
+  await page.screenshot({ path: join(directory, "real-edited.png") });
   console.log(JSON.stringify({ passed: true, directory, expectedHead, expectedBranch, result, realGitHubWrite: true }));
 } finally { await app.close(); }

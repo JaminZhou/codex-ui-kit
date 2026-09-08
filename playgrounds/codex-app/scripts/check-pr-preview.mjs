@@ -14,6 +14,16 @@ for (const width of [1180, 720]) {
       globalThis.__prReadFails = true;
       globalThis.__prCreated = false;
       globalThis.__prDetailFails = false;
+      globalThis.__prEdited = null;
+      globalThis.__prEditCalls = [];
+      globalThis.__prEditLosesResponse = true;
+      ipcMain.removeHandler("demo:git:pr-edit");
+      ipcMain.handle("demo:git:pr-edit", (_event, input) => {
+        globalThis.__prEditCalls.push(input);
+        globalThis.__prEdited = { title: input.title, body: input.body };
+        if (globalThis.__prEditLosesResponse) throw new Error("synthetic saved but response lost");
+        return { number: 1, url: "https://github.com/owner/repo/pull/1", title: input.title, body: input.body, state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [] };
+      });
       globalThis.__prDiffFails = false;
       ipcMain.removeHandler("demo:git:pr-diff");
       ipcMain.handle("demo:git:pr-diff", (_event, input) => {
@@ -24,7 +34,7 @@ for (const width of [1180, 720]) {
       ipcMain.removeHandler("demo:git:pr-detail");
       ipcMain.handle("demo:git:pr-detail", () => {
         if (globalThis.__prDetailFails) throw new Error("synthetic detail failure");
-        return { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Existing details", body: "<script>not executed</script>\nBody text", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/example.ts", additions: 2, deletions: 1 }] };
+        return { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Existing details", body: "<script>not executed</script>\nBody text", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/example.ts", additions: 2, deletions: 1 }], ...globalThis.__prEdited };
       });
       ipcMain.removeHandler("demo:git:pr-preview");
       ipcMain.removeHandler("demo:git:pr-create");
@@ -102,6 +112,40 @@ for (const width of [1180, 720]) {
     await app.evaluate(() => { globalThis.__prDetailFails = false; });
     await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
     await detail.waitFor();
+    await detail.getByRole("button", { name: "Edit title and description", exact: true }).click();
+    const editor = dialog.getByRole("region", { name: "Edit existing PR", exact: true });
+    const save = editor.getByRole("button", { name: "Confirm update PR", exact: true });
+    assert.equal(await save.isDisabled(), true, "Unchanged PR cannot be submitted");
+    await editor.getByLabel("Existing PR title", { exact: true }).fill("Edited title");
+    await editor.getByLabel("Existing PR description", { exact: true }).fill("Edited description");
+    assert.equal((await app.evaluate(() => globalThis.__prEditCalls)).length, 0);
+    await editor.scrollIntoViewIfNeeded();
+    await page.screenshot({ path: join(directory, `edit-${width}.png`) });
+    await save.click();
+    await dialog.getByRole("alert").waitFor();
+    assert.equal(await save.isDisabled(), true, "Uncertain result requires a fresh detail read");
+    assert.equal(await editor.getByLabel("Existing PR description", { exact: true }).inputValue(), "Edited description");
+    assert.equal(await detail.count(), 0);
+    await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
+    await detail.waitFor();
+    assert.equal(await save.isDisabled(), true, "Already-saved edits must not be blindly retried");
+    const editCalls = await app.evaluate(() => globalThis.__prEditCalls);
+    assert.equal(editCalls.length, 1);
+    assert.equal(editCalls[0].expected.title, "Existing details");
+    await app.evaluate(() => { globalThis.__prEditLosesResponse = false; });
+    await editor.getByLabel("Existing PR title", { exact: true }).fill("Verified edited title");
+    await save.click();
+    await dialog.getByText("Updated PR #1.", { exact: true }).waitFor();
+    assert.equal(await editor.count(), 0);
+    assert.ok((await detail.textContent()).includes("Verified edited title"));
+    assert.ok((await dialog.getByRole("region", { name: "PR preview", exact: true }).textContent()).includes("Verified edited title"));
+    const editedFooter = await dialog.getByRole("button", { name: "Close", exact: true }).boundingBox();
+    assert.ok(editedFooter && editedFooter.y >= 0 && editedFooter.y + editedFooter.height <= 820);
+    await page.screenshot({ path: join(directory, `edited-${width}.png`) });
+    await detail.getByRole("button", { name: "Edit title and description", exact: true }).click();
+    await editor.getByLabel("Existing PR title", { exact: true }).fill("Cancelled title");
+    await editor.getByRole("button", { name: "Cancel PR edit", exact: true }).click();
+    assert.equal((await app.evaluate(() => globalThis.__prEditCalls)).length, 2);
     assert.equal(await dialog.getByLabel("PR description", { exact: true }).inputValue(), "Preserve this draft");
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
     await page.waitForFunction(() => document.activeElement?.textContent === "Prepare pull request");

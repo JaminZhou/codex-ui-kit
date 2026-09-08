@@ -2,7 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ exec: vi.fn(), preview: vi.fn() }));
 vi.mock("node:child_process", () => ({ execFile: mocks.exec }));
 vi.mock("../electron/git-pr-preview.js", () => ({ readGitPullRequestPreview: mocks.preview }));
-import { parsePullRequestDetail, readGitPullRequestDiff } from "../electron/git-pr-detail";
+import { editGitPullRequest, parsePullRequestDetail, readGitPullRequestDiff } from "../electron/git-pr-detail";
 
 const detail = { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Example", body: "Untrusted **body**", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 2, files: [{ path: "a file.ts", additions: 1, deletions: 0 }] };
 beforeEach(() => {
@@ -43,4 +43,34 @@ it("rejects mismatched PRs and malformed file counts", () => {
   for (const value of [{ ...detail, number: 2 }, { ...detail, url: "https://evil.test" }, { ...detail, changedFiles: 0 }, { ...detail, files: [{ path: "x", additions: -1, deletions: 0 }] }, { ...detail, body: null }]) {
     expect(() => parsePullRequestDetail(JSON.stringify(value), "owner/repo", 1)).toThrow();
   }
+});
+
+const edit = { remote: "origin", number: 1, title: "Updated title", body: "Updated description", expected: detail };
+it("edits only confirmed metadata and verifies the saved response", async () => {
+  const updated = { ...detail, title: edit.title, body: edit.body };
+  responses(updated);
+  expect(await editGitPullRequest("/project", edit)).toEqual(updated);
+  expect(mocks.exec.mock.calls[1].slice(0, 2)).toEqual(["gh", ["pr", "edit", "1", "--repo", "github.com/owner/repo", "--title", edit.title, "--body", edit.body]]);
+});
+it("rejects invalid, unchanged and stale edits before any mutation", async () => {
+  for (const input of [
+    { ...edit, title: " " }, { ...edit, body: "bad\0body" }, { ...edit, title: detail.title, body: detail.body },
+    ...(["title", "body", "headRefOid", "baseRefName", "baseRefOid"] as const).map(key => ({ ...edit, expected: { ...detail, [key]: "outdated" } })),
+  ]) {
+    mocks.exec.mockClear(); responses();
+    await expect(editGitPullRequest("/project", input)).rejects.toThrow();
+    expect(mocks.exec.mock.calls.some(call => call[1][1] === "edit")).toBe(false);
+  }
+});
+it("does not report success or retry after a failed or unverified edit", async () => {
+  responses();
+  await expect(editGitPullRequest("/project", edit)).rejects.toThrow("uncertain");
+  expect(mocks.exec.mock.calls.filter(call => call[1][1] === "edit")).toHaveLength(1);
+  mocks.exec.mockClear();
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "edit") callback(new Error("lost response"));
+    else callback(null, { stdout: JSON.stringify(detail) });
+  });
+  await expect(editGitPullRequest("/project", edit)).rejects.toThrow("lost response");
+  expect(mocks.exec.mock.calls.filter(call => call[1][1] === "edit")).toHaveLength(1);
 });

@@ -1586,7 +1586,7 @@ gate is in acceptance and performs zero GitHub writes. Real creation is a
 separate explicit opt-in script, `create-reviewed-pr.mjs`, restricted by an
 expected local head/branch and a clean checkout; use it for the development
 PR itself, never as an automatic recurring test. Synthetic evidence alone is
-not proof of real GitHub creation. Fork/enterprise flows, PR detail mutation,
+not proof of real GitHub creation. Fork/enterprise flows, PR mutations beyond the metadata slice below,
 provider authentication UX and current installed-product pixels remain open.
 
 ## Same-branch PR detail follow-up
@@ -1603,7 +1603,7 @@ The existing synthetic 1180/720 PR gate covers detail success/failure/retry,
 literal HTML-like text, links and expanded-dialog/footer bounds. The separate
 explicit development-PR creation script now also reads that actual PR's detail
 through the UI. Neither test is evidence of installed-Codex pixel parity. Full
-diff support beyond the bounded text patch below, PR edits/merge, closed-PR history and provider-specific flows remain
+diff support beyond the bounded text patch below, PR edits beyond title/body, merge, closed-PR history and provider-specific flows remain
 open; this does not mark the complete PR workflow finished.
 
 ## Same-branch PR diff follow-up
@@ -1621,6 +1621,24 @@ scrolling/footer reachability and failed-read recovery. Backend tests cover
 stale heads, changed bases, unrelated PRs and command/output failure. The opt-in
 development-PR script also reads the real PR diff through the UI. These are own
 playground functional checks, not current installed-Codex pixel parity.
+
+## Explicit existing-PR metadata edit follow-up
+
+Live PR details now open a separate title/description editor. Only explicit
+confirmation writes GitHub; cancel and unchanged values perform no mutation.
+The host re-reads the same-project open PR and compares its original title,
+body, head, base name and base SHA before issuing a metadata-only edit. A fresh
+detail read verifies the saved values. This optimistic check is not an atomic
+server-side lock against other writers. Failed or uncertain outcomes preserve
+the draft, clear obsolete detail/diff and require a detail refresh before another
+confirmation; an already-saved draft becomes a no-op rather than a blind retry.
+
+Backend tests cover successful and stale edits, validation, no-op and uncertain
+responses. The 1180/720 synthetic Electron gate covers explicit confirmation,
+lost-response reconciliation, a subsequent successful edit, cancel and footer
+reachability. The opt-in development-PR script verifies one real description edit
+through Electron. Base/reviewer/label mutations, merge and closed history remain
+open; no installed-product pixel-parity claim is made for this own-host editor.
 
 ## Planning rules
 
