@@ -586,8 +586,22 @@ not replay scenario names or unrelated Desktop sessions. Ownership is stored in
 the app's namespaced `live-threads.json` under Electron user data. It contains
 IDs, project directories, titles and timestamps; conversation content remains in
 the public App Server's storage. Registry reads and atomic updates are serialized
-within the host process, with corrupt files preserved and surfaced as errors.
-Cross-process registry coordination remains open.
+within each instance and across processes using an exclusive sibling lock
+directory, with corrupt files preserved and surfaced as errors. The lock spans
+remote acknowledgement and the subsequent atomic write, so another instance
+cannot overwrite that operation using a stale read. Four independent Node
+processes concurrently create and rename 40 owned records in the registry test;
+all projects and titles must survive. This is local registry evidence, not a
+claim that two Electron renderers automatically refresh each other's lists.
+
+Contention waits up to five seconds, then reports a retryable busy error before
+calling a remote mutation. Lock age never authorizes stealing a lock from a
+slow live operation. If a process crashes while holding the lock, close **all**
+playground instances, verify that no registry writer is running, then remove
+only the empty `live-threads.json.lock` directory beside the configured registry
+using `rmdir`. Preserve `live-threads.json` and any temporary data files. Do not
+remove the lock while another instance is active. Automatic crash recovery and
+cross-instance UI refresh remain open.
 
 `check:history` is a deterministic Electron contract included in acceptance. It
 checks corrupted-registry Retry, empty state, 20+5 row pagination, rejection of
@@ -622,8 +636,8 @@ without creating an App Server thread. The same gate selects an empty project,
 restarts the host, and verifies its empty conversation state and usable Composer.
 Registry version 2 stores projects independently of threads; version 1 history
 is migrated on the next successful write, retaining thread ownership. Invalid
-project data fails closed without replacing the file. Cross-process registry
-coordination remains open.
+project data fails closed without replacing the file. Concurrent registry access
+uses the same fail-closed locking policy described above.
 
 ## Live conversation rename
 

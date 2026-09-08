@@ -1,4 +1,5 @@
-import { readFile, mkdir, writeFile, rename } from "node:fs/promises";
+import { readFile, mkdir, writeFile, rename, rmdir } from "node:fs/promises";
+import { setTimeout as delay } from "node:timers/promises";
 import { basename, dirname, isAbsolute } from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -24,8 +25,9 @@ interface RegistryData {
  * Public source labels are not reliable ownership credentials. */
 export class LiveThreadRegistry {
   private queue: Promise<unknown> = Promise.resolve();
-  constructor(private readonly path: string) {
+  constructor(private readonly path: string, private readonly lockTimeoutMs = 5000) {
     if (!isAbsolute(path)) throw new TypeError("An absolute history registry path is required.");
+    if (!Number.isFinite(lockTimeoutMs) || lockTimeoutMs < 0) throw new TypeError("Invalid registry lock timeout.");
   }
 
   private async read(): Promise<RegistryData> {
@@ -73,7 +75,24 @@ export class LiveThreadRegistry {
   }
 
   private serialize<T>(operation: () => Promise<T>): Promise<T> {
-    const next = this.queue.then(operation, operation);
+    const locked = async () => {
+      await mkdir(dirname(this.path), { recursive: true });
+      const lock = `${this.path}.lock`;
+      const deadline = performance.now() + this.lockTimeoutMs;
+      for (;;) {
+        try { await mkdir(lock, { mode: 0o700 }); break; }
+        catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+          if (performance.now() >= deadline) throw new Error("Live history registry is busy. Retry after the other playground operation finishes. A lock left by a crashed process requires recovery with all playground instances closed.");
+          await delay(25);
+        }
+      }
+      // Hold across remote acknowledgement and the atomic local write. Never
+      // steal an old lock: a slow remote operation is not proof of a dead owner.
+      try { return await operation(); }
+      finally { await rmdir(lock); }
+    };
+    const next = this.queue.then(locked, locked);
     this.queue = next.catch(() => undefined);
     return next;
   }
