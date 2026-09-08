@@ -40,9 +40,32 @@ probe invokes preload directly rather than submitting through Composer, does
 not exercise a granted approval, and does not open Review. Visual inspection
 found that the new-file row incorrectly shows `+0 −0`: the actual add event
 contains raw file text, while the renderer currently assumes unified diff
-markers. Fix and gate raw add-content mapping before promoting Review. Native
+markers. The follow-up below fixes and gates raw add-content mapping. Native
 Terminal execution, project-selection interaction, PR operations, current
 product comparison, and a complete live coding workflow remain open.
+
+### Live raw-add Review follow-up — 2026-09-08
+
+A second disposable-workspace run submits through the actual Composer (fill
+and Enter), not preload `startLive`. It creates the same exact `sum.mjs`, runs
+the successful Node assertion, and reaches `LIVE_EDIT_OK`. Opening Review
+shows one added line and the exact source at both 1180×820 and 720×820, with
+no document overflow. The narrow screenshot was inspected. On narrowing an
+already open panel, AppShell intentionally collapses it; the probe waits for
+that state and clicks Review again before checking visible content. Merely
+finding text in the hidden panel is not accepted as a pass.
+
+Live add events explicitly use raw-content mapping, preserving literal patch
+prefixes, indentation, and blank lines. Historical replay unified patches
+retain their original parser. Unit tests cover both formats. The deterministic
+Electron IPC test covers raw lines at both widths plus collapse, wide-screen
+restoration, and narrow reopening without making paid model calls. It is
+synthetic regression evidence, separate from the real Composer run above.
+
+The real run requested no additional approvals; it therefore does not validate
+granting approval. Its protocol log and screenshots stay local-only. This
+closes raw-added-file Review for the sampled successful workflow, not current
+Codex visual parity or the remaining full-workflow gates listed above.
 
 The probe's protocol log and screenshot are local-only. Its first launch used
 the repository root rather than the playground working directory, so
