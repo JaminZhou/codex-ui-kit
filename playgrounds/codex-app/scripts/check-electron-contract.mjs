@@ -13105,6 +13105,9 @@ try {
         globalThis.__codexUiKitApprovalResponse = input;
       });
       const window = BrowserWindow.getAllWindows()[0];
+      window?.webContents.send("demo:live:session", {
+        kind: "live-bind", projectToken: "startup-workspace", threadId: "thread-live-session",
+      });
       window?.webContents.send("demo:notification", {
         method: "item/started",
         params: {
@@ -16720,6 +16723,9 @@ try {
   await liveSubagentApp.evaluate(({ BrowserWindow }) => {
     const contents = BrowserWindow.getAllWindows()[0]?.webContents;
     const startedAtMs = Date.now() - 2_000;
+    contents?.send("demo:live:session", {
+      kind: "live-bind", projectToken: "startup-workspace", threadId: "thread-live-subagent",
+    });
     contents?.send("demo:notification", {
       method: "turn/started",
       params: {
