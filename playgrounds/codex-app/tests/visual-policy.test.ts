@@ -555,7 +555,7 @@ describe("lifecycle visual policy", () => {
     );
     expect(electronHarness).toContain("CODEX_DEMO_NATIVE_THEME_SOURCE");
     expect(electronMain).toContain("!nativeTheme.shouldUseDarkColors");
-    expect(appSource).toContain("const themeAvailable = isDemoThemeView(view)");
+    expect(appSource).toContain("const themeAvailable = isDemoThemeAvailable(view, mode)");
     expect(appSource).toContain(
       'const appliedTheme = themeAvailable ? theme : "dark"',
     );

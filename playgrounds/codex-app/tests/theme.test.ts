@@ -2,11 +2,18 @@ import { describe, expect, it } from "vitest";
 import {
   applyDemoThemePreference,
   isDemoThemeView,
+  isDemoThemeAvailable,
   parseDemoThemePreference,
   resolveDemoThemePreference,
 } from "../src/theme";
 
 describe("demo theme preference", () => {
+  it("allows live terminal themes without widening replay evidence", () => {
+    for (const view of ["conversation", "pull-request", "shell", "workspace", "projects"]) {
+      expect(isDemoThemeAvailable(view, "live")).toBe(true);
+      expect(isDemoThemeAvailable(view, "replay")).toBe(isDemoThemeView(view));
+    }
+  });
   it("keeps the existing dark baseline for absent and invalid values", () => {
     expect(parseDemoThemePreference(null)).toBe("dark");
     expect(parseDemoThemePreference("contrast")).toBe("dark");

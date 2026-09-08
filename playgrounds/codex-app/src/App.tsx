@@ -243,7 +243,7 @@ import {
 } from "./pull-request-lifecycle";
 import {
   applyDemoThemePreference,
-  isDemoThemeView,
+  isDemoThemeAvailable,
   parseDemoThemePreference,
   resolveDemoThemePreference,
   type DemoThemePreference,
@@ -3228,7 +3228,7 @@ export function App() {
     setRouteHistory((current) => pushDemoRoute(current, nextView));
   const navigateRouteHistory = (delta: -1 | 1) =>
     setRouteHistory((current) => moveDemoRoute(current, delta));
-  const themeAvailable = mode === "live" || isDemoThemeView(view);
+  const themeAvailable = isDemoThemeAvailable(view, mode);
   const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null
