@@ -10,14 +10,31 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [preview, setPreview] = useState<GitPullRequestPreview | null>(null);
-  const [busy, setBusy] = useState<"read" | "create" | "detail" | "diff" | null>(null);
+  const [busy, setBusy] = useState<"read" | "create" | "detail" | "diff" | "edit" | null>(null);
+  const [editDraft, setEditDraft] = useState<{ number: number; title: string; body: string } | null>(null);
   const [patch, setPatch] = useState<string | null>(null);
   const [detail, setDetail] = useState<GitPullRequestDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const epoch = useRef(0);
   const trigger = useRef<HTMLButtonElement | null>(null);
-  const invalidate = () => { epoch.current++; setPreview(null); setDetail(null); setPatch(null); setBusy(null); setError(null); setResult(null); };
+  const invalidate = () => { epoch.current++; setPreview(null); setDetail(null); setPatch(null); setEditDraft(null); setBusy(null); setError(null); setResult(null); };
+  const saveEdit = async () => {
+    if (!projectToken || !detail || !editDraft || editDraft.number !== detail.number || !window.codexDemo || busy) return;
+    const request = ++epoch.current;
+    setBusy("edit"); setError(null); setResult(null); setPatch(null);
+    try {
+      const { title: oldTitle, body: oldBody, headRefOid, baseRefName, baseRefOid } = detail;
+      const value = await window.codexDemo.editPullRequest({ projectToken, remote: remote.trim(), number: detail.number, title: editDraft.title, body: editDraft.body,
+        expected: { title: oldTitle, body: oldBody, headRefOid, baseRefName, baseRefOid } });
+      if (request === epoch.current) {
+        setDetail(value); setEditDraft(null); setResult(`Updated PR #${value.number}.`);
+        setPreview(previous => previous && ({ ...previous, pullRequests: previous.pullRequests.map(pr => pr.number === value.number ? { ...pr, title: value.title } : pr) }));
+      }
+    } catch {
+      if (request === epoch.current) { setDetail(null); setError("Edit did not return verified success. Read details again before retrying: GitHub may already have saved it. Your edit draft is preserved."); }
+    } finally { if (request === epoch.current) setBusy(null); }
+  };
   const readDiff = async () => {
     if (!projectToken || !detail || !window.codexDemo || busy) return;
     const request = ++epoch.current;
@@ -32,6 +49,7 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const readDetail = async (number: number) => {
     if (!projectToken || !window.codexDemo || busy) return;
     const request = ++epoch.current;
+    setEditDraft(previous => previous?.number === number ? previous : null);
     setDetail(null); setPatch(null); setError(null); setBusy("detail");
     try {
       const value = await window.codexDemo.readPullRequest({ projectToken, remote: remote.trim(), number });
@@ -66,16 +84,16 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
       if (request === epoch.current) setError("Creation did not return success. Refresh PRs before retrying: the request may already have created one. Your draft is preserved.");
     } finally { if (request === epoch.current) { setBusy(null); setPreview(null); } }
   };
-  const close = () => { if (busy === "create") return; invalidate(); setOpen(false); };
+  const close = () => { if (busy === "create" || busy === "edit") return; invalidate(); setOpen(false); };
   const field = { display: "grid", gap: 6 };
   return <>
     <AppSidebarItem disabled={!projectToken} onClick={event => { trigger.current = event.currentTarget; invalidate(); setOpen(true); }}>Prepare pull request</AppSidebarItem>
     <Dialog title="Prepare pull request" open={open} size="wide" returnFocusRef={trigger} onOpenChange={value => { if (!value) close(); }}
-      footer={<><Button disabled={!!busy || !remote.trim()} onClick={() => void read()}>Refresh PRs</Button><Button disabled={!!busy || !preview || !!preview.pullRequests.length || !title.trim() || !base.trim() || base.trim() === preview.branch} onClick={() => void create()}>Confirm create PR</Button><Button disabled={busy === "create"} onClick={close}>Close</Button></>}>
+      footer={<><Button disabled={!!busy || !remote.trim()} onClick={() => void read()}>Refresh PRs</Button><Button disabled={!!busy || !preview || !!preview.pullRequests.length || !title.trim() || !base.trim() || base.trim() === preview.branch} onClick={() => void create()}>Confirm create PR</Button><Button disabled={busy === "create" || busy === "edit"} onClick={close}>Close</Button></>}>
       <div style={{ display: "grid", gap: 12, minWidth: 0, overflowWrap: "anywhere", maxHeight: "60vh", overflowY: "auto" }}>
         <label style={field}>Remote name<input aria-label="PR remote" value={remote} disabled={!!busy} onChange={event => { invalidate(); setRemote(event.target.value); }} /></label>
         <p>Creates a ready-for-review PR on GitHub after confirmation. No push or merge is performed. Base branch must exist.</p>
-        {busy && <p role="status">{busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : busy === "diff" ? "Reading PR diff…" : "Reading pull requests…"}</p>}
+        {busy && <p role="status">{busy === "edit" ? "Updating pull request…" : busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : busy === "diff" ? "Reading PR diff…" : "Reading pull requests…"}</p>}
         {error && <p role="alert">{error}</p>}{result && <p role="status">{result}</p>}
         {preview && <section aria-label="PR preview"><p>Repository: {preview.repository}</p><p>Head: {preview.branch} · {preview.head}</p>
           {preview.pullRequests.length ? <ul>{preview.pullRequests.map(pr => <li key={pr.number}>Existing PR #{pr.number}: {pr.title} → {pr.baseRefName}<br /><a href={pr.url} target="_blank" rel="noreferrer">Open PR #{pr.number} on GitHub</a> <Button disabled={!!busy} onClick={() => void readDetail(pr.number)}>Read details #{pr.number}</Button></li>)}</ul> : <p>No open PR for this branch.</p>}
@@ -87,7 +105,15 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
           <p>{detail.files.length} of {detail.changedFiles} changed files shown</p>
           <ul>{detail.files.map(file => <li key={file.path}>{file.path} (+{file.additions} / −{file.deletions})</li>)}</ul>
           <Button disabled={!!busy} onClick={() => void readDiff()}>Read PR diff</Button>
+          <Button disabled={!!busy || !!editDraft || detail.state !== "OPEN"} onClick={() => { setEditDraft({ number: detail.number, title: detail.title, body: detail.body }); setResult(null); }}>Edit title and description</Button>
           {patch !== null && <pre aria-label="PR diff" tabIndex={0} style={{ maxHeight: "30vh", overflow: "auto", whiteSpace: "pre" }}>{patch || "No diff content returned."}</pre>}
+        </section>}
+        {editDraft && <section aria-label="Edit existing PR" style={{ display: "grid", gap: 12 }}>
+          <p>Editing PR #{editDraft.number}. Confirmation updates only its title and description on GitHub.</p>
+          <label style={field}>Existing PR title<input aria-label="Existing PR title" value={editDraft.title} maxLength={256} disabled={!!busy} onChange={event => setEditDraft({ ...editDraft, title: event.target.value })} /></label>
+          <label style={field}>Existing PR description<textarea aria-label="Existing PR description" value={editDraft.body} maxLength={65000} rows={4} disabled={!!busy} onChange={event => setEditDraft({ ...editDraft, body: event.target.value })} /></label>
+          <Button disabled={!!busy || !detail || detail.number !== editDraft.number || !editDraft.title.trim() || (detail.title === editDraft.title.trim() && detail.body === editDraft.body)} onClick={() => void saveEdit()}>Confirm update PR</Button>
+          <Button disabled={!!busy} onClick={() => setEditDraft(null)}>Cancel PR edit</Button>
         </section>}
         <label style={field}>Base branch<input aria-label="PR base branch" value={base} disabled={!!busy} onChange={event => setBase(event.target.value)} /></label>
         <label style={field}>Title<input aria-label="PR title" value={title} maxLength={256} disabled={!!busy} onChange={event => setTitle(event.target.value)} /></label>

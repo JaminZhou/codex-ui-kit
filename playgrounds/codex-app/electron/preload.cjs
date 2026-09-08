@@ -30,6 +30,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   createPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-create", input),
   readPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-detail", input),
   readPullRequestDiff: (input) => ipcRenderer.invoke("demo:git:pr-diff", input),
+  editPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-edit", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   startTerminal: (input) => ipcRenderer.invoke("demo:terminal:start", input),
   openTerminalShell: (input) => ipcRenderer.invoke("demo:terminal:open-shell", input),

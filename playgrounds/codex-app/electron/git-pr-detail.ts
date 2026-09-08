@@ -46,6 +46,33 @@ export async function readGitPullRequestDetail(directory: string, remote: string
 
 export interface GitPullRequestDiff { number: number; head: string; patch: string }
 
+export interface EditPullRequestInput {
+  remote: string;
+  number: number;
+  title: string;
+  body: string;
+  expected: Pick<GitPullRequestDetail, "title" | "body" | "headRefOid" | "baseRefName" | "baseRefOid">;
+}
+
+/** Explicit metadata-only edit. Optimistic revalidation is not a server-side lock. */
+export async function editGitPullRequest(directory: string, input: EditPullRequestInput): Promise<GitPullRequestDetail> {
+  if (typeof input.title !== "string" || typeof input.body !== "string" || !input.title.trim()
+    || input.title.length > 256 || input.body.length > 65000 || /\0/.test(input.title + input.body)) throw new Error("Provide a valid PR title and description.");
+  const before = await readGitPullRequestDetail(directory, input.remote, input.number);
+  const keys = ["title", "body", "headRefOid", "baseRefName", "baseRefOid"] as const;
+  if (before.state !== "OPEN" || !input.expected || keys.some(key => before[key] !== input.expected[key])) throw new Error("PR changed. Refresh details before confirming edits.");
+  const title = input.title.trim();
+  if (title === before.title && input.body === before.body) throw new Error("No PR edits to save.");
+  const repository = before.url.split("/").slice(3, 5).join("/");
+  await promisify(execFile)("gh", ["pr", "edit", String(input.number), "--repo", `github.com/${repository}`, "--title", title, "--body", input.body], {
+    cwd: directory, encoding: "utf8", timeout: 60000, maxBuffer: 2 * 1024 * 1024, env: { ...process.env, GH_PROMPT_DISABLED: "1" },
+  });
+  const after = await readGitPullRequestDetail(directory, input.remote, input.number);
+  if (after.state !== "OPEN" || after.title !== title || after.body !== input.body
+    || after.headRefOid !== before.headRefOid || after.baseRefName !== before.baseRefName || after.baseRefOid !== before.baseRefOid) throw new Error("Edit outcome changed or is uncertain. Refresh before another edit.");
+  return after;
+}
+
 /** Read GitHub's patch without checking out or modifying the working tree. */
 export async function readGitPullRequestDiff(directory: string, remote: string, number: number, expectedHead: string): Promise<GitPullRequestDiff> {
   const before = await readGitPullRequestDetail(directory, remote, number);

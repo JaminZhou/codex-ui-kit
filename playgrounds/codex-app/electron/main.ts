@@ -36,7 +36,7 @@ import { LiveThreadRegistry } from "./live-thread-registry.js";
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
 import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
-import { readGitPullRequestDetail, readGitPullRequestDiff } from "./git-pr-detail.js";
+import { editGitPullRequest, readGitPullRequestDetail, readGitPullRequestDiff, type EditPullRequestInput } from "./git-pr-detail.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -954,6 +954,13 @@ ipcMain.handle("demo:git:pr-diff", async (event, raw: unknown) => {
   const { remote, number, head } = raw as Record<string, unknown>;
   if (typeof remote !== "string" || typeof number !== "number" || typeof head !== "string") throw new TypeError("Select a current PR detail.");
   return gitBranchOperationQueue.run(() => readGitPullRequestDiff(directory, remote, number, head));
+});
+ipcMain.handle("demo:git:pr-edit", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const input = raw as EditPullRequestInput;
+  if (typeof input.remote !== "string" || typeof input.number !== "number") throw new TypeError("Select a current PR detail.");
+  return gitBranchOperationQueue.run(() => editGitPullRequest(directory, input));
 });
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);
