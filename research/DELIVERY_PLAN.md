@@ -1252,8 +1252,11 @@ when its window regains focus, deferring while a draft/dialog or request is open
 Same-snapshot complete archived IDs invalidate host and renderer caches without
 mistaking a missing paginated row for an archive. The deterministic Electron
 gate covers external rename, draft preservation, corrupt-read recovery and
-selected archive beyond the first archived page. Project-discovery refresh and
-background synchronization remain separate work.
+selected archive beyond the first archived page. Project discovery now also
+revalidates on Live window focus without changing the active project or Composer
+draft. The wide/720 Electron gate covers externally added/renamed owned projects,
+stable project tokens and recovery after a corrupt registry. Continuous
+background synchronization remains separate work.
 
 ### 6. Perform global visual convergence
 

@@ -610,8 +610,8 @@ ID set from the same locked snapshot as its paginated rows. Newly observed
 archives invalidate renderer selection/history caches; the host also drops a
 matching cached session. Missing entries on a single page never imply archive.
 Read failures retain the current transcript and offer retry. This is focus-based
-conversation refresh, not continuous multi-window synchronization or automatic
-refresh of project-directory discovery.
+conversation refresh, not continuous multi-window synchronization. Project
+discovery now also refreshes on focus in Live mode, as described below.
 
 `check:history` externally edits only its disposable registry, verifies focus
 rename refresh and draft preservation, corrupt-read recovery, and a selected
@@ -653,6 +653,15 @@ Registry version 2 stores projects independently of threads; version 1 history
 is migrated on the next successful write, retaining thread ownership. Invalid
 project data fails closed without replacing the file. Concurrent registry access
 uses the same fail-closed locking policy described above.
+
+On Live window focus, owned project discovery re-reads the registry and directory
+availability without selecting a different project or resetting the Composer.
+Stable host-issued tokens preserve the active project's state; stale responses
+after another refresh or leaving Live are ignored. Discovery errors retain the
+existing list and provide Retry. The 1180/720 deterministic gate adds an external
+owned project and changes its label, verifies the active project and unsubmitted
+draft survive, and exercises corrupted-registry recovery. It does not access
+global Desktop projects or claim continuous background synchronization.
 
 ## Live conversation rename
 
