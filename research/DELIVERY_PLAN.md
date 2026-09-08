@@ -1525,6 +1525,27 @@ exact branch immediately. GitHub CI and bot review are not queried or awaited
 for this exploration workflow; failures discovered by the required local gates
 still block the merge.
 
+## Local staged commit follow-up
+
+The own-playground Live sidebar now exposes a staged-change preview and an
+explicit local commit confirmation with a required message. Trusted project
+tokens scope both IPC calls; the host Git queue serializes its operations.
+The preview records branch, parent, exact staged patch and a fingerprint;
+confirmation re-reads it and rejects stale, empty, conflicted or detached state.
+It never auto-stages, discards files or pushes, and ordinary Git hooks remain
+enabled. External Git writers are not serialized by this queue, so users must
+avoid concurrent edits during confirmation. A command error is not described
+as proof that nothing changed; refresh is required before another attempt.
+
+Real temporary-Git tests cover unborn/detached HEAD, binary/rename/deletion,
+conflicts, stale previews, hook rejection and staged-only successful commits.
+The 1180/720 Electron gate confirms the rendered preview and local commit,
+preserves unstaged/untracked contents, invalidates consumed previews, clears
+failed refreshes and ignores a late read after leaving Live. It is included in
+full acceptance. This is own-host functional evidence, not installed-Codex
+pixel parity. Push/remote confirmation and the complete PR mutation workflow
+remain open; this section does not mark Stage 5 complete.
+
 ## Planning rules
 
 - Split an inventory ID whenever independently owned states or transitions can
