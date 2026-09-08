@@ -6693,7 +6693,7 @@ export function App() {
             key={project.id}
             leading={<SidebarGlyph name="folder-current" />}
             onClick={() => openWorkspace(project.id)}
-            selected={workspaceProjectId === project.id}
+            aria-pressed={workspaceProjectId === project.id}
           >
             {project.label}
           </AppSidebarItem>
@@ -6702,9 +6702,10 @@ export function App() {
           leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("codex-ui-kit")}
           selected={
-            (view === "workspace" || mode === "live") &&
+            view === "workspace" &&
             workspaceProjectId === "codex-ui-kit"
           }
+          aria-pressed={mode === "live" ? workspaceProjectId === "codex-ui-kit" : undefined}
         >
           codex-ui-kit
         </AppSidebarItem>
@@ -6712,9 +6713,10 @@ export function App() {
           leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("app-server-client")}
           selected={
-            (view === "workspace" || mode === "live") &&
+            view === "workspace" &&
             workspaceProjectId === "app-server-client"
           }
+          aria-pressed={mode === "live" ? workspaceProjectId === "app-server-client" : undefined}
         >
           codex-app-server-client
         </AppSidebarItem>

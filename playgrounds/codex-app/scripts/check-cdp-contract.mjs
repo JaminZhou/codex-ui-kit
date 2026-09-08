@@ -21809,6 +21809,12 @@ try {
       `sidebar-current: Live local did not own the only current page: ${JSON.stringify(liveCurrentPages)}`,
     );
   }
+  const selectedLiveProjects = await sidebarPage.locator(
+    '.codex-ui-app-sidebar [aria-pressed="true"] .codex-ui-app-sidebar__item-label',
+  ).allTextContents();
+  if (JSON.stringify(selectedLiveProjects) !== JSON.stringify(["codex-ui-kit"])) {
+    throw new Error(`sidebar-current: Live project selection was not independent: ${JSON.stringify(selectedLiveProjects)}`);
+  }
   await projectsToggle.click();
   const collapsed = {
     expanded: await projectsToggle.getAttribute("aria-expanded"),
