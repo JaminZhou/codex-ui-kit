@@ -1212,9 +1212,13 @@ history registry after application restart. The host checks directory existence
 and reissues opaque project tokens; unavailable directories are disabled and can
 be retried after recovery. Synthetic Electron acceptance covers corrupt-registry
 retry, restart at 1180/720px, project-scoped history and missing-directory recovery
-without listing external sessions or starting a model turn. This restores projects
-with recorded conversations, not empty project selections or a global Codex index.
-Current-product pixels, persistence of empty project selections, archive/rename/
+without listing external sessions or starting a model turn. The empty-project
+follow-up persists native directory selections and labels before any conversation
+exists. Registry version 2 preserves these independently of threads and migrates
+version 1 ownership records on write. The Electron gate now selects an empty
+project, restarts and restores its empty history with an enabled Composer, without
+creating a model thread. It does not import a global Codex project index.
+Current-product pixels, archive/rename/
 delete actions and cross-process registry coordination remain open.
 
 ### 6. Perform global visual convergence

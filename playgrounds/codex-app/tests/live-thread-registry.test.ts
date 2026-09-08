@@ -10,6 +10,31 @@ async function fixture() {
   return { path, registry: new LiveThreadRegistry(path) };
 }
 describe("playground-owned thread registry", () => {
+  it("retains empty selected projects and labels alongside later thread writes", async () => {
+    const { path, registry } = await fixture();
+    await registry.rememberProject({ path: "/empty", label: "My project", updatedAt: 1 });
+    await registry.remember({ id: "other", directory: "/other", title: "Other", updatedAt: 2 });
+    await registry.remember({ id: "first", directory: "/empty", title: "First", updatedAt: 3 });
+    expect(await new LiveThreadRegistry(path).projects()).toEqual([
+      { path: "/empty", label: "My project", updatedAt: 3 },
+      { path: "/other", label: "other", updatedAt: 2 },
+    ]);
+    expect(JSON.parse(await readFile(path, "utf8")).version).toBe(2);
+  });
+  it("migrates legacy history without losing thread ownership", async () => {
+    const { path, registry } = await fixture();
+    await writeFile(path, JSON.stringify({ version: 1, threads: [{ id: "legacy", directory: "/legacy", title: "Legacy", updatedAt: 1 }] }));
+    await registry.rememberProject({ path: "/empty", label: "Empty", updatedAt: 2 });
+    expect((await new LiveThreadRegistry(path).require("/legacy", "legacy")).title).toBe("Legacy");
+    expect(await registry.directories()).toEqual(["/empty", "/legacy"]);
+  });
+  it("rejects corrupt project metadata without replacing storage", async () => {
+    const { path, registry } = await fixture();
+    const raw = JSON.stringify({ version: 2, threads: [], projects: [{ path: "relative", label: "Broken", updatedAt: 0 }] });
+    await writeFile(path, raw);
+    await expect(registry.rememberProject({ path: "/valid", label: "Valid", updatedAt: 1 })).rejects.toThrow();
+    expect(await readFile(path, "utf8")).toBe(raw);
+  });
   it("persists, orders and isolates threads across registry restarts", async () => {
     const { path, registry } = await fixture();
     await Promise.all([

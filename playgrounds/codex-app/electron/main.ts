@@ -16,7 +16,6 @@ import {
 import { randomUUID } from "node:crypto";
 import { stat } from "node:fs/promises";
 import {
-  basename,
   dirname,
   extname,
   isAbsolute,
@@ -615,6 +614,13 @@ async function handleSelectAttachments(event: IpcMainInvokeEvent) {
 
 async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
   assertTrustedIpc(event);
+  const rememberSelection = async (selection: { label: string; path: string }) => {
+    const described = await describeProjectSelection(selection);
+    if (described.projectToken) {
+      await historyRegistry().rememberProject({ ...selection, updatedAt: Date.now() });
+    }
+    return described;
+  };
   const fixtureSelectionsRaw =
     process.env.CODEX_DEMO_PROJECT_FIXTURE_SELECTIONS;
   if (fixtureSelectionsRaw) {
@@ -641,7 +647,7 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
       Math.min(projectFixtureSelectionIndex, fixtureSelections.length - 1)
     ] as { label: string; path: string };
     projectFixtureSelectionIndex += 1;
-    return describeProjectSelection(selection);
+    return rememberSelection(selection);
   }
   const fixturePathsRaw = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATHS;
   let fixturePath = process.env.CODEX_DEMO_PROJECT_FIXTURE_PATH;
@@ -668,7 +674,7 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
         "CODEX_DEMO_PROJECT_FIXTURE_PATH must be an absolute directory path.",
       );
     }
-    return describeProjectSelection({
+    return rememberSelection({
       label: attachmentPathLabel(fixturePath, process.platform),
       path: fixturePath,
     });
@@ -684,7 +690,7 @@ async function handleSelectProjectDirectory(event: IpcMainInvokeEvent) {
       });
   const path = result.filePaths[0];
   if (result.canceled || !path) return null;
-  return describeProjectSelection({
+  return rememberSelection({
     label: attachmentPathLabel(path, process.platform),
     path,
   });
@@ -882,8 +888,8 @@ function createWindow() {
 ipcMain.handle("demo:live:start", startLive);
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);
-  const directories = await historyRegistry().directories();
-  return Promise.all(directories.map(path => describeProjectSelection({ path, label: basename(path) || path })));
+  const projects = await historyRegistry().projects();
+  return Promise.all(projects.map(({ path, label }) => describeProjectSelection({ path, label })));
 });
 ipcMain.handle("demo:live:threads", async (event, raw: unknown) => {
   assertTrustedIpc(event);
