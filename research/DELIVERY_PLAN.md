@@ -1163,6 +1163,11 @@ the explicit local gate and limitations in
 [`VALIDATION.md`](../playgrounds/codex-app/docs/VALIDATION.md). The persistent
 PTY follow-up now retains shell state and emulator output independently of
 panel mounting and adds raw input, resize and tab-close ownership checks.
+The granted-approval follow-up now verifies a real Composer submission in a
+read-only temporary workspace, exact-file `Allow once`, completed file write,
+wide/compact Review, and a PTY read-back in one application session. It does
+not approve broader roots or session-wide access. Other approval kinds and
+real PR operations remain outside this sampled path.
 Model-background-process integration and current-product PTY visual evidence
 remain open; this does not close the complete-workflow exit gate.
 
