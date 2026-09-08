@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, mkdir, rmdir } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import ts from "typescript";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { LiveThreadRegistry } from "../electron/live-thread-registry";
@@ -10,6 +12,66 @@ async function fixture() {
   return { path, registry: new LiveThreadRegistry(path) };
 }
 describe("playground-owned thread registry", () => {
+  it("retains every write from independent operating-system processes", async () => {
+    const { path, registry } = await fixture();
+    const source = await readFile(new URL("../electron/live-thread-registry.ts", import.meta.url), "utf8");
+    const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2023, module: ts.ModuleKind.ESNext } }).outputText;
+    const moduleUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
+    await Promise.all(Array.from({ length: 4 }, (_, worker) => new Promise<void>((resolve, reject) => {
+      const child = spawn(process.execPath, ["--input-type=module", "-e", `
+        const { LiveThreadRegistry } = await import(${JSON.stringify(moduleUrl)});
+        const registry = new LiveThreadRegistry(${JSON.stringify(path)});
+        for (let i = 0; i < 10; i++) {
+          await registry.remember({id: '${worker}-' + i, directory: '/project-${worker}', title: 'Original', updatedAt: i});
+          await registry.rename('/project-${worker}', '${worker}-' + i, 'Renamed', async () => new Promise(resolve => setTimeout(resolve, 3)));
+        }
+      `], { stdio: ["ignore", "ignore", "pipe"] });
+      let stderr = "";
+      child.stderr.on("data", chunk => { stderr += chunk; });
+      child.once("error", reject);
+      child.once("exit", code => code === 0 ? resolve() : reject(new Error(`Registry worker exited ${code}: ${stderr}`)));
+    })));
+    expect(await registry.directories()).toHaveLength(4);
+    for (let worker = 0; worker < 4; worker++) {
+      const rows = await registry.list(`/project-${worker}`);
+      expect(rows).toHaveLength(10);
+      expect(rows.every(row => row.title === "Renamed")).toBe(true);
+    }
+  }, 15000);
+
+  it("does not steal a busy or orphaned lock or call the remote mutation", async () => {
+    const { path, registry } = await fixture();
+    await registry.remember({ id: "a", directory: "/a", title: "A", updatedAt: 1 });
+    await mkdir(`${path}.lock`);
+    const impatient = new LiveThreadRegistry(path, 30);
+    let called = false;
+    await expect(impatient.rename("/a", "a", "Lost", async () => { called = true; })).rejects.toThrow("registry is busy");
+    expect(called).toBe(false);
+    await expect(mkdir(`${path}.lock`)).rejects.toMatchObject({ code: "EEXIST" });
+    await rmdir(`${path}.lock`);
+    expect((await impatient.require("/a", "a")).title).toBe("A");
+  });
+
+  it("serializes independent instances across remote acknowledgement and releases failed operations", async () => {
+    const { path, registry } = await fixture();
+    const other = new LiveThreadRegistry(path);
+    await registry.remember({ id: "a", directory: "/a", title: "A", updatedAt: 1 });
+    let release!: () => void;
+    let entered!: () => void;
+    const started = new Promise<void>(resolve => { entered = resolve; });
+    const pending = registry.rename("/a", "a", "New", async () => {
+      entered();
+      await new Promise<void>(resolve => { release = resolve; });
+    });
+    await started;
+    const touch = other.touch("/a", "a", 9);
+    release();
+    await Promise.all([pending, touch]);
+    expect(await other.require("/a", "a")).toMatchObject({ title: "New", updatedAt: 9 });
+    await expect(registry.setArchived("/a", "a", true, async () => { throw new Error("Remote failed"); })).rejects.toThrow("Remote failed");
+    await other.touch("/a", "a", 10);
+    expect((await other.require("/a", "a")).updatedAt).toBe(10);
+  });
   it("persists archived ownership and restores only the requested thread", async () => {
     const { path, registry } = await fixture();
     for (const id of ["parent", "child", "other"]) {

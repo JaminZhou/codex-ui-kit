@@ -1238,8 +1238,15 @@ with the original history and name intact at 1180/720px. The two disposable
 threads are archived after verification. Synthetic tests separately cover
 descendant notification bookkeeping and restore-one semantics; an actual
 multi-descendant archive lifecycle is not yet claimed.
-Current-product pixels, permanent deletion, real descendant-archive coverage
-and cross-process registry coordination remain open.
+The cross-process registry follow-up serializes reads, remote acknowledgement,
+and atomic writes with an exclusive sibling lock directory. Four independent
+Node processes concurrently create and rename 40 records without losing project
+or title metadata. Contention times out before remote mutation; failed operations
+release their lock. Crash-orphaned locks deliberately fail closed and require
+explicit recovery with all playground instances closed, rather than age-based
+lock stealing. See the recovery instructions in `VALIDATION.md`.
+Current-product pixels, permanent deletion, real descendant-archive coverage,
+automatic orphan-lock recovery and cross-instance UI refresh remain open.
 
 ### 6. Perform global visual convergence
 
