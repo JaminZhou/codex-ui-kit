@@ -32,6 +32,14 @@ for (const width of [1180, 720]) {
       for (const event of notifications) window.webContents.send("demo:notification", event);
     }, events);
     const group = page.getByTestId("file-change-group");
+    // A thread notification alone cannot claim the selected project. Mirror
+    // the trusted host binding sent by startLive before a real turn begins.
+    assert.equal(await group.count(), 0);
+    await app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0].webContents.send("demo:live:session", {
+        kind: "live-bind", projectToken: "startup-workspace", threadId: "raw-add-thread",
+      });
+    });
     await group.waitFor();
     assert.match(await group.innerText(), /\+5/);
     await group.getByRole("button", { name: "Review", exact: true }).click();

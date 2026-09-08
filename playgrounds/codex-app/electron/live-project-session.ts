@@ -1,21 +1,21 @@
 /** The caller serializes starts and rejects them while a turn is active. */
 export class LiveProjectSession<T> {
-  private current: { directory: string; thread: T } | null = null;
+  private threads = new Map<string, T>();
   private generation = 0;
 
   clear() {
     this.generation += 1;
-    this.current = null;
+    this.threads.clear();
   }
 
   async select(directory: string, create: () => Promise<T>): Promise<T> {
-    if (this.current?.directory === directory) return this.current.thread;
+    if (this.threads.has(directory)) return this.threads.get(directory)!;
     const generation = this.generation;
     const thread = await create();
     if (generation !== this.generation) {
       throw new Error("The live session was closed before the thread started.");
     }
-    this.current = { directory, thread };
+    this.threads.set(directory, thread);
     return thread;
   }
 }

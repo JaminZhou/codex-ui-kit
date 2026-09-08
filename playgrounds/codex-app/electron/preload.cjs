@@ -32,6 +32,12 @@ contextBridge.exposeInMainWorld("codexDemo", {
     ipcRenderer.on("demo:terminal:event", listener);
     return () => ipcRenderer.removeListener("demo:terminal:event", listener);
   },
+  onLiveSession: (handler) => {
+    if (typeof handler !== "function") throw new TypeError("Live session handler must be a function.");
+    const listener = (_event, value) => handler(value);
+    ipcRenderer.on("demo:live:session", listener);
+    return () => ipcRenderer.removeListener("demo:live:session", listener);
+  },
   onNotification: (handler) => {
     if (typeof handler !== "function") {
       throw new TypeError("Notification handler must be a function.");
@@ -51,5 +57,5 @@ contextBridge.exposeInMainWorld("codexDemo", {
   respondToApproval: (input) =>
     ipcRenderer.invoke("demo:approval:respond", input),
   startLive: (input) => ipcRenderer.invoke("demo:live:start", input),
-  stopLive: () => ipcRenderer.invoke("demo:live:stop"),
+  stopLive: (input) => ipcRenderer.invoke("demo:live:stop", input),
 });
