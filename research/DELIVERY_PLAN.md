@@ -1155,6 +1155,15 @@ dependencies in the public root package.
 Exit: the demo can reproduce a complete coding workflow in replay and live
 local modes with the same UI state model.
 
+Live progress (2026-09-08): actual Composer submission, file creation, Node
+assertion, and raw-added-file Review now pass at 1180/720px. The command-oriented
+Terminal follow-up reaches real success/failure, stdin, stop and mode-change
+process cleanup through Electron using sandboxed App Server execution. See
+the explicit local gate and limitations in
+[`VALIDATION.md`](../playgrounds/codex-app/docs/VALIDATION.md). Persistent shell
+state, full PTY UI behavior and model-background-process integration remain
+open; this does not close the complete-workflow exit gate.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:

@@ -15,6 +15,41 @@ client/runtime versions, workspace, ordered user actions, observed protocol
 completion and UI settlement, and host/protocol/UI failure attribution, with
 credentials and private content excluded from committed evidence.
 
+### Live Terminal execution — 2026-09-08
+
+After `pnpm build:codex-app`, run
+`pnpm --filter @codex-ui-kit/codex-app-playground check:live-terminal` for
+the explicit local integration gate. This starts the dependency-owned App
+Server (client `8cf5823ee12c00f7bc9c5eaeef80049e65f0e881`, CLI 0.153.4)
+and issues real sandboxed `command/exec` requests, not model turns. It is
+separate from deterministic replay acceptance. Screenshots and results are
+retained in the printed disposable-directory path, not committed.
+
+The Electron test opens Terminal from an empty Live conversation, submits a
+successful command and an exit-code-7 failure through the input, sends stdin
+to a waiting command, stops a running command, and checks visible 1180/720px
+input with zero document overflow. It observes a running shell pid, switches
+to Replay, and verifies that pid no longer exists; re-entering Live starts a
+fresh Terminal without replay/live output contamination. The 720px output
+was also visually inspected during development.
+
+The host chooses the project path, shell, process id, sandbox and limits.
+Renderer-supplied paths and sandbox overrides are ignored. A separate
+connection owns terminal processes; leaving Live or closing the window closes
+that connection without using an unrestricted process API. The existing host
+write opt-in applies, with network disabled. Unit tests cover trusted project
+selection, malformed input, duplicate running sessions, split UTF-8 output,
+truncation markers, failure, stdin/stop ownership and late callbacks.
+
+This is command-oriented execution with a fresh `/bin/zsh -c` per submitted
+command, not yet a persistent interactive shell: `cd` and shell variables do
+not persist between completed commands. Each command has a 120-second timeout
+and 1 MiB per-stream output cap. Full PTY terminal emulation/resize, persistent
+shell state, and integration with model-owned background processes remain
+open. A running session must be stopped before its tab is closed; hiding the
+panel does not stop it. These limits must not be presented as full terminal
+parity or current-product pixel evidence.
+
 ### Live runtime check — 2026-09-08
 
 The previous pinned client bundled Codex CLI 0.145.0. A real live turn using

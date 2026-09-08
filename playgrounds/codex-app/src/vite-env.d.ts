@@ -2,6 +2,7 @@
 
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import type { ProtocolEventRecord } from "./protocol-state";
+import type { LiveTerminalEvent } from "../electron/live-terminal";
 
 interface CodexDemoBridge {
   liveWorkspaceWritable: boolean;
@@ -52,6 +53,11 @@ interface CodexDemoBridge {
     | null
   >;
   closeLive(): Promise<void>;
+  startTerminal(input: { sessionId: string; projectToken: string; command: string }): Promise<{ processId: string }>;
+  writeTerminal(input: { sessionId: string; text: string }): Promise<void>;
+  stopTerminal(input: { sessionId: string }): Promise<void>;
+  closeTerminals(): Promise<void>;
+  onTerminalEvent(handler: (event: LiveTerminalEvent) => void): () => void;
   onNotification(
     handler: (notification: JsonRpcNotification) => void,
   ): () => void;

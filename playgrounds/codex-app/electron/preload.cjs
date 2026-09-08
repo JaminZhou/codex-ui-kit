@@ -20,6 +20,16 @@ contextBridge.exposeInMainWorld("codexDemo", {
     ipcRenderer.invoke("demo:git:checkout-branch", input),
   listBranches: (input) => ipcRenderer.invoke("demo:git:list-branches", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
+  startTerminal: (input) => ipcRenderer.invoke("demo:terminal:start", input),
+  writeTerminal: (input) => ipcRenderer.invoke("demo:terminal:write", input),
+  stopTerminal: (input) => ipcRenderer.invoke("demo:terminal:stop", input),
+  closeTerminals: () => ipcRenderer.invoke("demo:terminal:close"),
+  onTerminalEvent: (handler) => {
+    if (typeof handler !== "function") throw new TypeError("Terminal handler must be a function.");
+    const listener = (_event, value) => handler(value);
+    ipcRenderer.on("demo:terminal:event", listener);
+    return () => ipcRenderer.removeListener("demo:terminal:event", listener);
+  },
   onNotification: (handler) => {
     if (typeof handler !== "function") {
       throw new TypeError("Notification handler must be a function.");

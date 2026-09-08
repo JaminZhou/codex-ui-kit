@@ -20,6 +20,7 @@
     "check:electron": "node scripts/check-electron-contract.mjs",
     "check:live-policy": "node scripts/check-live-policy.mjs",
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
+    "check:live-terminal": "node scripts/check-live-terminal.mjs",
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",

@@ -33,6 +33,7 @@ import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
+import { LiveTerminalManager } from "./live-terminal.js";
 import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
@@ -86,6 +87,7 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 let mainWindow: BrowserWindow | null = null;
 let client: CodexAppServerClient | null = null;
+let terminalHost: { client: CodexAppServerClient; manager: LiveTerminalManager; ready: Promise<unknown> } | null = null;
 const liveSession = new LiveProjectSession<CodexThread>();
 let activeTurn: CodexTurn | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
@@ -364,6 +366,13 @@ async function handleApprovalResponse(
   }
 }
 
+async function closeTerminals() {
+  const closingTerminalHost = terminalHost;
+  terminalHost = null;
+  closingTerminalHost?.manager.dispose();
+  await closingTerminalHost?.client.close();
+}
+
 async function closeLive() {
   activeTurn = null;
   liveSession.clear();
@@ -374,7 +383,36 @@ async function closeLive() {
   liveApprovalGate.declineAll();
   const closingClient = client;
   client = null;
-  await closingClient?.close();
+  await Promise.all([closingClient?.close(), closeTerminals()]);
+}
+
+async function ensureTerminalHost() {
+  if (!terminalHost) {
+    const terminalClient = new CodexAppServerClient({
+      clientInfo: { name: "codex_ui_kit_terminal", title: "Codex UI Kit Terminal", version: "0.0.0" },
+      protocolValidation: "strict",
+    });
+    const manager = new LiveTerminalManager({
+      execute: input => terminalClient.call("command/exec", input),
+      write: (processId, deltaBase64) => terminalClient.call("command/exec/write", { processId, deltaBase64 }),
+      terminate: processId => terminalClient.call("command/exec/terminate", { processId }),
+    }, trustedProjectDirectories, terminalEvent => {
+      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("demo:terminal:event", terminalEvent);
+    }, liveWriteOptIn);
+    terminalClient.onNotification("command/exec/outputDelta", params => manager.output(params));
+    terminalHost = { client: terminalClient, manager, ready: terminalClient.connect() };
+  }
+  const host = terminalHost;
+  try {
+    await host.ready;
+    if (terminalHost !== host) throw new Error("The terminal connection was closed.");
+    return host.manager;
+  } catch (error) {
+    if (terminalHost === host) terminalHost = null;
+    host.manager.dispose();
+    await host.client.close().catch(() => undefined);
+    throw error;
+  }
 }
 
 async function handleCloseLive(event: IpcMainInvokeEvent) {
@@ -737,6 +775,30 @@ function createWindow() {
 ipcMain.handle("demo:live:start", startLive);
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:live:close", handleCloseLive);
+ipcMain.handle("demo:terminal:start", async (event, input) => {
+  assertTrustedIpc(event);
+  // Validate the project before connecting a new host process.
+  if (!input || typeof input.projectToken !== "string" || !trustedProjectDirectories.has(input.projectToken)) {
+    throw new Error("Select a host-owned local project.");
+  }
+  const manager = await ensureTerminalHost();
+  assertTrustedIpc(event);
+  return manager.start(input);
+});
+ipcMain.handle("demo:terminal:write", async (event, input) => {
+  assertTrustedIpc(event);
+  if (!terminalHost || typeof input?.sessionId !== "string" || typeof input?.text !== "string") throw new Error("Invalid terminal input.");
+  await terminalHost.manager.write(input.sessionId, input.text);
+});
+ipcMain.handle("demo:terminal:stop", async (event, input) => {
+  assertTrustedIpc(event);
+  if (!terminalHost || typeof input?.sessionId !== "string") throw new Error("Invalid terminal session.");
+  await terminalHost.manager.stop(input.sessionId);
+});
+ipcMain.handle("demo:terminal:close", async event => {
+  assertTrustedIpc(event);
+  await closeTerminals();
+});
 ipcMain.handle("demo:approval:respond", handleApprovalResponse);
 ipcMain.handle("demo:attachments:select", handleSelectAttachments);
 ipcMain.handle("demo:project:select", handleSelectProjectDirectory);
