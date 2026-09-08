@@ -202,6 +202,8 @@ import {
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
 import { initialLiveProjectState, liveProjectState, reduceLiveProjectState } from "./live-project-state";
+import { reduceLiveInputs } from "./live-input-state";
+import { LiveUserInput } from "./LiveUserInput";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -3065,6 +3067,7 @@ export function App() {
     initialSelection.frame,
   );
   const [replayCount, setReplayCount] = useState(initialCount);
+  const [liveInputs, dispatchLiveInput] = useReducer(reduceLiveInputs, []);
   const [liveProjects, dispatchLive] = useReducer(
     reduceLiveProjectState,
     initialLiveProjectState,
@@ -4509,12 +4512,17 @@ export function App() {
 
   useEffect(() => {
     if (!window.codexDemo) return;
-    const removeLiveSession = window.codexDemo.onLiveSession(dispatchLive);
+    const removeLiveSession = window.codexDemo.onLiveSession((event) => {
+      dispatchLive(event);
+      dispatchLiveInput(event);
+    });
     const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
+      dispatchLiveInput(notification);
     });
     const removeServerRequest = window.codexDemo.onServerRequest((request) => {
       dispatchLive(request);
+      dispatchLiveInput(request);
     });
     return () => {
       removeNotification();
@@ -15844,7 +15852,16 @@ export function App() {
         ) : (
           <>
             <ConversationThreadShell
-              aboveComposer={composerPlanProgress}
+              aboveComposer={mode === "live" && liveInputs.some((request) => request.threadId === liveState.threadId) ? <>
+                {composerPlanProgress}
+                {mode === "live" && liveInputs.filter((request) => request.threadId === liveState.threadId).map((request) => (
+                  <LiveUserInput key={`${request.threadId}:${typeof request.requestId}:${request.requestId}`} request={request} onSubmit={async (answers) => {
+                    if (!window.codexDemo) throw new Error("Live host unavailable.");
+                    await window.codexDemo.respondToUserInput({ requestId: request.requestId, threadId: request.threadId, answers });
+                    dispatchLiveInput({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
+                  }} />
+                ))}
+              </> : composerPlanProgress}
               composer={composer}
               floatingControl={floatingControl}
               header={header}

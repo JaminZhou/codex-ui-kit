@@ -542,3 +542,22 @@ using the pinned client and CLI 0.153.4. Reviewed captures show the stopped row,
 rejected file/approval, and successful follow-up at 720px. This proves the
 sampled pending-file-approval interruption path, not every running-tool Stop
 variant or current installed-product pixel parity.
+## Pending user-input contract
+
+`pnpm --filter @codex-ui-kit/codex-app-playground check:user-input` checks the
+Electron question form with synthetic public-protocol requests: explicit option
+selection, custom text, password-masked input, exact response payload, owning
+thread visibility, server resolution and client reset. It checks that the real
+host rejects absent requests before substituting the response transport for the
+UI test. Host-gate unit tests separately cover thread validation, malformed
+answers, once-only responses and cancellation. The acceptance command includes
+this deterministic contract; no signed-in model turn is consumed by this gate.
+
+This does **not** prove a real model-generated question/answer round trip or
+pixel parity with the installed Codex application. Screenshots at 1180/720px
+are playground layout evidence only. Submitted answers are not retained in the
+protocol history, and the form does not display host error payloads that might
+echo sensitive values. The schema's optional `isBlocking` is normalized to true
+for older hosts; deprecated auto-resolution timers do not silently answer a
+question. Public lifecycle reference:
+[App Server user input](https://learn.chatgpt.com/docs/app-server#toolrequestuserinput).

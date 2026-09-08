@@ -30,6 +30,7 @@ import {
   type AttachmentDialogKind,
 } from "./attachment-dialog.js";
 import { LiveApprovalGate } from "./live-approval-gate.js";
+import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -99,6 +100,7 @@ let gitBranchOperationActive = false;
 const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
+const liveInputGate = new LiveUserInputGate();
 
 interface ApprovalResponseInput {
   decision: "accept" | "acceptForSession" | "decline";
@@ -226,10 +228,32 @@ async function delayGitBranchOperationForFixture(
 }
 
 function broadcastNotification(notification: JsonRpcNotification) {
+  if (notification.method === "turn/completed") {
+    const params = notification.params as { threadId?: unknown; turn?: { id?: unknown } } | undefined;
+    if (typeof params?.threadId === "string" && typeof params.turn?.id === "string") {
+      liveInputGate.clearTurn(params.threadId, params.turn.id);
+    }
+  }
+  if (notification.method === "serverRequest/resolved") {
+    const params = notification.params as { requestId?: unknown; threadId?: unknown } | undefined;
+    if (params && (typeof params.requestId === "string" || typeof params.requestId === "number") && typeof params.threadId === "string") {
+      liveInputGate.cancel(params.requestId, params.threadId);
+    }
+  }
   const window = mainWindow;
   if (window && !window.isDestroyed()) {
     window.webContents.send("demo:notification", notification);
   }
+}
+
+function requestRendererInput(params: LiveInputRequest, requestId: number | string) {
+  const window = mainWindow;
+  if (!window || window.isDestroyed()) return Promise.resolve({ answers: {} });
+  const response = liveInputGate.request(requestId, params);
+  window.webContents.send("demo:server-request", {
+    id: requestId, kind: "request", method: "item/tool/requestUserInput", params,
+  });
+  return response;
 }
 
 function requestRendererApproval(
@@ -275,6 +299,7 @@ function openAllowedExternalUrl(url: string) {
 
 async function ensureClient() {
   if (client?.state === "connected") return client;
+  liveInputGate.clear();
   liveSession.clear();
   mainWindow?.webContents.send("demo:live:session", { kind: "live-reset" });
   if (client) {
@@ -295,6 +320,8 @@ async function ensureClient() {
   });
   unsubscribeNotifications = client.onNotification(broadcastNotification);
   unsubscribeServerRequests = [
+    client.onServerRequest("item/tool/requestUserInput", (params, request) =>
+      requestRendererInput({ ...params, isBlocking: params.isBlocking ?? true }, request.id)),
     client.onServerRequest(
       "item/commandExecution/requestApproval",
       (params, request) =>
@@ -356,7 +383,10 @@ async function startLive(
 async function stopLive() {
   if (!activeTurn) return;
   liveApprovalGate.declineAll();
+  const stoppingThreadId = activeTurnThreadId;
+  const stoppingTurnId = activeTurn.id;
   await activeTurn.interrupt();
+  if (stoppingThreadId) liveInputGate.clearTurn(stoppingThreadId, stoppingTurnId);
 }
 
 async function handleStopLive(event: IpcMainInvokeEvent, rawInput: unknown) {
@@ -392,6 +422,7 @@ async function closeTerminals() {
 }
 
 async function closeLive() {
+  liveInputGate.clear();
   activeTurn = null;
   activeTurnThreadId = null;
   liveSession.clear();
@@ -795,6 +826,17 @@ function createWindow() {
 
 ipcMain.handle("demo:live:start", startLive);
 ipcMain.handle("demo:live:stop", handleStopLive);
+ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {
+  assertTrustedIpc(event);
+  if (!rawInput || typeof rawInput !== "object") throw new TypeError("Invalid answer response.");
+  const input = rawInput as { requestId?: unknown; threadId?: unknown; answers?: unknown };
+  if ((typeof input.requestId !== "string" && typeof input.requestId !== "number") || typeof input.threadId !== "string") {
+    throw new TypeError("A request and owning thread are required.");
+  }
+  if (!liveInputGate.respond(input.requestId, input.threadId, input.answers)) {
+    throw new Error("The question is no longer pending.");
+  }
+});
 ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:terminal:start", async (event, input) => {
   assertTrustedIpc(event);
