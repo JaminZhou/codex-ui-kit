@@ -37,6 +37,7 @@ import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js"
 import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
 import { editGitPullRequest, readGitPullRequestDetail, readGitPullRequestDiff, type EditPullRequestInput } from "./git-pr-detail.js";
+import { mergePullRequest, readPullRequestMergeStatus, type PullRequestMergeTarget } from "./git-pr-merge.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -961,6 +962,16 @@ ipcMain.handle("demo:git:pr-edit", async (event, raw: unknown) => {
   const input = raw as EditPullRequestInput;
   if (typeof input.remote !== "string" || typeof input.number !== "number") throw new TypeError("Select a current PR detail.");
   return gitBranchOperationQueue.run(() => editGitPullRequest(directory, input));
+});
+ipcMain.handle("demo:git:pr-merge", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  return gitBranchOperationQueue.run(() => mergePullRequest(directory, raw as PullRequestMergeTarget & { adminConfirmed: boolean }));
+});
+ipcMain.handle("demo:git:pr-merge-status", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  return gitBranchOperationQueue.run(() => readPullRequestMergeStatus(directory, raw as PullRequestMergeTarget));
 });
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);

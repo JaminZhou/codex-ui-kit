@@ -1603,7 +1603,7 @@ The existing synthetic 1180/720 PR gate covers detail success/failure/retry,
 literal HTML-like text, links and expanded-dialog/footer bounds. The separate
 explicit development-PR creation script now also reads that actual PR's detail
 through the UI. Neither test is evidence of installed-Codex pixel parity. Full
-diff support beyond the bounded text patch below, PR edits beyond title/body, merge, closed-PR history and provider-specific flows remain
+diff support beyond the bounded text patch below, PR edits beyond title/body, merge modes beyond the explicit admin slice below, closed-PR history and provider-specific flows remain
 open; this does not mark the complete PR workflow finished.
 
 ## Same-branch PR diff follow-up
@@ -1637,8 +1637,34 @@ Backend tests cover successful and stale edits, validation, no-op and uncertain
 responses. The 1180/720 synthetic Electron gate covers explicit confirmation,
 lost-response reconciliation, a subsequent successful edit, cancel and footer
 reachability. The opt-in development-PR script verifies one real description edit
-through Electron. Base/reviewer/label mutations, merge and closed history remain
+through Electron. Base/reviewer/label mutations, other merge modes and closed history remain
 open; no installed-product pixel-parity claim is made for this own-host editor.
+
+## Explicit administrator squash-merge follow-up
+
+The Live PR panel now prepares a separate merge target and requires both explicit
+administrator/local-validation acknowledgement and the exact head SHA. This
+own-host action is intentionally labelled as bypassing required checks/reviews;
+it does not change repository protection, enqueue auto-merge or perform local Git
+cleanup. The backend revalidates the current project's open PR, head and base,
+rejects conflicting/unknown readiness and passes `--match-head-commit` to GitHub.
+The base recheck is optimistic, not a server-side transactional lock.
+
+Success requires a matching `MERGED` result and a merge commit SHA, not just exit
+zero from the command. Lost responses reconcile once with a read; the UI exposes
+read-only result checks and blocks blind mutation retries. Result reads resolve
+the selected project's exact GitHub remote and still work after head deletion.
+The 1180/720 synthetic gate covers confirmation, wrong heads, pending dismissal,
+lost-response/status-error recovery and footer bounds with zero GitHub writes.
+Backend tests gate exact arguments, stale targets, conflicts and result identity.
+
+`merge-reviewed-pr.mjs` is a separate explicit opt-in real development-PR action,
+never acceptance. It requires a clean expected head/branch and a receipt proving
+both complete local gates exited zero for that head before clicking the UI merge.
+The UI checkbox itself is an acknowledgement, not execution of local validation.
+After a real merge, the agent still synchronizes main and removes only that PR's
+branch. Normal non-admin/queue/rebase merge modes, integrated local cleanup,
+closed-PR history and current installed-product pixels remain open.
 
 ## Planning rules
 

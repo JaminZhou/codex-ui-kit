@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppSidebarItem, Button, Dialog } from "codex-ui-kit";
 import type { GitPullRequestPreview } from "../electron/git-pr-preview";
 import type { GitPullRequestDetail } from "../electron/git-pr-detail";
+import { LivePullRequestMerge } from "./LivePullRequestMerge";
 
 export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const [open, setOpen] = useState(false);
@@ -10,7 +11,7 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [preview, setPreview] = useState<GitPullRequestPreview | null>(null);
-  const [busy, setBusy] = useState<"read" | "create" | "detail" | "diff" | "edit" | null>(null);
+  const [busy, setBusy] = useState<"read" | "create" | "detail" | "diff" | "edit" | "merge" | "merge-status" | null>(null);
   const [editDraft, setEditDraft] = useState<{ number: number; title: string; body: string } | null>(null);
   const [patch, setPatch] = useState<string | null>(null);
   const [detail, setDetail] = useState<GitPullRequestDetail | null>(null);
@@ -84,16 +85,16 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
       if (request === epoch.current) setError("Creation did not return success. Refresh PRs before retrying: the request may already have created one. Your draft is preserved.");
     } finally { if (request === epoch.current) { setBusy(null); setPreview(null); } }
   };
-  const close = () => { if (busy === "create" || busy === "edit") return; invalidate(); setOpen(false); };
+  const close = () => { if (busy === "create" || busy === "edit" || busy === "merge") return; invalidate(); setOpen(false); };
   const field = { display: "grid", gap: 6 };
   return <>
     <AppSidebarItem disabled={!projectToken} onClick={event => { trigger.current = event.currentTarget; invalidate(); setOpen(true); }}>Prepare pull request</AppSidebarItem>
     <Dialog title="Prepare pull request" open={open} size="wide" returnFocusRef={trigger} onOpenChange={value => { if (!value) close(); }}
-      footer={<><Button disabled={!!busy || !remote.trim()} onClick={() => void read()}>Refresh PRs</Button><Button disabled={!!busy || !preview || !!preview.pullRequests.length || !title.trim() || !base.trim() || base.trim() === preview.branch} onClick={() => void create()}>Confirm create PR</Button><Button disabled={busy === "create" || busy === "edit"} onClick={close}>Close</Button></>}>
+      footer={<><Button disabled={!!busy || !remote.trim()} onClick={() => void read()}>Refresh PRs</Button><Button disabled={!!busy || !preview || !!preview.pullRequests.length || !title.trim() || !base.trim() || base.trim() === preview.branch} onClick={() => void create()}>Confirm create PR</Button><Button disabled={busy === "create" || busy === "edit" || busy === "merge"} onClick={close}>Close</Button></>}>
       <div style={{ display: "grid", gap: 12, minWidth: 0, overflowWrap: "anywhere", maxHeight: "60vh", overflowY: "auto" }}>
         <label style={field}>Remote name<input aria-label="PR remote" value={remote} disabled={!!busy} onChange={event => { invalidate(); setRemote(event.target.value); }} /></label>
-        <p>Creates a ready-for-review PR on GitHub after confirmation. No push or merge is performed. Base branch must exist.</p>
-        {busy && <p role="status">{busy === "edit" ? "Updating pull request…" : busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : busy === "diff" ? "Reading PR diff…" : "Reading pull requests…"}</p>}
+        <p>Creation makes a ready-for-review PR without pushing. Editing and administrator merge require their own explicit confirmation. Base branch must exist.</p>
+        {busy && <p role="status">{busy === "merge" ? "Merging pull request…" : busy === "merge-status" ? "Checking merge result…" : busy === "edit" ? "Updating pull request…" : busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : busy === "diff" ? "Reading PR diff…" : "Reading pull requests…"}</p>}
         {error && <p role="alert">{error}</p>}{result && <p role="status">{result}</p>}
         {preview && <section aria-label="PR preview"><p>Repository: {preview.repository}</p><p>Head: {preview.branch} · {preview.head}</p>
           {preview.pullRequests.length ? <ul>{preview.pullRequests.map(pr => <li key={pr.number}>Existing PR #{pr.number}: {pr.title} → {pr.baseRefName}<br /><a href={pr.url} target="_blank" rel="noreferrer">Open PR #{pr.number} on GitHub</a> <Button disabled={!!busy} onClick={() => void readDetail(pr.number)}>Read details #{pr.number}</Button></li>)}</ul> : <p>No open PR for this branch.</p>}
@@ -115,6 +116,7 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
           <Button disabled={!!busy || !detail || detail.number !== editDraft.number || !editDraft.title.trim() || (detail.title === editDraft.title.trim() && detail.body === editDraft.body)} onClick={() => void saveEdit()}>Confirm update PR</Button>
           <Button disabled={!!busy} onClick={() => setEditDraft(null)}>Cancel PR edit</Button>
         </section>}
+        {open && <LivePullRequestMerge key={`${projectToken}:${remote}`} projectToken={projectToken} remote={remote.trim()} repository={preview?.repository} detail={editDraft ? null : detail} busy={!!busy} onBusy={setBusy} onMerged={() => { setDetail(null); setPreview(null); setPatch(null); setEditDraft(null); setResult(null); }} />}
         <label style={field}>Base branch<input aria-label="PR base branch" value={base} disabled={!!busy} onChange={event => setBase(event.target.value)} /></label>
         <label style={field}>Title<input aria-label="PR title" value={title} maxLength={256} disabled={!!busy} onChange={event => setTitle(event.target.value)} /></label>
         <label style={field}>Description<textarea aria-label="PR description" value={body} maxLength={65000} rows={4} disabled={!!busy} onChange={event => setBody(event.target.value)} /></label>
