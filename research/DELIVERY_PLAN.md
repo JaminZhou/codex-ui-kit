@@ -1589,6 +1589,23 @@ PR itself, never as an automatic recurring test. Synthetic evidence alone is
 not proof of real GitHub creation. Fork/enterprise flows, PR detail mutation,
 provider authentication UX and current installed-product pixels remain open.
 
+## Same-branch PR detail follow-up
+
+Existing PR entries now expose GitHub links and a trusted-project detail read.
+The host accepts only a PR discovered for the current same-repository branch,
+validates its identity and detects a changed PR head during the read. The UI
+shows status, base, head, plain-text body and file additions/deletions. It reports
+both returned and total file counts rather than implying partial data is complete.
+Failed reads clear old details; drafts remain intact. The content area scrolls
+within a bounded height so the 720px footer remains reachable.
+
+The existing synthetic 1180/720 PR gate covers detail success/failure/retry,
+literal HTML-like text, links and expanded-dialog/footer bounds. The separate
+explicit development-PR creation script now also reads that actual PR's detail
+through the UI. Neither test is evidence of installed-Codex pixel parity. Full
+diff viewing, PR edits/merge, closed-PR history and provider-specific flows remain
+open; this does not mark the complete PR workflow finished.
+
 ## Planning rules
 
 - Split an inventory ID whenever independently owned states or transitions can

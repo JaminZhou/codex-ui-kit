@@ -35,5 +35,14 @@ try {
   await status.waitFor({ timeout: 120000 });
   const result = await status.textContent();
   await page.screenshot({ path: join(directory, "created.png") });
+  const number = Number(result.match(/^Created PR #(\d+):/)?.[1]);
+  assert.ok(Number.isSafeInteger(number) && number > 0);
+  await dialog.getByRole("button", { name: "Refresh PRs", exact: true }).click();
+  await dialog.getByRole("button", { name: `Read details #${number}`, exact: true }).click({ timeout: 120000 });
+  const detail = dialog.getByRole("region", { name: "PR details", exact: true });
+  await detail.waitFor({ timeout: 120000 });
+  assert.ok((await detail.textContent()).includes(expectedHead));
+  assert.ok((await detail.textContent()).includes(title));
+  await page.screenshot({ path: join(directory, "real-details.png") });
   console.log(JSON.stringify({ passed: true, directory, expectedHead, expectedBranch, result, realGitHubWrite: true }));
 } finally { await app.close(); }

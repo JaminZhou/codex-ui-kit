@@ -13,6 +13,12 @@ for (const width of [1180, 720]) {
       globalThis.__prCreateCalls = [];
       globalThis.__prReadFails = true;
       globalThis.__prCreated = false;
+      globalThis.__prDetailFails = false;
+      ipcMain.removeHandler("demo:git:pr-detail");
+      ipcMain.handle("demo:git:pr-detail", () => {
+        if (globalThis.__prDetailFails) throw new Error("synthetic detail failure");
+        return { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Existing details", body: "<script>not executed</script>\nBody text", state: "OPEN", baseRefName: "main", headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/example.ts", additions: 2, deletions: 1 }] };
+      });
       ipcMain.removeHandler("demo:git:pr-preview");
       ipcMain.removeHandler("demo:git:pr-create");
       ipcMain.handle("demo:git:pr-preview", () => {
@@ -53,6 +59,25 @@ for (const width of [1180, 720]) {
     await dialog.getByRole("button", { name: "Refresh PRs", exact: true }).click();
     await dialog.getByText(/Existing PR #1:/).waitFor();
     assert.equal(await confirm.isDisabled(), true, "Reconciled existing PR prevents blind retry");
+    const link = dialog.getByRole("link", { name: "Open PR #1 on GitHub", exact: true });
+    assert.equal(await link.getAttribute("href"), "https://github.com/owner/repo/pull/1");
+    await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
+    const detail = dialog.getByRole("region", { name: "PR details", exact: true });
+    await detail.getByText("1 of 3 changed files shown", { exact: true }).waitFor();
+    assert.ok((await detail.textContent()).includes("<script>not executed</script>"));
+    assert.equal(await detail.locator("script").count(), 0);
+    const detailBounds = await dialog.boundingBox();
+    assert.ok(detailBounds && detailBounds.y >= 0 && detailBounds.y + detailBounds.height <= 820);
+    const closeBounds = await dialog.getByRole("button", { name: "Close", exact: true }).boundingBox();
+    assert.ok(closeBounds && closeBounds.y >= 0 && closeBounds.y + closeBounds.height <= 820, "Footer must remain inside the window");
+    await page.screenshot({ path: join(directory, `details-${width}.png`) });
+    await app.evaluate(() => { globalThis.__prDetailFails = true; });
+    await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
+    await dialog.getByRole("alert").waitFor();
+    assert.equal(await detail.count(), 0, "Failed detail refresh must clear obsolete contents");
+    await app.evaluate(() => { globalThis.__prDetailFails = false; });
+    await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
+    await detail.waitFor();
     assert.equal(await dialog.getByLabel("PR description", { exact: true }).inputValue(), "Preserve this draft");
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
     await page.waitForFunction(() => document.activeElement?.textContent === "Prepare pull request");

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AppSidebarItem, Button, Dialog } from "codex-ui-kit";
 import type { GitPullRequestPreview } from "../electron/git-pr-preview";
+import type { GitPullRequestDetail } from "../electron/git-pr-detail";
 
 export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const [open, setOpen] = useState(false);
@@ -9,12 +10,24 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [preview, setPreview] = useState<GitPullRequestPreview | null>(null);
-  const [busy, setBusy] = useState<"read" | "create" | null>(null);
+  const [busy, setBusy] = useState<"read" | "create" | "detail" | null>(null);
+  const [detail, setDetail] = useState<GitPullRequestDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const epoch = useRef(0);
   const trigger = useRef<HTMLButtonElement | null>(null);
-  const invalidate = () => { epoch.current++; setPreview(null); setBusy(null); setError(null); setResult(null); };
+  const invalidate = () => { epoch.current++; setPreview(null); setDetail(null); setBusy(null); setError(null); setResult(null); };
+  const readDetail = async (number: number) => {
+    if (!projectToken || !window.codexDemo || busy) return;
+    const request = ++epoch.current;
+    setDetail(null); setError(null); setBusy("detail");
+    try {
+      const value = await window.codexDemo.readPullRequest({ projectToken, remote: remote.trim(), number });
+      if (request === epoch.current) setDetail(value);
+    } catch {
+      if (request === epoch.current) setError("Couldn’t read current PR details. Refresh PRs and retry.");
+    } finally { if (request === epoch.current) setBusy(null); }
+  };
   useEffect(() => {
     invalidate(); setOpen(false); setRemote("origin"); setBase("main"); setTitle(""); setBody("");
     return () => { epoch.current++; };
@@ -22,7 +35,7 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const read = async () => {
     if (!projectToken || !window.codexDemo || busy) return;
     const request = ++epoch.current;
-    setPreview(null); setError(null); setResult(null); setBusy("read");
+    setPreview(null); setDetail(null); setError(null); setResult(null); setBusy("read");
     try {
       const value = await window.codexDemo.previewPullRequest({ projectToken, remote: remote.trim() });
       if (request === epoch.current) setPreview(value);
@@ -47,13 +60,20 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
     <AppSidebarItem disabled={!projectToken} onClick={event => { trigger.current = event.currentTarget; invalidate(); setOpen(true); }}>Prepare pull request</AppSidebarItem>
     <Dialog title="Prepare pull request" open={open} size="wide" returnFocusRef={trigger} onOpenChange={value => { if (!value) close(); }}
       footer={<><Button disabled={!!busy || !remote.trim()} onClick={() => void read()}>Refresh PRs</Button><Button disabled={!!busy || !preview || !!preview.pullRequests.length || !title.trim() || !base.trim() || base.trim() === preview.branch} onClick={() => void create()}>Confirm create PR</Button><Button disabled={busy === "create"} onClick={close}>Close</Button></>}>
-      <div style={{ display: "grid", gap: 12, minWidth: 0, overflowWrap: "anywhere" }}>
+      <div style={{ display: "grid", gap: 12, minWidth: 0, overflowWrap: "anywhere", maxHeight: "60vh", overflowY: "auto" }}>
         <label style={field}>Remote name<input aria-label="PR remote" value={remote} disabled={!!busy} onChange={event => { invalidate(); setRemote(event.target.value); }} /></label>
         <p>Creates a ready-for-review PR on GitHub after confirmation. No push or merge is performed. Base branch must exist.</p>
-        {busy && <p role="status">{busy === "create" ? "Creating pull request…" : "Reading pull requests…"}</p>}
+        {busy && <p role="status">{busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : "Reading pull requests…"}</p>}
         {error && <p role="alert">{error}</p>}{result && <p role="status">{result}</p>}
         {preview && <section aria-label="PR preview"><p>Repository: {preview.repository}</p><p>Head: {preview.branch} · {preview.head}</p>
-          {preview.pullRequests.length ? <ul>{preview.pullRequests.map(pr => <li key={pr.number}>Existing PR #{pr.number}: {pr.title} → {pr.baseRefName}<br />{pr.url}</li>)}</ul> : <p>No open PR for this branch.</p>}
+          {preview.pullRequests.length ? <ul>{preview.pullRequests.map(pr => <li key={pr.number}>Existing PR #{pr.number}: {pr.title} → {pr.baseRefName}<br /><a href={pr.url} target="_blank" rel="noreferrer">Open PR #{pr.number} on GitHub</a> <Button disabled={!!busy} onClick={() => void readDetail(pr.number)}>Read details #{pr.number}</Button></li>)}</ul> : <p>No open PR for this branch.</p>}
+        </section>}
+        {detail && <section aria-label="PR details" style={{ maxHeight: "35vh", overflow: "auto" }}>
+          <h3>{detail.title}</h3><p>{detail.state} · Base: {detail.baseRefName}</p>
+          <p>Head: {detail.headRefOid}</p>
+          <p style={{ whiteSpace: "pre-wrap" }}>{detail.body || "No description."}</p>
+          <p>{detail.files.length} of {detail.changedFiles} changed files shown</p>
+          <ul>{detail.files.map(file => <li key={file.path}>{file.path} (+{file.additions} / −{file.deletions})</li>)}</ul>
         </section>}
         <label style={field}>Base branch<input aria-label="PR base branch" value={base} disabled={!!busy} onChange={event => setBase(event.target.value)} /></label>
         <label style={field}>Title<input aria-label="PR title" value={title} maxLength={256} disabled={!!busy} onChange={event => setTitle(event.target.value)} /></label>
