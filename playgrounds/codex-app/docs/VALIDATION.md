@@ -15,6 +15,40 @@ client/runtime versions, workspace, ordered user actions, observed protocol
 completion and UI settlement, and host/protocol/UI failure attribution, with
 credentials and private content excluded from committed evidence.
 
+### Live runtime check — 2026-09-08
+
+The previous pinned client bundled Codex CLI 0.145.0. A real live turn using
+the account's default `gpt-6-astra` model failed with a server-side 400 requiring
+a newer Codex version, before any file change. Updating the global CLI would
+not change this dependency-owned executable.
+
+Client commit `8cf5823ee12c00f7bc9c5eaeef80049e65f0e881` bundles CLI 0.153.4.
+With that client, one isolated Electron playground run in a disposable local
+directory reached the following public-protocol path using workspace-write,
+network disabled, and rejection of all additional approval requests:
+
+1. Start a fresh live thread through the preload bridge with the startup
+   project's host-issued token; no model override.
+2. Create `sum.mjs` containing `export const add = (a, b) => a + b;` plus a
+   newline through a real file-change operation.
+3. Execute a Node import/assertion checking `add(2, 3) === 5`, exit code 0.
+4. Receive completed file-change, command, and turn events; verify exact file
+   bytes and the visible final reply `LIVE_EDIT_OK` in Electron.
+
+This is a host/transport/editing slice, not complete workflow acceptance: the
+probe invokes preload directly rather than submitting through Composer, does
+not exercise a granted approval, and does not open Review. Visual inspection
+found that the new-file row incorrectly shows `+0 −0`: the actual add event
+contains raw file text, while the renderer currently assumes unified diff
+markers. Fix and gate raw add-content mapping before promoting Review. Native
+Terminal execution, project-selection interaction, PR operations, current
+product comparison, and a complete live coding workflow remain open.
+
+The probe's protocol log and screenshot are local-only. Its first launch used
+the repository root rather than the playground working directory, so
+`electron .` never opened a BrowserWindow; that harness error is not counted as
+an application failure or successful evidence.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:

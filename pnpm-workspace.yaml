@@ -7,5 +7,6 @@ overrides:
 
 allowBuilds:
   "@jaminzhou/codex-app-server-client@https://codeload.github.com/JaminZhou/codex-app-server-client/tar.gz/97ffcd496aa0aefdbdc868d13a5bce4e09a5afc5": true
+  "@jaminzhou/codex-app-server-client@https://codeload.github.com/JaminZhou/codex-app-server-client/tar.gz/8cf5823ee12c00f7bc9c5eaeef80049e65f0e881": true
   electron: true
   esbuild: true
