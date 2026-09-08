@@ -202,6 +202,7 @@ import {
   type ProtocolEventRecord,
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
+import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
 import { LiveApprovalSubmissionGate } from "./live-approval-submission-gate";
@@ -242,7 +243,7 @@ import {
 } from "./pull-request-lifecycle";
 import {
   applyDemoThemePreference,
-  isDemoThemeView,
+  isDemoThemeAvailable,
   parseDemoThemePreference,
   resolveDemoThemePreference,
   type DemoThemePreference,
@@ -3227,7 +3228,7 @@ export function App() {
     setRouteHistory((current) => pushDemoRoute(current, nextView));
   const navigateRouteHistory = (delta: -1 | 1) =>
     setRouteHistory((current) => moveDemoRoute(current, delta));
-  const themeAvailable = isDemoThemeView(view);
+  const themeAvailable = isDemoThemeAvailable(view, mode);
   const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null
@@ -4006,6 +4007,8 @@ export function App() {
   >({});
   const [liveTerminalStatus, setLiveTerminalStatus] = useState<Record<string, "starting" | "running" | "exited" | "failed">>({});
   const liveTerminalProjectTokens = useRef<Record<string, string>>({});
+  const ptySessions = useRef(new Map<string, PtyTerminalHandle>());
+  const ptyStarts = useRef(new Map<string, Promise<unknown>>());
   const [terminalHistoryByCommand, setTerminalHistoryByCommand] = useState<
     Record<string, TerminalEntry[]>
   >(() =>
@@ -4477,7 +4480,9 @@ export function App() {
     const bridge = window.codexDemo;
     const unsubscribe = bridge?.onTerminalEvent(event => {
     const sessionId = event.sessionId;
+    if (event.kind === "failed" || event.kind === "completed") ptyStarts.current.delete(sessionId);
     setLiveTerminalStatus(status => ({ ...status, [sessionId]: event.kind === "started" || event.kind === "output" ? "running" : event.kind === "failed" || event.exitCode !== 0 ? "failed" : "exited" }));
+    if (ptySessions.current.has(sessionId)) return;
     setTerminalHistoryByCommand(history => {
       const entries = history[sessionId] ?? [];
       const text = event.kind === "started" ? `$ ${event.command}`
@@ -4494,6 +4499,9 @@ export function App() {
     });
     return () => {
       unsubscribe?.();
+      for (const session of ptySessions.current.values()) session.dispose();
+      ptySessions.current.clear();
+      ptyStarts.current.clear();
       void bridge?.closeTerminals().catch(() => undefined);
     };
   }, [mode]);
@@ -7187,6 +7195,15 @@ export function App() {
           </div>
         ) : (
           <div className="demo-header-actions">
+            {mode === "live" ? (
+              <label className="demo-theme-control">
+                <select aria-label="Theme" value={theme} onChange={event => setTheme(parseDemoThemePreference(event.currentTarget.value))}>
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </label>
+            ) : null}
             <span className="demo-status" data-status={displayedStatus}>
               {replayStatusLabel(
                 state.status,
@@ -14724,6 +14741,49 @@ export function App() {
         sessionId === "agent-background-terminal";
       return {
         entries: terminalEntriesBySession[sessionId]!,
+        terminalContent: mode === "live" && sessionId.startsWith("local-terminal-") ? (
+          <PtyTerminal
+            sessionId={sessionId}
+            sessions={ptySessions.current}
+            onReady={size => {
+              const bridge = window.codexDemo;
+              const projectToken = liveTerminalProjectTokens.current[sessionId] ?? workspaceProjectToken;
+              if (!bridge || !projectToken) {
+                ptySessions.current.get(sessionId)?.terminal.writeln("Select a local project before opening a terminal.");
+                setLiveTerminalStatus(status => ({ ...status, [sessionId]: "failed" }));
+                return;
+              }
+              liveTerminalProjectTokens.current[sessionId] = projectToken;
+              setLiveTerminalStatus(status => ({ ...status, [sessionId]: "starting" }));
+              const request = bridge.openTerminalShell({ sessionId, projectToken, size });
+              ptyStarts.current.set(sessionId, request);
+              void request.catch(error => {
+                ptySessions.current.get(sessionId)?.terminal.writeln(String(error));
+                setLiveTerminalStatus(status => ({ ...status, [sessionId]: "failed" }));
+              });
+            }}
+            onInput={text => {
+              void ptyStarts.current.get(sessionId)?.then(() => window.codexDemo?.writeTerminal({ sessionId, text })).catch(error => {
+                ptySessions.current.get(sessionId)?.terminal.writeln(String(error));
+              });
+            }}
+            onResize={size => {
+              void ptyStarts.current.get(sessionId)?.then(() => window.codexDemo?.resizeTerminal({ sessionId, size })).catch(error => {
+                ptySessions.current.get(sessionId)?.terminal.writeln(String(error));
+              });
+            }}
+            subscribeOutput={write => window.codexDemo?.onTerminalEvent(event => {
+              if (event.sessionId !== sessionId) return;
+              if (event.kind === "output") write(event.text);
+              else if (event.kind === "failed") write(`\r\n${event.message}\r\n`);
+              else if (event.kind === "completed") write(`\r\nProcess exited with code ${event.exitCode}\r\n`);
+            }) ?? (() => undefined)}
+            onError={message => {
+              ptySessions.current.get(sessionId)?.terminal.writeln(message);
+              void window.codexDemo?.stopTerminal({ sessionId }).catch(() => undefined);
+            }}
+          />
+        ) : undefined,
         id: sessionId,
         icon: currentTerminal26825Frame(activeFrame) ? (
           <CurrentBuildIcon name="thread-command-terminal" />
@@ -14825,6 +14885,7 @@ export function App() {
       actions={mode === "live" && liveTerminalStatus[activeTerminalSessionId] === "running" ? (
         <Button onClick={() => {
           void window.codexDemo?.stopTerminal({ sessionId: activeTerminalSessionId }).catch(error => {
+            ptySessions.current.get(activeTerminalSessionId)?.terminal.writeln(String(error));
             setTerminalHistoryByCommand(history => ({ ...history, [activeTerminalSessionId]: [...(history[activeTerminalSessionId] ?? []), { id: `stop-error:${Date.now()}`, kind: "system", text: String(error) }] }));
           });
         }}>Stop</Button>
@@ -14832,7 +14893,21 @@ export function App() {
       label="Terminal"
       onActiveSessionChange={setTerminalCommandId}
       onClose={() => setTerminalOpen(false)}
-      onCloseSession={(sessionId) => {
+      onCloseSession={async (sessionId) => {
+        if (ptySessions.current.has(sessionId)) {
+          try {
+            await ptyStarts.current.get(sessionId)?.catch(() => undefined);
+            if (liveTerminalStatus[sessionId] === "running" || liveTerminalStatus[sessionId] === "starting") {
+              await window.codexDemo?.stopTerminal({ sessionId });
+            }
+          } catch (error) {
+            ptySessions.current.get(sessionId)?.terminal.writeln(String(error));
+            return;
+          }
+          ptySessions.current.get(sessionId)?.dispose();
+          ptySessions.current.delete(sessionId);
+          ptyStarts.current.delete(sessionId);
+        } else
         if (liveTerminalStatus[sessionId] === "running" || liveTerminalStatus[sessionId] === "starting") {
           setTerminalHistoryByCommand(history => ({ ...history, [sessionId]: [...(history[sessionId] ?? []), { id: `close-running:${Date.now()}`, kind: "system", text: "Stop the running process before closing this terminal." }] }));
           return;
@@ -15221,7 +15296,7 @@ export function App() {
       data-route-history-length={routeHistory.entries.length}
       data-view={view}
     >
-      {!initialSelection.capture && themeAvailable ? (
+      {!initialSelection.capture && themeAvailable && mode !== "live" ? (
         <label className="demo-theme-control demo-theme-control--floating">
           <span>Theme</span>
           <select

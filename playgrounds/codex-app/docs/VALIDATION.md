@@ -25,13 +25,14 @@ and issues real sandboxed `command/exec` requests, not model turns. It is
 separate from deterministic replay acceptance. Screenshots and results are
 retained in the printed disposable-directory path, not committed.
 
-The Electron test opens Terminal from an empty Live conversation, submits a
-successful command and an exit-code-7 failure through the input, sends stdin
-to a waiting command, stops a running command, and checks visible 1180/720px
-input with zero document overflow. It observes a running shell pid, switches
-to Replay, and verifies that pid no longer exists; re-entering Live starts a
-fresh Terminal without replay/live output contamination. The 720px output
-was also visually inspected during development.
+The host probe verifies persistent shell directory/environment, actual
+`stty size` after resize, Ctrl-C followed by another command, and shell exit.
+The Electron gate uses real keyboard input into the bundled xterm emulator.
+It checks persistent directory/environment, interruption, hidden-panel output,
+multiple sessions, tab-close process termination, 1180/720px layout, and
+theme switching without resetting the shell. It observes a running shell pid,
+switches to Replay, and verifies that pid no longer exists; re-entering Live
+starts a fresh Terminal and verifies an exit-code-7 failure.
 
 The host chooses the project path, shell, process id, sandbox and limits.
 Renderer-supplied paths and sandbox overrides are ignored. A separate
@@ -41,14 +42,14 @@ write opt-in applies, with network disabled. Unit tests cover trusted project
 selection, malformed input, duplicate running sessions, split UTF-8 output,
 truncation markers, failure, stdin/stop ownership and late callbacks.
 
-This is command-oriented execution with a fresh `/bin/zsh -c` per submitted
-command, not yet a persistent interactive shell: `cd` and shell variables do
-not persist between completed commands. Each command has a 120-second timeout
-and 1 MiB per-stream output cap. Full PTY terminal emulation/resize, persistent
-shell state, and integration with model-owned background processes remain
-open. A running session must be stopped before its tab is closed; hiding the
-panel does not stop it. These limits must not be presented as full terminal
-parity or current-product pixel evidence.
+Live local tabs now use a persistent `/bin/zsh -f -i` PTY, without user shell
+startup files, command timeouts or a lifetime output cap. The renderer retains
+5000 scrollback lines and stops a session if pending render input exceeds
+1 MiB of characters. Tabs own their emulator independently of panel mounting;
+closing a tab terminates its shell, while hiding the panel does not.
+The legacy command API keeps its 120-second timeout and 1 MiB output cap.
+Model-owned background-process integration and current-product PTY pixel
+comparison remain open. Functional local evidence is not full terminal parity.
 
 ### Live runtime check — 2026-09-08
 

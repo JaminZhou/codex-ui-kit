@@ -25,6 +25,11 @@ export function resolveDemoThemePreference(
   return isDemoThemeView(view) ? parseDemoThemePreference(value) : "dark";
 }
 
+/** Live is independently themed; replay keeps its evidenced route boundary. */
+export function isDemoThemeAvailable(view: string, mode: "live" | "replay"): boolean {
+  return mode === "live" || isDemoThemeView(view);
+}
+
 export function applyDemoThemePreference(
   root: HTMLElement,
   preference: DemoThemePreference,

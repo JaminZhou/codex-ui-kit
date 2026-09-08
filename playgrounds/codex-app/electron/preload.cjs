@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld("codexDemo", {
   listBranches: (input) => ipcRenderer.invoke("demo:git:list-branches", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   startTerminal: (input) => ipcRenderer.invoke("demo:terminal:start", input),
+  openTerminalShell: (input) => ipcRenderer.invoke("demo:terminal:open-shell", input),
+  resizeTerminal: (input) => ipcRenderer.invoke("demo:terminal:resize", input),
   writeTerminal: (input) => ipcRenderer.invoke("demo:terminal:write", input),
   stopTerminal: (input) => ipcRenderer.invoke("demo:terminal:stop", input),
   closeTerminals: () => ipcRenderer.invoke("demo:terminal:close"),

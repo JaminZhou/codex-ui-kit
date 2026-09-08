@@ -20,7 +20,7 @@
     "check:electron": "node scripts/check-electron-contract.mjs",
     "check:live-policy": "node scripts/check-live-policy.mjs",
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
-    "check:live-terminal": "node scripts/check-live-terminal.mjs",
+    "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
@@ -28,6 +28,8 @@
     "check:all": "pnpm check && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {
+    "@xterm/xterm": "6.0.0",
+    "@xterm/addon-fit": "0.11.0",
     "@jaminzhou/codex-app-server-client": "github:JaminZhou/codex-app-server-client#8cf5823ee12c00f7bc9c5eaeef80049e65f0e881",
     "codex-ui-kit": "workspace:*",
     "react": "19.2.8",
