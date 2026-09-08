@@ -608,3 +608,13 @@ source was `vscode`, not `appServer`; source labels are therefore not used as an
 ownership boundary. See [public thread APIs](https://learn.chatgpt.com/docs/app-server).
 Archive/rename/delete UI, persisted project discovery and installed-product
 pixel parity remain separate delivery work.
+# Live project discovery
+
+`pnpm --filter @codex-ui-kit/codex-app-playground check:project-discovery`
+is part of complete acceptance. It seeds only its own temporary history registry,
+restarts Electron at 1180/720px, restores a non-startup project, verifies scoped
+conversation rows, and exercises corrupt-registry Retry and missing-directory
+recovery. It does not query global App Server history or invoke a model.
+Screenshots are functional playground evidence, not current-product pixel parity.
+Only projects with recorded conversations are restored; empty selected projects
+and cross-process registry coordination remain open.

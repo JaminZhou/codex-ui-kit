@@ -18,6 +18,7 @@ describe("playground-owned thread registry", () => {
       registry.remember({ id: "c", directory: "/project-a", title: "C", updatedAt: 3 }),
     ]);
     expect((await new LiveThreadRegistry(path).list("/project-a")).map(thread => thread.id)).toEqual(["c", "a"]);
+    expect(await new LiveThreadRegistry(path).directories()).toEqual(["/project-a", "/project-b"]);
     await expect(registry.require("/project-b", "a")).rejects.toThrow("does not belong");
     await expect(registry.require("/project-a", "foreign-codex-thread")).rejects.toThrow("does not belong");
   });
@@ -33,6 +34,7 @@ describe("playground-owned thread registry", () => {
     const { path, registry } = await fixture();
     await writeFile(path, "broken");
     await expect(registry.list("/a")).rejects.toThrow();
+    await expect(registry.directories()).rejects.toThrow();
     await expect(registry.remember({ id: "a", directory: "/a", title: "A", updatedAt: 1 })).rejects.toThrow();
     expect(await readFile(path, "utf8")).toBe("broken");
   });

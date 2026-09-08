@@ -1207,7 +1207,14 @@ failure/Retry, 20-row pagination, unowned-ID rejection and late-read cancellatio
 An explicit three-turn Electron probe creates two chats, switches between them,
 restarts the application, restores the first chat and continues its same thread
 at 1180/720px; its two disposable threads are archived after verification.
-Current-product pixels, persisted project-directory discovery, archive/rename/
+The project-discovery follow-up restores project entries from that same owned
+history registry after application restart. The host checks directory existence
+and reissues opaque project tokens; unavailable directories are disabled and can
+be retried after recovery. Synthetic Electron acceptance covers corrupt-registry
+retry, restart at 1180/720px, project-scoped history and missing-directory recovery
+without listing external sessions or starting a model turn. This restores projects
+with recorded conversations, not empty project selections or a global Codex index.
+Current-product pixels, persistence of empty project selections, archive/rename/
 delete actions and cross-process registry coordination remain open.
 
 ### 6. Perform global visual convergence

@@ -3272,6 +3272,28 @@ export function App() {
         }
       : {},
   );
+  const [liveProjectsError, setLiveProjectsError] = useState(false);
+  const [liveProjectsRefresh, setLiveProjectsRefresh] = useState(0);
+  useEffect(() => {
+    if (mode !== "live" || !window.codexDemo) return;
+    let active = true;
+    setLiveProjectsError(false);
+    void window.codexDemo.listLiveProjects().then(projects => {
+      if (!active) return;
+      const restored = projects.filter(project => project.path !== window.codexDemo?.workspaceProjectPath)
+        .map(project => ({ ...project, id: workspaceProjects.find(known => known.path === project.path)?.id ?? `created:${project.path}` }));
+      setCreatedProjects(current => [...current.filter(project => !restored.some(row => row.path === project.path)), ...restored]);
+      setWorkspaceProjectTokens(current => {
+        const next = { ...current };
+        for (const project of restored) {
+          if (project.projectToken) next[project.id] = project.projectToken;
+          else delete next[project.id];
+        }
+        return next;
+      });
+    }).catch(() => { if (active) setLiveProjectsError(true); });
+    return () => { active = false; };
+  }, [mode, liveProjectsRefresh]);
   const [workspaceHostBranchesByProject, setWorkspaceHostBranchesByProject] =
     useState<Record<string, WorkspaceHostBranchState>>({});
   const workspaceProjectToken = workspaceProjectId
@@ -6746,6 +6768,8 @@ export function App() {
         {mode === "live" ? createdProjects.map((project) => (
           <AppSidebarItem
             key={project.id}
+            disabled={!project.projectToken}
+            title={project.projectToken ? project.path : `Directory unavailable: ${project.path}`}
             leading={<SidebarGlyph name="folder-current" />}
             onClick={() => openWorkspace(project.id)}
             aria-pressed={workspaceProjectId === project.id}
@@ -6753,6 +6777,12 @@ export function App() {
             {project.label}
           </AppSidebarItem>
         )) : null}
+        {mode === "live" && createdProjects.some(project => !project.projectToken) ?
+          <AppSidebarItem onClick={() => setLiveProjectsRefresh(value => value + 1)}>Retry unavailable projects</AppSidebarItem> : null}
+        {mode === "live" && liveProjectsError ? <>
+          <p role="alert">Couldn’t restore projects.</p>
+          <AppSidebarItem onClick={() => setLiveProjectsRefresh(value => value + 1)}>Retry projects</AppSidebarItem>
+        </> : null}
         <AppSidebarItem
           leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("codex-ui-kit")}
