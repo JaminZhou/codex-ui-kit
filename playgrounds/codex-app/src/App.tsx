@@ -4004,6 +4004,8 @@ export function App() {
   const [terminalValuesByCommand, setTerminalValuesByCommand] = useState<
     Record<string, string>
   >({});
+  const [liveTerminalStatus, setLiveTerminalStatus] = useState<Record<string, "starting" | "running" | "exited" | "failed">>({});
+  const liveTerminalProjectTokens = useRef<Record<string, string>>({});
   const [terminalHistoryByCommand, setTerminalHistoryByCommand] = useState<
     Record<string, TerminalEntry[]>
   >(() =>
@@ -4465,6 +4467,36 @@ export function App() {
     subagentPanelOpen,
     subagentPanelSelected,
   ]);
+
+  useEffect(() => {
+    if (mode !== "live") {
+      setLiveTerminalStatus({});
+      liveTerminalProjectTokens.current = {};
+      return;
+    }
+    const bridge = window.codexDemo;
+    const unsubscribe = bridge?.onTerminalEvent(event => {
+    const sessionId = event.sessionId;
+    setLiveTerminalStatus(status => ({ ...status, [sessionId]: event.kind === "started" || event.kind === "output" ? "running" : event.kind === "failed" || event.exitCode !== 0 ? "failed" : "exited" }));
+    setTerminalHistoryByCommand(history => {
+      const entries = history[sessionId] ?? [];
+      const text = event.kind === "started" ? `$ ${event.command}`
+        : event.kind === "output" ? event.text + (event.truncated ? "\n[Output truncated]\n" : "")
+        : event.kind === "failed" ? event.message : `Process exited with code ${event.exitCode}`;
+      const kind = event.kind === "started" ? "command" as const : event.kind === "output" ? event.stream : "system" as const;
+      const id = `${event.processId}:${event.kind}:${event.kind === "output" ? event.stream : ""}`;
+      const last = entries.at(-1);
+      if (event.kind === "output" && last?.id.startsWith(`${id}:`)) {
+        return { ...history, [sessionId]: [...entries.slice(0, -1), { ...last, text: last.text + text }] };
+      }
+      return { ...history, [sessionId]: [...entries, { id: `${id}:${entries.length}`, kind, text }] };
+    });
+    });
+    return () => {
+      unsubscribe?.();
+      void bridge?.closeTerminals().catch(() => undefined);
+    };
+  }, [mode]);
 
   useEffect(() => {
     if (!window.codexDemo) return;
@@ -4970,6 +5002,16 @@ export function App() {
   };
 
   const selectMode = (nextMode: "live" | "replay") => {
+    if (nextMode === "live" && mode !== "live") {
+      // A replay terminal is not a live process and must not retain its
+      // workspace label or fabricated output as an execution session.
+      setTerminalSessionIds([]);
+      setTerminalCommandId(null);
+      setTerminalHistoryByCommand({});
+      setTerminalValuesByCommand({});
+      setTerminalWorkspaceBySession({});
+      setTerminalOpen(false);
+    }
     cancelReplaySubmitTimer();
     setView("conversation");
     setMode(nextMode);
@@ -7152,7 +7194,7 @@ export function App() {
                 isConversationLifecycle && replayComposerStopped,
               )}
             </span>
-            {scenarioId === "background-terminal" ||
+            {mode === "live" || scenarioId === "background-terminal" ||
             scenarioId === "terminal-lifecycle" ? (
               <Button
                 aria-label="Toggle bottom panel"
@@ -14687,8 +14729,8 @@ export function App() {
           <CurrentBuildIcon name="thread-command-terminal" />
         ) : undefined,
         inputDisabled:
-          activeFrame === "terminal-current-running" &&
-          sessionId === activeTerminalSessionId,
+          liveTerminalStatus[sessionId] === "starting" || (activeFrame === "terminal-current-running" &&
+          sessionId === activeTerminalSessionId),
         label,
         notice: mismatched ? (
           <TerminalWorkspaceMismatchNotice
@@ -14721,10 +14763,12 @@ export function App() {
             }
           : undefined,
         showStatus:
-          !sessionId.startsWith("local-terminal-") &&
-          !isBackgroundTerminal,
+          mode === "live" || (!sessionId.startsWith("local-terminal-") &&
+          !isBackgroundTerminal),
         status:
-          terminalReloadPendingIds.has(sessionId)
+          mode === "live" && liveTerminalStatus[sessionId]
+            ? liveTerminalStatus[sessionId] === "starting" ? "running" as const : liveTerminalStatus[sessionId] as "running" | "exited" | "failed"
+            : terminalReloadPendingIds.has(sessionId)
             ? ("restoring" as const)
             : isDirectShellReload
               ? ("failed" as const)
@@ -14744,6 +14788,7 @@ export function App() {
   const createTerminalSession = () => {
     const sessionId = `local-terminal-${terminalSessionCounterRef.current}`;
     terminalSessionCounterRef.current += 1;
+    if (mode === "live" && workspaceProjectToken) liveTerminalProjectTokens.current[sessionId] = workspaceProjectToken;
     setTerminalSessionIds((sessionIds) => [
       ...sessionIds,
       sessionId,
@@ -14777,10 +14822,21 @@ export function App() {
         ) : undefined
       }
       data-testid="terminal-panel"
+      actions={mode === "live" && liveTerminalStatus[activeTerminalSessionId] === "running" ? (
+        <Button onClick={() => {
+          void window.codexDemo?.stopTerminal({ sessionId: activeTerminalSessionId }).catch(error => {
+            setTerminalHistoryByCommand(history => ({ ...history, [activeTerminalSessionId]: [...(history[activeTerminalSessionId] ?? []), { id: `stop-error:${Date.now()}`, kind: "system", text: String(error) }] }));
+          });
+        }}>Stop</Button>
+      ) : undefined}
       label="Terminal"
       onActiveSessionChange={setTerminalCommandId}
       onClose={() => setTerminalOpen(false)}
       onCloseSession={(sessionId) => {
+        if (liveTerminalStatus[sessionId] === "running" || liveTerminalStatus[sessionId] === "starting") {
+          setTerminalHistoryByCommand(history => ({ ...history, [sessionId]: [...(history[sessionId] ?? []), { id: `close-running:${Date.now()}`, kind: "system", text: "Stop the running process before closing this terminal." }] }));
+          return;
+        }
         setTerminalSessionIds((sessionIds) => {
           const closingIndex = sessionIds.indexOf(sessionId);
           const remaining = sessionIds.filter((id) => id !== sessionId);
@@ -14808,6 +14864,21 @@ export function App() {
         });
       }}
       onCommandSubmit={(sessionId, command) => {
+        if (mode === "live") {
+          const bridge = window.codexDemo;
+          const projectToken = liveTerminalProjectTokens.current[sessionId] ?? workspaceProjectToken;
+          if (!bridge || !projectToken || liveTerminalStatus[sessionId] === "starting") return;
+          liveTerminalProjectTokens.current[sessionId] = projectToken;
+          const running = liveTerminalStatus[sessionId] === "running";
+          if (!running) setLiveTerminalStatus(status => ({ ...status, [sessionId]: "starting" }));
+          setTerminalValuesByCommand(values => ({ ...values, [sessionId]: "" }));
+          const request = running ? bridge.writeTerminal({ sessionId, text: `${command}\n` }) : bridge.startTerminal({ sessionId, projectToken, command });
+          void request.catch(error => {
+            if (!running) setLiveTerminalStatus(status => ({ ...status, [sessionId]: "failed" }));
+            setTerminalHistoryByCommand(history => ({ ...history, [sessionId]: [...(history[sessionId] ?? []), { id: `terminal-error:${Date.now()}`, kind: "system", text: String(error) }] }));
+          });
+          return;
+        }
         const terminalCommand = terminalCommands.find(
           ({ id }) => id === sessionId,
         );
