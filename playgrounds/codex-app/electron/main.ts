@@ -34,6 +34,7 @@ import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
 import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
 import { LiveThreadRegistry } from "./live-thread-registry.js";
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
+import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -907,6 +908,22 @@ ipcMain.handle("demo:git:commit", async (event, raw: unknown) => {
   if (typeof input.fingerprint !== "string" || typeof input.message !== "string") throw new TypeError("A reviewed preview and commit message are required.");
   const { fingerprint, message } = input;
   return gitBranchOperationQueue.run(() => commitGitPreview(directory, fingerprint, message));
+});
+ipcMain.handle("demo:git:push-preview", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const input = raw as { remote?: unknown; target?: unknown };
+  if (typeof input.remote !== "string" || (input.target !== undefined && typeof input.target !== "string")) throw new TypeError("A named remote and branch are required.");
+  const { remote, target } = input;
+  return gitBranchOperationQueue.run(() => readGitPushPreview(directory, remote, target as string | undefined));
+});
+ipcMain.handle("demo:git:push", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const input = raw as { remote?: unknown; target?: unknown; fingerprint?: unknown };
+  if (typeof input.remote !== "string" || typeof input.target !== "string" || typeof input.fingerprint !== "string") throw new TypeError("A confirmed push preview is required.");
+  const { remote, target, fingerprint } = input;
+  return gitBranchOperationQueue.run(() => pushGitPreview(directory, remote, target, fingerprint));
 });
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);

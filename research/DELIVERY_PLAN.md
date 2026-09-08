@@ -1546,6 +1546,30 @@ full acceptance. This is own-host functional evidence, not installed-Codex
 pixel parity. Push/remote confirmation and the complete PR mutation workflow
 remain open; this section does not mark Stage 5 complete.
 
+## Confirmed single-branch push follow-up
+
+The own-playground Live sidebar now separates reading a remote preview from
+explicit push confirmation. A named remote must resolve to one push URL;
+embedded HTTP credentials are rejected before sending the destination to the
+renderer. The preview shows the exact destination, local/target branch, local
+and remote commits, and outgoing commit count (listing at most 100 subjects).
+Confirmation revalidates the fingerprint and sends the reviewed SHA to exactly
+one branch, without force, implicit tags or recursive submodule pushes.
+Missing remote objects or divergent history require explicit fetch/reconcile;
+no background fetch, merge, reset or staging is performed. Git hooks remain
+enabled. External writers are not locked; command failure is not represented
+as proof that the remote remained unchanged.
+
+Real temporary bare-repository tests verify single-ref scope even with mirror
+and follow-tags configuration, stale local previews, multiple destination
+rejection, no-op and divergent-history rejection. The 1180/720 Electron gate
+checks read-only preview, changed-target invalidation, stale-confirm rejection,
+refresh/retry, successful explicit push, read failure recovery and focus return.
+Screenshots are outside the fixture repositories. `check:push-preview` now runs
+in full acceptance. No real hosting remote was mutated by these tests and no
+model turn was used. Authentication UI, provider-specific protection errors,
+current installed-Codex visual parity and the complete PR workflow remain open.
+
 ## Planning rules
 
 - Split an inventory ID whenever independently owned states or transitions can

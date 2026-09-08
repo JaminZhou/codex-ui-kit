@@ -7,6 +7,8 @@ import type { LiveTerminalEvent } from "../electron/live-terminal";
 interface CodexDemoBridge {
   previewCommit(input: { projectToken: string }): Promise<import("../electron/git-commit-preview").GitCommitPreview>;
   commitPreview(input: { projectToken: string; fingerprint: string; message: string }): Promise<{ head: string }>;
+  previewPush(input: { projectToken: string; remote: string; target?: string }): Promise<import("../electron/git-push-preview").GitPushPreview>;
+  pushPreview(input: { projectToken: string; remote: string; target: string; fingerprint: string }): Promise<{ head: string; target: string }>;
   liveWorkspaceWritable: boolean;
   useRendererAttachmentFixture: boolean;
   useWorkspaceBranchFixture: boolean;
