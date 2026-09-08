@@ -1168,6 +1168,13 @@ read-only temporary workspace, exact-file `Allow once`, completed file write,
 wide/compact Review, and a PTY read-back in one application session. It does
 not approve broader roots or session-wide access. Other approval kinds and
 real PR operations remain outside this sampled path.
+The project-continuity follow-up now verifies A → B → A with three real
+Composer turns, same-thread reuse for A, isolated histories, and wide/compact
+captures. A further one-turn approval probe switches projects while A waits,
+checks B cannot display A's approval or stop it using a non-owning thread ID,
+returns to approve A, and retains A's PTY cwd and shell variable after another
+switch to B. This is independent playground evidence; owning-thread Stop,
+concurrent approvals, and additional approval types remain open.
 Model-background-process integration and current-product PTY visual evidence
 remain open; this does not close the complete-workflow exit gate.
 

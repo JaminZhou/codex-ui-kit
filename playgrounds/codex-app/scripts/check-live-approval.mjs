@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, writeFile, realpath } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile, realpath } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
@@ -7,13 +7,15 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 // Explicit signed-in live check: one model turn, exact temporary-file approval.
 // Never grant a session-wide, command, network, or broader directory request.
 const directory = await realpath(await mkdtemp(join(tmpdir(), "ui-kit-live-approval-")));
+const secondProject = join(directory, "project-b");
+await mkdir(secondProject);
 const filename = "approval-proof.txt";
 const content = "APPROVED_LOCAL_FILE\n";
 const playgroundPackage = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 const clientPackage = JSON.parse(await readFile(new URL("../package.json", import.meta.resolve("@jaminzhou/codex-app-server-client")), "utf8"));
 const { app, page } = await launchScene(visualScenes.find(scene => scene.id === "pull-request-detail"), {
   capture: false,
-  environment: { CODEX_UI_KIT_WORKSPACE: directory, CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0" },
+  environment: { CODEX_UI_KIT_WORKSPACE: directory, CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0", CODEX_DEMO_PROJECT_FIXTURE_PATH: secondProject },
 });
 let result = {
   passed: false, directory,
@@ -47,6 +49,24 @@ try {
   const approval = page.getByTestId("approval-request");
   await approval.waitFor({ state: "visible" });
   await page.screenshot({ path: join(directory, "approval-pending.png") });
+  await page.getByRole("button", { name: "New project", exact: true }).click();
+  await approval.waitFor({ state: "hidden" });
+  const wrongStop = await page.evaluate(async () => {
+    try {
+      await window.codexDemo.stopLive({ threadId: "non-owning-project-thread" });
+      return null;
+    } catch (error) { return String(error); }
+  });
+  assert.match(wrongStop ?? "", /active turn belongs to another project/);
+  assert.equal(await page.evaluate(() => window.__approvalEvidence.some(event => event.method === "turn/completed")), false);
+  await assert.rejects(readFile(join(directory, filename)), { code: "ENOENT" });
+  await page.screenshot({ path: join(directory, "project-b-no-approval.png") });
+  const projectsToggle = page.getByRole("button", { name: "Toggle projects", exact: true });
+  if (await projectsToggle.getAttribute("aria-expanded") === "false") await projectsToggle.click();
+  const projects = page.locator(".codex-ui-app-sidebar__section").filter({ has: projectsToggle });
+  await projects.getByRole("button", { name: "codex-ui-kit", exact: true }).click();
+  await approval.waitFor({ state: "visible" });
+  await page.screenshot({ path: join(directory, "project-a-approval-restored.png") });
   await approval.getByRole("button", { name: "Allow once", exact: true }).click();
   await page.waitForFunction(() => window.__approvalEvidence.some(event => event.method === "turn/completed"), undefined, { timeout: 180000 });
   const events = await page.evaluate(() => window.__approvalEvidence);
@@ -83,7 +103,17 @@ try {
   await input.press("Enter");
   await page.waitForFunction(() => [...document.querySelectorAll(".xterm-accessibility-tree")].some(el => el.textContent.includes("TERMINAL_verified")));
   await page.screenshot({ path: join(directory, "approved-terminal-verified.png") });
-  result = { ...result, passed: true, grantedOnce: true, reviewWidths: [1180, 720], terminalVerifiedFile: true, modelTurns: 1 };
+  await input.pressSequentially("export PROJECT_SESSION_PROOF=retained");
+  await input.press("Enter");
+  await projects.getByRole("button", { name: "project-b", exact: true }).click();
+  await input.waitFor();
+  await input.pressSequentially(`test "$PWD" = '${directory}' && printf 'OWNER_%s\\n' "$PROJECT_SESSION_PROOF"`);
+  await input.press("Enter");
+  await page.waitForFunction(() => [...document.querySelectorAll(".xterm-accessibility-tree")].some(el => el.textContent.includes("OWNER_retained")));
+  await page.screenshot({ path: join(directory, "project-b-terminal-still-owned-by-a.png") });
+  await projects.getByRole("button", { name: "codex-ui-kit", exact: true }).click();
+  await page.getByText("APPROVAL_FLOW_OK", { exact: true }).waitFor();
+  result = { ...result, passed: true, grantedOnce: true, crossProjectApprovalRestored: true, wrongThreadStopRejected: true, terminalProjectOwnershipRetained: true, reviewWidths: [1180, 720], terminalVerifiedFile: true, modelTurns: 1 };
 } catch (error) {
   result.error = String(error);
   process.exitCode = 1;

@@ -497,7 +497,7 @@ drives open, zoom, Escape/focus restoration, and removal. The two optional
 local-only 720×680 product references independently gate the Composer and the
 preview's required controls/image/toolbar; Edit image is excluded because it
 is feature-state-dependent.
-# Live project continuity
+## Live project continuity
 
 `pnpm --filter @codex-ui-kit/codex-app-playground check:live-projects` is an
 explicit signed-in check with three read-only model turns, not part of the
@@ -510,5 +510,16 @@ The 2026-09-08 run passed in
 `/private/var/folders/0x/qnx4hd7s4_dc0ft9j8cxvyvc0000gn/T/ui-kit-live-projects-0gqSOZ`.
 These captures prove this playground workflow, not current Codex product pixel
 parity. Unit coverage additionally exercises background messages, child-thread
-isolation, delayed approval responses, and client reset. Active cross-project
-approval/stop and retained PTY interaction still need dedicated runtime coverage.
+isolation, delayed approval responses, and client reset.
+
+The extended `check:live-approval` run passed in
+`/private/var/folders/0x/qnx4hd7s4_dc0ft9j8cxvyvc0000gn/T/ui-kit-live-approval-1fZuQP`.
+With A waiting for real file approval, choosing B hides A's card. An IPC stop
+request with a non-owning thread ID is rejected while A remains pending and
+the file remains absent. Returning to A restores the same approval, which is
+granted once and completes normally. After Review and PTY file read-back,
+switching to B retains A's terminal cwd and an exported shell variable; the
+terminal keeps A's label. No second model turn or broader grant is needed.
+This covers wrong-thread rejection, not interruption via the owning thread's
+Stop button; owning-thread interruption, concurrent approvals, and additional
+approval types still need dedicated live coverage.
