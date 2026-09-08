@@ -8418,6 +8418,15 @@ for (const scene of selectedScenes) {
       }
       await page.getByRole("button", { name: "Pull requests" }).click();
       await page.waitForSelector(
+        '.demo-root[data-view="pull-request"][data-mode="live"] [aria-label="Live pull requests"]',
+      );
+      if (await page.locator('[data-testid="pull-request-panel"]').count()) {
+        throw new Error(`${scene.id}: Live PR navigation substituted replay detail`);
+      }
+      await page.getByRole("button", { name: "Live local", exact: true }).click();
+      await page.getByRole("button", { name: "Replay", exact: true }).click();
+      await page.getByRole("button", { name: "Pull requests" }).click();
+      await page.waitForSelector(
         '.demo-root[data-view="pull-request"] [data-testid="pull-request-panel"]',
       );
       const routeRestored = await page.evaluate(() => ({
