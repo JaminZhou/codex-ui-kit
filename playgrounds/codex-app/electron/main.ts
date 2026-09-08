@@ -90,6 +90,7 @@ let client: CodexAppServerClient | null = null;
 let terminalHost: { client: CodexAppServerClient; manager: LiveTerminalManager; ready: Promise<unknown> } | null = null;
 const liveSession = new LiveProjectSession<CodexThread>();
 let activeTurn: CodexTurn | null = null;
+let activeTurnThreadId: string | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
 let unsubscribeServerRequests: (() => void)[] = [];
 let attachmentFixtureFailureInjected = false;
@@ -275,6 +276,7 @@ function openAllowedExternalUrl(url: string) {
 async function ensureClient() {
   if (client?.state === "connected") return client;
   liveSession.clear();
+  mainWindow?.webContents.send("demo:live:session", { kind: "live-reset" });
   if (client) {
     unsubscribeNotifications?.();
     unsubscribeNotifications = null;
@@ -326,17 +328,26 @@ async function startLive(
         sandbox: policy.sandbox,
       }),
     );
+    mainWindow?.webContents.send("demo:live:session", {
+      kind: "live-bind",
+      projectToken: (rawInput as { projectToken: string }).projectToken,
+      threadId: thread.id,
+    });
     const turn = await thread.startTurn(prompt, {
       approvalPolicy: policy.approvalPolicy,
       cwd: directory,
       sandboxPolicy: policy.sandboxPolicy,
     });
     activeTurn = turn;
+    activeTurnThreadId = thread.id;
     void turn
       .result()
       .catch(() => undefined)
       .finally(() => {
-        if (activeTurn === turn) activeTurn = null;
+        if (activeTurn === turn) {
+          activeTurn = null;
+          activeTurnThreadId = null;
+        }
       });
     return { threadId: thread.id, turnId: turn.id };
   });
@@ -348,8 +359,15 @@ async function stopLive() {
   await activeTurn.interrupt();
 }
 
-async function handleStopLive(event: IpcMainInvokeEvent) {
+async function handleStopLive(event: IpcMainInvokeEvent, rawInput: unknown) {
   assertTrustedIpc(event);
+  if (typeof rawInput !== "object" || rawInput === null ||
+      typeof (rawInput as { threadId?: unknown }).threadId !== "string") {
+    throw new TypeError("A live thread is required to stop a turn.");
+  }
+  if (activeTurn && (rawInput as { threadId: string }).threadId !== activeTurnThreadId) {
+    throw new Error("The active turn belongs to another project.");
+  }
   await stopLive();
 }
 
@@ -375,7 +393,9 @@ async function closeTerminals() {
 
 async function closeLive() {
   activeTurn = null;
+  activeTurnThreadId = null;
   liveSession.clear();
+  mainWindow?.webContents.send("demo:live:session", { kind: "live-reset" });
   unsubscribeNotifications?.();
   unsubscribeNotifications = null;
   unsubscribeServerRequests.forEach((unsubscribe) => unsubscribe());

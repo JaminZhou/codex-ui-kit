@@ -192,7 +192,6 @@ import {
   messageAttachmentAccessibleLabel,
   messageAttachmentPreviewSource,
   reduceProtocolNotification,
-  reduceLiveProtocolNotification,
   settleApprovedCommandReplay,
   settleRejectedFileReplay,
   subagentTimelinePresentation,
@@ -202,6 +201,7 @@ import {
   type ProtocolEventRecord,
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
+import { initialLiveProjectState, liveProjectState, reduceLiveProjectState } from "./live-project-state";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -3065,9 +3065,9 @@ export function App() {
     initialSelection.frame,
   );
   const [replayCount, setReplayCount] = useState(initialCount);
-  const [liveState, dispatchLive] = useReducer(
-    reduceLiveProtocolNotification,
-    initialProtocolState,
+  const [liveProjects, dispatchLive] = useReducer(
+    reduceLiveProjectState,
+    initialLiveProjectState,
   );
   const [mode, setMode] = useState<"live" | "replay">("replay");
   const [theme, setTheme] = useState<DemoThemePreference>(
@@ -3271,6 +3271,7 @@ export function App() {
   const workspaceProjectToken = workspaceProjectId
     ? workspaceProjectTokens[workspaceProjectId]
     : undefined;
+  const liveState = liveProjectState(liveProjects, workspaceProjectToken);
   const workspaceUsesHostBranches = Boolean(
     window.codexDemo && !window.codexDemo.useWorkspaceBranchFixture,
   );
@@ -4508,6 +4509,7 @@ export function App() {
 
   useEffect(() => {
     if (!window.codexDemo) return;
+    const removeLiveSession = window.codexDemo.onLiveSession(dispatchLive);
     const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
     });
@@ -4517,6 +4519,7 @@ export function App() {
     return () => {
       removeNotification();
       removeServerRequest();
+      removeLiveSession();
     };
   }, []);
 
@@ -4706,6 +4709,18 @@ export function App() {
   const openWorkspace = (
     projectId: string | null = workspaceProjectId,
   ) => {
+    if (mode === "live") {
+      updateWorkspaceProjectId(projectId);
+      setView("conversation");
+      setReviewOpen(false);
+      setSubagentPanelOpen(false);
+      setComposerValue("");
+      setComposerAttachments([]);
+      setComposerOverlay(null);
+      setLiveError(null);
+      dismissSidebarAfterNavigation();
+      return;
+    }
     cancelReplaySubmitTimer();
     setMode("replay");
     setView("workspace");
@@ -4796,6 +4811,12 @@ export function App() {
           ? withoutSelectedPath
           : [{ id, ...selection }, ...withoutSelectedPath];
       });
+      if (mode === "live") {
+        openWorkspace(id);
+        setProjectCreationStatus("idle");
+        setProjectCreationSource(null);
+        return;
+      }
       cancelReplaySubmitTimer();
       setMode("replay");
       setView("workspace");
@@ -5232,11 +5253,9 @@ export function App() {
   };
 
   const stopLive = async () => {
+    if (!liveState.threadId) return;
     try {
-      await window.codexDemo?.stopLive();
-    } catch (error) {
-      setLiveError(error instanceof Error ? error.message : String(error));
-    } finally {
+      await window.codexDemo?.stopLive({ threadId: liveState.threadId });
       liveState.approvals
         .filter(({ decision }) => decision === "pending")
         .forEach(({ requestId }) => {
@@ -5246,6 +5265,8 @@ export function App() {
             requestId,
           });
         });
+    } catch (error) {
+      setLiveError(error instanceof Error ? error.message : String(error));
     }
   };
 
@@ -6667,11 +6688,21 @@ export function App() {
         title="Projects"
         toggleLabel="Toggle projects"
       >
+        {mode === "live" ? createdProjects.map((project) => (
+          <AppSidebarItem
+            key={project.id}
+            leading={<SidebarGlyph name="folder-current" />}
+            onClick={() => openWorkspace(project.id)}
+            selected={workspaceProjectId === project.id}
+          >
+            {project.label}
+          </AppSidebarItem>
+        )) : null}
         <AppSidebarItem
           leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("codex-ui-kit")}
           selected={
-            view === "workspace" &&
+            (view === "workspace" || mode === "live") &&
             workspaceProjectId === "codex-ui-kit"
           }
         >
@@ -6681,7 +6712,7 @@ export function App() {
           leading={<SidebarGlyph name="folder-current" />}
           onClick={() => openWorkspace("app-server-client")}
           selected={
-            view === "workspace" &&
+            (view === "workspace" || mode === "live") &&
             workspaceProjectId === "app-server-client"
           }
         >

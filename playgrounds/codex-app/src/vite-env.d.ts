@@ -53,6 +53,7 @@ interface CodexDemoBridge {
     | null
   >;
   closeLive(): Promise<void>;
+  onLiveSession(handler: (event: import("./live-project-state").LiveSessionEvent) => void): () => void;
   startTerminal(input: { sessionId: string; projectToken: string; command: string }): Promise<{ processId: string }>;
   openTerminalShell(input: { sessionId: string; projectToken: string; size: { cols: number; rows: number } }): Promise<{ processId: string }>;
   resizeTerminal(input: { sessionId: string; size: { cols: number; rows: number } }): Promise<void>;
@@ -74,7 +75,7 @@ interface CodexDemoBridge {
     threadId: string;
     turnId: string;
   }>;
-  stopLive(): Promise<void>;
+  stopLive(input: { threadId: string }): Promise<void>;
 }
 
 declare global {

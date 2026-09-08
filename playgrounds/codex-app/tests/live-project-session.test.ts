@@ -19,14 +19,14 @@ describe("live project routing", () => {
     }
   });
 
-  it("continues a project thread but starts a fresh thread when projects change", async () => {
+  it("restores each project thread across A to B to A switches", async () => {
     const session = new LiveProjectSession<string>();
     const create = vi.fn().mockResolvedValueOnce("first").mockResolvedValueOnce("second").mockResolvedValueOnce("third");
     expect(await session.select("/startup", create)).toBe("first");
     expect(await session.select("/startup", create)).toBe("first");
     expect(await session.select("/chosen", create)).toBe("second");
-    expect(await session.select("/startup", create)).toBe("third");
-    expect(create).toHaveBeenCalledTimes(3);
+    expect(await session.select("/startup", create)).toBe("first");
+    expect(create).toHaveBeenCalledTimes(2);
   });
 
   it("does not bind a failed creation to the new project", async () => {
