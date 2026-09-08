@@ -10,17 +10,29 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [preview, setPreview] = useState<GitPullRequestPreview | null>(null);
-  const [busy, setBusy] = useState<"read" | "create" | "detail" | null>(null);
+  const [busy, setBusy] = useState<"read" | "create" | "detail" | "diff" | null>(null);
+  const [patch, setPatch] = useState<string | null>(null);
   const [detail, setDetail] = useState<GitPullRequestDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const epoch = useRef(0);
   const trigger = useRef<HTMLButtonElement | null>(null);
-  const invalidate = () => { epoch.current++; setPreview(null); setDetail(null); setBusy(null); setError(null); setResult(null); };
+  const invalidate = () => { epoch.current++; setPreview(null); setDetail(null); setPatch(null); setBusy(null); setError(null); setResult(null); };
+  const readDiff = async () => {
+    if (!projectToken || !detail || !window.codexDemo || busy) return;
+    const request = ++epoch.current;
+    setPatch(null); setError(null); setBusy("diff");
+    try {
+      const value = await window.codexDemo.readPullRequestDiff({ projectToken, remote: remote.trim(), number: detail.number, head: detail.headRefOid });
+      if (request === epoch.current) setPatch(value.patch);
+    } catch {
+      if (request === epoch.current) setError("Couldn’t read the current diff. Refresh details and retry; large or unavailable diffs may need GitHub.");
+    } finally { if (request === epoch.current) setBusy(null); }
+  };
   const readDetail = async (number: number) => {
     if (!projectToken || !window.codexDemo || busy) return;
     const request = ++epoch.current;
-    setDetail(null); setError(null); setBusy("detail");
+    setDetail(null); setPatch(null); setError(null); setBusy("detail");
     try {
       const value = await window.codexDemo.readPullRequest({ projectToken, remote: remote.trim(), number });
       if (request === epoch.current) setDetail(value);
@@ -35,7 +47,7 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
   const read = async () => {
     if (!projectToken || !window.codexDemo || busy) return;
     const request = ++epoch.current;
-    setPreview(null); setDetail(null); setError(null); setResult(null); setBusy("read");
+    setPreview(null); setDetail(null); setPatch(null); setError(null); setResult(null); setBusy("read");
     try {
       const value = await window.codexDemo.previewPullRequest({ projectToken, remote: remote.trim() });
       if (request === epoch.current) setPreview(value);
@@ -63,7 +75,7 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
       <div style={{ display: "grid", gap: 12, minWidth: 0, overflowWrap: "anywhere", maxHeight: "60vh", overflowY: "auto" }}>
         <label style={field}>Remote name<input aria-label="PR remote" value={remote} disabled={!!busy} onChange={event => { invalidate(); setRemote(event.target.value); }} /></label>
         <p>Creates a ready-for-review PR on GitHub after confirmation. No push or merge is performed. Base branch must exist.</p>
-        {busy && <p role="status">{busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : "Reading pull requests…"}</p>}
+        {busy && <p role="status">{busy === "create" ? "Creating pull request…" : busy === "detail" ? "Reading PR details…" : busy === "diff" ? "Reading PR diff…" : "Reading pull requests…"}</p>}
         {error && <p role="alert">{error}</p>}{result && <p role="status">{result}</p>}
         {preview && <section aria-label="PR preview"><p>Repository: {preview.repository}</p><p>Head: {preview.branch} · {preview.head}</p>
           {preview.pullRequests.length ? <ul>{preview.pullRequests.map(pr => <li key={pr.number}>Existing PR #{pr.number}: {pr.title} → {pr.baseRefName}<br /><a href={pr.url} target="_blank" rel="noreferrer">Open PR #{pr.number} on GitHub</a> <Button disabled={!!busy} onClick={() => void readDetail(pr.number)}>Read details #{pr.number}</Button></li>)}</ul> : <p>No open PR for this branch.</p>}
@@ -74,6 +86,8 @@ export function LivePullRequest({ projectToken }: { projectToken?: string }) {
           <p style={{ whiteSpace: "pre-wrap" }}>{detail.body || "No description."}</p>
           <p>{detail.files.length} of {detail.changedFiles} changed files shown</p>
           <ul>{detail.files.map(file => <li key={file.path}>{file.path} (+{file.additions} / −{file.deletions})</li>)}</ul>
+          <Button disabled={!!busy} onClick={() => void readDiff()}>Read PR diff</Button>
+          {patch !== null && <pre aria-label="PR diff" tabIndex={0} style={{ maxHeight: "30vh", overflow: "auto", whiteSpace: "pre" }}>{patch || "No diff content returned."}</pre>}
         </section>}
         <label style={field}>Base branch<input aria-label="PR base branch" value={base} disabled={!!busy} onChange={event => setBase(event.target.value)} /></label>
         <label style={field}>Title<input aria-label="PR title" value={title} maxLength={256} disabled={!!busy} onChange={event => setTitle(event.target.value)} /></label>

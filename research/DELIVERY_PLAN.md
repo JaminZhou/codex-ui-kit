@@ -1603,8 +1603,24 @@ The existing synthetic 1180/720 PR gate covers detail success/failure/retry,
 literal HTML-like text, links and expanded-dialog/footer bounds. The separate
 explicit development-PR creation script now also reads that actual PR's detail
 through the UI. Neither test is evidence of installed-Codex pixel parity. Full
-diff viewing, PR edits/merge, closed-PR history and provider-specific flows remain
+diff support beyond the bounded text patch below, PR edits/merge, closed-PR history and provider-specific flows remain
 open; this does not mark the complete PR workflow finished.
+
+## Same-branch PR diff follow-up
+
+The Live PR detail now reads a plain-text GitHub diff on explicit request, without
+checkout or working-tree writes. The host revalidates current-project PR ownership
+and the selected head before reading, then checks head, base name and base SHA
+again afterward. Changed revisions reject the result; this is not a transactional
+lock against external writers. Output is bounded to 8 MiB and provider failures
+clear previous patch contents with a refresh/retry message. Binary contents and
+provider-limited diffs are not claimed as complete previews.
+
+The 1180/720 synthetic Electron gate covers literal patch rendering, bounded
+scrolling/footer reachability and failed-read recovery. Backend tests cover
+stale heads, changed bases, unrelated PRs and command/output failure. The opt-in
+development-PR script also reads the real PR diff through the UI. These are own
+playground functional checks, not current installed-Codex pixel parity.
 
 ## Planning rules
 

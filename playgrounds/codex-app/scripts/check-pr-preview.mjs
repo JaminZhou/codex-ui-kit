@@ -14,10 +14,17 @@ for (const width of [1180, 720]) {
       globalThis.__prReadFails = true;
       globalThis.__prCreated = false;
       globalThis.__prDetailFails = false;
+      globalThis.__prDiffFails = false;
+      ipcMain.removeHandler("demo:git:pr-diff");
+      ipcMain.handle("demo:git:pr-diff", (_event, input) => {
+        if (globalThis.__prDiffFails) throw new Error("synthetic stale diff");
+        if (input.number !== 1 || input.head !== "a".repeat(40)) throw new Error("wrong PR revision");
+        return { number: 1, head: input.head, patch: "diff --git a/src/example.ts b/src/example.ts\n-previous\n+<script>literal patch</script>\n".repeat(30) };
+      });
       ipcMain.removeHandler("demo:git:pr-detail");
       ipcMain.handle("demo:git:pr-detail", () => {
         if (globalThis.__prDetailFails) throw new Error("synthetic detail failure");
-        return { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Existing details", body: "<script>not executed</script>\nBody text", state: "OPEN", baseRefName: "main", headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/example.ts", additions: 2, deletions: 1 }] };
+        return { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Existing details", body: "<script>not executed</script>\nBody text", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/example.ts", additions: 2, deletions: 1 }] };
       });
       ipcMain.removeHandler("demo:git:pr-preview");
       ipcMain.removeHandler("demo:git:pr-create");
@@ -71,10 +78,27 @@ for (const width of [1180, 720]) {
     const closeBounds = await dialog.getByRole("button", { name: "Close", exact: true }).boundingBox();
     assert.ok(closeBounds && closeBounds.y >= 0 && closeBounds.y + closeBounds.height <= 820, "Footer must remain inside the window");
     await page.screenshot({ path: join(directory, `details-${width}.png`) });
+    await detail.getByRole("button", { name: "Read PR diff", exact: true }).click();
+    const patch = dialog.getByLabel("PR diff", { exact: true });
+    await patch.waitFor();
+    assert.ok((await patch.textContent()).includes("+<script>literal patch</script>"));
+    assert.equal(await patch.locator("script").count(), 0);
+    await patch.scrollIntoViewIfNeeded();
+    const diffFooter = await dialog.getByRole("button", { name: "Close", exact: true }).boundingBox();
+    assert.ok(diffFooter && diffFooter.y >= 0 && diffFooter.y + diffFooter.height <= 820);
+    await page.screenshot({ path: join(directory, `diff-${width}.png`) });
+    await app.evaluate(() => { globalThis.__prDiffFails = true; });
+    await detail.getByRole("button", { name: "Read PR diff", exact: true }).click();
+    await dialog.getByRole("alert").waitFor();
+    assert.equal(await patch.count(), 0, "Failed diff refresh must remove the previous patch");
+    await app.evaluate(() => { globalThis.__prDiffFails = false; });
+    await detail.getByRole("button", { name: "Read PR diff", exact: true }).click();
+    await patch.waitFor();
     await app.evaluate(() => { globalThis.__prDetailFails = true; });
     await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
     await dialog.getByRole("alert").waitFor();
     assert.equal(await detail.count(), 0, "Failed detail refresh must clear obsolete contents");
+    assert.equal(await patch.count(), 0);
     await app.evaluate(() => { globalThis.__prDetailFails = false; });
     await dialog.getByRole("button", { name: "Read details #1", exact: true }).click();
     await detail.waitFor();

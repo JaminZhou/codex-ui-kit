@@ -44,5 +44,11 @@ try {
   assert.ok((await detail.textContent()).includes(expectedHead));
   assert.ok((await detail.textContent()).includes(title));
   await page.screenshot({ path: join(directory, "real-details.png") });
+  await detail.getByRole("button", { name: "Read PR diff", exact: true }).click();
+  const patch = dialog.getByLabel("PR diff", { exact: true });
+  await patch.waitFor({ timeout: 180000 });
+  assert.ok((await patch.textContent()).includes("diff --git "));
+  await patch.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: join(directory, "real-diff.png") });
   console.log(JSON.stringify({ passed: true, directory, expectedHead, expectedBranch, result, realGitHubWrite: true }));
 } finally { await app.close(); }
