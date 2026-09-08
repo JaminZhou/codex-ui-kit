@@ -23,6 +23,7 @@
     "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
     "check:live-approval": "node scripts/check-live-approval.mjs",
     "check:live-projects": "node scripts/check-live-projects.mjs",
+    "check:live-stop": "node scripts/check-live-stop.mjs",
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
