@@ -1,6 +1,6 @@
 import {
   CodexAppServerClient,
-  type CodexThread,
+  CodexThread,
   type CodexTurn,
   type JsonRpcNotification,
 } from "@jaminzhou/codex-app-server-client";
@@ -31,6 +31,7 @@ import {
 } from "./attachment-dialog.js";
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
+import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -89,7 +90,10 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 let mainWindow: BrowserWindow | null = null;
 let client: CodexAppServerClient | null = null;
 let terminalHost: { client: CodexAppServerClient; manager: LiveTerminalManager; ready: Promise<unknown> } | null = null;
-const liveSession = new LiveProjectSession<CodexThread>();
+const liveSession = new LiveProjectSession<{
+  thread: CodexThread;
+  settings: Pick<Awaited<ReturnType<CodexAppServerClient["threadStart"]>>, "model" | "reasoningEffort">;
+}>();
 let activeTurn: CodexTurn | null = null;
 let activeTurnThreadId: string | null = null;
 let unsubscribeNotifications: (() => void) | null = null;
@@ -311,6 +315,7 @@ async function ensureClient() {
   }
 
   client = new CodexAppServerClient({
+    capabilities: { experimentalApi: true },
     clientInfo: {
       name: "codex_ui_kit_app_playground",
       title: "Codex App Playground",
@@ -343,24 +348,31 @@ async function startLive(
 ): Promise<{ threadId: string; turnId: string }> {
   assertTrustedIpc(event);
   const { directory, prompt } = resolveLiveProject(rawInput, trustedProjectDirectories);
+  const collaborationMode = resolveLiveMode((rawInput as { collaborationMode?: unknown }).collaborationMode);
   const policy = liveWorkspacePolicy(directory, liveWriteOptIn);
   return liveTurnStartGate.run(() => activeTurn !== null, async () => {
     const connectedClient = await ensureClient();
-    const thread = await liveSession.select(directory, () =>
-      connectedClient.createThread({
+    const session = await liveSession.select(directory, async () => {
+      const response = await connectedClient.threadStart({
         approvalPolicy: policy.approvalPolicy,
         cwd: directory,
         ephemeral: true,
         historyMode: "paginated",
         sandbox: policy.sandbox,
-      }),
-    );
+      });
+      return {
+        thread: new CodexThread(connectedClient, response.thread),
+        settings: { model: response.model, reasoningEffort: response.reasoningEffort },
+      };
+    });
+    const { thread } = session;
     mainWindow?.webContents.send("demo:live:session", {
       kind: "live-bind",
       projectToken: (rawInput as { projectToken: string }).projectToken,
       threadId: thread.id,
     });
     const turn = await thread.startTurn(prompt, {
+      collaborationMode: liveCollaborationMode(collaborationMode, session.settings),
       approvalPolicy: policy.approvalPolicy,
       cwd: directory,
       sandboxPolicy: policy.sandboxPolicy,

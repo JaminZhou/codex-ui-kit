@@ -25,6 +25,7 @@
     "check:live-projects": "node scripts/check-live-projects.mjs",
     "check:live-stop": "node scripts/check-live-stop.mjs",
     "check:user-input": "node scripts/check-user-input-contract.mjs",
+    "check:live-input": "node scripts/check-live-user-input.mjs",
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",

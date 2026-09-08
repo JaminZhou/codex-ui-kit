@@ -561,3 +561,20 @@ echo sensitive values. The schema's optional `isBlocking` is normalized to true
 for older hosts; deprecated auto-resolution timers do not silently answer a
 question. Public lifecycle reference:
 [App Server user input](https://learn.chatgpt.com/docs/app-server#toolrequestuserinput).
+
+### Explicit live Plan/question round trip
+
+`pnpm --filter @codex-ui-kit/codex-app-playground check:live-input` is an opt-in,
+signed-in two-model-turn check, not part of automatic acceptance. It uses a
+read-only temporary workspace, selects Plan in the visible UI, requires an actual
+`item/tool/requestUserInput`, rejects a wrong-thread response, answers BLUE through
+the form, and requires server resolution plus successful model completion. It then
+selects Default and verifies same-thread continuation without another question.
+The probe rejects evidence containing command/file/MCP/search/delegation items, never grants approval,
+and captures 1180/720px pending-question and 720px completion evidence locally.
+
+The host enables experimental protocol support for `collaborationMode`, retains
+the server-selected model/reasoning effort, and uses built-in mode instructions
+(`developer_instructions: null`). Default is sent explicitly so a previous Plan
+turn cannot remain sticky. This sampled real round trip does not validate all
+question variants or claim installed-product pixel parity.

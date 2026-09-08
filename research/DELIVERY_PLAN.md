@@ -1187,8 +1187,13 @@ masked sensitive input). Resolved requests, completed turns and client resets
 clear pending questions; answers are not added to conversation history.
 Unit tests and a deterministic Electron UI/IPC contract cover submission,
 stale-request rejection, thread visibility and cancellation at 1180/720px.
-This is synthetic functional evidence, not a real model round trip or current
-Codex pixel parity; those two validations remain open.
+The subsequent Plan/Default wiring uses public collaboration-mode settings with
+the model and reasoning effort returned by thread start. An explicit two-turn
+Electron probe now verifies a real model question, rejects a wrong-thread answer,
+submits BLUE through the visible form, observes `serverRequest/resolved` and the
+model's completion, then switches to Default and completes a same-thread reply.
+The Composer and host share the same mode state. Wide/720 captures document this
+functional path; current Codex pixel parity and other question variants remain open.
 
 ### 6. Perform global visual convergence
 

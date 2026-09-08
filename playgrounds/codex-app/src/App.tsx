@@ -5039,6 +5039,7 @@ export function App() {
   };
 
   const selectMode = (nextMode: "live" | "replay") => {
+    if (nextMode === "live" && composerMode === "goal") setComposerMode(null);
     if (nextMode === "live" && mode !== "live") {
       // A replay terminal is not a live process and must not retain its
       // workspace label or fabricated output as an execution session.
@@ -5250,7 +5251,7 @@ export function App() {
     setMode("live");
     setLiveError(null);
     try {
-      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken });
+      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken, collaborationMode: composerMode === "plan" ? "plan" : "default" });
       setComposerValue((current) => (current === prompt ? "" : current));
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
@@ -7284,6 +7285,13 @@ export function App() {
             >
               {mode === "replay" ? "Live" : "Replay"}
             </Button>
+            {mode === "live" && <Button
+              aria-label="Plan mode"
+              aria-pressed={composerMode === "plan"}
+              disabled={composerIsRunning || liveStartPending}
+              onClick={() => setComposerMode((current) => current === "plan" ? null : "plan")}
+              size="small" tone="ghost"
+            >{composerMode === "plan" ? "Plan" : "Default"}</Button>}
           </div>
         )
       }

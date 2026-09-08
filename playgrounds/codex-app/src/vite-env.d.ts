@@ -76,7 +76,7 @@ interface CodexDemoBridge {
     threadId: string;
     answers: Record<string, string[]>;
   }): Promise<void>;
-  startLive(input: { prompt: string; projectToken: string }): Promise<{
+  startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan" }): Promise<{
     threadId: string;
     turnId: string;
   }>;

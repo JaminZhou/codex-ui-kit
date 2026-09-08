@@ -22,6 +22,11 @@ const send = (channel, event) => app.evaluate(({ BrowserWindow }, { channel, eve
 }, { channel, event });
 try {
   await page.getByRole("button", { name: "Live local", exact: true }).click();
+  const planToggle = page.getByRole("button", { name: "Plan mode", exact: true });
+  await planToggle.click();
+  await page.getByRole("textbox", { name: "Describe your task to generate a plan...", exact: true }).waitFor();
+  await planToggle.click();
+  await page.getByRole("textbox", { name: "Message composer", exact: true }).waitFor();
   const rejected = await page.evaluate(async () => {
     try {
       await window.codexDemo.respondToUserInput({ requestId: "expired", threadId: "input-thread", answers: {} });
