@@ -521,5 +521,24 @@ granted once and completes normally. After Review and PTY file read-back,
 switching to B retains A's terminal cwd and an exported shell variable; the
 terminal keeps A's label. No second model turn or broader grant is needed.
 This covers wrong-thread rejection, not interruption via the owning thread's
-Stop button; owning-thread interruption, concurrent approvals, and additional
-approval types still need dedicated live coverage.
+Stop button; concurrent approvals and additional approval types still need
+dedicated live coverage. Owning-thread interruption is covered separately below.
+
+## Live Stop and same-thread recovery
+
+After building, `pnpm --filter @codex-ui-kit/codex-app-playground check:live-stop`
+is an explicit signed-in, two-turn probe, not a deterministic acceptance test.
+It requests a file change in a disposable read-only workspace, waits for a real
+approval card, and clicks the visible owning-thread Stop button without granting
+approval. It requires `turn/completed` with `interrupted`, a matching
+`serverRequest/resolved`, and continued absence of the requested file. A second
+Composer submission must complete on the same thread with `STOP_RECOVERY_OK`,
+without another approval or a file write. Wide/720 recovery screenshots and
+ordered protocol records accompany the result.
+
+The 2026-09-08 run passed in
+`/private/var/folders/0x/qnx4hd7s4_dc0ft9j8cxvyvc0000gn/T/ui-kit-live-stop-c1WeG5`
+using the pinned client and CLI 0.153.4. Reviewed captures show the stopped row,
+rejected file/approval, and successful follow-up at 720px. This proves the
+sampled pending-file-approval interruption path, not every running-tool Stop
+variant or current installed-product pixel parity.
