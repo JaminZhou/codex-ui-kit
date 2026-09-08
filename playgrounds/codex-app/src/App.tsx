@@ -12548,7 +12548,7 @@ export function App() {
   const livePullRequestRoute = useLivePullRequestRoute({
     projectToken: workspaceProjectToken,
     active: mode === "live" && view === "pull-request",
-    open: pullRequestOpen,
+    open: Boolean(pullRequestOpen),
     expanded: pullRequestExpanded,
     onExpandedChange: setPullRequestExpanded,
     onOpen: () => { setPullRequestOpen(true); if (window.innerWidth < 1040) setSidebarOpen(false); },
