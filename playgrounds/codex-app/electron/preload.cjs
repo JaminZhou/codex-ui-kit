@@ -26,6 +26,8 @@ contextBridge.exposeInMainWorld("codexDemo", {
   commitPreview: (input) => ipcRenderer.invoke("demo:git:commit", input),
   previewPush: (input) => ipcRenderer.invoke("demo:git:push-preview", input),
   pushPreview: (input) => ipcRenderer.invoke("demo:git:push", input),
+  previewPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-preview", input),
+  createPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-create", input),
   closeLive: () => ipcRenderer.invoke("demo:live:close"),
   startTerminal: (input) => ipcRenderer.invoke("demo:terminal:start", input),
   openTerminalShell: (input) => ipcRenderer.invoke("demo:terminal:open-shell", input),

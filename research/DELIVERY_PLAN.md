@@ -1570,6 +1570,25 @@ in full acceptance. No real hosting remote was mutated by these tests and no
 model turn was used. Authentication UI, provider-specific protection errors,
 current installed-Codex visual parity and the complete PR workflow remain open.
 
+## Explicit PR preparation and creation follow-up
+
+The own-playground Live sidebar can prepare a same-repository github.com PR
+from an already pushed branch. It resolves the selected remote explicitly,
+excludes fork PRs with the same branch name, rechecks the pushed head after
+reading PRs, and fingerprints the preview. Creation checks it again, rejects
+an existing open PR, and sends the user's base/title/body through the public
+GitHub REST API using `gh`. It does not push, fork, merge, change protection
+rules or request reviews. External branch writers are not locked.
+
+The 1180/720 synthetic Electron gate verifies draft retention, read failure
+recovery and reconciliation after a simulated lost creation response. This
+gate is in acceptance and performs zero GitHub writes. Real creation is a
+separate explicit opt-in script, `create-reviewed-pr.mjs`, restricted by an
+expected local head/branch and a clean checkout; use it for the development
+PR itself, never as an automatic recurring test. Synthetic evidence alone is
+not proof of real GitHub creation. Fork/enterprise flows, PR detail mutation,
+provider authentication UX and current installed-product pixels remain open.
+
 ## Planning rules
 
 - Split an inventory ID whenever independently owned states or transitions can

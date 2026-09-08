@@ -35,6 +35,7 @@ import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js"
 import { LiveThreadRegistry } from "./live-thread-registry.js";
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
 import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
+import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -924,6 +925,20 @@ ipcMain.handle("demo:git:push", async (event, raw: unknown) => {
   if (typeof input.remote !== "string" || typeof input.target !== "string" || typeof input.fingerprint !== "string") throw new TypeError("A confirmed push preview is required.");
   const { remote, target, fingerprint } = input;
   return gitBranchOperationQueue.run(() => pushGitPreview(directory, remote, target, fingerprint));
+});
+ipcMain.handle("demo:git:pr-preview", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const { remote } = raw as { remote?: unknown };
+  if (typeof remote !== "string") throw new TypeError("A named remote is required.");
+  return gitBranchOperationQueue.run(() => readGitPullRequestPreview(directory, remote));
+});
+ipcMain.handle("demo:git:pr-create", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const { remote, fingerprint, base, title, body } = raw as Record<string, unknown>;
+  if (typeof remote !== "string" || typeof fingerprint !== "string" || typeof base !== "string" || typeof title !== "string" || typeof body !== "string") throw new TypeError("A confirmed PR preview and content are required.");
+  return gitBranchOperationQueue.run(() => createGitPullRequest(directory, { remote, fingerprint, base, title, body }));
 });
 ipcMain.handle("demo:live:projects", async (event) => {
   assertTrustedIpc(event);

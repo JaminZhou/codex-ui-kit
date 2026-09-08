@@ -9,6 +9,8 @@ interface CodexDemoBridge {
   commitPreview(input: { projectToken: string; fingerprint: string; message: string }): Promise<{ head: string }>;
   previewPush(input: { projectToken: string; remote: string; target?: string }): Promise<import("../electron/git-push-preview").GitPushPreview>;
   pushPreview(input: { projectToken: string; remote: string; target: string; fingerprint: string }): Promise<{ head: string; target: string }>;
+  previewPullRequest(input: { projectToken: string; remote: string }): Promise<import("../electron/git-pr-preview").GitPullRequestPreview>;
+  createPullRequest(input: { projectToken: string } & import("../electron/git-pr-preview").CreatePullRequestInput): Promise<{ number: number; url: string }>;
   liveWorkspaceWritable: boolean;
   useRendererAttachmentFixture: boolean;
   useWorkspaceBranchFixture: boolean;
