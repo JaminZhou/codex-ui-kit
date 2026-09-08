@@ -6601,6 +6601,68 @@ textarea {
   width: 1rem;
 }
 
+.demo-live-pr-index {
+  background: var(--codex-ui-background-surface);
+  color: var(--codex-ui-text-foreground);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.demo-live-pr-index > header,
+.demo-live-pr-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.demo-live-pr-index h1 { font-size: 20px; margin: 0 auto 0 0; }
+.demo-live-pr-index p { margin: 0; font-size: 13px; line-height: 1.5; }
+.demo-live-pr-index input { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.demo-live-pr-content {
+  min-width: 0;
+  padding: 20px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.demo-live-pr-content h2 { font-size: 18px; }
+.demo-live-pr-content pre { white-space: pre; overflow: auto; max-width: 100%; }
+.demo-live-pr-panel { background: var(--codex-ui-background-surface); color: var(--codex-ui-text-foreground); }
+.demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__backdrop[hidden] {
+  display: none !important;
+}
+@media (max-width: 679px) {
+  .demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__side-panel {
+    inset-inline: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+@media (min-width: 680px) {
+  .demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__layout {
+    grid-template-columns: var(--codex-ui-app-shell-sidebar-track) minmax(0, 1fr) var(--codex-ui-app-shell-side-panel-track);
+  }
+  .demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__main { grid-column: 2; }
+  .demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__side-panel {
+    position: relative;
+    grid-column: 3;
+    grid-row: 1;
+    inset: auto;
+    width: auto;
+    max-width: none;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 .demo-pr-index {
   background: #101010;
   color: rgba(255, 255, 255, 0.92);

@@ -1695,6 +1695,24 @@ local/remote branch absence. It still requires both complete local gates for the
 final head before any real merge. Closed history, other merge modes and current
 installed-product pixel convergence remain incomplete.
 
+## Current-branch Live PR workspace route
+
+The sidebar Pull requests entry now preserves Live mode instead of switching to
+replay fixtures. Its own-host route reads open PRs for the current pushed branch
+on origin, retains search state across navigation, and opens non-modal Summary
+and Code panels backed by the existing detail and bounded-diff APIs. Loading,
+empty, provider errors and retries are explicit; failed reads clear stale data.
+Project changes and refreshed requests invalidate older detail responses.
+Existing create/edit/merge/cleanup actions remain available from this route.
+
+The synthetic Electron gate covers 1180/720/600 widths and dark/light cases,
+route restoration, literal description rendering, retry and panel geometry.
+Below 680px the detail replaces the list and fills the window. The opt-in real
+development-PR script also reads the created PR through this route. These are
+own-playground functional and responsive checks, not current installed-product
+pixel evidence. Project-wide and closed history, comments/reviews and broader
+PR workflows remain incomplete.
+
 ## Planning rules
 
 - Split an inventory ID whenever independently owned states or transitions can

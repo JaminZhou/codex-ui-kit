@@ -208,6 +208,7 @@ import { LiveThreadList } from "./LiveThreadList";
 import { LiveCommitPreview } from "./LiveCommitPreview";
 import { LivePushPreview } from "./LivePushPreview";
 import { LivePullRequest } from "./LivePullRequest";
+import { useLivePullRequestRoute } from "./useLivePullRequestRoute";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -6335,9 +6336,8 @@ export function App() {
             <AppSidebarItem
               leading={<SidebarGlyph name="pull-request" />}
               onClick={() => {
-                setMode("replay");
                 setView("pull-request");
-                setPullRequestOpen(!isNarrowDemoWindow());
+                setPullRequestOpen(mode === "live" ? false : !isNarrowDemoWindow());
                 dismissSidebarAfterNavigation();
               }}
               selected={view === "pull-request"}
@@ -6373,9 +6373,8 @@ export function App() {
           <AppSidebarItem
             leading={<SidebarGlyph name="pull-request" />}
             onClick={() => {
-              setMode("replay");
               setView("pull-request");
-              setPullRequestOpen(!isNarrowDemoWindow());
+              setPullRequestOpen(mode === "live" ? false : !isNarrowDemoWindow());
               dismissSidebarAfterNavigation();
             }}
             selected={view === "pull-request" || view === "shell"}
@@ -12540,6 +12539,23 @@ export function App() {
       Select pull request to view
     </div>
   );
+  useEffect(() => {
+    if (mode !== "live" || view !== "pull-request" || !pullRequestOpen) return;
+    const resize = () => { if (window.innerWidth < 1040) setSidebarOpen(false); };
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [mode, view, pullRequestOpen]);
+  const livePullRequestRoute = useLivePullRequestRoute({
+    projectToken: workspaceProjectToken,
+    active: mode === "live" && view === "pull-request",
+    open: pullRequestOpen,
+    expanded: pullRequestExpanded,
+    onExpandedChange: setPullRequestExpanded,
+    onOpen: () => { setPullRequestOpen(true); if (window.innerWidth < 1040) setSidebarOpen(false); },
+    onClose: () => setPullRequestOpen(false),
+    onSidebar: () => { if (!sidebarOpen) setPullRequestOpen(false); setSidebarOpen(value => !value); },
+    onWorkspaceChanged: () => setWorkspaceBranchRefreshEpoch(value => value + 1),
+  });
   const pullRequestIndex = (
     <section
       aria-label="Pull requests"
@@ -15600,6 +15616,7 @@ export function App() {
         bottomPanelResizeLabel="Resize bottom panel"
         onBottomPanelHeightChange={setTerminalHeight}
         layoutMode={
+          (mode === "live" && view === "pull-request" && !livePullRequestRoute.compact) ||
           (initialSelection.capture &&
             initialSelection.layoutMode !== "narrow" &&
             activeFrame !== "pr-compact-detail" &&
@@ -15653,7 +15670,9 @@ export function App() {
         responsiveSidebarContinuity={false}
         sidePanel={
           view === "pull-request"
-            ? isCurrentPullRequestRouteReplay
+            ? mode === "live"
+              ? livePullRequestRoute.panel
+              : isCurrentPullRequestRouteReplay
               ? isCurrentPullRequestReviewReplay
                 ? pullRequestPanel
                 : currentPullRequestEmptyPanel
@@ -15669,7 +15688,7 @@ export function App() {
               : reviewPanel
         }
         sidePanelExpanded={
-          view === "pull-request" && pullRequestExpanded
+          view === "pull-request" && (pullRequestExpanded || (mode === "live" && livePullRequestRoute.compact))
         }
         sidePanelLabel={
           view === "pull-request"
@@ -15688,7 +15707,7 @@ export function App() {
         }
         sidePanelMinMainWidth={
           view === "pull-request"
-            ? 390
+            ? mode === "live" ? 300 : 390
             : isCurrentCitations26825Replay
               ? 374.328125
             : isCurrentBrowser26825Replay
@@ -15728,7 +15747,7 @@ export function App() {
               : reviewOpen && Boolean(reviewPanel)
         }
         sidePanelOverlay={
-          view === "pull-request" && !isCurrentPullRequestRouteReplay
+          view === "pull-request" && mode !== "live" && !isCurrentPullRequestRouteReplay
         }
         sidePanelOverlayModal={
           view !== "pull-request" &&
@@ -15933,7 +15952,7 @@ export function App() {
         }
       >
         {view === "pull-request" ? (
-          pullRequestIndex
+          mode === "live" ? livePullRequestRoute.index : pullRequestIndex
         ) : view === "projects" ? (
           projectsRoute
         ) : view === "automations" ? (
