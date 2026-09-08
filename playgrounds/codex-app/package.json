@@ -32,10 +32,11 @@
     "check:branch-recovery": "node scripts/check-branch-recovery.mjs",
     "check:commit-preview": "node scripts/check-commit-preview.mjs",
     "check:push-preview": "node scripts/check-push-preview.mjs",
+    "check:pr-preview": "node scripts/check-pr-preview.mjs",
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
-    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:user-input && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:cdp && pnpm check:electron && pnpm check:visual",
+    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:user-input && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:cdp && pnpm check:electron && pnpm check:visual",
     "check:all": "pnpm check && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {
