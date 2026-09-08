@@ -56,6 +56,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   },
   respondToApproval: (input) =>
     ipcRenderer.invoke("demo:approval:respond", input),
+  respondToUserInput: (input) => ipcRenderer.invoke("demo:input:respond", input),
   startLive: (input) => ipcRenderer.invoke("demo:live:start", input),
   stopLive: (input) => ipcRenderer.invoke("demo:live:stop", input),
 });

@@ -71,6 +71,11 @@ interface CodexDemoBridge {
     decision: "accept" | "acceptForSession" | "decline";
     requestId: number | string;
   }): Promise<void>;
+  respondToUserInput(input: {
+    requestId: number | string;
+    threadId: string;
+    answers: Record<string, string[]>;
+  }): Promise<void>;
   startLive(input: { prompt: string; projectToken: string }): Promise<{
     threadId: string;
     turnId: string;

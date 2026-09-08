@@ -1181,6 +1181,15 @@ variants, concurrent approvals, and additional approval types remain open.
 Model-background-process integration and current-product PTY visual evidence
 remain open; this does not close the complete-workflow exit gate.
 
+The user-input follow-up registers public `item/tool/requestUserInput` with a
+thread-owned host answer gate and a pending-question form (options, free text,
+masked sensitive input). Resolved requests, completed turns and client resets
+clear pending questions; answers are not added to conversation history.
+Unit tests and a deterministic Electron UI/IPC contract cover submission,
+stale-request rejection, thread visibility and cancellation at 1180/720px.
+This is synthetic functional evidence, not a real model round trip or current
+Codex pixel parity; those two validations remain open.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:
