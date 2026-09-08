@@ -32,6 +32,7 @@ import {
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
 import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
+import { LiveThreadRegistry } from "./live-thread-registry.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
@@ -105,6 +106,20 @@ const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 const liveInputGate = new LiveUserInputGate();
+let liveThreadRegistry: LiveThreadRegistry | null = null;
+function historyRegistry() {
+  return liveThreadRegistry ??= new LiveThreadRegistry(
+    process.env.CODEX_UI_KIT_LIVE_HISTORY_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-threads.json"),
+  );
+}
+
+function resolveHistoryProject(raw: unknown) {
+  if (!raw || typeof raw !== "object") throw new TypeError("A selected project is required.");
+  const input = raw as { projectToken?: unknown; threadId?: unknown; cursor?: unknown };
+  const directory = typeof input.projectToken === "string" ? trustedProjectDirectories.get(input.projectToken) : undefined;
+  if (!directory) throw new Error("Select a host-owned local project.");
+  return { input, directory };
+}
 
 interface ApprovalResponseInput {
   decision: "accept" | "acceptForSession" | "decline";
@@ -349,23 +364,50 @@ async function startLive(
   assertTrustedIpc(event);
   const { directory, prompt } = resolveLiveProject(rawInput, trustedProjectDirectories);
   const collaborationMode = resolveLiveMode((rawInput as { collaborationMode?: unknown }).collaborationMode);
+  const requestedThreadId = (rawInput as { threadId?: unknown }).threadId;
+  if (requestedThreadId !== undefined && requestedThreadId !== null && typeof requestedThreadId !== "string") {
+    throw new TypeError("Invalid live thread selection.");
+  }
   const policy = liveWorkspacePolicy(directory, liveWriteOptIn);
   return liveTurnStartGate.run(() => activeTurn !== null, async () => {
     const connectedClient = await ensureClient();
-    const session = await liveSession.select(directory, async () => {
-      const response = await connectedClient.threadStart({
-        approvalPolicy: policy.approvalPolicy,
-        cwd: directory,
-        ephemeral: true,
-        historyMode: "paginated",
-        sandbox: policy.sandbox,
-      });
-      return {
-        thread: new CodexThread(connectedClient, response.thread),
-        settings: { model: response.model, reasoningEffort: response.reasoningEffort },
+    const registry = historyRegistry();
+    const session = await liveSession.replace(directory, async () => {
+      // Validate persisted ownership before opening or resuming any server thread.
+      const owned = typeof requestedThreadId === "string" ? await registry.require(directory, requestedThreadId) : undefined;
+      const create = async () => {
+        const response = await connectedClient.threadStart({
+          approvalPolicy: policy.approvalPolicy,
+          cwd: directory,
+          ephemeral: process.env.CODEX_UI_KIT_LIVE_EPHEMERAL === "1",
+          historyMode: "paginated",
+          sandbox: policy.sandbox,
+        });
+        try {
+          await registry.remember({ id: response.thread.id, directory, title: prompt.replace(/\s+/g, " ").slice(0, 100), updatedAt: Date.now() });
+        } catch (error) {
+          await connectedClient.threadArchive({ threadId: response.thread.id }).catch(() => undefined);
+          throw error;
+        }
+        return {
+          thread: new CodexThread(connectedClient, response.thread),
+          settings: { model: response.model, reasoningEffort: response.reasoningEffort },
+        };
       };
+      let selected = liveSession.get(directory);
+      if (requestedThreadId === null) selected = await create();
+      else if (owned && selected?.thread.id !== owned.id) {
+        const response = await connectedClient.threadResume({
+          threadId: owned.id, cwd: directory, sandbox: policy.sandbox, approvalPolicy: policy.approvalPolicy,
+        });
+        selected = { thread: new CodexThread(connectedClient, response.thread), settings: { model: response.model, reasoningEffort: response.reasoningEffort } };
+      }
+      return selected ?? await create();
     });
     const { thread } = session;
+    const record = await registry.require(directory, thread.id);
+    await registry.remember({ ...record, updatedAt: Date.now() });
+    if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed before the thread started.");
     mainWindow?.webContents.send("demo:live:session", {
       kind: "live-bind",
       projectToken: (rawInput as { projectToken: string }).projectToken,
@@ -837,6 +879,26 @@ function createWindow() {
 }
 
 ipcMain.handle("demo:live:start", startLive);
+ipcMain.handle("demo:live:threads", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  if (input.cursor !== undefined && (typeof input.cursor !== "string" || !/^\d+$/.test(input.cursor))) throw new TypeError("Invalid thread-list cursor.");
+  const offset = input.cursor === undefined ? 0 : Number(input.cursor);
+  if (!Number.isSafeInteger(offset)) throw new TypeError("Invalid thread-list cursor.");
+  const threads = await historyRegistry().list(directory);
+  return { threads: threads.slice(offset, offset + 20).map(({ id, title, updatedAt }) => ({ id, title, updatedAt })), nextCursor: offset + 20 < threads.length ? String(offset + 20) : null };
+});
+ipcMain.handle("demo:live:thread:read", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  if (typeof input.threadId !== "string") throw new TypeError("A thread is required.");
+  await historyRegistry().require(directory, input.threadId);
+  const connectedClient = await ensureClient();
+  const { thread } = await connectedClient.threadRead({ threadId: input.threadId, includeTurns: true });
+  if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed while reading history.");
+  if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
+  return { threadId: thread.id, turns: thread.turns };
+});
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {
   assertTrustedIpc(event);

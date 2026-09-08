@@ -53,4 +53,16 @@ describe("live project routing", () => {
     await expect(pending).rejects.toThrow("session was closed");
     expect(await session.select("/startup", async () => "fresh")).toBe("fresh");
   });
+  it("replaces a selected thread but rejects a replacement that outlives close", async () => {
+    const session = new LiveProjectSession<string>();
+    await session.select("/project", async () => "first");
+    await session.replace("/project", async () => "second");
+    expect(session.get("/project")).toBe("second");
+    let finish!: (value: string) => void;
+    const pending = session.replace("/project", () => new Promise(resolve => { finish = resolve; }));
+    session.clear();
+    finish("stale");
+    await expect(pending).rejects.toThrow("session was closed");
+    expect(session.get("/project")).toBeUndefined();
+  });
 });

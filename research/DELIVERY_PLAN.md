@@ -1195,6 +1195,21 @@ model's completion, then switches to Default and completes a same-thread reply.
 The Composer and host share the same mode state. Wide/720 captures document this
 functional path; current Codex pixel parity and other question variants remain open.
 
+The live-history follow-up replaces replay-only Recents and pinned sample tasks
+in Live mode with playground-owned, project-scoped conversation rows. New chat
+creates a distinct persisted thread; selected history hydrates from the public
+App Server snapshot and later Composer submissions resume that exact thread.
+A private local ID registry—not the server source label—defines ownership:
+the pinned runtime reported `vscode` for this integration in the isolated probe.
+The registry excludes unrelated Codex sessions, and malformed storage fails
+closed instead of being overwritten. Deterministic acceptance covers empty,
+failure/Retry, 20-row pagination, unowned-ID rejection and late-read cancellation.
+An explicit three-turn Electron probe creates two chats, switches between them,
+restarts the application, restores the first chat and continues its same thread
+at 1180/720px; its two disposable threads are archived after verification.
+Current-product pixels, persisted project-directory discovery, archive/rename/
+delete actions and cross-process registry coordination remain open.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:

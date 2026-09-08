@@ -578,3 +578,33 @@ the server-selected model/reasoning effort, and uses built-in mode instructions
 (`developer_instructions: null`). Default is sent explicitly so a previous Plan
 turn cannot remain sticky. This sampled real round trip does not validate all
 question variants or claim installed-product pixel parity.
+
+## Playground-owned persistent history
+
+Live Recents now show only the selected project's playground-created threads,
+not replay scenario names or unrelated Desktop sessions. Ownership is stored in
+the app's namespaced `live-threads.json` under Electron user data. It contains
+IDs, project directories, titles and timestamps; conversation content remains in
+the public App Server's storage. Registry reads and atomic updates are serialized
+within the host process, with corrupt files preserved and surfaced as errors.
+Cross-process registry coordination remains open.
+
+`check:history` is a deterministic Electron contract included in acceptance. It
+checks corrupted-registry Retry, empty state, 20+5 row pagination, rejection of
+unowned IDs, stored-snapshot rendering and ignoring a late read after leaving
+Live. The history response for that UI fixture is synthetic, not model evidence.
+
+`check:live-history` is a separate signed-in three-turn gate. It creates two real
+threads, returns to the first, closes/restarts Electron, reads persisted history
+and continues the exact first thread, then captures wide/720px output. Only the
+two IDs created in its disposable project are archived afterward; cleanup is
+recoverable. Routine harness runs use a fresh registry path and ephemeral threads
+so unrelated tests do not populate the user's real history; this explicit gate
+opts into persistence with its own registry.
+
+The fixed runtime supports full reads/resume of the sampled paginated history,
+despite the current public documentation's unsupported-mode note. Its thread
+source was `vscode`, not `appServer`; source labels are therefore not used as an
+ownership boundary. See [public thread APIs](https://learn.chatgpt.com/docs/app-server).
+Archive/rename/delete UI, persisted project discovery and installed-product
+pixel parity remain separate delivery work.
