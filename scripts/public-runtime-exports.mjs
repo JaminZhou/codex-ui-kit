@@ -54,6 +54,7 @@ export const publicRuntimeExports = [
   "ConversationThreadShell",
   "Dialog",
   "DialogChoice",
+  "DocumentPreviewPanel",
   "EnvironmentSettingsPage",
   "FileChange",
   "FileChangeGroup",

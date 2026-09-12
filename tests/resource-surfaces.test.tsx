@@ -7,6 +7,7 @@ import {
   ArtifactList,
   CitationMention,
   Dialog,
+  DocumentPreviewPanel,
   GeneratedImageGallery,
   ImagePreviewDialog,
   ResourceCard,
@@ -28,6 +29,41 @@ const images: GeneratedImageItem[] = Array.from({ length: 6 }, (_, index) => ({
 }));
 
 describe("resource surfaces", () => {
+  it("keeps document preview status and host actions explicit", () => {
+    const onRetry = vi.fn();
+    const onOpen = vi.fn();
+    const { rerender } = render(
+      <DocumentPreviewPanel
+        kind="pdf"
+        onOpen={onOpen}
+        onRetry={onRetry}
+        status="error"
+        subtitle="3 pages"
+        title="report.pdf"
+      />,
+    );
+
+    const region = screen.getByRole("region", { name: "report.pdf" });
+    expect(region.getAttribute("data-kind")).toBe("pdf");
+    expect(region.getAttribute("data-status")).toBe("error");
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Preview unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Retry preview" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open document" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(onOpen).toHaveBeenCalledOnce();
+
+    rerender(
+      <DocumentPreviewPanel kind="notebook" status="loading" title="work.ipynb" />,
+    );
+    expect(screen.getByRole("status", { name: "Loading preview" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "work.ipynb" }).getAttribute("aria-busy")).toBe("true");
+
+    rerender(<DocumentPreviewPanel kind="spreadsheet" status="ready" title="data.xlsx" />);
+    expect(screen.getByRole("img", { name: "Preview page" })).toBeTruthy();
+  });
+
   it("renders current citation semantics with an optional favicon", () => {
     render(
       <CitationMention
