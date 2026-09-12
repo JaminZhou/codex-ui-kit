@@ -1771,7 +1771,10 @@
         "browser-workspace-panel",
         "legacy-browser-cdp:26.825.31414-one-tab-shell-and-toolbar",
         "legacy-electron:26.825.31414-browser-workspace-shell",
-        "legacy-pixel:26.825.31414-browser-chrome-region"
+        "legacy-pixel:26.825.31414-browser-chrome-region",
+        "playground:browser-workspace-legacy-controlled-replay",
+        "electron:browser-workspace-tabs-toolbar-close-flow",
+        "pixel:browser-workspace-own-fixture-1180-720-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
