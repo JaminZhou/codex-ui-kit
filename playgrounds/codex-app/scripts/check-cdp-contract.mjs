@@ -80,6 +80,7 @@ const currentReplayComposerScenarios = new Set([
   "mcp-current-26-820-recovery",
   "mcp-current-26-820-success",
   "mcp-current-26-825-lifecycle",
+  "mcp-current-26-903-recovery",
   "mcp-current-26-903-success",
   "mcp-current-recovery",
   "mcp-current-success",
@@ -16628,7 +16629,8 @@ for (const scene of selectedScenes) {
         scene.scenario === "mcp-current-26-820-success" ||
         scene.scenario === "mcp-current-26-820-recovery";
       const isCurrentMcp26903 =
-        scene.scenario === "mcp-current-26-903-success";
+        scene.scenario === "mcp-current-26-903-success" ||
+        scene.scenario === "mcp-current-26-903-recovery";
       if (
         !contract.mcp ||
         contract.mcp.toolCount !== scene.toolCount ||

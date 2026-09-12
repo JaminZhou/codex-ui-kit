@@ -6017,6 +6017,135 @@ try {
   await currentMcp26903App.close();
 }
 
+const currentMcp26903RecoveryScene = {
+  currentSidebar: true,
+  frame: "mcp-current-26-903-recovery",
+  id: "electron-current-mcp-26-903-recovery",
+  scenario: "mcp-current-26-903-recovery",
+  sidebarState: "hidden",
+  summaryState: "hidden",
+};
+const {
+  app: currentMcp26903RecoveryApp,
+  page: currentMcp26903RecoveryPage,
+} = await launchScene(currentMcp26903RecoveryScene, { capture: false });
+
+try {
+  const timeline = currentMcp26903RecoveryPage.getByRole("button", {
+    name: "Worked for 41s",
+  });
+  if ((await timeline.getAttribute("aria-expanded")) !== "false") {
+    throw new Error("26.903 Electron MCP recovery should start collapsed.");
+  }
+  await timeline.click();
+  await currentMcp26903RecoveryPage
+    .getByRole("button", {
+      name: "Used OpenAI Developer Docs integration",
+    })
+    .click();
+  const state = await currentMcp26903RecoveryPage.evaluate(() => {
+    const answer = document.querySelector(
+      '[data-item-id="assistant-current-mcp-26-903-recovery"] .demo-current-mcp-answer',
+    );
+    return {
+      answer:
+        answer instanceof HTMLElement
+          ? answer.innerText.replace(/\s+/g, " ").trim()
+          : null,
+      callLabels: Array.from(
+        document.querySelectorAll(".codex-ui-tool-call__label"),
+        (element) => element.textContent?.trim(),
+      ),
+      errorCards: document.querySelectorAll(
+        ".codex-ui-tool-call__error, .codex-ui-tool-call__result",
+      ).length,
+      href: answer?.querySelector("a")?.getAttribute("href"),
+      overflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      rowDisclosures: document.querySelectorAll(
+        ".codex-ui-mcp-tool-call-group .codex-ui-tool-call button, .codex-ui-mcp-tool-call-group .codex-ui-tool-call details, .codex-ui-mcp-tool-call-group .codex-ui-tool-call summary",
+      ).length,
+      title: document
+        .querySelector(".codex-ui-thread-header__title")
+        ?.textContent?.trim(),
+    };
+  });
+  const toggle = currentMcp26903RecoveryPage.getByRole("button", {
+    name: "Toggle summary",
+  });
+  await toggle.click();
+  const summary = await currentMcp26903RecoveryPage.evaluate(() => {
+    const dock = document.querySelector(
+      ".demo-current-mcp-source-summary-dock",
+    );
+    const panel = dock?.querySelector(
+      ".demo-current-mcp-source-summary-panel",
+    );
+    const bounds = panel?.getBoundingClientRect();
+    return {
+      labels: Array.from(
+        panel?.querySelectorAll(
+          ".codex-ui-thread-summary-section h3, .codex-ui-thread-summary-item__label",
+        ) ?? [],
+        (element) => element.textContent?.trim(),
+      ),
+      open: dock?.getAttribute("data-open"),
+      pinned: dock?.getAttribute("data-pinned"),
+      rect: bounds
+        ? {
+            height: bounds.height,
+            left: bounds.left,
+            top: bounds.top,
+            width: bounds.width,
+          }
+        : null,
+    };
+  });
+  await currentMcp26903RecoveryApp.evaluate(({ BrowserWindow }) => {
+    BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+  });
+  await currentMcp26903RecoveryPage.waitForFunction(
+    () => window.innerWidth === 720 && window.innerHeight === 680,
+    undefined,
+    { timeout: 5_000 },
+  );
+  const compactOverflow = await currentMcp26903RecoveryPage.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  if (
+    state.title !== "Recover MCP docs page" ||
+    JSON.stringify(state.callLabels) !==
+      JSON.stringify([
+        "Fetch OpenAI doc",
+        "Search OpenAI docs",
+        "Fetch OpenAI doc",
+      ]) ||
+    state.errorCards !== 0 ||
+    state.rowDisclosures !== 0 ||
+    state.overflow > 1 ||
+    state.answer !==
+      "CURRENT MCP 26.903 RECOVERY — Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp" ||
+    state.href !==
+      "https://learn.chatgpt.com/docs/extend/mcp" ||
+    summary.open !== "true" ||
+    summary.pinned !== "true" ||
+    !summary.rect ||
+    Math.abs(summary.rect.width - 300) > 1 ||
+    !summary.labels.includes("Environment") ||
+    !summary.labels.includes("main") ||
+    !summary.labels.includes("Compare branch") ||
+    !summary.labels.includes("openai-docs-mcp") ||
+    compactOverflow > 1
+  ) {
+    throw new Error(
+      `26.903 Electron MCP recovery drifted: ${JSON.stringify({ compactOverflow, state, summary })}`,
+    );
+  }
+} finally {
+  await currentMcp26903RecoveryApp.close();
+}
+
 const currentMcp26825RecoveryScene = {
   currentSidebar: true,
   frame: "mcp-current-26-825-recovery",

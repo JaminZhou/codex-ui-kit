@@ -494,7 +494,11 @@
         "replay:current-26.825-mcp-failure-search-fetch-recovery-wide-compact",
         "browser-cdp:current-26.825-mcp-failure-recovery-and-focus-lifecycle",
         "electron:current-26.825-mcp-failure-recovery-and-sources-lifecycle",
-        "pixel:current-26.825-mcp-recovery-wide-compact-and-sources-regions"
+        "pixel:current-26.825-mcp-recovery-wide-compact-and-sources-regions",
+        "replay:current-26.903-mcp-failure-search-fetch-recovery-wide-compact",
+        "browser-cdp:current-26.903-mcp-failure-recovery-and-sources",
+        "electron:current-26.903-mcp-failure-recovery-and-sources",
+        "pixel:current-26.903-mcp-recovery-wide-compact-and-sources-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -511,7 +515,11 @@
         "cdp-26.820.60940:real-openai-developer-docs-invalid-url-fetch-search-fetch-recovery-expanded-1180x820-and-720x680",
         "cdp-26.820.60940:current-mcp-direct-failure-and-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates",
         "cdp-26.825.51511:real-openai-developer-docs-invalid-url-fetch-search-fetch-same-thread-recovery-expanded-1180x820-and-720x680",
-        "cdp-26.825.51511:current-mcp-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
+        "cdp-26.825.51511:current-mcp-recovery-computed-styles-noninteractive-call-rows-and-regional-pixel-gates",
+        "cdp-26.903.71938:real-openai-developer-docs-invalid-url-fetch-search-fetch-recovery-expanded-1180x820-and-720x680",
+        "cdp-26.903.71938:current-mcp-recovery-computed-styles-noninteractive-call-rows-and-sources-pixel-gates",
+        "cdp-26.903.71938:current-mcp-electron-failure-recovery-and-sources-lifecycle",
+        "cdp-26.903.71938:current-mcp-pixel-recovery-wide-compact-and-sources-regions"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
