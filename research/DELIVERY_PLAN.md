@@ -27,7 +27,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 12 groups have current-build runtime evidence, 71 have previous-build-only
+- 13 groups have current-build runtime evidence, 70 have previous-build-only
   runtime evidence, and 8 have not been sampled. Browser/Electron verified
   statuses are intentionally downgraded until the affected slices are
   re-observed on 26.903; their older gates remain regression fixtures.
@@ -348,7 +348,14 @@ exit gates; it does not replace the inventory.
   frames; local-only regions pass at 2.6742%, 4.8070%, 3.8995%, and 2.9276%
   under independent 2.8%, 5%, 4.1%, and 3.1% limits. Authentication,
   elicitation, MCP approvals, cancellation, terminal same-transport failure,
-  and other integrations remain open. The current citations follow-up separately
+  and other integrations remain open. A fresh 26.903.71938 read-only task now
+  adds a success-only Search → Fetch observation: `Search OpenAI docs · 3
+  calls`, `Fetch OpenAI doc`, and the current `Model Context Protocol` answer.
+  CDP, Electron, wide/720 replay, Sources pinning, and three optional local
+  product regions pass at 4.386%, 4.391%, and 4.260% under independent 5%
+  ceilings. This does not promote recovery, approval, authentication, or other
+  MCP transitions, and the native product references remain local-only. The
+  current citations follow-up separately
   reaches three real inline OpenAI citations and the five-query Web Search
   Sources workspace. Six wide/compact replay frames pass Browser/CDP,
   Electron, reviewed pixels, and optional local-only product regions; the

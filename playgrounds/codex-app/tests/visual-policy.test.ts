@@ -148,6 +148,36 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the runtime-observed 26.903 MCP success-only turn", () => {
+    for (const scene of [
+      "mcp-current-26-903-success",
+      "mcp-current-26-903-success-compact",
+      "mcp-current-26-903-sources-pinned",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_903_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_903_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_903_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      'scene.scenario === "mcp-current-26-903-success"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-903-success"',
+    );
+    expect(appSource).toContain(
+      'scenarioId === "mcp-current-26-903-success"',
+    );
+    expect(appSource).toContain('current26903?: boolean');
+    expect(appStyles).toContain(
+      '[data-scenario="mcp-current-26-903-success"]',
+    );
+  });
+
   it("gates the runtime-observed 26.825 transport recovery lifecycle", () => {
     for (const scene of [
       "current-transport-network-waiting",

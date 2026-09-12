@@ -647,15 +647,19 @@ function CurrentMcpLink({ href }: { href: string }) {
 function CurrentMcpAnswer({
   current26820 = false,
   current26825 = false,
+  current26903 = false,
   recovery = false,
 }: {
   current26820?: boolean;
   current26825?: boolean;
+  current26903?: boolean;
   recovery?: boolean;
 }) {
   const href = recovery && !current26825
     ? "https://learn.chatgpt.com/docs/mcp-server"
-    : "https://learn.chatgpt.com/docs/extend/mcp";
+    : current26903
+      ? "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features"
+      : "https://learn.chatgpt.com/docs/extend/mcp";
   return (
     <div
       className="demo-current-mcp-answer"
@@ -672,6 +676,12 @@ function CurrentMcpAnswer({
             {recovery
               ? "Use Codex with the Agents SDK"
               : "Model Context Protocol"}
+            <br />
+            <CurrentMcpLink href={href} />
+          </>
+        ) : current26903 ? (
+          <>
+            Model Context Protocol
             <br />
             <CurrentMcpLink href={href} />
           </>
@@ -1924,11 +1934,13 @@ function McpResponseActions({
   copyLabel = "Copy response",
   includeFork = true,
   label = "MCP response actions",
+  rateResponse = false,
   toolbar = true,
 }: {
   copyLabel?: string;
   includeFork?: boolean;
   label?: string | null;
+  rateResponse?: boolean;
   toolbar?: boolean;
 }) {
   return (
@@ -1940,12 +1952,20 @@ function McpResponseActions({
       <button aria-label={copyLabel} type="button">
         <CurrentBuildIcon name="thread-assistant-copy" />
       </button>
-      <button aria-label="Good response" type="button">
-        <CurrentBuildIcon name="thread-assistant-good" />
-      </button>
-      <button aria-label="Bad response" type="button">
-        <CurrentBuildIcon name="thread-assistant-bad" />
-      </button>
+      {rateResponse ? (
+        <button aria-label="Rate response" type="button">
+          <CurrentBuildIcon name="thread-assistant-good" />
+        </button>
+      ) : (
+        <>
+          <button aria-label="Good response" type="button">
+            <CurrentBuildIcon name="thread-assistant-good" />
+          </button>
+          <button aria-label="Bad response" type="button">
+            <CurrentBuildIcon name="thread-assistant-bad" />
+          </button>
+        </>
+      )}
       {includeFork ? (
         <button aria-label="Fork chat from here" type="button">
           <CurrentBuildIcon name="thread-assistant-fork" />
@@ -4575,14 +4595,19 @@ export function App() {
     isCurrentMcp26820SuccessReplay || isCurrentMcp26820RecoveryReplay;
   const isCurrentMcp26825Replay =
     mode === "replay" && scenarioId === "mcp-current-26-825-lifecycle";
+  const isCurrentMcp26903SuccessReplay =
+    mode === "replay" && scenarioId === "mcp-current-26-903-success";
   const usesCurrentMcpFlatRows =
-    isCurrentMcp26820Replay || isCurrentMcp26825Replay;
+    isCurrentMcp26820Replay ||
+    isCurrentMcp26825Replay ||
+    isCurrentMcp26903SuccessReplay;
   const isCurrentMcpSuccessReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-success" ||
       scenarioId === "mcp-current-26-818-success" ||
       scenarioId === "mcp-current-26-820-success" ||
-      scenarioId === "mcp-current-26-825-lifecycle");
+      scenarioId === "mcp-current-26-825-lifecycle" ||
+      scenarioId === "mcp-current-26-903-success");
   const isCurrentMcpRecoveryReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-recovery" ||
@@ -7269,6 +7294,7 @@ export function App() {
       className={
         usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
+        isCurrentMcp26903SuccessReplay ||
         isCurrentCitations26825Replay
           ? "demo-current-basic-26-825-header"
           : undefined
@@ -7276,6 +7302,7 @@ export function App() {
       endActions={
         usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
+        isCurrentMcp26903SuccessReplay ||
         isCurrentCitations26825Replay ? (
           <div className="demo-current-basic-26-825-header-actions">
             <button aria-label="Share" type="button">
@@ -7290,14 +7317,14 @@ export function App() {
                   : isCurrentAttachment26825Replay
                     ? activeFrame ===
                       "attachment-current-26-825-completed"
-                  : isCurrentMcp26825Replay
+                  : isCurrentMcp26825Replay || isCurrentMcp26903SuccessReplay
                   ? mcpSourceSummaryPinned
                   : undefined
               }
               onClick={
                 isCurrentCitations26825Replay
                   ? () => setCitationSummaryOpen((open) => !open)
-                  : isCurrentMcp26825Replay
+                  : isCurrentMcp26825Replay || isCurrentMcp26903SuccessReplay
                   ? () => {
                       if (mcpSourceSummaryOpen && mcpSourceSummaryPinned) {
                         setMcpSourceSummaryOpen(false);
@@ -7310,7 +7337,9 @@ export function App() {
                   : undefined
               }
               ref={
-                isCurrentMcp26825Replay || isCurrentCitations26825Replay
+                isCurrentMcp26825Replay ||
+                isCurrentMcp26903SuccessReplay ||
+                isCurrentCitations26825Replay
                   ? mcpSourceSummaryTriggerRef
                   : undefined
               }
@@ -7604,6 +7633,7 @@ export function App() {
       }
       navigation={
         isCurrentMcp26825Replay ||
+        isCurrentMcp26903SuccessReplay ||
         isCurrentApproval26825FileReplay ||
         isCurrentAttachment26825Replay ? (
           <div className="demo-current-mcp-26-825-header-navigation">
@@ -7748,6 +7778,7 @@ export function App() {
           </span>
         ) : usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
+        isCurrentMcp26903SuccessReplay ||
         isCurrentCitations26825Replay ? (
           <button
             aria-label="Chat actions"
@@ -7769,6 +7800,7 @@ export function App() {
       title={
         usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
+        isCurrentMcp26903SuccessReplay ||
         isCurrentCitations26825Replay
           ? (
               <>
@@ -7786,6 +7818,7 @@ export function App() {
                 >
                   <span>
                     {isCurrentMcp26825Replay ||
+                    isCurrentMcp26903SuccessReplay ||
                     isCurrentCitations26825Replay ||
                     isCurrentApproval26825FileReplay ||
                     isCurrentAttachment26825Replay
@@ -13491,7 +13524,9 @@ export function App() {
                     message.id ===
                       "assistant-current-mcp-26-820-success" ||
                     message.id ===
-                      "assistant-current-mcp-26-825-success")) ||
+                      "assistant-current-mcp-26-825-success" ||
+                    message.id ===
+                      "assistant-current-mcp-26-903-success")) ||
                 (isCurrentMcpRecoveryReplay &&
                   (message.id === "assistant-current-mcp-recovery" ||
                     message.id ===
@@ -13622,6 +13657,7 @@ export function App() {
                         ? "Response actions"
                         : undefined
                     }
+                    rateResponse={isCurrentMcp26903SuccessReplay}
                     toolbar={
                       !isAnyCurrentBasicMessageReplay &&
                       !isCurrentAttachment26825Replay &&
@@ -13734,6 +13770,9 @@ export function App() {
               ) : message.id ===
                 "assistant-current-mcp-26-825-recovery" ? (
                 <CurrentMcpAnswer current26825 recovery />
+              ) : message.id ===
+                "assistant-current-mcp-26-903-success" ? (
+                <CurrentMcpAnswer current26903 />
               ) : message.id ===
                 "assistant-current-citations-26-825" ? (
                 <CurrentCitationAnswer />
@@ -14234,6 +14273,7 @@ export function App() {
             activeFrame === "mcp-current-26-820-running" ||
             activeFrame === "mcp-current-26-820-success" ||
             activeFrame === "mcp-current-26-825-success" ||
+            activeFrame === "mcp-current-26-903-success" ||
             activeFrame === "mcp-current-26-825-recovery")) ||
         (isCurrentMcpRecoveryReplay &&
           (activeFrame === "mcp-current-recovery-failed" ||
@@ -16704,6 +16744,54 @@ export function App() {
                         leading={<SummaryGlyph name="github" />}
                       />
                     </ThreadSummarySection>
+                  ) : isCurrentMcp26903SuccessReplay ? (
+                    <>
+                      <ThreadSummarySection
+                        actions={
+                          <ThreadSummaryIconButton
+                            icon="+"
+                            label="Set up local environment"
+                          />
+                        }
+                        title="Trailglass"
+                      >
+                        <ThreadSummaryItem
+                          label="Changes"
+                          leading={<SummaryGlyph name="changes" />}
+                          meta={<ThreadSummaryDelta added={511} removed={146} />}
+                        />
+                        <ThreadSummaryItem
+                          label="Local"
+                          leading={<SummaryGlyph name="computer" />}
+                          title="Select where to run the chat"
+                          trailing="⌄"
+                        />
+                        <ThreadSummaryItem
+                          label="fix/library-loading-and-scale"
+                          leading={<SummaryGlyph name="branch" />}
+                          title="Switch branch"
+                          trailing="⌄"
+                        />
+                        <ThreadSummaryItem
+                          disabled
+                          label="Commit or push"
+                          leading={<SummaryGlyph name="commit" />}
+                        />
+                        <ThreadSummaryItem
+                          label="Create pull request"
+                          leading={<SummaryGlyph name="github" />}
+                        />
+                      </ThreadSummarySection>
+                      <ThreadSummarySection
+                        actions={
+                          <ThreadSummaryIconButton
+                            icon="+"
+                            label="Set up local environment"
+                          />
+                        }
+                        title="AppKitInspector"
+                      />
+                    </>
                   ) : (
                     <ThreadSummarySection
                       actions={
