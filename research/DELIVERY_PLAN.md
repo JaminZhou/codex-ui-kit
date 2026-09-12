@@ -10,16 +10,27 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- Installed-package discovery on 2026-09-07 found Codex Desktop
-  `26.901.51231` (`8109`); see [the pending refresh](26.901.51231.md).
-  The machine-readable evidence baseline is still `26.825.51511` (`7377`).
-  Its verified statuses are relative to that recorded baseline, not proof of
-  parity with the newly installed build. Stage 0 must re-observe the new
-  runtime before any surface is promoted; existing fixtures remain regression
-  evidence.
+- Installed-package discovery on 2026-09-12 now resolves to Codex Desktop
+  `26.903.71938` (`8576`), Chromium `152.0.7977.83`, and ASAR SHA-256
+  `58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0`;
+  see [the current baseline](26.903.71938.md). The previous package-only
+  `26.901.51231` note is superseded. Existing surface evidence remains tied to
+  its recorded build until each affected surface is re-observed; old fixtures
+  remain regression evidence rather than current-product proof.
+- Stage 0 shell refresh is now captured at 26.903: the isolated Renderer was
+  selected by URL, area, landmarks, and visible-control density; New chat,
+  explicit Hide/Show, Pull requests → New chat restoration, sidebar
+  expansion/focus, Help, and Projects wide/collapsed geometry pass the
+  current baseline contract with zero horizontal overflow. The native project
+  action trigger is verified, but its AppKit item list is intentionally marked
+  unavailable because the new Renderer no longer exposes the old Fiber provider
+  and CDP cannot inspect native windows. No unsampled menu contents are
+  promoted.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 74 groups have current-build runtime evidence, 7 have previous-build-only
-  runtime evidence, and 10 have not been sampled.
+- 9 groups have current-build runtime evidence, 72 have previous-build-only
+  runtime evidence, and 10 have not been sampled. Browser/Electron verified
+  statuses are intentionally downgraded until the affected slices are
+  re-observed on 26.903; their older gates remain regression fixtures.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
   selection, wide/compact preview and pixels, focus-preserving removal, exact

@@ -11,12 +11,12 @@ export const currentBaselineViewports = Object.freeze({
 });
 
 export const currentBaselineFingerprint = Object.freeze({
-  appAsarBytes: 284_032_150,
+  appAsarBytes: 306_621_494,
   appAsarSha256:
-    "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
-  appVersion: "26.825.51511",
-  buildNumber: "7377",
-  chromiumVersion: "151.0.7922.174",
+    "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
+  appVersion: "26.903.71938",
+  buildNumber: "8576",
+  chromiumVersion: "152.0.7977.83",
 });
 
 const primaryRoutes = Object.freeze([
@@ -138,7 +138,7 @@ export function assertCurrentProjectsIndexObservation(observation) {
     wide?.title?.count !== 1 ||
     !withinTolerance(wide?.title?.rect?.height, 33.59) ||
     wide?.title?.style?.fontSize !== "28px" ||
-    wide?.title?.style?.fontWeight !== "400" ||
+    wide?.title?.style?.fontWeight !== "500" ||
     wide?.title?.style?.lineHeight !== "33.6px" ||
     wide?.search?.count !== 1 ||
     wide?.search?.placeholder !== "Search projects" ||
@@ -390,8 +390,18 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
           : item.submenu == null)
       );
     });
+  const observationStatus =
+    projectMenu?.observationStatus ??
+    (Array.isArray(projectMenu?.items) ? "native-items-observed" : null);
+  const nativeItemsUnavailable =
+    observationStatus === "native-items-unavailable" &&
+    projectMenu.items === null;
+  const projectMenuBoundaryMatch = nativeItemsUnavailable || projectMenuItemsMatch;
   if (
     projectMenu?.renderMode !== "electron-native-context-menu" ||
+    !["native-items-observed", "native-items-unavailable"].includes(
+      observationStatus,
+    ) ||
     projectMenu.bridge?.available !== true ||
     projectMenu.bridge?.frozen !== true ||
     projectMenu.trigger?.tag !== "button" ||
@@ -399,7 +409,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     projectMenu.trigger?.ariaExpanded !== "false" ||
     !withinTolerance(projectMenu.trigger?.rect?.width, 24) ||
     !withinTolerance(projectMenu.trigger?.rect?.height, 24) ||
-    !projectMenuItemsMatch
+    !projectMenuBoundaryMatch
   ) {
     throw new Error(
       `Current sidebar lifecycle does not prove the project menu boundary: ${JSON.stringify(projectMenu)}`,
