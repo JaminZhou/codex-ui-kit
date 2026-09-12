@@ -1205,14 +1205,16 @@ workspace tab with a 40px toolbar, page-aware navigation, fit/percentage zoom,
 annotation mode, one document scroller, expansion, and compact hide/reopen.
 Fourteen recorded Renderer states promote runtime evidence for
 `workspace.document-previews` and `workspace.artifact-shell`; their current
-Browser/Electron and product-pixel gates remain open. The implementation
-now has a dedicated `PdfPreviewPanel` and a real private PDF.js workspace replay.
-Targeted Electron paging/zoom/expand/resize/close/reopen checks pass, but the
-unmasked product comparison is still above 1% (about 1.51% wide / 2.09% compact).
-The compact decoded bitmap itself is identical. Investigate the verified
-Chromium 152 product / Chromium 150 playground difference before promoting
-verification, generating the seven new regression baselines or running full
-acceptance. Other document formats and host effects remain open.
+Browser/Electron and product-pixel gates remain scoped to this slice. The
+implementation now has a dedicated `PdfPreviewPanel` and a real private PDF.js
+workspace replay. Targeted Electron paging/zoom/expand/resize/close/reopen
+checks pass, and the complete owned-panel comparison passes at 0.1544% wide /
+0.2600% compact with no masks under the unchanged 1% ceiling. The decoded
+bitmap is pixel-identical before CSS composition; the replay also preserves the
+observed relative positioning and paint-isolation boundaries. Seven new visual
+baselines are now committed for this slice; the full local acceptance passes
+with 438 CDP lifecycle frames, Electron contracts, and 438 visual pixel frames.
+Other document formats and host effects remain open.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

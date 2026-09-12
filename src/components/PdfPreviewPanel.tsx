@@ -16,7 +16,7 @@ export interface PdfPreviewPanelProps
   onOpen?: () => void;
   onOpenOptions?: () => void;
   openLabel?: string;
-  icons?: Partial<Record<"previous" | "next" | "annotate" | "chevron" | "download" | "open", ReactNode>>;
+  icons?: Partial<Record<"previous" | "next" | "annotate" | "chevron" | "options" | "download" | "open", ReactNode>>;
   viewportRef?: Ref<HTMLDivElement>;
   viewportProps?: HTMLAttributes<HTMLDivElement>;
   status?: "ready" | "loading" | "error";
@@ -68,7 +68,7 @@ export function PdfPreviewPanel({
           {onDownload ? <button aria-label="Download" disabled={!ready} onClick={onDownload} type="button">{glyph("download")}</button> : null}
           {onOpen ? <div className="codex-ui-pdf-preview__open-group">
             <button aria-label={openLabel} className="codex-ui-pdf-preview__open" onClick={onOpen} type="button">{icons.open}<span>Open</span></button>
-            {onOpenOptions ? <button aria-label="Open options" className="codex-ui-pdf-preview__open-options" onClick={onOpenOptions} type="button">{glyph("chevron")}</button> : null}
+            {onOpenOptions ? <button aria-label="Open options" className="codex-ui-pdf-preview__open-options" onClick={onOpenOptions} type="button">{icons.options ?? glyph("chevron")}</button> : null}
           </div> : null}
         </div>
       </header>

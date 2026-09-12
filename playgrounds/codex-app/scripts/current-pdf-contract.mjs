@@ -11,6 +11,7 @@ export async function readCurrentPdfContract(page) {
     return {
       panel: rect(panel), header: rect(header), viewport: rect(viewport),
       headerStyle: { display: getComputedStyle(header).display, fontSize: getComputedStyle(header).fontSize, fontWeight: getComputedStyle(header).fontWeight },
+      composition: { panelPosition: getComputedStyle(panel).position, containment: getComputedStyle(panel.closest(".codex-ui-workspace-panel")).contain, isolation: getComputedStyle(panel.closest(".codex-ui-workspace-panel")).isolation },
       zoom: Number(panel.dataset.zoom), page: Number(panel.dataset.page), pageCount: Number(panel.dataset.pageCount),
       canvases: [...panel.querySelectorAll("canvas")].map(rect),
       painted: panel.querySelectorAll('[data-painted="true"]').length,
@@ -41,6 +42,7 @@ export async function assertCurrentPdfContract(page, scene) {
   assert.equal(state.viewport.height, compact ? 594 : 734);
   assert.ok(Math.abs(state.panel.width - (expanded ? 1180 : compact ? 344.671875 : 590.828125)) < 1, JSON.stringify(state));
   assert.deepEqual(state.headerStyle, { display: "grid", fontSize: "13px", fontWeight: "430" });
+  assert.deepEqual(state.composition, { panelPosition: "relative", containment: "layout paint", isolation: "isolate" });
   assert.equal(state.zoom, scene.frame.endsWith("-zoom-150") ? 150 : expanded ? 190 : compact ? 50 : 91);
   assert.equal(state.annotating, scene.frame.endsWith("-annotating"));
   assert.match(state.text, /Design specification/);

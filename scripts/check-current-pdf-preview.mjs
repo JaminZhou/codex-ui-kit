@@ -83,13 +83,18 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     record.sample.sha256, "The replay must use the observed synthetic PDF");
   const assets = JSON.parse(readFileSync(new URL("../research/current-pdf-assets.json", import.meta.url), "utf8"));
   for (const key of ["appVersion", "buildNumber", "appAsarSha256"]) assert.equal(assets.baseline[key], record.baseline[key]);
-  assert.deepEqual(assets.icons.map(icon => icon.id), ["previous", "next", "annotate", "chevron", "download", "annotating"]);
+  assert.deepEqual(assets.icons.map(icon => icon.id), ["previous", "next", "annotate", "chevron", "download", "annotating", "options"]);
   for (const { sha256, ...icon } of assets.icons) {
     assert.equal(createHash("sha256").update(JSON.stringify(icon)).digest("hex"), sha256, `PDF glyph integrity: ${icon.id}`);
     assert(icon.primitives.length > 0);
     assert(icon.primitives.every(primitive => primitive.tag === "path"));
   }
   assert.match(assets.ownership, /not part of the MIT npm package/);
-  assert.equal(assets.remainingApproximation.length, 1, "Keep the uncaptured native Preview icon explicit");
+  assert.equal(assets.remainingApproximation.length, 0);
+  assert.equal(assets.rasterAssets.length, 1);
+  const icon = assets.rasterAssets[0];
+  assert.equal(icon.path, "playgrounds/codex-app/src/assets/preview-app-16.png");
+  assert.equal(createHash("sha256").update(readFileSync(new URL(`../${icon.path}`, import.meta.url))).digest("hex"), icon.sha256);
+  assert.match(icon.ownership, /Apple.*not relicensed under MIT/);
   console.log("Current PDF product capture passed: 14 Renderer states; replay/pixel/native-window gates remain separate.");
 }

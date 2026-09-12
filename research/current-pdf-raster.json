@@ -120,8 +120,31 @@
     "electron": "43.2.0",
     "chromium": "150.0.7871.129",
     "compactBitmapChangedPixels": 0,
-    "ownedPanelPixelGate": "open",
-    "notes": "Identical decoded bitmap and matching measured rectangles do not prove matching composed pixels. The runtime engines differ; the compositor cause is not yet established."
+    "ownedPanelPixelGate": "pass",
+    "ownedPanelPixelComparison": {
+      "reference": "private current-build owned-panel crops",
+      "masks": [],
+      "maxRatio": 0.01,
+      "wide": {
+        "width": 590,
+        "height": 774,
+        "changedPixels": 705,
+        "ratio": 0.0015438181579293128
+      },
+      "compact": {
+        "width": 344,
+        "height": 634,
+        "changedPixels": 567,
+        "ratio": 0.002599772577213704
+      }
+    },
+    "composition": {
+      "pdfSectionPosition": "relative",
+      "workspaceContain": "layout paint",
+      "workspaceIsolation": "isolate",
+      "pageShadow": "0px 1px 2px -1px rgba(0, 0, 0, 0.08)"
+    },
+    "notes": "The decoded canvas remains pixel-identical before CSS composition. Matching the observed positioning and paint-isolation boundaries reduced the unmasked owned-panel comparison below the 1% ceiling on both sampled Renderer-emulation sizes. The project remains pinned to Electron 43.2.0; no engine upgrade or reference rewrite was used."
   },
   "cleanup": {
     "previewCount": 0,

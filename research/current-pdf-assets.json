@@ -8,9 +8,7 @@
   },
   "ownership": "App-only reference glyphs remain OpenAI property; private exploratory playground only, not part of the MIT npm package.",
   "source": "Trusted CDP, synthetic PDF toolbar, same current build as current-pdf-preview.json",
-  "remainingApproximation": [
-    "Native Preview application raster icon not captured; blank size-preserving slot, not pixel exact."
-  ],
+  "remainingApproximation": [],
   "icons": [
     {
       "id": "previous",
@@ -185,6 +183,46 @@
         }
       ],
       "sha256": "369532f448a661c85dd2527fd5a5baf952394c3b55e8559a7e481e6819ddf682"
+    },
+    {
+      "id": "options",
+      "sourceLabel": "Open options",
+      "viewBox": "0 0 20 21",
+      "renderSize": {
+        "width": 14,
+        "height": 14
+      },
+      "rootAttributes": {
+        "fill": "none"
+      },
+      "rootComputedStyle": {},
+      "primitives": [
+        {
+          "tag": "path",
+          "attributes": {
+            "d": "M15.2793 7.71101C15.539 7.45131 15.961 7.45131 16.2207 7.71101C16.4804 7.97071 16.4804 8.39272 16.2207 8.65242L10.4707 14.4024C10.211 14.6621 9.78902 14.6621 9.52932 14.4024L3.77932 8.65242L3.69436 8.54792C3.52385 8.28979 3.55205 7.93828 3.77932 7.71101C4.00659 7.48374 4.3581 7.45554 4.61623 7.62605L4.72073 7.71101L10 12.9903L15.2793 7.71101Z",
+            "fill": "currentColor",
+            "stroke": "currentColor",
+            "stroke-width": "0.6"
+          },
+          "computedStyle": {},
+          "children": []
+        }
+      ],
+      "sha256": "20a7eec553c7ef2b476a7dcd0db136e02dbd3a338616451dec56fe50295c4d6f"
+    }
+  ],
+  "rasterAssets": [
+    {
+      "id": "preview-app",
+      "source": "/System/Applications/Preview.app/Contents/Resources/AppIcon.icns",
+      "sourceSha256": "66c352424b84f4991cd0e2c30b7584aa5d529ab3ce536e4116f434f0639b9d47",
+      "extraction": "iconutil -c iconset; unmodified icon_16x16.png",
+      "width": 16,
+      "height": 16,
+      "path": "playgrounds/codex-app/src/assets/preview-app-16.png",
+      "sha256": "f1449bf01385e69119c699ce0eca876217c999c5bfec23d647eea8f99c5cafca",
+      "ownership": "Apple system application icon; private exploratory reference only, not relicensed under MIT and not distributed in the public npm package."
     }
   ]
 }

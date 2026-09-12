@@ -3,6 +3,7 @@ import { GlobalWorkerOptions, getDocument, TextLayer, type PDFDocumentProxy, typ
 import workerUrl from "pdfjs-dist/build/pdf.worker.mjs?url";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import sampleUrl from "../fixtures/documents/design-spec.pdf?url";
+import previewIcon from "./assets/preview-app-16.png";
 import pdfAssets from "../../../research/current-pdf-assets.json";
 import { VisualAssetIcon, type VisualAssetIconData } from "./VisualAssetIcon";
 
@@ -13,7 +14,6 @@ function pdfIcon(id: string) {
 }
 
 GlobalWorkerOptions.workerSrc = workerUrl;
-
 
 function PdfPage({ page, scale, onError }: { page: PDFPageProxy; scale: number; onError: (message: string) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,6 +82,8 @@ export function PdfWorkspacePreview({ initialZoom = "fit", initialAnnotating = f
     return () => observer.disconnect();
   }, []);
   const pageWidth = pages[0]?.getViewport({ scale: 1 }).width ?? 595.2756;
+  // The observed page box is integer-sized before deriving fit scale. Rounding
+  // only the bitmap would keep its dimensions but change PDF glyph positions.
   const scale = zoom === "fit" ? Math.max(.01, Math.floor(width - 48) / pageWidth) : zoom / 100;
   const syncCurrentPage = () => {
     const viewport = viewportRef.current;
@@ -100,7 +102,7 @@ export function PdfWorkspacePreview({ initialZoom = "fit", initialAnnotating = f
   };
   return <PdfPreviewPanel annotating={annotating} currentPage={currentPage} data-testid="current-pdf-preview"
     data-zoom={Math.round(scale * 100)} data-intent={intent} errorDescription={error}
-    icons={{ previous: pdfIcon("previous"), next: pdfIcon("next"), annotate: pdfIcon(annotating ? "annotating" : "annotate"), chevron: pdfIcon("chevron"), download: pdfIcon("download"), open: <span aria-hidden="true" className="demo-pdf-open-icon" /> }}
+    icons={{ previous: pdfIcon("previous"), next: pdfIcon("next"), annotate: pdfIcon(annotating ? "annotating" : "annotate"), chevron: pdfIcon("chevron"), options: pdfIcon("options"), download: pdfIcon("download"), open: <img alt="" className="demo-pdf-open-icon" src={previewIcon} /> }}
     onAnnotatingChange={setAnnotating} onDownload={() => setIntent("Replay: download requested")}
     onOpen={() => setIntent("Replay: external open requested")} onOpenOptions={() => setIntent("Replay: open options requested")}
     onPageChange={(page) => {

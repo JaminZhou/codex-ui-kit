@@ -3597,6 +3597,7 @@ export async function launchScene(
   {
     capture = true,
     environment = {},
+    executablePath = electronPath,
     layoutMode,
     nativeThemeSource,
     theme,
@@ -3608,7 +3609,7 @@ export async function launchScene(
   const resolvedTheme = theme ?? scene.theme ?? "dark";
   const app = await electron.launch({
     args: ["."],
-    executablePath: electronPath,
+    executablePath,
     env: {
       ...process.env,
       CODEX_UI_KIT_LIVE_HISTORY_PATH: join(tmpdir(), `ui-kit-history-${randomUUID()}.json`),
