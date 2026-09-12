@@ -1194,9 +1194,14 @@ permission prompts, and page-owned states remain open.
 The public package now supplies a controlled `DocumentPreviewPanel` shell for
 PDF, document, notebook, spreadsheet, and presentation previews. It covers
 ready/loading/empty/error semantics and explicit host-owned Open/Retry actions,
-but does not decode or embed files. `workspace.document-previews` is therefore
-promoted from `not_started` to implementation `partial`; runtime reachability,
-Browser/CDP, Electron, and installed-product pixels remain unsampled.
+but does not decode or embed files. The full-app playground now exposes a
+workspace artifact route with ready, loading, and error/retry states; three
+Browser/CDP frames, three Electron frames, and three reviewed pixel baselines
+gate that controlled route. `workspace.document-previews` remains runtime
+`not_sampled` and its Browser/Electron inventory statuses stay open because no
+installed-product preview route was reached. `workspace.artifact-shell` now
+shares the same public route evidence without claiming file decoding or
+artifact mutation.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

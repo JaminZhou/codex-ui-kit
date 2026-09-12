@@ -5402,6 +5402,94 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (
+      scene.view === "workspace" &&
+      scene.frame?.startsWith("workspace-document-preview")
+    ) {
+      await page.waitForTimeout(50);
+      const contract = await page.evaluate(() => {
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        const root = document.querySelector(".demo-root");
+        const panel = document.querySelector(
+          '[data-testid="document-preview-panel"]',
+        );
+        const title = panel?.querySelector(
+          ".codex-ui-document-preview__title",
+        );
+        const body = panel?.querySelector(
+          ".codex-ui-document-preview__body",
+        );
+        const page = panel?.querySelector(
+          ".demo-document-preview-page, .codex-ui-document-preview__page",
+        );
+        return {
+          ariaBusy: panel?.getAttribute("aria-busy"),
+          body: rect(body),
+          frame: root?.getAttribute("data-frame"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          kind: panel?.getAttribute("data-kind"),
+          panel: rect(panel),
+          page: rect(page),
+          retry: panel?.querySelector(
+            ".codex-ui-document-preview__retry",
+          )
+            ? true
+            : false,
+          status: panel?.getAttribute("data-status"),
+          title: title?.textContent?.trim(),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const expectedStatus = scene.frame.endsWith("-loading")
+        ? "loading"
+        : scene.frame.endsWith("-error")
+          ? "error"
+          : "ready";
+      const expectedCompact = scene.id.endsWith("-compact");
+      if (
+        contract.view !== undefined ||
+        contract.frame !== scene.frame ||
+        contract.horizontalOverflow > 1 ||
+        contract.status !== expectedStatus ||
+        contract.kind !== "pdf" ||
+        contract.title !== "design-spec.pdf" ||
+        !contract.panel ||
+        contract.panel.width < (expectedCompact ? 300 : 500) ||
+        !contract.body ||
+        (expectedStatus === "loading" && contract.ariaBusy !== "true") ||
+        (expectedStatus !== "loading" && contract.ariaBusy !== null) ||
+        (expectedStatus === "ready" && !contract.page) ||
+        (expectedStatus === "error" && !contract.retry)
+      ) {
+        throw new Error(
+          `${scene.id}: document preview contract failed: ${JSON.stringify(contract)}`,
+        );
+      }
+      if (expectedStatus === "error") {
+        await page.getByRole("button", { name: "Retry preview" }).click();
+        await page
+          .locator('[data-testid="document-preview-panel"][data-status="ready"]')
+          .waitFor();
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.view === "workspace") {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
