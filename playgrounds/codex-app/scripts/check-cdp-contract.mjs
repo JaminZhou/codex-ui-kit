@@ -9686,6 +9686,7 @@ for (const scene of selectedScenes) {
             ),
             scroller: {
               clientHeight: root.clientHeight,
+              clientWidth: root.clientWidth,
               rect: rect(root),
               scrollHeight: root.scrollHeight,
               scrollTop: root.scrollTop,
@@ -9715,6 +9716,17 @@ for (const scene of selectedScenes) {
           ? [79, 79, 58]
           : [79, 58, 79]
         : [79, 58, 58];
+      // Detail pages always scroll. On hosts with non-overlay scrollbars,
+      // clientWidth (rather than the outer scroller rect) is the product
+      // layout canvas. Keep both the fixed caps and the internal gutters.
+      const expectedHeaderWidth = Math.min(
+        736,
+        pluginDetail.scroller.clientWidth - 32,
+      );
+      const expectedSuggestionWidth = Math.min(
+        492.796875,
+        pluginDetail.scroller.clientWidth - 252,
+      );
       const closeTo = (actual, expected, tolerance = 1) =>
         typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
       if (
@@ -9730,7 +9742,7 @@ for (const scene of selectedScenes) {
           ? pluginDetail.scroller.scrollTop <= 0
           : pluginDetail.scroller.scrollTop !== 0) ||
         !pluginDetail.header ||
-        !closeTo(pluginDetail.header.width, compact ? 688 : 736) ||
+        !closeTo(pluginDetail.header.width, expectedHeaderWidth) ||
         !pluginDetail.artwork ||
         !closeTo(pluginDetail.artwork.width, 58) ||
         !pluginDetail.title ||
@@ -9741,7 +9753,7 @@ for (const scene of selectedScenes) {
         pluginDetail.suggestions.some(
           (suggestion, index) =>
             !suggestion ||
-            !closeTo(suggestion.width, compact ? 468.15625 : 492.796875) ||
+            !closeTo(suggestion.width, expectedSuggestionWidth) ||
             !closeTo(suggestion.height, expectedSuggestionHeights[index]),
         ) ||
         pluginDetail.appsCount !== (installed ? 2 : 1) ||
