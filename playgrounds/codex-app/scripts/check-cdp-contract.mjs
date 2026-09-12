@@ -15614,9 +15614,14 @@ for (const scene of selectedScenes) {
             "https://openai.com/codex/",
           ) ||
           !browserFailure.unsupportedError?.paragraph ||
+          !browserFailure.chromiumError?.paragraph ||
           Math.abs(
             browserFailure.unsupportedError.paragraph.left -
-              (compact ? 16 : 383.453125),
+              browserFailure.chromiumError.paragraph.left,
+          ) > 0.1 ||
+          Math.abs(
+            browserFailure.unsupportedError.paragraph.width -
+              browserFailure.chromiumError.paragraph.width,
           ) > 0.1 ||
           Math.abs(
             browserFailure.unsupportedError.paragraph.top -
