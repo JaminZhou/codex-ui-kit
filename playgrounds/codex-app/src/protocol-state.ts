@@ -28,6 +28,14 @@ export interface ProtocolApprovalResolution {
   responseDecision?: DemoApprovalResponseDecision;
 }
 
+export interface ProtocolMcpElicitationResolution {
+  action: "accept" | "decline" | "cancel";
+  content?: Record<string, unknown>;
+  kind: "mcp-elicitation-resolution";
+  requestId: number | string;
+  threadId: string;
+}
+
 export interface DemoMessage {
   attachments?: DemoMessageAttachment[];
   compaction?: "running" | "completed";
@@ -189,6 +197,19 @@ export interface DemoMcpToolCall {
   turnId: string | null;
 }
 
+export interface DemoMcpElicitation {
+  elicitationId?: string;
+  id: string;
+  message: string;
+  mode: "form" | "openai/form" | "openaiForm" | "url";
+  requestId: number | string;
+  requestedSchema?: Record<string, unknown>;
+  serverName: string;
+  threadId: string;
+  turnId: string | null;
+  url?: string;
+}
+
 export type DemoWebSearchAction =
   | "findInPage"
   | "openPage"
@@ -292,6 +313,7 @@ export interface DemoProtocolState {
   eventCount: number;
   fileChanges: DemoFileChange[];
   lastMethod: string | null;
+  mcpElicitations: DemoMcpElicitation[];
   mcpToolCalls: DemoMcpToolCall[];
   messages: DemoMessage[];
   plan: DemoTurnPlanStep[];
@@ -327,6 +349,7 @@ export const initialProtocolState: DemoProtocolState = {
   eventCount: 0,
   fileChanges: [],
   lastMethod: null,
+  mcpElicitations: [],
   mcpToolCalls: [],
   messages: [],
   plan: [],
@@ -1163,6 +1186,9 @@ export function hasActiveTurnWork(state: DemoProtocolState) {
         turnId === state.currentTurnId &&
         (status === "pending" || status === "running"),
     ) ||
+    state.mcpElicitations.some(
+      ({ turnId }) => turnId === state.currentTurnId,
+    ) ||
     state.webSearches.some(
       ({ status, turnId }) =>
         turnId === state.currentTurnId && status === "running",
@@ -1200,6 +1226,7 @@ export function reduceProtocolNotification(
   notification:
     | JsonRpcNotification
     | ProtocolApprovalResolution
+    | ProtocolMcpElicitationResolution
     | ProtocolEventRecord,
 ): DemoProtocolState {
   if (
@@ -1220,6 +1247,21 @@ export function reduceProtocolNotification(
                 notification.responseDecision ?? approval.responseDecision,
             }
           : approval,
+      ),
+      eventCount: state.eventCount + 1,
+    };
+  }
+
+  if (
+    "kind" in notification &&
+    notification.kind === "mcp-elicitation-resolution"
+  ) {
+    return {
+      ...state,
+      mcpElicitations: state.mcpElicitations.filter(
+        (request) =>
+          request.requestId !== notification.requestId ||
+          request.threadId !== notification.threadId,
       ),
       eventCount: state.eventCount + 1,
     };
@@ -1316,6 +1358,48 @@ export function reduceProtocolNotification(
         id: approvalTimelineId(requestId),
         kind: "approval",
       }),
+    };
+  }
+
+  if (
+    "kind" in notification &&
+    notification.kind === "request" &&
+    notification.method === "mcpServer/elicitation/request"
+  ) {
+    const requestId = notification.id;
+    const threadId = asString(params.threadId);
+    const serverName = asString(params.serverName);
+    const message = asString(params.message);
+    const mode = params.mode;
+    if (
+      requestId === undefined ||
+      !threadId ||
+      !serverName ||
+      !message ||
+      (mode !== "form" &&
+        mode !== "openai/form" &&
+        mode !== "openaiForm" &&
+        mode !== "url")
+    ) {
+      return next;
+    }
+    return {
+      ...next,
+      mcpElicitations: upsertById(state.mcpElicitations, {
+        elicitationId: asString(params.elicitationId) ?? undefined,
+        id: `mcp-elicitation:${String(requestId)}`,
+        message,
+        mode,
+        requestId,
+        requestedSchema: isRecord(params.requestedSchema)
+          ? params.requestedSchema
+          : undefined,
+        serverName,
+        threadId,
+        turnId: asString(params.turnId),
+        url: asString(params.url) ?? undefined,
+      }),
+      status: "running",
     };
   }
 
@@ -1993,6 +2077,9 @@ export function reduceProtocolNotification(
               ),
             }
           : approval,
+      ),
+      mcpElicitations: state.mcpElicitations.filter(
+        (request) => request.requestId !== requestId,
       ),
     };
   }

@@ -457,7 +457,8 @@
         "replay:current-26.903-mcp-search-three-calls-fetch-success-wide-compact",
         "browser-cdp:current-26.903-mcp-success-computed-style-and-geometry",
         "electron:current-26.903-mcp-success-summary-and-compact-lifecycle",
-        "pixel:current-26.903-mcp-success-wide-compact-and-sources-regions"
+        "pixel:current-26.903-mcp-success-wide-compact-and-sources-regions",
+        "playground:mcp-elicitation-form-accept-decline-cancel"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

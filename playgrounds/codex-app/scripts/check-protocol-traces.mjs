@@ -41,6 +41,15 @@ const fileApprovalResponseSchema = JSON.parse(
     "utf8",
   ),
 );
+const mcpElicitationResponseSchema = JSON.parse(
+  await readFile(
+    fileURLToPath(
+      import.meta.resolve(
+        "@jaminzhou/codex-app-server-client/schemas/McpServerElicitationRequestResponse.json",
+      ),
+    ),
+  ),
+);
 const notificationVariants =
   protocolSchema.definitions?.ServerNotification?.oneOf;
 if (!Array.isArray(notificationVariants)) {
@@ -101,6 +110,10 @@ const serverRequestResponseValidators = new Map([
   [
     "item/fileChange/requestApproval",
     ajv.compile(fileApprovalResponseSchema),
+  ],
+  [
+    "mcpServer/elicitation/request",
+    ajv.compile(mcpElicitationResponseSchema),
   ],
 ]);
 const itemStartedValidator = notificationValidator("item/started");

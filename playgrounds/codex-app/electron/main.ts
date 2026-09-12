@@ -31,6 +31,10 @@ import {
 } from "./attachment-dialog.js";
 import { LiveApprovalGate } from "./live-approval-gate.js";
 import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
+import {
+  LiveMcpElicitationGate,
+  type LiveMcpElicitationRequest,
+} from "./live-mcp-elicitation.js";
 import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
 import { LiveThreadRegistry } from "./live-thread-registry.js";
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
@@ -113,6 +117,7 @@ const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 const liveInputGate = new LiveUserInputGate();
+const liveMcpElicitationGate = new LiveMcpElicitationGate();
 let liveThreadRegistry: LiveThreadRegistry | null = null;
 function historyRegistry() {
   return liveThreadRegistry ??= new LiveThreadRegistry(
@@ -267,12 +272,14 @@ function broadcastNotification(notification: JsonRpcNotification) {
     const params = notification.params as { threadId?: unknown; turn?: { id?: unknown } } | undefined;
     if (typeof params?.threadId === "string" && typeof params.turn?.id === "string") {
       liveInputGate.clearTurn(params.threadId, params.turn.id);
+      liveMcpElicitationGate.clearTurn(params.threadId, params.turn.id);
     }
   }
   if (notification.method === "serverRequest/resolved") {
     const params = notification.params as { requestId?: unknown; threadId?: unknown } | undefined;
     if (params && (typeof params.requestId === "string" || typeof params.requestId === "number") && typeof params.threadId === "string") {
       liveInputGate.cancel(params.requestId, params.threadId);
+      liveMcpElicitationGate.cancel(params.requestId, params.threadId);
     }
   }
   const window = mainWindow;
@@ -287,6 +294,22 @@ function requestRendererInput(params: LiveInputRequest, requestId: number | stri
   const response = liveInputGate.request(requestId, params);
   window.webContents.send("demo:server-request", {
     id: requestId, kind: "request", method: "item/tool/requestUserInput", params,
+  });
+  return response;
+}
+
+function requestRendererMcpElicitation(
+  params: LiveMcpElicitationRequest,
+  requestId: number | string,
+) {
+  const window = mainWindow;
+  if (!window || window.isDestroyed()) return Promise.resolve({ _meta: null, action: "cancel" as const, content: null });
+  const response = liveMcpElicitationGate.request(requestId, params);
+  window.webContents.send("demo:server-request", {
+    id: requestId,
+    kind: "request",
+    method: "mcpServer/elicitation/request",
+    params,
   });
   return response;
 }
@@ -358,6 +381,10 @@ async function ensureClient() {
   unsubscribeServerRequests = [
     client.onServerRequest("item/tool/requestUserInput", (params, request) =>
       requestRendererInput({ ...params, isBlocking: params.isBlocking ?? true }, request.id)),
+    client.onServerRequest(
+      "mcpServer/elicitation/request",
+      (params, request) => requestRendererMcpElicitation(params, request.id),
+    ),
     client.onServerRequest(
       "item/commandExecution/requestApproval",
       (params, request) =>
@@ -452,6 +479,7 @@ async function startLive(
 async function stopLive() {
   if (!activeTurn) return;
   liveApprovalGate.declineAll();
+  liveMcpElicitationGate.clear();
   const stoppingThreadId = activeTurnThreadId;
   const stoppingTurnId = activeTurn.id;
   await activeTurn.interrupt();
@@ -492,6 +520,7 @@ async function closeTerminals() {
 
 async function closeLive() {
   liveInputGate.clear();
+  liveMcpElicitationGate.clear();
   activeTurn = null;
   activeTurnThreadId = null;
   liveSession.clear();
@@ -1073,6 +1102,22 @@ ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {
   if (!liveInputGate.respond(input.requestId, input.threadId, input.answers)) {
     throw new Error("The question is no longer pending.");
   }
+});
+ipcMain.handle("demo:mcp-elicitation:respond", (event, rawInput: unknown) => {
+  assertTrustedIpc(event);
+  if (!rawInput || typeof rawInput !== "object") throw new TypeError("Invalid MCP elicitation response.");
+  const input = rawInput as { requestId?: unknown; threadId?: unknown; action?: unknown; content?: unknown };
+  if (
+    (typeof input.requestId !== "string" && typeof input.requestId !== "number") ||
+    typeof input.threadId !== "string" ||
+    !["accept", "decline", "cancel"].includes(input.action as string)
+  ) throw new TypeError("A request, owning thread, and valid action are required.");
+  if (!liveMcpElicitationGate.respond(
+    input.requestId,
+    input.threadId,
+    input.action as "accept" | "decline" | "cancel",
+    input.content,
+  )) throw new Error("The MCP elicitation is no longer pending.");
 });
 ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:terminal:start", async (event, input) => {

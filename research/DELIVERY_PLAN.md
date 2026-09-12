@@ -366,7 +366,13 @@ exit gates; it does not replace the inventory.
   This is one same-turn recovery observation, not a universal automatic-retry
   rule. Authentication, approval, elicitation, cancellation, and other MCP
   transitions remain open, and native references remain local-only. The
-  current citations follow-up separately
+  playground now adds an isolated public-protocol MCP elicitation form with
+  typed string/enum/boolean fields, explicit Accept/Decline/Cancel responses,
+  thread ownership, deterministic replay, and a real Electron responsive
+  contract. It is own-playground App Server evidence only; it does not promote
+  installed-product elicitation or current-build pixel parity. Authentication,
+  approval, and cancellation therefore remain open product work.
+  The current citations follow-up separately
   reaches three real inline OpenAI citations and the five-query Web Search
   Sources workspace. Six wide/compact replay frames pass Browser/CDP,
   Electron, reviewed pixels, and optional local-only product regions; the

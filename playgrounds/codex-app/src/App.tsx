@@ -211,6 +211,11 @@ import { changeStats, reviewContent } from "./diff-lines";
 import { initialLiveProjectState, liveProjectState, reduceLiveProjectState } from "./live-project-state";
 import { reduceLiveInputs } from "./live-input-state";
 import { LiveUserInput } from "./LiveUserInput";
+import { LiveMcpElicitation } from "./LiveMcpElicitation";
+import {
+  reduceLiveMcpElicitations,
+  type PendingMcpElicitation,
+} from "./live-mcp-elicitation-state";
 import { LiveThreadList } from "./LiveThreadList";
 import { LiveCommitPreview } from "./LiveCommitPreview";
 import { LivePushPreview } from "./LivePushPreview";
@@ -3213,6 +3218,10 @@ export function App() {
   );
   const [replayCount, setReplayCount] = useState(initialCount);
   const [liveInputs, dispatchLiveInput] = useReducer(reduceLiveInputs, []);
+  const [liveMcpElicitations, dispatchLiveMcpElicitation] = useReducer(
+    reduceLiveMcpElicitations,
+    [] as PendingMcpElicitation[],
+  );
   const [liveHistoryLoading, setLiveHistoryLoading] = useState(false);
   const liveHistoryReadId = useRef(0);
   const [liveProjects, dispatchLive] = useReducer(
@@ -4031,6 +4040,13 @@ export function App() {
       decision: "approved" | "rejected";
       requestId: number | string;
     } | null>(null);
+  const [replayMcpElicitationResolution, setReplayMcpElicitationResolution] =
+    useState<{
+      action: "accept" | "decline" | "cancel";
+      content?: Record<string, unknown>;
+      requestId: number | string;
+      threadId: string;
+    } | null>(null);
   const [replaySessionApprovalScope, setReplaySessionApprovalScope] = useState<
     "once" | "session" | null
   >(
@@ -4431,12 +4447,18 @@ export function App() {
             kind: "approval-resolution",
           })
         : lifecycleReplay;
+      const resolvedMcp = replayMcpElicitationResolution
+        ? reduceProtocolNotification(resolvedReplay, {
+            ...replayMcpElicitationResolution,
+            kind: "mcp-elicitation-resolution",
+          })
+        : resolvedReplay;
       if (
         scenarioId === "approval-denied" &&
         replayApprovalResolution?.decision === "approved"
       ) {
         return settleApprovedCommandReplay(
-          resolvedReplay,
+          resolvedMcp,
           replayApprovalResolution.requestId,
           {
             durationMs: 23_000,
@@ -4452,19 +4474,29 @@ export function App() {
         replayApprovalResolution?.decision === "rejected"
       ) {
         return settleRejectedFileReplay(
-          resolvedReplay,
+          resolvedMcp,
           replayApprovalResolution.requestId,
         );
       }
-      return resolvedReplay;
+      return resolvedMcp;
     },
     [
       lifecycleReplay,
       liveState,
       mode,
       replayApprovalResolution,
+      replayMcpElicitationResolution,
     ],
   );
+  const visibleMcpElicitations =
+    mode === "live"
+      ? liveMcpElicitations.filter(
+          (request) => request.threadId === liveState.threadId,
+        )
+      : state.mcpElicitations;
+  const hasLiveInputRequests =
+    mode === "live" &&
+    liveInputs.some((request) => request.threadId === liveState.threadId);
   const isCurrentApprovalReplay =
     mode === "replay" &&
     (scenarioId === "approval-allow-once" ||
@@ -4762,14 +4794,17 @@ export function App() {
     const removeLiveSession = window.codexDemo.onLiveSession((event) => {
       dispatchLive(event);
       dispatchLiveInput(event);
+      dispatchLiveMcpElicitation(event);
     });
     const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
       dispatchLiveInput(notification);
+      dispatchLiveMcpElicitation(notification);
     });
     const removeServerRequest = window.codexDemo.onServerRequest((request) => {
       dispatchLive(request);
       dispatchLiveInput(request);
+      dispatchLiveMcpElicitation(request);
     });
     return () => {
       removeNotification();
@@ -8445,6 +8480,10 @@ export function App() {
         steps={state.plan}
       />
     ) : null;
+  const hasAboveComposerContent =
+    Boolean(composerPlanProgress) ||
+    hasLiveInputRequests ||
+    visibleMcpElicitations.length > 0;
   const skillTryNowComposer = (
     <form
       aria-label="OpenAI Docs skill draft"
@@ -16435,16 +16474,36 @@ export function App() {
         ) : (
           <>
             <ConversationThreadShell
-              aboveComposer={mode === "live" && liveInputs.some((request) => request.threadId === liveState.threadId) ? <>
+              aboveComposer={hasAboveComposerContent ? <>
                 {composerPlanProgress}
-                {mode === "live" && liveInputs.filter((request) => request.threadId === liveState.threadId).map((request) => (
+                {hasLiveInputRequests && liveInputs.filter((request) => request.threadId === liveState.threadId).map((request) => (
                   <LiveUserInput key={`${request.threadId}:${typeof request.requestId}:${request.requestId}`} request={request} onSubmit={async (answers) => {
                     if (!window.codexDemo) throw new Error("Live host unavailable.");
                     await window.codexDemo.respondToUserInput({ requestId: request.requestId, threadId: request.threadId, answers });
                     dispatchLiveInput({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
                   }} />
                 ))}
-              </> : composerPlanProgress}
+                {visibleMcpElicitations.map((request) => (
+                  <LiveMcpElicitation
+                    key={`${request.threadId}:${typeof request.requestId}:${request.requestId}`}
+                    request={request}
+                    onSubmit={async (action, content) => {
+                      if (mode === "live") {
+                        if (!window.codexDemo) throw new Error("Live host unavailable.");
+                        await window.codexDemo.respondToMcpElicitation({
+                          action,
+                          content,
+                          requestId: request.requestId,
+                          threadId: request.threadId,
+                        });
+                        dispatchLiveMcpElicitation({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
+                      } else {
+                        setReplayMcpElicitationResolution({ action, content, requestId: request.requestId, threadId: request.threadId });
+                      }
+                    }}
+                  />
+                ))}
+              </> : undefined}
               composer={composer}
               floatingControl={floatingControl}
               header={header}

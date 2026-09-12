@@ -46,6 +46,7 @@ import mcpCurrent26820SuccessTrace from "../fixtures/traces/mcp-current-26-820-s
 import mcpCurrent26825LifecycleTrace from "../fixtures/traces/mcp-current-26-825-lifecycle.jsonl?raw";
 import mcpCurrent26903RecoveryTrace from "../fixtures/traces/mcp-current-26-903-recovery.jsonl?raw";
 import mcpCurrent26903SuccessTrace from "../fixtures/traces/mcp-current-26-903-success.jsonl?raw";
+import mcpElicitationTrace from "../fixtures/traces/mcp-elicitation.jsonl?raw";
 import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
 import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
@@ -63,6 +64,7 @@ import workflowTrace from "../fixtures/traces/workspace-workflow.jsonl?raw";
 import type { ProtocolEventRecord } from "./protocol-state";
 
 export type ReplayScenarioId =
+  | "mcp-elicitation"
   | "approval-allow-once"
   | "approval-current-26-820-file"
   | "approval-current-26-825-file"
@@ -202,6 +204,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Conversation and Composer lifecycle",
     "Long-thread navigation, follow recovery, Composer growth, queueing, interruption, automatic continuation, and legacy paused-queue compatibility.",
     conversationLifecycleTrace,
+  ),
+  "mcp-elicitation": scenario(
+    "mcp-elicitation",
+    "MCP elicitation form",
+    "An MCP server requests a typed project form before continuing; the client can accept, decline, or cancel without leaking answers into transcript history.",
+    mcpElicitationTrace,
   ),
   "current-attachment-26-825": scenario(
     "current-attachment-26-825",
