@@ -14671,6 +14671,21 @@ for (const scene of selectedScenes) {
         );
       }
       if (
+        scene.id === "current-sidebar-collection-error" &&
+        (collection.fixture !== "error" ||
+          collection.state !== "error" ||
+          collection.role !== "alert" ||
+          collection.text !== "Could not load chats" ||
+          collection.stateStyle?.fontSize !== "14px" ||
+          collection.stateStyle?.lineHeight !== "21px" ||
+          collection.stateStyle?.opacity !== "0.5" ||
+          collection.stateStyle?.padding !== "4px 32px")
+      ) {
+        throw new Error(
+          `${scene.id}: current error collection contract failed: ${JSON.stringify(collection)}`,
+        );
+      }
+      if (
         scene.id === "current-sidebar-collection-long-list" &&
         (collection.fixture !== "long-list" ||
           collection.itemCount !== 5 ||

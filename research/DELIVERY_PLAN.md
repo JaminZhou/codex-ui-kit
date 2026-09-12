@@ -828,9 +828,13 @@ project row as the shared spinner visual and replaces the older reversible
 long-list replay with the live one-way `Show more` lifecycle. The current
 worktree follow-ups re-observe a real empty collection and the complete sampled
 loading → controlled failure → failed-plus-unread → Retry → restored boundary.
-Remaining Stage 1 work includes re-observing ordinary error and collection
-loading, plus broader route lifecycle feedback and unsampled notification
-tones. Previous 26.820 Projects → Back → Forward now preserves the product
+The playground now also exposes a deterministic `collection-error` replay with
+the same `role="alert"`, copy, typography, and compact geometry as the shared
+collection state component. This closes the implementation/acceptance gap for
+the failed collection branch without promoting a synthetic failure to current
+installed-product evidence. Remaining Stage 1 work includes re-observing
+ordinary error and collection loading on the installed build, plus broader
+route lifecycle feedback and unsampled notification tones. Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
 independent Browser/Electron route stack additionally preserves a selected
 project chat through Back/Forward, closing the previous selection-continuity

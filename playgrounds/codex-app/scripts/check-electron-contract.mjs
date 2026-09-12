@@ -2277,6 +2277,13 @@ for (const collectionScene of [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "electron-current-sidebar-collection-error",
+    scenario: "streaming-recovery",
+    sidebarState: "collection-error",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "electron-current-sidebar-collection-long-list",
     scenario: "streaming-recovery",
     sidebarSectionKind: "threads",
@@ -2360,6 +2367,22 @@ for (const collectionScene of [
     ) {
       throw new Error(
         `${collectionScene.id}: Electron loading collection drifted: ${JSON.stringify(collection)}`,
+      );
+    }
+    if (
+      collectionScene.sidebarState === "collection-error" &&
+      (collection.fixture !== "error" ||
+        collection.state !== "error" ||
+        collection.role !== "alert" ||
+        collection.text !== "Could not load chats" ||
+        collection.height !== 29 ||
+        collection.style.fontSize !== "14px" ||
+        collection.style.lineHeight !== "21px" ||
+        collection.style.opacity !== "0.5" ||
+        collection.style.padding !== "4px 32px")
+    ) {
+      throw new Error(
+        `${collectionScene.id}: Electron error collection drifted: ${JSON.stringify(collection)}`,
       );
     }
     if (collectionScene.sidebarState === "collection-long-list") {

@@ -1617,7 +1617,7 @@ CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_ERROR_REFERENCE=/absolute/path/to/current-
 CODEX_UI_KIT_CURRENT_SIDEBAR_WORKTREE_RESTORED_REFERENCE=/absolute/path/to/current-sidebar-worktree-restored-row.png \
 CODEX_UI_KIT_CURRENT_SIDEBAR_EMPTY_COLLECTION_REFERENCE=/absolute/path/to/current-sidebar-empty-140x29.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=current-sidebar-recents,current-sidebar-status-lifecycle,current-sidebar-collection-empty,current-sidebar-collection-loading,current-sidebar-collection-long-list
+  --scenes=current-sidebar-recents,current-sidebar-status-lifecycle,current-sidebar-collection-empty,current-sidebar-collection-loading,current-sidebar-collection-error,current-sidebar-collection-long-list
 ```
 
 The `26.820.60940` ordinary-row refresh uses current 28×30 active/unread and

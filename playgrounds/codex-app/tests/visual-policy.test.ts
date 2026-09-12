@@ -361,6 +361,7 @@ describe("lifecycle visual policy", () => {
       "current-sidebar-status-lifecycle",
       "current-sidebar-collection-empty",
       "current-sidebar-collection-loading",
+      "current-sidebar-collection-error",
       "current-sidebar-collection-long-list",
     ]) {
       expect(electronHarness).toContain(`id: "${scene}"`);
@@ -372,6 +373,9 @@ describe("lifecycle visual policy", () => {
       'scene.id === "current-sidebar-collection-loading"',
     );
     expect(cdpContract).toContain(
+      'scene.id === "current-sidebar-collection-error"',
+    );
+    expect(cdpContract).toContain(
       'scene.id === "current-sidebar-collection-long-list"',
     );
     expect(electronContract).toContain(
@@ -379,6 +383,9 @@ describe("lifecycle visual policy", () => {
     );
     expect(electronContract).toContain(
       'id: "electron-current-sidebar-collection-loading"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-sidebar-collection-error"',
     );
     expect(electronContract).toContain(
       'id: "electron-current-sidebar-collection-long-list"',
