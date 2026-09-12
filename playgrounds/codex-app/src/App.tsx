@@ -87,6 +87,7 @@ import {
   ScheduledTaskFilterTabs,
   ScheduledTaskNavigator,
   ScheduledTasksPage,
+  SitesIndexPage,
   SourceActivityList,
   SourceSearchActivity,
   SettingsShell,
@@ -157,6 +158,8 @@ import {
   type ScheduledTaskItem,
   type ScheduledTaskPageStatus,
   type ScheduledTaskSuggestion,
+  type SiteIndexItem,
+  type SitesIndexStatus,
   type SubagentItem,
   type WorktreeSetupPhase,
   type WorktreeSettingsValue,
@@ -734,9 +737,11 @@ function querySelection() {
         ? "plugins"
       : params.get("view") === "projects"
         ? "projects"
-        : params.get("view") === "shell"
-          ? "shell"
-          : params.get("view") === "workspace"
+      : params.get("view") === "shell"
+        ? "shell"
+        : params.get("view") === "sites"
+          ? "sites"
+        : params.get("view") === "workspace"
             ? "workspace"
             : "conversation";
   const theme = resolveDemoThemePreference(params.get("theme"), view);
@@ -2991,6 +2996,27 @@ const currentScheduledSuggestions: readonly ScheduledTaskSuggestion[] = [
   },
 ];
 
+const currentSites: readonly SiteIndexItem[] = [
+  {
+    description: "A controlled Playground fixture for product briefs",
+    id: "product-brief",
+    lastUpdated: "Updated today",
+    leading: <CurrentBuildIcon name="sidebar-sites" />,
+    name: "Product brief",
+    sharing: "Shared",
+    url: "brief.example",
+  },
+  {
+    description: "A controlled Playground fixture for launch notes",
+    id: "launch-notes",
+    lastUpdated: "Updated yesterday",
+    leading: <CurrentBuildIcon name="sidebar-sites" />,
+    name: "Launch notes",
+    sharing: "Private",
+    url: "notes.example",
+  },
+];
+
 const currentScheduledTimeOptions = Array.from({ length: 96 }, (_, index) => {
   const hour = Math.floor(index / 4);
   const minute = (index % 4) * 15;
@@ -3192,6 +3218,17 @@ export function App() {
     runsIn: "existing-chat",
     runsOn: "device",
   });
+  const [sitesQuery, setSitesQuery] = useState(
+    initialSelection.frame?.includes("sites-empty") ? "missing" : "",
+  );
+  const [sitesStatus, setSitesStatus] = useState<SitesIndexStatus>(
+    initialSelection.frame?.includes("sites-unavailable")
+      ? "unavailable"
+      : initialSelection.frame?.includes("sites-error")
+        ? "error"
+        : "ready",
+  );
+  const [sitesAction, setSitesAction] = useState("");
   const [mcpServers, setMcpServers] = useState(initialMcpServers);
   const [mcpQuery, setMcpQuery] = useState(
     initialSelection.frame?.endsWith("-empty") ? "no-match-26-825" : "",
@@ -6382,7 +6419,14 @@ export function App() {
           >
             Pull requests
           </AppSidebarItem>
-          <AppSidebarItem leading={<SidebarGlyph name="sites" />}>
+          <AppSidebarItem
+            leading={<SidebarGlyph name="sites" />}
+            onClick={() => {
+              setView("sites");
+              dismissSidebarAfterNavigation();
+            }}
+            selected={view === "sites"}
+          >
             Sites
           </AppSidebarItem>
           <AppSidebarItem
@@ -11131,6 +11175,36 @@ export function App() {
     />
   );
 
+  const sitesRoute = (
+    <SitesIndexPage
+      className="demo-current-sites-route"
+      data-action={sitesAction || undefined}
+      data-testid="current-sites-route"
+      items={currentSites}
+      onCreate={() => setSitesAction("create")}
+      onOpen={(site) => setSitesAction(`open:${site.id}`)}
+      onOverflowAction={(site, action) =>
+        setSitesAction(`${action}:${site.id}`)
+      }
+      onQueryChange={setSitesQuery}
+      onRefresh={() => setSitesAction("refresh")}
+      onRetry={() => {
+        setSitesAction("retry");
+        setSitesStatus("ready");
+      }}
+      onShare={(site) => setSitesAction(`share:${site.id}`)}
+      query={sitesQuery}
+      status={sitesStatus}
+      statusDescription={
+        sitesStatus === "unavailable"
+          ? "Sites are unavailable for this controlled Playground session."
+          : sitesStatus === "error"
+            ? "The controlled site index did not load."
+            : undefined
+      }
+    />
+  );
+
   const currentPluginDetailTitle = pluginDetailInstalled ? "GitHub" : "Gmail";
   const pluginDetailRoute = (
     <PluginDetailPage
@@ -15798,6 +15872,7 @@ export function App() {
                 currentContext26825Replay ||
                 currentTerminal26825Frame(activeFrame) ||
                 view === "automations" ||
+                view === "sites" ||
                 isCurrentRichMarkdownStreamingReplay ||
                 usesCurrent26825ThreadHeader ||
                 isCurrentCitations26825Replay ||
@@ -15822,6 +15897,7 @@ export function App() {
           view === "projects" ||
           view === "automations" ||
           view === "plugins" ||
+          view === "sites" ||
           view === "shell" ||
           view === "workspace" ? (
             view === "workspace" && workspaceShowsSettings ? null : (
@@ -15982,6 +16058,8 @@ export function App() {
           projectsRoute
         ) : view === "automations" ? (
           scheduledTasksRoute
+        ) : view === "sites" ? (
+          sitesRoute
         ) : view === "plugins" ? (
           pluginDetailOpen ? (
             pluginDetailRoute

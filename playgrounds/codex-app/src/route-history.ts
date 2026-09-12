@@ -5,6 +5,7 @@ export type DemoView =
   | "plugins"
   | "pull-request"
   | "shell"
+  | "sites"
   | "workspace";
 
 export interface DemoRouteHistory {

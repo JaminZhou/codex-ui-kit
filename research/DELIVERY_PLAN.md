@@ -1144,6 +1144,17 @@ limit. This delivers one read-only end-to-end `integrations.mcp` slice while
 keeping real save/toggle/uninstall, OAuth/permission, and failure effects open;
 Stage 4 therefore remains in progress.
 
+The Sites index slice adds a controlled `SitesIndexPage` for the older
+runtime-observed search, refresh, create, share, and overflow affordances.
+The replay fixture covers two site rows plus loading, empty, unavailable, and
+retry states at 1180px and 720px. Its Browser/Electron contract checks each
+host callback, requires every compact row action to remain inside the visible
+route boundary, and repeats the two own-fixture screenshots with zero pixel
+drift. This is deliberately only `partial_legacy`: the only runtime evidence
+is the older `26.715.72359` observation, the fixture is our own, and it does
+not invoke an installed Codex Sites list, creation, sharing, or removal flow.
+Stage 4 therefore remains in progress.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 
