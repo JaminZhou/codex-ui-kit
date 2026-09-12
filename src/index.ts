@@ -18,6 +18,7 @@ export * from "./components/McpSettings.js";
 export * from "./components/PluginDetail.js";
 export * from "./components/SkillDetail.js";
 export * from "./components/ScheduledTasks.js";
+export * from "./components/SitesIndex.js";
 export * from "./components/BranchCreationDialog.js";
 export * from "./components/CommandExecution.js";
 export * from "./components/Dialog.js";

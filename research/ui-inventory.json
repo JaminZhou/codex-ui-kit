@@ -1456,15 +1456,19 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": [
-        "app-main"
+        "app-main",
+        "sites-index-page",
+        "playground:sites-index-controlled-replay",
+        "electron:sites-index-search-refresh-create-share-overflow-and-unavailable-retry",
+        "pixel:sites-index-own-fixture-1180-720-zero-drift-visible-actions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:sites-index-search-refresh-create-actions"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {

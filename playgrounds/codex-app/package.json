@@ -20,6 +20,7 @@
     "check:electron": "node scripts/check-electron-contract.mjs",
     "check:live-policy": "node scripts/check-live-policy.mjs",
     "check:live-environment-status": "node scripts/check-live-environment-status.mjs",
+    "check:sites-index": "node scripts/check-sites-index.mjs",
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
     "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
     "check:live-approval": "node scripts/check-live-approval.mjs",
@@ -39,7 +40,7 @@
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
-  "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-environment-status && pnpm check:live-file-content && pnpm check:user-input && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:pr-cleanup && pnpm check:live-pr-route && pnpm check:cdp && pnpm check:electron && pnpm check:visual",
+    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-environment-status && pnpm check:sites-index && pnpm check:live-file-content && pnpm check:user-input && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:pr-cleanup && pnpm check:live-pr-route && pnpm check:cdp && pnpm check:electron && pnpm check:visual",
     "check:all": "pnpm check && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {
