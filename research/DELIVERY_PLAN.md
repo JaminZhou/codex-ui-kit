@@ -27,7 +27,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 14 groups have current-build runtime evidence, 69 have previous-build-only
+- 15 groups have current-build runtime evidence, 68 have previous-build-only
   runtime evidence, and 8 have not been sampled. Browser/Electron verified
   statuses are intentionally downgraded until the affected slices are
   re-observed on 26.903; their older gates remain regression fixtures.
@@ -36,6 +36,13 @@ exit gates; it does not replace the inventory.
   selection, wide/compact preview and pixels, focus-preserving removal, exact
   completion, and sent-media ownership. Upload failure/progress and plugin
   variants remain open.
+- A current-build `26.903.71938` isolated approval probe now records the real
+  external-file denial boundary: the contents-specific `Edit files` card,
+  `Deny`/`Allow once` actions, and the exact no-write response after denial.
+  The deterministic replay is covered at wide and compact sizes by Browser/CDP
+  and Electron contracts and is intentionally not treated as product-pixel
+  promotion. Allow, command/directory, session-lifetime, automatic-review,
+  and other approval variants remain open.
 - The current subagent refresh promotes `thread.subagent-delegation` and
   `thread.subagent-collaboration` from previous-build presentation evidence to
   `26.825.51511`. Three real tasks lock the active inline chip, completed-chip

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appVersion": "26.903.71938",
+    "buildNumber": "8576",
+    "chromiumVersion": "152.0.7977.83",
+    "appAsarSha256": "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
+    "theme": "dark"
+  },
+  "captureKind": "isolated_renderer_live_disposable_denied",
+  "capturedOn": "2026-09-13",
+  "isolation": {
+    "cdpAddress": "127.0.0.1:9941",
+    "mainCodexProcessPreserved": true,
+    "mutationsSubmitted": true,
+    "mutationScope": "one disposable no-project task; approval denied; target remained absent",
+    "profileKind": "unique-private-tmp-profile",
+    "rawScreenshots": "local-only-and-removed",
+    "profileAfterCapture": "removed"
+  },
+  "request": {
+    "method": "item/fileChange/requestApproval",
+    "actionLabels": ["Deny", "Allow once"],
+    "heading": "Allow ChatGPT to edit the contents of approval-proof.txt?",
+    "identity": "Edit files",
+    "description": "创建用户指定的 approval-proof.txt 文件",
+    "assistantDeniedCopy": "无法创建：文件写入批准未被授予，apply_patch 被系统拦截。",
+    "targetPath": "/private/tmp/isolated/approval-proof.txt",
+    "filePresentAfterDeny": false,
+    "pathBoundary": "exact isolated disposable target only"
+  },
+  "evidenceBoundary": [
+    "This record promotes only the denied external-file approval path.",
+    "It does not establish Allow once, Allow all edits, command, directory, session-lifetime, automatic-review, authentication, MCP approval, or current-product pixel parity.",
+    "Raw screenshots, account/project/task data, and the temporary profile are not committed."
+  ]
+}

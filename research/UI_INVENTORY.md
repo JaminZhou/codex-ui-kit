@@ -80,7 +80,14 @@ observation from a previous build remains historical evidence.
   with optional local-only product-region differences of 5.9622%, 4.1367%, and
   3.7687% under independent 6.5%, 5%, and 5% ceilings. Native references stay
   local-only; authentication, approval, cancellation, and other MCP
-  transitions remain open. The previous activity follow-up first re-observed
+  transitions remain open. A separate current 26.903 external-file approval
+  denial probe records the contents-specific `Edit files` card, exact
+  `Deny`/`Allow once` actions, and the absent-file boundary after denial
+  (`cdp-26.903.71938:real-external-file-approval-denied-no-write`). Its replay
+  is Browser/CDP and Electron verified; allow, command/directory,
+  session-lifetime, automatic-review, and product-pixel approval evidence
+  remain open. Native screenshots and the disposable profile are local-only.
+  The previous activity follow-up first re-observed
   the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
@@ -282,7 +289,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 14 have current-build runtime evidence, 69 have previous-build-only runtime evidence, 8 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
+Current inventory: 91 surface groups; 15 have current-build runtime evidence, 68 have previous-build-only runtime evidence, 8 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

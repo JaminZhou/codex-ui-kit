@@ -4502,6 +4502,7 @@ export function App() {
     (scenarioId === "approval-allow-once" ||
       scenarioId === "approval-current-26-820-file" ||
       scenarioId === "approval-current-26-825-file" ||
+      scenarioId === "approval-current-26-903-file" ||
       scenarioId === "approval-denied" ||
       scenarioId === "approval-similar-commands" ||
       scenarioId === "approval-for-session");
@@ -4511,6 +4512,9 @@ export function App() {
   const isCurrentApproval26825FileReplay =
     mode === "replay" &&
     scenarioId === "approval-current-26-825-file";
+  const isCurrentApproval26903FileReplay =
+    mode === "replay" &&
+    scenarioId === "approval-current-26-903-file";
   const isCurrentApprovalSimilarReplay =
     mode === "replay" && scenarioId === "approval-similar-commands";
   const isCurrentApprovalSessionReplay =
@@ -4562,6 +4566,7 @@ export function App() {
   const usesCurrent26825ThreadHeader =
     isCurrentBasic26825Replay ||
     isCurrentApproval26825FileReplay ||
+    isCurrentApproval26903FileReplay ||
     isCurrentAttachment26825Replay;
   const isAnyCurrentBasicMessageReplay =
     isCurrentBasicMessageReplay || isCurrentBasic26825Replay;
@@ -5388,9 +5393,14 @@ export function App() {
       if (isCurrentApprovalReplay) {
         if (
           isCurrentApproval26820FileReplay ||
-          isCurrentApproval26825FileReplay
+          isCurrentApproval26825FileReplay ||
+          isCurrentApproval26903FileReplay
         ) {
-          const build = isCurrentApproval26825FileReplay ? "26-825" : "26-820";
+          const build = isCurrentApproval26903FileReplay
+            ? "26-903"
+            : isCurrentApproval26825FileReplay
+              ? "26-825"
+              : "26-820";
           const nextFrame =
             decision === "decline"
               ? `approval-current-${build}-file-denied`
@@ -7678,6 +7688,7 @@ export function App() {
         isCurrentMcp26825Replay ||
         isCurrentMcp26903Replay ||
         isCurrentApproval26825FileReplay ||
+        isCurrentApproval26903FileReplay ||
         isCurrentAttachment26825Replay ? (
           <div className="demo-current-mcp-26-825-header-navigation">
             <button
@@ -7864,6 +7875,7 @@ export function App() {
                     isCurrentMcp26903Replay ||
                     isCurrentCitations26825Replay ||
                     isCurrentApproval26825FileReplay ||
+                    isCurrentApproval26903FileReplay ||
                     isCurrentAttachment26825Replay
                       ? scenario.label
                       : "Reply with CURRENT BASIC MESSAGE"}
@@ -7903,6 +7915,7 @@ export function App() {
       scenarioId === "attachment-lifecycle" ||
       scenarioId === "approval-current-26-820-file" ||
       scenarioId === "approval-current-26-825-file" ||
+      scenarioId === "approval-current-26-903-file" ||
       scenarioId === "approval-allow-once" ||
       scenarioId === "approval-denied" ||
       scenarioId === "approval-similar-commands" ||
@@ -8523,7 +8536,9 @@ export function App() {
     : undefined;
   const currentPendingApprovalFilePath =
     currentPendingApproval?.command ??
-    (isCurrentApproval26825FileReplay
+    (isCurrentApproval26903FileReplay
+      ? "/private/tmp/isolated/approval-proof.txt"
+      : isCurrentApproval26825FileReplay
       ? "/Users/demo-user/Desktop/codex-ui-kit-26-825-approval-probe-pending.txt"
       : "/Users/demo/Desktop/codex-ui-kit-26-820-approval-file.txt");
   const currentPendingApprovalFileName =
@@ -8540,14 +8555,16 @@ export function App() {
       }
       autoFocus={false}
       className={
-        isCurrentApproval26825FileReplay
+        isCurrentApproval26903FileReplay
+          ? "demo-current-26-903-file-approval"
+          : isCurrentApproval26825FileReplay
           ? "demo-current-26-825-file-approval"
           : isCurrentApproval26820FileReplay
             ? "demo-current-26-820-file-approval"
             : undefined
       }
       children={
-        isCurrentApproval26825FileReplay ? (
+        isCurrentApproval26903FileReplay || isCurrentApproval26825FileReplay ? (
           <ApprovalFilePreview
             additions={1}
             deletions={0}
@@ -8559,14 +8576,14 @@ export function App() {
       data-item-id={currentPendingApproval.itemId}
       data-testid="current-approval-request"
       description={
-        isCurrentApproval26825FileReplay
+        isCurrentApproval26903FileReplay || isCurrentApproval26825FileReplay
           ? undefined
           : isCurrentApproval26820FileReplay
           ? currentPendingApproval.reason
           : currentPendingApproval.command
       }
       identity={
-        isCurrentApproval26825FileReplay
+        isCurrentApproval26903FileReplay || isCurrentApproval26825FileReplay
           ? "Edit files"
           : isCurrentApproval26820FileReplay
           ? "Permissions"
@@ -8575,7 +8592,7 @@ export function App() {
             : "Terminal"
       }
       identityIcon={
-        isCurrentApproval26825FileReplay ? (
+        isCurrentApproval26903FileReplay || isCurrentApproval26825FileReplay ? (
           <CurrentBuildIcon name="sidebar-project-menu-edit" />
         ) : isCurrentApproval26820FileReplay ? (
           <CurrentBuildIcon name="composer-permission-ask" />
@@ -8584,7 +8601,7 @@ export function App() {
           )
       }
       kind={
-        isCurrentApproval26825FileReplay
+        isCurrentApproval26903FileReplay || isCurrentApproval26825FileReplay
           ? "file"
           : isCurrentApproval26820FileReplay
           ? "permission"
@@ -8604,7 +8621,7 @@ export function App() {
             ? "Allow this and future file edits in this conversation without asking again"
             : "Allow future commands that match this proposed rule",
         label:
-          isCurrentApproval26825FileReplay
+          isCurrentApproval26903FileReplay || isCurrentApproval26825FileReplay
             ? "Allow all edits"
             : isCurrentApproval26820FileReplay
             ? "Allow this conversation"
@@ -8621,7 +8638,16 @@ export function App() {
           ),
       }}
       title={
-        isCurrentApproval26825FileReplay ? (
+        isCurrentApproval26903FileReplay ? (
+          <span className="demo-current-26-903-file-approval__question">
+            Allow ChatGPT to edit the contents of{" "}
+            <span className="demo-current-26-903-file-approval__file">
+              <CurrentBuildIcon name="review-file-text" />
+              <span>{currentPendingApprovalFileName}</span>
+            </span>
+            ?
+          </span>
+        ) : isCurrentApproval26825FileReplay ? (
           "Allow ChatGPT to edit the following file?"
         ) : isCurrentApproval26820FileReplay ? (
           <span className="demo-current-26-820-file-approval__question">
@@ -13525,6 +13551,18 @@ export function App() {
               }
             />
           ) : null}
+          {isCurrentApproval26903FileReplay &&
+          message.id.startsWith("assistant-approval-current-26-903-") ? (
+            <ActivityTimeline
+              className="demo-current-26-903-file-approval__duration"
+              summary={
+                <TurnDuration
+                  durationMs={118_000}
+                  status="worked"
+                />
+              }
+            />
+          ) : null}
           {isCurrentApproval26825FileReplay &&
           message.id.startsWith("assistant-approval-current-26-825-") ? (
             <ActivityTimeline
@@ -13596,6 +13634,7 @@ export function App() {
                     message.id === "assistant-workflow")) ||
                 ((scenarioId === "approval-current-26-820-file" ||
                   scenarioId === "approval-current-26-825-file" ||
+                  scenarioId === "approval-current-26-903-file" ||
                   scenarioId === "approval-denied" ||
                   scenarioId === "approval-allow-once" ||
                   scenarioId === "approval-similar-commands") &&
@@ -13652,6 +13691,7 @@ export function App() {
                 scenarioId === "mcp-recovery-mixed-thread" ||
                 scenarioId === "approval-current-26-820-file" ||
                 scenarioId === "approval-current-26-825-file" ||
+                scenarioId === "approval-current-26-903-file" ||
                 scenarioId === "approval-allow-once" ||
                 scenarioId === "approval-denied" ||
                 scenarioId === "approval-similar-commands" ||
@@ -13700,6 +13740,8 @@ export function App() {
                         "assistant-approval-current-26-825-denied" ||
                       message.id ===
                         "assistant-approval-current-26-825-allowed" ||
+                      message.id ===
+                        "assistant-approval-current-26-903-denied" ||
                       message.id === "assistant-approval-denied" ||
                       message.id === "assistant-approval-approved" ||
                       message.id === "assistant-approval-allow-once" ||
