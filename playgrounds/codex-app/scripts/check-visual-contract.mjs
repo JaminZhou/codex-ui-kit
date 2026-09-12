@@ -787,6 +787,14 @@ const currentScheduledReferences = {
     process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MANUAL_REFERENCE,
   "scheduled-current-26-825-manual-compact":
     process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MANUAL_COMPACT_REFERENCE,
+  "scheduled-current-26-903":
+    process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_REFERENCE,
+  "scheduled-current-26-903-compact":
+    process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_COMPACT_REFERENCE,
+  "scheduled-current-26-903-manual":
+    process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_MANUAL_REFERENCE,
+  "scheduled-current-26-903-manual-compact":
+    process.env.CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_MANUAL_COMPACT_REFERENCE,
 };
 const defaultLifecycleMainPixelRatio = 0.0025;
 const defaultLifecycleSidebarPixelRatio = 0.05;
@@ -2856,6 +2864,7 @@ for (const scene of selectedScenes) {
     const reference = PNG.sync.read(await readFile(currentScheduledReference));
     const compact = scene.id.endsWith("-compact");
     const manual = scene.id.includes("-manual");
+    const currentBuild26903 = scene.id.startsWith("scheduled-current-26-903");
     const expectedWidth = compact ? 720 : 1180;
     if (
       reference.width !== expectedWidth ||
@@ -2901,8 +2910,12 @@ for (const scene of selectedScenes) {
     }
     const maximumRatio = environmentRatio(
       manual
-        ? "CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MANUAL_MAX_DIFF_RATIO"
-        : "CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MAX_DIFF_RATIO",
+        ? currentBuild26903
+          ? "CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_MANUAL_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MANUAL_MAX_DIFF_RATIO"
+        : currentBuild26903
+          ? "CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_MAX_DIFF_RATIO"
+          : "CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_825_MAX_DIFF_RATIO",
       manual ? 0.07 : 0.06,
     );
     if (comparison.ratio > maximumRatio) {

@@ -1216,6 +1216,25 @@ All actual task mutations, execution, notification delivery, and backend
 integration remain host-supplied. Reviewed replay baselines are committed;
 task content, product screenshots, and isolated profile data are not.
 
+The promoted native baseline is now `26.903.71938` (build `8576`). Its
+current-build replay is kept separate from the historical `26.825.51511`
+scenes: the wide/compact index and manual-editor frames lock the observed
+three-task state and the current `500` heading weight. Local-only product
+references may be supplied when a fresh isolated capture is available:
+
+```bash
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_REFERENCE=/absolute/path/to/scheduled-26-903-wide.png \
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_COMPACT_REFERENCE=/absolute/path/to/scheduled-26-903-compact.png \
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_MANUAL_REFERENCE=/absolute/path/to/scheduled-26-903-manual-wide.png \
+CODEX_UI_KIT_CURRENT_AUTOMATIONS_26_903_MANUAL_COMPACT_REFERENCE=/absolute/path/to/scheduled-26-903-manual-compact.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=scheduled-current-26-903,scheduled-current-26-903-compact,scheduled-current-26-903-manual,scheduled-current-26-903-manual-compact
+```
+
+The 26.903 task labels, prompts, and isolated profile are never committed.
+Current native evidence was captured at 1180×820 and 720×680; the visual
+replay scenes use the existing 1180×820 and 720×820 regional gate sizes.
+
 ## Development
 
 From the repository root:

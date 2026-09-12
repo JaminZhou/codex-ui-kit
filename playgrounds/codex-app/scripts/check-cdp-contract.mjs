@@ -9132,9 +9132,13 @@ for (const scene of selectedScenes) {
       continue;
     }
 
-    if (scene.id.startsWith("scheduled-current-26-825")) {
+    if (
+      scene.id.startsWith("scheduled-current-26-825") ||
+      scene.id.startsWith("scheduled-current-26-903")
+    ) {
       const compact = scene.id.endsWith("-compact");
       const manual = scene.id.includes("-manual");
+      const currentBuild26903 = scene.id.startsWith("scheduled-current-26-903");
       const scheduled = await page.evaluate(({ manual }) => {
         const rect = (target) => {
           if (!(target instanceof Element)) return null;
@@ -9195,6 +9199,9 @@ for (const scene of selectedScenes) {
             (tab) => tab.textContent?.trim(),
           ),
           heading: rect(root?.querySelector("h1")),
+          headingFontWeight: root?.querySelector("h1")
+            ? getComputedStyle(root.querySelector("h1")).fontWeight
+            : null,
           horizontalOverflow:
             document.documentElement.scrollWidth -
             document.documentElement.clientWidth,
@@ -9265,7 +9272,8 @@ for (const scene of selectedScenes) {
             "Ask ChatGPT to schedule tasks, set reminders, or monitor for updates" ||
           JSON.stringify(scheduled.filters) !==
             JSON.stringify(["All", "Active", "Paused", "Completed"]) ||
-          scheduled.taskCount !== 2 ||
+          scheduled.taskCount !== (currentBuild26903 ? 3 : 2) ||
+          scheduled.headingFontWeight !== (currentBuild26903 ? "500" : "400") ||
           scheduled.suggestionCount !== 3 ||
           JSON.stringify(scheduled.suggestionTitles) !==
             JSON.stringify(["Daily brief", "Weekly review", "Follow-up monitor"]) ||
@@ -9283,11 +9291,16 @@ for (const scene of selectedScenes) {
         }
         if (!compact) {
           const search = page.getByPlaceholder("Search scheduled tasks");
-          await search.fill("no-match-26-825");
+          await search.fill(
+            currentBuild26903 ? "no-match-26-903" : "no-match-26-825",
+          );
           await page.getByText("No scheduled tasks found", { exact: true }).waitFor();
           await search.fill("");
           await page.getByRole("tab", { name: "Active" }).click();
-          if ((await page.locator(".codex-ui-scheduled-tasks__task").count()) !== 2) {
+          if (
+            (await page.locator(".codex-ui-scheduled-tasks__task").count()) !==
+            (currentBuild26903 ? 3 : 2)
+          ) {
             throw new Error(`${scene.id}: active filter did not retain active rows.`);
           }
           await page

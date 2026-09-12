@@ -3047,6 +3047,18 @@ const currentScheduledTasks: readonly ScheduledTaskItem[] = [
   },
 ];
 
+const currentScheduledTasks26903: readonly ScheduledTaskItem[] = [
+  ...currentScheduledTasks,
+  {
+    actionIcon: <CurrentScheduledGlyph name="pause" />,
+    id: "review-monitor",
+    nextRun: "Tomorrow",
+    schedule: "Weekdays at 10:00 AM",
+    status: "active",
+    title: "Review monitor",
+  },
+];
+
 const currentScheduledSuggestions: readonly ScheduledTaskSuggestion[] = [
   {
     description:
@@ -3285,6 +3297,11 @@ export function App() {
   const [scheduledEditorOpen, setScheduledEditorOpen] = useState(
     initialSelection.frame?.includes("-manual") ?? false,
   );
+  const currentAutomations26903Replay =
+    initialSelection.frame?.startsWith("scheduled-current-26-903") ?? false;
+  const scheduledTasks = currentAutomations26903Replay
+    ? currentScheduledTasks26903
+    : currentScheduledTasks;
   const [scheduledAction, setScheduledAction] = useState("");
   const [scheduledName, setScheduledName] = useState("");
   const [scheduledPrompt, setScheduledPrompt] = useState("");
@@ -11321,9 +11338,17 @@ export function App() {
       valueText: scheduledFieldValues.notifications,
     },
   ];
+  const scheduledRouteClassName = [
+    "demo-current-scheduled-route",
+    currentAutomations26903Replay
+      ? "demo-current-scheduled-route--current-26-903"
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const scheduledTasksRoute = scheduledEditorOpen ? (
     <div
-      className="demo-current-scheduled-route demo-current-scheduled-route--editor"
+      className={`${scheduledRouteClassName} demo-current-scheduled-route--editor`}
       data-action={scheduledAction || undefined}
       data-testid="current-scheduled-route"
     >
@@ -11334,7 +11359,7 @@ export function App() {
           onTaskOpen={(task) => setScheduledAction(`open:${task.id}`)}
           onTaskToggle={(task) => setScheduledAction(`toggle:${task.id}`)}
           query={scheduledQuery}
-          tasks={currentScheduledTasks}
+          tasks={scheduledTasks}
         />
         <ScheduledTaskEditor
           detailsFields={scheduledDetailsFields}
@@ -11363,7 +11388,7 @@ export function App() {
   ) : (
     <ScheduledTasksPage
       activeFilter={scheduledFilter}
-      className="demo-current-scheduled-route"
+      className={scheduledRouteClassName}
       data-action={scheduledAction || undefined}
       data-testid="current-scheduled-route"
       onFilterChange={setScheduledFilter}
@@ -11390,7 +11415,7 @@ export function App() {
             : undefined
       }
       suggestions={currentScheduledSuggestions}
-      tasks={currentScheduledTasks}
+      tasks={scheduledTasks}
     />
   );
 

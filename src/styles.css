@@ -23686,6 +23686,11 @@ button.codex-ui-generated-image-gallery__image {
   margin: 0;
 }
 
+.demo-current-scheduled-route--current-26-903
+  .codex-ui-scheduled-tasks__intro h1 {
+  font-weight: 500;
+}
+
 .codex-ui-scheduled-tasks__intro p {
   color: color-mix(in srgb, var(--codex-ui-text) 65%, transparent);
   font-size: 0.875rem;
