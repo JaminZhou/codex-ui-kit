@@ -453,7 +453,11 @@
         "replay:current-26.825-mcp-search-fetch-success-wide",
         "browser-cdp:current-26.825-mcp-success-disclosure-and-computed-style",
         "electron:current-26.825-mcp-success-disclosure-lifecycle",
-        "pixel:current-26.825-mcp-success-product-region"
+        "pixel:current-26.825-mcp-success-product-region",
+        "replay:current-26.903-mcp-search-three-calls-fetch-success-wide-compact",
+        "browser-cdp:current-26.903-mcp-success-computed-style-and-geometry",
+        "electron:current-26.903-mcp-success-summary-and-compact-lifecycle",
+        "pixel:current-26.903-mcp-success-wide-compact-and-sources-regions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -471,7 +475,9 @@
         "cdp-26.820.60940:real-openai-developer-docs-search-fetch-success-expanded-1180x820",
         "cdp-26.820.60940:current-mcp-success-computed-styles-noninteractive-call-rows-and-unmasked-tool-group-pixel-gate",
         "cdp-26.825.51511:real-openai-developer-docs-search-fetch-success-and-same-thread-recovery-expanded-1180x820-and-720x680",
-        "cdp-26.825.51511:current-mcp-computed-styles-noninteractive-call-rows-and-regional-pixel-gates"
+        "cdp-26.825.51511:current-mcp-computed-styles-noninteractive-call-rows-and-regional-pixel-gates",
+        "cdp-26.903.71938:real-openai-developer-docs-search-three-calls-fetch-success-expanded-1180x820-and-720x680",
+        "cdp-26.903.71938:current-mcp-success-computed-styles-and-regional-pixel-gates"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

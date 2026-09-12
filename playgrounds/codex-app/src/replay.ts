@@ -44,6 +44,7 @@ import mcpCurrent26818SuccessTrace from "../fixtures/traces/mcp-current-26-818-s
 import mcpCurrent26820RecoveryTrace from "../fixtures/traces/mcp-current-26-820-recovery.jsonl?raw";
 import mcpCurrent26820SuccessTrace from "../fixtures/traces/mcp-current-26-820-success.jsonl?raw";
 import mcpCurrent26825LifecycleTrace from "../fixtures/traces/mcp-current-26-825-lifecycle.jsonl?raw";
+import mcpCurrent26903SuccessTrace from "../fixtures/traces/mcp-current-26-903-success.jsonl?raw";
 import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
 import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
 import mcpToolCallTrace from "../fixtures/traces/mcp-tool-call.jsonl?raw";
@@ -114,6 +115,7 @@ export type ReplayScenarioId =
   | "mcp-current-26-820-recovery"
   | "mcp-current-26-820-success"
   | "mcp-current-26-825-lifecycle"
+  | "mcp-current-26-903-success"
   | "mcp-current-recovery"
   | "mcp-current-success"
   | "mcp-tool-call"
@@ -498,6 +500,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "查找官方 MCP 文档页面",
     "The runtime-observed 26.825 product completes a successful Search and Fetch turn, then recovers from an invalid Fetch through Search and Fetch in the same thread, with the current Environment and Sources summary.",
     mcpCurrent26825LifecycleTrace,
+  ),
+  "mcp-current-26-903-success": scenario(
+    "mcp-current-26-903-success",
+    "Find official Codex MCP page",
+    "The runtime-observed 26.903 product groups three OpenAI Developer Docs Search calls and one Fetch call in a single successful turn.",
+    mcpCurrent26903SuccessTrace,
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",

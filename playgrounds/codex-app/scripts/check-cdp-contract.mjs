@@ -80,6 +80,7 @@ const currentReplayComposerScenarios = new Set([
   "mcp-current-26-820-recovery",
   "mcp-current-26-820-success",
   "mcp-current-26-825-lifecycle",
+  "mcp-current-26-903-success",
   "mcp-current-recovery",
   "mcp-current-success",
   "mcp-recovery-mixed-thread",
@@ -16626,6 +16627,8 @@ for (const scene of selectedScenes) {
       const isCurrentMcp26820 =
         scene.scenario === "mcp-current-26-820-success" ||
         scene.scenario === "mcp-current-26-820-recovery";
+      const isCurrentMcp26903 =
+        scene.scenario === "mcp-current-26-903-success";
       if (
         !contract.mcp ||
         contract.mcp.toolCount !== scene.toolCount ||
@@ -16643,15 +16646,18 @@ for (const scene of selectedScenes) {
           scene.id === "mcp-current-26-818-recovery-completed" ||
           scene.id === "mcp-current-26-818-sources-pinned" ||
           isCurrentMcp26820 ||
+          isCurrentMcp26903 ||
           scene.id === "mcp-current-integration-recovered" ||
           scene.id === "mcp-current-recovery-completed") &&
           (contract.mcp.groupStyle.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
             contract.mcp.groupStyle.fontWeight !==
-              (isCurrentMcp26820 ? "400" : "445") ||
+              (isCurrentMcp26820 || isCurrentMcp26903 ? "400" : "445") ||
             (isCurrentMcp26820
               ? contract.mcp.groupStyle.color !== "rgb(223, 223, 223)"
-              : !contract.mcp.groupStyle.color.includes("0.6")))) ||
+              : isCurrentMcp26903
+                ? contract.mcp.groupStyle.color !== "rgb(255, 255, 255)"
+                : !contract.mcp.groupStyle.color.includes("0.6")))) ||
         JSON.stringify(contract.mcp.callLabels) !==
           JSON.stringify(scene.callLabels)
       ) {
@@ -16681,7 +16687,7 @@ for (const scene of selectedScenes) {
               },
               index,
             ) => {
-              if (isCurrentMcp26820) {
+              if (isCurrentMcp26820 || isCurrentMcp26903) {
                 return (
                   buttonRect !== null ||
                   chevronVisible !== null ||

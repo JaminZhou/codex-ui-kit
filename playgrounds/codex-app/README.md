@@ -1561,6 +1561,27 @@ the compact failure comparison gates the visible card region under 1.2%; and
 the fallback comparison gates the exact 688×71 integration group under 1.3%.
 Product references remain local-only.
 
+The current `26.903.71938` MCP probe is a separate success-only slice. It
+replays the real `Search OpenAI docs · 3 calls` → `Fetch OpenAI doc` turn,
+keeps the `Model Context Protocol` answer and observed docs URL, and covers
+wide, 720×680 compact, and pinned Sources frames. CDP checks the current
+computed typography/geometry and noninteractive rows; Electron repeats the
+timeline/group, answer, Sources pin, and compact overflow interactions. The
+native product PNGs are optional and local-only:
+
+```bash
+CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_903_REFERENCE=/absolute/path/to/mcp-success-wide.png \
+CODEX_UI_KIT_CURRENT_MCP_SUCCESS_26_903_COMPACT_REFERENCE=/absolute/path/to/mcp-success-compact.png \
+CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_903_REFERENCE=/absolute/path/to/mcp-sources-pinned.png \
+  pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
+  --scenes=mcp-current-26-903-success,mcp-current-26-903-success-compact,mcp-current-26-903-sources-pinned
+```
+
+The current product regions pass at 4.386% wide, 4.391% compact, and 4.260%
+for Sources under independent 5% ceilings. This observation does not imply
+recovery, authentication, approval, or other MCP transitions; those remain
+separate follow-up captures.
+
 The sidebar gate uses a full 1180×820 current-build reference and compares
 only application-owned regions:
 
