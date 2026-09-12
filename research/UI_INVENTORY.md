@@ -45,16 +45,16 @@ observation from a previous build remains historical evidence.
 
 ## Current baseline
 
-- Codex Desktop `26.825.51511` (`7377`)
-- Package and scoped shell lifecycle sampled on 2026-08-30
+- Codex Desktop `26.903.71938` (`8576`)
+- Package and scoped shell lifecycle sampled on 2026-09-12
 - `app.asar` SHA-256:
-  `f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7`
+  `58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0`
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- Fresh current-build Renderer evidence covers the New chat shell,
+- Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
   New chat, current Composer geometry, zero horizontal overflow, and stable
@@ -66,10 +66,11 @@ observation from a previous build remains historical evidence.
   the collapsed 600px Projects route remains 559px with 415/128 columns.
   Explore is present and `Sites` is absent from the sampled fixed-route stack.
   Details are in
-  [`26.825.51511.md`](26.825.51511.md). Rich Markdown streaming, Plan progress,
+  [`26.903.71938.md`](26.903.71938.md). Rich Markdown streaming, Plan progress,
   pure-reasoning cadence, long-thread navigation, Web Search, Browser success,
-  and the sampled Browser failure/recovery terminal path are current on
-  26.825.51511. Browser success is now current activity-only evidence; the
+  and the sampled Browser failure/recovery terminal path remain historical
+  26.825.51511 evidence until re-observed on 26.903. Browser success is now
+  current activity-only evidence on its recorded build; the
   separate Browser workspace remains 26.825.31414 regression evidence. The
   previous activity follow-up first re-observed the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
@@ -272,7 +273,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 74 have current-build runtime evidence, 7 have previous-build-only runtime evidence, 10 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 73 groups and Electron verification covers 73.
+Current inventory: 91 surface groups; 9 have current-build runtime evidence, 72 have previous-build-only runtime evidence, 10 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

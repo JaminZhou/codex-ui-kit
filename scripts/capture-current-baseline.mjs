@@ -662,17 +662,31 @@ try {
         }
         fiber = fiber.return;
       }
+      const triggerObservation = {
+        ariaExpanded: element.getAttribute("aria-expanded"),
+        ariaHaspopup: element.getAttribute("aria-haspopup"),
+        rect: {
+          height: round(bounds.height),
+          width: round(bounds.width),
+        },
+        tag: element.tagName.toLowerCase(),
+      };
+      const bridge = {
+        available:
+          typeof window.electronBridge?.showContextMenu === "function",
+        frozen: Object.isFrozen(window.electronBridge),
+      };
       if (!Array.isArray(nativeItems)) {
-        throw new Error(
-          "The current project action trigger did not expose one native-item provider.",
-        );
+        return {
+          bridge,
+          items: null,
+          observationStatus: "native-items-unavailable",
+          renderMode: "electron-native-context-menu",
+          trigger: triggerObservation,
+        };
       }
       return {
-        bridge: {
-          available:
-            typeof window.electronBridge?.showContextMenu === "function",
-          frozen: Object.isFrozen(window.electronBridge),
-        },
+        bridge,
         items: nativeItems.map((item) => ({
           defaultMessage: item.message?.defaultMessage ?? null,
           enabled: item.enabled !== false,
@@ -694,16 +708,9 @@ try {
             : null,
           type: item.type ?? "item",
         })),
+        observationStatus: "native-items-observed",
         renderMode: "electron-native-context-menu",
-        trigger: {
-          ariaExpanded: element.getAttribute("aria-expanded"),
-          ariaHaspopup: element.getAttribute("aria-haspopup"),
-          rect: {
-            height: round(bounds.height),
-            width: round(bounds.width),
-          },
-          tag: element.tagName.toLowerCase(),
-        },
+        trigger: triggerObservation,
       };
     });
   const inspectResponsiveSidebar = () =>
@@ -1254,6 +1261,10 @@ try {
       .first();
     if ((await candidateTrigger.count()) !== 1) continue;
     const candidate = await inspectNativeProjectMenu(candidateTrigger);
+    if (candidate.observationStatus === "native-items-unavailable") {
+      projectMenuObservation ??= candidate;
+      continue;
+    }
     const ids = candidate.items.map((item) => item.id);
     if (
       ids.includes("move-to-custom-section") &&

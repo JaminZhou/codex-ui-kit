@@ -782,7 +782,7 @@ describe("current baseline capture contract", () => {
         rect: { height: 33.59 },
         style: {
           fontSize: "28px",
-          fontWeight: "400",
+          fontWeight: "500",
           lineHeight: "33.6px",
         },
       },
@@ -1175,28 +1175,28 @@ describe("current baseline capture contract", () => {
     };
     const record = {
       baseline: {
-        appAsarBytes: 284_032_150,
+        appAsarBytes: 306_621_494,
         appAsarSha256:
-          "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
-        appVersion: "26.825.51511",
-        buildNumber: "7377",
-        chromiumVersion: "151.0.7922.174",
+          "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
+        appVersion: "26.903.71938",
+        buildNumber: "8576",
+        chromiumVersion: "152.0.7977.83",
       },
       captureKind: "renderer_emulation",
       runtimeBundleIdentity: {
         afterCapture: {
-          appAsarBytes: 284_032_150,
-          appAsarSha256:
-            "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        appAsarBytes: 306_621_494,
+        appAsarSha256:
+          "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_351_000_000,
           device: "16777231",
           inode: "346397970",
         },
         beforeCapture: {
-          appAsarBytes: 284_032_150,
-          appAsarSha256:
-            "f56ac8d5254a10fc4a04e7417fa787d135c3bbca49bad7d668d4ae65833d40c7",
+        appAsarBytes: 306_621_494,
+        appAsarSha256:
+          "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
           changedAtMs: 1_786_150_111_000,
           checkedAtMs: 1_786_350_900_000,
           device: "16777231",
@@ -1392,6 +1392,13 @@ describe("current baseline capture contract", () => {
     };
 
     expect(() => assertCurrentBaselineRecord(record)).not.toThrow();
+    const nativeItemsUnavailable = structuredClone(record.sidebarLifecycle) as any;
+    nativeItemsUnavailable.projectMenu = {
+      ...nativeItemsUnavailable.projectMenu,
+      items: null,
+      observationStatus: "native-items-unavailable",
+    };
+    expect(() => assertCurrentSidebarLifecycle(nativeItemsUnavailable)).not.toThrow();
     expect(() =>
       assertCurrentBaselineRecord({
         ...record,
@@ -1524,7 +1531,7 @@ describe("current baseline capture contract", () => {
         },
       }),
     ).not.toThrow();
-    expect(currentBaselineFingerprint.appVersion).toBe("26.825.51511");
+    expect(currentBaselineFingerprint.appVersion).toBe("26.903.71938");
     expect(currentBaselineViewports.compact.width).toBe(720);
     expect(() =>
       assertCurrentSidebarLifecycle({
@@ -1887,6 +1894,8 @@ describe("current baseline capture contract", () => {
     expect(captureSource).not.toContain(".reload(");
     expect(captureSource).not.toContain(".screenshot(");
     expect(captureSource).not.toContain("document.body.textContent");
+    expect(captureSource).toContain('observationStatus: "native-items-unavailable"');
+    expect(captureSource).toContain('observationStatus === "native-items-unavailable"');
   });
 
   it("restores an isolated account-menu capture from an already-open menu", () => {
