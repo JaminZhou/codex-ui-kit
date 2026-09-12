@@ -1165,6 +1165,17 @@ older `26.721.81911` resource menu, so `composer.plugins` remains
 `partial_legacy`; discovery, installation, permissions, and real execution
 remain host-owned and open.
 
+The Browser workspace slice activates the historical one-tab shell only in an
+isolated controlled replay. It covers tab creation, selection, close-to-empty
+dismissal, toolbar event delegation, responsive panel reachability, and
+1180px/720px own-fixture pixel stability. The content pane remains explicitly
+source-owned and exposes only a URL boundary; it neither loads nor reproduces
+external pages. Its product evidence remains the legacy `26.825.31414` shell,
+while the current `26.825.51511` Browser success path is separately verified
+to have no mounted workspace. `workspace.browser` therefore remains
+`partial_legacy`; multi-tab product behavior, authentication, downloads,
+permission prompts, and page-owned states remain open.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 

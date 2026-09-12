@@ -837,6 +837,7 @@ export function ImagePreviewDialog({
   const previewImageRef = useRef<HTMLImageElement>(null);
   const previewStageRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
+  const hasManualZoomRef = useRef(false);
   const [inferredTheme, setInferredTheme] = useState<string>();
   const requestedIndex = imageId ? images.findIndex((image) => image.id === imageId) : 0;
   const [activeIndex, setActiveIndex] = useState(Math.max(0, requestedIndex));
@@ -877,6 +878,7 @@ export function ImagePreviewDialog({
     const stage = previewStageRef.current;
     const image = previewImageRef.current;
     if (!stage || !image) return;
+    hasManualZoomRef.current = false;
     const updateFit = () => {
       if (!image.naturalWidth || !image.naturalHeight) return;
       const nextFit = Math.max(
@@ -890,7 +892,9 @@ export function ImagePreviewDialog({
         ),
       );
       setIntrinsicSize({ height: image.naturalHeight, width: image.naturalWidth });
-      setZoomScale(nextFit);
+      if (!hasManualZoomRef.current) {
+        setZoomScale(nextFit);
+      }
     };
     updateFit();
     const observer =
@@ -1076,7 +1080,9 @@ export function ImagePreviewDialog({
                   height: image.naturalHeight,
                   width: image.naturalWidth,
                 });
-                setZoomScale(fit);
+                if (!hasManualZoomRef.current) {
+                  setZoomScale(fit);
+                }
               }}
               ref={previewImageRef}
               referrerPolicy="no-referrer"
@@ -1100,9 +1106,10 @@ export function ImagePreviewDialog({
             <button
               aria-label={zoomOutLabel}
               disabled={zoomScale <= 10}
-              onClick={() =>
-                setZoomScale((current) => Math.max(10, current / 1.2))
-              }
+              onClick={() => {
+                hasManualZoomRef.current = true;
+                setZoomScale((current) => Math.max(10, current / 1.2));
+              }}
               type="button"
             >
               <ImagePreviewZoomOutIcon />
@@ -1111,9 +1118,10 @@ export function ImagePreviewDialog({
             <button
               aria-label={zoomInLabel}
               disabled={zoomScale >= 400}
-              onClick={() =>
-                setZoomScale((current) => Math.min(400, current * 1.2))
-              }
+              onClick={() => {
+                hasManualZoomRef.current = true;
+                setZoomScale((current) => Math.min(400, current * 1.2));
+              }}
               type="button"
             >
               <ImagePreviewZoomInIcon />

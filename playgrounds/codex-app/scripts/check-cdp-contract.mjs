@@ -130,6 +130,7 @@ for (const scene of selectedScenes) {
           const card = root.querySelector(
             ".codex-ui-worktree-setup__card",
           );
+          const layoutContainer = root.closest(".codex-ui-thread");
           const cardStyle = card ? getComputedStyle(card) : null;
           const details = root.querySelector(
             ".codex-ui-worktree-setup__details",
@@ -169,6 +170,13 @@ for (const scene of selectedScenes) {
             horizontalOverflow:
               document.documentElement.scrollWidth -
               document.documentElement.clientWidth,
+            layoutContainer: layoutContainer
+              ? {
+                  clientWidth: layoutContainer.clientWidth,
+                  offsetWidth: layoutContainer.offsetWidth,
+                  rect: rect(layoutContainer),
+                }
+              : null,
             phase: root.getAttribute("data-phase"),
             role: root.getAttribute("role"),
             root: rect(root),
@@ -212,7 +220,16 @@ for (const scene of selectedScenes) {
         : scene.id.endsWith("-creating")
           ? "creating"
           : "failed";
-      const expectedRootWidth = compact ? 366.125 : 736;
+      // Compact threads can reserve a native scrollbar; measure the fractional
+      // layout canvas instead of assuming an overlay scrollbar.
+      const expectedRootWidth = compact
+        ? setup.layoutContainer
+          ? setup.layoutContainer.rect.width -
+            32 -
+            (setup.layoutContainer.offsetWidth -
+              setup.layoutContainer.clientWidth)
+          : Number.NaN
+        : 736;
       const expectedRootHeight =
         expectedPhase === "created" ? 50 : collapsed || expectedPhase === "creating" ? 141 : 276.5;
       const expectedActions =
@@ -9686,6 +9703,7 @@ for (const scene of selectedScenes) {
             ),
             scroller: {
               clientHeight: root.clientHeight,
+              clientWidth: root.clientWidth,
               rect: rect(root),
               scrollHeight: root.scrollHeight,
               scrollTop: root.scrollTop,
@@ -9715,6 +9733,17 @@ for (const scene of selectedScenes) {
           ? [79, 79, 58]
           : [79, 58, 79]
         : [79, 58, 58];
+      // Detail pages always scroll. On hosts with non-overlay scrollbars,
+      // clientWidth (rather than the outer scroller rect) is the product
+      // layout canvas. Keep both the fixed caps and the internal gutters.
+      const expectedHeaderWidth = Math.min(
+        736,
+        pluginDetail.scroller.clientWidth - 32,
+      );
+      const expectedSuggestionWidth = Math.min(
+        492.796875,
+        pluginDetail.scroller.clientWidth - 252,
+      );
       const closeTo = (actual, expected, tolerance = 1) =>
         typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
       if (
@@ -9730,7 +9759,7 @@ for (const scene of selectedScenes) {
           ? pluginDetail.scroller.scrollTop <= 0
           : pluginDetail.scroller.scrollTop !== 0) ||
         !pluginDetail.header ||
-        !closeTo(pluginDetail.header.width, compact ? 688 : 736) ||
+        !closeTo(pluginDetail.header.width, expectedHeaderWidth) ||
         !pluginDetail.artwork ||
         !closeTo(pluginDetail.artwork.width, 58) ||
         !pluginDetail.title ||
@@ -9741,7 +9770,7 @@ for (const scene of selectedScenes) {
         pluginDetail.suggestions.some(
           (suggestion, index) =>
             !suggestion ||
-            !closeTo(suggestion.width, compact ? 468.15625 : 492.796875) ||
+            !closeTo(suggestion.width, expectedSuggestionWidth) ||
             !closeTo(suggestion.height, expectedSuggestionHeights[index]),
         ) ||
         pluginDetail.appsCount !== (installed ? 2 : 1) ||
@@ -9885,8 +9914,17 @@ for (const scene of selectedScenes) {
           ? "Work with Codex across your favorite tools"
           : "Extend Codex with task-specific skills";
       const expectedInstalledCount = expectedKind === "plugins" ? 13 : 6;
-      const expectedSearchLeft = compact ? 21 : 387.4375;
-      const expectedHeadingLeft = compact ? 29 : 395.4375;
+      // A tall catalog may reserve a non-overlay scrollbar on macOS. Anchor
+      // wide coordinates to the measured catalog body so that this host
+      // preference cannot masquerade as an eight-pixel product regression.
+      const expectedSearchLeft =
+        (integrationCatalog.body?.left ?? Number.NaN) + 20;
+      const expectedHeadingLeft =
+        (integrationCatalog.body?.left ?? Number.NaN) + 28;
+      const expectedSearchWidth =
+        (integrationCatalog.body?.width ?? Number.NaN) - 40;
+      const expectedHeadingWidth =
+        (integrationCatalog.body?.width ?? Number.NaN) - 56;
       if (
         integrationCatalog.kind !== expectedKind ||
         integrationCatalog.status !== "ready" ||
@@ -9898,15 +9936,21 @@ for (const scene of selectedScenes) {
         (expectedKind === "plugins" &&
           !integrationCatalog.sectionHeadings.includes("Popular")) ||
         !integrationCatalog.heading ||
+        !integrationCatalog.body ||
+        (!compact && Math.abs(integrationCatalog.body.width - 768) > 1) ||
         Math.abs(integrationCatalog.heading.left - expectedHeadingLeft) > 1 ||
+        Math.abs(integrationCatalog.heading.width - expectedHeadingWidth) > 1 ||
         Math.abs(integrationCatalog.heading.top - 66) > 1 ||
         !integrationCatalog.search ||
         Math.abs(integrationCatalog.search.left - expectedSearchLeft) > 1 ||
         Math.abs(integrationCatalog.search.top - 151.59375) > 1 ||
-        Math.abs(integrationCatalog.search.width - (compact ? 679 : 728)) > 1 ||
+        Math.abs(integrationCatalog.search.width - expectedSearchWidth) > 1 ||
         integrationCatalog.grids.length < (expectedKind === "plugins" ? 2 : 2) ||
         integrationCatalog.grids.some(
-          ({ columns }) => columns.trim().split(/\s+/).length !== 2,
+          ({ columns, rect }) =>
+            columns.trim().split(/\s+/).length !== 2 ||
+            Math.abs(rect.left - expectedSearchLeft) > 1 ||
+            Math.abs(rect.width - expectedSearchWidth) > 1,
         ) ||
         Math.abs(integrationCatalog.horizontalOverflow) > 1 ||
         integrationCatalog.viewport.width !== (compact ? 720 : 1180) ||
@@ -10805,6 +10849,8 @@ for (const scene of selectedScenes) {
               : null,
             navigation: {
               clientHeight: navigation.clientHeight,
+              clientWidth: navigation.clientWidth,
+              offsetWidth: navigation.offsetWidth,
               rect: rect(navigation),
               scrollHeight: navigation.scrollHeight,
             },
@@ -14460,6 +14506,13 @@ for (const scene of selectedScenes) {
       await page.mouse.move(640, 100);
     }
     if (currentSidebarWorktreeLifecycleScene) {
+      // Worktree rows live in the scrollable sidebar navigation, so preserve
+      // their 16px gutters after subtracting any native scrollbar slot.
+      const expectedWorktreeRowWidth =
+        contract.sidebar.navigation.rect.width -
+        16 -
+        (contract.sidebar.navigation.offsetWidth -
+          contract.sidebar.navigation.clientWidth);
       const [active, failed, recovered, restored] =
         contract.sidebar.worktreeFixtures;
       const expectedSelectedFixture = scene.id.startsWith(
@@ -14476,7 +14529,7 @@ for (const scene of selectedScenes) {
         (fixture) =>
           !fixture ||
           fixture.rowRect?.height !== 30 ||
-          Math.abs(fixture.rowRect?.width - 305.875) > 0.1 ||
+          Math.abs(fixture.rowRect?.width - expectedWorktreeRowWidth) > 0.1 ||
           fixture.branchRect?.height !== 14 ||
           fixture.branchRect?.width !== 14 ||
           fixture.branchViewBox !== "0 0 20 20" ||
@@ -15587,9 +15640,14 @@ for (const scene of selectedScenes) {
             "https://openai.com/codex/",
           ) ||
           !browserFailure.unsupportedError?.paragraph ||
+          !browserFailure.chromiumError?.paragraph ||
           Math.abs(
             browserFailure.unsupportedError.paragraph.left -
-              (compact ? 16 : 383.453125),
+              browserFailure.chromiumError.paragraph.left,
+          ) > 0.1 ||
+          Math.abs(
+            browserFailure.unsupportedError.paragraph.width -
+              browserFailure.chromiumError.paragraph.width,
           ) > 0.1 ||
           Math.abs(
             browserFailure.unsupportedError.paragraph.top -

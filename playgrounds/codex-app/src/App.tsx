@@ -789,6 +789,7 @@ function replayState(
 }
 
 const conversationHostFrames = new Set([
+  "browser-workspace-legacy-shell",
   "composer-attachment",
   "composer-auto-continued",
   "composer-disabled",
@@ -1539,6 +1540,22 @@ const composerPluginResourceGroups: readonly ComposerResourceGroup[] = [
     ],
   },
 ];
+
+type BrowserWorkspaceReplayTab = {
+  id: string;
+  title: string;
+  url: string;
+};
+
+function initialBrowserWorkspaceReplayTabs(): BrowserWorkspaceReplayTab[] {
+  return [
+    {
+      id: "codex-page",
+      title: "Codex in ChatGPT | AI Coding Agents for Software Engineering | OpenAI",
+      url: "https://openai.com/codex/",
+    },
+  ];
+}
 
 function initialQueuedPrompts(frame: string | null): QueuedPrompt[] {
   const currentQueuePhase = initialCurrentQueue26825Phase(frame);
@@ -3969,6 +3986,8 @@ export function App() {
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
   const composerPluginMenuFrame = activeFrame === "composer-plugins-menu";
+  const isBrowserWorkspaceControlledReplay =
+    mode === "replay" && activeFrame === "browser-workspace-legacy-shell";
   useLayoutEffect(() => {
     if (
       !pluginDetailOpen ||
@@ -4062,9 +4081,17 @@ export function App() {
       initialSelection.frame === "current-review-26-825-open",
   );
   const [browserPanelOpen, setBrowserPanelOpen] = useState(
-    false,
+    initialSelection.frame === "browser-workspace-legacy-shell",
   );
   const [browserPanelWidth, setBrowserPanelWidth] = useState(419.59375);
+  const [browserWorkspaceAction, setBrowserWorkspaceAction] = useState<
+    string | null
+  >(null);
+  const [browserWorkspaceActiveTabId, setBrowserWorkspaceActiveTabId] =
+    useState<string | null>("codex-page");
+  const [browserWorkspaceTabs, setBrowserWorkspaceTabs] = useState<
+    BrowserWorkspaceReplayTab[]
+  >(initialBrowserWorkspaceReplayTabs);
   const [subagentPanelOpen, setSubagentPanelOpen] = useState(
     currentSubagentPanelFrame(initialSelection.frame),
   );
@@ -5087,6 +5114,11 @@ export function App() {
     setScenarioSelectionVersion((version) => version + 1);
     setWindowedSelectedMessageIndex(initialWindowedMessageIndex(frame));
     setReviewOpen(false);
+    setBrowserPanelOpen(frame === "browser-workspace-legacy-shell");
+    setBrowserPanelWidth(419.59375);
+    setBrowserWorkspaceAction(null);
+    setBrowserWorkspaceActiveTabId("codex-page");
+    setBrowserWorkspaceTabs(initialBrowserWorkspaceReplayTabs());
     setReviewSelection(null);
     setFileRevertErrorOpen(false);
     setActiveConversationSidePanel(
@@ -5174,6 +5206,11 @@ export function App() {
     setView("conversation");
     setMode(nextMode);
     setActiveFrame(null);
+    setBrowserPanelOpen(false);
+    setBrowserPanelWidth(419.59375);
+    setBrowserWorkspaceAction(null);
+    setBrowserWorkspaceActiveTabId("codex-page");
+    setBrowserWorkspaceTabs(initialBrowserWorkspaceReplayTabs());
     setComposerValue("");
     setComposerOverlay(null);
     setComposerPluginAction(null);
@@ -11728,33 +11765,66 @@ export function App() {
       />
     )
   ) : null;
-  const browserWorkspacePanel = isCurrentBrowser26825Replay ? (
+  const activeBrowserWorkspaceTab =
+    browserWorkspaceTabs.find(
+      ({ id }) => id === browserWorkspaceActiveTabId,
+    ) ?? browserWorkspaceTabs[0];
+  const browserWorkspacePanel = isBrowserWorkspaceControlledReplay ? (
     <BrowserWorkspacePanel
       className="demo-current-browser-workspace"
       data-testid="current-browser-workspace"
-      onCloseTab={() => setBrowserPanelOpen(false)}
-      tabs={[
-        {
-          active: true,
-          id: "codex-page",
-          title: (
+      onAction={(action) => {
+        setBrowserWorkspaceAction(action);
+        if (action !== "new-tab") return;
+        const nextTab: BrowserWorkspaceReplayTab = {
+          id: `documentation-${browserWorkspaceTabs.length + 1}`,
+          title: "OpenAI developer documentation",
+          url: "https://developers.openai.com/codex/",
+        };
+        setBrowserWorkspaceTabs((current) => [...current, nextTab]);
+        setBrowserWorkspaceActiveTabId(nextTab.id);
+      }}
+      onCloseTab={(tab) => {
+        const closingIndex = browserWorkspaceTabs.findIndex(
+          ({ id }) => id === tab.id,
+        );
+        const remainingTabs = browserWorkspaceTabs.filter(
+          ({ id }) => id !== tab.id,
+        );
+        setBrowserWorkspaceAction(`close:${tab.id}`);
+        setBrowserWorkspaceTabs(remainingTabs);
+        if (remainingTabs.length === 0) {
+          setBrowserPanelOpen(false);
+          setBrowserWorkspaceActiveTabId(null);
+          return;
+        }
+        if (tab.id === browserWorkspaceActiveTabId) {
+          setBrowserWorkspaceActiveTabId(
+            remainingTabs[Math.min(closingIndex, remainingTabs.length - 1)].id,
+          );
+        }
+      }}
+      onSelectTab={(tab) => {
+        setBrowserWorkspaceAction(`select:${tab.id}`);
+        setBrowserWorkspaceActiveTabId(tab.id);
+      }}
+      tabs={browserWorkspaceTabs.map((tab) => ({
+        active: tab.id === activeBrowserWorkspaceTab?.id,
+        id: tab.id,
+        title: (
             <span className="demo-current-browser-workspace__tab-label">
               <span aria-hidden="true">◉</span>
-              <span>
-                Codex in ChatGPT | AI Coding Agents for Software Engineering |
-                OpenAI
-              </span>
+              <span>{tab.title}</span>
             </span>
-          ),
-        },
-      ]}
+        ),
+      }))}
     >
       <div
         className="demo-current-browser-workspace__page"
         data-source-owned="external-web-content"
       >
         <strong>External page content</strong>
-        <span>https://openai.com/codex/</span>
+        <span>{activeBrowserWorkspaceTab?.url}</span>
       </div>
     </BrowserWorkspacePanel>
   ) : null;
@@ -15557,6 +15627,8 @@ export function App() {
           : undefined
       }
       data-composer-plugin-action={composerPluginAction ?? undefined}
+      data-browser-workspace-action={browserWorkspaceAction ?? undefined}
+      data-browser-workspace-tab={activeBrowserWorkspaceTab?.id}
       data-queue-count={
         isConversationLifecycle || currentComposerQueue26825Replay
           ? queuedPrompts.length
@@ -15803,6 +15875,8 @@ export function App() {
             ? setPullRequestOpen
             : isCurrentCitations26825Replay
               ? setCitationSourcesOpen
+            : isBrowserWorkspaceControlledReplay
+              ? setBrowserPanelOpen
             : isCurrentBrowser26825Replay
               ? setBrowserPanelOpen
             : backgroundTerminalPanelSelected
@@ -15816,6 +15890,8 @@ export function App() {
             ? setPullRequestWidth
             : isCurrentCitations26825Replay
               ? setCitationSourcesWidth
+            : isBrowserWorkspaceControlledReplay
+              ? setBrowserPanelWidth
             : isCurrentBrowser26825Replay
               ? setBrowserPanelWidth
             : backgroundTerminalPanelSelected
@@ -15826,7 +15902,8 @@ export function App() {
         }
         responsivePanelContinuity={
           !initialSelection.capture &&
-          activeFrame !== "pr-compact-detail"
+          activeFrame !== "pr-compact-detail" &&
+          !isBrowserWorkspaceControlledReplay
         }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         responsiveSidebarContinuity={false}
@@ -15841,6 +15918,8 @@ export function App() {
               : pullRequestPanel
             : isCurrentCitations26825Replay
               ? citationSourcesPanel
+            : isBrowserWorkspaceControlledReplay
+              ? browserWorkspacePanel
             : isCurrentBrowser26825Replay
               ? null
             : backgroundTerminalPanelSelected
@@ -15857,6 +15936,8 @@ export function App() {
             ? "Pull request details"
             : isCurrentCitations26825Replay
               ? "Sources"
+            : isBrowserWorkspaceControlledReplay
+              ? "Browser"
             : isCurrentBrowser26825Replay
               ? "Browser"
             : backgroundTerminalPanelSelected
@@ -15872,6 +15953,8 @@ export function App() {
             ? mode === "live" ? 300 : 390
             : isCurrentCitations26825Replay
               ? 374.328125
+            : isBrowserWorkspaceControlledReplay
+              ? 405.53125
             : isCurrentBrowser26825Replay
               ? 405.53125
             : backgroundTerminalPanelSelected
@@ -15887,6 +15970,8 @@ export function App() {
             ? 322
             : isCurrentCitations26825Replay
               ? 320
+            : isBrowserWorkspaceControlledReplay
+              ? 320
             : isCurrentBrowser26825Replay
               ? 320
             : backgroundTerminalPanelSelected
@@ -15900,6 +15985,8 @@ export function App() {
             ? pullRequestOpen
             : isCurrentCitations26825Replay
               ? citationSourcesOpen
+            : isBrowserWorkspaceControlledReplay
+              ? browserPanelOpen
             : isCurrentBrowser26825Replay
               ? browserPanelOpen
             : backgroundTerminalPanelSelected
@@ -15914,6 +16001,7 @@ export function App() {
         sidePanelOverlayModal={
           view !== "pull-request" &&
           !isCurrentCitations26825Replay &&
+          !isBrowserWorkspaceControlledReplay &&
           !backgroundTerminalPanelSelected &&
           !subagentPanelSelected
         }
@@ -15923,6 +16011,8 @@ export function App() {
             ? pullRequestWidth
             : isCurrentCitations26825Replay
               ? citationSourcesWidth
+            : isBrowserWorkspaceControlledReplay
+              ? browserPanelWidth
             : isCurrentBrowser26825Replay
               ? browserPanelWidth
             : backgroundTerminalPanelSelected
@@ -15944,6 +16034,7 @@ export function App() {
                 isCurrentRichMarkdownStreamingReplay ||
                 usesCurrent26825ThreadHeader ||
                 isCurrentCitations26825Replay ||
+                isBrowserWorkspaceControlledReplay ||
                 isCurrentPullRequestRouteReplay
               ? activeFrame === "terminal-current-26-825-compact-sidebar"
                 ? 320.265625
