@@ -6636,6 +6636,26 @@ textarea {
 .demo-live-pr-content h2 { font-size: 18px; }
 .demo-live-pr-content pre { white-space: pre; overflow: auto; max-width: 100%; }
 .demo-live-pr-panel { background: var(--codex-ui-background-surface); color: var(--codex-ui-text-foreground); }
+.demo-live-environment-settings {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.demo-live-environment-settings p { margin: 0; }
+.demo-live-environment-settings__field { display: grid; gap: 6px; max-width: 28rem; }
+.demo-live-environment-settings__field input { box-sizing: border-box; max-width: 100%; min-width: 0; }
+.demo-live-environment-settings__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-live-environment-settings__result {
+  border: 1px solid var(--codex-ui-border, rgb(255 255 255 / 12%));
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  max-width: 36rem;
+  padding: 12px;
+}
+.demo-live-environment-settings__result h2 { font-size: 14px; margin: 0; }
+.demo-live-environment-settings__result code { overflow-wrap: anywhere; }
 .demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__backdrop[hidden] {
   display: none !important;
 }

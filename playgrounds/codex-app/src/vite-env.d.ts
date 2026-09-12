@@ -57,6 +57,7 @@ interface CodexDemoBridge {
     }[]
   >;
   listLiveProjects(): Promise<Array<{ label: string; path: string; projectToken?: string }>>;
+  readEnvironmentStatus(input: { projectToken: string; environmentId: string }): Promise<import("../electron/live-environment-status").LiveEnvironmentStatusResult>;
   renameLiveThread(input: { projectToken: string; threadId: string; name: string }): Promise<{ threadId: string; title: string }>;
   setLiveThreadArchived(input: { projectToken: string; threadId: string; archived: boolean }): Promise<{ threadId: string; archived: boolean; changedThreadIds: string[] }>;
   selectProjectDirectory(): Promise<

@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   selectAttachments: () => ipcRenderer.invoke("demo:attachments:select"),
   selectProjectDirectory: () => ipcRenderer.invoke("demo:project:select"),
   listLiveProjects: () => ipcRenderer.invoke("demo:live:projects"),
+  readEnvironmentStatus: (input) => ipcRenderer.invoke("demo:environment:status", input),
   renameLiveThread: (input) => ipcRenderer.invoke("demo:live:thread:rename", input),
   setLiveThreadArchived: (input) => ipcRenderer.invoke("demo:live:thread:archive", input),
   createAndCheckoutBranch: (input) =>
