@@ -42,6 +42,7 @@ import { cleanupMergedPullRequest } from "./git-pr-cleanup.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
+import { normalizeEnvironmentId, readLiveEnvironmentStatus } from "./live-environment-status.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
   checkoutGitBranch,
@@ -900,6 +901,17 @@ function createWindow() {
 }
 
 ipcMain.handle("demo:live:start", startLive);
+ipcMain.handle("demo:environment:status", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input } = resolveHistoryProject(raw);
+  const environmentId = normalizeEnvironmentId((input as { environmentId?: unknown }).environmentId);
+  const connectedClient = await ensureClient();
+  const result = await readLiveEnvironmentStatus(connectedClient, environmentId);
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session closed while checking environment status.");
+  }
+  return result;
+});
 ipcMain.handle("demo:git:commit-preview", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);

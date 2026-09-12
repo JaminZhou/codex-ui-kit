@@ -1268,6 +1268,20 @@ draft. The wide/720 Electron gate covers externally added/renamed owned projects
 stable project tokens and recovery after a corrupt registry. Continuous
 background synchronization remains separate work.
 
+The Live environment-status follow-up adds one deliberately narrow Stage 3
+vertical slice: an owned-project sidebar route accepts a single opaque public
+App Server environment ID and renders ready, pending, disconnected, unknown,
+error/retry, and late-response replacement states. Main-process IPC verifies
+the trusted project token and rejects paths and URLs before it can start a
+Live App Server client; the only public protocol method in scope is
+`environment/status`. It neither lists, creates, edits, connects, recovers,
+nor persists environments. Focused unit coverage and synthetic Electron IPC
+exercise the actual preload/renderer route at 1180px and 720px, including the
+preflight rejection and the return-to-conversation action, without a model
+turn or a real remote-environment request. It is own-playground functional
+evidence, not installed-Codex visual parity or coverage of configured remote
+environment workflows.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:

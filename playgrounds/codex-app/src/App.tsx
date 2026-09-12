@@ -209,6 +209,7 @@ import { LiveCommitPreview } from "./LiveCommitPreview";
 import { LivePushPreview } from "./LivePushPreview";
 import { LivePullRequest } from "./LivePullRequest";
 import { useLivePullRequestRoute } from "./useLivePullRequestRoute";
+import { LiveEnvironmentStatus } from "./LiveEnvironmentStatus";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -6856,6 +6857,19 @@ export function App() {
             : sidebarRecentItems}
       </AppSidebarSection>
       <AppSidebarSection title="Connection">
+        {mode === "live" && <AppSidebarItem
+          disabled={!workspaceProjectToken}
+          leading={<SidebarGlyph name="folder-current" />}
+          onClick={() => {
+            setWorkspacePage("environments");
+            setActiveFrame("workspace-environments-live-status");
+            setView("workspace");
+            dismissSidebarAfterNavigation();
+          }}
+          selected={view === "workspace" && workspacePage === "environments"}
+        >
+          Environment status
+        </AppSidebarItem>}
         <AppSidebarItem
           disabled={!window.codexDemo}
           leading={<SidebarGlyph name="plugins" />}
@@ -8524,7 +8538,9 @@ export function App() {
     );
   const workspaceBaseFrame =
     workspacePage === "environments"
-      ? "workspace-environments-unavailable"
+      ? mode === "live"
+        ? "workspace-environments-live-status"
+        : "workspace-environments-unavailable"
       : workspacePage === "general-settings"
         ? activeFrame?.startsWith("workspace-general-settings")
           ? activeFrame
@@ -9255,7 +9271,11 @@ export function App() {
                   onSelect={() => {
                     setWorkspaceOverlay(null);
                     setWorkspacePage("environments");
-                    setActiveFrame("workspace-environments-unavailable");
+                    setActiveFrame(
+                      mode === "live"
+                        ? "workspace-environments-live-status"
+                        : "workspace-environments-unavailable",
+                    );
                   }}
                 >
                   Set up project
@@ -10160,7 +10180,7 @@ export function App() {
   ) : null;
   const workspaceEnvironmentSettingsRoute = (
     <div className="demo-workspace-environment-settings-route">
-      <EnvironmentSettingsPage status="unavailable" />
+      {mode === "live" ? <LiveEnvironmentStatus projectToken={workspaceProjectToken} /> : <EnvironmentSettingsPage status="unavailable" />}
     </div>
   );
   const settingsNavigation = [
@@ -15821,6 +15841,11 @@ export function App() {
                       icon: <CurrentBuildIcon name="window-chrome-back" />,
                       label: "Back to ChatGPT",
                       onClick: () => {
+                        if (mode === "live") {
+                          setView("conversation");
+                          setActiveFrame("home");
+                          return;
+                        }
                         setWorkspacePage("conversation");
                         setActiveFrame(
                           workspaceEnvironmentId === "worktree"
