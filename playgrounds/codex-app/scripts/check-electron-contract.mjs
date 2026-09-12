@@ -1279,6 +1279,24 @@ for (const scheduledScene of [
     view: "automations",
     windowSize: { height: 820, width: 720 },
   },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903",
+    id: "electron-current-scheduled-26-903-wide",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-manual",
+    id: "electron-current-scheduled-26-903-manual-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
 ]) {
   const { app: scheduledApp, page: scheduledPage } = await launchScene(
     scheduledScene,
@@ -1287,6 +1305,9 @@ for (const scheduledScene of [
   try {
     const compact = scheduledScene.id.endsWith("compact");
     const manual = scheduledScene.frame.includes("manual");
+    const currentBuild26903 = scheduledScene.frame.startsWith(
+      "scheduled-current-26-903",
+    );
     const nativeBounds = await scheduledApp.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0]?.getContentBounds(),
     );
@@ -1309,6 +1330,9 @@ for (const scheduledScene of [
       return {
         editor: rect(editor),
         heading: rect(pageRoot?.querySelector("h1")),
+        headingFontWeight: pageRoot?.querySelector("h1")
+          ? getComputedStyle(pageRoot.querySelector("h1")).fontWeight
+          : null,
         horizontalOverflow:
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
@@ -1343,7 +1367,8 @@ for (const scheduledScene of [
           !scheduled.search ||
           Math.abs(scheduled.search.left - 387.4375) > 1 ||
           Math.abs(scheduled.search.width - 728) > 1 ||
-          scheduled.taskCount !== 2 ||
+          scheduled.taskCount !== (currentBuild26903 ? 3 : 2) ||
+          scheduled.headingFontWeight !== (currentBuild26903 ? "500" : "400") ||
           scheduled.suggestionCount !== 3)
     ) {
       throw new Error(

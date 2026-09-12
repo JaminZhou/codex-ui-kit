@@ -1592,8 +1592,11 @@ without confusing package readiness with full product reconstruction.
     now delivered for wide/compact index layout, status/search empty states,
     suggestions, split Create choices, navigator/manual editor, unavailable
     recovery, Browser/CDP, Electron, and four local-only current-product pixel
-    comparisons. Real task creation, edit, pause/resume, detail, execution,
-    delivery, and permission/failure transitions remain open. Plugin detail
+    comparisons. The promoted 26.903.71938 native baseline now has a separate
+    four-frame current-build replay (wide/compact index plus manual editor)
+    with CDP, Electron, and regional-pixel gates; 26.825 remains historical
+    regression evidence. Real task creation, edit, pause/resume, detail,
+    execution, delivery, and permission/failure transitions remain open. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only
