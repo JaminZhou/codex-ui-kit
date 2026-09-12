@@ -1802,7 +1802,10 @@
       "ownership": "workspace",
       "packageEvidence": [
         "artifact-tab-content",
-        "artifact-preview-status"
+        "artifact-preview-status",
+        "document-preview-panel",
+        "playground:workspace-document-preview-route",
+        "electron:workspace-document-preview-replay"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
@@ -1820,7 +1823,11 @@
         "docx-preview-panel",
         "PopcornElectronWorkbookPanel",
         "PopcornElectronPresentationPanel",
-        "document-preview-panel"
+        "document-preview-panel",
+        "playground:workspace-document-preview-ready-loading-error",
+        "browser-cdp:workspace-document-preview-three-lifecycle-frames",
+        "electron:workspace-document-preview-three-lifecycle-frames",
+        "pixel:workspace-document-preview-three-reviewed-baselines"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",

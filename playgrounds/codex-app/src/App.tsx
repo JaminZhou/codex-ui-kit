@@ -39,6 +39,7 @@ import {
   ConversationProjectListbox,
   ConversationThreadShell,
   Dialog,
+  DocumentPreviewPanel,
   EnvironmentSettingsPage,
   FileChangeGroup,
   FileRevertErrorDialog,
@@ -135,6 +136,8 @@ import {
   type ComposerModeKind,
   type ComposerResourceGroup,
   type CodeReviewSettingsValue,
+  type DocumentPreviewKind,
+  type DocumentPreviewStatus,
   type GeneralSettingsValue,
   type GitSettingsValue,
   type HookSettingsEntry,
@@ -770,6 +773,26 @@ function querySelection() {
     theme,
     view,
   };
+}
+
+function documentPreviewStatusForFrame(
+  frame: string | null,
+): DocumentPreviewStatus {
+  if (frame?.endsWith("-loading")) return "loading";
+  if (frame?.endsWith("-error")) return "error";
+  if (frame?.endsWith("-empty")) return "empty";
+  return "ready";
+}
+
+function documentPreviewKindForFrame(
+  frame: string | null,
+): DocumentPreviewKind {
+  if (frame?.includes("document-preview")) return "pdf";
+  if (frame?.includes("notebook")) return "notebook";
+  if (frame?.includes("spreadsheet")) return "spreadsheet";
+  if (frame?.includes("presentation")) return "presentation";
+  if (frame?.includes("document")) return "document";
+  return "pdf";
 }
 
 function isNarrowDemoWindow() {
@@ -3317,6 +3340,11 @@ export function App() {
         },
   );
   const [mcpSettingsAction, setMcpSettingsAction] = useState("");
+  const [documentPreviewStatus, setDocumentPreviewStatus] =
+    useState<DocumentPreviewStatus>(() =>
+      documentPreviewStatusForFrame(initialSelection.frame),
+    );
+  const [documentPreviewAction, setDocumentPreviewAction] = useState("");
   const [routeHistory, setRouteHistory] = useState(() =>
     createDemoRouteHistory(
       initialSelection.view,
@@ -3449,6 +3477,7 @@ export function App() {
     | "appearance-settings"
     | "code-review-settings"
     | "conversation"
+    | "document-preview"
     | "environments"
     | "general-settings"
     | "git-settings"
@@ -3487,6 +3516,9 @@ export function App() {
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
         ? "keyboard-shortcuts-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-document-preview")
+        ? "document-preview"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith(
             "workspace-mcp-settings-current-26-825",
@@ -8739,6 +8771,10 @@ export function App() {
         ? initialSelection.frame?.startsWith("workspace-appearance-settings")
           ? initialSelection.frame
           : "workspace-appearance-settings"
+      : workspacePage === "document-preview"
+        ? activeFrame?.startsWith("workspace-document-preview")
+          ? activeFrame
+          : "workspace-document-preview-ready"
       : workspacePage === "git-settings"
         ? initialSelection.frame === "workspace-git-settings-compact"
           ? "workspace-git-settings-compact"
@@ -10966,11 +11002,50 @@ export function App() {
       personalCards={currentPersonalPlanCards(planMultiplier)}
     />
   );
+  const workspaceDocumentPreviewRoute = (
+    <div
+      className="demo-document-preview-route"
+      data-testid="document-preview-route"
+    >
+      <DocumentPreviewPanel
+        data-testid="document-preview-panel"
+        errorDescription="The preview service returned no document pages."
+        kind={documentPreviewKindForFrame(activeFrame)}
+        onOpen={() => setDocumentPreviewAction("Open requested")}
+        onRetry={() => {
+          setDocumentPreviewStatus("ready");
+          setDocumentPreviewAction("Retry requested");
+        }}
+        status={documentPreviewStatus}
+        subtitle="2 pages · 18 KB · workspace artifact"
+        title="design-spec.pdf"
+        toolbar={
+          <span aria-live="polite" className="demo-document-preview-action">
+            {documentPreviewAction}
+          </span>
+        }
+      >
+        <div
+          aria-label="Preview page 1 of 2"
+          className="demo-document-preview-page"
+          role="img"
+        >
+          <span className="demo-document-preview-page__eyebrow">
+            CODEx UI KIT
+          </span>
+          <strong>Workspace artifact preview</strong>
+          <span>Renderer-owned preview surface; file decoding stays host-owned.</span>
+        </div>
+      </DocumentPreviewPanel>
+    </div>
+  );
   const workspaceRoute =
     workspacePage === "plan-settings"
       ? workspacePlanSettingsRoute
       : workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
+      : workspacePage === "document-preview"
+      ? workspaceDocumentPreviewRoute
       : workspacePage === "git-settings" ||
           workspacePage === "hooks-settings" ||
           workspacePage === "code-review-settings" ||
