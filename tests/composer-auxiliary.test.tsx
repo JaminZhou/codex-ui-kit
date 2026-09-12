@@ -332,6 +332,37 @@ describe("composer auxiliary surfaces", () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
+  it("renders a host-owned plugin connection action outside resource selection", () => {
+    const onConnect = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <ComposerResourcePicker
+        footer={
+          <button onClick={onConnect} type="button">
+            <span>Connect plugins</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        }
+        groups={[
+          {
+            id: "plugins",
+            label: "Plugins",
+            options: [{ id: "documents", label: "Documents" }],
+          },
+        ]}
+        onSelect={onSelect}
+      />,
+    );
+
+    const picker = screen.getByRole("listbox", {
+      name: "Composer resources",
+    });
+    expect(picker.getAttribute("data-has-footer")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Connect plugins" }));
+    expect(onConnect).toHaveBeenCalledOnce();
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   it("exposes loading and empty mention states", () => {
     const onSelect = vi.fn();
     const { rerender } = render(

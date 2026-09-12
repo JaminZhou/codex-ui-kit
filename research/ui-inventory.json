@@ -1018,7 +1018,11 @@
       "ownership": "thread",
       "packageEvidence": [
         "composer-work-home-plugins-control",
-        "connect-plugins-submenu-item"
+        "connect-plugins-submenu-item",
+        "composer-resource-picker-plugin-footer",
+        "playground:composer-plugin-connect-controlled-replay",
+        "electron:composer-plugin-connect-select-dismiss-focus",
+        "pixel:composer-plugin-connect-own-fixture-1180-720-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
