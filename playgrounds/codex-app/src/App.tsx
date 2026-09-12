@@ -709,6 +709,7 @@ function querySelection() {
     "project-menu",
     "collection-empty",
     "collection-loading",
+    "collection-error",
     "collection-long-list",
     "status-lifecycle",
     "thread-lifecycle-current",
@@ -6536,6 +6537,11 @@ export function App() {
           data-sidebar-collection-fixture="loading"
           isLoading
           loadingLabel="Loading chats"
+        />
+      ) : initialSelection.sidebarState === "collection-error" ? (
+        <AppSidebarCollection
+          data-sidebar-collection-fixture="error"
+          error="Could not load chats"
         />
       ) : (
         <>

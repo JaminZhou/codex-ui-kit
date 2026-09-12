@@ -1550,6 +1550,14 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-collection-error",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "collection-error",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-collection-long-list",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
