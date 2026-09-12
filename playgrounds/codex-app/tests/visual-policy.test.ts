@@ -178,6 +178,35 @@ describe("lifecycle visual policy", () => {
     );
   });
 
+  it("gates the runtime-observed 26.903 MCP failure recovery turn", () => {
+    for (const scene of [
+      "mcp-current-26-903-recovery",
+      "mcp-current-26-903-recovery-compact",
+      "mcp-current-26-903-recovery-sources-pinned",
+    ]) {
+      expect(electronHarness).toContain(`id: "${scene}"`);
+    }
+    for (const reference of [
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_903_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_RECOVERY_26_903_COMPACT_REFERENCE",
+      "CODEX_UI_KIT_CURRENT_MCP_SOURCES_26_903_RECOVERY_REFERENCE",
+    ]) {
+      expect(contract).toContain(reference);
+    }
+    expect(cdpContract).toContain(
+      'scene.scenario === "mcp-current-26-903-recovery"',
+    );
+    expect(electronContract).toContain(
+      'id: "electron-current-mcp-26-903-recovery"',
+    );
+    expect(appSource).toContain(
+      'scenarioId === "mcp-current-26-903-recovery"',
+    );
+    expect(appStyles).toContain(
+      '[data-scenario="mcp-current-26-903-recovery"]',
+    );
+  });
+
   it("gates the runtime-observed 26.825 transport recovery lifecycle", () => {
     for (const scene of [
       "current-transport-network-waiting",

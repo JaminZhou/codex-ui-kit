@@ -72,7 +72,16 @@ observation from a previous build remains historical evidence.
   26.825.51511 evidence until re-observed on 26.903. Browser success is now
   current activity-only evidence on its recorded build; the
   separate Browser workspace remains 26.825.31414 regression evidence. The
-  previous activity follow-up first re-observed the 14/21px
+  current 26.903 MCP recovery slice now records an invalid `Fetch OpenAI doc`
+  followed in the same turn by `Search OpenAI docs` and a valid Fetch. The
+  failed row remains flat beside the two completed rows; no error card, row
+  disclosure, or universal retry behavior is inferred. Wide 1180×820, compact
+  720×680, and pinned-Sources Browser/CDP, Electron, and replay contracts pass,
+  with optional local-only product-region differences of 5.9622%, 4.1367%, and
+  3.7687% under independent 6.5%, 5%, and 5% ceilings. Native references stay
+  local-only; authentication, approval, cancellation, and other MCP
+  transitions remain open. The previous activity follow-up first re-observed
+  the 14/21px
   cadenced `Thinking` label with its 38.5% base and 75% sweep, plus
   collapsed/expanded `Worked for` and `Ran …` command rows. The tight
   previous-product `Thinking` comparison passes at 0.6%. The current Plan
@@ -273,7 +282,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 13 have current-build runtime evidence, 70 have previous-build-only runtime evidence, 8 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
+Current inventory: 91 surface groups; 14 have current-build runtime evidence, 69 have previous-build-only runtime evidence, 8 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

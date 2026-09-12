@@ -44,6 +44,7 @@ import mcpCurrent26818SuccessTrace from "../fixtures/traces/mcp-current-26-818-s
 import mcpCurrent26820RecoveryTrace from "../fixtures/traces/mcp-current-26-820-recovery.jsonl?raw";
 import mcpCurrent26820SuccessTrace from "../fixtures/traces/mcp-current-26-820-success.jsonl?raw";
 import mcpCurrent26825LifecycleTrace from "../fixtures/traces/mcp-current-26-825-lifecycle.jsonl?raw";
+import mcpCurrent26903RecoveryTrace from "../fixtures/traces/mcp-current-26-903-recovery.jsonl?raw";
 import mcpCurrent26903SuccessTrace from "../fixtures/traces/mcp-current-26-903-success.jsonl?raw";
 import mcpCurrentRecoveryTrace from "../fixtures/traces/mcp-current-recovery.jsonl?raw";
 import mcpCurrentSuccessTrace from "../fixtures/traces/mcp-current-success.jsonl?raw";
@@ -115,6 +116,7 @@ export type ReplayScenarioId =
   | "mcp-current-26-820-recovery"
   | "mcp-current-26-820-success"
   | "mcp-current-26-825-lifecycle"
+  | "mcp-current-26-903-recovery"
   | "mcp-current-26-903-success"
   | "mcp-current-recovery"
   | "mcp-current-success"
@@ -506,6 +508,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Find official Codex MCP page",
     "The runtime-observed 26.903 product groups three OpenAI Developer Docs Search calls and one Fetch call in a single successful turn.",
     mcpCurrent26903SuccessTrace,
+  ),
+  "mcp-current-26-903-recovery": scenario(
+    "mcp-current-26-903-recovery",
+    "Recover MCP docs page",
+    "The runtime-observed 26.903 product first shows an invalid Fetch row, then recovers with Search and Fetch in the same turn while retaining the current Sources summary.",
+    mcpCurrent26903RecoveryTrace,
   ),
   "mcp-tool-call": scenario(
     "mcp-tool-call",

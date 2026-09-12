@@ -27,7 +27,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 13 groups have current-build runtime evidence, 70 have previous-build-only
+- 14 groups have current-build runtime evidence, 69 have previous-build-only
   runtime evidence, and 8 have not been sampled. Browser/Electron verified
   statuses are intentionally downgraded until the affected slices are
   re-observed on 26.903; their older gates remain regression fixtures.
@@ -355,6 +355,17 @@ exit gates; it does not replace the inventory.
   product regions pass at 4.386%, 4.391%, and 4.260% under independent 5%
   ceilings. This does not promote recovery, approval, authentication, or other
   MCP transitions, and the native product references remain local-only. The
+  current 26.903.71938 recovery task separately captures an invalid
+  `Fetch OpenAI doc` followed in the same turn by `Search OpenAI docs` and a
+  valid `Fetch OpenAI doc`. The three flat rows retain the failed status without
+  an error card or row disclosure, and the canonical final answer is
+  `CURRENT MCP 26.903 RECOVERY — Model Context Protocol —
+  https://learn.chatgpt.com/docs/extend/mcp`. Wide, compact, and pinned-Sources
+  Browser/CDP, Electron, and replay pixels pass; local-only product regions
+  differ by 5.9622%, 4.1367%, and 3.7687% under 6.5%, 5%, and 5% ceilings.
+  This is one same-turn recovery observation, not a universal automatic-retry
+  rule. Authentication, approval, elicitation, cancellation, and other MCP
+  transitions remain open, and native references remain local-only. The
   current citations follow-up separately
   reaches three real inline OpenAI citations and the five-query Web Search
   Sources workspace. Six wide/compact replay frames pass Browser/CDP,

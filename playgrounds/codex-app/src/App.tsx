@@ -655,10 +655,12 @@ function CurrentMcpAnswer({
   current26903?: boolean;
   recovery?: boolean;
 }) {
-  const href = recovery && !current26825
-    ? "https://learn.chatgpt.com/docs/mcp-server"
-    : current26903
-      ? "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features"
+  const href = current26903
+    ? recovery
+      ? "https://learn.chatgpt.com/docs/extend/mcp"
+      : "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features"
+    : recovery && !current26825
+      ? "https://learn.chatgpt.com/docs/mcp-server"
       : "https://learn.chatgpt.com/docs/extend/mcp";
   return (
     <div
@@ -681,8 +683,9 @@ function CurrentMcpAnswer({
           </>
         ) : current26903 ? (
           <>
-            Model Context Protocol
-            <br />
+            {recovery ? "CURRENT MCP 26.903 RECOVERY — " : ""}
+            Model Context Protocol{recovery ? " — " : null}
+            {!recovery ? <br /> : null}
             <CurrentMcpLink href={href} />
           </>
         ) : recovery ? (
@@ -4597,10 +4600,14 @@ export function App() {
     mode === "replay" && scenarioId === "mcp-current-26-825-lifecycle";
   const isCurrentMcp26903SuccessReplay =
     mode === "replay" && scenarioId === "mcp-current-26-903-success";
+  const isCurrentMcp26903RecoveryReplay =
+    mode === "replay" && scenarioId === "mcp-current-26-903-recovery";
+  const isCurrentMcp26903Replay =
+    isCurrentMcp26903SuccessReplay || isCurrentMcp26903RecoveryReplay;
   const usesCurrentMcpFlatRows =
     isCurrentMcp26820Replay ||
     isCurrentMcp26825Replay ||
-    isCurrentMcp26903SuccessReplay;
+    isCurrentMcp26903Replay;
   const isCurrentMcpSuccessReplay =
     mode === "replay" &&
     (scenarioId === "mcp-current-success" ||
@@ -4613,7 +4620,8 @@ export function App() {
     (scenarioId === "mcp-current-recovery" ||
       scenarioId === "mcp-current-26-818-recovery" ||
       scenarioId === "mcp-current-26-820-recovery" ||
-      scenarioId === "mcp-current-26-825-lifecycle");
+      scenarioId === "mcp-current-26-825-lifecycle" ||
+      scenarioId === "mcp-current-26-903-recovery");
 
   const clearCurrentWorktreeSetupTimers = useCallback(() => {
     currentWorktreeSetupTimersRef.current.forEach((timer) =>
@@ -7294,7 +7302,7 @@ export function App() {
       className={
         usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
-        isCurrentMcp26903SuccessReplay ||
+        isCurrentMcp26903Replay ||
         isCurrentCitations26825Replay
           ? "demo-current-basic-26-825-header"
           : undefined
@@ -7302,7 +7310,7 @@ export function App() {
       endActions={
         usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
-        isCurrentMcp26903SuccessReplay ||
+        isCurrentMcp26903Replay ||
         isCurrentCitations26825Replay ? (
           <div className="demo-current-basic-26-825-header-actions">
             <button aria-label="Share" type="button">
@@ -7317,14 +7325,14 @@ export function App() {
                   : isCurrentAttachment26825Replay
                     ? activeFrame ===
                       "attachment-current-26-825-completed"
-                  : isCurrentMcp26825Replay || isCurrentMcp26903SuccessReplay
+                  : isCurrentMcp26825Replay || isCurrentMcp26903Replay
                   ? mcpSourceSummaryPinned
                   : undefined
               }
               onClick={
                 isCurrentCitations26825Replay
                   ? () => setCitationSummaryOpen((open) => !open)
-                  : isCurrentMcp26825Replay || isCurrentMcp26903SuccessReplay
+                  : isCurrentMcp26825Replay || isCurrentMcp26903Replay
                   ? () => {
                       if (mcpSourceSummaryOpen && mcpSourceSummaryPinned) {
                         setMcpSourceSummaryOpen(false);
@@ -7338,7 +7346,7 @@ export function App() {
               }
               ref={
                 isCurrentMcp26825Replay ||
-                isCurrentMcp26903SuccessReplay ||
+                isCurrentMcp26903Replay ||
                 isCurrentCitations26825Replay
                   ? mcpSourceSummaryTriggerRef
                   : undefined
@@ -7633,7 +7641,7 @@ export function App() {
       }
       navigation={
         isCurrentMcp26825Replay ||
-        isCurrentMcp26903SuccessReplay ||
+        isCurrentMcp26903Replay ||
         isCurrentApproval26825FileReplay ||
         isCurrentAttachment26825Replay ? (
           <div className="demo-current-mcp-26-825-header-navigation">
@@ -7778,7 +7786,7 @@ export function App() {
           </span>
         ) : usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
-        isCurrentMcp26903SuccessReplay ||
+        isCurrentMcp26903Replay ||
         isCurrentCitations26825Replay ? (
           <button
             aria-label="Chat actions"
@@ -7800,7 +7808,7 @@ export function App() {
       title={
         usesCurrent26825ThreadHeader ||
         isCurrentMcp26825Replay ||
-        isCurrentMcp26903SuccessReplay ||
+        isCurrentMcp26903Replay ||
         isCurrentCitations26825Replay
           ? (
               <>
@@ -7818,7 +7826,7 @@ export function App() {
                 >
                   <span>
                     {isCurrentMcp26825Replay ||
-                    isCurrentMcp26903SuccessReplay ||
+                    isCurrentMcp26903Replay ||
                     isCurrentCitations26825Replay ||
                     isCurrentApproval26825FileReplay ||
                     isCurrentAttachment26825Replay
@@ -13342,6 +13350,8 @@ export function App() {
           (scenarioId === "mcp-current-integration-recovery" &&
             message.id ===
               "assistant-current-integration-recovery-intro") ||
+          (isCurrentMcp26903RecoveryReplay &&
+            message.id === "assistant-current-mcp-26-903-recovery-intro") ||
           (isCurrentMixedToolReplay &&
             message.id === "assistant-current-mixed-mcp-intro")) &&
         hasMcpToolCallGroupForTurn(state, message.turnId);
@@ -13534,7 +13544,9 @@ export function App() {
                     message.id ===
                       "assistant-current-mcp-26-820-recovery" ||
                     message.id ===
-                      "assistant-current-mcp-26-825-recovery")) ||
+                      "assistant-current-mcp-26-825-recovery" ||
+                    message.id ===
+                      "assistant-current-mcp-26-903-recovery")) ||
                 (scenarioId === "mcp-current-integration-recovery" &&
                   (message.id ===
                     "assistant-current-integration-unavailable" ||
@@ -13657,7 +13669,7 @@ export function App() {
                         ? "Response actions"
                         : undefined
                     }
-                    rateResponse={isCurrentMcp26903SuccessReplay}
+                    rateResponse={isCurrentMcp26903Replay}
                     toolbar={
                       !isAnyCurrentBasicMessageReplay &&
                       !isCurrentAttachment26825Replay &&
@@ -13773,6 +13785,9 @@ export function App() {
               ) : message.id ===
                 "assistant-current-mcp-26-903-success" ? (
                 <CurrentMcpAnswer current26903 />
+              ) : message.id ===
+                "assistant-current-mcp-26-903-recovery" ? (
+                <CurrentMcpAnswer current26903 recovery />
               ) : message.id ===
                 "assistant-current-citations-26-825" ? (
                 <CurrentCitationAnswer />
@@ -14254,6 +14269,8 @@ export function App() {
           (id === "assistant-mcp-intro" ||
             (scenarioId === "mcp-current-integration-recovery" &&
               id === "assistant-current-integration-recovery-intro") ||
+            (isCurrentMcp26903RecoveryReplay &&
+              id === "assistant-current-mcp-26-903-recovery-intro") ||
             (isCurrentMixedToolReplay &&
               id === "assistant-current-mixed-mcp-intro")),
       );
@@ -14284,7 +14301,8 @@ export function App() {
             activeFrame === "mcp-current-26-818-recovery-completed" ||
             activeFrame === "mcp-current-26-820-recovery-retrying" ||
             activeFrame === "mcp-current-26-820-recovery-completed" ||
-            activeFrame === "mcp-current-26-825-recovery")) ||
+            activeFrame === "mcp-current-26-825-recovery" ||
+            activeFrame === "mcp-current-26-903-recovery")) ||
         (scenarioId === "mcp-current-integration-recovery" &&
           (activeFrame === "mcp-current-integration-recovering" ||
             activeFrame === "mcp-current-integration-recovered")) ||
@@ -14392,7 +14410,8 @@ export function App() {
                     initialSelection.capture &&
                     (call.id === "mcp-fetch-invalid" ||
                       call.id === "mcp-current-fetch-invalid" ||
-                      call.id === "mcp-current-26-818-fetch-invalid") &&
+                      call.id === "mcp-current-26-818-fetch-invalid" ||
+                      call.id === "mcp-current-26-903-recovery-fetch-invalid") &&
                     (activeFrame === "mcp-recovery-failed" ||
                       activeFrame === "mcp-recovery-completed" ||
                       activeFrame === "mcp-current-recovery-failed" ||
@@ -14400,7 +14419,8 @@ export function App() {
                       activeFrame ===
                         "mcp-current-26-818-recovery-failed" ||
                       activeFrame ===
-                        "mcp-current-26-818-recovery-completed")
+                        "mcp-current-26-818-recovery-completed" ||
+                      activeFrame === "mcp-current-26-903-recovery")
                       ? true
                       : undefined
                   }
@@ -16792,6 +16812,44 @@ export function App() {
                         title="AppKitInspector"
                       />
                     </>
+                  ) : isCurrentMcp26903RecoveryReplay ? (
+                    <ThreadSummarySection
+                      actions={
+                        <ThreadSummaryIconButton
+                          icon="+"
+                          label="Set up local environment"
+                        />
+                      }
+                      title="Environment"
+                    >
+                      <ThreadSummaryItem
+                        label="Changes"
+                        leading={<SummaryGlyph name="changes" />}
+                        meta={<ThreadSummaryDelta added={0} removed={0} />}
+                      />
+                      <ThreadSummaryItem
+                        label="Local"
+                        leading={<SummaryGlyph name="computer" />}
+                        title="Select where to run the chat"
+                        trailing="⌄"
+                      />
+                      <ThreadSummaryItem
+                        label="main"
+                        leading={<SummaryGlyph name="branch" />}
+                        title="Switch branch"
+                        trailing="⌄"
+                      />
+                      <ThreadSummaryItem
+                        disabled
+                        label="Commit or push"
+                        leading={<SummaryGlyph name="commit" />}
+                      />
+                      <ThreadSummaryItem
+                        disabled
+                        label="Compare branch"
+                        leading={<SummaryGlyph name="branch" />}
+                      />
+                    </ThreadSummarySection>
                   ) : (
                     <ThreadSummarySection
                       actions={
