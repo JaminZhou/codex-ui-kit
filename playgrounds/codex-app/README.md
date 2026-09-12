@@ -67,6 +67,16 @@ The Electron main process owns `CodexAppServerClient`; the sandboxed renderer
 receives sanitized events and returns explicit approval decisions through
 preload IPC.
 
+### MCP elicitation form
+
+The playground also includes a deterministic `mcp-elicitation` replay for the
+public `mcpServer/elicitation/request` server request. It renders typed
+string/enum/boolean fields, validates required values and thread ownership, and
+returns explicit Accept, Decline, or Cancel responses. The live Electron path
+uses the same bounded gate through preload IPC; answers are delivered to the
+App Server callback and are not copied into transcript history. This is
+playground protocol evidence, not a claim about the installed Codex renderer.
+
 ## Third vertical slice
 
 The third slice extends the file workflow to the current multi-file shape:

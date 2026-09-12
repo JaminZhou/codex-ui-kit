@@ -32,6 +32,7 @@
     "check:live-stop": "node scripts/check-live-stop.mjs",
     "check:user-input": "node scripts/check-user-input-contract.mjs",
     "check:live-input": "node scripts/check-live-user-input.mjs",
+    "check:mcp-elicitation": "node scripts/check-mcp-elicitation.mjs",
     "check:live-history": "node scripts/check-live-history.mjs",
     "check:history": "node scripts/check-history-contract.mjs",
     "check:project-discovery": "node scripts/check-project-discovery.mjs",
@@ -44,7 +45,7 @@
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
-    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-environment-status && pnpm check:browser-workspace-replay && pnpm check:composer-plugin-connect && pnpm check:sites-index && pnpm check:live-file-content && pnpm check:user-input && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:pr-cleanup && pnpm check:live-pr-route && pnpm check:cdp && pnpm check:document-preview-electron && pnpm check:electron && pnpm check:visual",
+    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-environment-status && pnpm check:browser-workspace-replay && pnpm check:composer-plugin-connect && pnpm check:sites-index && pnpm check:live-file-content && pnpm check:user-input && pnpm check:mcp-elicitation && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:pr-cleanup && pnpm check:live-pr-route && pnpm check:cdp && pnpm check:document-preview-electron && pnpm check:electron && pnpm check:visual",
     "check:all": "pnpm check && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {
