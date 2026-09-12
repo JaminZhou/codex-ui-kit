@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-12T10:34:38.738Z",
+  "baseline": {
+    "appAsarBytes": 306621494,
+    "appAsarSha256": "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
+    "appVersion": "26.903.71938",
+    "buildNumber": "8576",
+    "chromiumVersion": "152.0.7977.83",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationsSubmitted": false,
+    "captureMode": "native-viewport-only"
+  },
+  "page": {
+    "title": "Scheduled tasks",
+    "description": "Ask ChatGPT to schedule tasks, set reminders, or monitor for updates",
+    "nativeViewport": { "width": 2555, "height": 1318 },
+    "heading": {
+      "left": 1082.9375,
+      "top": 66,
+      "width": 454.25,
+      "height": 33.59375,
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "28px",
+      "fontWeight": "500",
+      "lineHeight": "33.6px"
+    },
+    "descriptionRect": {
+      "left": 1082.9375,
+      "top": 107.59375,
+      "width": 454.25,
+      "height": 24
+    },
+    "search": {
+      "left": 1074.9375,
+      "top": 151.59375,
+      "width": 728,
+      "height": 32,
+      "background": "rgb(45, 45, 45)",
+      "border": "1px solid rgba(255, 255, 255, 0.157)",
+      "borderRadius": "9999px",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "14px",
+      "fontWeight": "430",
+      "lineHeight": "18px",
+      "padding": "0px 10px"
+    },
+    "filters": [
+      { "label": "All", "left": 1086.9375, "top": 211.59375, "width": 33.3125, "height": 28 },
+      { "label": "Active", "left": 1122.25, "top": 211.59375, "width": 55.796875, "height": 28 },
+      { "label": "Paused", "left": 1180.046875, "top": 211.59375, "width": 62.828125, "height": 28 },
+      { "label": "Completed", "left": 1244.875, "top": 211.59375, "width": 84.765625, "height": 28 }
+    ],
+    "taskCount": 3,
+    "taskStatuses": ["Pause", "Pause", "Pause"],
+    "suggestions": ["Daily brief", "Weekly review", "Follow-up monitor"],
+    "horizontalOverflow": 0
+  },
+  "visibleIconProvenance": {
+    "source": "read-only current-renderer DOM capture",
+    "taskActionPathCount": 4,
+    "taskActionPathSha256": "746d3584ccac04723abdbc5b1930e0c70a14b147fd6dc2c83d31ce6bef655000",
+    "suggestionPathSha256": {
+      "Daily brief": "edaf91c94627cea8b732fe1f122947e31db60f1f7d071de0dd338cc01be7e8b1",
+      "Weekly review": "32c56c5ed6d142e99935199335060528afe39aee4ed965537890bdba153f323a",
+      "Follow-up monitor": "727ce4dacc5b8ec52cd691126bc3c60313766528016dd7fabf80833d1e169133"
+    }
+  },
+  "evidenceBoundary": [
+    "This is a current-build native-viewport observation only.",
+    "The 1180x820 and 720x680 Browser/CDP and Electron replay contracts remain tied to 26.825.51511 until re-recorded on 26.903.71938.",
+    "No task creation, edit, pause/resume, execution, delivery, or permission mutation was submitted."
+  ]
+}

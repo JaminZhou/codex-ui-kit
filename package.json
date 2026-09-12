@@ -76,7 +76,7 @@
     "capture:current-skill-detail-26-825": "node scripts/capture-current-skill-detail.mjs",
     "capture:current-thread-overflow-26-825": "node scripts/capture-current-thread-overflow.mjs",
     "capture:current-mcp-settings-26-825": "node scripts/capture-current-mcp-settings.mjs",
-    "capture:current-automations-26-825": "node scripts/capture-current-automations.mjs",
+    "capture:current-automations-26-903": "node scripts/capture-current-automations.mjs",
     "capture:current-compaction-26-825": "node scripts/capture-current-compaction.mjs",
     "capture:current-transport-proxy-26-825": "node scripts/current-transport-proxy.mjs",
     "capture:current-review-26-825": "node scripts/capture-current-review-anchor.mjs",

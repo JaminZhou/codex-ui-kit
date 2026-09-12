@@ -38,11 +38,11 @@ if (!profile.startsWith("/private/tmp/codex-ui-kit-")) {
 }
 if (
   dirname(output) !== profile ||
-  !basename(output).startsWith("current-automations-26-825-") ||
+  !basename(output).startsWith("current-automations-26-903-") ||
   !basename(output).endsWith(".json")
 ) {
   throw new Error(
-    "The output must be a current-automations-26-825-*.json direct child of the isolated profile.",
+    "The output must be a current-automations-26-903-*.json direct child of the isolated profile.",
   );
 }
 
