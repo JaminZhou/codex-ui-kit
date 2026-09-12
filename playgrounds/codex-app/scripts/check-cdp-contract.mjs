@@ -9885,8 +9885,17 @@ for (const scene of selectedScenes) {
           ? "Work with Codex across your favorite tools"
           : "Extend Codex with task-specific skills";
       const expectedInstalledCount = expectedKind === "plugins" ? 13 : 6;
-      const expectedSearchLeft = compact ? 21 : 387.4375;
-      const expectedHeadingLeft = compact ? 29 : 395.4375;
+      // A tall catalog may reserve a non-overlay scrollbar on macOS. Anchor
+      // wide coordinates to the measured catalog body so that this host
+      // preference cannot masquerade as an eight-pixel product regression.
+      const expectedSearchLeft =
+        (integrationCatalog.body?.left ?? Number.NaN) + 20;
+      const expectedHeadingLeft =
+        (integrationCatalog.body?.left ?? Number.NaN) + 28;
+      const expectedSearchWidth =
+        (integrationCatalog.body?.width ?? Number.NaN) - 40;
+      const expectedHeadingWidth =
+        (integrationCatalog.body?.width ?? Number.NaN) - 56;
       if (
         integrationCatalog.kind !== expectedKind ||
         integrationCatalog.status !== "ready" ||
@@ -9898,15 +9907,21 @@ for (const scene of selectedScenes) {
         (expectedKind === "plugins" &&
           !integrationCatalog.sectionHeadings.includes("Popular")) ||
         !integrationCatalog.heading ||
+        !integrationCatalog.body ||
+        (!compact && Math.abs(integrationCatalog.body.width - 768) > 1) ||
         Math.abs(integrationCatalog.heading.left - expectedHeadingLeft) > 1 ||
+        Math.abs(integrationCatalog.heading.width - expectedHeadingWidth) > 1 ||
         Math.abs(integrationCatalog.heading.top - 66) > 1 ||
         !integrationCatalog.search ||
         Math.abs(integrationCatalog.search.left - expectedSearchLeft) > 1 ||
         Math.abs(integrationCatalog.search.top - 151.59375) > 1 ||
-        Math.abs(integrationCatalog.search.width - (compact ? 679 : 728)) > 1 ||
+        Math.abs(integrationCatalog.search.width - expectedSearchWidth) > 1 ||
         integrationCatalog.grids.length < (expectedKind === "plugins" ? 2 : 2) ||
         integrationCatalog.grids.some(
-          ({ columns }) => columns.trim().split(/\s+/).length !== 2,
+          ({ columns, rect }) =>
+            columns.trim().split(/\s+/).length !== 2 ||
+            Math.abs(rect.left - expectedSearchLeft) > 1 ||
+            Math.abs(rect.width - expectedSearchWidth) > 1,
         ) ||
         Math.abs(integrationCatalog.horizontalOverflow) > 1 ||
         integrationCatalog.viewport.width !== (compact ? 720 : 1180) ||
