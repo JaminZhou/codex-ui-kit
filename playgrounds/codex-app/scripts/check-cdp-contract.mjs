@@ -130,6 +130,7 @@ for (const scene of selectedScenes) {
           const card = root.querySelector(
             ".codex-ui-worktree-setup__card",
           );
+          const layoutContainer = root.closest(".codex-ui-thread");
           const cardStyle = card ? getComputedStyle(card) : null;
           const details = root.querySelector(
             ".codex-ui-worktree-setup__details",
@@ -169,6 +170,13 @@ for (const scene of selectedScenes) {
             horizontalOverflow:
               document.documentElement.scrollWidth -
               document.documentElement.clientWidth,
+            layoutContainer: layoutContainer
+              ? {
+                  clientWidth: layoutContainer.clientWidth,
+                  offsetWidth: layoutContainer.offsetWidth,
+                  rect: rect(layoutContainer),
+                }
+              : null,
             phase: root.getAttribute("data-phase"),
             role: root.getAttribute("role"),
             root: rect(root),
@@ -212,7 +220,16 @@ for (const scene of selectedScenes) {
         : scene.id.endsWith("-creating")
           ? "creating"
           : "failed";
-      const expectedRootWidth = compact ? 366.125 : 736;
+      // Compact threads can reserve a native scrollbar; measure the fractional
+      // layout canvas instead of assuming an overlay scrollbar.
+      const expectedRootWidth = compact
+        ? setup.layoutContainer
+          ? setup.layoutContainer.rect.width -
+            32 -
+            (setup.layoutContainer.offsetWidth -
+              setup.layoutContainer.clientWidth)
+          : Number.NaN
+        : 736;
       const expectedRootHeight =
         expectedPhase === "created" ? 50 : collapsed || expectedPhase === "creating" ? 141 : 276.5;
       const expectedActions =
@@ -10832,6 +10849,8 @@ for (const scene of selectedScenes) {
               : null,
             navigation: {
               clientHeight: navigation.clientHeight,
+              clientWidth: navigation.clientWidth,
+              offsetWidth: navigation.offsetWidth,
               rect: rect(navigation),
               scrollHeight: navigation.scrollHeight,
             },
@@ -14487,6 +14506,13 @@ for (const scene of selectedScenes) {
       await page.mouse.move(640, 100);
     }
     if (currentSidebarWorktreeLifecycleScene) {
+      // Worktree rows live in the scrollable sidebar navigation, so preserve
+      // their 16px gutters after subtracting any native scrollbar slot.
+      const expectedWorktreeRowWidth =
+        contract.sidebar.navigation.rect.width -
+        16 -
+        (contract.sidebar.navigation.offsetWidth -
+          contract.sidebar.navigation.clientWidth);
       const [active, failed, recovered, restored] =
         contract.sidebar.worktreeFixtures;
       const expectedSelectedFixture = scene.id.startsWith(
@@ -14503,7 +14529,7 @@ for (const scene of selectedScenes) {
         (fixture) =>
           !fixture ||
           fixture.rowRect?.height !== 30 ||
-          Math.abs(fixture.rowRect?.width - 305.875) > 0.1 ||
+          Math.abs(fixture.rowRect?.width - expectedWorktreeRowWidth) > 0.1 ||
           fixture.branchRect?.height !== 14 ||
           fixture.branchRect?.width !== 14 ||
           fixture.branchViewBox !== "0 0 20 20" ||
