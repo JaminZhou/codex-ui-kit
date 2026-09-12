@@ -1807,7 +1807,10 @@
         "playground:workspace-document-preview-route",
         "electron:workspace-document-preview-replay"
       ],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.903.71938:synthetic-pdf-draft-opens-right-workspace-tab-with-expand-compact-hide-reopen-and-close-ownership"
+      ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
       "electronStatus": "not_started",
@@ -1829,7 +1832,10 @@
         "electron:workspace-document-preview-three-lifecycle-frames",
         "pixel:workspace-document-preview-three-reviewed-baselines"
       ],
-      "runtimeStatus": "not_sampled",
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.903.71938:real-two-page-pdf-canvas-preview-pagination-zoom-fit-annotation-mode-wide-and-compact-fourteen-renderer-states"
+      ],
       "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",

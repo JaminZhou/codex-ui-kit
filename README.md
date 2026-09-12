@@ -25,10 +25,14 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   `26.903.71938` (`8576`) build. Its 91 candidate surface groups and
   build-scoped evidence status are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); the current-build
-  refresh currently covers 9 groups, 72 older groups remain explicit
-  regression evidence, and 10 are still unsampled. The 26.903 capture
+  runtime captures currently cover 11 groups, 72 older groups remain explicit
+  regression evidence, and 8 are still unsampled. The 26.903 capture
   revalidates the shell, responsive sidebar, primary route restoration,
-  project-group lifecycle, Help menu, and Projects Index. Older conversation,
+  project-group lifecycle, Help menu, and Projects Index. A separate
+  [PDF workspace capture](research/26.903.71938-pdf.md) now observes the real
+  right-hand preview and its lifecycle. Its decoded PDF replay and targeted
+  Electron lifecycle now work; composed product pixels and full acceptance
+  remain pending. Older conversation,
   Markdown, MCP, Review, Settings, Plugin, and Electron/pixel slices remain
   build-scoped until re-observed on 26.903. This remains a partial UI
   foundation rather than a global reconstruction claim.

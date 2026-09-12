@@ -278,6 +278,17 @@ export const visualScenes = [
     view: "workspace",
     windowSize: { height: 680, width: 720 },
   },
+  ...["ready", "page-two", "zoom-menu", "zoom-150", "annotating", "expanded", "compact"].map((state) => ({
+    currentSidebar: true,
+    frame: `workspace-document-preview-current-${state}`,
+    id: `workspace-document-preview-current-${state}`,
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "workspace",
+    ...(state === "compact" ? { windowSize: { height: 680, width: 720 } } : {}),
+  })),
   {
     currentSidebar: true,
     frame: "workspace-context-current-26-825-ready",
@@ -3586,6 +3597,7 @@ export async function launchScene(
   {
     capture = true,
     environment = {},
+    executablePath = electronPath,
     layoutMode,
     nativeThemeSource,
     theme,
@@ -3597,7 +3609,7 @@ export async function launchScene(
   const resolvedTheme = theme ?? scene.theme ?? "dark";
   const app = await electron.launch({
     args: ["."],
-    executablePath: electronPath,
+    executablePath,
     env: {
       ...process.env,
       CODEX_UI_KIT_LIVE_HISTORY_PATH: join(tmpdir(), `ui-kit-history-${randomUUID()}.json`),
@@ -3637,6 +3649,17 @@ export async function launchScene(
   await page.waitForSelector(
     `.demo-root[data-scenario="${scene.scenario}"][data-frame="${scene.frame}"]`,
   );
+  if (scene.frame?.startsWith("workspace-document-preview-current")) {
+    try {
+      await page.waitForFunction(() => document.querySelectorAll('[data-pdf-page][data-painted="true"]').length === 2);
+    } catch (error) {
+      const detail = await page.locator('[data-testid="current-pdf-preview"]').textContent().catch(() => "PDF panel absent");
+      await app.close();
+      throw new Error(`PDF renderer did not become ready: ${detail}`, { cause: error });
+    }
+    if (scene.frame.endsWith("-page-two")) await page.getByRole("button", { name: "Next page", exact: true }).click();
+    if (scene.frame.endsWith("-zoom-menu")) await page.getByRole("button", { name: "Zoom", exact: true }).click();
+  }
   if (
     resolvedLayoutMode === "narrow" &&
     scene.frame === "review-open" &&
