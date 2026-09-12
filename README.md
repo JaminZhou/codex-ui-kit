@@ -22,22 +22,16 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
 - The authoritative full-surface inventory baseline is the installed
-  `26.825.51511` (`7377`) build. Its 91 candidate surface groups and
+  `26.903.71938` (`8576`) build. Its 91 candidate surface groups and
   build-scoped evidence status are tracked in
-  [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); current-build
-  observation covers 73 groups; 7 previous-build groups remain regression
-  evidence and 11 are still unsampled. The refresh revalidates the global
-  shell, responsive Composer, primary navigation, project-group lifecycle,
-  Help and Account menus, route restoration, Projects Index, current
-  conversation/Markdown/MCP/Review slices, Settings through Usage & billing,
-  the read-only MCP Settings manager,
-  the read-only installed/discovery Plugin detail surface,
-  and the Electron-native project action menu. The current slices combine
-  Browser/CDP, Electron, reviewed replay baselines, and local-only
-  current-product pixel gates. The
-  visual-asset manifest remains separately build-scoped. This remains a
-  partial UI foundation rather than a
-  global reconstruction claim.
+  [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md); the current-build
+  refresh currently covers 9 groups, 72 older groups remain explicit
+  regression evidence, and 10 are still unsampled. The 26.903 capture
+  revalidates the shell, responsive sidebar, primary route restoration,
+  project-group lifecycle, Help menu, and Projects Index. Older conversation,
+  Markdown, MCP, Review, Settings, Plugin, and Electron/pixel slices remain
+  build-scoped until re-observed on 26.903. This remains a partial UI
+  foundation rather than a global reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
