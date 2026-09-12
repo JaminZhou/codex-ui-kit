@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appVersion": "26.903.71938",
+    "buildNumber": "8576",
+    "chromiumVersion": "152.0.7977.83",
+    "appAsarSha256": "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0"
+  },
+  "captureKind": "renderer_emulation",
+  "sample": "design-spec.pdf",
+  "states": {
+    "wide": {
+      "canvas": {
+        "width": 370,
+        "height": 523,
+        "rect": {
+          "x": 786.703125,
+          "y": 111,
+          "width": 368,
+          "height": 521
+        }
+      },
+      "page": {
+        "tag": "DIV",
+        "class": "pdfPreviewPage relative shrink-0 overflow-hidden border border-default bg-white shadow-sm",
+        "style": "--scale-factor: 0.6215608366948014; --user-unit: 1; height: 523px; width: 370px;",
+        "rect": {
+          "x": 785.703125,
+          "y": 110,
+          "width": 370,
+          "height": 523
+        },
+        "computed": {
+          "width": "370px",
+          "height": "523px",
+          "padding": "0px",
+          "border": "1px solid rgba(255, 255, 255, 0.082)",
+          "box-sizing": "border-box",
+          "transform": "none",
+          "image-rendering": "auto"
+        }
+      },
+      "container": {
+        "tag": "DIV",
+        "class": "flex min-h-full w-max min-w-full flex-col items-center gap-6 px-6",
+        "style": null,
+        "rect": {
+          "x": 761.40625,
+          "y": 110,
+          "width": 418.59375,
+          "height": 1070
+        },
+        "computed": {
+          "width": "418.594px",
+          "height": "1070px",
+          "padding": "0px 24px",
+          "border": "0px solid rgb(255, 255, 255)",
+          "box-sizing": "border-box",
+          "transform": "none",
+          "image-rendering": "auto"
+        }
+      },
+      "bitmapSha256": "cd106ba172676cafc60cfa5738fe631f482240e1e30e950a3ad64dc5dcd80345"
+    },
+    "compact": {
+      "canvas": {
+        "width": 296,
+        "height": 419,
+        "rect": {
+          "x": 400.65625,
+          "y": 111,
+          "width": 294,
+          "height": 417
+        }
+      },
+      "page": {
+        "tag": "DIV",
+        "class": "pdfPreviewPage relative shrink-0 overflow-hidden border border-default bg-white shadow-sm",
+        "style": "--scale-factor: 0.49724866935584117; --user-unit: 1; height: 419px; width: 296px;",
+        "rect": {
+          "x": 399.65625,
+          "y": 110,
+          "width": 296,
+          "height": 419
+        },
+        "computed": {
+          "width": "296px",
+          "height": "419px",
+          "padding": "0px",
+          "border": "1px solid rgba(255, 255, 255, 0.082)",
+          "box-sizing": "border-box",
+          "transform": "none",
+          "image-rendering": "auto"
+        }
+      },
+      "container": {
+        "tag": "DIV",
+        "class": "flex min-h-full w-max min-w-full flex-col items-center gap-6 px-6",
+        "style": null,
+        "rect": {
+          "x": 375.328125,
+          "y": 110,
+          "width": 344.671875,
+          "height": 862
+        },
+        "computed": {
+          "width": "344.672px",
+          "height": "862px",
+          "padding": "0px 24px",
+          "border": "0px solid rgb(255, 255, 255)",
+          "box-sizing": "border-box",
+          "transform": "none",
+          "image-rendering": "auto"
+        }
+      },
+      "bitmapSha256": "bc5f4e55a351443d6b1ca447b549d8f3db1486c66799360066ef98505d9a105a"
+    }
+  },
+  "replay": {
+    "electron": "43.2.0",
+    "chromium": "150.0.7871.129",
+    "compactBitmapChangedPixels": 0,
+    "ownedPanelPixelGate": "open",
+    "notes": "Identical decoded bitmap and matching measured rectangles do not prove matching composed pixels. The runtime engines differ; the compositor cause is not yet established."
+  },
+  "cleanup": {
+    "previewCount": 0,
+    "attachmentCount": 0,
+    "editorLength": 0,
+    "isolatedOwnerStopped": true
+  }
+}

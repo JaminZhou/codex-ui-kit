@@ -30,8 +30,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   revalidates the shell, responsive sidebar, primary route restoration,
   project-group lifecycle, Help menu, and Projects Index. A separate
   [PDF workspace capture](research/26.903.71938-pdf.md) now observes the real
-  right-hand preview and its lifecycle; matching replay and pixel gates are
-  still pending. Older conversation,
+  right-hand preview and its lifecycle. Its decoded PDF replay and targeted
+  Electron lifecycle now work; composed product pixels and full acceptance
+  remain pending. Older conversation,
   Markdown, MCP, Review, Settings, Plugin, and Electron/pixel slices remain
   build-scoped until re-observed on 26.903. This remains a partial UI
   foundation rather than a global reconstruction claim.

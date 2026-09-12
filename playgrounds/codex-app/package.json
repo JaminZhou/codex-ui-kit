@@ -18,6 +18,7 @@
     "check:protocol": "node scripts/check-protocol-traces.mjs",
     "check:cdp": "node scripts/check-cdp-contract.mjs",
     "check:document-preview-electron": "node scripts/check-document-preview-electron.mjs",
+    "check:pdf-product": "node scripts/check-current-pdf-product.mjs",
     "check:electron": "node scripts/check-electron-contract.mjs",
     "check:live-policy": "node scripts/check-live-policy.mjs",
     "check:live-environment-status": "node scripts/check-live-environment-status.mjs",
@@ -47,19 +48,20 @@
     "check:all": "pnpm check && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {
-    "@xterm/xterm": "6.0.0",
-    "@xterm/addon-fit": "0.11.0",
     "@jaminzhou/codex-app-server-client": "github:JaminZhou/codex-app-server-client#8cf5823ee12c00f7bc9c5eaeef80049e65f0e881",
+    "@xterm/addon-fit": "0.11.0",
+    "@xterm/xterm": "6.0.0",
     "codex-ui-kit": "workspace:*",
+    "pdfjs-dist": "6.3.289",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "ajv": "8.20.0",
     "@types/node": "24.13.3",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
     "@vitejs/plugin-react": "6.1.1",
+    "ajv": "8.20.0",
     "electron": "43.2.0",
     "pixelmatch": "7.2.0",
     "playwright-core": "1.62.1",

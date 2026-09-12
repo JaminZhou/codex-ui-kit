@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
+import { assertCurrentPdfContract } from "./current-pdf-contract.mjs";
 
 process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
 
@@ -5402,6 +5403,11 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
+    if (scene.frame?.startsWith("workspace-document-preview-current")) {
+      const contract = await assertCurrentPdfContract(page, scene);
+      await writeFile(join(artifactDirectory, `${scene.id}.json`), `${JSON.stringify(contract, null, 2)}\n`);
+      continue;
+    }
     if (
       scene.view === "workspace" &&
       scene.frame?.startsWith("workspace-document-preview")
@@ -5460,7 +5466,6 @@ for (const scene of selectedScenes) {
           : "ready";
       const expectedCompact = scene.id.endsWith("-compact");
       if (
-        contract.view !== undefined ||
         contract.frame !== scene.frame ||
         contract.horizontalOverflow > 1 ||
         contract.status !== expectedStatus ||

@@ -23,6 +23,7 @@ export * from "./components/BranchCreationDialog.js";
 export * from "./components/CommandExecution.js";
 export * from "./components/Dialog.js";
 export * from "./components/DocumentPreviewPanel.js";
+export * from "./components/PdfPreviewPanel.js";
 export * from "./components/EnvironmentSurfaces.js";
 export * from "./components/FileChange.js";
 export * from "./components/InteractivePrimitives.js";

@@ -1,3 +1,4 @@
+import { PdfWorkspacePreview } from "./PdfWorkspacePreview";
 import {
   ActivityTimeline,
   AgentComposer,
@@ -4018,6 +4019,27 @@ export function App() {
       !current26825LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  const isCurrentPdfReplay = mode === "replay" && view === "workspace" && Boolean(activeFrame?.startsWith("workspace-document-preview-current"));
+  const [pdfOpen, setPdfOpen] = useState(true);
+  const [pdfAttached, setPdfAttached] = useState(true);
+  const [pdfExpanded, setPdfExpanded] = useState(initialSelection.frame?.endsWith("-expanded") ?? false);
+  const [pdfWidth, setPdfWidth] = useState(591.828125);
+  const [pdfDraft, setPdfDraft] = useState("");
+  const pdfAttachmentRef = useRef<HTMLDivElement>(null);
+  const closePdf = () => {
+    setPdfOpen(false); setPdfExpanded(false);
+    requestAnimationFrame(() => pdfAttachmentRef.current?.querySelector<HTMLButtonElement>('button[aria-label="Preview design-spec.pdf"]')?.focus());
+  };
+  useEffect(() => {
+    if (!isCurrentPdfReplay) return;
+    let previousWidth = window.innerWidth;
+    const onResize = () => {
+      if (previousWidth > 800 && window.innerWidth <= 800) { setPdfOpen(false); setPdfExpanded(false); }
+      previousWidth = window.innerWidth;
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [isCurrentPdfReplay]);
   const composerPluginMenuFrame = activeFrame === "composer-plugins-menu";
   const isBrowserWorkspaceControlledReplay =
     mode === "replay" && activeFrame === "browser-workspace-legacy-shell";
@@ -11039,8 +11061,20 @@ export function App() {
       </DocumentPreviewPanel>
     </div>
   );
+  const currentPdfDraftRoute = <div className="demo-current-pdf-draft" ref={pdfAttachmentRef}>
+    <NewConversationStart label="PDF draft workspace" destination="What should we build?" context={null}
+      composer={<AgentComposer attachments={pdfAttached ? <ComposerAttachment label="design-spec.pdf" kind="file" layout="card" meta="PDF" openLabel="Preview design-spec.pdf"
+        onOpen={() => setPdfOpen(true)} onRemove={() => { setPdfAttached(false); closePdf(); }} removeLabel="Remove design-spec.pdf" /> : null}
+        onSubmit={() => {}} onValueChange={setPdfDraft} placeholder="Ask anything" submitDisabled value={pdfDraft} />} />
+  </div>;
+  const currentPdfWorkspacePanel = isCurrentPdfReplay && pdfOpen && pdfAttached ? <WorkspacePanel
+    activeTabId="design-spec" className="demo-current-pdf-workspace" closeIcon={<CurrentBuildIcon name="review-close" />}
+    expandIcon={<CurrentBuildIcon name="review-expand" />} expanded={pdfExpanded} expandPanelLabel="Enter full screen" restorePanelLabel="Exit full screen"
+    label="PDF workspace" onActiveTabChange={() => {}} onCloseTab={closePdf} onExpandedChange={setPdfExpanded}
+    tabCloseButtons tabs={[{ id: "design-spec", label: "design-spec.pdf", closeLabel: "Close design-spec.pdf",
+      content: <PdfWorkspacePreview initialAnnotating={activeFrame?.endsWith("-annotating")} initialZoom={activeFrame?.endsWith("-zoom-150") ? 150 : "fit"} /> }]} /> : null;
   const workspaceRoute =
-    workspacePage === "plan-settings"
+    isCurrentPdfReplay ? currentPdfDraftRoute : workspacePage === "plan-settings"
       ? workspacePlanSettingsRoute
       : workspacePage === "environments"
       ? workspaceEnvironmentSettingsRoute
@@ -15931,7 +15965,7 @@ export function App() {
         bottomPanelResizeLabel="Resize bottom panel"
         onBottomPanelHeightChange={setTerminalHeight}
         layoutMode={
-          (mode === "live" && view === "pull-request" && !livePullRequestRoute.compact) ||
+          isCurrentPdfReplay ? "wide" : (mode === "live" && view === "pull-request" && !livePullRequestRoute.compact) ||
           (initialSelection.capture &&
             initialSelection.layoutMode !== "narrow" &&
             activeFrame !== "pr-compact-detail" &&
@@ -15952,7 +15986,7 @@ export function App() {
         narrowSidebarBehavior="current-build"
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
-          view === "pull-request"
+          isCurrentPdfReplay ? setPdfOpen : view === "pull-request"
             ? setPullRequestOpen
             : isCurrentCitations26825Replay
               ? setCitationSourcesOpen
@@ -15967,7 +16001,7 @@ export function App() {
               : setReviewOpen
         }
         onSidePanelWidthChange={
-          view === "pull-request"
+          isCurrentPdfReplay ? setPdfWidth : view === "pull-request"
             ? setPullRequestWidth
             : isCurrentCitations26825Replay
               ? setCitationSourcesWidth
@@ -15982,14 +16016,14 @@ export function App() {
               : setReviewPanelWidth
         }
         responsivePanelContinuity={
-          !initialSelection.capture &&
+          !isCurrentPdfReplay && !initialSelection.capture &&
           activeFrame !== "pr-compact-detail" &&
           !isBrowserWorkspaceControlledReplay
         }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         responsiveSidebarContinuity={false}
         sidePanel={
-          view === "pull-request"
+          isCurrentPdfReplay ? currentPdfWorkspacePanel : view === "pull-request"
             ? mode === "live"
               ? livePullRequestRoute.panel
               : isCurrentPullRequestRouteReplay
@@ -16010,10 +16044,10 @@ export function App() {
               : reviewPanel
         }
         sidePanelExpanded={
-          view === "pull-request" && (pullRequestExpanded || (mode === "live" && livePullRequestRoute.compact))
+          isCurrentPdfReplay ? pdfExpanded : view === "pull-request" && (pullRequestExpanded || (mode === "live" && livePullRequestRoute.compact))
         }
         sidePanelLabel={
-          view === "pull-request"
+          isCurrentPdfReplay ? "PDF workspace" : view === "pull-request"
             ? "Pull request details"
             : isCurrentCitations26825Replay
               ? "Sources"
@@ -16030,7 +16064,7 @@ export function App() {
               : "Review"
         }
         sidePanelMinMainWidth={
-          view === "pull-request"
+          isCurrentPdfReplay ? 374.328125 : view === "pull-request"
             ? mode === "live" ? 300 : 390
             : isCurrentCitations26825Replay
               ? 374.328125
@@ -16047,7 +16081,7 @@ export function App() {
                 : undefined
         }
         sidePanelMinWidth={
-          view === "pull-request"
+          isCurrentPdfReplay ? 320 : view === "pull-request"
             ? 322
             : isCurrentCitations26825Replay
               ? 320
@@ -16062,7 +16096,7 @@ export function App() {
               : undefined
         }
         sidePanelOpen={
-          view === "pull-request"
+          isCurrentPdfReplay ? pdfOpen && pdfAttached : view === "pull-request"
             ? pullRequestOpen
             : isCurrentCitations26825Replay
               ? citationSourcesOpen
@@ -16080,7 +16114,7 @@ export function App() {
           view === "pull-request" && mode !== "live" && !isCurrentPullRequestRouteReplay
         }
         sidePanelOverlayModal={
-          view !== "pull-request" &&
+          !isCurrentPdfReplay && view !== "pull-request" &&
           !isCurrentCitations26825Replay &&
           !isBrowserWorkspaceControlledReplay &&
           !backgroundTerminalPanelSelected &&
@@ -16088,7 +16122,7 @@ export function App() {
         }
         sidePanelResizable
         sidePanelWidth={
-          view === "pull-request"
+          isCurrentPdfReplay ? pdfWidth : view === "pull-request"
             ? pullRequestWidth
             : isCurrentCitations26825Replay
               ? citationSourcesWidth
@@ -16131,7 +16165,7 @@ export function App() {
               ? 240
               : undefined
         }
-        sidebarOpen={sidebarOpen}
+        sidebarOpen={isCurrentPdfReplay ? false : sidebarOpen}
         sidebarResizable
         windowChrome={
           view === "projects" ||
