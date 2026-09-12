@@ -1,0 +1,2325 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appVersion": "26.903.71938",
+    "buildNumber": "8576",
+    "chromiumVersion": "152.0.7977.83",
+    "appAsarSha256": "58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0",
+    "appAsarBytes": 306621494,
+    "sampledAt": "2026-09-12"
+  },
+  "captureKind": "renderer_emulation",
+  "ownership": "workspace",
+  "entry": "Attach the synthetic PDF to an empty New chat draft with trusted CDP drag input, then click its file button. No prompt is submitted.",
+  "sample": {
+    "fileName": "design-spec.pdf",
+    "pageCount": 2,
+    "byteLength": 2755,
+    "sha256": "94579de3d31551646afce27a2ec85f26fa58df26a7d7385542a9468ed050a0a3",
+    "source": "independently_generated_local_fixture"
+  },
+  "nativeWindowStatus": "not_verified: Browser.getWindowForTarget reports Browser window not found, including with the observed explicit target ID.",
+  "styles": {
+    "panel": {
+      "backgroundColor": "rgb(20, 20, 20)",
+      "borderBottomColor": "rgb(255, 255, 255)",
+      "borderBottomWidth": "0px",
+      "borderRadius": "0px",
+      "color": "rgb(255, 255, 255)",
+      "display": "flex",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "16px",
+      "fontWeight": "430",
+      "gap": "normal",
+      "gridTemplateColumns": "none",
+      "lineHeight": "24px",
+      "opacity": "1",
+      "overflowX": "visible",
+      "overflowY": "visible",
+      "paddingTop": "0px",
+      "paddingRight": "0px",
+      "paddingBottom": "0px",
+      "paddingLeft": "0px"
+    },
+    "header": {
+      "backgroundColor": "rgb(24, 24, 24)",
+      "borderBottomColor": "rgba(255, 255, 255, 0.043)",
+      "borderBottomWidth": "1px",
+      "borderRadius": "0px",
+      "color": "rgb(255, 255, 255)",
+      "display": "grid",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "gap": "8px",
+      "gridTemplateColumns": "211.547px 108px 231.281px",
+      "lineHeight": "20px",
+      "opacity": "1",
+      "overflowX": "hidden",
+      "overflowY": "hidden",
+      "paddingTop": "0px",
+      "paddingRight": "8px",
+      "paddingBottom": "0px",
+      "paddingLeft": "16px"
+    },
+    "controls": [
+      {
+        "label": "Previous page",
+        "style": {
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderBottomColor": "rgba(0, 0, 0, 0)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "12.5px",
+          "color": "rgba(255, 255, 255, 0.498)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "0.4",
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingTop": "0px",
+          "paddingRight": "0px",
+          "paddingBottom": "0px",
+          "paddingLeft": "0px"
+        }
+      },
+      {
+        "label": "Next page",
+        "style": {
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderBottomColor": "rgba(0, 0, 0, 0)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "12.5px",
+          "color": "rgba(255, 255, 255, 0.498)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "1",
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingTop": "0px",
+          "paddingRight": "0px",
+          "paddingBottom": "0px",
+          "paddingLeft": "0px"
+        }
+      },
+      {
+        "label": "Annotate",
+        "style": {
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderBottomColor": "rgba(0, 0, 0, 0)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "12.5px",
+          "color": "rgba(255, 255, 255, 0.498)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "1",
+          "overflowX": "hidden",
+          "overflowY": "hidden",
+          "paddingTop": "0px",
+          "paddingRight": "0px",
+          "paddingBottom": "0px",
+          "paddingLeft": "0px"
+        }
+      },
+      {
+        "label": "Zoom",
+        "style": {
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderBottomColor": "rgba(0, 0, 0, 0)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "12.5px",
+          "color": "rgba(255, 255, 255, 0.498)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "1",
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingTop": "0px",
+          "paddingRight": "8px",
+          "paddingBottom": "0px",
+          "paddingLeft": "8px"
+        }
+      },
+      {
+        "label": "Download",
+        "style": {
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "borderBottomColor": "rgba(0, 0, 0, 0)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "12.5px",
+          "color": "rgba(255, 255, 255, 0.498)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "1",
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingTop": "0px",
+          "paddingRight": "0px",
+          "paddingBottom": "0px",
+          "paddingLeft": "0px"
+        }
+      },
+      {
+        "label": "Open in Preview",
+        "style": {
+          "backgroundColor": "rgba(255, 255, 255, 0.03)",
+          "borderBottomColor": "rgba(255, 255, 255, 0.082)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "12.5px 0px 0px 12.5px",
+          "color": "rgb(255, 255, 255)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "1",
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingTop": "0px",
+          "paddingRight": "4px",
+          "paddingBottom": "0px",
+          "paddingLeft": "8px"
+        }
+      },
+      {
+        "label": "Open options",
+        "style": {
+          "backgroundColor": "rgba(255, 255, 255, 0.03)",
+          "borderBottomColor": "rgba(255, 255, 255, 0.082)",
+          "borderBottomWidth": "1px",
+          "borderRadius": "0px 12.5px 12.5px 0px",
+          "color": "rgb(255, 255, 255)",
+          "display": "flex",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "430",
+          "gap": "4px",
+          "gridTemplateColumns": "none",
+          "lineHeight": "20px",
+          "opacity": "1",
+          "overflowX": "visible",
+          "overflowY": "visible",
+          "paddingTop": "0px",
+          "paddingRight": "6px",
+          "paddingBottom": "0px",
+          "paddingLeft": "2px"
+        }
+      }
+    ]
+  },
+  "states": {
+    "wide-ready": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 111,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 902,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 0,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "page-two": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 2,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": -704,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 87,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 815,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "page-one": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 87,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 878,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 24,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "zoom-menu": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 87,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 878,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 24,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": [
+        {
+          "role": "menu",
+          "text": "25%50%100%150%200%Zoom to fit",
+          "rect": {
+            "x": 882,
+            "y": 85,
+            "width": 160,
+            "height": 188.375
+          },
+          "items": [
+            {
+              "text": "25%",
+              "role": "menuitem",
+              "rect": {
+                "x": 886,
+                "y": 89,
+                "width": 152,
+                "height": 28.5625
+              }
+            },
+            {
+              "text": "50%",
+              "role": "menuitem",
+              "rect": {
+                "x": 886,
+                "y": 117.5625,
+                "width": 152,
+                "height": 28.5625
+              }
+            },
+            {
+              "text": "100%",
+              "role": "menuitem",
+              "rect": {
+                "x": 886,
+                "y": 146.125,
+                "width": 152,
+                "height": 28.5625
+              }
+            },
+            {
+              "text": "150%",
+              "role": "menuitem",
+              "rect": {
+                "x": 886,
+                "y": 174.6875,
+                "width": 152,
+                "height": 28.5625
+              }
+            },
+            {
+              "text": "200%",
+              "role": "menuitem",
+              "rect": {
+                "x": 886,
+                "y": 203.25,
+                "width": 152,
+                "height": 28.5625
+              }
+            },
+            {
+              "text": "Zoom to fit",
+              "role": "menuitem",
+              "rect": {
+                "x": 886,
+                "y": 240.8125,
+                "width": 152,
+                "height": 28.5625
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "zoom-150": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "203.391px 108px 239.438px",
+      "page": 1,
+      "zoomPercent": 150,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 816.5625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 896.5625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 932.5625,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 968.5625,
+            "y": 51.5,
+            "width": 74.59375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 439.171875,
+            "y": -150,
+            "width": 891,
+            "height": 1261
+          },
+          "intrinsic": {
+            "width": 893,
+            "height": 1263
+          }
+        },
+        {
+          "rect": {
+            "x": 439.171875,
+            "y": 1137,
+            "width": 891,
+            "height": 1261
+          },
+          "intrinsic": {
+            "width": 893,
+            "height": 1263
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 261,
+          "scrollHeight": 2598,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "fit": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 70,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 861,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 41,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "annotate": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "136.797px 108px 306.031px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": true,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 749.96875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 829.96875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotating",
+          "rect": {
+            "x": 865.96875,
+            "y": 51.5,
+            "width": 106.75,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 70,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 861,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 41,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "unannotate": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 70,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 861,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 41,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "expanded": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 0,
+        "y": 46,
+        "width": 1180,
+        "height": 774
+      },
+      "header": {
+        "x": 0,
+        "y": 46,
+        "width": 1180,
+        "height": 40
+      },
+      "headerColumns": "516px 108px 516px",
+      "page": 1,
+      "zoomPercent": 190,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 540,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 620,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 932.5625,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 968.5625,
+            "y": 51.5,
+            "width": 74.59375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 25,
+            "y": -351,
+            "width": 1130,
+            "height": 1599
+          },
+          "intrinsic": {
+            "width": 1132,
+            "height": 1601
+          }
+        },
+        {
+          "rect": {
+            "x": 25,
+            "y": 1274,
+            "width": 1130,
+            "height": 1599
+          },
+          "intrinsic": {
+            "width": 1132,
+            "height": 1601
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 86,
+            "width": 1180,
+            "height": 734
+          },
+          "scrollTop": 462,
+          "scrollHeight": 3368,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "collapsed": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 70,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 861,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 41,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    },
+    "compact-open": {
+      "viewport": {
+        "width": 720,
+        "height": 680,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 375.328125,
+        "y": 46,
+        "width": 344.671875,
+        "height": 634
+      },
+      "header": {
+        "x": 375.328125,
+        "y": 46,
+        "width": 344.671875,
+        "height": 40
+      },
+      "headerColumns": "0px 73.3906px 231.281px",
+      "page": 1,
+      "zoomPercent": 50,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 382.03125,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 462.03125,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 480.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 516.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 587.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 619.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 689,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 400.65625,
+            "y": 111,
+            "width": 294,
+            "height": 417
+          },
+          "intrinsic": {
+            "width": 296,
+            "height": 419
+          }
+        },
+        {
+          "rect": {
+            "x": 400.65625,
+            "y": 554,
+            "width": 294,
+            "height": 417
+          },
+          "intrinsic": {
+            "width": 296,
+            "height": 419
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 375.328125,
+            "y": 86,
+            "width": 344.671875,
+            "height": 594
+          },
+          "scrollTop": 0,
+          "scrollHeight": 910,
+          "clientHeight": 594
+        }
+      ],
+      "menus": []
+    },
+    "compact-page-two": {
+      "viewport": {
+        "width": 720,
+        "height": 680,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 375.328125,
+        "y": 46,
+        "width": 344.671875,
+        "height": 634
+      },
+      "header": {
+        "x": 375.328125,
+        "y": 46,
+        "width": 344.671875,
+        "height": 40
+      },
+      "headerColumns": "0px 73.3906px 231.281px",
+      "page": 2,
+      "zoomPercent": 50,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 382.03125,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 462.03125,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 480.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 516.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 587.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 619.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 689,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 400.65625,
+            "y": -205,
+            "width": 294,
+            "height": 417
+          },
+          "intrinsic": {
+            "width": 296,
+            "height": 419
+          }
+        },
+        {
+          "rect": {
+            "x": 400.65625,
+            "y": 238,
+            "width": 294,
+            "height": 417
+          },
+          "intrinsic": {
+            "width": 296,
+            "height": 419
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 375.328125,
+            "y": 86,
+            "width": 344.671875,
+            "height": 594
+          },
+          "scrollTop": 316,
+          "scrollHeight": 910,
+          "clientHeight": 594
+        }
+      ],
+      "menus": []
+    },
+    "compact-reopened": {
+      "viewport": {
+        "width": 720,
+        "height": 680,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 375.328125,
+        "y": 46,
+        "width": 344.671875,
+        "height": 634
+      },
+      "header": {
+        "x": 375.328125,
+        "y": 46,
+        "width": 344.671875,
+        "height": 40
+      },
+      "headerColumns": "0px 73.3906px 231.281px",
+      "page": 1,
+      "zoomPercent": 50,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 382.03125,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 462.03125,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 480.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 516.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 587.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 619.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 689,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 400.65625,
+            "y": 111,
+            "width": 294,
+            "height": 417
+          },
+          "intrinsic": {
+            "width": 296,
+            "height": 419
+          }
+        },
+        {
+          "rect": {
+            "x": 400.65625,
+            "y": 554,
+            "width": 294,
+            "height": 417
+          },
+          "intrinsic": {
+            "width": 296,
+            "height": 419
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 375.328125,
+            "y": 86,
+            "width": 344.671875,
+            "height": 594
+          },
+          "scrollTop": 0,
+          "scrollHeight": 910,
+          "clientHeight": 594
+        }
+      ],
+      "menus": []
+    },
+    "wide-restored": {
+      "viewport": {
+        "width": 1180,
+        "height": 820,
+        "devicePixelRatio": 1
+      },
+      "horizontalOverflow": 0,
+      "panel": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 774
+      },
+      "header": {
+        "x": 589.171875,
+        "y": 46,
+        "width": 590.828125,
+        "height": 40
+      },
+      "headerColumns": "211.547px 108px 231.281px",
+      "page": 1,
+      "zoomPercent": 91,
+      "annotating": false,
+      "controls": [
+        {
+          "label": "Previous page",
+          "rect": {
+            "x": 824.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": true,
+          "visible": true
+        },
+        {
+          "label": "Next page",
+          "rect": {
+            "x": 904.71875,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Annotate",
+          "rect": {
+            "x": 940.71875,
+            "y": 51.5,
+            "width": 32,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Zoom",
+          "rect": {
+            "x": 976.71875,
+            "y": 51.5,
+            "width": 66.4375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Download",
+          "rect": {
+            "x": 1047.15625,
+            "y": 51.5,
+            "width": 28,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open in Preview",
+          "rect": {
+            "x": 1079.15625,
+            "y": 51.5,
+            "width": 69.84375,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        },
+        {
+          "label": "Open options",
+          "rect": {
+            "x": 1149,
+            "y": 51.5,
+            "width": 23,
+            "height": 28
+          },
+          "disabled": false,
+          "visible": true
+        }
+      ],
+      "canvases": [
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": -174,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        },
+        {
+          "rect": {
+            "x": 614.578125,
+            "y": 617,
+            "width": 540,
+            "height": 765
+          },
+          "intrinsic": {
+            "width": 542,
+            "height": 767
+          }
+        }
+      ],
+      "scrollOwners": [
+        {
+          "rect": {
+            "x": 589.171875,
+            "y": 86,
+            "width": 590.828125,
+            "height": 734
+          },
+          "scrollTop": 285,
+          "scrollHeight": 1606,
+          "clientHeight": 734
+        }
+      ],
+      "menus": []
+    }
+  },
+  "lifecycle": {
+    "resizeToCompact": {
+      "viewport": {
+        "width": 720,
+        "height": 680
+      },
+      "previewCount": 0,
+      "attachmentCount": 1,
+      "editorLength": 0,
+      "horizontalOverflow": 0
+    },
+    "close": {
+      "state": "close",
+      "previewCount": 0,
+      "attachmentCount": 1,
+      "editorLength": 0,
+      "viewport": {
+        "width": 720,
+        "height": 680
+      }
+    },
+    "cleanup": {
+      "state": "cleanup",
+      "previewCount": 0,
+      "attachmentCount": 0,
+      "editorLength": 0,
+      "viewport": {
+        "width": 720,
+        "height": 680
+      }
+    }
+  },
+  "limitations": [
+    "The previous centered-card replay is not the observed PDF workspace layout.",
+    "No loading, error, password-protected or malformed PDF state was forced.",
+    "No annotation was drawn, document downloaded, or external application opened.",
+    "Document content is a host-owned renderer; non-PDF formats remain unsampled.",
+    "Renderer viewport emulation is not native-window resize acceptance.",
+    "Product screenshots and raw visual primitives remain local-only; replay and product pixel gates are still pending."
+  ]
+}

@@ -1,0 +1,2 @@
+# PDF cross-reference byte offsets must not be treated as editable text.
+playgrounds/codex-app/fixtures/documents/*.pdf binary
