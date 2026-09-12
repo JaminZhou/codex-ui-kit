@@ -160,6 +160,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 ## Resources and media
 
+- `DocumentPreviewPanel`: protocol-neutral PDF, document, notebook, spreadsheet,
+  and presentation preview shell with ready, loading, empty, and error states;
+  hosts provide the renderer and own file loading while retry/open callbacks
+  remain explicit.
 - `CitationMention`: inline external citation with optional favicon or supplied icon, deterministic new-tab security defaults, and the current `data-inline-mention-interactive` host hook.
 - `ResourceCard` and `ResourceList`: file, website, Drive, app, and image resources with previews, metadata, optional labelled opening actions, trailing actions, and progressive reveal. Cards without `href` or `onOpen` remain static content.
 - `SourceList`: compact file, web, tool, and external citation summaries with metadata, optional labelled opening actions, and expansion. Sources without `href` or `onOpen` remain static rows.

@@ -1819,10 +1819,11 @@
         "pdf-preview-panel",
         "docx-preview-panel",
         "PopcornElectronWorkbookPanel",
-        "PopcornElectronPresentationPanel"
+        "PopcornElectronPresentationPanel",
+        "document-preview-panel"
       ],
       "runtimeStatus": "not_sampled",
-      "implementationStatus": "not_started",
+      "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",
       "priority": "p1"

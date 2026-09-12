@@ -75,6 +75,10 @@ map protocol-specific data and actions into the public component props. The
 private `playgrounds/codex-app` workspace demonstrates that boundary without
 changing the package exports or runtime dependencies.
 
+`DocumentPreviewPanel` is intentionally renderer-agnostic: PDF, Office,
+notebook, and spreadsheet decoding stays in the host. The package only owns
+the status shell and does not fetch, execute, or embed document content.
+
 ## Pre-1.0 policy
 
 Compatibility claims apply to the current `main` revision until the first npm release. Public APIs may change before 1.0, with changes recorded in pull requests and eventual release notes.
