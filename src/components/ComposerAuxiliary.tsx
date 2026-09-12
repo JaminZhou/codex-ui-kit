@@ -230,6 +230,7 @@ export interface ComposerResourcePickerProps
   extends Omit<ComponentPropsWithoutRef<"div">, "children" | "onSelect"> {
   activeId?: string;
   descriptionSeparator?: ReactNode;
+  footer?: ReactNode;
   groups: readonly ComposerResourceGroup[];
   heading?: ReactNode;
   onActiveIdChange?: (id: string) => void;
@@ -241,6 +242,7 @@ export function ComposerResourcePicker({
   activeId,
   className,
   descriptionSeparator = " — ",
+  footer,
   groups,
   heading = "Add",
   onActiveIdChange,
@@ -340,6 +342,7 @@ export function ComposerResourcePicker({
       className={["codex-ui-composer-resource-picker", className]
         .filter(Boolean)
         .join(" ")}
+      data-has-footer={footer ? true : undefined}
       onKeyDown={handleKeyDown}
       role="listbox"
       tabIndex={0}
@@ -414,6 +417,11 @@ export function ComposerResourcePicker({
           ) : null,
         )}
       </div>
+      {footer ? (
+        <div className="codex-ui-composer-resource-picker__footer">
+          {footer}
+        </div>
+      ) : null}
     </div>
   );
 }

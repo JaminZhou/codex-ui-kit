@@ -1155,6 +1155,16 @@ is the older `26.715.72359` observation, the fixture is our own, and it does
 not invoke an installed Codex Sites list, creation, sharing, or removal flow.
 Stage 4 therefore remains in progress.
 
+The Composer plugin-connect slice makes the legacy-observed `Connect plugins`
+entry explicit without claiming to install or authorize a plugin. The shared
+resource picker now supports a host-owned footer, and an isolated replay frame
+uses it with four controlled plugin choices. Electron checks selection,
+connection callback, dismissal, focus return, zero overflow, and 1180px/720px
+own-fixture replay with zero pixel drift. Its only product evidence is the
+older `26.721.81911` resource menu, so `composer.plugins` remains
+`partial_legacy`; discovery, installation, permissions, and real execution
+remain host-owned and open.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 

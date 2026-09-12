@@ -797,6 +797,7 @@ const conversationHostFrames = new Set([
   "composer-multiline",
   "composer-plan",
   "composer-permissions-menu",
+  "composer-plugins-menu",
   "composer-queue-paused",
   "composer-queued",
   "composer-resources-menu",
@@ -1017,6 +1018,7 @@ function initialComposerValue(frame: string | null) {
   if (
     frame === "composer-multiline" ||
     frame === "composer-permissions-menu" ||
+    frame === "composer-plugins-menu" ||
     frame === "composer-resources-menu" ||
     frame === "workspace-composer-current-26-825-multiline-four"
   ) {
@@ -1045,6 +1047,7 @@ function initialComposerOverlay(frame: string | null): ComposerOverlay {
   }
   if (
     frame === "composer-resources-menu" ||
+    frame === "composer-plugins-menu" ||
     frame === "workspace-composer-current-26-825-resources"
   ) {
     return "resources";
@@ -1500,6 +1503,39 @@ const composerResourceGroups: readonly ComposerResourceGroup[] = [
       { icon: "⊕", id: "browser-tab", label: "Open browser tab" },
       { icon: "⊕", id: "recent-screenshot", label: "Recent screenshot" },
       { icon: "⊕", id: "clipboard", label: "Clipboard" },
+    ],
+  },
+];
+
+const composerPluginResourceGroups: readonly ComposerResourceGroup[] = [
+  {
+    id: "plugins",
+    label: "Available plugins",
+    options: [
+      {
+        description: "Create and edit document artifacts",
+        icon: "▤",
+        id: "documents",
+        label: "Documents",
+      },
+      {
+        description: "Read, create, and verify PDF files",
+        icon: "▧",
+        id: "pdf",
+        label: "PDF",
+      },
+      {
+        description: "Create and edit spreadsheet files",
+        icon: "▦",
+        id: "spreadsheets",
+        label: "Spreadsheets",
+      },
+      {
+        description: "Create and edit presentations",
+        icon: "▥",
+        id: "presentations",
+        label: "Presentations",
+      },
     ],
   },
 ];
@@ -3823,6 +3859,9 @@ export function App() {
     useState("full");
   const [composerResourceActiveId, setComposerResourceActiveId] =
     useState("files");
+  const [composerPluginAction, setComposerPluginAction] = useState<
+    string | null
+  >(null);
   const [composerAttachments, setComposerAttachments] = useState<
     DemoComposerAttachmentItem[]
   >(() => attachmentItemsForFrame(initialSelection.frame));
@@ -3929,6 +3968,7 @@ export function App() {
       !current26825LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  const composerPluginMenuFrame = activeFrame === "composer-plugins-menu";
   useLayoutEffect(() => {
     if (
       !pluginDetailOpen ||
@@ -5009,6 +5049,7 @@ export function App() {
     setComposerOverlay(initialComposerOverlay(frame));
     setComposerMode(initialComposerMode(frame));
     setComposerResourceActiveId("files");
+    setComposerPluginAction(null);
     setComposerAttachments(attachmentItemsForFrame(frame));
     setAttachmentPreviewId(
       frame === "attachment-current-26-825-preview"
@@ -5135,6 +5176,7 @@ export function App() {
     setActiveFrame(null);
     setComposerValue("");
     setComposerOverlay(null);
+    setComposerPluginAction(null);
     setComposerAttachments([]);
     setSubmittedComposerAttachments([]);
     setSubmittedComposerPrompt(null);
@@ -8114,11 +8156,36 @@ export function App() {
           composerOverlay === "resources" ? (
           <ComposerResourcePicker
             activeId={composerResourceActiveId}
-            groups={composerResourceGroups}
+            footer={
+              composerPluginMenuFrame ? (
+                <button
+                  aria-label="Connect plugins"
+                  onClick={() => {
+                    setComposerPluginAction("connect");
+                    dismissComposerResources();
+                  }}
+                  type="button"
+                >
+                  <span>Connect plugins</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+              ) : undefined
+            }
+            groups={
+              composerPluginMenuFrame
+                ? composerPluginResourceGroups
+                : composerResourceGroups
+            }
+            heading={composerPluginMenuFrame ? "Plugins" : undefined}
             onActiveIdChange={setComposerResourceActiveId}
             onDismiss={dismissComposerResources}
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
+              if (composerPluginMenuFrame) {
+                setComposerPluginAction(`select:${option.id}`);
+                dismissComposerResources();
+                return;
+              }
               if (isCurrentAttachmentReplay && option.id === "files") {
                 void selectFilesAndFolders();
                 return;
@@ -15489,6 +15556,7 @@ export function App() {
           ? composerMode ?? undefined
           : undefined
       }
+      data-composer-plugin-action={composerPluginAction ?? undefined}
       data-queue-count={
         isConversationLifecycle || currentComposerQueue26825Replay
           ? queuedPrompts.length
