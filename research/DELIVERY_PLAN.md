@@ -27,7 +27,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
-- 11 groups have current-build runtime evidence, 72 have previous-build-only
+- 12 groups have current-build runtime evidence, 71 have previous-build-only
   runtime evidence, and 8 have not been sampled. Browser/Electron verified
   statuses are intentionally downgraded until the affected slices are
   re-observed on 26.903; their older gates remain regression fixtures.
