@@ -129,14 +129,20 @@ async function waitForNotificationAction(page, action, expectedTotal) {
 
 async function settleNotificationPaint(page, { clearPointer = false } = {}) {
   // The action removes one queued toast and moves focus to the next action.
-  // Let the 300ms transform/opacity transition and its compositor frame settle
-  // before capturing the hard 0%-drift gate. A shorter wait can leave a
+  // Let the 300ms transform/opacity transition and multiple compositor frames
+  // settle before capturing the hard 0%-drift gate. A shorter wait can leave a
   // fractional rounded-border pixel at a different raster position between
-  // otherwise identical launches.
+  // otherwise identical launches on the macOS headless GPU.
   // Moving the pointer off the clicked action also prevents a stale :hover
   // compositing pass from changing the shadow raster by a single pixel.
   if (clearPointer) await page.mouse.move(0, 0);
-  await page.waitForTimeout(360);
+  await page.waitForTimeout(1000);
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
+      }),
+  );
 }
 
 async function run(width, suffix) {
