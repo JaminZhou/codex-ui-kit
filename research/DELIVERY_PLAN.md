@@ -1022,7 +1022,9 @@ An opt-in real file-variant probe now verifies separate current-build
 `fileChange` update and delete requests, exact absolute paths/diffs, two
 `Allow once` decisions, final updated/deleted files, and 1180/720 no-overflow
 frames. Rename, binary, upload-failure, and installed-product parity remain
-separate boundaries.
+separate boundaries. The probe is now part of full playground acceptance, so
+the same disposable real-update/delete evidence runs on every complete local
+acceptance pass.
 An opt-in real long-thread probe now runs twelve no-tool turns on one stable
 thread, proves repeated live bindings keep same-thread completion, and exercises
 scroll-away/latest-follow convergence at 1180/720px with no overflow. The
