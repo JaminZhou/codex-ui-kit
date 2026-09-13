@@ -610,6 +610,12 @@ exit gates; it does not replace the inventory.
   implementation/replay evidence only; it does not claim that the installed
   product emitted the same renderer failure or that provider/plugin Markdown
   errors are covered.
+  A bounded terminal-transport replay now covers the current terminal panel's
+  disconnected state, session-scoped `Reconnect` action, focus reachability,
+  recovery to a fresh prompt, responsive containment, and zero-drift
+  1180px/720px own-fixture screenshots in Electron. This remains replay-only
+  evidence; it does not claim a real PTY/IPC transport drop in the installed
+  product.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -1645,8 +1651,9 @@ without confusing package readiness with full product reconstruction.
     restoration, and five product-region pixel gates. Continue with plugin
     attachment variants and table/Markdown error variants, populated
     artifact/source sections, real-product subagent
-    recovery capture, terminal transport failure, and broader real global
-    notification reachability. Current real transport recovery is delivered
+    recovery capture, and broader real global notification reachability. The
+    bounded terminal transport-failure replay is delivered separately; current
+    real transport recovery is delivered
     through an isolated proxy plus CDP/Electron/pixel gates. The independent
     transport state machine and
     subagent

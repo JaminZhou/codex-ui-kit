@@ -2084,6 +2084,13 @@ responsive containment, and zero-drift 1180px/720px own-fixture captures in
 Electron. This remains replay-only evidence and does not promote an installed
 product failure, provider error, or plugin-generated Markdown variant.
 
+The replay now also includes one explicit terminal transport-failure boundary.
+It checks the current terminal panel's disconnected alert, `Reconnect` focus
+and action, session-scoped recovery to a fresh prompt, responsive containment,
+and zero-drift 1180px/720px own-fixture captures in Electron. This remains
+replay-only evidence and does not promote a real PTY/IPC transport drop from
+the installed product.
+
 The latest `26.825.51511` context-control follow-up supersedes the previous
 `26.820.60940` sample for the project/Local/main entry family. It re-observes
 the 736×28 context row, 260×249.5 project dialog at wide and 720×680 compact,

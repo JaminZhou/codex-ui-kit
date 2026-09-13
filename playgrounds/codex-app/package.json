@@ -26,6 +26,7 @@
     "check:composer-plugin-connect": "node scripts/check-composer-plugin-connect.mjs",
     "check:composer-plugin-attachment": "node scripts/check-composer-plugin-attachment.mjs",
     "check:markdown-error": "node scripts/check-markdown-error.mjs",
+    "check:terminal-transport-failure": "node scripts/check-terminal-transport-failure.mjs",
     "check:composer-resources-current-26-908": "node scripts/check-composer-resources-current-26-908.mjs",
     "check:sites-index": "node scripts/check-sites-index.mjs",
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
@@ -49,7 +50,7 @@
     "check:visual": "node scripts/check-visual-contract.mjs",
     "visual:update": "node scripts/check-visual-contract.mjs --update",
     "check": "pnpm check:protocol && pnpm typecheck && pnpm test && pnpm build",
-    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-environment-status && pnpm check:browser-workspace-replay && pnpm check:composer-plugin-connect && pnpm check:composer-resources-current-26-908 && pnpm check:composer-plugin-attachment && pnpm check:markdown-error && pnpm check:sites-index && pnpm check:live-file-content && pnpm check:user-input && pnpm check:mcp-elicitation && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:pr-cleanup && pnpm check:live-pr-route && pnpm check:current-approval-26-903 && pnpm check:cdp && pnpm check:document-preview-electron && pnpm check:electron && pnpm check:visual",
+    "check:acceptance": "pnpm build && pnpm check:live-policy && pnpm check:live-environment-status && pnpm check:browser-workspace-replay && pnpm check:composer-plugin-connect && pnpm check:composer-resources-current-26-908 && pnpm check:composer-plugin-attachment && pnpm check:markdown-error && pnpm check:terminal-transport-failure && pnpm check:sites-index && pnpm check:live-file-content && pnpm check:user-input && pnpm check:mcp-elicitation && pnpm check:history && pnpm check:project-discovery && pnpm check:branch-recovery && pnpm check:commit-preview && pnpm check:push-preview && pnpm check:pr-preview && pnpm check:pr-cleanup && pnpm check:live-pr-route && pnpm check:current-approval-26-903 && pnpm check:cdp && pnpm check:document-preview-electron && pnpm check:electron && pnpm check:visual",
     "check:all": "pnpm check && pnpm check:live-policy && pnpm check:live-file-content && pnpm check:cdp && pnpm check:electron && pnpm check:visual"
   },
   "dependencies": {

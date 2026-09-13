@@ -1795,6 +1795,10 @@ function currentTerminal26825Frame(frame: string | null) {
   return frame?.startsWith("terminal-current-26-825-") ?? false;
 }
 
+function currentTerminalTransportFailure26825Frame(frame: string | null) {
+  return frame === "terminal-current-26-825-transport-failed";
+}
+
 function initialTerminalSessionIds(
   scenarioId: ReplayScenarioId,
   frame: string | null,
@@ -4454,7 +4458,8 @@ export function App() {
     useState<Set<string>>(() => new Set());
   const [terminalReloadSessionId, setTerminalReloadSessionId] =
     useState<string | null>(() =>
-      initialSelection.frame === "terminal-current-reload"
+      initialSelection.frame === "terminal-current-reload" ||
+      currentTerminalTransportFailure26825Frame(initialSelection.frame)
         ? "local-terminal-1"
         : null,
     );
@@ -5476,7 +5481,10 @@ export function App() {
     setDismissedTerminalMismatchIds(new Set());
     setTerminalReloadPendingIds(new Set());
     setTerminalReloadSessionId(
-      frame === "terminal-current-reload" ? "local-terminal-1" : null,
+      frame === "terminal-current-reload" ||
+        currentTerminalTransportFailure26825Frame(frame)
+        ? "local-terminal-1"
+        : null,
     );
     setTerminalTabPickerOpen(
       frame === "terminal-picker" ||
@@ -15630,6 +15638,10 @@ export function App() {
         activeFrame === "terminal-current-reload" &&
         sessionId === terminalReloadSessionId &&
         !terminalReloadPendingIds.has(sessionId);
+      const isCurrentTerminalTransportFailure =
+        currentTerminalTransportFailure26825Frame(activeFrame) &&
+        sessionId === terminalReloadSessionId &&
+        !terminalReloadPendingIds.has(sessionId);
       const isBackgroundTerminal =
         sessionId === "agent-background-terminal";
       return {
@@ -15697,7 +15709,8 @@ export function App() {
             onOpenNewTerminal={() => createTerminalSession()}
           />
         ) : undefined,
-        onReload: isDirectShellReload
+        onReload:
+          isDirectShellReload || isCurrentTerminalTransportFailure
           ? () => {
               cancelTerminalReloadTimer();
               setTerminalReloadPendingIds((sessionIds) =>
@@ -15711,7 +15724,11 @@ export function App() {
                   return next;
                 });
                 setTerminalReloadSessionId(null);
-                setActiveFrame("terminal-current-single");
+                setActiveFrame(
+                  isCurrentTerminalTransportFailure
+                    ? "terminal-current-26-825-transport-recovered"
+                    : "terminal-current-single",
+                );
               }, 160);
             }
           : undefined,
@@ -15723,9 +15740,11 @@ export function App() {
             ? liveTerminalStatus[sessionId] === "starting" ? "running" as const : liveTerminalStatus[sessionId] as "running" | "exited" | "failed"
             : terminalReloadPendingIds.has(sessionId)
             ? ("restoring" as const)
-            : isDirectShellReload
-              ? ("failed" as const)
-              : isBackgroundTerminal
+              : isDirectShellReload
+                ? ("failed" as const)
+                : isCurrentTerminalTransportFailure
+                  ? ("failed" as const)
+                : isBackgroundTerminal
                 ? ("running" as const)
                 : terminalCommand?.status === "running"
             ? ("running" as const)
@@ -15734,6 +15753,13 @@ export function App() {
               : terminalCommand?.status === "completed"
                 ? ("exited" as const)
                 : ("idle" as const),
+        reloadDescription: isCurrentTerminalTransportFailure
+          ? "The terminal transport disconnected. Reload to reconnect."
+          : undefined,
+        reloadLabel: isCurrentTerminalTransportFailure ? "Reconnect" : undefined,
+        reloadTitle: isCurrentTerminalTransportFailure
+          ? "Terminal connection lost"
+          : undefined,
         value: terminalValuesByCommand[sessionId] ?? "",
       };
     },
