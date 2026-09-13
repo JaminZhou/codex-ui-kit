@@ -758,7 +758,8 @@ exit gates; it does not replace the inventory.
   project-named single Terminal tab and close/add controls passed independent
   Browser, Electron, and regional pixel gates before the broader current
   Terminal refresh superseded them.
-  Unsampled global notification tones, light-theme shell evidence, unsampled
+  Installed-product global notification tones beyond the sampled success path,
+  light-theme shell evidence, unsampled
   long-thread window sizes/eviction heuristics, direct-shell failure/restart
   semantics, background agent-process reopening, current-product review submission and
   mutating comment/merge transitions, and the remaining Markdown, tool, and
@@ -898,7 +899,7 @@ collection state component. This closes the implementation/acceptance gap for
 the failed collection branch without promoting a synthetic failure to current
 installed-product evidence. Remaining Stage 1 work includes re-observing
 ordinary error and collection loading on the installed build, plus broader
-route lifecycle feedback and unsampled notification tones. Previous 26.820 Projects → Back → Forward now preserves the product
+route lifecycle feedback and installed-product notification reachability. Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
 independent Browser/Electron route stack additionally preserves a selected
 project chat through Back/Forward, closing the previous selection-continuity
@@ -915,7 +916,11 @@ state; those negative probes do not satisfy the runtime gate.
 The `26.825.51511` same-contract refresh now promotes the sampled success and
 bounded stack to the active baseline through title-hash-only CDP evidence,
 exact computed styles, two regional screenshots, reversible Pin/Undo state,
-and precise disposable-task cleanup; other notification tones remain open.
+and precise disposable-task cleanup. A replay-only tone/action matrix now
+covers success, warning, info, and neutral queue entries at 1180px and 720px
+with computed-style, focus, action-transition, and repeat-screenshot gates;
+this does not promote unsampled tones or their triggers to installed-product
+runtime evidence, and error/danger reachability remains open.
 The same build now also supersedes the legacy App Server recovery card with
 the full-window fatal page. A fail-closed isolated capture proves the exact
 terminated → fatal replacement → post-Restart three-process transition,
@@ -1530,9 +1535,12 @@ without confusing package readiness with full product reconstruction.
    repeats the single success and four-item stack with computed-style and
    notification-only screenshot evidence. Four reversible Pin/Undo transitions also
    lock simultaneous same-tone stacking, centered 5%/8px layer geometry, hover
-   expansion, and a 0.2907% product crop. Other notification tones and the
-   complete response-stream retry/failure/follow-up state machine retain their
-   recorded evidence levels.
+   expansion, and a 0.2907% product crop. The replay-only notification
+   tone/action matrix additionally covers success/warning/info/neutral entries,
+   Review → Open → View transitions, focus restoration, computed colors, and
+   1180/720 repeat pixels; installed-product evidence remains limited to the
+   sampled success/stack path and the complete response-stream
+   retry/failure/follow-up state machine retains its recorded evidence level.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add
@@ -1654,10 +1662,11 @@ without confusing package readiness with full product reconstruction.
     reverse-origin scroll, Electron, and product-region pixel gates. Continue
     A separate current-media replay now locks real loaded and unavailable
     images, wide/compact geometry, immersive caption/Close/zoom, focus
-    restoration, and five product-region pixel gates. Continue with plugin
-    attachment variants and table/Markdown error variants, real-product
-    subagent
-    recovery capture, and broader real global notification reachability. The
+    restoration, and five product-region pixel gates. The replay-only plugin
+    attachment, Markdown error, terminal transport-failure, populated summary,
+    and notification tone/action slices are now delivered; continue with
+    real-product subagent recovery capture and broader real global notification
+    reachability. The
     bounded terminal transport-failure replay is delivered separately; current
     real transport recovery is delivered
     through an isolated proxy plus CDP/Electron/pixel gates. The independent

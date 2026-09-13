@@ -641,8 +641,11 @@ wide/compact geometry, prompt focus/selection, and external Light pixels are
 now recorded, and the preference was restored to System. This remains scoped
 to the visible current home and shell. The later account-menu matrix closes
 the footer/account Light and compact gap; broader Settings routes, route
-lifecycle feedback, and unsampled notification tones still require live
-evidence.
+lifecycle feedback, and installed-product reachability for other notification
+tones/triggers still require live evidence. A replay-only tone/action matrix
+now covers success, warning, info, and neutral queue entries with computed
+colors, Review → Open → View focus transitions, and repeat 1180/720
+screenshots; it does not promote those paths to installed-product evidence.
 
 The application-shell continuity slice splits window navigation, route
 lifecycle feedback, route selection/restoration, fatal App Server recovery,
