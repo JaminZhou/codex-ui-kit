@@ -1555,8 +1555,13 @@ implements the public exec-server handshake: both 1180/720 Electron windows
 complete `environment/add`, `environment/info`, and `environment/status`, and
 render the returned shell/cwd and Ready state without a model turn. This
 promotes the public App Server-to-exec-server mapping, not production Remote
-registry/Noise-relay reachability; cloud registration and environment editing
-remain open.
+registry/Noise-relay reachability; production cloud registration and remote
+environment editing remain open. The same real gate now persists the
+credential-free endpoint by
+host-owned project directory across a second Electron process, supports an
+explicit re-add/update, and exposes a local-only Forget action. Because the
+public protocol has no remote-delete method, this does not claim cloud
+registration, remote deletion, or production Remote registry parity.
 
 ### 6. Perform global visual convergence
 

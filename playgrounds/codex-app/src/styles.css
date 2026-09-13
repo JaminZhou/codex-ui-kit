@@ -7192,6 +7192,20 @@ textarea {
 .demo-live-environment-settings__field { display: grid; gap: 6px; max-width: 28rem; }
 .demo-live-environment-settings__field input { box-sizing: border-box; max-width: 100%; min-width: 0; }
 .demo-live-environment-settings__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-live-environment-settings__saved {
+  border: 1px solid var(--codex-ui-border, rgb(255 255 255 / 12%));
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  max-width: 42rem;
+  padding: 12px;
+}
+.demo-live-environment-settings__saved h2 { font-size: 14px; margin: 0; }
+.demo-live-environment-settings__saved ul { display: grid; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.demo-live-environment-settings__saved li { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.demo-live-environment-settings__saved li > code { min-width: 0; overflow-wrap: anywhere; }
+.demo-live-environment-settings__saved li > code:first-of-type { margin-inline-end: auto; }
+.demo-live-environment-settings__saved p { font-size: 12px; opacity: .76; }
 .demo-live-environment-settings__result {
   border: 1px solid var(--codex-ui-border, rgb(255 255 255 / 12%));
   border-radius: 12px;

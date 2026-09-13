@@ -4,7 +4,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WebSocketServer } from "ws";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
-import { fileURLToPath } from "node:url";
 
 // This is an opt-in integration gate. The App Server client is real; the
 // loopback executor speaks the public exec-server JSON-RPC handshake so the
@@ -66,72 +65,21 @@ assert.ok(address && typeof address === "object", "loopback exec server is liste
 const execServerUrl = `ws://127.0.0.1:${address.port}`;
 
 const appServerHome = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-codex-home-"));
-const clientModulePath = fileURLToPath(
-  import.meta.resolve("@jaminzhou/codex-app-server-client"),
-);
+const registryDirectory = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-registry-"));
+const registryPath = join(registryDirectory, "environments.json");
 const results = [];
 try {
   for (const width of [1180, 720]) {
     const { app, page } = await launchScene(scene, {
       capture: false,
       currentSidebar: true,
-      environment: { CODEX_HOME: appServerHome },
+      environment: {
+        CODEX_HOME: appServerHome,
+        CODEX_UI_KIT_LIVE_ENVIRONMENTS_PATH: registryPath,
+      },
       windowSize: { width, height: 820 },
     });
     try {
-      await app.evaluate(async ({ ipcMain }, input) => {
-        const { CodexAppServerClient } = process.mainModule.require(
-          input.clientModulePath,
-        );
-        const client = new CodexAppServerClient({
-          capabilities: { experimentalApi: true },
-          clientInfo: {
-            name: "ui_kit_live_environment_remote",
-            title: "UI Kit Live Environment Remote",
-            version: "0.0.0",
-          },
-          env: { ...process.env, CODEX_HOME: input.codexHome },
-          protocolValidation: "strict",
-          requestTimeoutMs: 15_000,
-        });
-        await client.connect();
-        globalThis.__liveEnvironmentRemoteClient = client;
-        ipcMain.removeHandler("demo:environment:add");
-        ipcMain.handle("demo:environment:add", async (_event, value) => {
-          if (value?.projectToken !== "startup-workspace") {
-            throw new Error("Unexpected project token.");
-          }
-          const environmentId = value?.environmentId;
-          const execServerUrl = value?.execServerUrl;
-          const result = await client.call("environment/add", {
-            connectTimeoutMs: 5_000,
-            environmentId,
-            execServerUrl,
-          });
-          return { environmentId, execServerUrl: new URL(execServerUrl).toString(), status: "added", ...result };
-        });
-        ipcMain.removeHandler("demo:environment:status");
-        ipcMain.handle("demo:environment:status", async (_event, value) => {
-          if (value?.projectToken !== "startup-workspace") {
-            throw new Error("Unexpected project token.");
-          }
-          return {
-            environmentId: value.environmentId,
-            ...(await client.call("environment/status", { environmentId: value.environmentId })),
-          };
-        });
-        ipcMain.removeHandler("demo:environment:info");
-        ipcMain.handle("demo:environment:info", async (_event, value) => {
-          if (value?.projectToken !== "startup-workspace") {
-            throw new Error("Unexpected project token.");
-          }
-          return {
-            environmentId: value.environmentId,
-            ...(await client.call("environment/info", { environmentId: value.environmentId })),
-          };
-        });
-      }, { clientModulePath, codexHome: appServerHome });
-
       const liveLocal = page.getByRole("button", { name: "Live local", exact: true });
       if (!(await liveLocal.isVisible())) {
         await page.getByRole("button", { name: "Show sidebar", exact: true }).click();
@@ -144,6 +92,11 @@ try {
       await navigation.click();
       const route = page.getByRole("region", { name: "Environments", exact: true });
       await route.waitFor();
+      const saved = route.getByRole("region", { name: "Saved environments", exact: true });
+      if (width === 720) {
+        await saved.getByRole("button", { name: `Use ${remoteEnvironmentId}`, exact: true }).waitFor();
+        assert.match(await saved.innerText(), new RegExp(remoteEnvironmentId));
+      }
 
       const input = route.getByRole("textbox", { name: "Environment ID", exact: true });
       const execUrl = route.getByRole("textbox", { name: "Exec server URL", exact: true });
@@ -156,6 +109,8 @@ try {
       const added = route.getByRole("status", { name: "Add environment result", exact: true });
       await added.getByRole("heading", { name: "Environment added", exact: true }).waitFor();
       assert.match(await added.innerText(), new RegExp(execServerUrl.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")));
+      await saved.getByRole("button", { name: `Use ${remoteEnvironmentId}`, exact: true }).waitFor();
+      assert.match(await saved.innerText(), new RegExp(remoteEnvironmentId));
 
       await inspect.click();
       const info = route.getByRole("status", { name: "Environment info result", exact: true });
@@ -170,11 +125,11 @@ try {
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       await page.screenshot({ path: join(directory, `environment-remote-${width}.png`) });
       results.push({ width, status: await status.innerText() });
+      if (width === 720) {
+        await saved.getByRole("button", { name: `Forget ${remoteEnvironmentId}`, exact: true }).click();
+        await saved.waitFor({ state: "detached" });
+      }
     } finally {
-      await app.evaluate(async () => {
-        await globalThis.__liveEnvironmentRemoteClient?.close();
-        delete globalThis.__liveEnvironmentRemoteClient;
-      }).catch(() => undefined);
       await app.close();
     }
   }
@@ -194,4 +149,5 @@ try {
 } finally {
   await new Promise((resolve) => server.close(resolve));
   await rm(appServerHome, { recursive: true, force: true });
+  await rm(registryDirectory, { recursive: true, force: true });
 }

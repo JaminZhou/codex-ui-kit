@@ -62,6 +62,7 @@ import {
   normalizeExecServerUrl,
 } from "./live-environment-add.js";
 import { readLiveEnvironmentInfo } from "./live-environment-info.js";
+import { LiveEnvironmentRegistry } from "./live-environment-registry.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
   checkoutGitBranch,
@@ -139,9 +140,16 @@ const pendingPermissionRequests = new Map<
 const liveInputGate = new LiveUserInputGate();
 const liveMcpElicitationGate = new LiveMcpElicitationGate();
 let liveThreadRegistry: LiveThreadRegistry | null = null;
+let liveEnvironmentRegistry: LiveEnvironmentRegistry | null = null;
 function historyRegistry() {
   return liveThreadRegistry ??= new LiveThreadRegistry(
     process.env.CODEX_UI_KIT_LIVE_HISTORY_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-threads.json"),
+  );
+}
+
+function environmentRegistry() {
+  return liveEnvironmentRegistry ??= new LiveEnvironmentRegistry(
+    process.env.CODEX_UI_KIT_LIVE_ENVIRONMENTS_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-environments.json"),
   );
 }
 
@@ -1062,9 +1070,18 @@ ipcMain.handle("demo:environment:status", async (event, raw: unknown) => {
   }
   return result;
 });
+ipcMain.handle("demo:environment:list", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  return (await environmentRegistry().list(directory)).map(({ environmentId, execServerUrl, updatedAt }) => ({
+    environmentId,
+    execServerUrl,
+    updatedAt,
+  }));
+});
 ipcMain.handle("demo:environment:add", async (event, raw: unknown) => {
   assertTrustedIpc(event);
-  const { input } = resolveHistoryProject(raw);
+  const { input, directory } = resolveHistoryProject(raw);
   const environmentId = normalizeEnvironmentId(
     (input as { environmentId?: unknown }).environmentId,
   );
@@ -1080,7 +1097,21 @@ ipcMain.handle("demo:environment:add", async (event, raw: unknown) => {
   if (client !== connectedClient || connectedClient.state !== "connected") {
     throw new Error("The live session closed while adding the environment.");
   }
+  await environmentRegistry().upsert({
+    directory,
+    environmentId,
+    execServerUrl,
+    updatedAt: Date.now(),
+  });
   return result;
+});
+ipcMain.handle("demo:environment:forget", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory, input } = resolveHistoryProject(raw);
+  const environmentId = normalizeEnvironmentId(
+    (input as { environmentId?: unknown }).environmentId,
+  );
+  return { environmentId, forgotten: await environmentRegistry().forget(directory, environmentId) };
 });
 ipcMain.handle("demo:environment:info", async (event, raw: unknown) => {
   assertTrustedIpc(event);

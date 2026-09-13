@@ -7,6 +7,11 @@ import type { LiveEnvironmentStatusResult } from "../electron/live-environment-s
 type ReadState = "idle" | "loading" | "error" | "ready";
 type AddState = "idle" | "loading" | "error" | "success";
 type InfoState = "idle" | "loading" | "error" | "success";
+type SavedEnvironment = {
+  environmentId: string;
+  execServerUrl: string;
+  updatedAt: number;
+};
 
 function statusCopy(result: LiveEnvironmentStatusResult) {
   if (result.status === "ready") return "Ready";
@@ -27,6 +32,8 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
   );
   const [infoState, setInfoState] = useState<InfoState>("idle");
   const [infoResult, setInfoResult] = useState<LiveEnvironmentInfoResult | null>(null);
+  const [savedEnvironments, setSavedEnvironments] = useState<readonly SavedEnvironment[]>([]);
+  const [forgettingEnvironmentId, setForgettingEnvironmentId] = useState<string | null>(null);
   const requestEpoch = useRef(0);
 
   const clear = () => {
@@ -37,13 +44,26 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
     setAddResult(null);
     setInfoState("idle");
     setInfoResult(null);
+    setForgettingEnvironmentId(null);
   };
+  const refreshSaved = useCallback(async () => {
+    if (!projectToken || !window.codexDemo?.listEnvironments) {
+      setSavedEnvironments([]);
+      return;
+    }
+    try {
+      setSavedEnvironments(await window.codexDemo.listEnvironments({ projectToken }));
+    } catch {
+      setSavedEnvironments([]);
+    }
+  }, [projectToken]);
   useEffect(() => {
     clear();
     setEnvironmentId("");
     setExecServerUrl("");
+    void refreshSaved();
     return () => { requestEpoch.current++; };
-  }, [projectToken]);
+  }, [projectToken, refreshSaved]);
 
   const read = useCallback(async () => {
     if (!projectToken || !window.codexDemo || state === "loading") return;
@@ -85,10 +105,30 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
       });
       setAddResult(value);
       setAddState("success");
+      await refreshSaved();
     } catch {
       setAddState("error");
     }
-  }, [addState, environmentId, execServerUrl, projectToken]);
+  }, [addState, environmentId, execServerUrl, projectToken, refreshSaved]);
+
+  const forget = useCallback(async (saved: SavedEnvironment) => {
+    if (!projectToken || !window.codexDemo?.forgetEnvironment) return;
+    setForgettingEnvironmentId(saved.environmentId);
+    try {
+      await window.codexDemo.forgetEnvironment({
+        projectToken,
+        environmentId: saved.environmentId,
+      });
+      if (environmentId.trim() === saved.environmentId) {
+        setEnvironmentId("");
+        setExecServerUrl("");
+        clear();
+      }
+      await refreshSaved();
+    } finally {
+      setForgettingEnvironmentId(null);
+    }
+  }, [clear, environmentId, projectToken, refreshSaved]);
 
   const inspect = useCallback(async () => {
     if (
@@ -123,6 +163,38 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
 
   return <EnvironmentSettingsPage className="demo-live-environment-settings">
     <p>Manage one exact public App Server environment ID. The host validates the project binding and endpoint before any public protocol call.</p>
+    {savedEnvironments.length > 0 && (
+      <section aria-label="Saved environments" className="demo-live-environment-settings__saved">
+        <h2>Saved environments</h2>
+        <ul>
+          {savedEnvironments.map((saved) => (
+            <li key={saved.environmentId}>
+              <button
+                aria-label={`Use ${saved.environmentId}`}
+                onClick={() => {
+                  clear();
+                  setEnvironmentId(saved.environmentId);
+                  setExecServerUrl(saved.execServerUrl);
+                }}
+                type="button"
+              >
+                <code>{saved.environmentId}</code>
+              </button>
+              <code>{saved.execServerUrl}</code>
+              <button
+                aria-label={`Forget ${saved.environmentId}`}
+                disabled={forgettingEnvironmentId === saved.environmentId}
+                onClick={() => void forget(saved)}
+                type="button"
+              >
+                Forget
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p>Forget removes only this playground’s local record; it never deletes a remote environment.</p>
+      </section>
+    )}
     <label className="demo-live-environment-settings__field">
       Environment ID
       <input
