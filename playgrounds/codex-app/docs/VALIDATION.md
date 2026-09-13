@@ -62,6 +62,25 @@ tool-call UI path; production MCP servers, OAuth/permissions, multi-tool
 turns, streaming/error variants, installed-product parity, and final pixel
 baselines remain separate boundaries.
 
+### Live MCP elicitation — 2026-09-14
+
+Run `pnpm check:codex-app:acceptance` after `pnpm build:codex-app` for the
+signed-in live integration gate (the root command includes the full playground
+acceptance and this probe). A disposable stdio MCP server sends a real
+`elicitation/create` request from inside `tools/call`; the App Server forwards
+it to the renderer's `MCP server request` form. The probe requires the form's
+incomplete Accept state, selects `codex-ui-kit`, enters `Jamin`, submits through
+the visible form, and then requires the same tool call to complete with the
+exact `MCP_ELICITATION_OK` result.
+
+The gate records computed form typography/geometry, wide and 720px screenshots,
+and compact no-overflow after the response. Auth links, protocol/MCP server
+logs, and screenshots remain in the printed disposable directory. This is a
+real local MCP elicitation and tool-call path; URL-mode elicitation,
+decline/cancel, authentication, permission variants, multi-turn/multi-tool
+behavior, production servers, and installed-product pixels remain separate
+boundaries.
+
 ### Live permissions-request bridge — 2026-09-13
 
 The Live Electron bridge now handles the public

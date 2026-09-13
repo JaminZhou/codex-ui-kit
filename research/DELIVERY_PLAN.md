@@ -1060,6 +1060,15 @@ playground protocol/UI evidence, not production MCP server or OAuth parity;
 multi-tool, streaming/error, permission variants, installed-product pixels,
 and remote transport remain open follow-up boundaries.
 
+The companion live MCP elicitation probe is now part of full playground
+acceptance. A disposable stdio server sends a real `elicitation/create` from
+inside `tools/call`; the signed-in App Server forwards the form, the renderer
+enforces required fields and visible Accept gating, and the same tool then
+completes with a deterministic result at 1180/720px. This promotes the
+sampled local form-to-tool lifecycle, not URL/decline/cancel/authentication,
+permission variants, production server reachability, or installed-product
+pixel parity.
+
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,
 No environment, starting branch, the current Branches search/roles, Escape
