@@ -156,6 +156,23 @@ does not claim that every installed Codex build emits the same lifecycle rows,
 that subagent work completed successfully, or that current installed-product
 pixel parity and background-process integration are complete.
 
+### Live approval cancellation and same-thread Stop recovery — 2026-09-13
+
+The opt-in `check:live-stop` probe exercises a second real signed-in turn in a
+disposable write-disabled workspace. It requests one exact file-change
+approval, verifies that the file is absent, captures the pending approval at
+1180px and 720px, then clicks the owning Composer Stop control. The public
+protocol must report `turn/completed` with `interrupted`, resolve the pending
+approval, and leave the file absent. A second Composer turn resumes the same
+thread without tools and must complete with `STOP_RECOVERY_OK`.
+
+The observed run used the pinned client commit
+`8cf5823ee12c00f7bc9c5eaeef80049e65f0e881` (runtime CLI `0.153.4`), two real
+model turns, no file write, and local-only protocol/screenshots. This closes
+the sampled real approval-cancellation and same-thread Stop recovery path; it
+does not cover every approval kind, running command/tool interruption, or
+installed-product pixel parity.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:
