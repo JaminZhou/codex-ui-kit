@@ -21,6 +21,13 @@ exit gates; it does not replace the inventory.
   read-only Composer menu from that newer build, but does not silently promote
   it to the full baseline: the package fingerprint and cross-surface matrix
   remain `26.903.71938` until a dedicated rebaseline is completed.
+- A dedicated isolated `26.908.40834` shell/sidebar candidate baseline is now
+  recorded in [`current-baseline-26.908.json`](current-baseline-26.908.json)
+  and [`26.908.40834.md`](26.908.40834.md). It covers eight renderer states,
+  the wide/compact Project Index, sidebar keyboard/pointer lifecycle, Help
+  menu geometry, and the native project-menu boundary. It remains a candidate
+  until the affected surface families are re-observed on this build; the
+  promoted global baseline is still `26.903.71938`.
 - Stage 0 shell refresh is now captured at 26.903: the isolated Renderer was
   selected by URL, area, landmarks, and visible-control density; New chat,
   explicit Hide/Show, Pull requests → New chat restoration, sidebar

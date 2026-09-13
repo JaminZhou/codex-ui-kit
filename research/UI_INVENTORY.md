@@ -58,6 +58,14 @@ observation from a previous build remains historical evidence.
   Its Composer resource-menu observation is intentionally scoped; the audited
   package-fingerprint baseline remains `26.903.71938` until a full rebaseline
   is captured.
+- A full isolated shell/sidebar candidate capture for `26.908.40834` is now
+  available in [`current-baseline-26.908.json`](current-baseline-26.908.json)
+  with the method and boundaries documented in
+  [`26.908.40834.md`](26.908.40834.md). It records eight renderer states,
+  Project Index wide/compact geometry, sidebar focus and collapse/pin
+  lifecycle, Help menu geometry, and the native project-menu item-list
+  boundary. This is candidate evidence only; it does not promote the global
+  `26.903.71938` baseline or imply that untouched surface families are current.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to

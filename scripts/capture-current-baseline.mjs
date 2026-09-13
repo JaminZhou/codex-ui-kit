@@ -8,11 +8,18 @@ import {
   assertCurrentBaselineRecord,
   assertCurrentProjectsIndexObservation,
   currentBaselineViewports,
+  currentCandidateBaselineFingerprint,
+  currentBaselineFingerprint,
   resolveCurrentBaselineOutputPath,
   runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
 } from "./current-baseline-contract.mjs";
+
+const expectedFingerprint =
+  process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.40834"
+    ? currentCandidateBaselineFingerprint
+    : currentBaselineFingerprint;
 
 const port = Number(process.env.CODEX_CURRENT_BASELINE_CDP_PORT);
 const expectedProfile = process.env.CODEX_CURRENT_BASELINE_PROFILE;
@@ -1429,7 +1436,7 @@ try {
     },
   };
   assertCurrentProjectsIndexObservation(projectsIndexObservation);
-  assertCurrentBaselineRecord(record);
+  assertCurrentBaselineRecord(record, expectedFingerprint);
   const output = `${JSON.stringify(record, null, 2)}\n`;
   if (normalizedOutputPath) {
     await writeCurrentBaselineOutput(
