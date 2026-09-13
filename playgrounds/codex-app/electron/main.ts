@@ -57,6 +57,10 @@ import {
   type LivePermissionRequestProfile,
 } from "./live-permission-approval.js";
 import { normalizeEnvironmentId, readLiveEnvironmentStatus } from "./live-environment-status.js";
+import {
+  addLiveEnvironment,
+  normalizeExecServerUrl,
+} from "./live-environment-add.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
   checkoutGitBranch,
@@ -1054,6 +1058,26 @@ ipcMain.handle("demo:environment:status", async (event, raw: unknown) => {
   const result = await readLiveEnvironmentStatus(connectedClient, environmentId);
   if (client !== connectedClient || connectedClient.state !== "connected") {
     throw new Error("The live session closed while checking environment status.");
+  }
+  return result;
+});
+ipcMain.handle("demo:environment:add", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input } = resolveHistoryProject(raw);
+  const environmentId = normalizeEnvironmentId(
+    (input as { environmentId?: unknown }).environmentId,
+  );
+  const execServerUrl = normalizeExecServerUrl(
+    (input as { execServerUrl?: unknown }).execServerUrl,
+  );
+  const connectedClient = await ensureClient();
+  const result = await addLiveEnvironment(
+    connectedClient,
+    environmentId,
+    execServerUrl,
+  );
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session closed while adding the environment.");
   }
   return result;
 });

@@ -1536,6 +1536,12 @@ preflight rejection and the return-to-conversation action, without a model
 turn or a real remote-environment request. It is own-playground functional
 evidence, not installed-Codex visual parity or coverage of configured remote
 environment workflows.
+The follow-up now adds a guarded `environment/add` path to the same route. The
+host validates a credential-free `ws://`/`wss://` exec-server endpoint before
+starting the client, maps success/failure/retry states, and keeps the renderer
+bound to the selected project token. Browser/Electron contracts cover both
+wide and compact layouts, but no real Remote environment creation is promoted
+until a reachable exec server and current-product pixels are captured.
 
 ### 6. Perform global visual convergence
 

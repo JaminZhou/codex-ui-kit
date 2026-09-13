@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, EnvironmentSettingsPage } from "codex-ui-kit";
+import type { LiveEnvironmentAddResult } from "../electron/live-environment-add";
 import type { LiveEnvironmentStatusResult } from "../electron/live-environment-status";
 
 type ReadState = "idle" | "loading" | "error" | "ready";
+type AddState = "idle" | "loading" | "error" | "success";
 
 function statusCopy(result: LiveEnvironmentStatusResult) {
   if (result.status === "ready") return "Ready";
@@ -16,16 +18,24 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
   const [environmentId, setEnvironmentId] = useState("");
   const [state, setState] = useState<ReadState>("idle");
   const [result, setResult] = useState<LiveEnvironmentStatusResult | null>(null);
+  const [execServerUrl, setExecServerUrl] = useState("");
+  const [addState, setAddState] = useState<AddState>("idle");
+  const [addResult, setAddResult] = useState<LiveEnvironmentAddResult | null>(
+    null,
+  );
   const requestEpoch = useRef(0);
 
   const clear = () => {
     requestEpoch.current++;
     setState("idle");
     setResult(null);
+    setAddState("idle");
+    setAddResult(null);
   };
   useEffect(() => {
     clear();
     setEnvironmentId("");
+    setExecServerUrl("");
     return () => { requestEpoch.current++; };
   }, [projectToken]);
 
@@ -49,6 +59,31 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
     }
   }, [environmentId, projectToken, state]);
 
+  const add = useCallback(async () => {
+    if (
+      !projectToken ||
+      !window.codexDemo ||
+      addState === "loading" ||
+      !environmentId.trim() ||
+      !execServerUrl.trim()
+    ) {
+      return;
+    }
+    setAddState("loading");
+    setAddResult(null);
+    try {
+      const value = await window.codexDemo.addEnvironment({
+        projectToken,
+        environmentId,
+        execServerUrl,
+      });
+      setAddResult(value);
+      setAddState("success");
+    } catch {
+      setAddState("error");
+    }
+  }, [addState, environmentId, execServerUrl, projectToken]);
+
   if (!projectToken || !window.codexDemo) {
     return <EnvironmentSettingsPage
       status="unavailable"
@@ -58,7 +93,7 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
   }
 
   return <EnvironmentSettingsPage className="demo-live-environment-settings">
-    <p>Read-only status for one exact public App Server environment ID. This view does not list, create, edit, connect, or recover environments.</p>
+    <p>Manage one exact public App Server environment ID. The host validates the project binding and endpoint before any public protocol call.</p>
     <label className="demo-live-environment-settings__field">
       Environment ID
       <input
@@ -72,6 +107,59 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
         value={environmentId}
       />
     </label>
+    <label className="demo-live-environment-settings__field">
+      Exec server URL
+      <input
+        aria-label="Exec server URL"
+        onChange={(event) => {
+          setAddState("idle");
+          setAddResult(null);
+          setExecServerUrl(event.currentTarget.value);
+        }}
+        placeholder="wss://exec.example.test"
+        spellCheck={false}
+        value={execServerUrl}
+      />
+    </label>
+    <div className="demo-live-environment-settings__actions">
+      <Button
+        disabled={
+          addState === "loading" ||
+          !environmentId.trim() ||
+          !execServerUrl.trim()
+        }
+        onClick={() => void add()}
+      >
+        Add environment
+      </Button>
+    </div>
+    {addState === "loading" && <p role="status">Adding environment…</p>}
+    {addState === "error" && (
+      <section
+        aria-label="Add environment result"
+        className="demo-live-environment-settings__result"
+        data-status="error"
+        role="alert"
+      >
+        <h2>Environment could not be added</h2>
+        <p>The endpoint was not accepted. Check the ID and websocket URL, then retry.</p>
+        <Button onClick={() => void add()}>Retry adding environment</Button>
+      </section>
+    )}
+    {addResult && (
+      <section
+        aria-label="Add environment result"
+        className="demo-live-environment-settings__result"
+        data-status="success"
+        role="status"
+      >
+        <h2>Environment added</h2>
+        <p>
+          <code>{addResult.environmentId}</code> is configured at{" "}
+          <code>{addResult.execServerUrl}</code>.
+        </p>
+      </section>
+    )}
     <div className="demo-live-environment-settings__actions">
       <Button disabled={state === "loading" || !environmentId.trim()} onClick={() => void read()}>
         Check environment status
