@@ -1221,52 +1221,52 @@ textarea {
   display: none;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-new-conversation-start__header {
   top: calc(50% - 149.59375px);
 }
 
-.demo-root[data-current-context-26-825] {
+.demo-root[data-current-context] {
   font-weight: 400;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-new-conversation-start__eyebrow {
   height: 56px;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-new-conversation-start__header h3 {
   margin-top: 24px;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-new-conversation-start__prompt {
   bottom: 168px;
 }
 
-.demo-root[data-current-context-26-825]
+.demo-root[data-current-context]
   .demo-workspace-prompts--current-context {
   width: 100%;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-conversation-context-bar {
   gap: 8px;
   padding-inline-start: 17.5px;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-conversation-context-bar__item {
   font-weight: 400;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-start
+.demo-root[data-current-context] .demo-workspace-start
   .codex-ui-conversation-context-bar__item[data-kind="run-location"] {
   width: auto;
 }
 
-.demo-root[data-current-composer-controls-26-825]
+.demo-root[data-current-composer-controls]
   .demo-workspace-start
   .demo-composer-controls
   .demo-composer-permission-trigger {
@@ -1275,7 +1275,7 @@ textarea {
   width: 105.0625px;
 }
 
-.demo-root[data-current-composer-controls-26-825]
+.demo-root[data-current-composer-controls]
   .demo-workspace-start
   .demo-composer-controls
   > .codex-ui-composer-mode {
@@ -1285,17 +1285,17 @@ textarea {
   width: auto;
 }
 
-.demo-root[data-current-composer-controls-26-825][data-composer-mode="goal"]
+.demo-root[data-current-composer-controls][data-composer-mode="goal"]
   .demo-workspace-start
   .codex-ui-composer,
-.demo-root[data-current-composer-controls-26-825][data-composer-mode="goal"]
+.demo-root[data-current-composer-controls][data-composer-mode="goal"]
   .demo-workspace-start
   .codex-ui-composer__fieldset {
   height: 134px;
   min-height: 134px;
 }
 
-.demo-root[data-current-composer-controls-26-825][data-composer-mode="goal"]
+.demo-root[data-current-composer-controls][data-composer-mode="goal"]
   .demo-workspace-start
   .codex-ui-composer__toolbar {
   margin-top: 36px;
@@ -1312,12 +1312,15 @@ textarea {
   width: 16px;
 }
 
-.demo-root[data-current-composer-controls-26-825]
-  .codex-ui-composer-resource-picker--current-26-825 {
+.demo-root[data-current-composer-controls]
+  :is(
+    .codex-ui-composer-resource-picker--current-26-825,
+    .codex-ui-composer-resource-picker--current-26-908
+  ) {
   font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
 }
 
-.demo-root[data-current-composer-controls-26-825]
+.demo-root[data-current-composer-controls]
   .demo-workspace-start
   .codex-ui-composer__input {
   font-size: 14px;
@@ -1442,7 +1445,7 @@ textarea {
   }
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-project-dialog,
+.demo-root[data-current-context] .demo-workspace-project-dialog,
 .demo-workspace-context-menu--current-26-825 {
   backdrop-filter: blur(8px);
   border: 0 solid currentColor;
@@ -1460,14 +1463,14 @@ textarea {
   translate: 0 -1px;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-project-dialog {
+.demo-root[data-current-context] .demo-workspace-project-dialog {
   gap: 4px;
   grid-template-rows: 28.5625px 208.9375px;
   left: 18px;
 }
 
 @container codex-ui-app-shell (max-width: 45rem) {
-  .demo-root[data-current-context-26-825] .demo-workspace-project-dialog {
+  .demo-root[data-current-context] .demo-workspace-project-dialog {
     left: 19px;
   }
 }
@@ -1507,7 +1510,7 @@ textarea {
   width: 100%;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-project-dialog
+.demo-root[data-current-context] .demo-workspace-project-dialog
   .codex-ui-conversation-project-options__item,
 .demo-workspace-context-menu--current-26-825 .codex-ui-menu-item {
   border-radius: 15px;
@@ -1515,7 +1518,7 @@ textarea {
   line-height: 18.5714px;
 }
 
-.demo-root[data-current-context-26-825] .demo-workspace-project-dialog
+.demo-root[data-current-context] .demo-workspace-project-dialog
   .codex-ui-conversation-project-options__check
   .demo-current-build-icon {
   height: 16px;

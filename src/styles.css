@@ -15703,7 +15703,10 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   margin-inline-start: auto;
 }
 
-.codex-ui-composer-resource-picker--current-26-825 {
+:is(
+  .codex-ui-composer-resource-picker--current-26-825,
+  .codex-ui-composer-resource-picker--current-26-908
+) {
   backdrop-filter: blur(8px);
   background: rgb(45, 45, 45);
   border-color: rgb(68, 68, 68);
@@ -15713,7 +15716,10 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   font-weight: 400;
 }
 
-.codex-ui-composer-resource-picker--current-26-825
+:is(
+  .codex-ui-composer-resource-picker--current-26-825,
+  .codex-ui-composer-resource-picker--current-26-908
+)
   :is(
     .codex-ui-composer-resource-picker__heading,
     .codex-ui-composer-resource-picker__group-label,
@@ -15722,7 +15728,10 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   min-height: 1.78515625rem;
 }
 
-.codex-ui-composer-resource-picker--current-26-825
+:is(
+  .codex-ui-composer-resource-picker--current-26-825,
+  .codex-ui-composer-resource-picker--current-26-908
+)
   .codex-ui-composer-resource-picker__option {
   border-radius: 0.9375rem;
   box-sizing: border-box;
@@ -15733,13 +15742,19 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   padding: 0.3125rem 0.5rem;
 }
 
-.codex-ui-composer-resource-picker--current-26-825
+:is(
+  .codex-ui-composer-resource-picker--current-26-825,
+  .codex-ui-composer-resource-picker--current-26-908
+)
   .codex-ui-composer-resource-picker__icon {
   height: 1.25rem;
   width: 1.25rem;
 }
 
-.codex-ui-composer-resource-picker--current-26-825
+:is(
+  .codex-ui-composer-resource-picker--current-26-825,
+  .codex-ui-composer-resource-picker--current-26-908
+)
   .codex-ui-composer-resource-picker__icon
   > svg {
   fill: currentColor;
@@ -15747,7 +15762,10 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   width: 1.25rem;
 }
 
-.codex-ui-composer-resource-picker--current-26-825
+:is(
+  .codex-ui-composer-resource-picker--current-26-825,
+  .codex-ui-composer-resource-picker--current-26-908
+)
   .codex-ui-composer-resource-picker__copy {
   gap: 0.5rem;
 }

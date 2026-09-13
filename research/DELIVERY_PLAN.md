@@ -17,6 +17,10 @@ exit gates; it does not replace the inventory.
   `26.901.51231` note is superseded. Existing surface evidence remains tied to
   its recorded build until each affected surface is re-observed; old fixtures
   remain regression evidence rather than current-product proof.
+- The installed app now reports `26.908.40834` (`8881`). This PR records one
+  read-only Composer menu from that newer build, but does not silently promote
+  it to the full baseline: the package fingerprint and cross-surface matrix
+  remain `26.903.71938` until a dedicated rebaseline is completed.
 - Stage 0 shell refresh is now captured at 26.903: the isolated Renderer was
   selected by URL, area, landmarks, and visible-control density; New chat,
   explicit Hide/Show, Pull requests → New chat restoration, sidebar
@@ -1211,6 +1215,20 @@ own-fixture replay with zero pixel drift. Its only product evidence is the
 older `26.721.81911` resource menu, so `composer.plugins` remains
 `partial_legacy`; discovery, installation, permissions, and real execution
 remain host-owned and open.
+
+The `26.908.40834` follow-up records the current unified `Add files and more`
+catalog separately from that legacy connect entry. It replays the seven observed
+top-level actions plus 14 sampled Plugins/skills rows at wide and compact sizes,
+requires scroll containment, keyboard End/Enter dismissal, Escape focus
+restoration, and two zero-drift own-fixture captures. The real sample was
+strictly read-only: an existing application-layer draft made selection unsafe,
+so it intentionally records neither a selected skill attachment/pill nor a
+plugin installation/authorization effect. Browser-context rows remain dynamic
+and excluded. This improves current menu coverage while retaining
+`composer.resources` and `composer.plugins` as partial verification until a
+safe selected-skill lifecycle and product-region pixel reference are captured.
+It is intentionally a scoped newer-build observation, not a silent replacement
+for the full `26.903.71938` package-fingerprint baseline.
 
 The Browser workspace slice activates the historical one-tab shell only in an
 isolated controlled replay. It covers tab creation, selection, close-to-empty

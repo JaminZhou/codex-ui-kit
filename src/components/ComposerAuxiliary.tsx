@@ -349,9 +349,11 @@ export function ComposerResourcePicker({
       {...props}
     >
       <div className="codex-ui-composer-resource-picker__scroller">
-        <div className="codex-ui-composer-resource-picker__heading">
-          {heading}
-        </div>
+        {heading == null ? null : (
+          <div className="codex-ui-composer-resource-picker__heading">
+            {heading}
+          </div>
+        )}
         {groups.map((group) =>
           group.options.length > 0 ? (
             <section

@@ -1,0 +1,61 @@
+{
+  "baseline": {
+    "build": "8881",
+    "bundleShortVersion": "26.908.40834",
+    "bundlePath": "/Applications/ChatGPT.app",
+    "observedOn": "2026-09-13"
+  },
+  "inventoryClassification": "scoped newer-build observation; it does not replace the full 26.903.71938 package fingerprint baseline",
+  "capture": {
+    "method": "one temporary loopback CDP process on port 9942",
+    "page": "app://-/index.html",
+    "scope": "read-only DOM and computed-layout observation after opening Add files and more",
+    "cleanup": "listener closed and temporary profile moved to Trash before implementation",
+    "safetyBoundary": "The application-level profile still exposed an existing draft, so no menu item was selected and no prompt was sent."
+  },
+  "observed": {
+    "composer": {
+      "addTrigger": "Add files and more",
+      "layout": {
+        "height": 98,
+        "width": 736
+      }
+    },
+    "menu": {
+      "itemHeight": 29,
+      "width": 726,
+      "topLevelOptions": [
+        "Files and folders",
+        "Attach Google Chrome",
+        "Work in a project — Choose project for new chats",
+        "Goal — Set a goal to keep pursuing",
+        "Plan mode — Turn plan mode on",
+        "Record a skill",
+        "Sketch — Draw a sketch"
+      ],
+      "sampledPluginAndSkillOptions": [
+        "GitHub Triage — PRs, issues, CI, and publish flows",
+        "Documents — Create and edit documents",
+        "PDF — Read, create, and verify PDFs",
+        "Spreadsheets — Create and edit spreadsheets",
+        "Presentations — Create and edit presentations",
+        "Template Creator — Create or update reusable templates from reference content",
+        "Browser — Control the in-app browser",
+        "Computer — Control Mac apps from ChatGPT",
+        "Visualize — Create interactive visuals",
+        "Watch PR — Drive GitHub bot review rounds to a clean pass.",
+        "AppKit Inspector — Inspect native macOS views in Codex Browser.",
+        "Deep Research — Deep research",
+        "Plugin Management — Discover and manage plugins",
+        "Sites — Build and deploy websites"
+      ]
+    }
+  },
+  "excluded": [
+    "Account-dependent installed-skill inventory beyond the sampled visible rows",
+    "Browser-tab rows and other user-context rows",
+    "Plugin discovery, installation, OAuth, permissions, and execution",
+    "Selection result or a Composer attachment/pill lifecycle",
+    "Upload, provider errors, and long-term persistence"
+  ]
+}
