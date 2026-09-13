@@ -1018,6 +1018,11 @@ second request for the independent second file change, so this promotes the
 current decision UI and bounded file outcomes without claiming session-lifetime
 suppression. Matching-command, network, and installed-product approval parity
 remain separate boundaries.
+An opt-in real file-variant probe now verifies separate current-build
+`fileChange` update and delete requests, exact absolute paths/diffs, two
+`Allow once` decisions, final updated/deleted files, and 1180/720 no-overflow
+frames. Rename, binary, upload-failure, and installed-product parity remain
+separate boundaries.
 
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,
