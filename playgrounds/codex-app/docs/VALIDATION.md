@@ -219,6 +219,16 @@ no-overflow screenshots are recorded in a disposable read-only workspace.
 Matching-command, network, and installed-product approval parity remain
 separately scoped.
 
+### Live file-change variants — 2026-09-13
+
+The opt-in `check:live-file-variants` probe uses two separate real
+`apply_patch` operations: one updates an existing file and the other deletes a
+second file. Each current file-change approval is inspected for its absolute
+path, `update`/`delete` kind, and diff before `Allow once`; the final files,
+completed turn, and 1180/720 no-overflow screenshots are verified in a
+disposable read-only workspace. Rename, binary, upload-failure, and installed-
+product parity remain separately scoped.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:
