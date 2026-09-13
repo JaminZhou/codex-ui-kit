@@ -5,7 +5,7 @@
     "appVersion": "26.908.40834",
     "buildNumber": "8881",
     "chromiumVersion": "152.0.7977.83",
-    "sampledAt": "2026-09-13"
+    "sampledAt": "2026-09-14"
   },
   "captureKind": "renderer_emulation",
   "runtimeBundleIdentity": {
@@ -13,7 +13,7 @@
       "appAsarBytes": 322016862,
       "appAsarSha256": "bb40cd8811887363104a19291346af9595632e0e956316a1086b274fb8e3eafc",
       "changedAtMs": 1789228807129,
-      "checkedAtMs": 1789263085873,
+      "checkedAtMs": 1789321043870,
       "device": "16777232",
       "inode": "362199084"
     },
@@ -21,12 +21,12 @@
       "appAsarBytes": 322016862,
       "appAsarSha256": "bb40cd8811887363104a19291346af9595632e0e956316a1086b274fb8e3eafc",
       "changedAtMs": 1789228807129,
-      "checkedAtMs": 1789263075380,
+      "checkedAtMs": 1789321034330,
       "device": "16777232",
       "inode": "362199084"
     },
-    "ownerPid": 93185,
-    "processStartedAtMs": 1789263063000
+    "ownerPid": 18783,
+    "processStartedAtMs": 1789321017000
   },
   "schemaVersion": 1,
   "projectsIndexObservation": {
@@ -110,8 +110,8 @@
       "expandedCount": 1,
       "focusOnToggle": true,
       "recentGroupCount": 1,
-      "recentGroupHeight": 72,
-      "wrapperHeight": 155
+      "recentGroupHeight": 36,
+      "wrapperHeight": 119
     },
     "sort": {
       "initial": {
@@ -449,7 +449,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1258
+          "scrollHeight": 1148
         }
       ],
       "routeMarkers": {
@@ -642,7 +642,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1218
+          "scrollHeight": 1108
         }
       ],
       "routeMarkers": {
@@ -835,7 +835,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1218
+          "scrollHeight": 1108
         }
       ],
       "routeMarkers": {
@@ -1028,7 +1028,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1218
+          "scrollHeight": 1108
         }
       ],
       "routeMarkers": {
@@ -1315,7 +1315,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1218
+          "scrollHeight": 1108
         }
       ],
       "routeMarkers": {
@@ -1465,7 +1465,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1218
+          "scrollHeight": 1108
         }
       ],
       "routeMarkers": {
@@ -1658,7 +1658,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1218
+          "scrollHeight": 1108
         }
       ],
       "routeMarkers": {
@@ -1733,19 +1733,19 @@
   "targetSelection": {
     "candidates": [
       {
-        "area": 967600,
-        "height": 820,
+        "area": 2153108,
+        "height": 2789,
         "index": 0,
         "landmarks": {
-          "main": 2,
-          "nav": 1,
-          "sidebarTrigger": 2,
+          "main": 1,
+          "nav": 0,
+          "sidebarTrigger": 0,
           "textbox": 1
         },
-        "selected": true,
-        "url": "app://-/index.html",
-        "visibleControls": 50,
-        "width": 1180
+        "selected": false,
+        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
+        "visibleControls": 0,
+        "width": 772
       },
       {
         "area": 691200,
@@ -1761,6 +1761,21 @@
         "url": "non-app-page",
         "visibleControls": 0,
         "width": 960
+      },
+      {
+        "area": 967600,
+        "height": 820,
+        "index": 2,
+        "landmarks": {
+          "main": 2,
+          "nav": 1,
+          "sidebarTrigger": 2,
+          "textbox": 1
+        },
+        "selected": true,
+        "url": "app://-/index.html",
+        "visibleControls": 51,
+        "width": 1180
       }
     ],
     "selected": {
@@ -1772,7 +1787,7 @@
         "textbox": 1
       },
       "url": "app://-/index.html",
-      "visibleControls": 50
+      "visibleControls": 51
     }
   }
 }
