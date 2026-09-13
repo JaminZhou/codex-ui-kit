@@ -58,6 +58,19 @@ request. No successful product reachability is claimed; the real request and
 current-product pixels remain an explicit follow-up once the transport is
 healthy.
 
+### Live environment add bridge — 2026-09-14
+
+The Live environment route now exposes a host-validated `environment/add`
+vertical slice alongside the exact-id status read. The host accepts only
+opaque environment IDs and credential-free `ws://`/`wss://` exec-server URLs,
+rejecting unsafe values before starting the App Server client. The renderer
+covers add success, failure/retry, status states, compact/wide no-overflow, and
+return-to-conversation behavior through the same Electron IPC contract.
+
+The contract is synthetic and does not claim a real Remote environment was
+created: the signed-in App Server transport and remote exec server remain
+unverified until a reachable endpoint is available.
+
 ### Live Terminal execution — 2026-09-08
 
 After `pnpm build:codex-app`, run
