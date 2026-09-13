@@ -11,6 +11,13 @@ versions, packed artifact digest, and links to that candidate's validation.
 A new commit invalidates candidate-specific evidence until it is rechecked.
 Unrun or unavailable checks stay open, not implicitly passed.
 
+The repository provides `pnpm check:release:candidate` for this audit. It
+packs the current private candidate into a temporary tarball, checks the
+public runtime export list and required package files from that tarball,
+rejects development-only paths, and prints the artifact byte count and
+SHA-256. It never publishes, changes `private`, or leaves a tarball in the
+repository.
+
 - [ ] Freeze root runtime exports against `scripts/public-runtime-exports.mjs`.
 - [ ] Review generated public declarations and `docs/COMPONENTS.md` together;
   document controlled state, callbacks, defaults, and host-owned effects.
