@@ -221,7 +221,8 @@ separately scoped.
 
 ### Live file-change variants — 2026-09-13
 
-The opt-in `check:live-file-variants` probe uses two separate real
+The `check:live-file-variants` probe now runs inside full playground acceptance
+and uses two separate real
 `apply_patch` operations: one updates an existing file and the other deletes a
 second file. Each current file-change approval is inspected for its absolute
 path, `update`/`delete` kind, and diff before `Allow once`; the final files,
