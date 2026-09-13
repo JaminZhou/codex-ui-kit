@@ -1549,7 +1549,14 @@ The next read-only `environment/info` slice now exposes the public shell/cwd
 details for the same selected ID, with malformed responses rejected at the
 host boundary and loading/failure/retry UI contracts at wide and compact
 sizes. It does not claim environment editing, persistence, or a reachable
-Remote exec server.
+Remote exec server. A follow-up local protocol gate now drives the same route
+through a real `CodexAppServerClient` and an isolated loopback WebSocket that
+implements the public exec-server handshake: both 1180/720 Electron windows
+complete `environment/add`, `environment/info`, and `environment/status`, and
+render the returned shell/cwd and Ready state without a model turn. This
+promotes the public App Server-to-exec-server mapping, not production Remote
+registry/Noise-relay reachability; cloud registration and environment editing
+remain open.
 
 ### 6. Perform global visual convergence
 
