@@ -110,6 +110,7 @@ const evidence = [];
 const result = {
   directory,
   liveAppServer: true,
+  mcpServerStatus: null,
   mcpServer: "ui_kit_echo",
   modelTurns: 1,
   passed: false,
@@ -118,6 +119,33 @@ const result = {
 let threadId = null;
 
 try {
+  const statusClient = new CodexAppServerClient({
+    capabilities: { experimentalApi: true },
+    protocolValidation: "strict",
+  });
+  try {
+    await statusClient.connect();
+    const statusResponse = await statusClient.call("mcpServerStatus/list", {
+      detail: "full",
+    });
+    const server = statusResponse.data?.find(
+      (candidate) => candidate?.name === "ui_kit_echo",
+    );
+    assert.ok(server, "The live MCP status list must include ui_kit_echo.");
+    assert.ok(
+      server.tools && typeof server.tools.ui_kit_echo === "object",
+      "The live MCP status list must expose the configured tool.",
+    );
+    result.mcpServerStatus = {
+      authStatus: server.authStatus,
+      name: server.name,
+      runtimeStatus: server.runtimeStatus ?? null,
+      toolNames: Object.keys(server.tools),
+    };
+  } finally {
+    await statusClient.close();
+  }
+
   await page.getByRole("button", { name: "Live local", exact: true }).click();
   await page.evaluate(() => {
     window.__liveMcpEvidence = [];
