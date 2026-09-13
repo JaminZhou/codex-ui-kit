@@ -78,12 +78,15 @@ the visible form, and then requires the same tool call to complete with the
 exact `MCP_ELICITATION_OK` result.
 
 The gate records computed form typography/geometry, wide and 720px screenshots,
-and compact no-overflow after the response. Auth links, protocol/MCP server
-logs, and screenshots remain in the printed disposable directory. This is a
-real local MCP elicitation and tool-call path; URL-mode elicitation,
-decline/cancel, authentication, permission variants, multi-turn/multi-tool
-behavior, production servers, and installed-product pixels remain separate
-boundaries.
+and compact no-overflow after the response. The same harness is run three times
+by full acceptance: `accept` requires a completed tool item and the exact
+`MCP_ELICITATION_OK` result, while `cancel` and `decline` require a failed tool
+item with the exact `MCP_ELICITATION_CANCELLED` or
+`MCP_ELICITATION_DECLINED` result. Auth links, protocol/MCP server logs, and
+screenshots remain in the printed disposable directory. This is a real local
+MCP elicitation and tool-call path; URL-mode elicitation, authentication,
+permission variants, multi-turn/multi-tool behavior, production servers, and
+installed-product pixels remain separate boundaries.
 
 ### Live permissions-request bridge — 2026-09-13
 
