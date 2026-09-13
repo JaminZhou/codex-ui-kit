@@ -1065,12 +1065,15 @@ boundaries.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from
-inside `tools/call`; the signed-in App Server forwards the form, the renderer
-enforces required fields and visible Accept gating, and the same tool then
-completes with a deterministic result at 1180/720px. This promotes the
-sampled local form-to-tool lifecycle, not URL/decline/cancel/authentication,
-permission variants, production server reachability, or installed-product
-pixel parity.
+inside `tools/call`; the signed-in App Server forwards the form, and the
+renderer enforces required fields and visible Accept gating. Full acceptance
+runs the same public path with Accept, Decline, and Cancel: Accept completes
+the tool with the deterministic `MCP_ELICITATION_OK` result, while Decline and
+Cancel settle the same tool as failed with their exact response tokens. Each
+action records the 1180/720 form geometry and compact no-overflow contract.
+This promotes the sampled local form-to-tool decision lifecycle, not URL-mode
+elicitation, authentication, permission variants, multi-turn/multi-tool
+behavior, production server reachability, or installed-product pixel parity.
 
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,

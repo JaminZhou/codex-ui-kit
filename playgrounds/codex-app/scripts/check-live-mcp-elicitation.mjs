@@ -6,6 +6,11 @@ import { join } from "node:path";
 import { CodexAppServerClient } from "@jaminzhou/codex-app-server-client";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
+const action = process.env.CODEX_UI_KIT_LIVE_MCP_ELICITATION_ACTION ?? "accept";
+assert.ok(
+  ["accept", "decline", "cancel"].includes(action),
+  "CODEX_UI_KIT_LIVE_MCP_ELICITATION_ACTION must be accept, decline, or cancel.",
+);
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-mcp-elicitation-"));
 const serverPath = join(directory, "server.mjs");
 const serverLogPath = join(directory, "server.log");
@@ -100,11 +105,14 @@ async function handle(message) {
   const response = await elicitation;
   const accepted = response?.result?.action === "accept";
   const content = response?.result?.content;
+  const outcome = accepted
+    ? "MCP_ELICITATION_OK:" + JSON.stringify(content)
+    : response?.result?.action === "cancel"
+      ? "MCP_ELICITATION_CANCELLED"
+      : "MCP_ELICITATION_DECLINED";
   reply(message.id, {
     content: [{
-      text: accepted
-        ? "MCP_ELICITATION_OK:" + JSON.stringify(content)
-        : "MCP_ELICITATION_DECLINED",
+      text: outcome,
       type: "text",
     }],
     isError: !accepted,
@@ -155,6 +163,7 @@ const result = {
   modelTurns: 1,
   passed: false,
   tool: "ui_kit_elicit",
+  action,
 };
 let threadId = null;
 
@@ -186,7 +195,7 @@ try {
     exact: true,
   });
   await composer.fill(
-    'Use exactly one MCP tool now. Call ui_kit_elicit on the ui_kit_elicit MCP server. Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_ELICITATION_OK.',
+    `Use exactly one MCP tool now. Call ui_kit_elicit on the ui_kit_elicit MCP server. Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_ELICITATION_${action.toUpperCase() === "ACCEPT" ? "OK" : action.toUpperCase() === "CANCEL" ? "CANCELLED" : "DECLINED"}.`,
   );
   await composer.press("Enter");
 
@@ -200,13 +209,15 @@ try {
     await form.getByText("Choose the project details that the MCP server should use.", { exact: true }).count(),
     1,
   );
-  const select = form.locator("select").first();
-  await select.selectOption("codex-ui-kit");
-  await form.locator("input[type=text]").first().fill("Jamin");
-  assert.equal(
-    await form.getByRole("button", { name: "Accept", exact: true }).isEnabled(),
-    true,
-  );
+  if (action === "accept") {
+    const select = form.locator("select").first();
+    await select.selectOption("codex-ui-kit");
+    await form.locator("input[type=text]").first().fill("Jamin");
+    assert.equal(
+      await form.getByRole("button", { name: "Accept", exact: true }).isEnabled(),
+      true,
+    );
+  }
   const formStyles = await form.evaluate((element) => {
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
@@ -215,7 +226,8 @@ try {
   result.form = formStyles;
   result.wideScreenshot = join(directory, "mcp-elicitation-wide.png");
   await page.screenshot({ path: result.wideScreenshot });
-  await form.getByRole("button", { name: "Accept", exact: true }).click();
+  const actionLabel = action[0].toUpperCase() + action.slice(1);
+  await form.getByRole("button", { name: actionLabel, exact: true }).click();
   await form.waitFor({ state: "detached", timeout: 30_000 });
 
   await page.waitForFunction(
@@ -237,10 +249,18 @@ try {
   );
   const item = completed?.params?.item;
   assert.ok(item, "A completed MCP elicitation tool-call item must be observed.");
-  assert.equal(item.status, "completed");
   assert.equal(item.server, "ui_kit_elicit");
   assert.equal(item.tool, "ui_kit_elicit");
-  assert.match(item.result?.content?.[0]?.text ?? "", /^MCP_ELICITATION_OK:/);
+  if (action === "accept") {
+    assert.equal(item.status, "completed");
+    assert.match(item.result?.content?.[0]?.text ?? "", /^MCP_ELICITATION_OK:/);
+  } else {
+    assert.equal(item.status, "failed");
+    assert.match(
+      item.result?.content?.[0]?.text ?? "",
+      new RegExp(`^MCP_ELICITATION_${action === "cancel" ? "CANCELLED" : "DECLINED"}$`),
+    );
+  }
   threadId = completed.params.threadId;
   result.completedItem = {
     id: item.id,
