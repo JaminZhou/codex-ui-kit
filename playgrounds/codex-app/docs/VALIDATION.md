@@ -731,12 +731,13 @@ checks corrupted-registry Retry, empty state, 20+5 row pagination, rejection of
 unowned IDs, stored-snapshot rendering and ignoring a late read after leaving
 Live. The history response for that UI fixture is synthetic, not model evidence.
 
-`check:live-history` is a separate signed-in three-turn gate. It creates two real
-threads, returns to the first, closes/restarts Electron, reads persisted history
+`check:live-history` now runs in full playground acceptance as a signed-in
+three-turn gate. It creates two real threads, returns to the first, closes/restarts Electron, reads persisted history
 and continues the exact first thread, then captures wide/720px output. Only the
 two IDs created in its disposable project are archived afterward; cleanup is
-recoverable. Routine harness runs use a fresh registry path and ephemeral threads
-so unrelated tests do not populate the user's real history; this explicit gate
+recoverable. The gate remains account/runtime dependent and uses a fresh registry
+path and ephemeral threads so unrelated tests do not populate the user's real
+history; this explicit gate
 opts into persistence with its own registry.
 
 The fixed runtime supports full reads/resume of the sampled paginated history,
