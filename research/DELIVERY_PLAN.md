@@ -1005,8 +1005,8 @@ SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   runs in full playground acceptance and verifies one
   `item/commandExecution/requestApproval` request, host-owned cwd, `Allow once`,
   completed command/turn, and a scoped write boundary outside one disposable
-  proof file at 1180/720px. An opt-in real
-  live-stop probe now
+  proof file at 1180/720px. The real live-stop probe now runs in full playground
+  acceptance and
   separately verifies a pending file approval, owning-thread Stop, interrupted
   settlement, resolved approval, no file write, and a same-thread recovery
   turn at 1180/720px. The real manual-compaction probe now runs in full
