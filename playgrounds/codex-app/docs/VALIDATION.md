@@ -17,10 +17,9 @@ credentials and private content excluded from committed evidence.
 
 ### Live granted-approval workflow — 2026-09-08
 
-After building, explicitly run `pnpm --filter
-@codex-ui-kit/codex-app-playground check:live-approval`. This is a signed-in,
-one-model-turn integration check, not part of default deterministic acceptance.
-It submits through Composer in a disposable read-only workspace and requires
+The `check:live-approval` probe now runs inside full playground acceptance as a
+signed-in one-model-turn integration gate. It submits through Composer in a
+disposable read-only workspace and requires
 a real file-change approval request. Before clicking `Allow once`, it checks
 the request's item, single add path, exact content, optional grant root, and
 the file's absence. Command, network, session-wide and broader-root requests
@@ -31,12 +30,16 @@ file-change and turn events, and verified exact file bytes and final reply.
 Review then displayed `+1` and the exact added line at 1180/720px, including
 the intentional compact collapse/reopen transition. A real PTY read the same
 file and reported success without any additional model turn or write grant.
+The gate also switches projects while the request is pending, rejects a
+wrong-thread Stop, restores the approval on the owning project, and retains
+that project's terminal cwd/environment after returning to the other project.
 Protocol records and wide/compact screenshots remain in the printed local
-temporary directory. This proves the sampled Composer → approval → file →
-Review → Terminal flow, not PR operations, every approval kind, or current
-installed-product pixel parity. Existing historical reconnect rows may remain
-in the conversation after the turn completes; completion is checked against
-the protocol and final UI reply, not inferred from those historical rows.
+temporary directory on every complete acceptance pass. This proves the
+sampled Composer → approval → file → Review → Terminal flow, not PR
+operations, every approval kind, or current installed-product pixel parity.
+Existing historical reconnect rows may remain in the conversation after the
+turn completes; completion is checked against the protocol and final UI reply,
+not inferred from those historical rows.
 
 ### Live Terminal execution — 2026-09-08
 

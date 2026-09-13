@@ -1373,11 +1373,14 @@ the explicit local gate and limitations in
 [`VALIDATION.md`](../playgrounds/codex-app/docs/VALIDATION.md). The persistent
 PTY follow-up now retains shell state and emulator output independently of
 panel mounting and adds raw input, resize and tab-close ownership checks.
-The granted-approval follow-up now verifies a real Composer submission in a
-read-only temporary workspace, exact-file `Allow once`, completed file write,
-wide/compact Review, and a PTY read-back in one application session. It does
-not approve broader roots or session-wide access. Other approval kinds and
-real PR operations remain outside this sampled path.
+The granted-approval follow-up now runs in full playground acceptance and
+verifies a real Composer submission in a read-only temporary workspace,
+exact-file `Allow once`, completed file write, wide/compact Review, and a PTY
+read-back in one application session. It also switches projects while the
+approval is pending, rejects a wrong-thread Stop, restores the owning-project
+approval, and retains that project's terminal cwd/environment after returning
+to the other project. It does not approve broader roots or session-wide access.
+Other approval kinds and real PR operations remain outside this sampled path.
 The opt-in live subagent follow-up now verifies one real public-protocol
 `collabAgentToolCall`, receiver-thread materialization, Agent activity geometry,
 owning-thread Stop, interrupted turn settlement, and visible `Stopped` status
