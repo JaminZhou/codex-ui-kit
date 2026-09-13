@@ -1001,7 +1001,11 @@ completion: reverse-origin follow, negative compact clipping, exact 16px Stop
 SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   wide/compact regional pixels. Command denial is verified on that build as well; file
   variants, remaining approval kinds, manual compaction, and long-thread
-  convergence remain the next Stage 2 work. An opt-in real live-stop probe now
+  convergence remain the next Stage 2 work. An opt-in real command-approval
+  probe now verifies one `item/commandExecution/requestApproval` request,
+  host-owned cwd, `Allow once`, completed command/turn, and a scoped write
+  boundary outside one disposable proof file at 1180/720px. An opt-in real
+  live-stop probe now
   separately verifies a pending file approval, owning-thread Stop, interrupted
   settlement, resolved approval, no file write, and a same-thread recovery
   turn at 1180/720px. The shared
@@ -1362,6 +1366,13 @@ approval resolution, no file write, and a same-thread recovery turn at
 1180/720px. It uses the pinned public client and a write-disabled disposable
 workspace; protocol logs and screenshots remain local-only. Other approval
 kinds and installed-product visual parity remain open.
+The companion opt-in command-approval follow-up now verifies one real
+`touch command-approval-proof.txt` request, the Terminal card's `Allow once`
+action, completed command/turn settlement, and wide/compact no-overflow
+screenshots in the same pinned client/runtime. The empty proof file is removed
+during cleanup; the protocol log and screenshots remain local-only.
+Matching-command/session approvals and installed-product visual parity remain
+separately scoped.
 The project-continuity follow-up now verifies A → B → A with three real
 Composer turns, same-thread reuse for A, isolated histories, and wide/compact
 captures. A further one-turn approval probe switches projects while A waits,
