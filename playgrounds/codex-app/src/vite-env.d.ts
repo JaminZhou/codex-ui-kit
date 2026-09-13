@@ -104,6 +104,7 @@ interface CodexDemoBridge {
     threadId: string;
     turnId: string;
   }>;
+  compactLive(input: { projectToken: string; threadId: string }): Promise<unknown>;
   stopLive(input: { threadId: string }): Promise<void>;
 }
 
