@@ -1836,12 +1836,32 @@
       "priority": "p1"
     },
     {
+      "id": "workspace.pdf-preview",
+      "area": "workspace",
+      "ownership": "workspace",
+      "packageEvidence": [
+        "pdf-preview-panel",
+        "pdf-workspace-preview",
+        "replay:workspace-document-preview-current-wide-compact",
+        "browser-cdp:current-26.903-pdf-pagination-zoom-annotation",
+        "electron:current-26.903-pdf-pagination-zoom-annotation-resize-close-reopen",
+        "pixel:current-26.903-pdf-owned-panel-wide-compact"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.903.71938:real-two-page-pdf-canvas-preview-pagination-zoom-fit-annotation-mode-wide-and-compact-fourteen-renderer-states"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "verified",
+      "electronStatus": "verified",
+      "priority": "p1"
+    },
+    {
       "id": "workspace.document-previews",
       "area": "workspace",
       "ownership": "workspace",
       "packageEvidence": [
         "notebook-preview-panel",
-        "pdf-preview-panel",
         "docx-preview-panel",
         "PopcornElectronWorkbookPanel",
         "PopcornElectronPresentationPanel",
@@ -1851,10 +1871,7 @@
         "electron:workspace-document-preview-three-lifecycle-frames",
         "pixel:workspace-document-preview-three-reviewed-baselines"
       ],
-      "runtimeStatus": "runtime_observed",
-      "runtimeEvidence": [
-        "cdp-26.903.71938:real-two-page-pdf-canvas-preview-pagination-zoom-fit-annotation-mode-wide-and-compact-fourteen-renderer-states"
-      ],
+      "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "not_started",
       "electronStatus": "not_started",

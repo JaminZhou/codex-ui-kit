@@ -26,11 +26,12 @@ exit gates; it does not replace the inventory.
   unavailable because the new Renderer no longer exposes the old Fiber provider
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
-- The inventory contains 91 surface groups: 59 P0, 21 P1, and 11 P2.
+- The inventory contains 92 surface groups: 59 P0, 22 P1, and 11 P2.
 - 15 groups have current-build runtime evidence, 68 have previous-build-only
-  runtime evidence, and 8 have not been sampled. Browser/Electron verified
-  statuses are intentionally downgraded until the affected slices are
-  re-observed on 26.903; their older gates remain regression fixtures.
+  runtime evidence, and 9 have not been sampled. Browser/Electron verified
+  statuses remain intentionally scoped: the current 26.903 PDF slice is
+  promoted, while older and broader families stay regression fixtures until
+  their affected slices are re-observed.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
   selection, wide/compact preview and pixels, focus-preserving removal, exact
@@ -1234,18 +1235,21 @@ product through an unsent synthetic draft attachment. It disproves the
 centered-card layout as a PDF reconstruction: the actual surface is a right
 workspace tab with a 40px toolbar, page-aware navigation, fit/percentage zoom,
 annotation mode, one document scroller, expansion, and compact hide/reopen.
-Fourteen recorded Renderer states promote runtime evidence for
-`workspace.document-previews` and `workspace.artifact-shell`; their current
-Browser/Electron and product-pixel gates remain scoped to this slice. The
-implementation now has a dedicated `PdfPreviewPanel` and a real private PDF.js
-workspace replay. Targeted Electron paging/zoom/expand/resize/close/reopen
-checks pass, and the complete owned-panel comparison passes at 0.1544% wide /
-0.2600% compact with no masks under the unchanged 1% ceiling. The decoded
-bitmap is pixel-identical before CSS composition; the replay also preserves the
-observed relative positioning and paint-isolation boundaries. Seven new visual
-baselines are now committed for this slice; the full local acceptance passes
-with 438 CDP lifecycle frames, Electron contracts, and 438 visual pixel frames.
-Other document formats and host effects remain open.
+Fourteen recorded Renderer states are scoped to a new
+`workspace.pdf-preview` inventory row; its current Browser/Electron and
+owned-panel pixel gates are verified independently. `workspace.artifact-shell`
+retains only the host-owned right-workspace reachability boundary, while the
+broader `workspace.document-previews` row remains open for notebook, DOCX,
+spreadsheet, and presentation formats. The implementation now has a dedicated
+`PdfPreviewPanel` and a real private PDF.js workspace replay. Targeted Electron
+paging/zoom/expand/resize/close/reopen checks pass, and the complete owned-panel
+comparison passes at 0.1544% wide / 0.2600% compact with no masks under the
+unchanged 1% ceiling. The decoded bitmap is pixel-identical before CSS
+composition; the replay also preserves the observed relative positioning and
+paint-isolation boundaries. Seven new visual baselines are now committed for
+this slice; the full local acceptance passes with 451 CDP lifecycle frames,
+Electron contracts, and 451 visual pixel frames. Other document formats and
+host effects remain open.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
