@@ -21,7 +21,8 @@
       "cdp-26.820.60940": "26.820.60940",
       "cdp-26.825.31414": "26.825.31414",
       "cdp-26.825.51511": "26.825.51511",
-      "cdp-26.903.71938": "26.903.71938"
+      "cdp-26.903.71938": "26.903.71938",
+      "cdp-26.908.40834": "26.908.40834"
     }
   },
   "surfaces": [
@@ -995,13 +996,15 @@
         "connect-plugins-submenu-item",
         "browser-cdp:current-26.825-resource-picker-semantics-focus-and-geometry",
         "electron:current-26.825-wide-compact-resource-picker",
-        "pixel:current-26.825-wide-compact-resource-picker"
+        "pixel:current-26.825-wide-compact-resource-picker",
+        "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
         "cdp-26.727.40816:add-files-inline-resource-picker-736x320-scrollable-groups",
-        "cdp-26.825.51511:add-files-inline-resource-picker-736-687x320-310-scroller-current-fixed-controls"
+        "cdp-26.825.51511:add-files-inline-resource-picker-736-687x320-310-scroller-current-fixed-controls",
+        "cdp-26.908.40834:read-only-add-files-menu-seven-top-level-actions-and-sampled-scrollable-plugin-skill-catalog"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1043,11 +1046,13 @@
         "composer-resource-picker-plugin-footer",
         "playground:composer-plugin-connect-controlled-replay",
         "electron:composer-plugin-connect-select-dismiss-focus",
-        "pixel:composer-plugin-connect-own-fixture-1180-720-zero-drift"
+        "pixel:composer-plugin-connect-own-fixture-1180-720-zero-drift",
+        "replay:current-26.908-sampled-plugin-skill-catalog-scroll-keyboard-focus"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu"
+        "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
+        "cdp-26.908.40834:read-only-add-files-menu-sampled-plugin-skill-options-without-selection"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

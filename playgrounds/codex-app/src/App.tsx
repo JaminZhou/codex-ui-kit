@@ -1092,7 +1092,8 @@ function initialComposerOverlay(frame: string | null): ComposerOverlay {
   if (
     frame === "composer-resources-menu" ||
     frame === "composer-plugins-menu" ||
-    frame === "workspace-composer-current-26-825-resources"
+    frame === "workspace-composer-current-26-825-resources" ||
+    frame === "workspace-composer-current-26-908-resources"
   ) {
     return "resources";
   }
@@ -1438,6 +1439,147 @@ const currentComposerResourceGroups: readonly ComposerResourceGroup[] = [
       { icon: "▧", id: "pdf", label: "PDF", description: "Read, create, and verify PDFs" },
       { icon: "▦", id: "spreadsheets", label: "Spreadsheets", description: "Create and edit spreadsheets" },
       { icon: "▥", id: "presentations", label: "Presentations", description: "Create and edit presentations" },
+    ],
+  },
+];
+
+// This is a bounded, read-only catalog sampled from the 26.908.40834 Add
+// menu. Installed skills and attached browser tabs remain host-owned: do not
+// infer that selecting one creates a Composer attachment until that lifecycle
+// is independently observed.
+const currentComposerResourceGroups26908: readonly ComposerResourceGroup[] = [
+  {
+    id: "add",
+    options: [
+      {
+        icon: <CurrentComposerResourceIcon name="files" />,
+        id: "files",
+        label: "Files and folders",
+      },
+      {
+        icon: <span aria-hidden="true" className="demo-current-chrome-icon" />,
+        id: "chrome",
+        label: "Attach Google Chrome",
+      },
+      {
+        description: "Choose project for new chats",
+        icon: <CurrentBuildIcon name="composer-project" />,
+        id: "project",
+        label: "Work in a project",
+      },
+      {
+        description: "Set a goal to keep pursuing",
+        icon: <CurrentComposerResourceIcon name="goal" />,
+        id: "goal",
+        label: "Goal",
+      },
+      {
+        description: "Turn plan mode on",
+        icon: <CurrentComposerResourceIcon name="plan" />,
+        id: "plan",
+        label: "Plan mode",
+      },
+      {
+        icon: <CurrentComposerResourceIcon name="skill" />,
+        id: "record-skill",
+        label: "Record a skill",
+      },
+      {
+        description: "Draw a sketch",
+        icon: <CurrentComposerResourceIcon name="skill" />,
+        id: "sketch",
+        label: "Sketch",
+      },
+    ],
+  },
+  {
+    id: "plugins",
+    label: "Plugins",
+    options: [
+      {
+        description: "PRs, issues, CI, and publish flows",
+        icon: "◆",
+        id: "github-triage",
+        label: "GitHub Triage",
+      },
+      {
+        description: "Create and edit documents",
+        icon: "▤",
+        id: "documents",
+        label: "Documents",
+      },
+      {
+        description: "Read, create, and verify PDFs",
+        icon: "▧",
+        id: "pdf",
+        label: "PDF",
+      },
+      {
+        description: "Create and edit spreadsheets",
+        icon: "▦",
+        id: "spreadsheets",
+        label: "Spreadsheets",
+      },
+      {
+        description: "Create and edit presentations",
+        icon: "▥",
+        id: "presentations",
+        label: "Presentations",
+      },
+      {
+        description: "Create or update reusable templates from reference content",
+        icon: "◇",
+        id: "template-creator",
+        label: "Template Creator",
+      },
+      {
+        description: "Control the in-app browser",
+        icon: "◎",
+        id: "browser",
+        label: "Browser",
+      },
+      {
+        description: "Control Mac apps from ChatGPT",
+        icon: "◎",
+        id: "computer",
+        label: "Computer",
+      },
+      {
+        description: "Create interactive visuals",
+        icon: "◎",
+        id: "visualize",
+        label: "Visualize",
+      },
+      {
+        description: "Drive GitHub bot review rounds to a clean pass.",
+        icon: "◎",
+        id: "watch-pr",
+        label: "Watch PR",
+      },
+      {
+        description: "Inspect native macOS views in Codex Browser.",
+        icon: "◎",
+        id: "appkit-inspector",
+        label: "AppKit Inspector",
+      },
+      {
+        description: "Deep research",
+        icon: "◎",
+        id: "deep-research",
+        label: "Deep Research",
+      },
+      {
+        description: "Discover and manage plugins",
+        icon: "◎",
+        id: "plugin-management",
+        label: "Plugin Management",
+      },
+      {
+        description: "Build and deploy websites",
+        icon: "◎",
+        id: "sites",
+        label: "Sites",
+      },
     ],
   },
 ];
@@ -3192,8 +3334,16 @@ export function App() {
   const initialSelection = useMemo(querySelection, []);
   const currentComposerControls26825Replay =
     initialSelection.view === "workspace" &&
-    initialSelection.frame?.startsWith(
+    (initialSelection.frame?.startsWith(
       "workspace-composer-current-26-825-",
+    ) ||
+      initialSelection.frame?.startsWith(
+        "workspace-composer-current-26-908-",
+      ));
+  const currentComposerControls26908Replay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame?.startsWith(
+      "workspace-composer-current-26-908-",
     );
   const currentComposerMultiline26825Replay =
     initialSelection.frame ===
@@ -8932,6 +9082,10 @@ export function App() {
         ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
+      : currentComposerControls26908Replay
+        ? composerOverlay === "resources"
+          ? "workspace-composer-current-26-908-resources"
+          : "workspace-composer-current-26-908-ready"
       : currentComposerControls26825Replay
         ? currentComposerQueue26825Replay
           ? `workspace-composer-current-26-825-queue-${currentQueue26825Phase ?? "pending"}`
@@ -10050,9 +10204,23 @@ export function App() {
         composerOverlay === "resources" ? (
           <ComposerResourcePicker
             activeId={composerResourceActiveId}
-            className="codex-ui-composer-resource-picker--current-26-825"
+            className={
+              currentComposerControls26908Replay
+                ? "codex-ui-composer-resource-picker--current-26-908"
+                : "codex-ui-composer-resource-picker--current-26-825"
+            }
+            data-current-resource-catalog={
+              currentComposerControls26908Replay
+                ? "26.908.40834"
+                : undefined
+            }
             descriptionSeparator=""
-            groups={currentComposerResourceGroups}
+            groups={
+              currentComposerControls26908Replay
+                ? currentComposerResourceGroups26908
+                : currentComposerResourceGroups
+            }
+            heading={currentComposerControls26908Replay ? null : undefined}
             onActiveIdChange={setComposerResourceActiveId}
             onDismiss={() => {
               setComposerOverlay(null);
@@ -15960,11 +16128,25 @@ export function App() {
       data-app-server-state={appServerCrashed ? "crashed" : "running"}
       data-notification-action={shellNotificationAction ?? undefined}
       data-current-home={currentHomeFrame || undefined}
+      data-current-context={currentContext26825Replay || undefined}
       data-current-context-26-825={
-        currentContext26825Replay || undefined
+        currentContext26825Replay && !currentComposerControls26908Replay
+          ? true
+          : undefined
+      }
+      data-current-context-26-908={
+        currentComposerControls26908Replay || undefined
+      }
+      data-current-composer-controls={
+        currentComposerControls26825Replay || undefined
       }
       data-current-composer-controls-26-825={
-        currentComposerControls26825Replay || undefined
+        currentComposerControls26825Replay && !currentComposerControls26908Replay
+          ? true
+          : undefined
+      }
+      data-current-composer-controls-26-908={
+        currentComposerControls26908Replay || undefined
       }
       data-route-history-index={routeHistory.index}
       data-route-history-length={routeHistory.entries.length}

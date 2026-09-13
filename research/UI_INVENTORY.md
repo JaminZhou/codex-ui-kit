@@ -54,6 +54,10 @@ observation from a previous build remains historical evidence.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
+- The installed application now reports a newer `26.908.40834` (`8881`) build.
+  Its Composer resource-menu observation is intentionally scoped; the audited
+  package-fingerprint baseline remains `26.903.71938` until a full rebaseline
+  is captured.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
@@ -2125,6 +2129,23 @@ ten local-only product ratios range from 0.6557% to 3.7314%. This promotes the
 sampled current paths of `composer.queue`, `composer.resources`, and long-input
 `composer.shell`; delete/reorder edge failures, resource-provider errors, and
 other host-owned plugin inventories keep their implementations `partial`.
+
+A newer **26.908.40834 (8881)** read-only Composer sample updates the resource
+catalog boundary without promoting an unobserved selection result. The current
+`Add files and more` menu begins with Files and folders, Attach Google Chrome,
+project, Goal, Plan mode, Record a skill, and Sketch, followed by a scrollable
+sampled Plugins/skills segment (GitHub Triage, Documents, PDF, Spreadsheets,
+Presentations, Template Creator, Browser, Computer, Visualize, Watch PR,
+AppKit Inspector, Deep Research, Plugin Management, and Sites). The isolated
+debug process exposed a pre-existing draft at the application layer, so the
+capture deliberately opened no option and sent no prompt; browser-tab rows,
+install/auth flows, provider errors, and the selected-skill attachment/pill
+lifecycle remain host-owned gaps. The deterministic replay now checks all 21
+sampled options, scroll containment, `End` → `Enter` dismissal, Escape focus
+restoration, and zero own-fixture pixel drift at 1180px and 720px. It is a
+newer-build semantic and interaction fixture, not a replacement for the full
+26.903 package-fingerprint baseline or a claim of current product-pixel
+approval, so the affected Browser/Electron inventory remains `partial_legacy`.
 
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
