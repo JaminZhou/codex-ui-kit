@@ -18,6 +18,32 @@ const { app, page } = await launchScene(visualScenes.find(scene => scene.id === 
 });
 const result = { passed: false, directory };
 try {
+  const visibleTextCount = async (text) =>
+    page.getByText(text, { exact: true }).evaluateAll((elements) =>
+      elements.filter((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      }).length,
+    );
+  const waitForVisibleText = async (text) =>
+    page.waitForFunction((expected) =>
+      Array.from(document.querySelectorAll("*")).some((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          element.textContent?.trim() === expected &&
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      }), text);
   await page.getByRole("button", { name: "Live local", exact: true }).click();
   await page.evaluate(() => {
     window.__projectEvents = [];
@@ -34,15 +60,16 @@ try {
   };
   await submit("PROJECT_A_FIRST");
   await page.getByRole("button", { name: "New project", exact: true }).click();
-  assert.equal(await page.getByText("PROJECT_A_FIRST", { exact: true }).count(), 0);
+  await page.getByText("No chats in this project yet.", { exact: true }).waitFor();
+  assert.equal(await visibleTextCount("PROJECT_A_FIRST"), 0);
   await submit("PROJECT_B_ONLY");
   const toggle = page.getByRole("button", { name: "Toggle projects", exact: true });
   if (await toggle.getAttribute("aria-expanded") === "false") await toggle.click();
   const projects = page.locator('.codex-ui-app-sidebar__section').filter({ has: toggle });
   // The Projects section, not the similarly named current-task row.
   await projects.getByRole("button", { name: "codex-ui-kit", exact: true }).click();
-  await page.getByText("PROJECT_A_FIRST", { exact: true }).waitFor();
-  assert.equal(await page.getByText("PROJECT_B_ONLY", { exact: true }).count(), 0);
+  await waitForVisibleText("PROJECT_A_FIRST");
+  assert.equal(await visibleTextCount("PROJECT_B_ONLY"), 0);
   await submit("PROJECT_A_RETURN");
   const bindings = await page.evaluate(() => window.__projectEvents.filter(event => event.kind === "live-bind"));
   assert.equal(bindings.length, 3);
@@ -51,8 +78,8 @@ try {
   for (const width of [1180, 720]) {
     await app.evaluate(({ BrowserWindow }, width) => BrowserWindow.getAllWindows()[0].setContentSize(width, 820), width);
     await page.waitForFunction(width => innerWidth === width, width);
-    await page.getByText("PROJECT_A_FIRST", { exact: true }).waitFor();
-    await page.getByText("PROJECT_A_RETURN", { exact: true }).waitFor();
+    await waitForVisibleText("PROJECT_A_FIRST");
+    await waitForVisibleText("PROJECT_A_RETURN");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: join(directory, `project-a-restored-${width}.png`) });
   }

@@ -1450,6 +1450,11 @@ exists. Registry version 2 preserves these independently of threads and migrates
 version 1 ownership records on write. The Electron gate now selects an empty
 project, restarts and restores its empty history with an enabled Composer, without
 creating a model thread. It does not import a global Codex project index.
+A separate live project-continuity probe now creates two disposable project
+directories and performs read-only A → B → A model turns, proving distinct B
+thread ownership, same-thread A restoration, and wide/720 captures. Its
+`check:live-projects` command is included in full playground acceptance; the
+captures remain workflow evidence rather than current Codex product pixel parity.
 The rename follow-up adds a keyboard-accessible row action and confirmation form,
 with empty-name validation, Cancel, pending state and retryable failure. The host
 checks registry ownership and the public thread cwd before `thread/name/set`;
