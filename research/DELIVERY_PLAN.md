@@ -1469,6 +1469,8 @@ older snapshot. Deterministic contracts cover cancellation, failure/retry and
 unowned-ID rejection. The explicit three-turn live-history probe now verifies
 UI rename, application restart, same-thread continuation and the public stored
 thread name at 1180/720px. Its two disposable threads are archived afterward.
+This three-turn signed-in probe is now part of full playground acceptance, with
+fresh registry ownership and exact disposable-thread cleanup on every run.
 The archive/restore follow-up adds an explicit subtree-scope confirmation,
 project-scoped archived list, restore-one confirmation, cancellation and retry.
 The host shares the turn-start lock, rejects active roots and foreign IDs, and
