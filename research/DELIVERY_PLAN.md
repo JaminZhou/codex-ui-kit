@@ -1008,9 +1008,16 @@ SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   live-stop probe now
   separately verifies a pending file approval, owning-thread Stop, interrupted
   settlement, resolved approval, no file write, and a same-thread recovery
-  turn at 1180/720px. The shared
+ turn at 1180/720px. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
+An opt-in real session-approval probe now exercises two separate file changes
+in one turn and records the current `acceptForSession`/`Allow all edits` response
+for each request at 1180/720px. The pinned CLI 0.153.4 runtime still emits a
+second request for the independent second file change, so this promotes the
+current decision UI and bounded file outcomes without claiming session-lifetime
+suppression. Matching-command, network, and installed-product approval parity
+remain separate boundaries.
 
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,
