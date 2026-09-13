@@ -1000,8 +1000,8 @@ same previous build with one real 1180→720 running resize and natural
 completion: reverse-origin follow, negative compact clipping, exact 16px Stop
 SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   wide/compact regional pixels. Command denial is verified on that build as well;
-  remaining approval kinds, manual compaction, and long-thread convergence remain
-  the next Stage 2 work. The real command-approval probe now
+  remaining approval kinds and long-thread convergence remain the next Stage 2
+  work. The real command-approval probe now
   runs in full playground acceptance and verifies one
   `item/commandExecution/requestApproval` request, host-owned cwd, `Allow once`,
   completed command/turn, and a scoped write boundary outside one disposable
@@ -1009,7 +1009,12 @@ SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   live-stop probe now
   separately verifies a pending file approval, owning-thread Stop, interrupted
   settlement, resolved approval, no file write, and a same-thread recovery
- turn at 1180/720px. The shared
+  turn at 1180/720px. The real manual-compaction probe now runs in full
+  playground acceptance and uses the host-owned project/thread bridge to require
+  context-compaction item start/completion plus same-thread recovery at
+  1180/720px. The current runtime emits no separate `thread/compacted`
+  notification, so the item lifecycle is the authoritative observed signal;
+  automatic threshold compaction remains a separate boundary. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
 An opt-in real session-approval probe now exercises two separate file changes
