@@ -2155,6 +2155,14 @@ newer-build semantic and interaction fixture, not a replacement for the full
 26.903 package-fingerprint baseline or a claim of current product-pixel
 approval, so the affected Browser/Electron inventory remains `partial_legacy`.
 
+The replay now includes one bounded selected `GitHub Triage` card from the
+26.908 catalog. Its ready state, disabled send boundary, remove action, focus
+restoration, responsive containment, and zero-drift 1180px/720px own-fixture
+captures are covered by the local Electron acceptance script. This remains
+replay-only evidence: installed-plugin authorization, network execution, and
+real product attachment persistence are not inferred, so the Composer resource
+and plugin rows remain partial.
+
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
 current-build Browser/CDP, native Electron, and regional-pixel contracts now

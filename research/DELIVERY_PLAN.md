@@ -1237,6 +1237,15 @@ safe selected-skill lifecycle and product-region pixel reference are captured.
 It is intentionally a scoped newer-build observation, not a silent replacement
 for the full `26.903.71938` package-fingerprint baseline.
 
+The bounded Composer follow-up now also replays one selected `GitHub Triage`
+plugin card from that catalog. Browser/Electron checks cover the card's
+ready/selected semantics, remove action, focus return, zero overflow, and
+1180px/720px own-fixture screenshots with zero drift. This is intentionally a
+playground replay-only lifecycle: it does not claim installed-plugin selection,
+authorization, network execution, or a real product attachment effect. The
+26.908 resource observation remains partial until those host-owned boundaries
+are captured safely on the installed product.
+
 The Browser workspace slice activates the historical one-tab shell only in an
 isolated controlled replay. It covers tab creation, selection, close-to-empty
 dismissal, toolbar event delegation, responsive panel reachability, and
