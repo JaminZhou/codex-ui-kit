@@ -2078,6 +2078,12 @@ under 4% and 1% ceilings. Rich streaming, citations/sources, and live media
 product reachability are now current; plugin variants, table error variants,
 and broader Markdown error reachability remain open.
 
+The replay now includes one explicit Markdown renderer-error boundary. It
+checks the public alert, `Try again` recovery to the table, focus reachability,
+responsive containment, and zero-drift 1180px/720px own-fixture captures in
+Electron. This remains replay-only evidence and does not promote an installed
+product failure, provider error, or plugin-generated Markdown variant.
+
 The latest `26.825.51511` context-control follow-up supersedes the previous
 `26.820.60940` sample for the project/Local/main entry family. It re-observes
 the 736×28 context row, 260×249.5 project dialog at wide and 720×680 compact,

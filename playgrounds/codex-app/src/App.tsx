@@ -2344,6 +2344,10 @@ function CurrentMarkdownTaskCheckbox({
   );
 }
 
+function CurrentMarkdownRenderErrorProbe(): never {
+  throw new Error("current markdown renderer probe");
+}
+
 const currentMarkdownCodeCopyLabel = <CurrentMarkdownCodeCopyIcon />;
 const currentMarkdownCodeLanguageIcon = <CurrentMarkdownCodeLanguageIcon />;
 const currentMarkdownCodeWrapIcon = <CurrentMarkdownCodeWrapIcon />;
@@ -4237,6 +4241,7 @@ export function App() {
       !current26825LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  const [markdownRenderRetried, setMarkdownRenderRetried] = useState(false);
   const isCurrentPdfReplay = mode === "replay" && view === "workspace" && Boolean(activeFrame?.startsWith("workspace-document-preview-current"));
   const [pdfOpen, setPdfOpen] = useState(true);
   const [pdfAttached, setPdfAttached] = useState(true);
@@ -4751,12 +4756,15 @@ export function App() {
     mode === "replay" && scenarioId === "markdown-current-26-820-media";
   const isCurrentMarkdown26825Replay =
     mode === "replay" && scenarioId === "markdown-current-26-825";
+  const isCurrentMarkdownRenderErrorReplay =
+    mode === "replay" && scenarioId === "markdown-current-26-825-error";
   const isCurrentMarkdown26825MediaReplay =
     mode === "replay" && scenarioId === "markdown-current-26-825-media";
   const isCurrentRichMarkdownStreamingReplay =
     mode === "replay" && scenarioId === "markdown-streaming-large";
   const usesCurrentMarkdown26825Presentation =
     isCurrentMarkdown26825Replay ||
+    isCurrentMarkdownRenderErrorReplay ||
     isCurrentMarkdown26825MediaReplay ||
     isCurrentRichMarkdownStreamingReplay;
   const isCurrentMixedToolReplay =
@@ -5376,6 +5384,7 @@ export function App() {
     setView("conversation");
     setMode("replay");
     setScenarioId(nextId);
+    setMarkdownRenderRetried(false);
     setReplayCount(
       replayCountForSelection(replayScenarios[nextId], frame),
     );
@@ -13793,6 +13802,8 @@ export function App() {
                   message.id === "assistant-markdown-media") ||
                 (isCurrentMarkdown26825Replay &&
                   message.id === "assistant-markdown-current-26-825") ||
+                (isCurrentMarkdownRenderErrorReplay &&
+                  message.id === "assistant-markdown-current-26-825") ||
                 (isCurrentMarkdown26825MediaReplay &&
                   message.id.startsWith(
                     "assistant-markdown-current-26-825-media-",
@@ -13903,6 +13914,7 @@ export function App() {
                 isCurrentMarkdown26818Replay ||
                 isCurrentBrowserFailure26825Replay ||
                 isCurrentMarkdown26820MediaReplay ||
+                isCurrentMarkdownRenderErrorReplay ||
                 isCurrentMarkdown26825MediaReplay ||
                 isCurrentMarkdown26825Replay ||
                 isCurrentRichMarkdownStreamingReplay ||
@@ -14106,7 +14118,13 @@ export function App() {
                     usesCurrentMarkdown26825Presentation
                   }
                   components={
-                    usesCurrentMarkdown26825Presentation
+                    isCurrentMarkdownRenderErrorReplay &&
+                    !markdownRenderRetried
+                      ? {
+                          ...currentMarkdownComponents,
+                          table: CurrentMarkdownRenderErrorProbe,
+                        }
+                      : usesCurrentMarkdown26825Presentation
                       ? currentMarkdownComponents
                       : undefined
                   }
@@ -14130,6 +14148,11 @@ export function App() {
                       : undefined
                   }
                   linkTarget="_blank"
+                  onRetryRender={
+                    isCurrentMarkdownRenderErrorReplay
+                      ? () => setMarkdownRenderRetried(true)
+                      : undefined
+                  }
                   streaming={message.status === "running"}
                 >
                   {message.text || " "}

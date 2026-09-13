@@ -111,6 +111,7 @@ export type ReplayScenarioId =
   | "markdown-current-26-818"
   | "markdown-current-26-820-media"
   | "markdown-current-26-825"
+  | "markdown-current-26-825-error"
   | "markdown-current-26-825-media"
   | "markdown-table-actions"
   | "markdown-streaming-large"
@@ -451,6 +452,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "markdown-current-26-825",
     "Render Markdown sample",
     "The current 26.825 heading, inline semantics, link, quote, list, table, code block, inline-math preservation, and block-math rendering boundary.",
+    markdownCurrent26825Trace,
+  ),
+  "markdown-current-26-825-error": scenario(
+    "markdown-current-26-825-error",
+    "Render current Markdown error",
+    "The current Markdown response exposes a renderer error boundary with an explicit retry path.",
     markdownCurrent26825Trace,
   ),
   "markdown-current-26-825-media": scenario(
