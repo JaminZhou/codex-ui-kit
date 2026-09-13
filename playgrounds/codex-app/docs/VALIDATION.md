@@ -76,6 +76,18 @@ renders the returned shell/cwd with loading, failure/retry, and compact/wide
 contracts. It is a read-only inspection path; environment editing, persistence,
 and real Remote reachability remain unverified.
 
+### Live local exec-server environment bridge — 2026-09-14
+
+The opt-in `check:live-environment-remote` gate now drives the same route with
+the real `CodexAppServerClient` and a loopback WebSocket speaking the public
+exec-server JSON-RPC handshake. Both 1180px and 720px Electron windows perform
+`environment/add`, `environment/info`, and `environment/status`; the UI renders
+the returned shell/cwd and Ready state with no horizontal overflow. The server
+is isolated, write-free, and receives no model turn. This proves the public
+App Server ↔ exec-server protocol mapping and renderer bridge, not a production
+Remote registry, Noise relay, or cloud authentication flow; those remain an
+explicit boundary for later acceptance.
+
 ### Live Terminal execution — 2026-09-08
 
 After `pnpm build:codex-app`, run
