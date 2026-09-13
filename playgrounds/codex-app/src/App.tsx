@@ -1190,6 +1190,18 @@ interface DemoComposerAttachmentItem {
 function attachmentItemsForFrame(
   frame: string | null,
 ): DemoComposerAttachmentItem[] {
+  if (frame === "workspace-composer-current-26-908-plugin-selected") {
+    return [
+      {
+        id: "current-plugin-github-triage-26-908",
+        kind: "file",
+        label: "GitHub Triage",
+        layout: "card",
+        meta: "Plugin",
+        status: "ready",
+      },
+    ];
+  }
   if (
     frame === "attachment-current-26-825-post-picker" ||
     frame === "attachment-current-26-825-preview"
@@ -9083,9 +9095,11 @@ export function App() {
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : currentComposerControls26908Replay
-        ? composerOverlay === "resources"
-          ? "workspace-composer-current-26-908-resources"
-          : "workspace-composer-current-26-908-ready"
+        ? composerAttachments.length > 0
+          ? "workspace-composer-current-26-908-plugin-selected"
+          : composerOverlay === "resources"
+            ? "workspace-composer-current-26-908-resources"
+            : "workspace-composer-current-26-908-ready"
       : currentComposerControls26825Replay
         ? currentComposerQueue26825Replay
           ? `workspace-composer-current-26-825-queue-${currentQueue26825Phase ?? "pending"}`
@@ -10199,6 +10213,10 @@ export function App() {
             : "Do anything"
       }
       ref={composerInputRef}
+      submitDisabled={
+        currentComposerControls26908Replay && composerAttachments.length > 0
+      }
+      attachments={composerAttachmentNodes}
       suggestions={
         currentComposerControls26825Replay &&
         composerOverlay === "resources" ? (
@@ -10228,6 +10246,19 @@ export function App() {
             }}
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
+              if (
+                currentComposerControls26908Replay &&
+                option.id === "github-triage"
+              ) {
+                setComposerAttachments(
+                  attachmentItemsForFrame(
+                    "workspace-composer-current-26-908-plugin-selected",
+                  ),
+                );
+                setActiveFrame(
+                  "workspace-composer-current-26-908-plugin-selected",
+                );
+              }
               if (option.id === "goal" || option.id === "plan") {
                 setComposerMode(option.id);
                 setComposerValue("");
