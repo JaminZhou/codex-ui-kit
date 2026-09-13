@@ -1023,6 +1023,11 @@ An opt-in real file-variant probe now verifies separate current-build
 `Allow once` decisions, final updated/deleted files, and 1180/720 no-overflow
 frames. Rename, binary, upload-failure, and installed-product parity remain
 separate boundaries.
+An opt-in real long-thread probe now runs twelve no-tool turns on one stable
+thread, proves repeated live bindings keep same-thread completion, and exercises
+scroll-away/latest-follow convergence at 1180/720px with no overflow. The
+30-turn windowed replay and installed-product eviction heuristics remain
+separate boundaries.
 
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,

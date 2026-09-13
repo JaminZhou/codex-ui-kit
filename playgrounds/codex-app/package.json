@@ -38,6 +38,7 @@
     "check:live-compaction": "node scripts/check-live-compaction.mjs",
     "check:live-session-approval": "node scripts/check-live-session-approval.mjs",
     "check:live-file-variants": "node scripts/check-live-file-variants.mjs",
+    "check:live-long-thread": "node scripts/check-live-long-thread.mjs",
     "check:live-subagent-recovery": "node scripts/check-live-subagent-recovery.mjs",
     "check:current-approval-26-903": "node scripts/check-current-approval-26-903.mjs",
     "check:live-projects": "node scripts/check-live-projects.mjs",

@@ -229,6 +229,15 @@ completed turn, and 1180/720 no-overflow screenshots are verified in a
 disposable read-only workspace. Rename, binary, upload-failure, and installed-
 product parity remain separately scoped.
 
+### Live long-thread convergence — 2026-09-13
+
+The opt-in `check:live-long-thread` probe runs twelve short no-tool turns on
+one real thread, asserts repeated live bindings keep one stable thread ID, then
+scrolls away and follows the latest turn again at 1180px and 720px. It records
+the viewport scroll metrics and no-overflow screenshots in a disposable
+read-only workspace. This is a sampled live convergence path; the 30-turn
+windowed replay and installed-product eviction heuristics remain separate.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:
