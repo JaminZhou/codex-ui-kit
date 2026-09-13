@@ -18831,6 +18831,8 @@ for (const scene of selectedScenes) {
       !scene.id.includes("approval-current-26-825-file-deny-pending") &&
       scene.id !== "approval-current-26-825-file-options-compact" &&
       scene.id !== "approval-current-26-825-file-allow-pending-compact" &&
+      !scene.id.includes("approval-current-26-903-file-deny-pending") &&
+      scene.id !== "approval-current-26-903-file-denied-compact" &&
       !scene.id.startsWith("current-review-undo-failed") &&
       !scene.id.startsWith("attachment-current-preview") &&
       !scene.id.startsWith("attachment-current-26-825-preview") &&

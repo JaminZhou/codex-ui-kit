@@ -620,7 +620,10 @@
         "replay:current-26.825-external-file-pending-denied-and-allowed",
         "browser-cdp:current-26.825-external-file-approval-six-frame-contract",
         "electron:current-26.825-external-file-deny-and-allow-once-settlement",
-        "pixel:current-26.825-wide-compact-card-and-options-product-regions"
+        "pixel:current-26.825-wide-compact-card-and-options-product-regions",
+        "replay:current-26.903-external-file-denied-no-write",
+        "browser-cdp:current-26.903-external-file-denial-wide-compact-contract",
+        "electron:current-26.903-external-file-denial-wide-compact-contract"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -630,7 +633,8 @@
         "cdp-26.730.61309:real-command-approval-allow-once-completed-computed-styles-and-masked-pending-completed-pixels",
         "cdp-26.730.61309:real-command-approval-similar-rule-repeated-command-no-second-prompt-computed-styles-and-masked-menu-completed-pixels",
         "cdp-26.820.60940:real-external-file-edit-pending-denied-no-file-and-allow-once-created-then-trashed",
-        "cdp-26.825.51511:real-external-file-edit-pending-denied-no-file-and-allow-once-created-then-trashed"
+        "cdp-26.825.51511:real-external-file-edit-pending-denied-no-file-and-allow-once-created-then-trashed",
+        "cdp-26.903.71938:real-external-file-approval-denied-no-write"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

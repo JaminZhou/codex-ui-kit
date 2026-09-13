@@ -1,6 +1,7 @@
 import approvalAllowOnceTrace from "../fixtures/traces/approval-allow-once.jsonl?raw";
 import approvalCurrent26820FileTrace from "../fixtures/traces/approval-current-26-820-file.jsonl?raw";
 import approvalCurrent26825FileTrace from "../fixtures/traces/approval-current-26-825-file.jsonl?raw";
+import approvalCurrent26903FileTrace from "../fixtures/traces/approval-current-26-903-file.jsonl?raw";
 import approvalDeniedTrace from "../fixtures/traces/approval-denied.jsonl?raw";
 import approvalForSessionTrace from "../fixtures/traces/approval-for-session.jsonl?raw";
 import approvalReviewTimeoutTrace from "../fixtures/traces/approval-review-timeout.jsonl?raw";
@@ -68,6 +69,7 @@ export type ReplayScenarioId =
   | "approval-allow-once"
   | "approval-current-26-820-file"
   | "approval-current-26-825-file"
+  | "approval-current-26-903-file"
   | "approval-denied"
   | "approval-for-session"
   | "approval-review-timeout"
@@ -222,6 +224,12 @@ export const replayScenarios: Record<ReplayScenarioId, ReplayScenario> = {
     "Create approval probe file",
     "The runtime-observed 26.825 external-file edit pauses in the Edit files card, exposes one-time and all-edits choices, preserves a denied no-write result, and completes an independently allowed write.",
     approvalCurrent26825FileTrace,
+  ),
+  "approval-current-26-903-file": scenario(
+    "approval-current-26-903-file",
+    "Observe 26.903 approval denial",
+    "The current 26.903 external-file request shows the contents-specific approval card, preserves the declined no-write result, and records the exact public denial boundary.",
+    approvalCurrent26903FileTrace,
   ),
   "background-terminal": scenario(
     "background-terminal",
