@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, EnvironmentSettingsPage } from "codex-ui-kit";
 import type { LiveEnvironmentAddResult } from "../electron/live-environment-add";
+import type { LiveEnvironmentInfoResult } from "../electron/live-environment-info";
 import type { LiveEnvironmentStatusResult } from "../electron/live-environment-status";
 
 type ReadState = "idle" | "loading" | "error" | "ready";
 type AddState = "idle" | "loading" | "error" | "success";
+type InfoState = "idle" | "loading" | "error" | "success";
 
 function statusCopy(result: LiveEnvironmentStatusResult) {
   if (result.status === "ready") return "Ready";
@@ -23,6 +25,8 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
   const [addResult, setAddResult] = useState<LiveEnvironmentAddResult | null>(
     null,
   );
+  const [infoState, setInfoState] = useState<InfoState>("idle");
+  const [infoResult, setInfoResult] = useState<LiveEnvironmentInfoResult | null>(null);
   const requestEpoch = useRef(0);
 
   const clear = () => {
@@ -31,6 +35,8 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
     setResult(null);
     setAddState("idle");
     setAddResult(null);
+    setInfoState("idle");
+    setInfoResult(null);
   };
   useEffect(() => {
     clear();
@@ -83,6 +89,29 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
       setAddState("error");
     }
   }, [addState, environmentId, execServerUrl, projectToken]);
+
+  const inspect = useCallback(async () => {
+    if (
+      !projectToken ||
+      !window.codexDemo ||
+      infoState === "loading" ||
+      !environmentId.trim()
+    ) {
+      return;
+    }
+    setInfoState("loading");
+    setInfoResult(null);
+    try {
+      const value = await window.codexDemo.readEnvironmentInfo({
+        projectToken,
+        environmentId,
+      });
+      setInfoResult(value);
+      setInfoState("success");
+    } catch {
+      setInfoState("error");
+    }
+  }, [environmentId, infoState, projectToken]);
 
   if (!projectToken || !window.codexDemo) {
     return <EnvironmentSettingsPage
@@ -157,6 +186,40 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
         <p>
           <code>{addResult.environmentId}</code> is configured at{" "}
           <code>{addResult.execServerUrl}</code>.
+        </p>
+      </section>
+    )}
+    <div className="demo-live-environment-settings__actions">
+      <Button disabled={infoState === "loading" || !environmentId.trim()} onClick={() => void inspect()}>
+        Inspect environment
+      </Button>
+    </div>
+    {infoState === "loading" && <p role="status">Reading environment details…</p>}
+    {infoState === "error" && (
+      <section
+        aria-label="Environment info result"
+        className="demo-live-environment-settings__result"
+        data-status="error"
+        role="alert"
+      >
+        <h2>Environment details unavailable</h2>
+        <p>The public environment did not return a valid shell. Check the ID, then retry.</p>
+        <Button onClick={() => void inspect()}>Retry environment details</Button>
+      </section>
+    )}
+    {infoResult && (
+      <section
+        aria-label="Environment info result"
+        className="demo-live-environment-settings__result"
+        data-status="success"
+        role="status"
+      >
+        <h2>Environment details</h2>
+        <p>
+          Shell <code>{infoResult.shell.name}</code> at <code>{infoResult.shell.path}</code>.
+        </p>
+        <p>
+          Working directory <code>{infoResult.cwd ?? "Not reported"}</code>.
         </p>
       </section>
     )}

@@ -1542,6 +1542,11 @@ starting the client, maps success/failure/retry states, and keeps the renderer
 bound to the selected project token. Browser/Electron contracts cover both
 wide and compact layouts, but no real Remote environment creation is promoted
 until a reachable exec server and current-product pixels are captured.
+The next read-only `environment/info` slice now exposes the public shell/cwd
+details for the same selected ID, with malformed responses rejected at the
+host boundary and loading/failure/retry UI contracts at wide and compact
+sizes. It does not claim environment editing, persistence, or a reachable
+Remote exec server.
 
 ### 6. Perform global visual convergence
 

@@ -61,6 +61,7 @@ import {
   addLiveEnvironment,
   normalizeExecServerUrl,
 } from "./live-environment-add.js";
+import { readLiveEnvironmentInfo } from "./live-environment-info.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
   checkoutGitBranch,
@@ -1078,6 +1079,19 @@ ipcMain.handle("demo:environment:add", async (event, raw: unknown) => {
   );
   if (client !== connectedClient || connectedClient.state !== "connected") {
     throw new Error("The live session closed while adding the environment.");
+  }
+  return result;
+});
+ipcMain.handle("demo:environment:info", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input } = resolveHistoryProject(raw);
+  const environmentId = normalizeEnvironmentId(
+    (input as { environmentId?: unknown }).environmentId,
+  );
+  const connectedClient = await ensureClient();
+  const result = await readLiveEnvironmentInfo(connectedClient, environmentId);
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session closed while reading the environment.");
   }
   return result;
 });
