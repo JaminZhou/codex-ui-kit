@@ -181,12 +181,12 @@ command/tool interruption, or installed-product pixel parity.
 The `check:live-command-approval` probe now runs inside full playground
 acceptance as a signed-in gate. It submits one real Composer turn in a
 disposable workspace-write workspace and requests exactly
-`touch command-approval-proof.txt`.
+`touch <temporary-proof-path>` outside that workspace.
 It requires the public protocol's `item/commandExecution/requestApproval` with
 the host-owned cwd, captures the pending Terminal card at 1180px, clicks
 `Allow once`, and requires one completed command item, a completed turn, and
 the exact `COMMAND_APPROVAL_OK` reply. The settled same-thread UI is checked at
-1180px and 720px with no horizontal overflow. The empty proof file is removed
+1180px and 720px with no horizontal overflow. The temporary target is removed
 during cleanup; no other file, network, delegation, or settings operation is
 permitted.
 
@@ -195,6 +195,24 @@ and screenshots in its printed temporary directory. It closes the sampled
 real command-approval Allow once path on every complete acceptance pass;
 matching-command/session approvals, denial, and installed-product pixel parity
 remain separately scoped.
+
+### Live matching-command approval — 2026-09-13
+
+The `check:live-matching-command-approval` probe now runs inside full
+playground acceptance as a signed-in gate. It asks the public App Server to run
+the same terminal command twice against a disposable path outside the selected
+workspace. The real `item/commandExecution/requestApproval` request exposes its
+`proposedExecpolicyAmendment`; the visible `Allow similar commands` menu sends
+that exact amendment through the Electron bridge. The probe requires two
+completed command items, one approval request, one completed turn, and the
+exact final answer at 1180px and 720px with no horizontal overflow.
+
+The amendment is kept scoped to the one disposable command and is never
+persisted outside the live session. The target directory, protocol log, and
+screenshots remain in the printed temporary directory and are removed during
+cleanup. This closes the real matching-command path; session-scoped file
+approval, network-policy amendments, denial variants, and installed-product
+pixel parity remain separate boundaries.
 
 ### Live manual compaction and same-thread recovery — 2026-09-13
 

@@ -33,6 +33,19 @@ describe("live approval gate", () => {
     });
   });
 
+  it("preserves a matching-command policy amendment", async () => {
+    const gate = new LiveApprovalGate();
+    const request = gate.request("command-similar");
+    const decision = {
+      acceptWithExecpolicyAmendment: {
+        execpolicy_amendment: ["touch", "proof.txt"],
+      },
+    };
+
+    expect(gate.resolve("command-similar", decision)).toBe(true);
+    await expect(request).resolves.toEqual({ decision });
+  });
+
   it("declines every pending request on shutdown", async () => {
     const gate = new LiveApprovalGate();
     const first = gate.request("first");

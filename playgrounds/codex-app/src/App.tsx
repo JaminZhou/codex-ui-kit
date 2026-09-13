@@ -5720,7 +5720,13 @@ export function App() {
     const submissionGate = liveApprovalSubmissionGateRef.current;
     if (!submissionGate.begin(requestId)) return;
     try {
-      await window.codexDemo?.respondToApproval({ decision, requestId });
+      await window.codexDemo?.respondToApproval({
+        decision:
+          decision === "accept" && scope === "similar"
+            ? "acceptSimilar"
+            : decision,
+        requestId,
+      });
       dispatchLive({
         decision: decision === "decline" ? "rejected" : "approved",
         kind: "approval-resolution",
@@ -15305,7 +15311,18 @@ export function App() {
                       "acceptForSession",
                     ),
                 }
-              : undefined
+              : approval.kind === "command"
+                ? {
+                    info: "Allow future commands that match this proposed rule",
+                    label: "Allow similar commands",
+                    onClick: () =>
+                      respondToApproval(
+                        approval.requestId,
+                        "accept",
+                        "similar",
+                      ),
+                  }
+                : undefined
           }
           title={
             approval.kind === "command"

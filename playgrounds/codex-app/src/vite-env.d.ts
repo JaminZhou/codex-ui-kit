@@ -84,7 +84,7 @@ interface CodexDemoBridge {
     handler: (request: ProtocolEventRecord) => void,
   ): () => void;
   respondToApproval(input: {
-    decision: "accept" | "acceptForSession" | "decline";
+    decision: "accept" | "acceptForSession" | "acceptSimilar" | "decline";
     requestId: number | string;
   }): Promise<void>;
   respondToUserInput(input: {
