@@ -1373,6 +1373,14 @@ screenshots in the same pinned client/runtime. The empty proof file is removed
 during cleanup; the protocol log and screenshots remain local-only.
 Matching-command/session approvals and installed-product visual parity remain
 separately scoped.
+The opt-in live-compaction follow-up now uses a host-owned project/thread
+bridge to call the public client's `CodexThread.compact()`, verifies real
+`contextCompaction` item lifecycle plus compact-turn completion, and completes
+a same-thread recovery turn at 1180/720px. The current CLI 0.153.4 run did not
+emit a separate `thread/compacted` notification; the item lifecycle is retained
+as the observed protocol signal. Active-turn and cross-project thread
+ownership are rejected by the bridge; automatic threshold compaction and
+installed-product visual parity remain separate boundaries.
 The project-continuity follow-up now verifies A → B → A with three real
 Composer turns, same-thread reuse for A, isolated histories, and wide/compact
 captures. A further one-turn approval probe switches projects while A waits,

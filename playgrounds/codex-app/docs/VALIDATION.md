@@ -191,6 +191,22 @@ and screenshots in its printed temporary directory. It closes the sampled
 real command-approval Allow once path; matching-command/session approvals,
 denial, and installed-product pixel parity remain separately scoped.
 
+### Live manual compaction and same-thread recovery — 2026-09-13
+
+The opt-in `check:live-compaction` probe uses a host-owned project/thread
+bridge to call the public client's `CodexThread.compact()` after one completed
+Composer turn. It requires real `contextCompaction` item start/completion and
+the matching compact-turn completion for the bound thread, then submits a
+second same-thread turn and requires `COMPACTION_RECOVERY`. The current CLI
+0.153.4 run did not emit a separate `thread/compacted` notification; the
+item-level lifecycle is the authoritative observed signal. The completed and
+recovered states are captured at 1180px and 720px with no horizontal overflow.
+
+The bridge rejects active turns and threads not owned by the selected project;
+the probe uses a disposable read-only workspace and leaves logs/screenshots in
+its printed temporary directory. This closes the sampled manual compact path,
+not automatic threshold compaction or installed-product pixel parity.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:

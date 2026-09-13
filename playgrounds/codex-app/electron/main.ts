@@ -476,6 +476,23 @@ async function startLive(
   });
 }
 
+async function compactLive(event: IpcMainInvokeEvent, raw: unknown) {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  const threadId = (input as { threadId?: unknown }).threadId;
+  if (typeof threadId !== "string" || threadId.length === 0) {
+    throw new TypeError("A live thread is required to compact a turn.");
+  }
+  if (activeTurn) {
+    throw new Error("A live turn is still running.");
+  }
+  const session = liveSession.get(directory);
+  if (!session || session.thread.id !== threadId) {
+    throw new Error("The selected live thread is not owned by this project.");
+  }
+  return session.thread.compact();
+}
+
 async function stopLive() {
   if (!activeTurn) return;
   liveApprovalGate.declineAll();
@@ -930,6 +947,7 @@ function createWindow() {
 }
 
 ipcMain.handle("demo:live:start", startLive);
+ipcMain.handle("demo:live:compact", compactLive);
 ipcMain.handle("demo:environment:status", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { input } = resolveHistoryProject(raw);

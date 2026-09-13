@@ -35,6 +35,7 @@
     "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
     "check:live-approval": "node scripts/check-live-approval.mjs",
     "check:live-command-approval": "node scripts/check-live-command-approval.mjs",
+    "check:live-compaction": "node scripts/check-live-compaction.mjs",
     "check:live-subagent-recovery": "node scripts/check-live-subagent-recovery.mjs",
     "check:current-approval-26-903": "node scripts/check-current-approval-26-903.mjs",
     "check:live-projects": "node scripts/check-live-projects.mjs",
