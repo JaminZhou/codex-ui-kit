@@ -15322,12 +15322,24 @@ export function App() {
                         "similar",
                       ),
                   }
-                : undefined
+                : approval.kind === "permission"
+                  ? {
+                      info: "Allow the requested permissions for this conversation",
+                      label: "Allow this conversation",
+                      onClick: () =>
+                        respondToApproval(
+                          approval.requestId,
+                          "acceptForSession",
+                        ),
+                    }
+                  : undefined
           }
           title={
             approval.kind === "command"
               ? "Run this command?"
-              : "Apply these file changes?"
+              : approval.kind === "file"
+                ? "Apply these file changes?"
+                : "Allow the requested permissions?"
           }
         />
       );

@@ -32,6 +32,8 @@ import {
 import {
   LiveApprovalGate,
   type LiveApprovalDecision,
+  type LivePermissionApprovalResponse,
+  type LivePermissionProfile,
 } from "./live-approval-gate.js";
 import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
 import {
@@ -49,6 +51,11 @@ import { cleanupMergedPullRequest } from "./git-pr-cleanup.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
 import { LiveProjectSession, resolveLiveProject } from "./live-project-session.js";
 import { liveWorkspacePolicy } from "./live-workspace-policy.js";
+import {
+  normalizePermissionProfile,
+  permissionApprovalResponse,
+  type LivePermissionRequestProfile,
+} from "./live-permission-approval.js";
 import { normalizeEnvironmentId, readLiveEnvironmentStatus } from "./live-environment-status.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
@@ -120,6 +127,10 @@ const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
 const pendingApprovalAmendments = new Map<string, string[]>();
+const pendingPermissionRequests = new Map<
+  string,
+  LivePermissionProfile
+>();
 const liveInputGate = new LiveUserInputGate();
 const liveMcpElicitationGate = new LiveMcpElicitationGate();
 let liveThreadRegistry: LiveThreadRegistry | null = null;
@@ -318,10 +329,20 @@ function requestRendererMcpElicitation(
   return response;
 }
 
-type LiveCommandApprovalResponse = { decision: LiveApprovalDecision };
+type LiveCommandApprovalDecision =
+  | "accept"
+  | "acceptForSession"
+  | "decline"
+  | {
+      acceptWithExecpolicyAmendment: {
+        execpolicy_amendment: string[];
+      };
+    };
+type LiveCommandApprovalResponse = { decision: LiveCommandApprovalDecision };
 type LiveFileApprovalResponse = {
   decision: "accept" | "acceptForSession" | "decline";
 };
+type LivePermissionApprovalParams = { permissions: LivePermissionRequestProfile };
 
 function requestRendererApproval(
   method: "item/commandExecution/requestApproval",
@@ -334,9 +355,15 @@ function requestRendererApproval(
   requestId: number | string,
 ): Promise<LiveFileApprovalResponse>;
 function requestRendererApproval(
+  method: "item/permissions/requestApproval",
+  params: unknown,
+  requestId: number | string,
+): Promise<LivePermissionApprovalResponse>;
+function requestRendererApproval(
   method:
     | "item/commandExecution/requestApproval"
-    | "item/fileChange/requestApproval",
+    | "item/fileChange/requestApproval"
+    | "item/permissions/requestApproval",
   params: unknown,
   requestId: number | string,
 ) {
@@ -350,6 +377,15 @@ function requestRendererApproval(
     method,
     params,
   });
+  const permissionProfile =
+    method === "item/permissions/requestApproval" &&
+    typeof params === "object" &&
+    params !== null &&
+    "permissions" in params
+      ? normalizePermissionProfile(
+          (params as LivePermissionApprovalParams).permissions,
+        )
+      : null;
   const amendment =
     method === "item/commandExecution/requestApproval" &&
     typeof params === "object" &&
@@ -361,12 +397,16 @@ function requestRendererApproval(
       : [];
   const key = `${typeof requestId}:${requestId}`;
   if (amendment.length > 0) pendingApprovalAmendments.set(key, amendment);
+  if (permissionProfile) pendingPermissionRequests.set(key, permissionProfile);
   const response = liveApprovalGate.request(requestId).finally(() => {
     pendingApprovalAmendments.delete(key);
+    pendingPermissionRequests.delete(key);
   });
   return method === "item/commandExecution/requestApproval"
-    ? response
-    : (response as Promise<LiveFileApprovalResponse>);
+    ? (response as Promise<LiveCommandApprovalResponse>)
+    : (response as
+        | Promise<LiveFileApprovalResponse>
+        | Promise<LivePermissionApprovalResponse>);
 }
 
 function assertTrustedIpc(event: IpcMainInvokeEvent) {
@@ -427,6 +467,11 @@ async function ensureClient() {
     ),
     client.onServerRequest(
       "item/fileChange/requestApproval",
+      (params, request) =>
+        requestRendererApproval(request.method, params, request.id),
+    ),
+    client.onServerRequest(
+      "item/permissions/requestApproval",
       (params, request) =>
         requestRendererApproval(request.method, params, request.id),
     ),
@@ -569,6 +614,12 @@ async function handleApprovalResponse(
         execpolicy_amendment: amendment,
       },
     };
+  } else {
+    const key = `${typeof rawInput.requestId}:${rawInput.requestId}`;
+    const permissions = pendingPermissionRequests.get(key);
+    if (permissions) {
+      decision = permissionApprovalResponse(permissions, rawInput.decision);
+    }
   }
   if (!liveApprovalGate.resolve(rawInput.requestId, decision)) {
     throw new Error("The approval request is no longer pending.");
