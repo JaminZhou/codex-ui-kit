@@ -2381,6 +2381,45 @@ describe("protocol lifecycle reducer", () => {
     expect(pending.approvals[0]?.command).toBe("File changes");
   });
 
+  it("renders live permission approval requests with a session scope action", () => {
+    const pending = reduceProtocolNotification(initialProtocolState, {
+      atMs: 10,
+      id: "permissions-approval",
+      kind: "request",
+      method: "item/permissions/requestApproval",
+      params: {
+        cwd: "/tmp/codex-ui-kit",
+        itemId: "permissions-item",
+        permissions: {
+          fileSystem: {
+            entries: [
+              {
+                access: "write",
+                path: { type: "path", path: "/tmp/codex-ui-kit" },
+              },
+            ],
+          },
+          network: null,
+        },
+        reason: "The task needs to write the generated artifact.",
+        startedAtMs: 10,
+        threadId: "thread-live",
+        turnId: "turn-live",
+      },
+    });
+
+    expect(pending.approvals[0]).toMatchObject({
+      command: "The task needs to write the generated artifact.",
+      decision: "pending",
+      kind: "permission",
+      reason: "The task needs to write the generated artifact.",
+    });
+    expect(pending.timeline).toContainEqual({
+      id: "string:permissions-approval",
+      kind: "approval",
+    });
+  });
+
   it("keeps completed compaction at its historical position on a follow-up turn", () => {
     const scenario = replayScenarios.compaction;
     const compacted = reduceProtocolTrace(

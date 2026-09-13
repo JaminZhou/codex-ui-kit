@@ -46,6 +46,29 @@ describe("live approval gate", () => {
     await expect(request).resolves.toEqual({ decision });
   });
 
+  it("preserves a permission grant decision", async () => {
+    const gate = new LiveApprovalGate();
+    const request = gate.request("permissions");
+    const decision = {
+      permissions: {
+        fileSystem: {
+          read: null,
+          write: null,
+          entries: [
+            {
+              access: "write" as const,
+              path: { type: "path", path: "/tmp/codex-ui-kit" } as const,
+            },
+          ],
+        },
+      },
+      scope: "session" as const,
+    };
+
+    expect(gate.resolve("permissions", decision)).toBe(true);
+    await expect(request).resolves.toEqual({ decision });
+  });
+
   it("declines every pending request on shutdown", async () => {
     const gate = new LiveApprovalGate();
     const first = gate.request("first");

@@ -41,6 +41,23 @@ Existing historical reconnect rows may remain in the conversation after the
 turn completes; completion is checked against the protocol and final UI reply,
 not inferred from those historical rows.
 
+### Live permissions-request bridge — 2026-09-13
+
+The Live Electron bridge now handles the public
+`item/permissions/requestApproval` request as a first-class approval. It
+forwards the host-validated filesystem/network profile to the renderer,
+renders the shared `Permissions` approval card, and maps the visible
+once/conversation actions back to the protocol's `{ permissions, scope }`
+response. Unit and reducer contracts cover the exact response shape and
+permission timeline entry.
+
+This slice is intentionally not promoted to live acceptance yet: the pinned
+signed-in probe was attempted twice, but the current App Server stream
+disconnected during TLS/network recovery before emitting a permissions
+request. No successful product reachability is claimed; the real request and
+current-product pixels remain an explicit follow-up once the transport is
+healthy.
+
 ### Live Terminal execution — 2026-09-08
 
 After `pnpm build:codex-app`, run

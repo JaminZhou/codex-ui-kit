@@ -1,3 +1,38 @@
+type LivePermissionPath =
+  | { type: "path"; path: string }
+  | { type: "glob_pattern"; pattern: string }
+  | {
+      type: "special";
+      value:
+        | { kind: "root" }
+        | { kind: "minimal" }
+        | { kind: "project_roots"; subpath: string | null }
+        | { kind: "tmpdir" }
+        | { kind: "slash_tmp" }
+        | { kind: "unknown"; path: string; subpath: string | null };
+    };
+
+export type LivePermissionEntry = {
+  access: "deny" | "read" | "write";
+  path: LivePermissionPath;
+};
+
+export type LivePermissionProfile = {
+  fileSystem?: {
+    read: string[] | null;
+    write: string[] | null;
+    entries?: LivePermissionEntry[];
+    globScanMaxDepth?: number;
+  };
+  network?: { enabled: boolean | null };
+};
+
+export type LivePermissionApprovalResponse = {
+  permissions: LivePermissionProfile;
+  scope: "session" | "turn";
+  strictAutoReview?: boolean;
+};
+
 export type LiveApprovalDecision =
   | "accept"
   | "acceptForSession"
@@ -6,7 +41,8 @@ export type LiveApprovalDecision =
       acceptWithExecpolicyAmendment: {
         execpolicy_amendment: string[];
       };
-    };
+    }
+  | LivePermissionApprovalResponse;
 export type LiveApprovalRequestId = number | string;
 
 function approvalKey(requestId: LiveApprovalRequestId) {

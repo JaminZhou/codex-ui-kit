@@ -1028,6 +1028,12 @@ The pinned CLI 0.153.4 runtime still emits a second request for the independent
   outcomes without claiming session-lifetime suppression. The live
   matching-command follow-up now proves the amendment-backed two-command path;
   network and installed-product approval parity remain separate boundaries.
+The Live Electron host now also maps the public
+`item/permissions/requestApproval` profile into the shared Permissions card and
+schema-shaped `{ permissions, scope }` response. Reducer and gate contracts
+cover this path, but the signed-in reachability probe encountered App Server
+TLS/network recovery before emitting a permissions request; live permissions
+and current-product pixels therefore remain explicitly unpromoted.
 An opt-in real file-variant probe now verifies separate current-build
 `fileChange` update and delete requests, exact absolute paths/diffs, two
 `Allow once` decisions, final updated/deleted files, and 1180/720 no-overflow

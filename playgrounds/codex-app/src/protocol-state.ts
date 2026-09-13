@@ -128,7 +128,7 @@ export interface DemoApprovalRequest {
   decision: "approved" | "pending" | "rejected";
   decisionScope?: "once" | "session" | "similar";
   itemId: string;
-  kind: "command" | "file";
+  kind: "command" | "file" | "permission";
   reason: string | null;
   requestId: number | string;
   responseDecision?: DemoApprovalResponseDecision;
@@ -1322,7 +1322,8 @@ export function reduceProtocolNotification(
     "kind" in notification &&
     notification.kind === "request" &&
     (notification.method === "item/commandExecution/requestApproval" ||
-      notification.method === "item/fileChange/requestApproval")
+      notification.method === "item/fileChange/requestApproval" ||
+      notification.method === "item/permissions/requestApproval")
   ) {
     const requestId = notification.id;
     const itemId = asString(params.itemId);
@@ -1336,7 +1337,9 @@ export function reduceProtocolNotification(
     const kind =
       notification.method === "item/fileChange/requestApproval"
         ? "file"
-        : "command";
+        : notification.method === "item/permissions/requestApproval"
+          ? "permission"
+          : "command";
     const responseDecision = approvalResponseDecision(notification.response);
     return {
       ...next,
@@ -1344,7 +1347,9 @@ export function reduceProtocolNotification(
         command:
           asString(params.command) ??
           command?.command ??
-          (fileChangePaths || "File changes"),
+          (kind === "permission"
+            ? asString(params.reason) || "Additional permissions"
+            : fileChangePaths || "File changes"),
         decision: "pending",
         itemId,
         kind,

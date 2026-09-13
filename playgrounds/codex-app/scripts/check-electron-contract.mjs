@@ -13495,6 +13495,113 @@ try {
   await liveSessionApprovalApp.close();
 }
 
+const {
+  app: livePermissionsApprovalApp,
+  page: livePermissionsApprovalPage,
+} = await launchScene(
+  {
+    frame: "markdown-complete",
+    id: "electron-live-permissions-approval",
+    scenario: "markdown",
+  },
+  { capture: false },
+);
+try {
+  await livePermissionsApprovalPage
+    .getByRole("button", { exact: true, name: "Live" })
+    .click();
+  await livePermissionsApprovalPage.waitForSelector(
+    '.demo-root[data-mode="live"]',
+  );
+  await livePermissionsApprovalApp.evaluate(
+    ({ BrowserWindow, ipcMain }) => {
+      globalThis.__codexUiKitPermissionResponse = null;
+      ipcMain.removeHandler("demo:approval:respond");
+      ipcMain.handle("demo:approval:respond", (_event, input) => {
+        globalThis.__codexUiKitPermissionResponse = input;
+      });
+      const window = BrowserWindow.getAllWindows()[0];
+      window?.webContents.send("demo:live:session", {
+        kind: "live-bind",
+        projectToken: "startup-workspace",
+        threadId: "thread-live-permissions",
+      });
+      window?.webContents.send("demo:server-request", {
+        id: "approval-live-permissions",
+        kind: "request",
+        method: "item/permissions/requestApproval",
+        params: {
+          cwd: "/tmp/codex-ui-kit",
+          itemId: "permissions-live",
+          permissions: {
+            fileSystem: {
+              entries: [
+                {
+                  access: "write",
+                  path: { type: "path", path: "/tmp/codex-ui-kit" },
+                },
+              ],
+              read: null,
+              write: null,
+            },
+            network: null,
+          },
+          reason: "Allow the task to write the generated artifact.",
+          threadId: "thread-live-permissions",
+          turnId: "turn-live-permissions",
+        },
+      });
+    },
+  );
+  const livePermissionsApproval = livePermissionsApprovalPage.getByTestId(
+    "approval-request",
+  );
+  await livePermissionsApproval.waitFor();
+  if (
+    (await livePermissionsApprovalPage
+      .getByText("Allow the requested permissions?", { exact: true })
+      .count()) !== 1 ||
+    (await livePermissionsApprovalPage
+      .getByText("Permissions", { exact: true })
+      .count()) < 1
+  ) {
+    throw new Error("Electron live permissions approval card did not render.");
+  }
+  await livePermissionsApproval
+    .getByRole("button", { name: "Approval options" })
+    .click();
+  const allowConversation = livePermissionsApprovalPage
+    .locator('.codex-ui-approval-request__options-menu [role="menuitem"]')
+    .filter({ hasText: "Allow this conversation" });
+  await allowConversation.waitFor();
+  if (
+    (await livePermissionsApprovalPage
+      .getByLabel("Allow the requested permissions for this conversation")
+      .count()) !== 1
+  ) {
+    throw new Error(
+      "Electron live permissions approval did not expose its conversation scope.",
+    );
+  }
+  await allowConversation.click();
+  const permissionResponse = await livePermissionsApprovalApp.evaluate(
+    () => globalThis.__codexUiKitPermissionResponse,
+  );
+  if (
+    JSON.stringify(permissionResponse) !==
+    JSON.stringify({
+      decision: "acceptForSession",
+      requestId: "approval-live-permissions",
+    })
+  ) {
+    throw new Error(
+      `Electron live permissions approval did not emit its session decision: ${JSON.stringify(permissionResponse)}`,
+    );
+  }
+} finally {
+  await livePermissionsApprovalApp.close();
+}
+
 for (const alternateDecision of ["Allow once", "Deny"]) {
   const { app: alternateApp, page: alternatePage } = await launchScene(
     {
