@@ -17435,6 +17435,11 @@ for (const scene of selectedScenes) {
         "thread-assistant-bad",
         "thread-assistant-fork",
       ];
+      // KaTeX 0.18 adds a larger display-line box than the 0.16 baseline
+      // used by the original 26.820 capture. Keep both known package-owned
+      // geometries explicit instead of silently accepting arbitrary drift.
+      const expectedMathDisplayHeights = [41.9375, 46.234375];
+      const expectedRootHeights = [442.515625, 446.8125];
       const [loaded, unavailable] = markdown?.media.items ?? [];
       if (
         !markdown ||
@@ -17449,7 +17454,9 @@ for (const scene of selectedScenes) {
             Math.abs(action.rect.height - 26) > 0.5,
         ) ||
         Math.abs(markdown.root.rect.width - expectedWidth) > 1 ||
-        Math.abs(markdown.root.rect.height - 442.515625) > 1 ||
+        !expectedRootHeights.some(
+          (height) => Math.abs(markdown.root.rect.height - height) <= 1,
+        ) ||
         markdown.root.color !== "rgb(223, 223, 223)" ||
         markdown.root.fontFamily !==
           '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
@@ -17462,7 +17469,9 @@ for (const scene of selectedScenes) {
           "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
         !markdown.math.display ||
         Math.abs(markdown.math.display.rect.width - expectedWidth) > 1 ||
-        Math.abs(markdown.math.display.rect.height - 41.9375) > 1 ||
+        !expectedMathDisplayHeights.some(
+          (height) => Math.abs(markdown.math.display.rect.height - height) <= 1,
+        ) ||
         markdown.math.display.marginBlockStart !== "14px" ||
         markdown.math.display.marginBlockEnd !== "14px" ||
         markdown.media.footnoteSections !== 0 ||
