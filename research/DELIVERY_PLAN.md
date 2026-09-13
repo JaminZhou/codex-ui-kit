@@ -999,12 +999,13 @@ separately versioned evidence. The streaming row is now also refreshed on the
 same previous build with one real 1180→720 running resize and natural
 completion: reverse-origin follow, negative compact clipping, exact 16px Stop
 SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
-  wide/compact regional pixels. Command denial is verified on that build as well; file
-  variants, remaining approval kinds, manual compaction, and long-thread
-  convergence remain the next Stage 2 work. An opt-in real command-approval
-  probe now verifies one `item/commandExecution/requestApproval` request,
-  host-owned cwd, `Allow once`, completed command/turn, and a scoped write
-  boundary outside one disposable proof file at 1180/720px. An opt-in real
+  wide/compact regional pixels. Command denial is verified on that build as well;
+  remaining approval kinds, manual compaction, and long-thread convergence remain
+  the next Stage 2 work. The real command-approval probe now
+  runs in full playground acceptance and verifies one
+  `item/commandExecution/requestApproval` request, host-owned cwd, `Allow once`,
+  completed command/turn, and a scoped write boundary outside one disposable
+  proof file at 1180/720px. An opt-in real
   live-stop probe now
   separately verifies a pending file approval, owning-thread Stop, interrupted
   settlement, resolved approval, no file write, and a same-thread recovery
