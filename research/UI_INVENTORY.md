@@ -289,7 +289,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 91 surface groups; 15 have current-build runtime evidence, 68 have previous-build-only runtime evidence, 8 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
+Current inventory: 92 surface groups; 15 have current-build runtime evidence, 68 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 1 group and Electron verification covers 1.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -297,10 +297,12 @@ The [26.903 PDF workspace capture](26.903.71938-pdf.md) reaches a real two-page
 preview from an unsent synthetic draft attachment. Fourteen Renderer states
 cover pagination, zoom, annotation mode, pane expansion, and compact
 hide/reopen. Closing the tab preserves the attachment; reopening resets to
-page 1. This promotes only runtime reachability for
-`workspace.document-previews` and `workspace.artifact-shell`. The existing
-centered-card replay does not match the observed right-hand workspace, so
-Browser/Electron verification and product-pixel gates remain open.
+page 1. The evidence is now split explicitly: `workspace.pdf-preview` is the
+current-build PDF slice with Browser/CDP, Electron, and owned-panel pixel
+gates; `workspace.artifact-shell` retains the right-workspace runtime
+reachability boundary. `workspace.document-previews` remains the broader
+notebook/DOCX/spreadsheet/presentation family and is not promoted by the PDF
+sample.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
