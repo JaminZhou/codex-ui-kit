@@ -173,6 +173,24 @@ the sampled real approval-cancellation and same-thread Stop recovery path; it
 does not cover every approval kind, running command/tool interruption, or
 installed-product pixel parity.
 
+### Live command approval — 2026-09-13
+
+The opt-in `check:live-command-approval` probe submits one real Composer turn
+in a disposable workspace-write workspace and requests exactly
+`touch command-approval-proof.txt`.
+It requires the public protocol's `item/commandExecution/requestApproval` with
+the host-owned cwd, captures the pending Terminal card at 1180px, clicks
+`Allow once`, and requires one completed command item, a completed turn, and
+the exact `COMMAND_APPROVAL_OK` reply. The settled same-thread UI is checked at
+1180px and 720px with no horizontal overflow. The empty proof file is removed
+during cleanup; no other file, network, delegation, or settings operation is
+permitted.
+
+The probe records the pinned client/runtime versions and keeps protocol logs
+and screenshots in its printed temporary directory. It closes the sampled
+real command-approval Allow once path; matching-command/session approvals,
+denial, and installed-product pixel parity remain separately scoped.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:
