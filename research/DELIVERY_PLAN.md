@@ -1408,6 +1408,9 @@ pending file approval, requires interrupted completion and resolved approval
 without a file write, then completes a same-thread Composer follow-up with
 wide/720 captures. This is independent playground evidence; running-tool Stop
 variants, concurrent approvals, and additional approval types remain open.
+The persistent PTY host/UI probe now also runs as `check:live-terminal` inside
+full playground acceptance, covering retained shell state, resize, interruption,
+hidden-panel output, tab ownership, theme switching, and Live/Replay cleanup.
 Model-background-process integration and current-product PTY visual evidence
 remain open; this does not close the complete-workflow exit gate.
 

@@ -42,10 +42,10 @@ the protocol and final UI reply, not inferred from those historical rows.
 
 After `pnpm build:codex-app`, run
 `pnpm --filter @codex-ui-kit/codex-app-playground check:live-terminal` for
-the explicit local integration gate. This starts the dependency-owned App
+the local integration gate included in full playground acceptance. This starts the dependency-owned App
 Server (client `8cf5823ee12c00f7bc9c5eaeef80049e65f0e881`, CLI 0.153.4)
 and issues real sandboxed `command/exec` requests, not model turns. It is
-separate from deterministic replay acceptance. Screenshots and results are
+separate from deterministic replay assertions. Screenshots and results are
 retained in the printed disposable-directory path, not committed.
 
 The host probe verifies persistent shell directory/environment, actual
