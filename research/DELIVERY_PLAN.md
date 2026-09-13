@@ -1025,9 +1025,10 @@ frames. Rename, binary, upload-failure, and installed-product parity remain
 separate boundaries. The probe is now part of full playground acceptance, so
 the same disposable real-update/delete evidence runs on every complete local
 acceptance pass.
-An opt-in real long-thread probe now runs twelve no-tool turns on one stable
-thread, proves repeated live bindings keep same-thread completion, and exercises
-scroll-away/latest-follow convergence at 1180/720px with no overflow. The
+The real long-thread probe now runs twelve no-tool turns on one stable thread,
+proves repeated live bindings keep same-thread completion, and exercises
+scroll-away/latest-follow convergence at 1180/720px with no overflow. It is now
+part of full playground acceptance with disposable workspace evidence. The
 30-turn windowed replay and installed-product eviction heuristics remain
 separate boundaries.
 
