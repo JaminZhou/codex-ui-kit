@@ -4,11 +4,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
-// Explicit signed-in one-turn check. The command writes only inside a disposable workspace.
+// Explicit signed-in one-turn check. The command writes only to a disposable
+// path outside the selected workspace so the sandbox must surface approval.
 const directory = await realpath(
   await mkdtemp(join(tmpdir(), "ui-kit-live-command-approval-")),
 );
+const targetDirectory = await realpath(
+  await mkdtemp(join(tmpdir(), "ui-kit-live-command-target-")),
+);
 const filename = "command-approval-proof.txt";
+const targetPath = join(targetDirectory, filename);
 const playgroundPackage = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
@@ -53,7 +58,7 @@ try {
     exact: true,
   });
   await composer.fill(
-    `In this disposable workspace run exactly the terminal command \`touch ${filename}\` once. Do not use another command, access other directories or network, change settings, or delegate. Request the command approval normally. After the command succeeds reply exactly COMMAND_APPROVAL_OK.`,
+    `In this disposable workspace run exactly the terminal command \`touch ${targetPath}\` once. The target is a disposable proof path outside the workspace, so request the command approval normally. Do not use another command, access other directories or network, change settings, or delegate. After the command succeeds reply exactly COMMAND_APPROVAL_OK.`,
   );
   await composer.press("Enter");
   await page.waitForFunction(
@@ -70,7 +75,7 @@ try {
   assert.ok(request, "A real command approval request is required");
   assert.equal(request.method, "item/commandExecution/requestApproval");
   assert.equal(request.params.cwd, directory);
-  assert.ok(request.params.command.includes(`touch ${filename}`));
+  assert.ok(request.params.command.includes(`touch ${targetPath}`));
   const started = before
     .filter((event) => event.method === "item/started")
     .map((event) => event.params.item)
@@ -104,7 +109,7 @@ try {
     .find((item) => item?.id === request.params.itemId);
   assert.equal(commandCompletion?.type, "commandExecution");
   assert.equal(commandCompletion?.status, "completed");
-  assert.equal((await stat(join(directory, filename))).size, 0);
+  assert.equal((await stat(targetPath)).size, 0);
 
   for (const width of [1180, 720]) {
     await app.evaluate(
@@ -144,6 +149,7 @@ try {
   await page.evaluate(() => window.codexDemo.closeLive()).catch(() => undefined);
   await app.close();
   await rm(join(directory, filename), { force: true }).catch(() => undefined);
+  await rm(targetDirectory, { force: true, recursive: true }).catch(() => undefined);
   await writeFile(join(directory, "result.json"), JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result));
 }

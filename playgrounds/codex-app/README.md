@@ -573,6 +573,23 @@ The twenty-ninth slice reaches the current matching-command approval rule on
   repeated-completion comparisons measure 1.21% and 1.37% under independent
   1.5% limits.
 
+## Live matching-command approval addendum
+
+The thirty-first slice reaches the real matching-command approval rule in the
+public App Server playground:
+
+- a signed-in Live turn asks for the same command twice against a disposable
+  path outside the selected workspace;
+- the real command request exposes `proposedExecpolicyAmendment`, and the
+  visible `Allow similar commands` action sends that exact amendment through
+  the preload/Electron bridge;
+- two command items complete with exactly one approval request and one
+  completed turn, with the final response, focus, and 1180/720 no-overflow
+  checks retained in the printed temporary evidence directory;
+- the amendment is session-scoped and disposable; denial, network-policy
+  amendments, session-scoped file approval, and installed-product pixels stay
+  separate evidence boundaries.
+
 ## Thirtieth vertical slice
 
 The thirtieth slice reaches the current pasted-image lifecycle on

@@ -1005,7 +1005,10 @@ SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   runs in full playground acceptance and verifies one
   `item/commandExecution/requestApproval` request, host-owned cwd, `Allow once`,
   completed command/turn, and a scoped write boundary outside one disposable
-  proof file at 1180/720px. The real live-stop probe now runs in full playground
+  proof file at 1180/720px. The live matching-command follow-up now reaches a
+  real `proposedExecpolicyAmendment`, sends that exact rule through the
+  Electron bridge, and proves two identical commands complete with one
+  approval request at 1180/720px. The real live-stop probe now runs in full playground
   acceptance and
   separately verifies a pending file approval, owning-thread Stop, interrupted
   settlement, resolved approval, no file write, and a same-thread recovery
@@ -1021,9 +1024,10 @@ The real session-approval probe now runs in full playground acceptance and
 exercises two separate file changes in one turn, recording the current
 `acceptForSession`/`Allow all edits` response for each request at 1180/720px.
 The pinned CLI 0.153.4 runtime still emits a second request for the independent
-second file change, so this promotes the current decision UI and bounded file
-outcomes without claiming session-lifetime suppression. Matching-command,
-network, and installed-product approval parity remain separate boundaries.
+  second file change, so this promotes the current decision UI and bounded file
+  outcomes without claiming session-lifetime suppression. The live
+  matching-command follow-up now proves the amendment-backed two-command path;
+  network and installed-product approval parity remain separate boundaries.
 An opt-in real file-variant probe now verifies separate current-build
 `fileChange` update and delete requests, exact absolute paths/diffs, two
 `Allow once` decisions, final updated/deleted files, and 1180/720 no-overflow
@@ -1646,7 +1650,8 @@ without confusing package readiness with full product reconstruction.
    covers pending → denied/no-file and pending → Allow once/file-created at
    wide and compact widths, while the Composer permission selector is the
    exact three-mode 26.820 menu. Historical matching-command persistence
-   remains regression evidence. Schema-validated
+   remains regression evidence, while the live follow-up now proves one real
+   amendment-backed approval for two identical commands. Schema-validated
    `acceptForSession` file approval and automatic-review timeout replays now
    pass Browser/CDP, Electron, and internal regional pixels against current
    `26.803.41515` structural evidence; safe real-product reachability remains

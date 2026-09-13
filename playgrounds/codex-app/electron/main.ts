@@ -29,7 +29,10 @@ import {
   attachmentDialogProperties,
   type AttachmentDialogKind,
 } from "./attachment-dialog.js";
-import { LiveApprovalGate } from "./live-approval-gate.js";
+import {
+  LiveApprovalGate,
+  type LiveApprovalDecision,
+} from "./live-approval-gate.js";
 import { LiveUserInputGate, type LiveInputRequest } from "./live-user-input.js";
 import {
   LiveMcpElicitationGate,
@@ -116,6 +119,7 @@ let gitBranchOperationActive = false;
 const gitBranchOperationQueue = new GitBranchOperationQueue();
 const liveTurnStartGate = new LiveTurnStartGate();
 const liveApprovalGate = new LiveApprovalGate();
+const pendingApprovalAmendments = new Map<string, string[]>();
 const liveInputGate = new LiveUserInputGate();
 const liveMcpElicitationGate = new LiveMcpElicitationGate();
 let liveThreadRegistry: LiveThreadRegistry | null = null;
@@ -134,7 +138,7 @@ function resolveHistoryProject(raw: unknown) {
 }
 
 interface ApprovalResponseInput {
-  decision: "accept" | "acceptForSession" | "decline";
+  decision: "accept" | "acceptForSession" | "acceptSimilar" | "decline";
   requestId: number | string;
 }
 
@@ -177,7 +181,7 @@ function assertApprovalResponseInput(
     value === null ||
     (typeof (value as ApprovalResponseInput).requestId !== "string" &&
       typeof (value as ApprovalResponseInput).requestId !== "number") ||
-    !["accept", "acceptForSession", "decline"].includes(
+    !["accept", "acceptForSession", "acceptSimilar", "decline"].includes(
       (value as ApprovalResponseInput).decision,
     )
   ) {
@@ -314,6 +318,21 @@ function requestRendererMcpElicitation(
   return response;
 }
 
+type LiveCommandApprovalResponse = { decision: LiveApprovalDecision };
+type LiveFileApprovalResponse = {
+  decision: "accept" | "acceptForSession" | "decline";
+};
+
+function requestRendererApproval(
+  method: "item/commandExecution/requestApproval",
+  params: unknown,
+  requestId: number | string,
+): Promise<LiveCommandApprovalResponse>;
+function requestRendererApproval(
+  method: "item/fileChange/requestApproval",
+  params: unknown,
+  requestId: number | string,
+): Promise<LiveFileApprovalResponse>;
 function requestRendererApproval(
   method:
     | "item/commandExecution/requestApproval"
@@ -331,7 +350,23 @@ function requestRendererApproval(
     method,
     params,
   });
-  return liveApprovalGate.request(requestId);
+  const amendment =
+    method === "item/commandExecution/requestApproval" &&
+    typeof params === "object" &&
+    params !== null &&
+    Array.isArray((params as { proposedExecpolicyAmendment?: unknown }).proposedExecpolicyAmendment)
+      ? (params as { proposedExecpolicyAmendment: unknown[] }).proposedExecpolicyAmendment.filter(
+          (token): token is string => typeof token === "string",
+        )
+      : [];
+  const key = `${typeof requestId}:${requestId}`;
+  if (amendment.length > 0) pendingApprovalAmendments.set(key, amendment);
+  const response = liveApprovalGate.request(requestId).finally(() => {
+    pendingApprovalAmendments.delete(key);
+  });
+  return method === "item/commandExecution/requestApproval"
+    ? response
+    : (response as Promise<LiveFileApprovalResponse>);
 }
 
 function assertTrustedIpc(event: IpcMainInvokeEvent) {
@@ -521,9 +556,21 @@ async function handleApprovalResponse(
 ) {
   assertTrustedIpc(event);
   assertApprovalResponseInput(rawInput);
-  if (
-    !liveApprovalGate.resolve(rawInput.requestId, rawInput.decision)
-  ) {
+  let decision: LiveApprovalDecision =
+    rawInput.decision === "acceptSimilar" ? "accept" : rawInput.decision;
+  if (rawInput.decision === "acceptSimilar") {
+    const key = `${typeof rawInput.requestId}:${rawInput.requestId}`;
+    const amendment = pendingApprovalAmendments.get(key);
+    if (!amendment?.length) {
+      throw new Error("The approval request has no matching command rule.");
+    }
+    decision = {
+      acceptWithExecpolicyAmendment: {
+        execpolicy_amendment: amendment,
+      },
+    };
+  }
+  if (!liveApprovalGate.resolve(rawInput.requestId, decision)) {
     throw new Error("The approval request is no longer pending.");
   }
 }

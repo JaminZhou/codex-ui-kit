@@ -1,7 +1,12 @@
 export type LiveApprovalDecision =
   | "accept"
   | "acceptForSession"
-  | "decline";
+  | "decline"
+  | {
+      acceptWithExecpolicyAmendment: {
+        execpolicy_amendment: string[];
+      };
+    };
 export type LiveApprovalRequestId = number | string;
 
 function approvalKey(requestId: LiveApprovalRequestId) {
