@@ -19,6 +19,18 @@ export const currentBaselineFingerprint = Object.freeze({
   chromiumVersion: "152.0.7977.83",
 });
 
+// A newer installed build can be captured as a candidate without silently
+// invalidating the promoted cross-surface baseline. Promote it only after the
+// affected surface families have been re-observed and their evidence refreshed.
+export const currentCandidateBaselineFingerprint = Object.freeze({
+  appAsarBytes: 322_016_862,
+  appAsarSha256:
+    "bb40cd8811887363104a19291346af9595632e0e956316a1086b274fb8e3eafc",
+  appVersion: "26.908.40834",
+  buildNumber: "8881",
+  chromiumVersion: "152.0.7977.83",
+});
+
 const primaryRoutes = Object.freeze([
   "New chat",
   "Plugins",
@@ -79,10 +91,13 @@ const appAsarSnapshotFields = Object.freeze([
   "inode",
 ]);
 
-const validAppAsarSnapshot = (snapshot) =>
+const validAppAsarSnapshot = (
+  snapshot,
+  expectedFingerprint = currentBaselineFingerprint,
+) =>
   Number.isSafeInteger(snapshot?.appAsarBytes) &&
-  snapshot.appAsarBytes === currentBaselineFingerprint.appAsarBytes &&
-  snapshot.appAsarSha256 === currentBaselineFingerprint.appAsarSha256 &&
+  snapshot.appAsarBytes === expectedFingerprint.appAsarBytes &&
+  snapshot.appAsarSha256 === expectedFingerprint.appAsarSha256 &&
   Number.isSafeInteger(snapshot.changedAtMs) &&
   snapshot.changedAtMs > 0 &&
   /^\d+$/.test(snapshot.device ?? "") &&
@@ -93,19 +108,22 @@ const validAppAsarSnapshot = (snapshot) =>
 const sameAppAsarSnapshot = (before, after) =>
   appAsarSnapshotFields.every((field) => before[field] === after[field]);
 
-const provesRuntimeBundleIdentity = (runtimeIdentity) => {
+const provesRuntimeBundleIdentity = (
+  runtimeIdentity,
+  expectedFingerprint = currentBaselineFingerprint,
+) => {
   const beforeBundle = runtimeIdentity?.beforeCapture;
   const afterBundle = runtimeIdentity?.afterCapture;
   const processStartedAtMs = runtimeIdentity?.processStartedAtMs;
   const bundleChangedBeforeProcess =
-    validAppAsarSnapshot(beforeBundle) &&
+    validAppAsarSnapshot(beforeBundle, expectedFingerprint) &&
     Number.isSafeInteger(processStartedAtMs) &&
     Math.ceil(beforeBundle.changedAtMs / 1_000) * 1_000 <= processStartedAtMs;
   return (
     Number.isSafeInteger(runtimeIdentity?.ownerPid) &&
     runtimeIdentity.ownerPid > 1 &&
     bundleChangedBeforeProcess &&
-    validAppAsarSnapshot(afterBundle) &&
+    validAppAsarSnapshot(afterBundle, expectedFingerprint) &&
     sameAppAsarSnapshot(beforeBundle, afterBundle) &&
     beforeBundle.checkedAtMs >= processStartedAtMs &&
     afterBundle.checkedAtMs >= beforeBundle.checkedAtMs
@@ -1406,11 +1424,14 @@ export function assertCurrentAppServerCrashRecoveryRecord(record) {
   }
 }
 
-export function assertCurrentBaselineRecord(record) {
+export function assertCurrentBaselineRecord(
+  record,
+  expectedFingerprint = currentBaselineFingerprint,
+) {
   if (record?.schemaVersion !== 1) {
     throw new Error("Current baseline record must use schema version 1.");
   }
-  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+  const fingerprintMismatch = Object.entries(expectedFingerprint).some(
     ([key, expected]) => record.baseline?.[key] !== expected,
   );
   if (fingerprintMismatch) {
@@ -1419,7 +1440,7 @@ export function assertCurrentBaselineRecord(record) {
     );
   }
   const runtimeIdentity = record.runtimeBundleIdentity;
-  if (!provesRuntimeBundleIdentity(runtimeIdentity)) {
+  if (!provesRuntimeBundleIdentity(runtimeIdentity, expectedFingerprint)) {
     throw new Error(
       "Current baseline record does not prove the running Renderer bundle identity.",
     );
