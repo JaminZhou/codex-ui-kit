@@ -601,6 +601,15 @@ exit gates; it does not replace the inventory.
   action-reachability state, and local-only 4%/1% preview/close gates now pass.
   Product reachability and pixel attribution for
   the streaming mutations remain open, as do table error variants.
+
+  The Markdown error follow-up now adds a controlled renderer-boundary replay:
+  the current rich response first shows the public `Markdown couldn't render`
+  alert and `Try again` action, then restores the table after retry. Electron
+  checks the alert semantics, focus reachability, retry transition, zero
+  overflow, and 1180px/720px own-fixture screenshots with zero drift. This is
+  implementation/replay evidence only; it does not claim that the installed
+  product emitted the same renderer failure or that provider/plugin Markdown
+  errors are covered.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
