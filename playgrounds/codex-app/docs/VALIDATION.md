@@ -175,8 +175,9 @@ installed-product pixel parity.
 
 ### Live command approval — 2026-09-13
 
-The opt-in `check:live-command-approval` probe submits one real Composer turn
-in a disposable workspace-write workspace and requests exactly
+The `check:live-command-approval` probe now runs inside full playground
+acceptance as a signed-in gate. It submits one real Composer turn in a
+disposable workspace-write workspace and requests exactly
 `touch command-approval-proof.txt`.
 It requires the public protocol's `item/commandExecution/requestApproval` with
 the host-owned cwd, captures the pending Terminal card at 1180px, clicks
@@ -188,8 +189,9 @@ permitted.
 
 The probe records the pinned client/runtime versions and keeps protocol logs
 and screenshots in its printed temporary directory. It closes the sampled
-real command-approval Allow once path; matching-command/session approvals,
-denial, and installed-product pixel parity remain separately scoped.
+real command-approval Allow once path on every complete acceptance pass;
+matching-command/session approvals, denial, and installed-product pixel parity
+remain separately scoped.
 
 ### Live manual compaction and same-thread recovery — 2026-09-13
 
