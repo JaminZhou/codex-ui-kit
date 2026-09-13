@@ -17858,6 +17858,11 @@ for (const scene of selectedScenes) {
         "thread-assistant-bad",
         "thread-assistant-fork",
       ];
+      // KaTeX 0.18 adds a larger display-line box than the 0.16 geometry
+      // recorded for this 26.825 sample. Keep both package-owned geometries
+      // explicit so a dependency refresh cannot silently become drift.
+      const expectedMathDisplayHeights = [41.9375, 46.234375];
+      const expectedRootHeights = [465.4375, 469.734375];
       const [surfaceHeader, stateHeader] = markdown?.tableHeaders ?? [];
       const [markdownCell, readyCell] = markdown?.tableCells ?? [];
       const [wrapAction, copyAction] = markdown?.codeActions ?? [];
@@ -17912,7 +17917,9 @@ for (const scene of selectedScenes) {
         Math.abs(markdown.externalLink.faviconRect.height - 16) > 0.5 ||
         Math.abs(markdown.externalLink.rect.width - 90.015625) > 0.5 ||
         Math.abs(markdown.root.rect.width - expectedWidth) > 0.5 ||
-        Math.abs(markdown.root.rect.height - 465.4375) > 0.5 ||
+        !expectedRootHeights.some(
+          (height) => Math.abs(markdown.root.rect.height - height) <= 0.5,
+        ) ||
         markdown.root.color !== "rgb(255, 255, 255)" ||
         markdown.root.fontFamily !==
           '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
@@ -17997,7 +18004,9 @@ for (const scene of selectedScenes) {
           "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
         !markdown.math.display ||
         Math.abs(markdown.math.display.rect.width - expectedWidth) > 0.5 ||
-        Math.abs(markdown.math.display.rect.height - 41.9375) > 0.5 ||
+        !expectedMathDisplayHeights.some(
+          (height) => Math.abs(markdown.math.display.rect.height - height) <= 0.5,
+        ) ||
         markdown.math.display.marginBlockStart !== "14px" ||
         markdown.math.display.marginBlockEnd !== "14px" ||
         !markdown.media.literalText.includes("Inline math: $E = mc^2$.") ||

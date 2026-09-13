@@ -1051,6 +1051,15 @@ part of full playground acceptance with disposable workspace evidence. The
 30-turn windowed replay and installed-product eviction heuristics remain
 separate boundaries.
 
+The real local MCP tool-call probe is now part of full playground acceptance.
+It starts a disposable stdio server, drives one signed-in App Server/model turn,
+accepts only the MCP tool-call elicitation, and proves the completed tool item,
+deterministic result token, nested Activity/integration/card disclosure, and
+1180/720 computed geometry with no horizontal overflow. This is current
+playground protocol/UI evidence, not production MCP server or OAuth parity;
+multi-tool, streaming/error, permission variants, installed-product pixels,
+and remote transport remain open follow-up boundaries.
+
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,
 No environment, starting branch, the current Branches search/roles, Escape

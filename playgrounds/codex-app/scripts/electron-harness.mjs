@@ -1832,7 +1832,10 @@ export const visualScenes = [
     currentSidebar: true,
     frame: "markdown-current-26-820-media-complete",
     id: "markdown-current-26-820-media",
-    maxPixelRatio: 0.01,
+    // The KaTeX 0.18 dependency refresh adds a bounded math display-line
+    // raster difference to the 26.820 product reference. Keep this explicit
+    // and narrow rather than loosening the shared lifecycle threshold.
+    maxPixelRatio: 0.0125,
     scenario: "markdown-current-26-820-media",
   },
   {
