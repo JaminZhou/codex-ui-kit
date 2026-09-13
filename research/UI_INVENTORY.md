@@ -2091,6 +2091,13 @@ and zero-drift 1180px/720px own-fixture captures in Electron. This remains
 replay-only evidence and does not promote a real PTY/IPC transport drop from
 the installed product.
 
+The context-summary replay now includes populated Outputs and Sources sections
+with a `README.md` artifact, source count, and `GitHub Triage` plugin source.
+Electron checks collapse/expand, focus, computed typography, responsive
+containment, and zero-drift 1180px/720px own-fixture captures. This remains
+replay-only evidence and does not promote a populated summary from an
+installed-product task.
+
 The latest `26.825.51511` context-control follow-up supersedes the previous
 `26.820.60940` sample for the project/Local/main entry family. It re-observes
 the 736×28 context row, 260×249.5 project dialog at wide and 720×680 compact,
