@@ -195,8 +195,9 @@ remain separately scoped.
 
 ### Live manual compaction and same-thread recovery — 2026-09-13
 
-The opt-in `check:live-compaction` probe uses a host-owned project/thread
-bridge to call the public client's `CodexThread.compact()` after one completed
+The `check:live-compaction` probe now runs inside full playground acceptance as
+a signed-in gate. It uses a host-owned project/thread bridge to call the public
+client's `CodexThread.compact()` after one completed
 Composer turn. It requires real `contextCompaction` item start/completion and
 the matching compact-turn completion for the bound thread, then submits a
 second same-thread turn and requires `COMPACTION_RECOVERY`. The current CLI
@@ -206,8 +207,9 @@ recovered states are captured at 1180px and 720px with no horizontal overflow.
 
 The bridge rejects active turns and threads not owned by the selected project;
 the probe uses a disposable read-only workspace and leaves logs/screenshots in
-its printed temporary directory. This closes the sampled manual compact path,
-not automatic threshold compaction or installed-product pixel parity.
+its printed temporary directory. This closes the sampled manual compact path on
+every complete acceptance pass, not automatic threshold compaction or
+installed-product pixel parity.
 
 ### Live session-scoped file approval — 2026-09-13
 
