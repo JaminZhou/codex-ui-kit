@@ -606,9 +606,9 @@ preview's required controls/image/toolbar; Edit image is excluded because it
 is feature-state-dependent.
 ## Live project continuity
 
-`pnpm --filter @codex-ui-kit/codex-app-playground check:live-projects` is an
-explicit signed-in check with three read-only model turns, not part of the
-deterministic acceptance suite. It creates two disposable project directories,
+`pnpm --filter @codex-ui-kit/codex-app-playground check:live-projects` is a
+signed-in check with three read-only model turns included in the full playground
+acceptance suite. It creates two disposable project directories,
 submits A → B → A through the Electron composer, and verifies the host emits the
 same thread ID for both A turns and a different ID for B. It also verifies
 restored A history excludes B and captures 1180px/720px screenshots.
