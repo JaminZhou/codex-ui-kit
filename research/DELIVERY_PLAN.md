@@ -1345,6 +1345,14 @@ read-only temporary workspace, exact-file `Allow once`, completed file write,
 wide/compact Review, and a PTY read-back in one application session. It does
 not approve broader roots or session-wide access. Other approval kinds and
 real PR operations remain outside this sampled path.
+The opt-in live subagent follow-up now verifies one real public-protocol
+`collabAgentToolCall`, receiver-thread materialization, Agent activity geometry,
+owning-thread Stop, interrupted turn settlement, and visible `Stopped` status
+in the same Electron Live bridge. Its disposable workspace is write-disabled,
+the child prompt forbids shell/network/file writes, and the created thread is
+archived after capture. This closes the sampled playground delegation/Stop
+slice; it does not promote replay fixtures to installed-product evidence or
+claim successful subagent completion.
 The project-continuity follow-up now verifies A → B → A with three real
 Composer turns, same-thread reuse for A, isolated histories, and wide/compact
 captures. A further one-turn approval probe switches projects while A waits,
@@ -1664,9 +1672,10 @@ without confusing package readiness with full product reconstruction.
     images, wide/compact geometry, immersive caption/Close/zoom, focus
     restoration, and five product-region pixel gates. The replay-only plugin
     attachment, Markdown error, terminal transport-failure, populated summary,
-    and notification tone/action slices are now delivered; continue with
-    real-product subagent recovery capture and broader real global notification
-    reachability. The
+    and notification tone/action slices are now delivered. The opt-in live
+    playground probe now covers real public-protocol subagent delegation and
+    owning-thread Stop settlement; continue with installed-product/background
+    process evidence and broader real global notification reachability. The
     bounded terminal transport-failure replay is delivered separately; current
     real transport recovery is delivered
     through an isolated proxy plus CDP/Electron/pixel gates. The independent

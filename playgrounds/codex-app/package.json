@@ -34,6 +34,7 @@
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
     "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
     "check:live-approval": "node scripts/check-live-approval.mjs",
+    "check:live-subagent-recovery": "node scripts/check-live-subagent-recovery.mjs",
     "check:current-approval-26-903": "node scripts/check-current-approval-26-903.mjs",
     "check:live-projects": "node scripts/check-live-projects.mjs",
     "check:live-stop": "node scripts/check-live-stop.mjs",

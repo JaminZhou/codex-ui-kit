@@ -127,12 +127,19 @@ async function waitForNotificationAction(page, action, expectedTotal) {
   );
 }
 
+async function settleNotificationPaint(page) {
+  // The action removes one queued toast and moves focus to the next action.
+  // Let that compositor frame settle before capturing the hard 0%-drift gate.
+  await page.waitForTimeout(120);
+}
+
 async function run(width, suffix) {
   const { app, page } = await launchScene(sceneFor(width), { capture: false });
   const screenshots = {};
   try {
     await assertInitialMatrix(page, width);
-    screenshots.initial = await page.screenshot();
+    await settleNotificationPaint(page);
+    screenshots.initial = await page.screenshot({ animations: "disabled" });
 
     const review = page.getByRole("button", { name: "Review", exact: true });
     await review.focus();
@@ -140,25 +147,29 @@ async function run(width, suffix) {
     await review.click();
     await waitForNotificationAction(page, "permission-reviewed", 3);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "Open");
-    screenshots.afterReview = await page.screenshot();
+    await settleNotificationPaint(page);
+    screenshots.afterReview = await page.screenshot({ animations: "disabled" });
 
     const open = page.getByRole("button", { name: "Open", exact: true });
     assert.equal(await open.count(), 1);
     await open.click();
     await waitForNotificationAction(page, "background-opened", 2);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "View");
-    screenshots.afterOpen = await page.screenshot();
+    await settleNotificationPaint(page);
+    screenshots.afterOpen = await page.screenshot({ animations: "disabled" });
 
     const view = page.getByRole("button", { name: "View", exact: true });
     assert.equal(await view.count(), 1);
     await view.click();
     await waitForNotificationAction(page, "update-viewed", 1);
     await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Close");
-    screenshots.afterView = await page.screenshot();
+    await settleNotificationPaint(page);
+    screenshots.afterView = await page.screenshot({ animations: "disabled" });
 
     await page.getByRole("button", { name: "Close", exact: true }).click();
     await page.waitForSelector(".codex-ui-app-notification-region", { state: "detached" });
-    screenshots.dismissed = await page.screenshot();
+    await settleNotificationPaint(page);
+    screenshots.dismissed = await page.screenshot({ animations: "disabled" });
 
     for (const [state, image] of Object.entries(screenshots)) {
       await writeFile(join(directory, `notification-${width}-${suffix}-${state}.png`), image);

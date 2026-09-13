@@ -131,6 +131,31 @@ the repository root rather than the playground working directory, so
 `electron .` never opened a BrowserWindow; that harness error is not counted as
 an application failure or successful evidence.
 
+### Live subagent delegation and Stop recovery — 2026-09-13
+
+After `pnpm build:codex-app`, run
+`pnpm --filter @codex-ui-kit/codex-app-playground check:live-subagent-recovery`
+for this explicit, opt-in integration gate. It uses the signed-in public App
+Server through the Electron Live bridge and a disposable read-only workspace;
+it is intentionally excluded from deterministic acceptance because it spends a
+real model turn and depends on account/runtime availability.
+
+The probe submits one Composer turn and observes the real protocol sequence:
+an initial `collabAgentToolCall` with an empty receiver list, followed by the
+same call completing with one receiver thread in `agentsStates`. The live UI
+renders the Agent activity row at 1180px, captures its computed font and
+geometry, and the real Stop button interrupts the owning turn. The probe then
+requires `turn/completed.status === "interrupted"`, visible `Stopped` status,
+and the settled screenshot. The disposable workspace remains write-disabled;
+the child prompt forbids shell, network, and file writes, and the created
+thread is archived after the run. The printed protocol log and screenshots are
+local-only and contain no committed private content.
+
+This closes the sampled playground public-protocol delegation/Stop path. It
+does not claim that every installed Codex build emits the same lifecycle rows,
+that subagent work completed successfully, or that current installed-product
+pixel parity and background-process integration are complete.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:
