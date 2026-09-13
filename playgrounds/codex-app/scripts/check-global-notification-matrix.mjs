@@ -127,10 +127,16 @@ async function waitForNotificationAction(page, action, expectedTotal) {
   );
 }
 
-async function settleNotificationPaint(page) {
+async function settleNotificationPaint(page, { clearPointer = false } = {}) {
   // The action removes one queued toast and moves focus to the next action.
-  // Let that compositor frame settle before capturing the hard 0%-drift gate.
-  await page.waitForTimeout(120);
+  // Let the 300ms transform/opacity transition and its compositor frame settle
+  // before capturing the hard 0%-drift gate. A shorter wait can leave a
+  // fractional rounded-border pixel at a different raster position between
+  // otherwise identical launches.
+  // Moving the pointer off the clicked action also prevents a stale :hover
+  // compositing pass from changing the shadow raster by a single pixel.
+  if (clearPointer) await page.mouse.move(0, 0);
+  await page.waitForTimeout(360);
 }
 
 async function run(width, suffix) {
@@ -147,7 +153,7 @@ async function run(width, suffix) {
     await review.click();
     await waitForNotificationAction(page, "permission-reviewed", 3);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "Open");
-    await settleNotificationPaint(page);
+    await settleNotificationPaint(page, { clearPointer: true });
     screenshots.afterReview = await page.screenshot({ animations: "disabled" });
 
     const open = page.getByRole("button", { name: "Open", exact: true });
@@ -155,7 +161,7 @@ async function run(width, suffix) {
     await open.click();
     await waitForNotificationAction(page, "background-opened", 2);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "View");
-    await settleNotificationPaint(page);
+    await settleNotificationPaint(page, { clearPointer: true });
     screenshots.afterOpen = await page.screenshot({ animations: "disabled" });
 
     const view = page.getByRole("button", { name: "View", exact: true });
@@ -163,7 +169,7 @@ async function run(width, suffix) {
     await view.click();
     await waitForNotificationAction(page, "update-viewed", 1);
     await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Close");
-    await settleNotificationPaint(page);
+    await settleNotificationPaint(page, { clearPointer: true });
     screenshots.afterView = await page.screenshot({ animations: "disabled" });
 
     await page.getByRole("button", { name: "Close", exact: true }).click();
