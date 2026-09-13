@@ -207,6 +207,18 @@ the probe uses a disposable read-only workspace and leaves logs/screenshots in
 its printed temporary directory. This closes the sampled manual compact path,
 not automatic threshold compaction or installed-product pixel parity.
 
+### Live session-scoped file approval — 2026-09-13
+
+The opt-in `check:live-session-approval` probe uses two separate `apply_patch`
+file changes in one real turn and requires the current `Allow all edits` action
+to return `acceptForSession` for each live request. With the pinned CLI 0.153.4
+runtime, a second independent file change still emits a second approval request;
+the probe records that observed boundary instead of claiming session-lifetime
+suppression. Both exact files, the completed turn, and the 1180/720
+no-overflow screenshots are recorded in a disposable read-only workspace.
+Matching-command, network, and installed-product approval parity remain
+separately scoped.
+
 ## Deterministic layers
 
 Every deterministic scenario has one ID and produces four evidence layers:
