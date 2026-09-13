@@ -1423,7 +1423,9 @@ Electron probe now verifies a real model question, rejects a wrong-thread answer
 submits BLUE through the visible form, observes `serverRequest/resolved` and the
 model's completion, then switches to Default and completes a same-thread reply.
 The Composer and host share the same mode state. Wide/720 captures document this
-functional path; current Codex pixel parity and other question variants remain open.
+functional path, and `check:live-input` is now part of the full playground
+acceptance command; current Codex pixel parity and other question variants
+remain open.
 
 The live-history follow-up replaces replay-only Recents and pinned sample tasks
 in Live mode with playground-owned, project-scoped conversation rows. New chat

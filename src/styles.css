@@ -19882,6 +19882,7 @@ button.codex-ui-generated-image-gallery__image {
   }
 
   .codex-ui-notice-action,
+  .codex-ui-app-notification,
   .codex-ui-stream-notice__chevron,
   .codex-ui-stream-notice__toggle {
     transition: none;

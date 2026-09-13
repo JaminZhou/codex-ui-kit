@@ -649,7 +649,7 @@ using the pinned client and CLI 0.153.4. Reviewed captures show the stopped row,
 rejected file/approval, and successful follow-up at 720px. This proves the
 sampled pending-file-approval interruption path, not every running-tool Stop
 variant or current installed-product pixel parity.
-## Pending user-input contract
+## User-input contract
 
 `pnpm --filter @codex-ui-kit/codex-app-playground check:user-input` checks the
 Electron question form with synthetic public-protocol requests: explicit option
@@ -671,8 +671,8 @@ question. Public lifecycle reference:
 
 ### Explicit live Plan/question round trip
 
-`pnpm --filter @codex-ui-kit/codex-app-playground check:live-input` is an opt-in,
-signed-in two-model-turn check, not part of automatic acceptance. It uses a
+`pnpm --filter @codex-ui-kit/codex-app-playground check:live-input` is a
+signed-in two-model-turn check included in automatic acceptance. It uses a
 read-only temporary workspace, selects Plan in the visible UI, requires an actual
 `item/tool/requestUserInput`, rejects a wrong-thread response, answers BLUE through
 the form, and requires server resolution plus successful model completion. It then
