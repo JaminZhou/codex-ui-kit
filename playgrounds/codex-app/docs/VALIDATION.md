@@ -55,12 +55,16 @@ The gate requires the real startup/tools-list/tools-call path, a completed
 `mcpToolCall` item and exact `MCP_TOOL_CALL_OK:pixel-check` result, then opens
 the Activity timeline, integration group, and result card before measuring its
 computed font, width, height, text, and 1180/720px no-overflow screenshots.
+Before the Composer turn it also calls the public `mcpServerStatus/list`
+method with full detail and requires the returned status inventory to contain
+`ui_kit_echo`, its `ui_kit_echo` tool, and the server's auth/runtime status.
 The temporary App Server auth link, protocol log, MCP server log, and images
 stay in the printed disposable directory and are never committed. This
-promotes a credential-free local MCP transport plus signed-in model-driven
-tool-call UI path; production MCP servers, OAuth/permissions, multi-tool
-turns, streaming/error variants, installed-product parity, and final pixel
-baselines remain separate boundaries.
+promotes a credential-free local MCP transport, the public MCP status-list
+mapping, and signed-in model-driven tool-call UI path; production MCP servers,
+OAuth/permissions, multi-tool turns, streaming/error variants,
+installed-product parity, and final pixel baselines remain separate
+boundaries.
 
 ### Live MCP elicitation — 2026-09-14
 

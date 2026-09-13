@@ -1056,9 +1056,12 @@ It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
 deterministic result token, nested Activity/integration/card disclosure, and
 1180/720 computed geometry with no horizontal overflow. This is current
-playground protocol/UI evidence, not production MCP server or OAuth parity;
-multi-tool, streaming/error, permission variants, installed-product pixels,
-and remote transport remain open follow-up boundaries.
+playground protocol/UI evidence, not production MCP server or OAuth parity.
+Before the turn, the same probe reads the public `mcpServerStatus/list` full
+inventory and requires the disposable server, tool map, and auth/runtime status
+to be present. Multi-tool, streaming/error, permission variants,
+installed-product pixels, and remote transport remain open follow-up
+boundaries.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from
