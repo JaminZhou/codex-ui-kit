@@ -71,6 +71,11 @@ The contract is synthetic and does not claim a real Remote environment was
 created: the signed-in App Server transport and remote exec server remain
 unverified until a reachable endpoint is available.
 
+The same route also reads public `environment/info` for a selected ID and
+renders the returned shell/cwd with loading, failure/retry, and compact/wide
+contracts. It is a read-only inspection path; environment editing, persistence,
+and real Remote reachability remain unverified.
+
 ### Live Terminal execution — 2026-09-08
 
 After `pnpm build:codex-app`, run

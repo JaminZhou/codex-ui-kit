@@ -39,9 +39,22 @@ for (const width of [1180, 720]) {
       }
     });
     assert.equal(rejectsUnsafeExecUrlBeforeStartingLiveClient, true);
+    const rejectsUnsafeInfoIdBeforeStartingLiveClient = await page.evaluate(async () => {
+      try {
+        await window.codexDemo.readEnvironmentInfo({
+          projectToken: "startup-workspace",
+          environmentId: "../unsafe",
+        });
+        return false;
+      } catch {
+        return true;
+      }
+    });
+    assert.equal(rejectsUnsafeInfoIdBeforeStartingLiveClient, true);
     await app.evaluate(({ ipcMain, BrowserWindow }, width) => {
       globalThis.__environmentCalls = [];
       globalThis.__environmentAddCalls = [];
+      globalThis.__environmentInfoCalls = [];
       globalThis.__environmentLate = null;
       globalThis.__environmentFail = true;
       ipcMain.removeHandler("demo:environment:status");
@@ -72,6 +85,18 @@ for (const width of [1180, 720]) {
           status: "added",
         };
       });
+      ipcMain.removeHandler("demo:environment:info");
+      ipcMain.handle("demo:environment:info", (_event, input) => {
+        globalThis.__environmentInfoCalls.push(input);
+        if (input?.environmentId === "remote:error" && globalThis.__environmentFail) {
+          throw new Error("synthetic info error");
+        }
+        return {
+          environmentId: input?.environmentId,
+          cwd: "file:///workspace/startup",
+          shell: { name: "zsh", path: "/bin/zsh" },
+        };
+      });
       BrowserWindow.getAllWindows()[0].setContentSize(width, 820);
     }, width);
     const liveLocal = page.getByRole("button", { name: "Live local", exact: true });
@@ -89,12 +114,18 @@ for (const width of [1180, 720]) {
     const input = route.getByRole("textbox", { name: "Environment ID", exact: true });
     const execUrl = route.getByRole("textbox", { name: "Exec server URL", exact: true });
     const add = route.getByRole("button", { name: "Add environment", exact: true });
+    const inspect = route.getByRole("button", { name: "Inspect environment", exact: true });
     const check = route.getByRole("button", { name: "Check environment status", exact: true });
     await input.fill("remote:ready");
     await execUrl.fill("wss://exec.test");
     await add.click();
     const added = route.getByRole("status", { name: "Add environment result", exact: true });
     await added.getByRole("heading", { name: "Environment added", exact: true }).waitFor();
+    await inspect.click();
+    const info = route.getByRole("status", { name: "Environment info result", exact: true });
+    await info.getByRole("heading", { name: "Environment details", exact: true }).waitFor();
+    assert.match(await info.innerText(), /zsh/);
+    assert.match(await info.innerText(), /file:\/\/\/workspace\/startup/);
     assert.match(await added.innerText(), /wss:\/\/exec\.test\//);
 
     await input.fill("remote:late");
@@ -139,11 +170,22 @@ for (const width of [1180, 720]) {
     await addFailure.getByRole("button", { name: "Retry adding environment", exact: true }).click();
     await added.getByRole("heading", { name: "Environment added", exact: true }).waitFor();
 
+    await app.evaluate(() => { globalThis.__environmentFail = true; });
+    await input.fill("remote:error");
+    await inspect.click();
+    const infoFailure = route.getByRole("alert", { name: "Environment info result", exact: true });
+    await infoFailure.getByRole("heading", { name: "Environment details unavailable", exact: true }).waitFor();
+    await app.evaluate(() => { globalThis.__environmentFail = false; });
+    await infoFailure.getByRole("button", { name: "Retry environment details", exact: true }).click();
+    await info.getByRole("heading", { name: "Environment details", exact: true }).waitFor();
+
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     const calls = await app.evaluate(() => globalThis.__environmentCalls);
     assert.ok(calls.every(({ projectToken, environmentId }) => projectToken === "startup-workspace" && typeof environmentId === "string"));
     const addCalls = await app.evaluate(() => globalThis.__environmentAddCalls);
     assert.ok(addCalls.every(({ projectToken, environmentId, execServerUrl }) => projectToken === "startup-workspace" && typeof environmentId === "string" && execServerUrl === "wss://exec.test"));
+    const infoCalls = await app.evaluate(() => globalThis.__environmentInfoCalls);
+    assert.ok(infoCalls.every(({ projectToken, environmentId }) => projectToken === "startup-workspace" && typeof environmentId === "string"));
     await page.screenshot({ path: join(directory, `environment-status-${width}.png`) });
     await page.getByRole("button", { name: "Back to ChatGPT", exact: true }).click();
     assert.equal(await page.locator(".demo-root").getAttribute("data-view"), "conversation");
@@ -151,4 +193,4 @@ for (const width of [1180, 720]) {
     await app.close();
   }
 }
-console.log(JSON.stringify({ passed: true, directory, widths: [1180, 720], syntheticIpc: true, realModelTurns: 0, publicProtocolMethod: "environment/status" }));
+console.log(JSON.stringify({ passed: true, directory, widths: [1180, 720], syntheticIpc: true, realModelTurns: 0, publicProtocolMethods: ["environment/status", "environment/add", "environment/info"] }));
