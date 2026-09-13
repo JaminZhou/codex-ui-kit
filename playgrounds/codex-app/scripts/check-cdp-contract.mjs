@@ -7266,6 +7266,35 @@ for (const scene of selectedScenes) {
         ];
         const closePath =
           "M14.6549 5.57307C14.9283 5.2997 15.3718 5.2997 15.6451 5.57307C15.9185 5.84643 15.9185 6.28993 15.6451 6.5633L11.3903 10.8182L15.6451 15.0731L15.735 15.1834C15.9141 15.4551 15.8842 15.8242 15.6451 16.0633C15.4061 16.3024 15.0369 16.3322 14.7653 16.1531L14.6549 16.0633L10.4 11.8084L6.14515 16.0633C5.87178 16.3367 5.42828 16.3367 5.15492 16.0633C4.88155 15.7899 4.88155 15.3464 5.15492 15.0731L9.4098 10.8182L5.15492 6.5633L5.06507 6.45295C4.88597 6.18128 4.91584 5.81214 5.15492 5.57307C5.39399 5.33399 5.76313 5.30413 6.0348 5.48322L6.14515 5.57307L10.4 9.82795L14.6549 5.57307Z";
+        const notificationTones = contract.notifications.map(
+          ({ alert, text, tone }) => ({
+            backgroundColor: alert?.style.backgroundColor ?? null,
+            color: alert?.style.color ?? null,
+            text: text ?? "",
+            tone,
+          }),
+        );
+        if (
+          JSON.stringify(notificationTones.map(({ tone }) => tone)) !==
+            JSON.stringify(["success", "warning", "info", "neutral"]) ||
+          !notificationTones[1].text.includes("Permission required") ||
+          !notificationTones[1].text.includes("Review") ||
+          !notificationTones[2].text.includes("Background task completed") ||
+          !notificationTones[2].text.includes("Open") ||
+          !notificationTones[3].text.includes("Update available") ||
+          !notificationTones[3].text.includes("View") ||
+          notificationTones.some(
+            ({ backgroundColor, color }) => !backgroundColor || !color,
+          ) ||
+          notificationTones[0].backgroundColor !== "rgb(1, 28, 11)" ||
+          notificationTones[0].color !== "rgb(64, 201, 119)" ||
+          notificationTones[1].backgroundColor !== "rgb(40, 17, 5)" ||
+          notificationTones[1].color !== "rgb(251, 106, 34)"
+        ) {
+          throw new Error(
+            `${scene.id}: notification tone matrix failed: ${JSON.stringify(notificationTones)}`,
+          );
+        }
         if (
           contract.notificationRegion?.position !== "top-center" ||
           contract.notificationRegion.ariaLabel !== "Notifications alt+T" ||
@@ -7388,6 +7417,30 @@ for (const scene of selectedScenes) {
             `${scene.id}: notification queue focus failed: ${JSON.stringify(focus)}`,
           );
         }
+        await page.getByRole("button", { name: "Open", exact: true }).click();
+        await page.waitForFunction(() => {
+          const root = document.querySelector(".demo-root");
+          const region = document.querySelector(
+            ".codex-ui-app-notification-region",
+          );
+          return (
+            root?.getAttribute("data-notification-action") ===
+              "background-opened" &&
+            region?.getAttribute("data-total-count") === "2"
+          );
+        });
+        await page.getByRole("button", { name: "View", exact: true }).click();
+        await page.waitForFunction(() => {
+          const root = document.querySelector(".demo-root");
+          const region = document.querySelector(
+            ".codex-ui-app-notification-region",
+          );
+          return (
+            root?.getAttribute("data-notification-action") === "update-viewed" &&
+            region?.getAttribute("data-total-count") === "1" &&
+            region?.getAttribute("data-hidden-count") === "0"
+          );
+        });
         contract.afterAction = focus;
       }
       if (scene.id === "shell-notification-success-stack") {
