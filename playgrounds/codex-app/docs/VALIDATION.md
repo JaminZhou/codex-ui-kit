@@ -41,6 +41,27 @@ Existing historical reconnect rows may remain in the conversation after the
 turn completes; completion is checked against the protocol and final UI reply,
 not inferred from those historical rows.
 
+### Live MCP tool call — 2026-09-14
+
+Run `pnpm --filter @codex-ui-kit/codex-app-playground check:live-mcp-tool-call`
+after `pnpm build:codex-app` for the signed-in live integration gate. The probe
+starts a disposable stdio MCP server named `ui_kit_echo`, advertises one
+deterministic `ui_kit_echo` tool, and submits one Composer turn through the
+real App Server. It accepts only the MCP-specific
+`mcpServer/elicitation/request` whose approval kind is `mcp_tool_call`; no
+general file, command, network, or delegation approval is granted.
+
+The gate requires the real startup/tools-list/tools-call path, a completed
+`mcpToolCall` item and exact `MCP_TOOL_CALL_OK:pixel-check` result, then opens
+the Activity timeline, integration group, and result card before measuring its
+computed font, width, height, text, and 1180/720px no-overflow screenshots.
+The temporary App Server auth link, protocol log, MCP server log, and images
+stay in the printed disposable directory and are never committed. This
+promotes a credential-free local MCP transport plus signed-in model-driven
+tool-call UI path; production MCP servers, OAuth/permissions, multi-tool
+turns, streaming/error variants, installed-product parity, and final pixel
+baselines remain separate boundaries.
+
 ### Live permissions-request bridge — 2026-09-13
 
 The Live Electron bridge now handles the public
