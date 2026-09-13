@@ -88,7 +88,7 @@
     "update:visual-assets:review": "node scripts/update-current-visual-assets.mjs --review-only --write",
     "update:current-thread-visual-assets": "node scripts/update-current-thread-visual-assets.mjs --write",
     "check:codex-app": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check",
-    "check:codex-app:acceptance": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check:acceptance",
+    "check:codex-app:acceptance": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check:acceptance:full",
     "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
