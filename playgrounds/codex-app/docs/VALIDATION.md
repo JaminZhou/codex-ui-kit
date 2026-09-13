@@ -88,6 +88,13 @@ App Server ↔ exec-server protocol mapping and renderer bridge, not a productio
 Remote registry, Noise relay, or cloud authentication flow; those remain an
 explicit boundary for later acceptance.
 
+The same gate persists the playground-owned endpoint by the host-selected
+project directory. A second 720px Electron process reads that record before
+making its update call, and the visible Forget action removes only the local
+record because the public protocol has no remote-delete method. This is
+playground persistence/update evidence, not cloud registration, remote
+deletion, or production Remote registry parity.
+
 ### Live Terminal execution — 2026-09-08
 
 After `pnpm build:codex-app`, run

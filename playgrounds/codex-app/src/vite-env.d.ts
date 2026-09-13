@@ -58,7 +58,9 @@ interface CodexDemoBridge {
   >;
   listLiveProjects(): Promise<Array<{ label: string; path: string; projectToken?: string }>>;
   readEnvironmentStatus(input: { projectToken: string; environmentId: string }): Promise<import("../electron/live-environment-status").LiveEnvironmentStatusResult>;
+  listEnvironments(input: { projectToken: string }): Promise<ReadonlyArray<{ environmentId: string; execServerUrl: string; updatedAt: number }>>;
   addEnvironment(input: { projectToken: string; environmentId: string; execServerUrl: string }): Promise<import("../electron/live-environment-add").LiveEnvironmentAddResult>;
+  forgetEnvironment(input: { projectToken: string; environmentId: string }): Promise<{ environmentId: string; forgotten: boolean }>;
   readEnvironmentInfo(input: { projectToken: string; environmentId: string }): Promise<import("../electron/live-environment-info").LiveEnvironmentInfoResult>;
   renameLiveThread(input: { projectToken: string; threadId: string; name: string }): Promise<{ threadId: string; title: string }>;
   setLiveThreadArchived(input: { projectToken: string; threadId: string; archived: boolean }): Promise<{ threadId: string; archived: boolean; changedThreadIds: string[] }>;
