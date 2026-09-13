@@ -1017,13 +1017,13 @@ SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
   automatic threshold compaction remains a separate boundary. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
-An opt-in real session-approval probe now exercises two separate file changes
-in one turn and records the current `acceptForSession`/`Allow all edits` response
-for each request at 1180/720px. The pinned CLI 0.153.4 runtime still emits a
-second request for the independent second file change, so this promotes the
-current decision UI and bounded file outcomes without claiming session-lifetime
-suppression. Matching-command, network, and installed-product approval parity
-remain separate boundaries.
+The real session-approval probe now runs in full playground acceptance and
+exercises two separate file changes in one turn, recording the current
+`acceptForSession`/`Allow all edits` response for each request at 1180/720px.
+The pinned CLI 0.153.4 runtime still emits a second request for the independent
+second file change, so this promotes the current decision UI and bounded file
+outcomes without claiming session-lifetime suppression. Matching-command,
+network, and installed-product approval parity remain separate boundaries.
 An opt-in real file-variant probe now verifies separate current-build
 `fileChange` update and delete requests, exact absolute paths/diffs, two
 `Allow once` decisions, final updated/deleted files, and 1180/720 no-overflow

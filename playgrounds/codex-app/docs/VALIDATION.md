@@ -214,15 +214,16 @@ installed-product pixel parity.
 
 ### Live session-scoped file approval — 2026-09-13
 
-The opt-in `check:live-session-approval` probe uses two separate `apply_patch`
-file changes in one real turn and requires the current `Allow all edits` action
+The `check:live-session-approval` probe now runs inside full playground
+acceptance as a signed-in gate. It uses two separate `apply_patch` file changes
+in one real turn and requires the current `Allow all edits` action
 to return `acceptForSession` for each live request. With the pinned CLI 0.153.4
 runtime, a second independent file change still emits a second approval request;
 the probe records that observed boundary instead of claiming session-lifetime
 suppression. Both exact files, the completed turn, and the 1180/720
-no-overflow screenshots are recorded in a disposable read-only workspace.
-Matching-command, network, and installed-product approval parity remain
-separately scoped.
+no-overflow screenshots are recorded in a disposable read-only workspace on
+every complete acceptance pass. Matching-command, network, and installed-
+product approval parity remain separately scoped.
 
 ### Live file-change variants — 2026-09-13
 
