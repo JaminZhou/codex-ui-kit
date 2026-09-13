@@ -999,9 +999,12 @@ separately versioned evidence. The streaming row is now also refreshed on the
 same previous build with one real 1180→720 running resize and natural
 completion: reverse-origin follow, negative compact clipping, exact 16px Stop
 SVG in its 28px control, and Send recovery pass Browser/CDP plus independent
-  wide/compact regional pixels. Command denial is verified on that build as well; file,
-  remaining approval kinds, interruption, compaction, and long-thread
-  convergence remain the next Stage 2 work. The shared
+  wide/compact regional pixels. Command denial is verified on that build as well; file
+  variants, remaining approval kinds, manual compaction, and long-thread
+  convergence remain the next Stage 2 work. An opt-in real live-stop probe now
+  separately verifies a pending file approval, owning-thread Stop, interrupted
+  settlement, resolved approval, no file write, and a same-thread recovery
+  turn at 1180/720px. The shared
 surface-token change affected 28 deterministic lifecycle baselines; each was
 reviewed and refreshed, and all 188 frames still pass their existing thresholds.
 
@@ -1353,6 +1356,12 @@ the child prompt forbids shell/network/file writes, and the created thread is
 archived after capture. This closes the sampled playground delegation/Stop
 slice; it does not promote replay fixtures to installed-product evidence or
 claim successful subagent completion.
+The companion opt-in live-stop follow-up now verifies a real pending
+file-approval request, owning-thread Stop, interrupted turn settlement,
+approval resolution, no file write, and a same-thread recovery turn at
+1180/720px. It uses the pinned public client and a write-disabled disposable
+workspace; protocol logs and screenshots remain local-only. Other approval
+kinds and installed-product visual parity remain open.
 The project-continuity follow-up now verifies A → B → A with three real
 Composer turns, same-thread reuse for A, isolated histories, and wide/compact
 captures. A further one-turn approval probe switches projects while A waits,
