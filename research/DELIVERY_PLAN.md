@@ -616,6 +616,12 @@ exit gates; it does not replace the inventory.
   1180px/720px own-fixture screenshots in Electron. This remains replay-only
   evidence; it does not claim a real PTY/IPC transport drop in the installed
   product.
+  A bounded context-summary replay now populates the Outputs and Sources
+  sections with an artifact, source count, and plugin source. Electron checks
+  section collapse/expand, focus reachability, computed typography, responsive
+  containment, and zero-drift 1180px/720px own-fixture screenshots. This is
+  replay-only evidence and does not claim a populated summary from an
+  installed-product task.
 - The previous `26.730.61309` refresh covered all six left-sidebar groups,
   selected/no-project and New worktree entry, plus sampled command, approval,
   interruption, compaction, summary, and pasted-image surfaces. The sidebar capture locks the
@@ -1649,8 +1655,8 @@ without confusing package readiness with full product reconstruction.
     A separate current-media replay now locks real loaded and unavailable
     images, wide/compact geometry, immersive caption/Close/zoom, focus
     restoration, and five product-region pixel gates. Continue with plugin
-    attachment variants and table/Markdown error variants, populated
-    artifact/source sections, real-product subagent
+    attachment variants and table/Markdown error variants, real-product
+    subagent
     recovery capture, and broader real global notification reachability. The
     bounded terminal transport-failure replay is delivered separately; current
     real transport recovery is delivered

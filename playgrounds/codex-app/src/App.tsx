@@ -977,6 +977,10 @@ function currentWorkspacePersistenceFrame(frame: string | null) {
   );
 }
 
+function currentContextSummaryPopulatedFrame(frame: string | null) {
+  return frame === "context-summary-populated";
+}
+
 function initialSubagentId(frame: string | null) {
   if (frame === "subagent-current-transcript") return "verifier";
   if (frame?.endsWith("transcript-alpha")) return "alpha";
@@ -4174,6 +4178,7 @@ export function App() {
   );
   const [threadSummaryOpen, setThreadSummaryOpen] = useState(
     initialSelection.frame === "context-summary-open" ||
+      currentContextSummaryPopulatedFrame(initialSelection.frame) ||
       currentSubagentSummaryFrame(initialSelection.frame) ||
       currentWorkspacePersistenceFrame(initialSelection.frame),
   );
@@ -4723,6 +4728,9 @@ export function App() {
     mode === "replay" && scenarioId === "compaction";
   const isCurrentContextSummaryReplay =
     mode === "replay" && scenarioId === "context-summary";
+  const isCurrentContextSummaryPopulatedReplay =
+    isCurrentContextSummaryReplay &&
+    currentContextSummaryPopulatedFrame(activeFrame);
   const isCurrentNetworkTransportRecoveryReplay =
     mode === "replay" &&
     scenarioId === "streaming-recovery-current-26-825";
@@ -5426,7 +5434,9 @@ export function App() {
         : null,
     );
     setThreadSummaryOpen(
-      (nextId === "context-summary" && frame === "context-summary-open") ||
+      (nextId === "context-summary" &&
+        (frame === "context-summary-open" ||
+          currentContextSummaryPopulatedFrame(frame))) ||
         (isSubagentScenarioId(nextId) && currentSubagentSummaryFrame(frame)),
     );
     setMcpSourceSummaryOpen(false);
@@ -7716,6 +7726,59 @@ export function App() {
                   </ThreadSummaryPanel>
                 ) : (
                   <ThreadSummaryPanel className="demo-current-context-summary-panel">
+                    {isCurrentContextSummaryPopulatedReplay ? (
+                      <>
+                        <ThreadSummarySection
+                          actions={
+                            <ThreadSummaryIconButton
+                              icon="+"
+                              label="Create a file or site"
+                            />
+                          }
+                          collapsible
+                          title="Outputs"
+                          toggleLabel="Toggle outputs summary"
+                        >
+                          <ThreadSummaryItem
+                            label="README.md"
+                            leading={<CurrentBuildIcon name="review-file-text" />}
+                            meta="Artifact · 2 pages"
+                          />
+                          <ThreadSummaryItem
+                            label="Open artifact preview"
+                            leading={<SummaryGlyph name="link" />}
+                            tone="muted"
+                          />
+                        </ThreadSummarySection>
+                        <ThreadSummarySection
+                          actions={
+                            <ThreadSummaryIconButton
+                              icon="+"
+                              label="Attach files or connect apps"
+                            />
+                          }
+                          collapsible
+                          title="Sources"
+                          toggleLabel="Toggle sources summary"
+                        >
+                          <ThreadSummaryItem
+                            label="OpenAI Developer Docs"
+                            leading={<SummaryGlyph name="globe" />}
+                            meta="3 sources"
+                          />
+                          <ThreadSummaryItem
+                            label="GitHub Triage"
+                            leading={<CurrentBuildIcon name="thread-mcp-tool" />}
+                            meta="Plugin"
+                          />
+                          <ThreadSummaryItem
+                            label="View all"
+                            leading={<SummaryGlyph name="link" />}
+                            tone="muted"
+                          />
+                        </ThreadSummarySection>
+                      </>
+                    ) : null}
                     <ThreadSummarySection
                       actions={
                         <ThreadSummaryIconButton
