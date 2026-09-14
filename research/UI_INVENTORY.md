@@ -328,6 +328,12 @@ expand/restore ownership in the PDF workspace replay.
 The media-generated-content row now has the same controlled image artifact
 route with wide/compact lifecycle gates; generation and decoding remain
 host-owned.
+The automations row now also has a controlled `ScheduledTaskDetail` surface:
+replay-owned create/edit/save, pause/resume, detail facts, run success, and a
+permission-shaped failure/retry state are covered at wide and 720px by
+Browser/CDP, Electron, and pixel gates. Persistence, cloud execution,
+delivery, real permissions, and installed-product mutation remain host-owned;
+this does not promote replay behavior to a real scheduled-task run.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

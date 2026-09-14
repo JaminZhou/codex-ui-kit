@@ -586,6 +586,110 @@ export interface ScheduledTaskEditorProps
   title?: ReactNode;
 }
 
+export type ScheduledTaskDetailStatus = "ready" | "running" | "error";
+
+export interface ScheduledTaskDetailProps
+  extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
+  lastRun?: ReactNode;
+  nextRun?: ReactNode;
+  onClose?: () => void;
+  onEdit?: () => void;
+  onRetry?: () => void;
+  onRun?: () => void;
+  onToggle?: () => void;
+  status?: ScheduledTaskDetailStatus;
+  statusMessage?: ReactNode;
+  task: ScheduledTaskItem;
+  title?: ReactNode;
+}
+
+/**
+ * Controlled detail surface for a scheduled task. The host owns persistence,
+ * execution, and permission effects; this component only renders lifecycle
+ * state and emits intent callbacks.
+ */
+export function ScheduledTaskDetail({
+  className,
+  lastRun = "Never",
+  nextRun,
+  onClose,
+  onEdit,
+  onRetry,
+  onRun,
+  onToggle,
+  status = "ready",
+  statusMessage,
+  task,
+  title = "Scheduled task",
+  ...props
+}: ScheduledTaskDetailProps) {
+  const taskTitle =
+    typeof task.title === "string" ? task.title : task.id;
+  const actionLabel = task.status === "paused" ? "Resume" : "Pause";
+  return (
+    <section
+      aria-label="Scheduled task details"
+      className={["codex-ui-scheduled-task-detail", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+      {...props}
+    >
+      <header className="codex-ui-scheduled-task-detail__header">
+        <div>
+          <span className="codex-ui-scheduled-task-detail__eyebrow">{title}</span>
+          <h2>{taskTitle}</h2>
+        </div>
+        {onClose ? (
+          <button aria-label="Close details" onClick={onClose} type="button">
+            ×
+          </button>
+        ) : null}
+      </header>
+      {status === "running" ? (
+        <p className="codex-ui-scheduled-task-detail__status" role="status">
+          Running scheduled task…
+        </p>
+      ) : status === "error" ? (
+        <div className="codex-ui-scheduled-task-detail__status" role="alert">
+          <strong>Scheduled task failed</strong>
+          <span>{statusMessage ?? "Check the task configuration and try again."}</span>
+          {onRetry ? (
+            <button onClick={onRetry} type="button">
+              Retry
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      <dl className="codex-ui-scheduled-task-detail__facts">
+        <div>
+          <dt>Status</dt>
+          <dd>{task.status}</dd>
+        </div>
+        <div>
+          <dt>Schedule</dt>
+          <dd>{task.schedule ?? "Not scheduled"}</dd>
+        </div>
+        <div>
+          <dt>Next run</dt>
+          <dd>{nextRun ?? task.nextRun ?? "Not scheduled"}</dd>
+        </div>
+        <div>
+          <dt>Last run</dt>
+          <dd>{lastRun}</dd>
+        </div>
+      </dl>
+      <footer className="codex-ui-scheduled-task-detail__actions">
+        <button onClick={onEdit} type="button">Edit</button>
+        <button onClick={onToggle} type="button">{actionLabel}</button>
+        <button disabled={status === "running"} onClick={onRun} type="button">
+          Run now
+        </button>
+      </footer>
+    </section>
+  );
+}
+
 function ScheduledTaskEditorSection({
   fields,
   label,

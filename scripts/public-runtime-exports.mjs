@@ -122,6 +122,7 @@ export const publicRuntimeExports = [
   "ResourceList",
   "RunLocationMenu",
   "ScheduledTaskCreateMenu",
+  "ScheduledTaskDetail",
   "ScheduledTaskEditor",
   "ScheduledTaskFilterTabs",
   "ScheduledTaskNavigator",

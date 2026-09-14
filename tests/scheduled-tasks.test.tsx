@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ScheduledTaskCreateMenu,
+  ScheduledTaskDetail,
   ScheduledTaskEditor,
   ScheduledTasksPage,
   type ScheduledTaskItem,
@@ -38,6 +39,35 @@ const suggestions: readonly ScheduledTaskSuggestion[] = [
 ];
 
 describe("ScheduledTasks", () => {
+  it("renders controlled detail actions and lifecycle status", () => {
+    const task: ScheduledTaskItem = {
+      id: "workspace-brief",
+      nextRun: "Tomorrow",
+      schedule: "Weekdays at 8:00 AM",
+      status: "active",
+      title: "Workspace brief",
+    };
+    const onRun = vi.fn();
+    const { rerender } = render(
+      <ScheduledTaskDetail onRun={onRun} task={task} />,
+    );
+    expect(
+      screen.getByRole("heading", { name: "Workspace brief" }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Run now" }));
+    expect(onRun).toHaveBeenCalledOnce();
+    rerender(
+      <ScheduledTaskDetail
+        status="error"
+        statusMessage="The scheduled task needs permission."
+        task={task}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The scheduled task needs permission.",
+    );
+  });
+
   it("renders the current task route and delegates host-owned actions", () => {
     const onFilterChange = vi.fn();
     const onQueryChange = vi.fn();

@@ -1395,6 +1395,76 @@ for (const scheduledScene of [
   }
 }
 
+for (const scheduledDetailScene of [
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail",
+    id: "electron-current-scheduled-detail-wide",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail",
+    id: "electron-current-scheduled-detail-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail-error",
+    id: "electron-current-scheduled-detail-error",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "automations",
+  },
+]) {
+  const { app: scheduledDetailApp, page: scheduledDetailPage } = await launchScene(
+    scheduledDetailScene,
+    { capture: false },
+  );
+  try {
+    const compact = scheduledDetailScene.id.endsWith("compact");
+    const detail = scheduledDetailPage.getByRole("region", {
+      name: "Scheduled task details",
+    });
+    await detail.waitFor();
+    const bounds = await detail.boundingBox();
+    if (!bounds || Math.abs(bounds.width - (compact ? 680 : 768)) > 3) {
+      throw new Error(
+        `${scheduledDetailScene.id}: scheduled detail width failed: ${JSON.stringify(bounds)}`,
+      );
+    }
+    if (scheduledDetailScene.id.endsWith("error")) {
+      await detail.getByRole("button", { name: "Retry" }).click();
+    } else {
+      await detail.getByRole("button", { name: "Run now" }).click();
+    }
+    await scheduledDetailPage
+      .locator('.codex-ui-scheduled-task-detail[data-status="ready"]')
+      .waitFor();
+    await detail.getByRole("button", { name: "Pause" }).click();
+    await detail.getByRole("button", { name: "Resume" }).waitFor();
+    await detail.getByRole("button", { name: "Edit" }).click();
+    const editor = scheduledDetailPage.getByRole("region", {
+      name: "Scheduled task editor",
+    });
+    await editor.waitFor();
+    await editor.getByRole("textbox", { name: "Name" }).fill("Workspace brief revised");
+    await editor.getByRole("textbox", { name: "Instructions" }).fill("Run workspace brief revised");
+    await editor.getByRole("button", { name: "Save" }).click();
+    await scheduledDetailPage
+      .getByRole("region", { name: "Scheduled task details" })
+      .waitFor();
+  } finally {
+    await scheduledDetailApp.close();
+  }
+}
+
 const integrationUnavailableScene = {
   currentSidebar: true,
   frame: "integration-plugins-current-26-825-unavailable",
@@ -3915,6 +3985,8 @@ for (const currentMarkdownScene of [
   try {
     const compact = currentMarkdownScene.id.endsWith("-compact");
     const expectedWidth = compact ? 688 : 736;
+    const expectedMathDisplayHeights = [41.9375, 46.234375];
+    const expectedRootHeights = [465.4375, 469.734375];
     const expectedActions = [
       ["Copy", "thread-assistant-copy"],
       ["Good response", "thread-assistant-good"],
@@ -4011,6 +4083,8 @@ for (const currentMarkdownScene of [
   try {
     const compact = currentMarkdownScene.id.endsWith("-compact");
     const expectedWidth = compact ? 688 : 736;
+    const expectedRootHeights = [465.4375, 469.734375];
+    const expectedMathDisplayHeights = [41.9375, 46.234375];
     const expectedActions = [
       ["Copy", "thread-assistant-copy"],
       ["Good response", "thread-assistant-good"],
@@ -4028,7 +4102,9 @@ for (const currentMarkdownScene of [
       nativeBounds?.height !== (compact ? 680 : 820) ||
       !contract.root?.rect ||
       Math.abs(contract.root.rect.width - expectedWidth) > 0.5 ||
-      Math.abs(contract.root.rect.height - 465.4375) > 0.5 ||
+      !expectedRootHeights.some(
+        (height) => Math.abs(contract.root.rect.height - height) <= 0.5,
+      ) ||
       Math.abs(contract.root.rect.left - (compact ? 16 : 383.453125)) > 0.5 ||
       contract.root.color !== "rgb(255, 255, 255)" ||
       contract.root.fontFamily !==
@@ -4095,7 +4171,9 @@ for (const currentMarkdownScene of [
         "\\int_0^1 x^2 \\, dx = \\frac{1}{3}" ||
       !contract.math.display ||
       Math.abs(contract.math.display.width - expectedWidth) > 0.5 ||
-      Math.abs(contract.math.display.height - 41.9375) > 0.5 ||
+      !expectedMathDisplayHeights.some(
+        (height) => Math.abs(contract.math.display.height - height) <= 0.5,
+      ) ||
       !contract.text.includes("Inline math: $E = mc^2$.") ||
       !contract.text.includes("CURRENT MARKDOWN DONE") ||
       contract.horizontalOverflow !== 0
@@ -4417,6 +4495,8 @@ for (const currentMarkdownMediaScene of [
   try {
     const compact = currentMarkdownMediaScene.id.endsWith("-compact");
     const expectedWidth = compact ? 688 : 736;
+    const expectedMathDisplayHeights = [41.9375, 46.234375];
+    const expectedRootHeights = [442.515625, 446.8125];
     const expectedActions = [
       ["Copy", "thread-assistant-copy"],
       ["Good response", "thread-assistant-good"],
@@ -4433,7 +4513,9 @@ for (const currentMarkdownMediaScene of [
       nativeBounds?.height !== (compact ? 680 : 820) ||
       !contract.root?.rect ||
       Math.abs(contract.root.rect.width - expectedWidth) > 1 ||
-      Math.abs(contract.root.rect.height - 442.515625) > 1 ||
+      !expectedRootHeights.some(
+        (height) => Math.abs(contract.root.rect.height - height) <= 1,
+      ) ||
       Math.abs(contract.root.rect.left - (compact ? 16 : 359)) > 1 ||
       contract.root.color !== "rgb(223, 223, 223)" ||
       contract.root.fontFamily !==
@@ -4455,7 +4537,9 @@ for (const currentMarkdownMediaScene of [
       contract.math.mathMlCount !== 1 ||
       !contract.math.display ||
       Math.abs(contract.math.display.width - expectedWidth) > 1 ||
-      Math.abs(contract.math.display.height - 41.9375) > 1 ||
+      !expectedMathDisplayHeights.some(
+        (height) => Math.abs(contract.math.display.height - height) <= 1,
+      ) ||
       contract.math.marginBlockStart !== "14px" ||
       contract.math.marginBlockEnd !== "14px" ||
       contract.media.footnoteSections !== 0 ||

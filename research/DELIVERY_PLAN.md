@@ -1906,8 +1906,12 @@ without confusing package readiness with full product reconstruction.
     comparisons. The promoted 26.903.71938 native baseline now has a separate
     four-frame current-build replay (wide/compact index plus manual editor)
     with CDP, Electron, and regional-pixel gates; 26.825 remains historical
-    regression evidence. Real task creation, edit, pause/resume, detail,
-    execution, delivery, and permission/failure transitions remain open. Plugin detail
+    regression evidence. The controlled `ScheduledTaskDetail` follow-up now
+    covers replay-owned create/edit/save, pause/resume, detail facts, run
+    success, and permission-shaped failure/retry at wide and 720px through
+    Browser/CDP, Electron, and pixel gates. Persistence, cloud execution,
+    delivery, real permissions, and installed-product automation mutations
+    remain host-owned and open. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only
