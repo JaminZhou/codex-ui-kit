@@ -27,10 +27,11 @@ exit gates; it does not replace the inventory.
   the wide/compact Project Index, sidebar keyboard/pointer lifecycle, Help
   menu geometry, and the native project-menu boundary. It remains a candidate
   until the affected surface families are re-observed on this build; the
-  promoted global baseline is still `26.903.71938`. A same-recipe recapture on
+  promoted global baseline is still `26.903.71938`. Same-recipe recaptures on
   2026-09-14 reselected the main Renderer after an additional avatar-overlay
   target appeared and recorded the content-dependent Recent chats/scroll-height
-  change instead of freezing the prior row geometry.
+  changes instead of freezing prior row geometry; the latest capture refreshed
+  the candidate identity and kept the scroll-owner assertion invariant.
 - Stage 0 shell refresh is now captured at 26.903: the isolated Renderer was
   selected by URL, area, landmarks, and visible-control density; New chat,
   explicit Hide/Show, Pull requests → New chat restoration, sidebar
