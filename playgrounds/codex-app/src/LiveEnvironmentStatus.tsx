@@ -7,6 +7,7 @@ import type { LiveEnvironmentStatusResult } from "../electron/live-environment-s
 type ReadState = "idle" | "loading" | "error" | "ready";
 type AddState = "idle" | "loading" | "error" | "success";
 type InfoState = "idle" | "loading" | "error" | "success";
+type AddResult = LiveEnvironmentAddResult & { updated: boolean };
 type SavedEnvironment = {
   environmentId: string;
   execServerUrl: string;
@@ -27,13 +28,12 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
   const [result, setResult] = useState<LiveEnvironmentStatusResult | null>(null);
   const [execServerUrl, setExecServerUrl] = useState("");
   const [addState, setAddState] = useState<AddState>("idle");
-  const [addResult, setAddResult] = useState<LiveEnvironmentAddResult | null>(
-    null,
-  );
+  const [addResult, setAddResult] = useState<AddResult | null>(null);
   const [infoState, setInfoState] = useState<InfoState>("idle");
   const [infoResult, setInfoResult] = useState<LiveEnvironmentInfoResult | null>(null);
   const [savedEnvironments, setSavedEnvironments] = useState<readonly SavedEnvironment[]>([]);
   const [forgettingEnvironmentId, setForgettingEnvironmentId] = useState<string | null>(null);
+  const [editingEnvironmentId, setEditingEnvironmentId] = useState<string | null>(null);
   const requestEpoch = useRef(0);
 
   const clear = () => {
@@ -45,6 +45,7 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
     setInfoState("idle");
     setInfoResult(null);
     setForgettingEnvironmentId(null);
+    setEditingEnvironmentId(null);
   };
   const refreshSaved = useCallback(async () => {
     if (!projectToken || !window.codexDemo?.listEnvironments) {
@@ -95,6 +96,7 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
     ) {
       return;
     }
+    const updating = editingEnvironmentId === environmentId.trim();
     setAddState("loading");
     setAddResult(null);
     try {
@@ -103,13 +105,13 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
         environmentId,
         execServerUrl,
       });
-      setAddResult(value);
+      setAddResult({ ...value, updated: updating });
       setAddState("success");
       await refreshSaved();
     } catch {
       setAddState("error");
     }
-  }, [addState, environmentId, execServerUrl, projectToken, refreshSaved]);
+  }, [addState, editingEnvironmentId, environmentId, execServerUrl, projectToken, refreshSaved]);
 
   const forget = useCallback(async (saved: SavedEnvironment) => {
     if (!projectToken || !window.codexDemo?.forgetEnvironment) return;
@@ -182,6 +184,18 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
               </button>
               <code>{saved.execServerUrl}</code>
               <button
+                aria-label={"Edit " + saved.environmentId}
+                onClick={() => {
+                  clear();
+                  setEnvironmentId(saved.environmentId);
+                  setExecServerUrl(saved.execServerUrl);
+                  setEditingEnvironmentId(saved.environmentId);
+                }}
+                type="button"
+              >
+                Edit
+              </button>
+              <button
                 aria-label={`Forget ${saved.environmentId}`}
                 disabled={forgettingEnvironmentId === saved.environmentId}
                 onClick={() => void forget(saved)}
@@ -231,10 +245,18 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
         }
         onClick={() => void add()}
       >
-        Add environment
+        {editingEnvironmentId === environmentId.trim()
+          ? "Update environment"
+          : "Add environment"}
       </Button>
     </div>
-    {addState === "loading" && <p role="status">Adding environment…</p>}
+    {addState === "loading" && (
+      <p role="status">
+        {editingEnvironmentId === environmentId.trim()
+          ? "Updating environment…"
+          : "Adding environment…"}
+      </p>
+    )}
     {addState === "error" && (
       <section
         aria-label="Add environment result"
@@ -242,9 +264,17 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
         data-status="error"
         role="alert"
       >
-        <h2>Environment could not be added</h2>
+        <h2>
+          {editingEnvironmentId === environmentId.trim()
+            ? "Environment could not be updated"
+            : "Environment could not be added"}
+        </h2>
         <p>The endpoint was not accepted. Check the ID and websocket URL, then retry.</p>
-        <Button onClick={() => void add()}>Retry adding environment</Button>
+        <Button onClick={() => void add()}>
+          Retry{" "}
+          {editingEnvironmentId === environmentId.trim() ? "updating" : "adding"}{" "}
+          environment
+        </Button>
       </section>
     )}
     {addResult && (
@@ -254,7 +284,7 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
         data-status="success"
         role="status"
       >
-        <h2>Environment added</h2>
+        <h2>Environment {addResult.updated ? "updated" : "added"}</h2>
         <p>
           <code>{addResult.environmentId}</code> is configured at{" "}
           <code>{addResult.execServerUrl}</code>.
