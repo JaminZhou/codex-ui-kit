@@ -1282,10 +1282,10 @@ reviewed wide/compact baselines are paired with optional local-only current
 product comparisons; their main-region differences range from 3.3067% to
 5.1784%, including host-owned third-party icon differences. The public
 component therefore keeps exact plugin artwork and installation effects
-host-supplied. The catalog now also has explicit wide/720 light-theme
-Browser/CDP, Electron, and regional-pixel coverage; this remains controlled
-read-only evidence and does not promote install, permission, or connection
-side effects.
+host-supplied. The Plugins and Skills catalogs now also have explicit wide/720
+light-theme Browser/CDP, Electron, and regional-pixel coverage; this remains
+controlled read-only evidence and does not promote install, permission, or
+connection side effects.
 
 The follow-up Plugin detail slice adds controlled `PluginDetailPage` and
 `PluginDetailBreadcrumb` primitives for installed/discovery identity,
