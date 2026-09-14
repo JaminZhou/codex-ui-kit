@@ -1465,10 +1465,12 @@ The running-command cancellation follow-up now asks the public App Server to
 execute a real disposable `sleep 30` command, waits for the
 `commandExecution` item to enter `inProgress`, and drives the owning Composer
 Stop control. It requires the same turn to settle as `interrupted` without a
-successful command completion, and captures the running/stopped states at
-1180/720px. This closes the sampled active command interruption lifecycle;
-provider-specific process-group guarantees, broader command-policy variants,
-and installed-product visual parity remain separate boundaries.
+successful command completion, reads the public item's `processId`, and
+requires that process to exit after Stop. It captures the running/stopped
+states at 1180/720px. This closes the sampled local App Server
+process-termination lifecycle; provider-specific external process-group
+behavior, broader command-policy variants, and installed-product visual parity
+remain separate boundaries.
 The companion opt-in command-approval follow-up now verifies one real
 `touch command-approval-proof.txt` request, the Terminal card's `Allow once`
 action, completed command/turn settlement, and wide/compact no-overflow

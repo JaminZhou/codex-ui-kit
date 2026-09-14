@@ -35,6 +35,22 @@ const result = {
   runtimeDependency: clientPackage.dependencies["@openai/codex"],
 };
 
+async function waitForProcessExit(processId) {
+  const pid = Number(processId);
+  assert.ok(Number.isInteger(pid) && pid > 0, "A numeric command processId is required.");
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    try {
+      process.kill(pid, 0);
+    } catch (error) {
+      if (error?.code === "ESRCH") return true;
+      throw error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return false;
+}
+
 try {
   await page.getByRole("button", { name: "Live local", exact: true }).click();
   await page.evaluate(() => {
@@ -106,9 +122,11 @@ try {
   const commandId = started.params.item.id;
   assert.equal(typeof threadId, "string");
   assert.equal(typeof commandId, "string");
+  assert.match(String(started.params.item.processId ?? ""), /^\d+$/);
   assert.match(JSON.stringify(started.params.item.command ?? ""), /sleep/);
   result.startedItem = {
     id: commandId,
+    processId: started.params.item.processId,
     status: started.params.item.status ?? null,
     command: started.params.item.command ?? null,
     cwd: started.params.item.cwd ?? null,
@@ -131,6 +149,8 @@ try {
   const completedTurn = events.findLast((event) => event.method === "turn/completed");
   assert.equal(completedTurn?.params?.threadId, threadId);
   assert.equal(completedTurn?.params?.turn?.status, "interrupted");
+  const processTerminated = await waitForProcessExit(started.params.item.processId);
+  assert.equal(processTerminated, true, "Stop must terminate the active command process.");
   const commandCompletions = events
     .filter(
       (event) =>
@@ -168,6 +188,7 @@ try {
     passed: true,
     interrupted: true,
     commandCompletionCount: commandCompletions.length,
+    processTerminated,
     turnStatus: completedTurn.params.turn.status,
     widths: [1180, 720],
   });
