@@ -1926,7 +1926,10 @@ without confusing package readiness with full product reconstruction.
     success, and permission-shaped failure/retry at wide and 720px through
     Browser/CDP, Electron, and pixel gates. Persistence, cloud execution,
     delivery, real permissions, and installed-product automation mutations
-    remain host-owned and open. Plugin detail
+    remain host-owned and open. The same current-build index now also has
+    explicit wide/720 light-theme Browser/CDP, Electron, and regional-pixel
+    coverage; the light matrix is replay evidence and does not claim cloud
+    persistence or mutation reachability. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only
