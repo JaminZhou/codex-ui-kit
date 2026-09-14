@@ -2402,7 +2402,8 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "workspace-general-settings-light" &&
+        (scene.id === "workspace-general-settings-light" ||
+          scene.id === "workspace-general-settings-light-compact") &&
         (general.theme !== "light" ||
           general.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
           general.visualStyles.navigation?.backgroundColor === "rgb(36, 36, 36)" ||
@@ -3601,7 +3602,9 @@ for (const scene of selectedScenes) {
           },
         };
       });
-      const compact = scene.id === "workspace-appearance-settings-compact";
+      const compact =
+        scene.id === "workspace-appearance-settings-compact" ||
+        scene.id === "workspace-appearance-settings-light-compact";
       const preferences = scene.id.endsWith("-preferences");
       const expectedWidth = compact ? 358.125 : 768;
       const expectedPreviewWidth = compact ? 111.375 : 248;
@@ -3673,7 +3676,8 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "workspace-appearance-settings-light" &&
+        (scene.id === "workspace-appearance-settings-light" ||
+          scene.id === "workspace-appearance-settings-light-compact") &&
         (appearance.themeValue !== "light" ||
           appearance.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
           appearance.visualStyles.navigation?.backgroundColor ===

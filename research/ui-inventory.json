@@ -2004,7 +2004,11 @@
         "general-settings",
         "browser-cdp:current-general-wide-compact-controls-and-route-persistence",
         "electron:current-general-wide-compact-controls-and-route-persistence",
-        "pixel:reviewed-current-general-settings-baselines"
+        "pixel:reviewed-current-general-settings-baselines",
+        "playground:workspace-general-settings-light-wide-compact",
+        "browser-cdp:workspace-general-settings-light-wide-compact",
+        "electron:workspace-general-settings-light-wide-compact",
+        "pixel:workspace-general-settings-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2028,7 +2032,11 @@
         "appearance-settings",
         "browser-cdp:current-appearance-wide-compact-theme-and-preference-controls",
         "electron:current-appearance-wide-compact-theme-and-preference-controls",
-        "pixel:reviewed-current-appearance-settings-baselines"
+        "pixel:reviewed-current-appearance-settings-baselines",
+        "playground:workspace-appearance-settings-light-wide-compact",
+        "browser-cdp:workspace-appearance-settings-light-wide-compact",
+        "electron:workspace-appearance-settings-light-wide-compact",
+        "pixel:workspace-appearance-settings-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

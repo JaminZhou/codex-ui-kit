@@ -1923,8 +1923,12 @@ without confusing package readiness with full product reconstruction.
     Personalization, Keyboard shortcuts, Voice/Dictation, and Usage & billing
     settings now also have explicit wide/720 light-theme Browser/CDP, Electron,
     and regional-pixel coverage; these are controlled replay evidence and do
-    not claim host persistence or billing side effects. Keyboard shortcuts and
-    Voice/Dictation are now separate delivered slices: the first
+    not claim host persistence or billing side effects.
+    General and Appearance now also have explicit wide/720 light-theme
+    Browser/CDP, Electron, and regional-pixel coverage; this remains controlled
+    replay evidence and does not claim host preference persistence.
+    Keyboard shortcuts and Voice/Dictation are now separate delivered slices:
+    the first
     gates all 129 visible commands, filtering, edit/capture, sticky scrolling,
     and the current narrow-column behavior; the second gates microphone and
     nine-voice selection, screen context, hotkeys, dictionary, recordings,
