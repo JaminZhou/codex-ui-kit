@@ -1061,9 +1061,11 @@ Before the turn, the same probe reads the public `mcpServerStatus/list` full
 inventory and requires the disposable server, tool map, and auth/runtime status
 to be present. A multi-tool mode now runs against the same real server, requires
 two completed tool items with exact deterministic results, and checks both
-visible cards at 1180/720 without overflow. Streaming/error, permission
-variants, installed-product pixels, and remote transport remain open follow-up
-boundaries.
+visible cards at 1180/720 without overflow. A retry mode returns one real MCP
+tool error, requires the same tool to be called again, and verifies failed-then-
+completed item states plus the exact recovery token. Permission variants,
+streaming beyond this bounded retry, installed-product pixels, and remote
+transport remain open follow-up boundaries.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from

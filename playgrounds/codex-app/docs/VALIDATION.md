@@ -88,8 +88,10 @@ MCP elicitation and tool-call path; URL-mode elicitation, authentication,
 permission variants, streaming/error behavior, production servers, and
 installed-product pixels remain separate boundaries. Full acceptance also runs
 a two-tool mode against the same real server, requiring both ordered tool items,
-exact result tokens, and two visible 1180/720 tool cards without overflow. A
-fourth full-acceptance
+exact result tokens, and two visible 1180/720 tool cards without overflow. It
+also runs a retry mode where the first real MCP result is an error and the
+same tool is called again, requiring failed-then-completed item states and the
+exact recovery token. A fourth full-acceptance
 run switches the same disposable server to URL mode, verifies the exact
 authorization link and `_blank` target, proves no browser opens implicitly, and
 cancels without visiting the external URL. OAuth provider behavior and
