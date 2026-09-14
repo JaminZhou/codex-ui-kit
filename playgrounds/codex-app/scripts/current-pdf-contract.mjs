@@ -8,10 +8,20 @@ export async function readCurrentPdfContract(page) {
     };
     const header = panel.querySelector("header");
     const viewport = panel.querySelector(".codex-ui-pdf-preview__viewport");
+    const workspace = panel.closest(".codex-ui-workspace-panel");
     return {
       panel: rect(panel), header: rect(header), viewport: rect(viewport),
       headerStyle: { display: getComputedStyle(header).display, fontSize: getComputedStyle(header).fontSize, fontWeight: getComputedStyle(header).fontWeight },
       composition: { panelPosition: getComputedStyle(panel).position, containment: getComputedStyle(panel.closest(".codex-ui-workspace-panel")).contain, isolation: getComputedStyle(panel.closest(".codex-ui-workspace-panel")).isolation },
+      workspaceShell: {
+        label: workspace?.getAttribute("aria-label"),
+        placement: workspace?.getAttribute("data-placement"),
+        selectedTabs: workspace?.querySelectorAll('[role="tab"][aria-selected="true"]').length ?? 0,
+        selectedTabLabel: workspace?.querySelector('[role="tab"][aria-selected="true"]')?.textContent?.trim(),
+        tabPanels: workspace?.querySelectorAll('[role="tabpanel"]').length ?? 0,
+        closeTabLabels: [...(workspace?.querySelectorAll('[aria-label^="Close "]') ?? [])].map((element) => element.getAttribute("aria-label")),
+        expandLabels: [...(workspace?.querySelectorAll('[aria-label="Enter full screen"], [aria-label="Exit full screen"]') ?? [])].map((element) => element.getAttribute("aria-label")),
+      },
       zoom: Number(panel.dataset.zoom), page: Number(panel.dataset.page), pageCount: Number(panel.dataset.pageCount),
       canvases: [...panel.querySelectorAll("canvas")].map(rect),
       painted: panel.querySelectorAll('[data-painted="true"]').length,
@@ -43,6 +53,15 @@ export async function assertCurrentPdfContract(page, scene) {
   assert.ok(Math.abs(state.panel.width - (expanded ? 1180 : compact ? 344.671875 : 590.828125)) < 1, JSON.stringify(state));
   assert.deepEqual(state.headerStyle, { display: "grid", fontSize: "13px", fontWeight: "430" });
   assert.deepEqual(state.composition, { panelPosition: "relative", containment: "layout paint", isolation: "isolate" });
+  assert.deepEqual(state.workspaceShell, {
+    label: "PDF workspace",
+    placement: "side",
+    selectedTabs: 1,
+    selectedTabLabel: "design-spec.pdf",
+    tabPanels: 1,
+    closeTabLabels: ["Close design-spec.pdf"],
+    expandLabels: [expanded ? "Exit full screen" : "Enter full screen"],
+  });
   assert.equal(state.zoom, scene.frame.endsWith("-zoom-150") ? 150 : expanded ? 190 : compact ? 50 : 91);
   assert.equal(state.annotating, scene.frame.endsWith("-annotating"));
   assert.match(state.text, /Design specification/);

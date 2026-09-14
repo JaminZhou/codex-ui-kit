@@ -315,7 +315,9 @@ gates; `workspace.artifact-shell` retains the right-workspace runtime
 reachability boundary. `workspace.document-previews` remains the broader
 notebook/DOCX/spreadsheet/presentation family: its controlled wide/compact
 replay matrix now has Browser/CDP, Electron, and pixel gates, while installed-
-product runtime decoding is still not sampled.
+product runtime decoding is still not sampled. The adjacent artifact shell is
+also gated for side placement, selected tab, tab-panel semantics, close and
+expand/restore ownership in the PDF workspace replay.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

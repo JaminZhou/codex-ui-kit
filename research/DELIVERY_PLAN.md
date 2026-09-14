@@ -1400,7 +1400,10 @@ annotation mode, one document scroller, expansion, and compact hide/reopen.
 Fourteen recorded Renderer states are scoped to a new
 `workspace.pdf-preview` inventory row; its current Browser/Electron and
 owned-panel pixel gates are verified independently. `workspace.artifact-shell`
-retains only the host-owned right-workspace reachability boundary, while the
+now also has an explicit controlled Browser/CDP and Electron contract for the
+side-placed tab shell: selected tab, tab panel, close affordance, expand/restore
+affordance, and compact reopen ownership. It retains only the host-owned
+right-workspace reachability boundary, while the
 `workspace.document-previews` row now has a controlled format matrix for
 notebook, DOCX, spreadsheet, and presentation formats. The implementation now
 has a dedicated
