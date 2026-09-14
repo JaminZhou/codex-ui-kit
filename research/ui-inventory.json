@@ -1872,14 +1872,15 @@
         "PopcornElectronPresentationPanel",
         "document-preview-panel",
         "playground:workspace-document-preview-ready-loading-error",
-        "browser-cdp:workspace-document-preview-three-lifecycle-frames",
-        "electron:workspace-document-preview-three-lifecycle-frames",
-        "pixel:workspace-document-preview-three-reviewed-baselines"
+        "playground:workspace-document-preview-format-matrix",
+        "browser-cdp:workspace-document-preview-format-matrix",
+        "electron:workspace-document-preview-format-matrix",
+        "pixel:workspace-document-preview-format-matrix"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {

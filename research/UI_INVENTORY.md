@@ -313,8 +313,9 @@ page 1. The evidence is now split explicitly: `workspace.pdf-preview` is the
 current-build PDF slice with Browser/CDP, Electron, and owned-panel pixel
 gates; `workspace.artifact-shell` retains the right-workspace runtime
 reachability boundary. `workspace.document-previews` remains the broader
-notebook/DOCX/spreadsheet/presentation family and is not promoted by the PDF
-sample.
+notebook/DOCX/spreadsheet/presentation family: its controlled wide/compact
+replay matrix now has Browser/CDP, Electron, and pixel gates, while installed-
+product runtime decoding is still not sampled.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

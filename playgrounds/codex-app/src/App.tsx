@@ -803,15 +803,34 @@ function documentPreviewStatusForFrame(
   return "ready";
 }
 
+function isDocumentPreviewFrame(frame: string | null): boolean {
+  return Boolean(
+    frame &&
+      (frame.startsWith("workspace-document-preview") ||
+        frame.startsWith("workspace-notebook-preview") ||
+        frame.startsWith("workspace-spreadsheet-preview") ||
+        frame.startsWith("workspace-presentation-preview") ||
+        frame.startsWith("workspace-doc-preview")),
+  );
+}
+
 function documentPreviewKindForFrame(
   frame: string | null,
 ): DocumentPreviewKind {
-  if (frame?.includes("document-preview")) return "pdf";
-  if (frame?.includes("notebook")) return "notebook";
-  if (frame?.includes("spreadsheet")) return "spreadsheet";
-  if (frame?.includes("presentation")) return "presentation";
-  if (frame?.includes("document")) return "document";
+  if (frame?.startsWith("workspace-notebook-preview")) return "notebook";
+  if (frame?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
+  if (frame?.startsWith("workspace-presentation-preview")) return "presentation";
+  if (frame?.startsWith("workspace-doc-preview")) return "document";
+  if (frame?.startsWith("workspace-document-preview")) return "pdf";
   return "pdf";
+}
+
+function documentPreviewTitleForFrame(frame: string | null): string {
+  if (frame?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
+  if (frame?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
+  if (frame?.startsWith("workspace-presentation-preview")) return "roadmap.pptx";
+  if (frame?.startsWith("workspace-doc-preview")) return "meeting-notes.docx";
+  return "design-spec.pdf";
 }
 
 function isNarrowDemoWindow() {
@@ -3741,7 +3760,7 @@ export function App() {
           initialSelection.frame?.startsWith("workspace-keyboard-shortcuts")
         ? "keyboard-shortcuts-settings"
       : initialSelection.view === "workspace" &&
-          initialSelection.frame?.startsWith("workspace-document-preview")
+          isDocumentPreviewFrame(initialSelection.frame)
         ? "document-preview"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith(
@@ -9165,7 +9184,7 @@ export function App() {
           ? initialSelection.frame
           : "workspace-appearance-settings"
       : workspacePage === "document-preview"
-        ? activeFrame?.startsWith("workspace-document-preview")
+        ? isDocumentPreviewFrame(activeFrame)
           ? activeFrame
           : "workspace-document-preview-ready"
       : workspacePage === "git-settings"
@@ -11448,7 +11467,7 @@ export function App() {
         }}
         status={documentPreviewStatus}
         subtitle="2 pages · 18 KB · workspace artifact"
-        title="design-spec.pdf"
+        title={documentPreviewTitleForFrame(activeFrame)}
         toolbar={
           <span aria-live="polite" className="demo-document-preview-action">
             {documentPreviewAction}
