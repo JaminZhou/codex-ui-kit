@@ -9,8 +9,8 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi", "retry", "timeout", "approval-denied", "remote", "oauth"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, remote, or oauth.",
+  ["single", "multi", "retry", "timeout", "approval-denied", "cancel", "remote", "oauth"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, cancel, remote, or oauth.",
 );
 const toolDefinitions = [
   {
@@ -234,6 +234,9 @@ for await (const line of input) {
     if (${JSON.stringify(mode === "timeout")}) {
       await new Promise((resolve) => setTimeout(resolve, 2_500));
     }
+    if (${JSON.stringify(mode === "cancel")}) {
+      await new Promise((resolve) => setTimeout(resolve, 30_000));
+    }
     const shouldFail = ${JSON.stringify(mode === "retry")} && callCount === 1;
     if (shouldFail) {
       reply(message.id, {
@@ -396,21 +399,44 @@ try {
         ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the tool returns MCP_TOOL_CALL_RETRYABLE_ERROR, retry the same tool exactly once with the same argument. Do not use shell, files, network, browser, search, or any other tool. After the retry succeeds, reply exactly MCP_TOOL_CALL_OK:pixel-check.'
       : mode === "timeout"
           ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". The MCP server intentionally exceeds its one-second tool timeout. Do not retry. After the timeout failure, reply exactly MCP_TOOL_CALL_TIMEOUT. Do not use shell, files, network, browser, search, or any other tool.'
-        : mode === "approval-denied"
+      : mode === "approval-denied"
           ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the MCP approval request is denied, do not retry. After the denial failure, reply exactly MCP_TOOL_CALL_APPROVAL_DENIED. Do not use shell, files, network, browser, search, or any other tool.'
+        : mode === "cancel"
+          ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". The tool call will be cancelled by the user while it is running. Do not retry or use shell, files, network, browser, search, or any other tool.'
         : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
   );
   await composer.press("Enter");
-  await page.waitForFunction(
-    (expectedCount) =>
-      (window.__liveMcpEvidence ?? []).filter(
-        (event) =>
-          event.method === "item/completed" &&
-          event.params?.item?.type === "mcpToolCall",
-    ).length >= expectedCount,
-    expectedCallCount,
-    { timeout: 180_000 },
-  );
+  if (mode === "cancel") {
+    await page.waitForFunction(
+      () =>
+        (window.__liveMcpEvidence ?? []).some(
+          (event) =>
+            event.method === "item/started" &&
+            event.params?.item?.type === "mcpToolCall",
+        ),
+      undefined,
+      { timeout: 180_000 },
+    );
+    const stop = page.getByRole("button", { name: "Stop", exact: true });
+    await stop.waitFor({ state: "visible", timeout: 30_000 });
+    await stop.click();
+    await page.waitForFunction(
+      () => (window.__liveMcpEvidence ?? []).some((event) => event.method === "turn/completed"),
+      undefined,
+      { timeout: 60_000 },
+    );
+  } else {
+    await page.waitForFunction(
+      (expectedCount) =>
+        (window.__liveMcpEvidence ?? []).filter(
+          (event) =>
+            event.method === "item/completed" &&
+            event.params?.item?.type === "mcpToolCall",
+        ).length >= expectedCount,
+      expectedCallCount,
+      { timeout: 180_000 },
+    );
+  }
 
   const events = await page.evaluate(() => window.__liveMcpEvidence);
   evidence.push(...events);
@@ -421,11 +447,23 @@ try {
         event.params?.item?.type === "mcpToolCall",
     )
     .map((event) => ({ item: event.params.item, threadId: event.params.threadId }));
-  assert.equal(
-    completedItems.length,
-    expectedCallCount,
-    `Expected exactly ${expectedCallCount} completed MCP tool-call items.`,
-  );
+  const startedItems = events
+    .filter(
+      (event) =>
+        event.method === "item/started" &&
+        event.params?.item?.type === "mcpToolCall",
+    )
+    .map((event) => ({ item: event.params.item, threadId: event.params.threadId }));
+  if (mode === "cancel") {
+    assert.equal(completedItems.length, 0, "An interrupted MCP call must not fabricate a completion item.");
+    assert.equal(startedItems.length, 1, "The cancelled MCP call must have one started item.");
+  } else {
+    assert.equal(
+      completedItems.length,
+      expectedCallCount,
+      `Expected exactly ${expectedCallCount} completed MCP tool-call items.`,
+    );
+  }
   const expectedResults = {
     ui_kit_echo: "MCP_TOOL_CALL_OK:pixel-check",
     ui_kit_upper: "MCP_TOOL_CALL_UPPER:PIXEL-CHECK",
@@ -480,6 +518,23 @@ try {
       serverToolCalls: serverToolCalls.length,
       status: deniedCall.item.status,
     };
+  } else if (mode === "cancel") {
+    const [cancelledCall] = startedItems;
+    assert.equal(cancelledCall.item.tool, "ui_kit_echo");
+    assert.equal(cancelledCall.item.status, "inProgress");
+    assert.equal(cancelledCall.item.server, "ui_kit_echo");
+    const serverLog = await readFile(serverLogPath, "utf8");
+    assert.ok(serverLog.includes('"method":"tools/call"'));
+    assert.ok(!serverLog.includes("MCP_TOOL_CALL_OK"));
+    const completedTurn = events.find((event) => event.method === "turn/completed");
+    assert.equal(completedTurn?.params?.turn?.status, "interrupted");
+    result.cancellation = {
+      itemCompleted: false,
+      itemStatus: cancelledCall.item.status,
+      serverReceivedCall: true,
+      serverResponded: false,
+      turnStatus: completedTurn.params.turn.status,
+    };
   } else if (mode === "remote" || mode === "oauth") {
     assert.ok(remoteMethods.includes("initialize"), "Remote MCP must receive initialize.");
     assert.ok(remoteMethods.includes("tools/list"), "Remote MCP must receive tools/list.");
@@ -505,28 +560,40 @@ try {
       );
     }
   }
-  const lastCompleted = completedItems.at(-1);
-  threadId = lastCompleted.threadId;
+  const displayedItems = mode === "cancel" ? [] : completedItems;
+  const lastEvidence = (completedItems.at(-1) ?? startedItems.at(-1));
+  threadId = lastEvidence.threadId;
   result.completedItems = completedItems.map(({ item }) => ({
     id: item.id,
     result: item.result,
     status: item.status,
     tool: item.tool,
   }));
-  const item = lastCompleted.item;
+  if (mode === "cancel") {
+    result.startedItems = startedItems.map(({ item }) => ({
+      id: item.id,
+      status: item.status,
+      tool: item.tool,
+    }));
+  }
+  const item = lastEvidence.item;
 
-  await page.getByText(/Worked for/).first().waitFor({ state: "visible", timeout: 60_000 });
-  await page.getByText(/Worked for/).first().click();
-  await page
-    .getByText(
-      mode === "timeout" || mode === "approval-denied"
-        ? "ui_kit_echo integration failed"
-        : "Used ui_kit_echo integration",
-      { exact: true },
-    )
-    .click();
+  if (mode === "cancel") {
+    await page.waitForSelector('.demo-root[data-status="interrupted"]', { state: "attached", timeout: 30_000 });
+  } else {
+    await page.getByText(/Worked for/).first().waitFor({ state: "visible", timeout: 60_000 });
+    await page.getByText(/Worked for/).first().click();
+    await page
+      .getByText(
+        mode === "timeout" || mode === "approval-denied"
+          ? "ui_kit_echo integration failed"
+          : "Used ui_kit_echo integration",
+        { exact: true },
+      )
+      .click();
+  }
   const cards = [];
-  for (const { item: completedItem } of completedItems) {
+  for (const { item: completedItem } of displayedItems) {
     const card = page.locator(`[data-item-id="${completedItem.id}"]`);
     await page.waitForTimeout(250);
     await card.waitFor({ state: "attached", timeout: 15_000 });
@@ -580,10 +647,13 @@ try {
   );
   result.compactScreenshot = join(directory, "mcp-tool-call-compact.png");
   const compactCard = page.locator(`[data-item-id="${item.id}"]`);
-  result.compactCard = await compactCard.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    return { height: rect.height, width: rect.width };
-  });
+  result.compactCard =
+    mode === "cancel"
+      ? null
+      : await compactCard.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          return { height: rect.height, width: rect.width };
+        });
   await page.screenshot({ path: result.compactScreenshot });
   result.passed = true;
 } catch (error) {
