@@ -379,6 +379,9 @@ transitions must add or split IDs.
   shell/search, Git/review-delivery, and Appearance slices are now
   current-build verified.
 - MCP, plugin detail/install, skill execution, and real automation mutations.
+  Settings Connections now has a controlled device/SSH directory and
+  Add/Edit/Forget/Test lifecycle with wide/720/error/form evidence; account
+  pairing, SSH credentials, and Remote registry/relay writes stay host-owned.
 
 ### P2: confirm scope before implementing
 

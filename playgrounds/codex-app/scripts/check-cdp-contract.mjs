@@ -5834,6 +5834,9 @@ for (const scene of selectedScenes) {
             label: tab.textContent?.trim() ?? null,
           }),
         );
+        const remoteConnections = document.querySelector(
+          ".codex-ui-remote-connections",
+        );
         const style = (element) => {
           if (!element) return null;
           const computed = getComputedStyle(element);
@@ -5987,6 +5990,20 @@ for (const scene of selectedScenes) {
                 page: rect(environmentEditor),
                 status: environmentEditor.getAttribute("data-status"),
                 tabs: environmentEditorTabs,
+              }
+            : null,
+          remoteConnections: remoteConnections
+            ? {
+                form: Boolean(
+                  remoteConnections.querySelector(
+                    ".codex-ui-remote-connections__form",
+                  ),
+                ),
+                rows: remoteConnections.querySelectorAll(
+                  ".codex-ui-remote-connections__row",
+                ).length,
+                status: remoteConnections.getAttribute("data-status"),
+                title: remoteConnections.querySelector("h1")?.textContent?.trim(),
               }
             : null,
           environment: environmentMenu
@@ -6190,6 +6207,39 @@ for (const scene of selectedScenes) {
         await page.getByRole("button", { name: "Add action" }).click();
         await page.getByRole("button", { name: "Save" }).click();
         await page.waitForSelector('.codex-ui-environment-editor[data-status="saved"]');
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify({ ...contract, afterSave: true }, null, 2)}\n`,
+        );
+        continue;
+      }
+      if (scene.frame.startsWith("workspace-connections-settings")) {
+        const connections = contract.remoteConnections;
+        const expectedStatus = scene.frame.endsWith("-error") ? "error" : "ready";
+        if (
+          contract.view !== "workspace" ||
+          contract.frame !== scene.frame ||
+          contract.horizontalOverflow > 1 ||
+          !connections ||
+          connections.title !== "Connections" ||
+          connections.status !== expectedStatus ||
+          (!scene.frame.endsWith("-form") && connections.rows < 1)
+        ) {
+          throw new Error(
+            `${scene.id}: remote connections contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        if (scene.frame.endsWith("-error")) {
+          await page.getByRole("button", { name: "Retry" }).click();
+        }
+        if (!scene.frame.endsWith("-form")) {
+          await page.getByRole("button", { name: "Add connection" }).click();
+        }
+        await page.getByRole("form", { name: "Connection editor" }).waitFor();
+        await page.getByRole("button", { name: "Save connection" }).click();
+        await page.waitForSelector(
+          ".codex-ui-remote-connections__list",
+        );
         await writeFile(
           join(artifactDirectory, `${scene.id}.json`),
           `${JSON.stringify({ ...contract, afterSave: true }, null, 2)}\n`,

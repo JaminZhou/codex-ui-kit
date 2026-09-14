@@ -119,6 +119,7 @@ export const publicRuntimeExports = [
   "PullRequestReviewThread",
   "PullRequestStatusBadge",
   "QueuedPromptList",
+  "RemoteConnectionsPage",
   "ResourceCard",
   "ResourceList",
   "RunLocationMenu",
