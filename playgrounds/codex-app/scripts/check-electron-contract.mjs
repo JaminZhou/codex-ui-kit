@@ -1544,6 +1544,35 @@ for (const environmentEditorScene of visualScenes.filter((candidate) =>
   }
 }
 
+for (const remoteConnectionsScene of visualScenes.filter((candidate) =>
+  candidate.id.startsWith("workspace-connections-settings"),
+)) {
+  const { app: remoteConnectionsApp, page: remoteConnectionsPage } =
+    await launchScene(remoteConnectionsScene, { capture: false });
+  try {
+    const connections = remoteConnectionsPage.getByRole("region", {
+      name: "Connections",
+    });
+    await connections.waitFor();
+    if (remoteConnectionsScene.id.endsWith("error")) {
+      await connections.getByRole("button", { name: "Retry" }).click();
+    }
+    if (!remoteConnectionsScene.id.endsWith("form")) {
+      await connections.getByRole("button", { name: "Add connection" }).click();
+    }
+    const form = remoteConnectionsPage.getByRole("form", {
+      name: "Connection editor",
+    });
+    await form.waitFor();
+    await form.getByRole("textbox", { name: "Connection name" }).fill("Review host");
+    await form.getByRole("button", { name: "Save connection" }).click();
+    await connections.getByText("Review host", { exact: true }).waitFor();
+    await connections.getByRole("button", { name: "Test" }).last().click();
+  } finally {
+    await remoteConnectionsApp.close();
+  }
+}
+
 const sidebarStatusScene = {
   currentSidebar: true,
   frame: "sidebar-current",

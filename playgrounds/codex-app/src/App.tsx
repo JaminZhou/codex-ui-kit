@@ -86,6 +86,9 @@ import {
   PullRequestPanelSummary,
   PullRequestQueryState,
   PullRequestReviewComposer,
+  RemoteConnectionsPage,
+  type RemoteConnection,
+  type RemoteConnectionFormValue,
   QueuedPromptList,
   ProjectIndex,
   SearchActivity,
@@ -3817,6 +3820,7 @@ export function App() {
   const [workspacePage, setWorkspacePage] = useState<
     | "appearance-settings"
     | "code-review-settings"
+    | "connections-settings"
     | "conversation"
     | "document-preview"
     | "environments"
@@ -3849,6 +3853,9 @@ export function App() {
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-code-review-settings")
         ? "code-review-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-connections-settings")
+        ? "connections-settings"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-general-settings")
         ? "general-settings"
@@ -3905,10 +3912,46 @@ export function App() {
           ? "worktrees"
         : initialSelection.frame?.startsWith("workspace-code-review-settings")
           ? "code-review"
+        : initialSelection.frame?.startsWith("workspace-connections-settings")
+          ? "connections"
         : "git",
   );
   const [settingsRouteFocusPending, setSettingsRouteFocusPending] =
     useState(false);
+  const [remoteConnections, setRemoteConnections] = useState<RemoteConnection[]>([
+    {
+      detail: "This Mac",
+      id: "this-device",
+      kind: "device",
+      label: "This device",
+      status: "connected",
+    },
+    {
+      detail: "build-host.example.com",
+      id: "build-host",
+      kind: "ssh",
+      label: "Build host",
+      status: "disconnected",
+    },
+  ]);
+  const [remoteConnectionsStatus, setRemoteConnectionsStatus] = useState<
+    "error" | "loading" | "ready"
+  >(
+    initialSelection.frame?.endsWith("-error")
+      ? "error"
+      : initialSelection.frame?.endsWith("-loading")
+        ? "loading"
+        : "ready",
+  );
+  const [remoteConnectionsAction, setRemoteConnectionsAction] = useState("");
+  const [remoteConnectionFormOpen, setRemoteConnectionFormOpen] = useState(
+    initialSelection.frame?.endsWith("-form") ?? false,
+  );
+  const [remoteConnectionForm, setRemoteConnectionForm] = useState<RemoteConnectionFormValue>({
+    detail: "",
+    kind: "ssh",
+    label: "",
+  });
   const settingsBackButtonRef = useRef<HTMLButtonElement>(null);
   const [gitSettings, setGitSettings] = useState<GitSettingsValue>({
     alwaysForcePush: false,
@@ -9282,6 +9325,10 @@ export function App() {
         ? activeFrame?.startsWith("workspace-code-review-settings")
           ? activeFrame
           : "workspace-code-review-settings"
+      : workspacePage === "connections-settings"
+        ? activeFrame?.startsWith("workspace-connections-settings")
+          ? activeFrame
+          : "workspace-connections-settings"
       : workspacePage === "appearance-settings"
         ? initialSelection.frame?.startsWith("workspace-appearance-settings")
           ? initialSelection.frame
@@ -11084,6 +11131,7 @@ export function App() {
         if (
           itemId !== "appearance" &&
           itemId !== "general" &&
+          itemId !== "connections" &&
           itemId !== "git" &&
           itemId !== "hooks" &&
           itemId !== "keyboard-shortcuts" &&
@@ -11111,6 +11159,8 @@ export function App() {
             ? "appearance-settings"
             : itemId === "general"
               ? "general-settings"
+              : itemId === "connections"
+                ? "connections-settings"
               : itemId === "personalization"
                 ? "personalization-settings"
               : itemId === "keyboard-shortcuts"
@@ -11132,6 +11182,8 @@ export function App() {
             ? "workspace-appearance-settings"
             : itemId === "general"
               ? "workspace-general-settings"
+              : itemId === "connections"
+                ? "workspace-connections-settings"
               : itemId === "personalization"
                 ? "workspace-personalization-settings"
               : itemId === "keyboard-shortcuts"
@@ -11154,7 +11206,81 @@ export function App() {
       sections={settingsNavigation}
       selectedId={selectedSettingsId}
     >
-      {workspacePage === "mcp-settings" ? (
+      {workspacePage === "connections-settings" ? (
+        <>
+          <RemoteConnectionsPage
+            connections={remoteConnections}
+            formOpen={remoteConnectionFormOpen}
+            formValue={remoteConnectionForm}
+            onAdd={() => {
+              setRemoteConnectionFormOpen(true);
+              setRemoteConnectionsAction("");
+              setActiveFrame("workspace-connections-settings-form");
+            }}
+            onCancelForm={() => {
+              setRemoteConnectionFormOpen(false);
+              setRemoteConnectionsAction("Form cancelled");
+              setActiveFrame("workspace-connections-settings");
+            }}
+            onChangeForm={setRemoteConnectionForm}
+            onEdit={(connection) => {
+              setRemoteConnectionFormOpen(true);
+              setRemoteConnectionForm({
+                detail: connection.detail,
+                kind: connection.kind,
+                label: connection.label,
+              });
+              setRemoteConnectionsAction(`Editing ${connection.label}`);
+              setActiveFrame("workspace-connections-settings-form");
+            }}
+            onForget={(connection) => {
+              setRemoteConnections((current) =>
+                current.filter((candidate) => candidate.id !== connection.id),
+              );
+              setRemoteConnectionsAction(`Forgot ${connection.label}`);
+            }}
+            onRetry={() => {
+              setRemoteConnectionsStatus("ready");
+              setRemoteConnectionsAction("Connections reloaded");
+            }}
+            onSave={() => {
+              const id = remoteConnectionForm.label.trim().toLowerCase().replace(/\s+/g, "-") || "connection";
+              setRemoteConnections((current) => [
+                ...current.filter((connection) => connection.id !== id),
+                {
+                  detail: remoteConnectionForm.detail || "Host pending",
+                  id,
+                  kind: remoteConnectionForm.kind,
+                  label: remoteConnectionForm.label || "New connection",
+                  status: "connected",
+                },
+              ]);
+              setRemoteConnectionFormOpen(false);
+              setRemoteConnectionsAction("Connection saved");
+              setActiveFrame("workspace-connections-settings");
+            }}
+            onTest={(connection) => {
+              setRemoteConnections((current) =>
+                current.map((candidate) =>
+                  candidate.id === connection.id
+                    ? { ...candidate, status: "connected" }
+                    : candidate,
+                ),
+              );
+              setRemoteConnectionsAction(`Connection test passed for ${connection.label}`);
+            }}
+            status={remoteConnectionsStatus}
+            statusMessage={
+              remoteConnectionsStatus === "error"
+                ? "Connection service unavailable"
+                : remoteConnectionsAction || undefined
+            }
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {remoteConnectionsAction}
+          </span>
+        </>
+      ) : workspacePage === "mcp-settings" ? (
         <>
           <McpServersPage
             activeCategory="mcps"
@@ -11679,6 +11805,7 @@ export function App() {
       : workspacePage === "git-settings" ||
           workspacePage === "hooks-settings" ||
           workspacePage === "code-review-settings" ||
+          workspacePage === "connections-settings" ||
           workspacePage === "appearance-settings" ||
           workspacePage === "general-settings" ||
           workspacePage === "keyboard-shortcuts-settings" ||
@@ -11696,6 +11823,7 @@ export function App() {
   const workspaceShowsSettings =
     workspacePage === "appearance-settings" ||
     workspacePage === "code-review-settings" ||
+    workspacePage === "connections-settings" ||
     workspacePage === "general-settings" ||
     workspacePage === "keyboard-shortcuts-settings" ||
     workspacePage === "mcp-settings" ||

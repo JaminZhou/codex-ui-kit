@@ -2302,15 +2302,21 @@
       "ownership": "app",
       "packageEvidence": [
         "remote-connections-page",
-        "remote-connections-settings"
+        "remote-connections-settings",
+        "component:RemoteConnectionsPage",
+        "playground:workspace-connections-settings-wide-compact-error-form",
+        "browser-cdp:workspace-connections-settings-wide-compact-error-form",
+        "electron:workspace-connections-settings-wide-compact-error-form",
+        "pixel:workspace-connections-settings-wide-compact-error-form"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:connections-device-ssh-and-connection-controls"
+        "cdp:connections-device-ssh-and-connection-controls",
+        "cdp:workspace-connections-settings-add-save-test-retry"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p2"
     },
     {

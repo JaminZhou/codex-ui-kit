@@ -25,6 +25,7 @@ export * from "./components/Dialog.js";
 export * from "./components/DocumentPreviewPanel.js";
 export * from "./components/PdfPreviewPanel.js";
 export * from "./components/EnvironmentSurfaces.js";
+export * from "./components/RemoteConnections.js";
 export * from "./components/LoginPage.js";
 export * from "./components/FileChange.js";
 export * from "./components/InteractivePrimitives.js";
