@@ -774,7 +774,8 @@ exit gates; it does not replace the inventory.
   Environment menu, and current non-radio Branches menu. This promotes the
   sampled `conversation.context-controls`, `conversation.project-picker`, and
   `composer.project-worktree-selection` paths while keeping populated
-  environment creation/editing, Remote, and branch-mutation failures open.
+  environment repair variants, production Remote, and branch-mutation
+  failures open.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build. The sampled unavailable-tool recovery is now current verified;
@@ -1109,7 +1110,7 @@ No environment, starting branch, the current Branches search/roles, Escape
 focus return, exact overlay geometry/style, and the 720px boundary pass
 Browser/CDP, Electron, and seven reviewed/product-region pixel gates.
 This same evidence also promotes `app.new-thread-workspace-selection`; its
-remaining gaps are populated environment editing, Remote providers, and
+remaining gaps are production Remote providers, repair variants, and
 branch-operation failure/recovery rather than the sampled entry composition.
 Populated environments, Remote, and branch-operation failures remain Stage 3
 work rather than blockers for this sampled Stage 2 context path.
@@ -1139,7 +1140,7 @@ independent host capability rather than the current New worktree entry path.
 The `26.825.51511` refresh supersedes its context-menu visuals and semantics:
 the current project picker, `Work in`, New local worktree, Environment, and
 Branches lifecycle now passes same-build wide/compact CDP, Electron, and
-product-region gates. Continue with populated environment creation/editing,
+product-region gates. Continue with populated environment repair variants,
 Remote connections, and real branch-operation failure/recovery.
 The previous `26.818.41509` Projects Index follow-up delivers the primary
 ready/expanded/sort/empty/compact route at both 1180×820 and explicitly
@@ -1151,8 +1152,8 @@ The previous follow-up adds the five-action `Work in` menu, treats Codex web as
 an external anchor rather than a synthetic execution environment, covers the
 New-worktree no-environment menu, and implements the sampled 768px unavailable
 Environments route. Browser/CDP, Electron, and three local-only product gates
-pass without creating an environment. Populated environment creation/editing,
-repair variants, and real Remote connection lifecycles remain in this phase.
+pass without creating an environment. Populated environment repair variants
+and real Remote connection lifecycles remain in this phase.
 The `26.818.41509` follow-up supersedes the worktree entry vocabulary with
 `New local worktree`, disabled `Cloud`, generic accessible context labels, and
 a 264×91.125 Environment menu containing only `Work without environment` and
@@ -1160,13 +1161,13 @@ a 264×91.125 Environment menu containing only `Work without environment` and
 controlled failure, Retry, and restored states. Browser/CDP, Electron, and
 three sampled-product tail comparisons now gate that entry/repair
 lifecycle. Projects-route loading/error/partial-error, populated environment
-editing, and Remote connections remain independent work.
+repair variants, and Remote connections remain independent work.
 The previous `26.820.60940` continuation repeats the controlled failure with a
 regular-file `.git/worktrees` blocker scoped to one disposable repository.
 It observes the exact branch/error/unread three-track row, removes the blocker,
 uses the real `Retry` control, and verifies root plus one child worktree before
 exact cleanup. The current failure tail passes at 0%; ordinary sidebar error,
-collection loading, populated environment editing, repair variants, and Remote
+collection loading, populated environment repair variants, and Remote
 connections remain independent work.
 
 Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
@@ -1610,20 +1611,21 @@ until a reachable exec server and current-product pixels are captured.
 The next read-only `environment/info` slice now exposes the public shell/cwd
 details for the same selected ID, with malformed responses rejected at the
 host boundary and loading/failure/retry UI contracts at wide and compact
-sizes. It does not claim environment editing, persistence, or a reachable
-Remote exec server. A follow-up local protocol gate now drives the same route
+sizes. A follow-up local protocol gate now drives the same route
 through a real `CodexAppServerClient` and an isolated loopback WebSocket that
 implements the public exec-server handshake: both 1180/720 Electron windows
 complete `environment/add`, `environment/info`, and `environment/status`, and
 render the returned shell/cwd and Ready state without a model turn. This
 promotes the public App Server-to-exec-server mapping, not production Remote
-registry/Noise-relay reachability; production cloud registration and remote
-environment editing remain open. The same real gate now persists the
-credential-free endpoint by
-host-owned project directory across a second Electron process, supports an
-explicit re-add/update, and exposes a local-only Forget action. Because the
+registry/Noise-relay reachability. The same real gate now persists the
+credential-free endpoint by host-owned project directory across a second
+Electron process. It drives an explicit Edit → Update flow that re-registers
+the same opaque ID against a second loopback endpoint, then verifies
+`environment/info` and `environment/status` through that updated connection at
+both 1180px and 720px. The UI exposes a local-only Forget action. Because the
 public protocol has no remote-delete method, this does not claim cloud
-registration, remote deletion, or production Remote registry parity.
+registration, remote deletion, Noise relay, authentication, or production
+Remote registry parity.
 
 ### 6. Perform global visual convergence
 
@@ -1774,8 +1776,8 @@ without confusing package readiness with full product reconstruction.
    wide/compact project picker, five-action run-location menu, four-control New
    local worktree state, two-action Environment menu, and non-radio Branches
    menu through CDP, Electron, reviewed baselines, and local-only product
-   regions. Continue with populated environment creation/editing, repair
-   variants, branch-operation failures, and real Remote connection lifecycles.
+   regions. Continue with populated environment repair variants,
+   branch-operation failures, and real Remote connection lifecycles.
 7. **Review content variants — delivered for the sampled current card,
    workspace, and Undo/Reapply family**: `26.820.60940` now covers a real
    added/modified/deleted `+4 −4` group, marker-backed two-file rename,

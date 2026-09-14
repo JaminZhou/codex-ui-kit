@@ -13,56 +13,68 @@ const scene = visualScenes.find(({ id }) => id === "workspace-environments-unava
 assert.ok(scene, "environment route scene is present");
 
 const remoteEnvironmentId = "ui-kit-local-remote";
-const remoteCwd = "file:///tmp/ui-kit-local-remote";
-const remoteInfo = {
-  cwd: remoteCwd,
-  shell: { name: "zsh", path: "/bin/zsh" },
-};
-const methods = [];
-const server = new WebSocketServer({ host: "127.0.0.1", port: 0 });
-server.on("connection", (socket) => {
-  socket.on("message", (raw) => {
-    let message;
-    try {
-      message = JSON.parse(raw.toString());
-    } catch {
-      socket.close();
-      return;
-    }
-    methods.push(message.method);
-    if (message.method === "initialize") {
+const createRemoteServer = async (label) => {
+  const methods = [];
+  const remoteInfo = {
+    cwd: `file:///tmp/ui-kit-local-remote-${label}`,
+    shell: { name: "zsh", path: "/bin/zsh" },
+  };
+  const server = new WebSocketServer({ host: "127.0.0.1", port: 0 });
+  server.on("connection", (socket) => {
+    socket.on("message", (raw) => {
+      let message;
+      try {
+        message = JSON.parse(raw.toString());
+      } catch {
+        socket.close();
+        return;
+      }
+      methods.push(message.method);
+      if (message.method === "initialize") {
+        socket.send(
+          JSON.stringify({
+            id: message.id,
+            result: {
+              environmentInfo: remoteInfo,
+              sessionId: `ui-kit-local-remote-${label}-session`,
+            },
+          }),
+        );
+        return;
+      }
+      if (message.method === "initialized") return;
+      if (message.method === "environment/info") {
+        socket.send(JSON.stringify({ id: message.id, result: remoteInfo }));
+        return;
+      }
+      if (message.method === "environment/status") {
+        socket.send(JSON.stringify({ id: message.id, result: { status: "ready" } }));
+        return;
+      }
       socket.send(
         JSON.stringify({
-          id: message.id,
-          result: {
-            environmentInfo: remoteInfo,
-            sessionId: "ui-kit-local-remote-session",
-          },
+          error: { code: -32601, message: `Unsupported exec-server method: ${message.method}` },
+          id: message.id ?? -1,
         }),
       );
-      return;
-    }
-    if (message.method === "initialized") return;
-    if (message.method === "environment/info") {
-      socket.send(JSON.stringify({ id: message.id, result: remoteInfo }));
-      return;
-    }
-    if (message.method === "environment/status") {
-      socket.send(JSON.stringify({ id: message.id, result: { status: "ready" } }));
-      return;
-    }
-    socket.send(
-      JSON.stringify({
-        error: { code: -32601, message: `Unsupported exec-server method: ${message.method}` },
-        id: message.id ?? -1,
-      }),
-    );
+    });
   });
-});
-await new Promise((resolve) => server.once("listening", resolve));
-const address = server.address();
-assert.ok(address && typeof address === "object", "loopback exec server is listening");
-const execServerUrl = `ws://127.0.0.1:${address.port}`;
+  await new Promise((resolve) => server.once("listening", resolve));
+  const address = server.address();
+  assert.ok(address && typeof address === "object", `${label} loopback exec server is listening`);
+  return {
+    methods,
+    remoteInfo,
+    server,
+    url: `ws://127.0.0.1:${address.port}`,
+  };
+};
+
+const initialServer = await createRemoteServer("initial");
+const updatedServer = await createRemoteServer("updated");
+const initialExecServerUrl = initialServer.url;
+const updatedExecServerUrl = updatedServer.url;
+const updatedExecServerValue = `${updatedExecServerUrl}/`;
 
 const appServerHome = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-codex-home-"));
 const registryDirectory = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-registry-"));
@@ -95,28 +107,49 @@ try {
       const saved = route.getByRole("region", { name: "Saved environments", exact: true });
       if (width === 720) {
         await saved.getByRole("button", { name: `Use ${remoteEnvironmentId}`, exact: true }).waitFor();
-        assert.match(await saved.innerText(), new RegExp(remoteEnvironmentId));
+        assert.match(await saved.innerText(), new RegExp(updatedExecServerUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
       }
 
       const input = route.getByRole("textbox", { name: "Environment ID", exact: true });
       const execUrl = route.getByRole("textbox", { name: "Exec server URL", exact: true });
-      const add = route.getByRole("button", { name: "Add environment", exact: true });
       const inspect = route.getByRole("button", { name: "Inspect environment", exact: true });
       const check = route.getByRole("button", { name: "Check environment status", exact: true });
-      await input.fill(remoteEnvironmentId);
-      await execUrl.fill(execServerUrl);
-      await add.click();
-      const added = route.getByRole("status", { name: "Add environment result", exact: true });
-      await added.getByRole("heading", { name: "Environment added", exact: true }).waitFor();
-      assert.match(await added.innerText(), new RegExp(execServerUrl.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")));
-      await saved.getByRole("button", { name: `Use ${remoteEnvironmentId}`, exact: true }).waitFor();
-      assert.match(await saved.innerText(), new RegExp(remoteEnvironmentId));
+      if (width === 1180) {
+        const add = route.getByRole("button", { name: "Add environment", exact: true });
+        await input.fill(remoteEnvironmentId);
+        await execUrl.fill(initialExecServerUrl);
+        await add.click();
+        const added = route.getByRole("status", { name: "Add environment result", exact: true });
+        await added.getByRole("heading", { name: "Environment added", exact: true }).waitFor();
+        assert.match(await added.innerText(), new RegExp(initialExecServerUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+        await saved.getByRole("button", { name: `Use ${remoteEnvironmentId}`, exact: true }).waitFor();
+        assert.match(await saved.innerText(), new RegExp(remoteEnvironmentId));
+        await saved.getByRole("button", { name: `Edit ${remoteEnvironmentId}`, exact: true }).click();
+        const update = route.getByRole("button", { name: "Update environment", exact: true });
+        await update.waitFor();
+        await execUrl.fill(updatedExecServerUrl);
+        await update.click();
+        const updated = route.getByRole("status", { name: "Add environment result", exact: true });
+        await updated.getByRole("heading", { name: "Environment updated", exact: true }).waitFor();
+        assert.match(await updated.innerText(), new RegExp(updatedExecServerUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+        assert.match(await saved.innerText(), new RegExp(updatedExecServerUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+      } else {
+        await saved.getByRole("button", { name: `Edit ${remoteEnvironmentId}`, exact: true }).click();
+        const update = route.getByRole("button", { name: "Update environment", exact: true });
+        await update.waitFor();
+        assert.equal(await input.inputValue(), remoteEnvironmentId);
+        assert.equal(await execUrl.inputValue(), updatedExecServerValue);
+        await update.click();
+        const updated = route.getByRole("status", { name: "Add environment result", exact: true });
+        await updated.getByRole("heading", { name: "Environment updated", exact: true }).waitFor();
+        assert.match(await updated.innerText(), new RegExp(updatedExecServerUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+      }
 
       await inspect.click();
       const info = route.getByRole("status", { name: "Environment info result", exact: true });
       await info.getByRole("heading", { name: "Environment details", exact: true }).waitFor();
       assert.match(await info.innerText(), /zsh/);
-      assert.match(await info.innerText(), /file:\/\/\/tmp\/ui-kit-local-remote/);
+      assert.match(await info.innerText(), /file:\/\/\/tmp\/ui-kit-local-remote-updated/);
 
       await check.click();
       const status = route.getByRole("status", { name: "Environment status result", exact: true });
@@ -133,21 +166,30 @@ try {
       await app.close();
     }
   }
-  assert.ok(methods.includes("initialize"));
-  assert.ok(methods.includes("environment/info"));
+  assert.ok(initialServer.methods.includes("initialize"));
+  assert.ok(updatedServer.methods.includes("initialize"));
+  assert.ok(updatedServer.methods.includes("environment/info"));
+  assert.ok(updatedServer.methods.includes("environment/status"));
   console.log(JSON.stringify({
     passed: true,
     directory,
-    execServerUrl,
+    initialExecServerUrl,
+    updatedExecServerUrl,
     widths: [1180, 720],
-    methods,
+    methods: {
+      initial: initialServer.methods,
+      updated: updatedServer.methods,
+    },
     results,
     realAppServer: true,
     modelTurns: 0,
     productionRemoteRegistry: false,
   }));
 } finally {
-  await new Promise((resolve) => server.close(resolve));
+  await Promise.all([
+    new Promise((resolve) => initialServer.server.close(resolve)),
+    new Promise((resolve) => updatedServer.server.close(resolve)),
+  ]);
   await rm(appServerHome, { recursive: true, force: true });
   await rm(registryDirectory, { recursive: true, force: true });
 }

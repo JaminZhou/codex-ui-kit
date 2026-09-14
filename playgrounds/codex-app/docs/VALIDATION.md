@@ -154,8 +154,9 @@ unverified until a reachable endpoint is available.
 
 The same route also reads public `environment/info` for a selected ID and
 renders the returned shell/cwd with loading, failure/retry, and compact/wide
-contracts. It is a read-only inspection path; environment editing, persistence,
-and real Remote reachability remain unverified.
+contracts. The renderer now exposes an explicit Edit → Update path for a
+saved environment; the real loopback gate below verifies that the update keeps
+the opaque ID while replacing its exec-server endpoint.
 
 ### Live local exec-server environment bridge — 2026-09-14
 
@@ -169,12 +170,15 @@ App Server ↔ exec-server protocol mapping and renderer bridge, not a productio
 Remote registry, Noise relay, or cloud authentication flow; those remain an
 explicit boundary for later acceptance.
 
-The same gate persists the playground-owned endpoint by the host-selected
-project directory. A second 720px Electron process reads that record before
-making its update call, and the visible Forget action removes only the local
-record because the public protocol has no remote-delete method. This is
-playground persistence/update evidence, not cloud registration, remote
-deletion, or production Remote registry parity.
+The same gate first registers an initial loopback endpoint at 1180px, uses
+Edit → Update to re-register the same opaque ID against a second loopback
+endpoint, and verifies `environment/info` plus `environment/status` through
+the updated connection. A second 720px Electron process reads the persisted
+updated endpoint before reconnecting through the same update path; the visible
+Forget action removes only the local record because the public protocol has no
+remote-delete method. This is playground persistence/update evidence, not
+cloud registration, remote deletion, Noise relay, authentication, or
+production Remote registry parity.
 
 ### Live Terminal execution — 2026-09-08
 
