@@ -1319,10 +1319,11 @@ shortcuts, and host-supplied Copy/Fork/Open-in submenus without performing any
 thread mutation. The product uses a native macOS menu, so the acceptance stack
 combines exact CDP trigger/computed-style evidence, Browser/Electron keyboard
 and focus contracts, reviewed wide/720 baselines, and an unmasked tight-menu
-comparison under a dedicated 9.5% native-vs-Renderer budget. Submenu contents,
-real effects, disabled variants, Light appearance, and keyboard-only native
-opening remain open; `thread.overflow-actions` is therefore `partial` rather
-than complete.
+comparison under a dedicated 9.5% native-vs-Renderer budget. The trigger and
+menu now also have explicit wide/720 light-theme Browser/CDP, Electron, and
+regional-pixel coverage. Submenu contents, real effects, disabled variants,
+and keyboard-only native opening remain open; `thread.overflow-actions` is
+therefore still `partial` rather than complete.
 
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and

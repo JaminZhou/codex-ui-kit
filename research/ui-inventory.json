@@ -831,7 +831,11 @@
         "replay:current-26.825-controlled-thread-overflow-menu-host-owned-submenus-and-effects",
         "browser-cdp:current-26.825-wide-compact-menu-geometry-accessible-root-keyboard-focus-and-submenu-escape",
         "electron:current-26.825-native-window-wide-compact-menu-geometry-and-keyboard-lifecycle",
-        "pixel:current-26.825-wide-compact-native-menu-tight-crop-under-9.5-percent"
+        "pixel:current-26.825-wide-compact-native-menu-tight-crop-under-9.5-percent",
+        "playground:thread-overflow-current-26-825-light-wide-compact",
+        "browser-cdp:thread-overflow-current-26-825-light-wide-compact",
+        "electron:thread-overflow-current-26-825-light-wide-compact",
+        "pixel:thread-overflow-current-26-825-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
