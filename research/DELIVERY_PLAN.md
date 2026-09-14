@@ -1074,6 +1074,11 @@ action records the 1180/720 form geometry and compact no-overflow contract.
 This promotes the sampled local form-to-tool decision lifecycle, not URL-mode
 elicitation, authentication, permission variants, multi-turn/multi-tool
 behavior, production server reachability, or installed-product pixel parity.
+The same live acceptance now adds a URL-mode request with an exact
+authorization link, `_blank` target, no implicit browser navigation, and safe
+Cancel response. This proves the public URL-mode forwarding boundary only;
+OAuth provider behavior, credential exchange, and external-page rendering stay
+host-owned.
 
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,
