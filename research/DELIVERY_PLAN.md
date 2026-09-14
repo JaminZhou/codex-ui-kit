@@ -1626,6 +1626,10 @@ both 1180px and 720px. The UI exposes a local-only Forget action. Because the
 public protocol has no remote-delete method, this does not claim cloud
 registration, remote deletion, Noise relay, authentication, or production
 Remote registry parity.
+The same gate also injects one malformed `environment/info` response at 1180px
+and requires the visible details Retry action to recover on the next public
+call before the 720px reload. This closes one deterministic environment repair
+variant while leaving production outage/recovery semantics unclaimed.
 
 ### 6. Perform global visual convergence
 
