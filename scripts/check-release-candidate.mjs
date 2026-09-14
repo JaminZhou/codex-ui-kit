@@ -25,6 +25,23 @@ assert(
   JSON.stringify(runtimeExports) === JSON.stringify(publicRuntimeExports),
   `public runtime exports changed: expected ${JSON.stringify(publicRuntimeExports)}, received ${JSON.stringify(runtimeExports)}`,
 );
+const componentReference = await readFile(
+  new URL("docs/COMPONENTS.md", root),
+  "utf8",
+);
+const undocumentedExports = publicRuntimeExports.filter(
+  (name) => !componentReference.includes(`\`${name}\``),
+);
+assert(
+  undocumentedExports.length === 0,
+  `public runtime exports missing from docs/COMPONENTS.md: ${undocumentedExports.join(", ")}`,
+);
+const releaseNotes = await readFile(new URL("docs/RELEASE_NOTES.md", root), "utf8");
+assert(
+  releaseNotes.includes("# Release notes") &&
+    releaseNotes.includes("private: true"),
+  "release notes must document the unpublished private-candidate boundary",
+);
 
 const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
 const tarDestination = await mkdtemp(join(tmpdir(), "codex-ui-kit-release-") );
@@ -95,6 +112,7 @@ try {
       tarballBytes: tarball.byteLength,
       sha256,
       runtimeExportCount: runtimeExports.length,
+      documentedExportCount: runtimeExports.length - undocumentedExports.length,
       provenance: "dist-only public package; no playground, research, or host runtime files",
     }),
   );
