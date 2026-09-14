@@ -20289,6 +20289,8 @@ try {
 const currentMcpSettingsElectronSceneIds = [
   "workspace-mcp-settings-current-26-825",
   "workspace-mcp-settings-current-26-825-compact",
+  "workspace-mcp-settings-current-26-825-light",
+  "workspace-mcp-settings-current-26-825-light-compact",
   "workspace-mcp-settings-current-26-825-http-create-compact",
   "workspace-mcp-settings-current-26-825-detail",
 ];

@@ -851,6 +851,23 @@ export const visualScenes = [
     windowSize: { height: 680, width: 720 },
   },
   {
+    frame: "workspace-mcp-settings-current-26-825",
+    id: "workspace-mcp-settings-current-26-825-light",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-mcp-settings-current-26-825",
+    id: "workspace-mcp-settings-current-26-825-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-mcp-settings-current-26-825-stdio-create",
     id: "workspace-mcp-settings-current-26-825-stdio-create",
     maxPixelRatio: 0.01,
