@@ -1324,8 +1324,11 @@ isolated `26.825.51511` Renderer supplies the current five-tab counts, 4+2 row
 grouping, 52/42.5625px rows, wide/720 geometry, and create/update field
 contracts. Six CDP frames, four native Electron representatives, six reviewed
 baselines, and six local-only product main-region comparisons pass under a 4%
-limit. This delivers one read-only end-to-end `integrations.mcp` slice while
-keeping real save/toggle/uninstall, OAuth/permission, and failure effects open;
+limit. The same list/compact replay now has explicit light-theme
+Browser/CDP, Electron, and regional-pixel coverage; this remains controlled
+UI evidence rather than a claim about provider state. This delivers one
+read-only end-to-end `integrations.mcp` slice while keeping real
+save/toggle/uninstall, OAuth/permission, and failure effects open;
 Stage 4 therefore remains in progress.
 
 The Sites index slice adds a controlled `SitesIndexPage` for the older

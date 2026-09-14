@@ -2192,7 +2192,11 @@
       "packageEvidence": [
         "mcp-settings",
         "mcp-capability-view-page",
-        "component:McpServersPage-McpServerEditor-PluginManagerTabs-IntegrationAddMenu"
+        "component:McpServersPage-McpServerEditor-PluginManagerTabs-IntegrationAddMenu",
+        "playground:workspace-mcp-settings-current-26-825-light-wide-compact",
+        "browser-cdp:workspace-mcp-settings-current-26-825-light-wide-compact",
+        "electron:workspace-mcp-settings-current-26-825-light-wide-compact",
+        "pixel:workspace-mcp-settings-current-26-825-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
