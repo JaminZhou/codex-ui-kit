@@ -954,7 +954,9 @@ for (const scene of selectedScenes) {
           viewport: { height: window.innerHeight, width: window.innerWidth },
         };
       });
-      const compact = scene.id === "workspace-git-settings-compact";
+      const compact =
+        scene.id === "workspace-git-settings-compact" ||
+        scene.id === "workspace-git-settings-light-compact";
       if (
         settings.horizontalOverflow > 1 ||
         settings.navigationCount !== 1 ||
@@ -985,7 +987,8 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "workspace-git-settings-light" &&
+        (scene.id === "workspace-git-settings-light" ||
+          scene.id === "workspace-git-settings-light-compact") &&
         (settings.theme !== "light" ||
           settings.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
           settings.visualStyles.navigation?.backgroundColor ===
@@ -3030,7 +3033,8 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "workspace-worktree-settings-light" &&
+        (scene.id === "workspace-worktree-settings-light" ||
+          scene.id === "workspace-worktree-settings-light-compact") &&
         (worktrees.theme !== "light" ||
           worktrees.visualStyles.shell?.color !== "rgb(26, 28, 31)" ||
           worktrees.visualStyles.preferences?.backgroundColor === "rgb(35, 35, 35)" ||
@@ -3197,7 +3201,9 @@ for (const scene of selectedScenes) {
           viewport: { height: innerHeight, width: innerWidth },
         };
       });
-      const compact = scene.id === "workspace-hooks-settings-compact";
+      const compact =
+        scene.id === "workspace-hooks-settings-compact" ||
+        scene.id === "workspace-hooks-settings-light-compact";
       const configured = scene.id === "workspace-hooks-settings-configured";
       const loading = scene.id === "workspace-hooks-settings-loading";
       const error = scene.id === "workspace-hooks-settings-error";
@@ -3220,7 +3226,8 @@ for (const scene of selectedScenes) {
         hooks.subtitle !==
           "Manage lifecycle hooks from config and enabled plugins. Learn more" ||
         !hooks.iconNames.includes("settings-hooks") ||
-        (scene.id === "workspace-hooks-settings-light" &&
+        ((scene.id === "workspace-hooks-settings-light" ||
+          scene.id === "workspace-hooks-settings-light-compact") &&
           hooks.theme !== "light") ||
         (configured &&
           (hooks.entryCount !== 3 ||

@@ -3840,7 +3840,12 @@ export function App() {
         isEnvironmentEditorReplay)
       ? "environments"
       : initialSelection.view === "workspace" &&
-          ["workspace-git-settings", "workspace-git-settings-compact"].includes(
+          [
+            "workspace-git-settings",
+            "workspace-git-settings-compact",
+            "workspace-git-settings-light",
+            "workspace-git-settings-light-compact",
+          ].includes(
             initialSelection.frame ?? "",
           )
         ? "git-settings"
@@ -9338,7 +9343,10 @@ export function App() {
           ? activeFrame
           : "workspace-document-preview-ready"
       : workspacePage === "git-settings"
-        ? initialSelection.frame === "workspace-git-settings-compact"
+        ? [
+            "workspace-git-settings-compact",
+            "workspace-git-settings-light-compact",
+          ].includes(initialSelection.frame ?? "")
           ? "workspace-git-settings-compact"
           : "workspace-git-settings"
       : projectIndexChat

@@ -1268,6 +1268,9 @@ the optional credits preference. Eight reviewed frames extend the matrix to
 188. The untracked full-frame current Hooks comparisons pass without masks at
 1.7651% wide and 1.8064% at 720px. The exact runtime reload SVG raised the
 asset manifest to 78 icons; the later completed-thread slice raises it to 90.
+Git preferences, Worktrees, and Hooks now also have explicit wide/720
+light-theme Browser/CDP, Electron, and regional-pixel coverage; these are
+controlled replay evidence and do not claim host persistence or hook mutation.
 Remaining P1 families keep their existing open
 gates, so Stage 4 is still in progress.
 

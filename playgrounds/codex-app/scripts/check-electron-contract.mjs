@@ -19253,6 +19253,21 @@ for (const settingsLightScene of [
     windowSize: { height: 680, width: 720 },
   },
   {
+    frame: "workspace-git-settings",
+    heading: "Git",
+    id: "electron-git-settings-light",
+    root: ".codex-ui-git-settings",
+    theme: "light",
+  },
+  {
+    frame: "workspace-git-settings",
+    heading: "Git",
+    id: "electron-git-settings-light-compact",
+    root: ".codex-ui-git-settings",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-keyboard-shortcuts",
     heading: "Keyboard shortcuts",
     id: "electron-keyboard-shortcuts-settings-light",
@@ -19279,6 +19294,36 @@ for (const settingsLightScene of [
     heading: "Voice",
     id: "electron-voice-settings-light-compact",
     root: ".codex-ui-voice-settings",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-worktree-settings",
+    heading: "Worktrees",
+    id: "electron-worktree-settings-light",
+    root: ".codex-ui-worktree-settings",
+    theme: "light",
+  },
+  {
+    frame: "workspace-worktree-settings",
+    heading: "Worktrees",
+    id: "electron-worktree-settings-light-compact",
+    root: ".codex-ui-worktree-settings",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-hooks-settings",
+    heading: "Hooks",
+    id: "electron-hooks-settings-light",
+    root: ".codex-ui-hooks-settings",
+    theme: "light",
+  },
+  {
+    frame: "workspace-hooks-settings",
+    heading: "Hooks",
+    id: "electron-hooks-settings-light-compact",
+    root: ".codex-ui-hooks-settings",
     theme: "light",
     windowSize: { height: 680, width: 720 },
   },
@@ -19327,6 +19372,10 @@ for (const settingsLightScene of [
       await settingsLightPage.waitForFunction(
         () => innerWidth === 720 && innerHeight === 680,
       );
+      await settingsLightPage.waitForFunction((rootSelector) => {
+        const root = document.querySelector(rootSelector);
+        return root instanceof HTMLElement && root.getBoundingClientRect().width > 0;
+      }, settingsLightScene.root);
     }
     const contract = await settingsLightPage.evaluate((rootSelector) => {
       const root = document.querySelector(rootSelector);
