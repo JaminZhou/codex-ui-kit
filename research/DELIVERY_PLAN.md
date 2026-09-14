@@ -1664,10 +1664,10 @@ relay services.
 The Settings `Connections` slice now adds a controlled `RemoteConnectionsPage`
 with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,
-error, and form replays pass Browser/CDP, Electron, and regional pixel gates.
-The form deliberately keeps credentials outside the renderer; real account
-pairing, Noise relay, SSH key exchange, and Remote registry writes remain
-outside this public contract.
+error, form, and light-theme replays pass Browser/CDP, Electron, and regional
+pixel gates. The form deliberately keeps credentials outside the renderer;
+real account pairing, Noise relay, SSH key exchange, and Remote registry
+writes remain outside this public contract.
 
 ### 6. Perform global visual convergence
 
