@@ -993,6 +993,8 @@ for (const overflowScene of visualScenes.filter(({ id }) =>
   [
     "thread-overflow-current-26-825-open",
     "thread-overflow-current-26-825-open-compact",
+    "thread-overflow-current-26-825-open-light",
+    "thread-overflow-current-26-825-open-light-compact",
   ].includes(id),
 )) {
   const { app: overflowApp, page: overflowPage } = await launchScene(
