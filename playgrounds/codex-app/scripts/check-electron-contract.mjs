@@ -19236,6 +19236,124 @@ try {
   await usageSettingsApp.close();
 }
 
+for (const settingsLightScene of [
+  {
+    frame: "workspace-personalization-settings",
+    heading: "Personalization",
+    id: "electron-personalization-settings-light",
+    root: ".codex-ui-personalization-settings",
+    theme: "light",
+  },
+  {
+    frame: "workspace-personalization-settings",
+    heading: "Personalization",
+    id: "electron-personalization-settings-light-compact",
+    root: ".codex-ui-personalization-settings",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-keyboard-shortcuts",
+    heading: "Keyboard shortcuts",
+    id: "electron-keyboard-shortcuts-settings-light",
+    root: ".codex-ui-keyboard-shortcuts",
+    theme: "light",
+  },
+  {
+    frame: "workspace-keyboard-shortcuts",
+    heading: "Keyboard shortcuts",
+    id: "electron-keyboard-shortcuts-settings-light-compact",
+    root: ".codex-ui-keyboard-shortcuts",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-voice-settings",
+    heading: "Voice",
+    id: "electron-voice-settings-light",
+    root: ".codex-ui-voice-settings",
+    theme: "light",
+  },
+  {
+    frame: "workspace-voice-settings",
+    heading: "Voice",
+    id: "electron-voice-settings-light-compact",
+    root: ".codex-ui-voice-settings",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-usage-settings",
+    heading: "Usage & billing",
+    id: "electron-usage-settings-light",
+    root: ".codex-ui-usage-settings",
+    theme: "light",
+  },
+  {
+    frame: "workspace-usage-settings",
+    heading: "Usage & billing",
+    id: "electron-usage-settings-light-compact",
+    root: ".codex-ui-usage-settings",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const compact = Boolean(settingsLightScene.windowSize);
+  const { app: settingsLightApp, page: settingsLightPage } = await launchScene(
+    {
+      currentSidebar: true,
+      frame: settingsLightScene.frame,
+      id: settingsLightScene.id,
+      scenario: "workspace-workflow",
+      theme: settingsLightScene.theme,
+      view: "workspace",
+      windowSize: compact ? undefined : settingsLightScene.windowSize,
+    },
+    { capture: false },
+  );
+  try {
+    await settingsLightPage
+      .getByRole("main")
+      .getByRole("heading", {
+        level: 1,
+        name: settingsLightScene.heading,
+        exact: true,
+      })
+      .waitFor();
+    if (compact) {
+      await settingsLightApp.evaluate(({ BrowserWindow }) => {
+        BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+      });
+      await settingsLightPage.waitForFunction(
+        () => innerWidth === 720 && innerHeight === 680,
+      );
+    }
+    const contract = await settingsLightPage.evaluate((rootSelector) => {
+      const root = document.querySelector(rootSelector);
+      return {
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        rootWidth: root?.getBoundingClientRect().width,
+        viewport: { height: innerHeight, width: innerWidth },
+      };
+    }, settingsLightScene.root);
+    const expectedWidth = compact ? 358.125 : 768;
+    if (
+      contract.viewport.width !== (compact ? 720 : 1180) ||
+      contract.viewport.height !== (compact ? 680 : 820) ||
+      Math.abs((contract.rootWidth ?? Infinity) - expectedWidth) > 1 ||
+      contract.horizontalOverflow > 1
+    ) {
+      throw new Error(
+        `${settingsLightScene.id}: Electron light settings contract failed: ${JSON.stringify(contract)}`,
+      );
+    }
+  } finally {
+    await settingsLightApp.close();
+  }
+}
+
 const planSettingsScene = {
   frame: "workspace-plan-settings-business",
   id: "electron-plan-settings-business",
