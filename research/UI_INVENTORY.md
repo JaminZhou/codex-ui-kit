@@ -371,7 +371,10 @@ transitions must add or split IDs.
 
 ### P1: make coding workflows complete
 
-- Browser and artifact panels, document previews, environments.
+- Browser and artifact panels, document previews, and environments. The
+  environment slice now includes a controlled Setup/Cleanup/Actions editor,
+  save/discard, conflict/error retry, and wide/720px Browser/Electron/pixel
+  evidence; Remote registry and relay behavior remains explicitly unclaimed.
 - Remaining Settings pages, including Hooks and code-review preferences. The
   shell/search, Git/review-delivery, and Appearance slices are now
   current-build verified.

@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
-import { EnvironmentSettingsPage } from "../src";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { EnvironmentEditorPage, EnvironmentSettingsPage } from "../src";
 
 afterEach(cleanup);
 
@@ -46,5 +46,57 @@ describe("environment settings surfaces", () => {
     expect(screen.getByRole("alert").textContent).toBe(
       "Environment service failed",
     );
+  });
+
+  it("supports controlled setup and action editing", () => {
+    const onTabChange = vi.fn();
+    const onActionAdd = vi.fn();
+    const onSave = vi.fn();
+    const { rerender } = render(
+      <EnvironmentEditorPage
+        actions={[
+          { command: "pnpm test", id: "verify", name: "Verify", platforms: "macOS" },
+        ]}
+        onActionAdd={onActionAdd}
+        onSave={onSave}
+        onTabChange={onTabChange}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Environment" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "Actions" }));
+    expect(onTabChange).toHaveBeenCalledWith("actions");
+    rerender(
+      <EnvironmentEditorPage
+        actions={[
+          { command: "pnpm test", id: "verify", name: "Verify", platforms: "macOS" },
+        ]}
+        activeTab="actions"
+        onActionAdd={onActionAdd}
+        onSave={onSave}
+        onTabChange={onTabChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Add action" }));
+    expect(onActionAdd).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(onSave).toHaveBeenCalledOnce();
+  });
+
+  it("announces conflict and exposes retry", () => {
+    const onRetry = vi.fn();
+    render(
+      <EnvironmentEditorPage
+        onRetry={onRetry}
+        status="conflict"
+        statusMessage="The environment is out of date"
+      />,
+    );
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The environment is out of date",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(onRetry).toHaveBeenCalledOnce();
   });
 });

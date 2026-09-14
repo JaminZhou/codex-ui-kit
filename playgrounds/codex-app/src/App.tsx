@@ -41,6 +41,9 @@ import {
   ConversationThreadShell,
   Dialog,
   DocumentPreviewPanel,
+  EnvironmentEditorPage,
+  type EnvironmentEditorAction,
+  type EnvironmentEditorTab,
   EnvironmentSettingsPage,
   FileChangeGroup,
   FileRevertErrorDialog,
@@ -3769,6 +3772,48 @@ export function App() {
         ? "worktree"
         : "local",
     );
+  const isEnvironmentEditorReplay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame?.startsWith("workspace-environment-editor") === true;
+  const [environmentEditorTab, setEnvironmentEditorTab] =
+    useState<EnvironmentEditorTab>(
+      initialSelection.frame?.endsWith("-actions") ? "actions" : "setup",
+    );
+  const [environmentEditorName, setEnvironmentEditorName] = useState(
+    "Codex UI Kit workspace",
+  );
+  const [environmentEditorSetup, setEnvironmentEditorSetup] = useState(
+    "pnpm install\npnpm check",
+  );
+  const [environmentEditorCleanup, setEnvironmentEditorCleanup] = useState(
+    "git clean -fdX",
+  );
+  const [environmentEditorActions, setEnvironmentEditorActions] = useState<
+    EnvironmentEditorAction[]
+  >([
+    {
+      command: "pnpm test --run",
+      id: "verify",
+      name: "Verify",
+      platforms: "macOS, Linux",
+    },
+  ]);
+  const [environmentEditorStatus, setEnvironmentEditorStatus] = useState<
+    "conflict" | "error" | "ready" | "saved"
+  >(
+    initialSelection.frame?.endsWith("-error")
+      ? "error"
+      : initialSelection.frame?.endsWith("-conflict")
+        ? "conflict"
+        : "ready",
+  );
+  const [environmentEditorMessage, setEnvironmentEditorMessage] = useState(
+    initialSelection.frame?.endsWith("-error")
+      ? "Environment service failed to save this configuration."
+      : initialSelection.frame?.endsWith("-conflict")
+        ? "This environment changed on another device."
+        : "",
+  );
   const [workspacePage, setWorkspacePage] = useState<
     | "appearance-settings"
     | "code-review-settings"
@@ -3787,7 +3832,8 @@ export function App() {
     | "worktree-settings"
   >(
     initialSelection.view === "workspace" &&
-      initialSelection.frame === "workspace-environments-unavailable"
+      (initialSelection.frame === "workspace-environments-unavailable" ||
+        isEnvironmentEditorReplay)
       ? "environments"
       : initialSelection.view === "workspace" &&
           ["workspace-git-settings", "workspace-git-settings-compact"].includes(
@@ -9189,7 +9235,11 @@ export function App() {
     );
   const workspaceBaseFrame =
     workspacePage === "environments"
-      ? mode === "live"
+      ? isEnvironmentEditorReplay
+        ? activeFrame?.startsWith("workspace-environment-editor")
+          ? activeFrame
+          : "workspace-environment-editor"
+        : mode === "live"
         ? "workspace-environments-live-status"
         : "workspace-environments-unavailable"
       : workspacePage === "general-settings"
@@ -10872,7 +10922,62 @@ export function App() {
   ) : null;
   const workspaceEnvironmentSettingsRoute = (
     <div className="demo-workspace-environment-settings-route">
-      {mode === "live" ? <LiveEnvironmentStatus projectToken={workspaceProjectToken} /> : <EnvironmentSettingsPage status="unavailable" />}
+      {isEnvironmentEditorReplay ? (
+        <EnvironmentEditorPage
+          actions={environmentEditorActions}
+          activeTab={environmentEditorTab}
+          cleanupScript={environmentEditorCleanup}
+          environmentName={environmentEditorName}
+          message={environmentEditorMessage || undefined}
+          onActionAdd={() => {
+            const id = `action-${environmentEditorActions.length + 1}`;
+            setEnvironmentEditorActions((current) => [
+              ...current,
+              { command: "", id, name: "New action", platforms: "All" },
+            ]);
+            setEnvironmentEditorTab("actions");
+            setActiveFrame("workspace-environment-editor-actions");
+          }}
+          onActionChange={(actionId, field, value) => {
+            setEnvironmentEditorActions((current) =>
+              current.map((action) =>
+                action.id === actionId ? { ...action, [field]: value } : action,
+              ),
+            );
+          }}
+          onActionDelete={(actionId) =>
+            setEnvironmentEditorActions((current) =>
+              current.filter((action) => action.id !== actionId),
+            )
+          }
+          onCleanupScriptChange={setEnvironmentEditorCleanup}
+          onDiscard={() => {
+            setEnvironmentEditorStatus("ready");
+            setEnvironmentEditorMessage("");
+          }}
+          onEnvironmentNameChange={setEnvironmentEditorName}
+          onRetry={() => {
+            setEnvironmentEditorStatus("ready");
+            setEnvironmentEditorMessage("");
+          }}
+          onSave={() => {
+            setEnvironmentEditorStatus("saved");
+            setEnvironmentEditorMessage("Environment saved");
+          }}
+          onSetupScriptChange={setEnvironmentEditorSetup}
+          onTabChange={(tab) => {
+            setEnvironmentEditorTab(tab);
+            setActiveFrame(`workspace-environment-editor-${tab}`);
+          }}
+          setupScript={environmentEditorSetup}
+          status={environmentEditorStatus}
+          statusMessage={environmentEditorMessage || undefined}
+        />
+      ) : mode === "live" ? (
+        <LiveEnvironmentStatus projectToken={workspaceProjectToken} />
+      ) : (
+        <EnvironmentSettingsPage status="unavailable" />
+      )}
     </div>
   );
   const settingsNavigation = [

@@ -1513,6 +1513,37 @@ try {
   await scheduledUnavailableApp.close();
 }
 
+for (const environmentEditorScene of visualScenes.filter((candidate) =>
+  candidate.id.startsWith("workspace-environment-editor"),
+)) {
+  const { app: environmentEditorApp, page: environmentEditorPage } =
+    await launchScene(environmentEditorScene, { capture: false });
+  try {
+    const editor = environmentEditorPage.getByRole("region", {
+      name: "Environment",
+    });
+    await editor.waitFor();
+    await editor.getByRole("tab", { name: "Actions" }).click();
+    await editor.getByRole("button", { name: "Add action" }).click();
+    await editor.getByRole("button", { name: "Save" }).click();
+    await environmentEditorPage
+      .locator('.codex-ui-environment-editor[data-status="saved"]')
+      .waitFor();
+    if (
+      (await editor.getByRole("textbox", { name: "Environment name" }).count()) !==
+      1 ||
+      (await editor.getByRole("tab", { name: "Setup" }).count()) !== 1 ||
+      (await editor.getByRole("tab", { name: "Cleanup" }).count()) !== 1
+    ) {
+      throw new Error(
+        `Electron environment editor contract is incomplete for ${environmentEditorScene.id}.`,
+      );
+    }
+  } finally {
+    await environmentEditorApp.close();
+  }
+}
+
 const sidebarStatusScene = {
   currentSidebar: true,
   frame: "sidebar-current",
