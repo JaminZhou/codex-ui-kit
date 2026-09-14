@@ -1064,13 +1064,16 @@ two completed tool items with exact deterministic results, and checks both
 visible cards at 1180/720 without overflow. A retry mode returns one real MCP
 tool error, requires the same tool to be called again, and verifies failed-then-
 completed item states plus the exact recovery token. Permission variants,
-streaming beyond this bounded retry, installed-product pixels, and remote
-transport remain open follow-up boundaries. The live timeout mode now adds a
+streaming beyond this bounded retry, and installed-product pixels remain open
+follow-up boundaries. The live timeout mode now adds a
 deliberately slow MCP server with a one-second tool limit and verifies the
-failed item state without a retry; OAuth/permission variants and remote
-transport remain open. The approval-denied mode now verifies the real MCP
-approval request, rejects it before the server's `tools/call`, and locks the
-failed item and 1180/720 card geometry; OAuth credential exchange remains open.
+failed item state without a retry; OAuth/permission variants remain open. The
+approval-denied mode now verifies the real MCP approval request, rejects it
+before the server's `tools/call`, and locks the failed item and 1180/720 card
+geometry. A remote mode now serves the same tool over a loopback Streamable
+HTTP `/mcp` endpoint and proves the real `initialize`/`tools/list`/`tools/call`
+sequence, completed card, and 1180/720 geometry; OAuth credential exchange and
+production remote-provider reachability remain open.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from

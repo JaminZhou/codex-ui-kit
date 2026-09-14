@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { access, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { constants } from "node:fs";
+import { createServer } from "node:http";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { CodexAppServerClient } from "@jaminzhou/codex-app-server-client";
@@ -8,8 +9,8 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi", "retry", "timeout", "approval-denied"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, or approval-denied.",
+  ["single", "multi", "retry", "timeout", "approval-denied", "remote"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, or remote.",
 );
 const toolDefinitions = [
   {
@@ -46,6 +47,9 @@ const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-mcp-tool-call-"));
 const serverPath = join(directory, "server.mjs");
 const serverLogPath = join(directory, "server.log");
 const historyPath = join(directory, "history.json");
+const remoteMethods = [];
+let remoteServer = null;
+let remoteUrl = null;
 const sourceCodexHome = process.env.CODEX_HOME ?? join(homedir(), ".codex");
 const sourceAuthPath = join(sourceCodexHome, "auth.json");
 const fallbackAuthPath = join(homedir(), ".codex", "auth.json");
@@ -64,6 +68,76 @@ assert.ok(
   "A signed-in Codex App Server runtime is required for the live MCP tool-call gate (auth.json was not found).",
 );
 await symlink(authPath, join(directory, "auth.json"));
+
+if (mode === "remote") {
+  remoteServer = createServer(async (request, response) => {
+    if (request.method !== "POST" || request.url !== "/mcp") {
+      response.writeHead(405, { Allow: "POST" });
+      response.end();
+      return;
+    }
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    const raw = Buffer.concat(chunks).toString("utf8");
+    let message;
+    try {
+      message = JSON.parse(raw);
+    } catch {
+      response.writeHead(400, { "Content-Type": "application/json" });
+      response.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32700, message: "Invalid JSON" }, id: null }));
+      return;
+    }
+    remoteMethods.push(message.method);
+    await writeFile(serverLogPath, `IN ${JSON.stringify(message)}\n`, { flag: "a" });
+    if (message.method === "notifications/initialized") {
+      response.writeHead(202, { "Mcp-Session-Id": "ui-kit-remote-session" });
+      response.end();
+      return;
+    }
+    if (message.method === "ping") {
+      response.writeHead(200, { "Content-Type": "application/json", "Mcp-Session-Id": "ui-kit-remote-session" });
+      response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: {} }));
+      return;
+    }
+    let result;
+    if (message.method === "initialize") {
+      result = {
+        capabilities: { tools: {} },
+        protocolVersion: "2024-11-05",
+        serverInfo: { name: "ui-kit-remote", version: "1.0.0" },
+      };
+    } else if (message.method === "tools/list") {
+      result = { tools: toolDefinitions };
+    } else if (message.method === "tools/call") {
+      const tool = String(message.params?.name ?? "");
+      const argument = String(message.params?.arguments?.message ?? "");
+      const text =
+        tool === "ui_kit_upper"
+          ? "MCP_TOOL_CALL_UPPER:" + argument.toUpperCase()
+          : "MCP_TOOL_CALL_OK:" + argument;
+      result = { content: [{ text, type: "text" }], isError: false };
+    } else if (message.method === "resources/list") {
+      result = { resources: [] };
+    } else if (message.method === "resources/templates/list") {
+      result = { resourceTemplates: [] };
+    } else {
+      response.writeHead(200, { "Content-Type": "application/json", "Mcp-Session-Id": "ui-kit-remote-session" });
+      response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: `Unsupported MCP method: ${message.method}` } }));
+      return;
+    }
+    const payload = { jsonrpc: "2.0", id: message.id, result };
+    await writeFile(serverLogPath, `OUT ${JSON.stringify(payload)}\n`, { flag: "a" });
+    response.writeHead(200, { "Content-Type": "application/json", "Mcp-Session-Id": "ui-kit-remote-session" });
+    response.end(JSON.stringify(payload));
+  });
+  await new Promise((resolve, reject) => {
+    remoteServer.once("error", reject);
+    remoteServer.listen(0, "127.0.0.1", resolve);
+  });
+  const address = remoteServer.address();
+  assert.ok(address && typeof address === "object", "The loopback MCP HTTP server must listen.");
+  remoteUrl = `http://127.0.0.1:${address.port}/mcp`;
+}
 
 const serverSource = `
 import fs from "node:fs";
@@ -132,7 +206,9 @@ for await (const line of input) {
 await writeFile(serverPath, serverSource);
 await writeFile(
   join(directory, "config.toml"),
-  `[mcp_servers.ui_kit_echo]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = ${mode === "timeout" ? 1 : 30}\n`,
+  mode === "remote"
+    ? `[mcp_servers.ui_kit_echo]\nurl = "${remoteUrl}"\nstartup_timeout_sec = 10\ntool_timeout_sec = 30\n`
+    : `[mcp_servers.ui_kit_echo]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = ${mode === "timeout" ? 1 : 30}\n`,
 );
 process.env.CODEX_HOME = directory;
 
@@ -312,6 +388,19 @@ try {
       serverToolCalls: serverToolCalls.length,
       status: deniedCall.item.status,
     };
+  } else if (mode === "remote") {
+    assert.ok(remoteMethods.includes("initialize"), "Remote MCP must receive initialize.");
+    assert.ok(remoteMethods.includes("tools/list"), "Remote MCP must receive tools/list.");
+    assert.equal(
+      remoteMethods.filter((method) => method === "tools/call").length,
+      1,
+      "Remote MCP must receive exactly one tools/call request.",
+    );
+    result.transport = {
+      kind: "streamable-http",
+      methods: [...remoteMethods],
+      url: remoteUrl,
+    };
   } else {
     for (const expectedTool of toolDefinitions.map(({ name }) => name)) {
       const completed = completedItems.find(({ item }) => item.tool === expectedTool);
@@ -413,6 +502,9 @@ try {
   await writeFile(join(directory, "events.json"), JSON.stringify(evidence, null, 2));
   await page.evaluate(() => window.codexDemo?.closeLive()).catch(() => undefined);
   await app.close();
+  if (remoteServer) {
+    await new Promise((resolve) => remoteServer.close(resolve));
+  }
   if (threadId) {
     const client = new CodexAppServerClient({
       capabilities: { experimentalApi: true },
