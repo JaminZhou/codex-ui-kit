@@ -807,6 +807,7 @@ function isDocumentPreviewFrame(frame: string | null): boolean {
   return Boolean(
     frame &&
       (frame.startsWith("workspace-document-preview") ||
+        frame.startsWith("workspace-image-preview") ||
         frame.startsWith("workspace-notebook-preview") ||
         frame.startsWith("workspace-spreadsheet-preview") ||
         frame.startsWith("workspace-presentation-preview") ||
@@ -817,6 +818,7 @@ function isDocumentPreviewFrame(frame: string | null): boolean {
 function documentPreviewKindForFrame(
   frame: string | null,
 ): DocumentPreviewKind {
+  if (frame?.startsWith("workspace-image-preview")) return "image";
   if (frame?.startsWith("workspace-notebook-preview")) return "notebook";
   if (frame?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
   if (frame?.startsWith("workspace-presentation-preview")) return "presentation";
@@ -826,11 +828,19 @@ function documentPreviewKindForFrame(
 }
 
 function documentPreviewTitleForFrame(frame: string | null): string {
+  if (frame?.startsWith("workspace-image-preview")) return "generated-image.png";
   if (frame?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
   if (frame?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
   if (frame?.startsWith("workspace-presentation-preview")) return "roadmap.pptx";
   if (frame?.startsWith("workspace-doc-preview")) return "meeting-notes.docx";
   return "design-spec.pdf";
+}
+
+function documentPreviewSubtitleForFrame(frame: string | null): string {
+  if (frame?.startsWith("workspace-image-preview")) {
+    return "Generated image · 1.2 MB · workspace artifact";
+  }
+  return "2 pages · 18 KB · workspace artifact";
 }
 
 function isNarrowDemoWindow() {
@@ -11466,7 +11476,7 @@ export function App() {
           setDocumentPreviewAction("Retry requested");
         }}
         status={documentPreviewStatus}
-        subtitle="2 pages · 18 KB · workspace artifact"
+        subtitle={documentPreviewSubtitleForFrame(activeFrame)}
         title={documentPreviewTitleForFrame(activeFrame)}
         toolbar={
           <span aria-live="polite" className="demo-document-preview-action">
@@ -11474,17 +11484,28 @@ export function App() {
           </span>
         }
       >
-        <div
-          aria-label="Preview page 1 of 2"
-          className="demo-document-preview-page"
-          role="img"
-        >
-          <span className="demo-document-preview-page__eyebrow">
-            CODEx UI KIT
-          </span>
-          <strong>Workspace artifact preview</strong>
-          <span>Renderer-owned preview surface; file decoding stays host-owned.</span>
-        </div>
+        {documentPreviewKindForFrame(activeFrame) === "image" ? (
+          <figure className="demo-document-preview-image-figure">
+            <img
+              alt="Generated workspace artifact"
+              className="demo-document-preview-image"
+              src={currentAttachmentProductPreviewUrl}
+            />
+            <figcaption>Renderer-owned image preview; generation stays host-owned.</figcaption>
+          </figure>
+        ) : (
+          <div
+            aria-label="Preview page 1 of 2"
+            className="demo-document-preview-page"
+            role="img"
+          >
+            <span className="demo-document-preview-page__eyebrow">
+              CODEx UI KIT
+            </span>
+            <strong>Workspace artifact preview</strong>
+            <span>Renderer-owned preview surface; file decoding stays host-owned.</span>
+          </div>
+        )}
       </DocumentPreviewPanel>
     </div>
   );

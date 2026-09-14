@@ -6,6 +6,10 @@ const sceneIds = [
   "workspace-document-preview-ready",
   "workspace-document-preview-error",
   "workspace-document-preview-loading-compact",
+  "workspace-image-preview-ready",
+  "workspace-image-preview-ready-compact",
+  "workspace-image-preview-error",
+  "workspace-image-preview-loading-compact",
   "workspace-notebook-preview-ready",
   "workspace-notebook-preview-ready-compact",
   "workspace-spreadsheet-preview-ready",
@@ -17,6 +21,9 @@ const sceneIds = [
 ];
 
 const expectedPreview = (frame) => {
+  if (frame.startsWith("workspace-image-preview")) {
+    return { kind: "image", title: "generated-image.png" };
+  }
   if (frame.startsWith("workspace-notebook-preview")) {
     return { kind: "notebook", title: "analysis.ipynb" };
   }
@@ -113,4 +120,4 @@ try {
   assert.equal(await page.getByRole("textbox", { name: "Message", exact: true }).inputValue(), "");
 } finally { await app.close(); }
 
-console.log("Electron document preview contracts passed: 11 generic format/lifecycle frames and current PDF paging/zoom/annotation/expansion/native resize/close/reopen/draft cleanup.");
+console.log("Electron document preview contracts passed: 15 generic format/lifecycle frames and current PDF paging/zoom/annotation/expansion/native resize/close/reopen/draft cleanup.");
