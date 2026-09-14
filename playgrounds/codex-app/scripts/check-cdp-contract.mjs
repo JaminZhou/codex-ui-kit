@@ -5,6 +5,34 @@ import { assertCurrentPdfContract } from "./current-pdf-contract.mjs";
 
 process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
 
+const documentPreviewScenePrefixes = [
+  "workspace-document-preview",
+  "workspace-notebook-preview",
+  "workspace-spreadsheet-preview",
+  "workspace-presentation-preview",
+  "workspace-doc-preview",
+];
+
+function isDocumentPreviewScene(frame) {
+  return documentPreviewScenePrefixes.some((prefix) => frame?.startsWith(prefix));
+}
+
+function expectedDocumentPreviewKind(frame) {
+  if (frame?.startsWith("workspace-notebook-preview")) return "notebook";
+  if (frame?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
+  if (frame?.startsWith("workspace-presentation-preview")) return "presentation";
+  if (frame?.startsWith("workspace-doc-preview")) return "document";
+  return "pdf";
+}
+
+function expectedDocumentPreviewTitle(frame) {
+  if (frame?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
+  if (frame?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
+  if (frame?.startsWith("workspace-presentation-preview")) return "roadmap.pptx";
+  if (frame?.startsWith("workspace-doc-preview")) return "meeting-notes.docx";
+  return "design-spec.pdf";
+}
+
 const currentSidebarErrorPathData = [
   "M10.6 9.70459C11.0142 9.70461 11.35 10.0404 11.35 10.4546V13.7876C11.35 14.2018 11.0142 14.5376 10.6 14.5376C10.1858 14.5376 9.84998 14.2018 9.84998 13.7876V10.4546C9.84998 10.0404 10.1858 9.70459 10.6 9.70459Z",
   "M10.6 6.2876C11.1292 6.28762 11.558 6.71732 11.558 7.24658C11.5578 7.77569 11.1291 8.20457 10.6 8.20459C10.0708 8.20459 9.64215 7.7757 9.64197 7.24658C9.64197 6.71731 10.0707 6.2876 10.6 6.2876Z",
@@ -5410,10 +5438,7 @@ for (const scene of selectedScenes) {
       await writeFile(join(artifactDirectory, `${scene.id}.json`), `${JSON.stringify(contract, null, 2)}\n`);
       continue;
     }
-    if (
-      scene.view === "workspace" &&
-      scene.frame?.startsWith("workspace-document-preview")
-    ) {
+    if (scene.view === "workspace" && isDocumentPreviewScene(scene.frame)) {
       await page.waitForTimeout(50);
       const contract = await page.evaluate(() => {
         const rect = (element) => {
@@ -5467,12 +5492,14 @@ for (const scene of selectedScenes) {
           ? "error"
           : "ready";
       const expectedCompact = scene.id.endsWith("-compact");
+      const expectedKind = expectedDocumentPreviewKind(scene.frame);
+      const expectedTitle = expectedDocumentPreviewTitle(scene.frame);
       if (
         contract.frame !== scene.frame ||
         contract.horizontalOverflow > 1 ||
         contract.status !== expectedStatus ||
-        contract.kind !== "pdf" ||
-        contract.title !== "design-spec.pdf" ||
+        contract.kind !== expectedKind ||
+        contract.title !== expectedTitle ||
         !contract.panel ||
         contract.panel.width < (expectedCompact ? 300 : 500) ||
         !contract.body ||

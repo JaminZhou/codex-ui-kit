@@ -1387,9 +1387,11 @@ The public package now supplies a controlled `DocumentPreviewPanel` shell for
 PDF, document, notebook, spreadsheet, and presentation previews. It covers
 ready/loading/empty/error semantics and explicit host-owned Open/Retry actions,
 but does not decode or embed files. The full-app playground now exposes a
-workspace artifact route with ready, loading, and error/retry states; three
-Browser/CDP frames, three Electron frames, and three reviewed pixel baselines
-gate that controlled route as an independent component regression.
+workspace artifact route with ready, loading, and error/retry states plus a
+wide/compact format matrix for DOCX, notebooks, spreadsheets, and
+presentations. Browser/CDP, Electron, and owned-pixel contracts gate that
+matrix as a controlled replay regression; they do not claim installed-product
+runtime decoding parity.
 The subsequent [26.903 real PDF capture](26.903.71938-pdf.md) now reaches the
 product through an unsent synthetic draft attachment. It disproves the
 centered-card layout as a PDF reconstruction: the actual surface is a right
@@ -1399,17 +1401,18 @@ Fourteen recorded Renderer states are scoped to a new
 `workspace.pdf-preview` inventory row; its current Browser/Electron and
 owned-panel pixel gates are verified independently. `workspace.artifact-shell`
 retains only the host-owned right-workspace reachability boundary, while the
-broader `workspace.document-previews` row remains open for notebook, DOCX,
-spreadsheet, and presentation formats. The implementation now has a dedicated
+`workspace.document-previews` row now has a controlled format matrix for
+notebook, DOCX, spreadsheet, and presentation formats. The implementation now
+has a dedicated
 `PdfPreviewPanel` and a real private PDF.js workspace replay. Targeted Electron
 paging/zoom/expand/resize/close/reopen checks pass, and the complete owned-panel
 comparison passes at 0.1544% wide / 0.2600% compact with no masks under the
 unchanged 1% ceiling. The decoded bitmap is pixel-identical before CSS
 composition; the replay also preserves the observed relative positioning and
 paint-isolation boundaries. Seven new visual baselines are now committed for
-this slice; the full local acceptance passes with 451 CDP lifecycle frames,
-Electron contracts, and 451 visual pixel frames. Other document formats and
-host effects remain open.
+this slice; the full local acceptance passes with the expanded CDP lifecycle,
+Electron, and owned-pixel format matrix. Other host effects and installed-
+product decoding remain open.
 
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.

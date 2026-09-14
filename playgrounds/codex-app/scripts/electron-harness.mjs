@@ -318,6 +318,33 @@ export const visualScenes = [
     view: "workspace",
     windowSize: { height: 680, width: 720 },
   },
+  ...[
+    ["notebook", "analysis.ipynb"],
+    ["spreadsheet", "budget.xlsx"],
+    ["presentation", "roadmap.pptx"],
+    ["doc", "meeting-notes.docx"],
+  ].flatMap(([kind]) => [
+    {
+      currentSidebar: true,
+      frame: `workspace-${kind}-preview-ready`,
+      id: `workspace-${kind}-preview-ready`,
+      maxPixelRatio: 0.01,
+      scenario: "workspace-workflow",
+      theme: "dark",
+      view: "workspace",
+    },
+    {
+      currentSidebar: true,
+      frame: `workspace-${kind}-preview-ready`,
+      id: `workspace-${kind}-preview-ready-compact`,
+      maxPixelRatio: 0.01,
+      scenario: "workspace-workflow",
+      sidebarState: "compact-collapsed",
+      theme: "dark",
+      view: "workspace",
+      windowSize: { height: 680, width: 720 },
+    },
+  ]),
   ...["ready", "page-two", "zoom-menu", "zoom-150", "annotating", "expanded", "compact"].map((state) => ({
     currentSidebar: true,
     frame: `workspace-document-preview-current-${state}`,

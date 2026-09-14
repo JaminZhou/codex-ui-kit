@@ -6,7 +6,31 @@ const sceneIds = [
   "workspace-document-preview-ready",
   "workspace-document-preview-error",
   "workspace-document-preview-loading-compact",
+  "workspace-notebook-preview-ready",
+  "workspace-notebook-preview-ready-compact",
+  "workspace-spreadsheet-preview-ready",
+  "workspace-spreadsheet-preview-ready-compact",
+  "workspace-presentation-preview-ready",
+  "workspace-presentation-preview-ready-compact",
+  "workspace-doc-preview-ready",
+  "workspace-doc-preview-ready-compact",
 ];
+
+const expectedPreview = (frame) => {
+  if (frame.startsWith("workspace-notebook-preview")) {
+    return { kind: "notebook", title: "analysis.ipynb" };
+  }
+  if (frame.startsWith("workspace-spreadsheet-preview")) {
+    return { kind: "spreadsheet", title: "budget.xlsx" };
+  }
+  if (frame.startsWith("workspace-presentation-preview")) {
+    return { kind: "presentation", title: "roadmap.pptx" };
+  }
+  if (frame.startsWith("workspace-doc-preview")) {
+    return { kind: "document", title: "meeting-notes.docx" };
+  }
+  return { kind: "pdf", title: "design-spec.pdf" };
+};
 
 for (const sceneId of sceneIds) {
   const scene = visualScenes.find(({ id }) => id === sceneId);
@@ -28,10 +52,11 @@ for (const sceneId of sceneIds) {
       : scene.frame.endsWith("-error")
         ? "error"
         : "ready";
+    const expected = expectedPreview(scene.frame);
     if (
-      contract.kind !== "pdf" ||
+      contract.kind !== expected.kind ||
       contract.status !== expectedStatus ||
-      contract.title !== "design-spec.pdf" ||
+      contract.title !== expected.title ||
       contract.width < (sceneId.endsWith("-compact") ? 300 : 500) ||
       (expectedStatus === "loading" && contract.ariaBusy !== "true") ||
       (expectedStatus !== "loading" && contract.ariaBusy !== null)
@@ -88,4 +113,4 @@ try {
   assert.equal(await page.getByRole("textbox", { name: "Message", exact: true }).inputValue(), "");
 } finally { await app.close(); }
 
-console.log("Electron document preview contracts passed: 3 generic frames and current PDF paging/zoom/annotation/expansion/native resize/close/reopen/draft cleanup.");
+console.log("Electron document preview contracts passed: 11 generic format/lifecycle frames and current PDF paging/zoom/annotation/expansion/native resize/close/reopen/draft cleanup.");
