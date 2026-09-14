@@ -11,6 +11,14 @@ assert.ok(
   ["accept", "decline", "cancel"].includes(action),
   "CODEX_UI_KIT_LIVE_MCP_ELICITATION_ACTION must be accept, decline, or cancel.",
 );
+const mode = process.env.CODEX_UI_KIT_LIVE_MCP_ELICITATION_MODE ?? "form";
+assert.ok(
+  ["form", "url"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_ELICITATION_MODE must be form or url.",
+);
+const authorizationUrl =
+  "https://auth.example.test/mcp/authorize?state=codex-ui-kit";
+const elicitationId = "ui-kit-url-elicitation-1";
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-mcp-elicitation-"));
 const serverPath = join(directory, "server.mjs");
 const serverLogPath = join(directory, "server.log");
@@ -36,6 +44,18 @@ assert.ok(
 );
 await symlink(authPath, join(directory, "auth.json"));
 
+const elicitationParamsSource =
+  mode === "url"
+    ? `elicitationId: ${JSON.stringify(elicitationId)},
+      url: ${JSON.stringify(authorizationUrl)},`
+    : `requestedSchema: {
+        properties: {
+          name: { title: "Name", type: "string" },
+          project: { enum: ["codex-ui-kit", "codex-app"], title: "Project", type: "string" },
+        },
+        required: ["project", "name"],
+        type: "object",
+      },`;
 const serverSource = `
 import fs from "node:fs";
 import readline from "node:readline";
@@ -88,16 +108,13 @@ async function handle(message) {
     id: requestId,
     method: "elicitation/create",
     params: {
-      message: "Choose the project details that the MCP server should use.",
-      mode: "form",
-      requestedSchema: {
-        properties: {
-          name: { title: "Name", type: "string" },
-          project: { enum: ["codex-ui-kit", "codex-app"], title: "Project", type: "string" },
-        },
-        required: ["project", "name"],
-        type: "object",
-      },
+      message: ${JSON.stringify(
+        mode === "url"
+          ? "Authorize the MCP server in a separate browser window."
+          : "Choose the project details that the MCP server should use.",
+      )},
+      mode: ${JSON.stringify(mode)},
+      ${elicitationParamsSource}
     },
   };
   log("OUT " + JSON.stringify(request));
@@ -164,7 +181,9 @@ const result = {
   passed: false,
   tool: "ui_kit_elicit",
   action,
+  mode,
 };
+if (mode === "url") result.authorizationUrl = authorizationUrl;
 let threadId = null;
 
 try {
@@ -201,15 +220,26 @@ try {
 
   const form = page.getByRole("form", { name: "MCP server request" });
   await form.waitFor({ state: "visible", timeout: 180_000 });
-  assert.equal(
-    await form.getByRole("button", { name: "Accept", exact: true }).isEnabled(),
-    false,
-  );
-  assert.equal(
-    await form.getByText("Choose the project details that the MCP server should use.", { exact: true }).count(),
-    1,
-  );
-  if (action === "accept") {
+  if (mode === "url") {
+    assert.equal(
+      await form.getByText("Authorize the MCP server in a separate browser window.", { exact: true }).count(),
+      1,
+    );
+    const link = form.getByRole("link", { name: "Open authorization URL", exact: true });
+    assert.equal(await link.getAttribute("href"), authorizationUrl);
+    assert.equal(await link.getAttribute("target"), "_blank");
+    assert.equal(page.context().pages().length, 1, "URL elicitation must not open a browser automatically.");
+  } else {
+    assert.equal(
+      await form.getByRole("button", { name: "Accept", exact: true }).isEnabled(),
+      false,
+    );
+    assert.equal(
+      await form.getByText("Choose the project details that the MCP server should use.", { exact: true }).count(),
+      1,
+    );
+  }
+  if (mode === "form" && action === "accept") {
     const select = form.locator("select").first();
     await select.selectOption("codex-ui-kit");
     await form.locator("input[type=text]").first().fill("Jamin");
