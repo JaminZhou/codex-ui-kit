@@ -9,8 +9,8 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi", "retry", "timeout", "approval-denied", "remote"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, or remote.",
+  ["single", "multi", "retry", "timeout", "approval-denied", "remote", "oauth"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, remote, or oauth.",
 );
 const toolDefinitions = [
   {
@@ -50,6 +50,9 @@ const historyPath = join(directory, "history.json");
 const remoteMethods = [];
 let remoteServer = null;
 let remoteUrl = null;
+let remoteBaseUrl = null;
+const oauthToken = "ui-kit-oauth-access-token";
+const oauthCode = "ui-kit-oauth-code";
 const sourceCodexHome = process.env.CODEX_HOME ?? join(homedir(), ".codex");
 const sourceAuthPath = join(sourceCodexHome, "auth.json");
 const fallbackAuthPath = join(homedir(), ".codex", "auth.json");
@@ -69,22 +72,81 @@ assert.ok(
 );
 await symlink(authPath, join(directory, "auth.json"));
 
-if (mode === "remote") {
+if (mode === "remote" || mode === "oauth") {
   remoteServer = createServer(async (request, response) => {
-    if (request.method !== "POST" || request.url !== "/mcp") {
+    const requestUrl = new URL(request.url ?? "/", `http://${request.headers.host ?? "127.0.0.1"}`);
+    const readBody = async () => {
+      const chunks = [];
+      for await (const chunk of request) chunks.push(chunk);
+      return Buffer.concat(chunks).toString("utf8");
+    };
+    const sendJson = (status, payload, headers = {}) => {
+      response.writeHead(status, { "Content-Type": "application/json", ...headers });
+      response.end(JSON.stringify(payload));
+    };
+    if (mode === "oauth" && request.method === "GET" && requestUrl.pathname === "/.well-known/oauth-protected-resource") {
+      sendJson(200, { authorization_servers: [remoteBaseUrl], resource: remoteUrl });
+      return;
+    }
+    if (mode === "oauth" && request.method === "GET" && requestUrl.pathname === "/.well-known/oauth-authorization-server") {
+      sendJson(200, {
+        authorization_endpoint: `${remoteBaseUrl}/authorize`,
+        code_challenge_methods_supported: ["S256"],
+        grant_types_supported: ["authorization_code"],
+        issuer: remoteBaseUrl,
+        registration_endpoint: `${remoteBaseUrl}/register`,
+        response_types_supported: ["code"],
+        scopes_supported: ["mcp:tools"],
+        token_endpoint: `${remoteBaseUrl}/token`,
+      });
+      return;
+    }
+    if (mode === "oauth" && request.method === "POST" && requestUrl.pathname === "/register") {
+      const registration = JSON.parse(await readBody());
+      await writeFile(serverLogPath, `DCR ${JSON.stringify(registration)}\n`, { flag: "a" });
+      sendJson(201, {
+        client_id: "ui-kit-oauth-client",
+        client_name: "Codex UI Kit",
+        redirect_uris: registration.redirect_uris ?? [],
+        token_endpoint_auth_method: "none",
+      });
+      return;
+    }
+    if (mode === "oauth" && request.method === "GET" && requestUrl.pathname === "/authorize") {
+      const redirect = requestUrl.searchParams.get("redirect_uri");
+      const state = requestUrl.searchParams.get("state");
+      assert.ok(redirect, "OAuth authorization request must include redirect_uri.");
+      const callback = new URL(redirect);
+      callback.searchParams.set("code", oauthCode);
+      if (state) callback.searchParams.set("state", state);
+      response.writeHead(302, { Location: callback.toString() });
+      response.end();
+      return;
+    }
+    if (mode === "oauth" && request.method === "POST" && requestUrl.pathname === "/token") {
+      const body = new URLSearchParams(await readBody());
+      assert.equal(body.get("code"), oauthCode, "OAuth token exchange must use the issued code.");
+      sendJson(200, { access_token: oauthToken, expires_in: 3600, scope: "mcp:tools", token_type: "Bearer" });
+      return;
+    }
+    if (request.method !== "POST" || requestUrl.pathname !== "/mcp") {
       response.writeHead(405, { Allow: "POST" });
       response.end();
       return;
     }
-    const chunks = [];
-    for await (const chunk of request) chunks.push(chunk);
-    const raw = Buffer.concat(chunks).toString("utf8");
+    if (mode === "oauth" && request.headers.authorization !== `Bearer ${oauthToken}`) {
+      response.writeHead(401, {
+        "WWW-Authenticate": `Bearer resource_metadata="${remoteBaseUrl}/.well-known/oauth-protected-resource"`,
+      });
+      response.end();
+      return;
+    }
+    const raw = await readBody();
     let message;
     try {
       message = JSON.parse(raw);
     } catch {
-      response.writeHead(400, { "Content-Type": "application/json" });
-      response.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32700, message: "Invalid JSON" }, id: null }));
+      sendJson(400, { jsonrpc: "2.0", error: { code: -32700, message: "Invalid JSON" }, id: null });
       return;
     }
     remoteMethods.push(message.method);
@@ -95,8 +157,7 @@ if (mode === "remote") {
       return;
     }
     if (message.method === "ping") {
-      response.writeHead(200, { "Content-Type": "application/json", "Mcp-Session-Id": "ui-kit-remote-session" });
-      response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result: {} }));
+      sendJson(200, { jsonrpc: "2.0", id: message.id, result: {} }, { "Mcp-Session-Id": "ui-kit-remote-session" });
       return;
     }
     let result;
@@ -111,24 +172,19 @@ if (mode === "remote") {
     } else if (message.method === "tools/call") {
       const tool = String(message.params?.name ?? "");
       const argument = String(message.params?.arguments?.message ?? "");
-      const text =
-        tool === "ui_kit_upper"
-          ? "MCP_TOOL_CALL_UPPER:" + argument.toUpperCase()
-          : "MCP_TOOL_CALL_OK:" + argument;
+      const text = tool === "ui_kit_upper" ? "MCP_TOOL_CALL_UPPER:" + argument.toUpperCase() : "MCP_TOOL_CALL_OK:" + argument;
       result = { content: [{ text, type: "text" }], isError: false };
     } else if (message.method === "resources/list") {
       result = { resources: [] };
     } else if (message.method === "resources/templates/list") {
       result = { resourceTemplates: [] };
     } else {
-      response.writeHead(200, { "Content-Type": "application/json", "Mcp-Session-Id": "ui-kit-remote-session" });
-      response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, error: { code: -32601, message: `Unsupported MCP method: ${message.method}` } }));
+      sendJson(200, { jsonrpc: "2.0", id: message.id, error: { code: -32601, message: `Unsupported MCP method: ${message.method}` } }, { "Mcp-Session-Id": "ui-kit-remote-session" });
       return;
     }
     const payload = { jsonrpc: "2.0", id: message.id, result };
     await writeFile(serverLogPath, `OUT ${JSON.stringify(payload)}\n`, { flag: "a" });
-    response.writeHead(200, { "Content-Type": "application/json", "Mcp-Session-Id": "ui-kit-remote-session" });
-    response.end(JSON.stringify(payload));
+    sendJson(200, payload, { "Mcp-Session-Id": "ui-kit-remote-session" });
   });
   await new Promise((resolve, reject) => {
     remoteServer.once("error", reject);
@@ -137,6 +193,7 @@ if (mode === "remote") {
   const address = remoteServer.address();
   assert.ok(address && typeof address === "object", "The loopback MCP HTTP server must listen.");
   remoteUrl = `http://127.0.0.1:${address.port}/mcp`;
+  remoteBaseUrl = `http://127.0.0.1:${address.port}`;
 }
 
 const serverSource = `
@@ -206,7 +263,7 @@ for await (const line of input) {
 await writeFile(serverPath, serverSource);
 await writeFile(
   join(directory, "config.toml"),
-  mode === "remote"
+  mode === "remote" || mode === "oauth"
     ? `[mcp_servers.ui_kit_echo]\nurl = "${remoteUrl}"\nstartup_timeout_sec = 10\ntool_timeout_sec = 30\n`
     : `[mcp_servers.ui_kit_echo]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = ${mode === "timeout" ? 1 : 30}\n`,
 );
@@ -245,13 +302,48 @@ try {
   });
   try {
     await statusClient.connect();
-    const statusResponse = await statusClient.call("mcpServerStatus/list", {
+    let statusResponse = await statusClient.call("mcpServerStatus/list", {
       detail: "full",
     });
-    const server = statusResponse.data?.find(
+    let server = statusResponse.data?.find(
       (candidate) => candidate?.name === "ui_kit_echo",
     );
     assert.ok(server, "The live MCP status list must include ui_kit_echo.");
+    if (mode === "oauth") {
+      let complete;
+      const completion = new Promise((resolve) => {
+        complete = resolve;
+      });
+      const unsubscribeOauth = statusClient.onNotification((event) => {
+        if (event.method === "mcpServer/oauthLogin/completed" && event.params?.name === "ui_kit_echo") {
+          complete(event.params);
+        }
+      });
+      const oauthLogin = await statusClient.call("mcpServer/oauth/login", {
+        clientRegistration: "dcr",
+        name: "ui_kit_echo",
+        scopes: ["mcp:tools"],
+        timeoutSecs: 30,
+      });
+      assert.match(oauthLogin.authorizationUrl, /^https?:\/\//);
+      const browserResponse = await fetch(oauthLogin.authorizationUrl, { redirect: "follow" });
+      assert.ok(browserResponse.status < 400, `OAuth callback returned HTTP ${browserResponse.status}.`);
+      const completed = await Promise.race([
+        completion,
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timed out waiting for OAuth completion.")), 30_000)),
+      ]);
+      unsubscribeOauth();
+      assert.equal(completed.success, true, `MCP OAuth login failed: ${completed.error ?? "unknown error"}`);
+      result.oauth = {
+        authorizationUrl: oauthLogin.authorizationUrl,
+        completed: true,
+        initialAuthStatus: server.authStatus ?? null,
+        success: completed.success,
+      };
+      statusResponse = await statusClient.call("mcpServerStatus/list", { detail: "full" });
+      server = statusResponse.data?.find((candidate) => candidate?.name === "ui_kit_echo");
+      assert.ok(server, "The OAuth-authenticated MCP status list must include ui_kit_echo.");
+    }
     assert.ok(server.tools, "The live MCP status list must expose configured tools.");
     for (const { name } of toolDefinitions) {
       assert.equal(
@@ -388,7 +480,7 @@ try {
       serverToolCalls: serverToolCalls.length,
       status: deniedCall.item.status,
     };
-  } else if (mode === "remote") {
+  } else if (mode === "remote" || mode === "oauth") {
     assert.ok(remoteMethods.includes("initialize"), "Remote MCP must receive initialize.");
     assert.ok(remoteMethods.includes("tools/list"), "Remote MCP must receive tools/list.");
     assert.equal(
@@ -397,7 +489,7 @@ try {
       "Remote MCP must receive exactly one tools/call request.",
     );
     result.transport = {
-      kind: "streamable-http",
+      kind: mode === "oauth" ? "streamable-http-oauth" : "streamable-http",
       methods: [...remoteMethods],
       url: remoteUrl,
     };
@@ -503,6 +595,7 @@ try {
   await page.evaluate(() => window.codexDemo?.closeLive()).catch(() => undefined);
   await app.close();
   if (remoteServer) {
+    remoteServer.closeAllConnections?.();
     await new Promise((resolve) => remoteServer.close(resolve));
   }
   if (threadId) {

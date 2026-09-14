@@ -1074,6 +1074,11 @@ geometry. A remote mode now serves the same tool over a loopback Streamable
 HTTP `/mcp` endpoint and proves the real `initialize`/`tools/list`/`tools/call`
 sequence, completed card, and 1180/720 geometry; OAuth credential exchange and
 production remote-provider reachability remain open.
+The follow-up OAuth mode now hosts a disposable protected-resource/OAuth
+provider, runs DCR plus authorization-code/token exchange through the public
+`mcpServer/oauth/login` method, and proves the resulting authenticated remote
+MCP tool call with the same card and 1180/720 geometry. Production provider
+discovery, account policy, and installed-product parity remain open.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from

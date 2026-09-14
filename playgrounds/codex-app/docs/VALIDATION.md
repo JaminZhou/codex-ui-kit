@@ -105,6 +105,15 @@ zero server-side `tools/call` executions, and a failed UI item. The remote mode
 now covers a real loopback Streamable HTTP server; OAuth provider behavior and
 credential exchange remain host-owned boundaries.
 
+Full acceptance additionally runs `check:live-mcp-tool-oauth`. That probe hosts
+a disposable loopback OAuth provider with protected-resource metadata, DCR,
+authorization-code redirect, and token exchange, drives the public
+`mcpServer/oauth/login` method, and then proves the authenticated remote MCP
+`tools/call` reaches the same UI card at 1180/720px. The authorization URL,
+provider log, token, protocol trace, and screenshots remain in the printed
+temporary directory and are never committed; this is a credential-exchange
+contract, not a production provider or installed-product claim.
+
 ### Live permissions-request bridge — 2026-09-13
 
 The Live Electron bridge now handles the public
