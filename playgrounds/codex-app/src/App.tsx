@@ -87,6 +87,7 @@ import {
   ProjectIndex,
   SearchActivity,
   ScheduledTaskCreateMenu,
+  ScheduledTaskDetail,
   ScheduledTaskEditor,
   ScheduledTaskFilterTabs,
   ScheduledTaskNavigator,
@@ -3557,12 +3558,31 @@ export function App() {
   );
   const currentAutomations26903Replay =
     initialSelection.frame?.startsWith("scheduled-current-26-903") ?? false;
-  const scheduledTasks = currentAutomations26903Replay
-    ? currentScheduledTasks26903
-    : currentScheduledTasks;
+  const [scheduledTasks, setScheduledTasks] = useState<readonly ScheduledTaskItem[]>(
+    () =>
+      currentAutomations26903Replay
+        ? [...currentScheduledTasks26903]
+        : [...currentScheduledTasks],
+  );
   const [scheduledAction, setScheduledAction] = useState("");
   const [scheduledName, setScheduledName] = useState("");
   const [scheduledPrompt, setScheduledPrompt] = useState("");
+  const [scheduledEditingTaskId, setScheduledEditingTaskId] = useState<string | null>(null);
+  const [scheduledSelectedTaskId, setScheduledSelectedTaskId] = useState<string | null>(
+    initialSelection.frame?.includes("-detail")
+      ? currentAutomations26903Replay
+        ? "workspace-brief"
+        : "workspace-brief"
+      : null,
+  );
+  const [scheduledDetailStatus, setScheduledDetailStatus] = useState<
+    "ready" | "running" | "error"
+  >(initialSelection.frame?.endsWith("-detail-error") ? "error" : "ready");
+  const [scheduledDetailMessage, setScheduledDetailMessage] = useState(
+    initialSelection.frame?.endsWith("-detail-error")
+      ? "The scheduled task needs permission."
+      : "",
+  );
   const [scheduledFieldValues, setScheduledFieldValues] = useState({
     at: "09:00",
     chat: "new-chat",
@@ -11800,6 +11820,70 @@ export function App() {
   ]
     .filter(Boolean)
     .join(" ");
+  const selectedScheduledTask = scheduledTasks.find(
+    (task) => task.id === scheduledSelectedTaskId,
+  );
+  const openScheduledEditor = (task?: ScheduledTaskItem) => {
+    setScheduledEditingTaskId(task?.id ?? null);
+    setScheduledName(typeof task?.title === "string" ? task.title : "");
+    setScheduledPrompt(
+      task
+        ? `Run ${typeof task.title === "string" ? task.title.toLocaleLowerCase() : task.id}`
+        : "",
+    );
+    setScheduledEditorOpen(true);
+    setScheduledAction(task ? `edit:${task.id}` : "manual-setup");
+  };
+  const toggleScheduledTask = (task: ScheduledTaskItem) => {
+    const nextStatus = task.status === "paused" ? "active" : "paused";
+    setScheduledTasks((current) =>
+      current.map((entry) =>
+        entry.id === task.id
+          ? {
+              ...entry,
+              status: nextStatus,
+              actionIcon: <CurrentScheduledGlyph name="pause" />,
+            }
+          : entry,
+      ),
+    );
+    setScheduledSelectedTaskId(task.id);
+    setScheduledDetailStatus("ready");
+    setScheduledDetailMessage("");
+    setScheduledAction(`toggle:${task.id}:${nextStatus}`);
+  };
+  const runScheduledTask = (task: ScheduledTaskItem) => {
+    setScheduledSelectedTaskId(task.id);
+    setScheduledDetailStatus("running");
+    setScheduledAction(`run:${task.id}`);
+    if (task.id === "dependency-monitor") {
+      setScheduledDetailStatus("error");
+      setScheduledDetailMessage("The scheduled task needs permission.");
+      setScheduledAction(`run-failed:${task.id}`);
+      return;
+    }
+    setScheduledDetailStatus("ready");
+    setScheduledDetailMessage("Last run completed successfully.");
+  };
+  const scheduledDetailRoute = selectedScheduledTask ? (
+    <ScheduledTaskDetail
+      data-testid="current-scheduled-detail"
+      lastRun={scheduledDetailMessage || "Never"}
+      nextRun={selectedScheduledTask.nextRun}
+      onClose={() => {
+        setScheduledSelectedTaskId(null);
+        setScheduledDetailStatus("ready");
+        setScheduledAction("close-detail");
+      }}
+      onEdit={() => openScheduledEditor(selectedScheduledTask)}
+      onRetry={() => runScheduledTask(selectedScheduledTask)}
+      onRun={() => runScheduledTask(selectedScheduledTask)}
+      onToggle={() => toggleScheduledTask(selectedScheduledTask)}
+      status={scheduledDetailStatus}
+      statusMessage={scheduledDetailMessage}
+      task={selectedScheduledTask}
+    />
+  ) : null;
   const scheduledTasksRoute = scheduledEditorOpen ? (
     <div
       className={`${scheduledRouteClassName} demo-current-scheduled-route--editor`}
@@ -11810,8 +11894,11 @@ export function App() {
         <ScheduledTaskNavigator
           activeFilter={scheduledFilter}
           onQueryChange={setScheduledQuery}
-          onTaskOpen={(task) => setScheduledAction(`open:${task.id}`)}
-          onTaskToggle={(task) => setScheduledAction(`toggle:${task.id}`)}
+          onTaskOpen={(task) => {
+            setScheduledSelectedTaskId(task.id);
+            setScheduledAction(`open:${task.id}`);
+          }}
+          onTaskToggle={toggleScheduledTask}
           query={scheduledQuery}
           tasks={scheduledTasks}
         />
@@ -11834,13 +11921,52 @@ export function App() {
           }}
           onNameChange={setScheduledName}
           onPromptChange={setScheduledPrompt}
-          onSubmit={() => setScheduledAction("submit")}
+          onSubmit={() => {
+            const trimmedName = scheduledName.trim();
+            const trimmedPrompt = scheduledPrompt.trim();
+            if (!trimmedName || !trimmedPrompt) return;
+            if (scheduledEditingTaskId) {
+              setScheduledTasks((current) =>
+                current.map((task) =>
+                  task.id === scheduledEditingTaskId
+                    ? { ...task, title: trimmedName }
+                    : task,
+                ),
+              );
+              setScheduledSelectedTaskId(scheduledEditingTaskId);
+              setScheduledAction(`edit-saved:${scheduledEditingTaskId}`);
+            } else {
+              const created: ScheduledTaskItem = {
+                id: "custom-scheduled-task",
+                nextRun: "Tomorrow",
+                schedule: "Daily at 9:00 AM",
+                status: "active",
+                title: trimmedName,
+              };
+              setScheduledTasks((current) =>
+                current.some((task) => task.id === created.id)
+                  ? current.map((task) =>
+                      task.id === created.id ? created : task,
+                    )
+                  : [...current, created],
+              );
+              setScheduledSelectedTaskId(created.id);
+              setScheduledAction("create-saved");
+            }
+            setScheduledEditorOpen(false);
+            setScheduledEditingTaskId(null);
+            setScheduledDetailStatus("ready");
+            setScheduledDetailMessage("Saved successfully.");
+          }}
           prompt={scheduledPrompt}
+          submitLabel={scheduledEditingTaskId ? "Save" : "Create"}
+          title={scheduledEditingTaskId ? "Edit" : "New"}
         />
       </div>
     </div>
   ) : (
-    <ScheduledTasksPage
+    <>
+      <ScheduledTasksPage
       activeFilter={scheduledFilter}
       className={scheduledRouteClassName}
       data-action={scheduledAction || undefined}
@@ -11851,14 +11977,29 @@ export function App() {
         setScheduledAction("retry");
         setScheduledStatus("ready");
       }}
-      onSuggestionAdd={(suggestion) =>
-        setScheduledAction(`add:${suggestion.id}`)
-      }
+      onSuggestionAdd={(suggestion) => {
+        setScheduledName(
+          typeof suggestion.title === "string" ? suggestion.title : suggestion.id,
+        );
+        setScheduledPrompt(
+          typeof suggestion.description === "string"
+            ? suggestion.description
+            : "",
+        );
+        setScheduledEditingTaskId(null);
+        setScheduledEditorOpen(true);
+        setScheduledAction(`add:${suggestion.id}`);
+      }}
       onSuggestionOpen={(suggestion) =>
         setScheduledAction(`suggestion:${suggestion.id}`)
       }
-      onTaskOpen={(task) => setScheduledAction(`open:${task.id}`)}
-      onTaskToggle={(task) => setScheduledAction(`toggle:${task.id}`)}
+      onTaskOpen={(task) => {
+        setScheduledSelectedTaskId(task.id);
+        setScheduledDetailStatus("ready");
+        setScheduledDetailMessage("");
+        setScheduledAction(`open:${task.id}`);
+      }}
+      onTaskToggle={toggleScheduledTask}
       query={scheduledQuery}
       status={scheduledStatus}
       statusDescription={
@@ -11869,8 +12010,10 @@ export function App() {
             : undefined
       }
       suggestions={currentScheduledSuggestions}
-      tasks={scheduledTasks}
-    />
+        tasks={scheduledTasks}
+      />
+      {scheduledDetailRoute}
+    </>
   );
 
   const sitesRoute = (

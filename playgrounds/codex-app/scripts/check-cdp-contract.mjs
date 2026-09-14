@@ -138,6 +138,59 @@ const currentPluginDetailContracts = [];
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   try {
+    if (scene.id.startsWith("scheduled-current-26-903-detail")) {
+      const compact = scene.id.endsWith("-compact");
+      const detail = page.getByRole("region", { name: "Scheduled task details" });
+      await detail.waitFor();
+      const contract = await page.evaluate(() => {
+        const root = document.querySelector(".codex-ui-scheduled-task-detail");
+        const bounds = root?.getBoundingClientRect();
+        return {
+          detail: bounds
+            ? { height: bounds.height, left: bounds.left, top: bounds.top, width: bounds.width }
+            : null,
+          facts: root?.querySelectorAll(".codex-ui-scheduled-task-detail__facts > div").length ?? 0,
+          horizontalOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          status: root?.getAttribute("data-status"),
+          title: root?.querySelector("h2")?.textContent?.trim(),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      if (
+        !contract.detail ||
+        contract.facts !== 4 ||
+        contract.status !== (scene.id.endsWith("-error") ? "error" : "ready") ||
+        contract.title !== "Workspace brief" ||
+        Math.abs(contract.horizontalOverflow) > 1 ||
+        contract.viewport.width !== (compact ? 720 : 1180) ||
+        contract.viewport.height !== 820
+      ) {
+        throw new Error(`${scene.id}: scheduled detail contract failed: ${JSON.stringify(contract)}`);
+      }
+      if (scene.id.endsWith("-error")) {
+        await detail.getByRole("button", { name: "Retry" }).click();
+        await page.locator('.codex-ui-scheduled-task-detail[data-status="ready"]').waitFor();
+      } else {
+        await detail.getByRole("button", { name: "Run now" }).click();
+        await page.locator('.codex-ui-scheduled-task-detail[data-status="ready"]').waitFor();
+      }
+      await detail.getByRole("button", { name: "Pause" }).click();
+      await detail.getByRole("button", { name: "Resume" }).waitFor();
+      await detail.getByRole("button", { name: "Edit" }).click();
+      const editor = page.getByRole("region", { name: "Scheduled task editor" });
+      await editor.waitFor();
+      const name = editor.getByRole("textbox", { name: "Name" });
+      await name.fill("Workspace brief revised");
+      await editor.getByRole("textbox", { name: "Instructions" }).fill("Run workspace brief revised");
+      await editor.getByRole("button", { name: "Save" }).click();
+      await page.getByRole("region", { name: "Scheduled task details" }).waitFor();
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ ...contract, interactions: ["run", "retry", "pause", "resume", "edit", "save"] }, null, 2)}\n`,
+      );
+      continue;
+    }
+
     if (
       scene.id.endsWith("-compact") &&
       scene.surfaces?.includes("reviewPanel")

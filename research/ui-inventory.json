@@ -2268,7 +2268,12 @@
         "browser-cdp:current-26-903-scheduled-wide-compact-editor",
         "electron:current-26-903-scheduled-wide-manual-compact",
         "pixel:current-26-903-scheduled-main-wide-compact-editor",
-        "runtime:current-26.903.71938-scheduled-native-viewport"
+        "runtime:current-26.903.71938-scheduled-native-viewport",
+        "component:ScheduledTaskDetail",
+        "playground:scheduled-detail-create-edit-pause-resume-run-retry",
+        "browser-cdp:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact",
+        "electron:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact",
+        "pixel:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2277,7 +2282,8 @@
         "cdp-26.903.71938:scheduled-native-task-count-and-icon-hashes",
         "cdp-26.903.71938:scheduled-wide-compact-manual-editor",
         "cdp-26.903.71938:scheduled-electron-wide-manual-compact",
-        "cdp-26.903.71938:scheduled-pixel-wide-compact-manual-editor"
+        "cdp-26.903.71938:scheduled-pixel-wide-compact-manual-editor",
+        "cdp:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
