@@ -2279,7 +2279,11 @@
         "playground:scheduled-detail-create-edit-pause-resume-run-retry",
         "browser-cdp:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact",
         "electron:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact",
-        "pixel:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact"
+        "pixel:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact",
+        "playground:scheduled-current-26-903-light-wide-compact",
+        "browser-cdp:scheduled-current-26-903-light-wide-compact",
+        "electron:scheduled-current-26-903-light-wide-compact",
+        "pixel:scheduled-current-26-903-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

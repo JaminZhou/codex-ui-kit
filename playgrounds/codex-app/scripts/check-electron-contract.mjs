@@ -1297,6 +1297,24 @@ for (const scheduledScene of [
     view: "automations",
     windowSize: { height: 820, width: 720 },
   },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903",
+    id: "electron-current-scheduled-26-903-light",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903",
+    id: "electron-current-scheduled-26-903-light-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "light",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
 ]) {
   const { app: scheduledApp, page: scheduledPage } = await launchScene(
     scheduledScene,
@@ -1363,10 +1381,10 @@ for (const scheduledScene of [
           !scheduled.search ||
           Math.abs(scheduled.search.left - 21) > 1
         : !scheduled.heading ||
-          Math.abs(scheduled.heading.left - 395.4375) > 1 ||
+          Math.abs(scheduled.heading.left - (compact ? 29 : 395.4375)) > 1 ||
           !scheduled.search ||
-          Math.abs(scheduled.search.left - 387.4375) > 1 ||
-          Math.abs(scheduled.search.width - 728) > 1 ||
+          Math.abs(scheduled.search.left - (compact ? 21 : 387.4375)) > 1 ||
+          Math.abs(scheduled.search.width - (compact ? 679 : 728)) > 1 ||
           scheduled.taskCount !== (currentBuild26903 ? 3 : 2) ||
           scheduled.headingFontWeight !== (currentBuild26903 ? "500" : "400") ||
           scheduled.suggestionCount !== 3)
