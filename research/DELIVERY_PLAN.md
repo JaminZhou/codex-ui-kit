@@ -1065,7 +1065,10 @@ visible cards at 1180/720 without overflow. A retry mode returns one real MCP
 tool error, requires the same tool to be called again, and verifies failed-then-
 completed item states plus the exact recovery token. Permission variants,
 streaming beyond this bounded retry, installed-product pixels, and remote
-transport remain open follow-up boundaries.
+transport remain open follow-up boundaries. The live timeout mode now adds a
+deliberately slow MCP server with a one-second tool limit and verifies the
+failed item state without a retry; OAuth/permission variants and remote
+transport remain open.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from

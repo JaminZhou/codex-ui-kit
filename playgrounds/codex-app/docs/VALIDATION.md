@@ -94,7 +94,9 @@ same tool is called again, requiring failed-then-completed item states and the
 exact recovery token. A fourth full-acceptance
 run switches the same disposable server to URL mode, verifies the exact
 authorization link and `_blank` target, proves no browser opens implicitly, and
-cancels without visiting the external URL. OAuth provider behavior and
+also runs a timeout mode with a one-second tool limit and a deliberately slow
+real server, requiring a failed MCP item with the configured timeout evidence.
+OAuth provider behavior and
 credential exchange remain host-owned boundaries.
 
 ### Live permissions-request bridge — 2026-09-13
