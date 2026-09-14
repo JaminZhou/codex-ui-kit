@@ -1424,6 +1424,15 @@ uses a checked-in image fixture and states that generation and file decoding
 remain host-owned. Browser/CDP, Electron, and owned-pixel contracts cover the
 route; no product-generation or runtime-decoder claim is made.
 
+The `app.onboarding-login` row now has a controlled `LoginPage` surface based
+on the current package's login-route provider labels and desktop geometry. It
+covers the primary ChatGPT sign-in route, expanded provider options, API-key
+entry, device-code handoff, browser-pending, loading, and error/retry states at
+wide and 720px compact sizes. Browser/CDP, Electron, and owned-pixel gates
+cover the five lifecycle frames. Credential exchange, browser navigation,
+account discovery, and first-run persistence remain host-owned; this slice is
+not evidence that the installed product's authentication flow was executed.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 

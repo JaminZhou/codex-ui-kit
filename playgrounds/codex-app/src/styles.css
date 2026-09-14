@@ -7245,6 +7245,16 @@ textarea {
 }
 .demo-live-environment-settings__result h2 { font-size: 14px; margin: 0; }
 .demo-live-environment-settings__result code { overflow-wrap: anywhere; }
+
+.demo-onboarding-login-route {
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
+.demo-onboarding-login {
+  min-height: 100%;
+}
 .demo-root[data-mode="live"][data-view="pull-request"] .codex-ui-app-shell__backdrop[hidden] {
   display: none !important;
 }

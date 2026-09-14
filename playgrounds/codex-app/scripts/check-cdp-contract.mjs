@@ -147,6 +147,76 @@ for (const scene of selectedScenes) {
       );
       await page.waitForTimeout(700);
     }
+    if (scene.view === "onboarding") {
+      const contract = await page.evaluate(() => {
+        const root = document.querySelector(".codex-ui-login-page");
+        const panel = root?.querySelector(".codex-ui-login-page__panel");
+        const rect = (element) => {
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: value.bottom,
+            height: value.height,
+            left: value.left,
+            right: value.right,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        return {
+          action: document.querySelector("[data-testid='onboarding-login-route']")?.getAttribute("data-action"),
+          bodyOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          heading: root?.querySelector("h1")?.textContent?.trim(),
+          mode: root?.getAttribute("data-mode"),
+          panel: rect(panel),
+          status: root?.getAttribute("data-status"),
+          viewport: { height: innerHeight, width: innerWidth },
+          visibleButtons: Array.from(root?.querySelectorAll("button") ?? [], (button) => button.textContent?.trim() || button.getAttribute("aria-label")),
+        };
+      });
+      if (
+        !contract.panel ||
+        contract.bodyOverflow > 1 ||
+        contract.heading !== "Sign in to ChatGPT" ||
+        contract.status !== (scene.id.endsWith("-error") ? "error" : "ready") ||
+        ![1180, 720].includes(contract.viewport.width) ||
+        contract.viewport.height < 680
+      ) {
+        throw new Error(`${scene.id}: onboarding shell contract failed: ${JSON.stringify(contract)}`);
+      }
+      if (scene.id === "onboarding-login") {
+        await page.getByRole("button", { name: "More options" }).click();
+        for (const label of [
+          "Continue with Google",
+          "Continue with Apple",
+          "Continue with Microsoft",
+          "Continue with email",
+          "Continue with phone",
+          "Use device code",
+        ]) {
+          await page.getByRole("button", { name: label, exact: true }).waitFor();
+        }
+        await page.getByRole("button", { name: "Continue with Google" }).click();
+        await page.getByText("Continue signing in with your browser").waitFor();
+        contract.action = await page
+          .locator("[data-testid='onboarding-login-route']")
+          .getAttribute("data-action");
+      } else if (scene.id === "onboarding-login-api-key") {
+        await page.getByLabel("Enter your OpenAI API key").waitFor();
+        await page.getByRole("button", { name: "Continue" }).waitFor();
+      } else if (scene.id === "onboarding-login-device-code") {
+        await page.getByText("ABCD-EFGH", { exact: true }).waitFor();
+        await page.getByRole("button", { name: "Open browser" }).waitFor();
+      } else if (scene.id === "onboarding-login-error") {
+        await page.getByRole("alert").waitFor();
+        await page.getByRole("button", { name: "Try again" }).waitFor();
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify(contract, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("current-worktree-setup-")) {
       const setup = await page
         .locator(".codex-ui-worktree-setup")

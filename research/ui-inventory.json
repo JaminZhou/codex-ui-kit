@@ -1544,7 +1544,12 @@
       "packageEvidence": [
         "onboarding-page",
         "login-route",
-        "first-run"
+        "first-run",
+        "asar-current-login-provider-labels",
+        "playground:onboarding-login-ready-api-key-device-code-error",
+        "browser-cdp:onboarding-login-wide-compact-lifecycle",
+        "electron:onboarding-login-wide-compact-lifecycle",
+        "pixel:onboarding-login-wide-compact-lifecycle"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
