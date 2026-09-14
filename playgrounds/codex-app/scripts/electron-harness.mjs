@@ -1050,6 +1050,15 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-appearance-settings",
+    id: "workspace-appearance-settings-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-appearance-settings-compact",
     id: "workspace-appearance-settings-compact",
     maxPixelRatio: 0.01,
@@ -1078,6 +1087,15 @@ export const visualScenes = [
     scenario: "workspace-workflow",
     theme: "light",
     view: "workspace",
+  },
+  {
+    frame: "workspace-general-settings",
+    id: "workspace-general-settings-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
   },
   {
     frame: "workspace-general-settings-compact",
