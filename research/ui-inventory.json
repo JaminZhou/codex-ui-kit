@@ -1892,12 +1892,17 @@
       "ownership": "workspace",
       "packageEvidence": [
         "artifact-file-preview-icon",
-        "home-prefill-artifact-preview"
+        "home-prefill-artifact-preview",
+        "document-preview-panel:image",
+        "playground:workspace-image-preview-ready-loading-error",
+        "browser-cdp:workspace-image-preview-format-lifecycle",
+        "electron:workspace-image-preview-format-lifecycle",
+        "pixel:workspace-image-preview-wide-compact"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
-      "electronStatus": "not_started",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {

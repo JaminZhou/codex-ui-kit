@@ -1417,6 +1417,13 @@ this slice; the full local acceptance passes with the expanded CDP lifecycle,
 Electron, and owned-pixel format matrix. Other host effects and installed-
 product decoding remain open.
 
+The adjacent `workspace.media-generated-content` row now has a controlled image
+artifact route with ready/error/loading states at wide and compact sizes. The
+public preview shell exposes an explicit `image` kind, while the playground
+uses a checked-in image fixture and states that generation and file decoding
+remain host-owned. Browser/CDP, Electron, and owned-pixel contracts cover the
+route; no product-generation or runtime-decoder claim is made.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 

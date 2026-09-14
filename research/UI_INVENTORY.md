@@ -318,6 +318,9 @@ replay matrix now has Browser/CDP, Electron, and pixel gates, while installed-
 product runtime decoding is still not sampled. The adjacent artifact shell is
 also gated for side placement, selected tab, tab-panel semantics, close and
 expand/restore ownership in the PDF workspace replay.
+The media-generated-content row now has the same controlled image artifact
+route with wide/compact lifecycle gates; generation and decoding remain
+host-owned.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

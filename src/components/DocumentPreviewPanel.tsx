@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 
 export type DocumentPreviewKind =
   | "document"
+  | "image"
   | "notebook"
   | "pdf"
   | "presentation"
@@ -26,6 +27,7 @@ export interface DocumentPreviewPanelProps
 
 const kindLabels: Record<DocumentPreviewKind, string> = {
   document: "Document",
+  image: "Image",
   notebook: "Notebook",
   pdf: "PDF",
   presentation: "Presentation",

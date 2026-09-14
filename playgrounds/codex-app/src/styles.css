@@ -496,6 +496,35 @@ textarea {
   line-height: 1.5;
 }
 
+.demo-document-preview-image-figure {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0 auto;
+  max-width: 34rem;
+  width: 100%;
+}
+
+.demo-document-preview-image {
+  background: #111827;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 0.625rem;
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 0.18);
+  display: block;
+  height: auto;
+  max-height: 24rem;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.demo-document-preview-image-figure figcaption {
+  color: #4b5563;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
 @media (max-width: 45rem) {
   .demo-document-preview-route {
     align-items: stretch;

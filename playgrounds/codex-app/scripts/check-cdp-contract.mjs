@@ -7,6 +7,7 @@ process.env.CODEX_DEMO_ATTACHMENT_RENDERER_FIXTURE = "1";
 
 const documentPreviewScenePrefixes = [
   "workspace-document-preview",
+  "workspace-image-preview",
   "workspace-notebook-preview",
   "workspace-spreadsheet-preview",
   "workspace-presentation-preview",
@@ -18,6 +19,7 @@ function isDocumentPreviewScene(frame) {
 }
 
 function expectedDocumentPreviewKind(frame) {
+  if (frame?.startsWith("workspace-image-preview")) return "image";
   if (frame?.startsWith("workspace-notebook-preview")) return "notebook";
   if (frame?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
   if (frame?.startsWith("workspace-presentation-preview")) return "presentation";
@@ -26,6 +28,7 @@ function expectedDocumentPreviewKind(frame) {
 }
 
 function expectedDocumentPreviewTitle(frame) {
+  if (frame?.startsWith("workspace-image-preview")) return "generated-image.png";
   if (frame?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
   if (frame?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
   if (frame?.startsWith("workspace-presentation-preview")) return "roadmap.pptx";
@@ -5464,7 +5467,7 @@ for (const scene of selectedScenes) {
           ".codex-ui-document-preview__body",
         );
         const page = panel?.querySelector(
-          ".demo-document-preview-page, .codex-ui-document-preview__page",
+          ".demo-document-preview-page, .demo-document-preview-image, .codex-ui-document-preview__page",
         );
         return {
           ariaBusy: panel?.getAttribute("aria-busy"),
