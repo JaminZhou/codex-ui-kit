@@ -789,6 +789,24 @@ for (const integrationScene of [
     view: "plugins",
     windowSize: { height: 820, width: 720 },
   },
+  {
+    currentSidebar: true,
+    frame: "integration-skills-current-26-825",
+    id: "electron-current-integration-skills-light",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "plugins",
+  },
+  {
+    currentSidebar: true,
+    frame: "integration-skills-current-26-825",
+    id: "electron-current-integration-skills-light-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "light",
+    view: "plugins",
+    windowSize: { height: 820, width: 720 },
+  },
 ]) {
   const { app: integrationApp, page: integrationPage } = await launchScene(
     integrationScene,
@@ -850,7 +868,7 @@ for (const integrationScene of [
         `${integrationScene.id}: Electron integration catalog geometry failed: ${JSON.stringify({ catalog, nativeBounds })}`,
       );
     }
-    if (!compact) {
+    if (!compact && expectedKind === "plugins") {
       await integrationPage.getByPlaceholder("Search plugins").fill("github");
       await integrationPage
         .locator(".codex-ui-integration-catalog-tabs")
