@@ -311,6 +311,24 @@ the sampled real approval-cancellation and same-thread Stop recovery path on
 every complete acceptance pass; it does not cover every approval kind, running
 command/tool interruption, or installed-product pixel parity.
 
+### Live running-command cancellation — 2026-09-14
+
+The `check:live-command-cancel` probe now runs inside full playground
+acceptance as a signed-in one-turn gate. It asks the public App Server to run
+only `sleep 30` in a disposable workspace, allows the exact command request if
+the host asks for approval, and waits for a real `commandExecution` item to
+enter `inProgress`. The probe then clicks the owning Composer `Stop` control
+and requires the same turn to settle as `interrupted`; a successful
+`item/completed` command result is forbidden, while a provider-emitted
+interrupted item is accepted. It captures the running/stopped state at
+1180/720px and asserts no horizontal overflow.
+
+The pinned client/runtime versions and protocol records remain in the printed
+temporary directory. The command is harmless, workspace-scoped, and leaves no
+file. This closes the sampled active command interruption lifecycle, not
+provider-specific process-group guarantees, every command approval policy, or
+installed-product pixel parity.
+
 ### Live command approval — 2026-09-13
 
 The `check:live-command-approval` probe now runs inside full playground

@@ -1461,6 +1461,14 @@ approval resolution, no file write, and a same-thread recovery turn at
 1180/720px. It uses the pinned public client and a write-disabled disposable
 workspace; protocol logs and screenshots remain local-only. Other approval
 kinds and installed-product visual parity remain open.
+The running-command cancellation follow-up now asks the public App Server to
+execute a real disposable `sleep 30` command, waits for the
+`commandExecution` item to enter `inProgress`, and drives the owning Composer
+Stop control. It requires the same turn to settle as `interrupted` without a
+successful command completion, and captures the running/stopped states at
+1180/720px. This closes the sampled active command interruption lifecycle;
+provider-specific process-group guarantees, broader command-policy variants,
+and installed-product visual parity remain separate boundaries.
 The companion opt-in command-approval follow-up now verifies one real
 `touch command-approval-proof.txt` request, the Terminal card's `Allow once`
 action, completed command/turn settlement, and wide/compact no-overflow
@@ -1835,7 +1843,11 @@ without confusing package readiness with full product reconstruction.
     playground probe now covers real public-protocol subagent delegation and
     owning-thread Stop settlement; continue with installed-product/background
     process evidence and broader real global notification reachability. The
-    bounded terminal transport-failure replay is delivered separately; current
+    real active `commandExecution` Stop follow-up now also settles an in-flight
+    `sleep 30` command as an interrupted turn without a successful completion;
+    provider-specific process-group behavior and installed-product evidence
+    remain open. The bounded terminal transport-failure replay is delivered
+    separately; current
     real transport recovery is delivered
     through an isolated proxy plus CDP/Electron/pixel gates. The independent
     transport state machine and
