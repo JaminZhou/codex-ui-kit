@@ -2226,7 +2226,11 @@
         "pixel:integration-plugins-current-26-825-light-wide-compact",
         "browser-cdp:current-26-825-plugin-detail-installed-discovery-wide-compact-bottom-actions-connection",
         "electron:current-26-825-plugin-detail-installed-actions-connection-discovery-compact",
-        "pixel:eight-reviewed-current-26-825-plugin-detail-scenes-and-eight-local-only-product-region-gates"
+        "pixel:eight-reviewed-current-26-825-plugin-detail-scenes-and-eight-local-only-product-region-gates",
+        "playground:integration-plugin-detail-current-26-825-light-wide-compact",
+        "browser-cdp:integration-plugin-detail-current-26-825-light-wide-compact",
+        "electron:integration-plugin-detail-current-26-825-light-wide-compact",
+        "pixel:integration-plugin-detail-current-26-825-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2255,7 +2259,11 @@
         "pixel:current-26-825-skill-main-wide-compact",
         "browser-cdp:current-26-825-skill-detail-wide-compact-actions-bottom-try-now",
         "electron:current-26-825-skill-detail-wide-compact-actions-bottom-try-now",
-        "pixel:five-reviewed-current-26-825-skill-detail-and-try-now-scenes"
+        "pixel:five-reviewed-current-26-825-skill-detail-and-try-now-scenes",
+        "playground:integration-skill-detail-current-26-825-light-wide-compact",
+        "browser-cdp:integration-skill-detail-current-26-825-light-wide-compact",
+        "electron:integration-skill-detail-current-26-825-light-wide-compact",
+        "pixel:integration-skill-detail-current-26-825-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

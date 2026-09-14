@@ -883,6 +883,8 @@ for (const pluginDetailScene of visualScenes.filter(({ id }) =>
     "integration-plugin-detail-current-26-825-actions",
     "integration-plugin-detail-current-26-825-connection",
     "integration-plugin-detail-current-26-825-discovery-compact",
+    "integration-plugin-detail-current-26-825-installed-light",
+    "integration-plugin-detail-current-26-825-installed-light-compact",
   ].includes(id),
 )) {
   const { app: pluginDetailApp, page: pluginDetailPage } = await launchScene(
@@ -1090,6 +1092,8 @@ for (const skillDetailScene of visualScenes.filter(({ id }) =>
     "integration-skill-detail-current-26-825-bottom",
     "integration-skill-detail-current-26-825-installed-compact",
     "integration-skill-detail-current-26-825-try-now-compact",
+    "integration-skill-detail-current-26-825-installed-light",
+    "integration-skill-detail-current-26-825-installed-light-compact",
   ].includes(id),
 )) {
   const { app: skillDetailApp, page: skillDetailPage } = await launchScene(
