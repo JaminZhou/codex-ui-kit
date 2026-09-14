@@ -13,8 +13,9 @@ const scene = visualScenes.find(({ id }) => id === "workspace-environments-unava
 assert.ok(scene, "environment route scene is present");
 
 const remoteEnvironmentId = "ui-kit-local-remote";
-const createRemoteServer = async (label) => {
+const createRemoteServer = async (label, { failInfoCount = 0 } = {}) => {
   const methods = [];
+  let remainingInfoFailures = failInfoCount;
   const remoteInfo = {
     cwd: `file:///tmp/ui-kit-local-remote-${label}`,
     shell: { name: "zsh", path: "/bin/zsh" },
@@ -44,6 +45,11 @@ const createRemoteServer = async (label) => {
       }
       if (message.method === "initialized") return;
       if (message.method === "environment/info") {
+        if (remainingInfoFailures > 0) {
+          remainingInfoFailures -= 1;
+          socket.send(JSON.stringify({ id: message.id, result: { cwd: remoteInfo.cwd, shell: {} } }));
+          return;
+        }
         socket.send(JSON.stringify({ id: message.id, result: remoteInfo }));
         return;
       }
@@ -71,7 +77,7 @@ const createRemoteServer = async (label) => {
 };
 
 const initialServer = await createRemoteServer("initial");
-const updatedServer = await createRemoteServer("updated");
+const updatedServer = await createRemoteServer("updated", { failInfoCount: 1 });
 const initialExecServerUrl = initialServer.url;
 const updatedExecServerUrl = updatedServer.url;
 const updatedExecServerValue = `${updatedExecServerUrl}/`;
@@ -146,6 +152,11 @@ try {
       }
 
       await inspect.click();
+      const infoError = route.getByRole("alert", { name: "Environment info result", exact: true });
+      if (width === 1180) {
+        await infoError.getByRole("heading", { name: "Environment details unavailable", exact: true }).waitFor();
+        await infoError.getByRole("button", { name: "Retry environment details", exact: true }).click();
+      }
       const info = route.getByRole("status", { name: "Environment info result", exact: true });
       await info.getByRole("heading", { name: "Environment details", exact: true }).waitFor();
       assert.match(await info.innerText(), /zsh/);
@@ -170,6 +181,7 @@ try {
   assert.ok(updatedServer.methods.includes("initialize"));
   assert.ok(updatedServer.methods.includes("environment/info"));
   assert.ok(updatedServer.methods.includes("environment/status"));
+  assert.equal(updatedServer.methods.filter((method) => method === "environment/info").length, 3);
   console.log(JSON.stringify({
     passed: true,
     directory,
@@ -181,6 +193,7 @@ try {
       updated: updatedServer.methods,
     },
     results,
+    repair: "malformed environment/info once, then UI Retry recovery",
     realAppServer: true,
     modelTurns: 0,
     productionRemoteRegistry: false,

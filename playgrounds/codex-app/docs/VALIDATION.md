@@ -180,6 +180,13 @@ remote-delete method. This is playground persistence/update evidence, not
 cloud registration, remote deletion, Noise relay, authentication, or
 production Remote registry parity.
 
+The same real gate injects one malformed `environment/info` response on the
+updated loopback connection at 1180px. The route must render its details
+failure card, invoke the visible Retry action, and then recover on the next
+public call before the 720px process reads the persisted endpoint. This is a
+deterministic protocol-repair variant, not a claim about production provider
+outages or remote recovery semantics.
+
 ### Live Terminal execution — 2026-09-08
 
 After `pnpm build:codex-app`, run
