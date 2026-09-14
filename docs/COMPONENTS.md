@@ -378,6 +378,116 @@ All privileged behavior remains host-owned. The components never auto-approve co
   availability, loading, repairing, disabled, and empty states.
 - `RunLocationMenu`: radio-menu composition for local, cloud, worktree, or
   host-defined execution locations.
+
+## Additional public contracts
+
+The following exports are intentionally listed separately because they are
+small, route-specific, or host-integration helpers. They follow the same
+boundary: values are controlled by the host, callbacks emit intent, and the
+kit never performs filesystem, network, account, or process mutations.
+
+### Shell, recovery, and workspace helpers
+
+- `AppServerCrashRecovery`: fatal App Server child-exit surface with a
+  host-supplied title, explanation, actions, and `onAction` callback. The
+  default restart action is only a label; restarting the client is host-owned.
+- `AppSidebarCollection` and `AppSidebarCollectionState`: reusable grouped
+  sidebar collections and loading/empty/error state rows. `items`, `status`,
+  `onRetry`, and action slots are controlled; the collection does not fetch or
+  persist history.
+- `BrowserWorkspacePanel`: controlled browser-tab shell with active tab,
+  close/open/expand callbacks, toolbar slots, and host-owned page content.
+  It does not navigate, authenticate, download, or execute page scripts.
+- `ThreadSummaryDock`: docked variant of the thread-summary surface with
+  controlled open state, labels, and close/focus callbacks; environment, Git,
+  and pull-request values remain host data.
+- `SystemErrorNotice` and `WorkingDirectoryNotice`: compact error and missing
+  working-directory notices with explicit retry/open-new-worktree actions.
+  They never inspect paths or repair a checkout themselves.
+- `TerminalReloadNotice`: terminal-crash/reload copy with an explicit reload
+  callback and optional detail. Reloading or recreating a process belongs to
+  the host.
+
+### Composer and content helpers
+
+- `ComposerPermissionMenu`: controlled Ask/Approve/Full (or host-defined)
+  permission choices with checked state, descriptions, and `onChange`.
+  Approval policy and persistence remain host-owned.
+- `ComposerPlanProgress`: pending, active, completed, and failed plan-step
+  progress with controlled steps and an optional `onDismiss`/action slot. It
+  renders protocol state and does not run a plan.
+- `ComposerResourcePicker`: searchable, grouped resource picker with loading,
+  empty, disabled, selected, footer, keyboard-dismissal, and `onSelect`/
+  `onClose` callbacks. Hosts own attachment, plugin, and skill effects.
+- `MarkdownImage`: protocol-neutral image renderer with ready/loading/error
+  status, source resolver, alt text, preview and retry callbacks. It never
+  fetches or decodes a remote URL on behalf of the host.
+- `McpToolIcon`: deterministic, replaceable MCP/tool identity glyph. The host
+  supplies the semantic label and may replace the icon; it has no tool-call
+  side effects.
+- `NewConversationPromptGrid`: controlled starter-prompt grid with prompt
+  values, disabled state, and `onSelect`. Submitting a prompt is host-owned.
+- `SubagentPanelIcon`: asset-free identity icon for delegated-agent panels;
+  the host supplies accessible labels and protocol metadata.
+
+### Settings, environment, and account surfaces
+
+- `CodeReviewSettingsPage`: controlled review-trigger policy, credits option,
+  loading/error/retry state, and `onChange`/`onRetry` callbacks. It never
+  starts a review or changes account limits.
+- `EnvironmentSettingsPage`: controlled environment list with ready/loading/
+  error/empty states, selection, refresh, and edit callbacks. Registry,
+  credentials, and provisioning stay in the host.
+- `EnvironmentEditorPage`: Setup/Cleanup/Actions tabs with controlled name,
+  script, action rows, dirty state, Save/Discard, and conflict/error Retry
+  callbacks. It is an editor contract, not a remote environment client.
+- `HooksSettingsPage`: controlled hook groups, trust/managed/changed states,
+  config-open and reload callbacks, and explicit error recovery. It does not
+  read or write hook files.
+- `KeyboardShortcutsPage`: searchable, grouped shortcut catalogue with
+  controlled capture/edit/clear/cancel state and `onShortcutChange`. Native
+  registration and persistence remain host-owned.
+- `PersonalizationSettingsPage`: controlled custom instructions, Memory
+  controls, warning, and Personality choice with save/reset callbacks. It
+  does not access account memory or profile services.
+- `VoiceSettingsPage`: controlled microphone, voice, screen-context,
+  dictionary, and recording states with host callbacks. Audio capture and
+  permissions remain outside the package.
+- `WorktreeSettingsPage`: controlled managed-worktree preferences and project
+  groups with Refresh/Delete/New-chat callbacks. It never deletes a directory
+  or changes Git state itself.
+- `WorktreeSetupStatus`: created/creating/failed setup phases, ordered steps,
+  sanitized log, and Retry/Cancel/Edit-environment actions. The host owns
+  checkout, filesystem, and retry effects.
+- `LoginPage`: ready/loading/error login shell with provider list, API-key and
+  device-code modes, browser-pending state, and host callbacks. Credentials,
+  browser navigation, and account persistence are never handled by the kit.
+- `RemoteConnectionsPage`: device/SSH rows with connected/connecting/
+  disconnected/error status plus Add/Edit/Forget/Test/Retry and a controlled
+  connection form. Credentials, pairing, Noise relay, SSH exchange, and
+  registry writes remain host-owned.
+
+### Integrations, automations, and previews
+
+- `ScheduledTasksPage`, `ScheduledTaskNavigator`, `ScheduledTaskFilterTabs`,
+  and `ScheduledTaskCreateMenu`: controlled automation index, filters, search,
+  suggestions, create choices, loading/error/unavailable states, and intent
+  callbacks. They do not schedule or execute work.
+- `ScheduledTaskEditor` and `ScheduledTaskDetail`: controlled task name,
+  prompt, frequency/detail fields, facts, running/error/retry state, and
+  Create/Save/Edit/Pause/Resume/Run callbacks. Persistence, permissions,
+  delivery, and cloud execution belong to the host.
+- `SitesIndexPage`: controlled site search/index with ready/loading/empty/
+  unavailable/error states and Create/Open/Share/Refresh/Overflow callbacks.
+  It does not call a Sites service or open external pages.
+- `SkillDetailDialog` and `SkillPromptMention`: controlled skill detail,
+  enabled state, action menu, long instructions, and unsent Try-now prompt.
+  Installation, execution, and prompt submission are host-owned.
+- `PdfPreviewPanel`: controlled PDF page/zoom/annotation/expand state with
+  page navigation, Open/Retry/Close callbacks, and an explicit renderer slot.
+  PDF decoding and file access remain host-owned.
+- `MenuLinkItem`: accessible menu item that renders a host-provided link or
+  callback while preserving menu focus semantics; navigation is not inferred.
 - `WorktreePicker`: controlled worktree and branch selection with availability
   and repair states.
 - `PullRequestPage` and `PullRequestList`: responsive split or stacked PR
