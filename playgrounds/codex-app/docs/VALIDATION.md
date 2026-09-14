@@ -62,7 +62,7 @@ The temporary App Server auth link, protocol log, MCP server log, and images
 stay in the printed disposable directory and are never committed. This
 promotes a credential-free local MCP transport, the public MCP status-list
 mapping, and signed-in model-driven tool-call UI path; production MCP servers,
-OAuth/permissions, multi-tool turns, streaming/error variants,
+OAuth/permissions, streaming/error variants,
 installed-product parity, and final pixel baselines remain separate
 boundaries.
 
@@ -85,8 +85,11 @@ item with the exact `MCP_ELICITATION_CANCELLED` or
 `MCP_ELICITATION_DECLINED` result. Auth links, protocol/MCP server logs, and
 screenshots remain in the printed disposable directory. This is a real local
 MCP elicitation and tool-call path; URL-mode elicitation, authentication,
-permission variants, multi-turn/multi-tool behavior, production servers, and
-installed-product pixels remain separate boundaries. A fourth full-acceptance
+permission variants, streaming/error behavior, production servers, and
+installed-product pixels remain separate boundaries. Full acceptance also runs
+a two-tool mode against the same real server, requiring both ordered tool items,
+exact result tokens, and two visible 1180/720 tool cards without overflow. A
+fourth full-acceptance
 run switches the same disposable server to URL mode, verifies the exact
 authorization link and `_blank` target, proves no browser opens implicitly, and
 cancels without visiting the external URL. OAuth provider behavior and
