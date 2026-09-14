@@ -2374,12 +2374,16 @@
         "component:RemoteConnectionsPage",
         "playground:workspace-connections-settings-wide-compact-error-form",
         "playground:workspace-connections-settings-light",
+        "playground:workspace-connections-settings-light-compact",
         "browser-cdp:workspace-connections-settings-wide-compact-error-form",
         "browser-cdp:workspace-connections-settings-light",
+        "browser-cdp:workspace-connections-settings-light-compact",
         "electron:workspace-connections-settings-wide-compact-error-form",
         "electron:workspace-connections-settings-light",
+        "electron:workspace-connections-settings-light-compact",
         "pixel:workspace-connections-settings-wide-compact-error-form",
-        "pixel:workspace-connections-settings-light"
+        "pixel:workspace-connections-settings-light",
+        "pixel:workspace-connections-settings-light-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

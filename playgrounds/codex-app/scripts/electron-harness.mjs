@@ -942,6 +942,16 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    currentSidebar: true,
+    frame: "workspace-connections-settings",
+    id: "workspace-connections-settings-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-git-settings",
     id: "workspace-git-settings",
     maxPixelRatio: 0.01,
