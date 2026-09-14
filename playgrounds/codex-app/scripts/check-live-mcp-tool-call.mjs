@@ -8,8 +8,8 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single or multi.",
+  ["single", "multi", "retry"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, or retry.",
 );
 const toolDefinitions = [
   {
@@ -78,6 +78,7 @@ const reply = (id, result) => {
 };
 
 log("boot");
+let callCount = 0;
 const input = readline.createInterface({ input: process.stdin });
 for await (const line of input) {
   log("IN " + line);
@@ -96,8 +97,17 @@ for await (const line of input) {
   } else if (message.method === "tools/list") {
     reply(message.id, { tools: ${toolListSource} });
   } else if (message.method === "tools/call") {
+    callCount += 1;
     const tool = String(message.params?.name ?? "");
     const argument = String(message.params?.arguments?.message ?? "");
+    const shouldFail = ${JSON.stringify(mode === "retry")} && callCount === 1;
+    if (shouldFail) {
+      reply(message.id, {
+        content: [{ text: "MCP_TOOL_CALL_RETRYABLE_ERROR", type: "text" }],
+        isError: true,
+      });
+      continue;
+    }
     const text =
       tool === "ui_kit_upper"
         ? "MCP_TOOL_CALL_UPPER:" + argument.toUpperCase()
@@ -207,10 +217,13 @@ try {
     name: "Message composer",
     exact: true,
   });
+  const expectedCallCount = mode === "multi" || mode === "retry" ? 2 : 1;
   await composer.fill(
     mode === "multi"
       ? 'Use exactly two MCP tools now, one after the other. First call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Then call the tool named ui_kit_upper on the same MCP server with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving both tool results, reply exactly MCP_TOOL_CALL_OK and MCP_TOOL_CALL_UPPER:PIXEL-CHECK.'
-      : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
+      : mode === "retry"
+        ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the tool returns MCP_TOOL_CALL_RETRYABLE_ERROR, retry the same tool exactly once with the same argument. Do not use shell, files, network, browser, search, or any other tool. After the retry succeeds, reply exactly MCP_TOOL_CALL_OK:pixel-check.'
+        : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
   );
   await composer.press("Enter");
   await page.waitForFunction(
@@ -220,7 +233,7 @@ try {
           event.method === "item/completed" &&
           event.params?.item?.type === "mcpToolCall",
     ).length >= expectedCount,
-    toolDefinitions.length,
+    expectedCallCount,
     { timeout: 180_000 },
   );
 
@@ -235,22 +248,38 @@ try {
     .map((event) => ({ item: event.params.item, threadId: event.params.threadId }));
   assert.equal(
     completedItems.length,
-    toolDefinitions.length,
-    `Expected exactly ${toolDefinitions.length} completed MCP tool-call items.`,
+    expectedCallCount,
+    `Expected exactly ${expectedCallCount} completed MCP tool-call items.`,
   );
   const expectedResults = {
     ui_kit_echo: "MCP_TOOL_CALL_OK:pixel-check",
     ui_kit_upper: "MCP_TOOL_CALL_UPPER:PIXEL-CHECK",
   };
-  for (const expectedTool of toolDefinitions.map(({ name }) => name)) {
-    const completed = completedItems.find(({ item }) => item.tool === expectedTool);
-    assert.ok(completed, `A completed ${expectedTool} item must be observed.`);
-    assert.equal(completed.item.status, "completed");
-    assert.equal(completed.item.server, "ui_kit_echo");
+  if (mode === "retry") {
+    const [failedCall, recoveredCall] = completedItems;
+    assert.equal(failedCall.item.tool, "ui_kit_echo");
+    assert.equal(failedCall.item.status, "failed");
     assert.equal(
-      completed.item.result?.content?.[0]?.text,
-      expectedResults[expectedTool],
+      failedCall.item.result?.content?.[0]?.text,
+      "MCP_TOOL_CALL_RETRYABLE_ERROR",
     );
+    assert.equal(recoveredCall.item.tool, "ui_kit_echo");
+    assert.equal(recoveredCall.item.status, "completed");
+    assert.equal(
+      recoveredCall.item.result?.content?.[0]?.text,
+      expectedResults.ui_kit_echo,
+    );
+  } else {
+    for (const expectedTool of toolDefinitions.map(({ name }) => name)) {
+      const completed = completedItems.find(({ item }) => item.tool === expectedTool);
+      assert.ok(completed, `A completed ${expectedTool} item must be observed.`);
+      assert.equal(completed.item.status, "completed");
+      assert.equal(completed.item.server, "ui_kit_echo");
+      assert.equal(
+        completed.item.result?.content?.[0]?.text,
+        expectedResults[expectedTool],
+      );
+    }
   }
   const lastCompleted = completedItems.at(-1);
   threadId = lastCompleted.threadId;
@@ -293,6 +322,15 @@ try {
     });
     assert.ok(cardContract.width > 0 && cardContract.height > 0);
     cards.push({ card: cardContract, tool: completedItem.tool });
+    const dialogs = page.getByRole("dialog");
+    if (await dialogs.count()) {
+      const dialog = dialogs.last();
+      const closeDialog = dialog.getByRole("button", { name: "Close dialog" });
+      if (await closeDialog.count()) {
+        await closeDialog.click();
+        await dialog.waitFor({ state: "hidden" });
+      }
+    }
   }
   result.cards = cards;
   result.wideScreenshot = join(directory, "mcp-tool-call-wide.png");
