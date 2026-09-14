@@ -96,7 +96,8 @@ run switches the same disposable server to URL mode, verifies the exact
 authorization link and `_blank` target, proves no browser opens implicitly, and
 also runs a timeout mode with a one-second tool limit and a deliberately slow
 real server, requiring a failed MCP item with the configured timeout evidence.
-OAuth provider behavior and
+It also runs an approval-denied mode, requiring the MCP approval request,
+zero server-side `tools/call` executions, and a failed UI item. OAuth provider behavior and
 credential exchange remain host-owned boundaries.
 
 ### Live permissions-request bridge — 2026-09-13

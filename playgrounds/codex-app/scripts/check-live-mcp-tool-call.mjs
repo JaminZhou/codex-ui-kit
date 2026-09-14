@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, mkdtemp, symlink, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { constants } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,8 +8,8 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi", "retry", "timeout"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, or timeout.",
+  ["single", "multi", "retry", "timeout", "approval-denied"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, or approval-denied.",
 );
 const toolDefinitions = [
   {
@@ -195,7 +195,7 @@ try {
   }
 
   await page.getByRole("button", { name: "Live local", exact: true }).click();
-  await page.evaluate(() => {
+  await page.evaluate((approvalAction) => {
     window.__liveMcpEvidence = [];
     window.codexDemo.onNotification((event) => {
       window.__liveMcpEvidence.push(event);
@@ -207,14 +207,14 @@ try {
         event.params?._meta?.codex_approval_kind === "mcp_tool_call"
       ) {
         void window.codexDemo.respondToMcpElicitation({
-          action: "accept",
+          action: approvalAction,
           content: {},
           requestId: event.id,
           threadId: event.params.threadId,
         });
       }
     });
-  });
+  }, mode === "approval-denied" ? "decline" : "accept");
 
   const composer = page.getByRole("textbox", {
     name: "Message composer",
@@ -226,8 +226,10 @@ try {
       ? 'Use exactly two MCP tools now, one after the other. First call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Then call the tool named ui_kit_upper on the same MCP server with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving both tool results, reply exactly MCP_TOOL_CALL_OK and MCP_TOOL_CALL_UPPER:PIXEL-CHECK.'
       : mode === "retry"
         ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the tool returns MCP_TOOL_CALL_RETRYABLE_ERROR, retry the same tool exactly once with the same argument. Do not use shell, files, network, browser, search, or any other tool. After the retry succeeds, reply exactly MCP_TOOL_CALL_OK:pixel-check.'
-        : mode === "timeout"
+      : mode === "timeout"
           ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". The MCP server intentionally exceeds its one-second tool timeout. Do not retry. After the timeout failure, reply exactly MCP_TOOL_CALL_TIMEOUT. Do not use shell, files, network, browser, search, or any other tool.'
+        : mode === "approval-denied"
+          ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the MCP approval request is denied, do not retry. After the denial failure, reply exactly MCP_TOOL_CALL_APPROVAL_DENIED. Do not use shell, files, network, browser, search, or any other tool.'
         : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
   );
   await composer.press("Enter");
@@ -284,6 +286,32 @@ try {
       status: timedOutCall.item.status,
       toolTimeoutSeconds: 1,
     };
+  } else if (mode === "approval-denied") {
+    const approvals = events.filter(
+      (event) =>
+        event.method === "mcpServer/elicitation/request" &&
+        event.params?._meta?.codex_approval_kind === "mcp_tool_call",
+    );
+    assert.ok(approvals.length >= 1, "The MCP tool call must request approval before denial.");
+    const [deniedCall] = completedItems;
+    assert.equal(deniedCall.item.tool, "ui_kit_echo");
+    assert.equal(deniedCall.item.status, "failed");
+    assert.equal(deniedCall.item.server, "ui_kit_echo");
+    const serverLog = await readFile(serverLogPath, "utf8");
+    const serverToolCalls = serverLog
+      .split("\\n")
+      .filter((line) => line.includes('"method":"tools/call"'));
+    assert.equal(
+      serverToolCalls.length,
+      0,
+      "A denied MCP approval must not reach the MCP server tools/call handler.",
+    );
+    result.approval = {
+      action: "decline",
+      requestCount: approvals.length,
+      serverToolCalls: serverToolCalls.length,
+      status: deniedCall.item.status,
+    };
   } else {
     for (const expectedTool of toolDefinitions.map(({ name }) => name)) {
       const completed = completedItems.find(({ item }) => item.tool === expectedTool);
@@ -310,7 +338,7 @@ try {
   await page.getByText(/Worked for/).first().click();
   await page
     .getByText(
-      mode === "timeout"
+      mode === "timeout" || mode === "approval-denied"
         ? "ui_kit_echo integration failed"
         : "Used ui_kit_echo integration",
       { exact: true },
