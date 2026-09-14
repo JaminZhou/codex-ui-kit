@@ -8,8 +8,8 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi", "retry"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, or retry.",
+  ["single", "multi", "retry", "timeout"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, or timeout.",
 );
 const toolDefinitions = [
   {
@@ -100,6 +100,9 @@ for await (const line of input) {
     callCount += 1;
     const tool = String(message.params?.name ?? "");
     const argument = String(message.params?.arguments?.message ?? "");
+    if (${JSON.stringify(mode === "timeout")}) {
+      await new Promise((resolve) => setTimeout(resolve, 2_500));
+    }
     const shouldFail = ${JSON.stringify(mode === "retry")} && callCount === 1;
     if (shouldFail) {
       reply(message.id, {
@@ -129,7 +132,7 @@ for await (const line of input) {
 await writeFile(serverPath, serverSource);
 await writeFile(
   join(directory, "config.toml"),
-  `[mcp_servers.ui_kit_echo]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = 30\n`,
+  `[mcp_servers.ui_kit_echo]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = ${mode === "timeout" ? 1 : 30}\n`,
 );
 process.env.CODEX_HOME = directory;
 
@@ -223,6 +226,8 @@ try {
       ? 'Use exactly two MCP tools now, one after the other. First call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Then call the tool named ui_kit_upper on the same MCP server with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving both tool results, reply exactly MCP_TOOL_CALL_OK and MCP_TOOL_CALL_UPPER:PIXEL-CHECK.'
       : mode === "retry"
         ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the tool returns MCP_TOOL_CALL_RETRYABLE_ERROR, retry the same tool exactly once with the same argument. Do not use shell, files, network, browser, search, or any other tool. After the retry succeeds, reply exactly MCP_TOOL_CALL_OK:pixel-check.'
+        : mode === "timeout"
+          ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". The MCP server intentionally exceeds its one-second tool timeout. Do not retry. After the timeout failure, reply exactly MCP_TOOL_CALL_TIMEOUT. Do not use shell, files, network, browser, search, or any other tool.'
         : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
   );
   await composer.press("Enter");
@@ -269,6 +274,16 @@ try {
       recoveredCall.item.result?.content?.[0]?.text,
       expectedResults.ui_kit_echo,
     );
+  } else if (mode === "timeout") {
+    const [timedOutCall] = completedItems;
+    assert.equal(timedOutCall.item.tool, "ui_kit_echo");
+    assert.equal(timedOutCall.item.status, "failed");
+    assert.equal(timedOutCall.item.server, "ui_kit_echo");
+    result.timeout = {
+      error: timedOutCall.item.error ?? null,
+      status: timedOutCall.item.status,
+      toolTimeoutSeconds: 1,
+    };
   } else {
     for (const expectedTool of toolDefinitions.map(({ name }) => name)) {
       const completed = completedItems.find(({ item }) => item.tool === expectedTool);
@@ -293,7 +308,14 @@ try {
 
   await page.getByText(/Worked for/).first().waitFor({ state: "visible", timeout: 60_000 });
   await page.getByText(/Worked for/).first().click();
-  await page.getByText("Used ui_kit_echo integration", { exact: true }).click();
+  await page
+    .getByText(
+      mode === "timeout"
+        ? "ui_kit_echo integration failed"
+        : "Used ui_kit_echo integration",
+      { exact: true },
+    )
+    .click();
   const cards = [];
   for (const { item: completedItem } of completedItems) {
     const card = page.locator(`[data-item-id="${completedItem.id}"]`);
