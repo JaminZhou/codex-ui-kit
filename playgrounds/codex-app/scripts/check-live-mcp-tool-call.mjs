@@ -6,6 +6,42 @@ import { join } from "node:path";
 import { CodexAppServerClient } from "@jaminzhou/codex-app-server-client";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
+const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
+assert.ok(
+  ["single", "multi"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single or multi.",
+);
+const toolDefinitions = [
+  {
+    description:
+      "Use this tool when the user explicitly asks for the MCP echo. Returns a deterministic validation token.",
+    inputSchema: {
+      properties: {
+        message: { description: "The message to echo", type: "string" },
+      },
+      required: ["message"],
+      type: "object",
+    },
+    name: "ui_kit_echo",
+  },
+  ...(mode === "multi"
+    ? [
+        {
+          description:
+            "Use this tool when the user explicitly asks for the MCP uppercase transform. Returns a deterministic validation token.",
+          inputSchema: {
+            properties: {
+              message: { description: "The message to transform", type: "string" },
+            },
+            required: ["message"],
+            type: "object",
+          },
+          name: "ui_kit_upper",
+        },
+      ]
+    : []),
+];
+const toolListSource = JSON.stringify(toolDefinitions);
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-mcp-tool-call-"));
 const serverPath = join(directory, "server.mjs");
 const serverLogPath = join(directory, "server.log");
@@ -58,24 +94,17 @@ for await (const line of input) {
       serverInfo: { name: "ui-kit-echo", version: "1.0.0" },
     });
   } else if (message.method === "tools/list") {
-    reply(message.id, {
-      tools: [{
-        description:
-          "Use this tool when the user explicitly asks for the MCP echo. Returns a deterministic validation token.",
-        inputSchema: {
-          properties: {
-            message: { description: "The message to echo", type: "string" },
-          },
-          required: ["message"],
-          type: "object",
-        },
-        name: "ui_kit_echo",
-      }],
-    });
+    reply(message.id, { tools: ${toolListSource} });
   } else if (message.method === "tools/call") {
+    const tool = String(message.params?.name ?? "");
+    const argument = String(message.params?.arguments?.message ?? "");
+    const text =
+      tool === "ui_kit_upper"
+        ? "MCP_TOOL_CALL_UPPER:" + argument.toUpperCase()
+        : "MCP_TOOL_CALL_OK:" + argument;
     reply(message.id, {
       content: [{
-        text: "MCP_TOOL_CALL_OK:" + String(message.params?.arguments?.message ?? ""),
+        text,
         type: "text",
       }],
       isError: false,
@@ -110,11 +139,13 @@ const evidence = [];
 const result = {
   directory,
   liveAppServer: true,
+  mode,
   mcpServerStatus: null,
   mcpServer: "ui_kit_echo",
   modelTurns: 1,
   passed: false,
   tool: "ui_kit_echo",
+  tools: toolDefinitions.map(({ name }) => name),
 };
 let threadId = null;
 
@@ -132,10 +163,14 @@ try {
       (candidate) => candidate?.name === "ui_kit_echo",
     );
     assert.ok(server, "The live MCP status list must include ui_kit_echo.");
-    assert.ok(
-      server.tools && typeof server.tools.ui_kit_echo === "object",
-      "The live MCP status list must expose the configured tool.",
-    );
+    assert.ok(server.tools, "The live MCP status list must expose configured tools.");
+    for (const { name } of toolDefinitions) {
+      assert.equal(
+        typeof server.tools[name],
+        "object",
+        `The live MCP status list must expose ${name}.`,
+      );
+    }
     result.mcpServerStatus = {
       authStatus: server.authStatus,
       name: server.name,
@@ -173,69 +208,93 @@ try {
     exact: true,
   });
   await composer.fill(
-    'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
+    mode === "multi"
+      ? 'Use exactly two MCP tools now, one after the other. First call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Then call the tool named ui_kit_upper on the same MCP server with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving both tool results, reply exactly MCP_TOOL_CALL_OK and MCP_TOOL_CALL_UPPER:PIXEL-CHECK.'
+      : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
   );
   await composer.press("Enter");
   await page.waitForFunction(
-    () =>
-      window.__liveMcpEvidence?.some(
+    (expectedCount) =>
+      (window.__liveMcpEvidence ?? []).filter(
         (event) =>
           event.method === "item/completed" &&
           event.params?.item?.type === "mcpToolCall",
-      ),
-    undefined,
+    ).length >= expectedCount,
+    toolDefinitions.length,
     { timeout: 180_000 },
   );
 
   const events = await page.evaluate(() => window.__liveMcpEvidence);
   evidence.push(...events);
-  const completed = events.findLast(
-    (event) =>
-      event.method === "item/completed" &&
-      event.params?.item?.type === "mcpToolCall",
+  const completedItems = events
+    .filter(
+      (event) =>
+        event.method === "item/completed" &&
+        event.params?.item?.type === "mcpToolCall",
+    )
+    .map((event) => ({ item: event.params.item, threadId: event.params.threadId }));
+  assert.equal(
+    completedItems.length,
+    toolDefinitions.length,
+    `Expected exactly ${toolDefinitions.length} completed MCP tool-call items.`,
   );
-  const item = completed?.params?.item;
-  assert.ok(item, "A completed MCP tool-call item must be observed.");
-  assert.equal(item.status, "completed");
-  assert.equal(item.server, "ui_kit_echo");
-  assert.equal(item.tool, "ui_kit_echo");
-  assert.equal(item.result?.content?.[0]?.text, "MCP_TOOL_CALL_OK:pixel-check");
-  threadId = completed.params.threadId;
-  result.completedItem = {
+  const expectedResults = {
+    ui_kit_echo: "MCP_TOOL_CALL_OK:pixel-check",
+    ui_kit_upper: "MCP_TOOL_CALL_UPPER:PIXEL-CHECK",
+  };
+  for (const expectedTool of toolDefinitions.map(({ name }) => name)) {
+    const completed = completedItems.find(({ item }) => item.tool === expectedTool);
+    assert.ok(completed, `A completed ${expectedTool} item must be observed.`);
+    assert.equal(completed.item.status, "completed");
+    assert.equal(completed.item.server, "ui_kit_echo");
+    assert.equal(
+      completed.item.result?.content?.[0]?.text,
+      expectedResults[expectedTool],
+    );
+  }
+  const lastCompleted = completedItems.at(-1);
+  threadId = lastCompleted.threadId;
+  result.completedItems = completedItems.map(({ item }) => ({
     id: item.id,
     result: item.result,
     status: item.status,
-  };
+    tool: item.tool,
+  }));
+  const item = lastCompleted.item;
 
   await page.getByText(/Worked for/).first().waitFor({ state: "visible", timeout: 60_000 });
   await page.getByText(/Worked for/).first().click();
   await page.getByText("Used ui_kit_echo integration", { exact: true }).click();
-  const card = page.locator(`[data-item-id="${item.id}"]`);
-  await page.waitForTimeout(500);
-  await card.waitFor({ state: "attached", timeout: 15_000 });
-  const cardSummary = card.locator("summary");
-  if (await cardSummary.count()) {
-    await cardSummary.click();
+  const cards = [];
+  for (const { item: completedItem } of completedItems) {
+    const card = page.locator(`[data-item-id="${completedItem.id}"]`);
+    await page.waitForTimeout(250);
+    await card.waitFor({ state: "attached", timeout: 15_000 });
+    const cardSummary = card.locator("summary");
+    if (await cardSummary.count()) {
+      await cardSummary.click();
+    }
+    const cardButtons = card.getByRole("button");
+    if (await cardButtons.count()) {
+      await cardButtons.first().click();
+    } else {
+      await card.click({ force: true });
+    }
+    await card.waitFor({ state: "visible", timeout: 15_000 });
+    const cardContract = await card.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        fontFamily: style.fontFamily,
+        height: rect.height,
+        text: element.textContent?.replace(/\\s+/g, " ").trim(),
+        width: rect.width,
+      };
+    });
+    assert.ok(cardContract.width > 0 && cardContract.height > 0);
+    cards.push({ card: cardContract, tool: completedItem.tool });
   }
-  const cardButtons = card.getByRole("button");
-  if (await cardButtons.count()) {
-    await cardButtons.first().click();
-  } else {
-    await card.click({ force: true });
-  }
-  await card.waitFor({ state: "visible", timeout: 15_000 });
-  const cardContract = await card.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    const style = getComputedStyle(element);
-    return {
-      fontFamily: style.fontFamily,
-      height: rect.height,
-      text: element.textContent?.replace(/\\s+/g, " ").trim(),
-      width: rect.width,
-    };
-  });
-  assert.ok(cardContract.width > 0 && cardContract.height > 0);
-  result.card = cardContract;
+  result.cards = cards;
   result.wideScreenshot = join(directory, "mcp-tool-call-wide.png");
   await page.screenshot({ path: result.wideScreenshot });
 
@@ -251,7 +310,8 @@ try {
     "Live MCP tool-call UI must not overflow at 720px.",
   );
   result.compactScreenshot = join(directory, "mcp-tool-call-compact.png");
-  result.compactCard = await card.evaluate((element) => {
+  const compactCard = page.locator(`[data-item-id="${item.id}"]`);
+  result.compactCard = await compactCard.evaluate((element) => {
     const rect = element.getBoundingClientRect();
     return { height: rect.height, width: rect.width };
   });

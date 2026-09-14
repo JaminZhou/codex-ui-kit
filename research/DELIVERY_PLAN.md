@@ -1059,8 +1059,10 @@ deterministic result token, nested Activity/integration/card disclosure, and
 playground protocol/UI evidence, not production MCP server or OAuth parity.
 Before the turn, the same probe reads the public `mcpServerStatus/list` full
 inventory and requires the disposable server, tool map, and auth/runtime status
-to be present. Multi-tool, streaming/error, permission variants,
-installed-product pixels, and remote transport remain open follow-up
+to be present. A multi-tool mode now runs against the same real server, requires
+two completed tool items with exact deterministic results, and checks both
+visible cards at 1180/720 without overflow. Streaming/error, permission
+variants, installed-product pixels, and remote transport remain open follow-up
 boundaries.
 
 The companion live MCP elicitation probe is now part of full playground
