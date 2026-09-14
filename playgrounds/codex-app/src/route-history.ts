@@ -1,6 +1,7 @@
 export type DemoView =
   | "automations"
   | "conversation"
+  | "onboarding"
   | "projects"
   | "plugins"
   | "pull-request"

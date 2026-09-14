@@ -18,6 +18,47 @@ const crossMacOsSystemFontRatios = {
 
 export const visualScenes = [
   {
+    frame: "onboarding-login",
+    id: "onboarding-login",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "onboarding",
+  },
+  {
+    frame: "onboarding-login",
+    id: "onboarding-login-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "onboarding",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "onboarding-login-api-key",
+    id: "onboarding-login-api-key",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "onboarding",
+  },
+  {
+    frame: "onboarding-login-device-code",
+    id: "onboarding-login-device-code",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "onboarding",
+  },
+  {
+    frame: "onboarding-login-error",
+    id: "onboarding-login-error",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "onboarding",
+  },
+  {
     currentSidebar: true,
     frame: "scheduled-current-26-825",
     id: "scheduled-current-26-825",

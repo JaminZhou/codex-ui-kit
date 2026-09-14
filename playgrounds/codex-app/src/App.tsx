@@ -59,6 +59,8 @@ import {
   SkillPromptMention,
   KeyboardShortcutsPage,
   LocalEnvironmentDialog,
+  LoginPage,
+  type LoginPageMode,
   Menu,
   MenuItem,
   MenuLinkItem,
@@ -756,6 +758,8 @@ function querySelection() {
       ? "pull-request"
       : params.get("view") === "automations"
         ? "automations"
+      : params.get("view") === "onboarding"
+        ? "onboarding"
       : params.get("view") === "plugins"
         ? "plugins"
       : params.get("view") === "projects"
@@ -3435,6 +3439,25 @@ export function App() {
   const [theme, setTheme] = useState<DemoThemePreference>(
     initialSelection.theme,
   );
+  const onboardingFrame = initialSelection.frame ?? "onboarding-login";
+  const [loginMode, setLoginMode] = useState<LoginPageMode>(
+    onboardingFrame.includes("api-key")
+      ? "api-key"
+      : onboardingFrame.includes("device-code")
+        ? "device-code"
+        : onboardingFrame.includes("pending")
+          ? "browser-pending"
+          : "chatgpt",
+  );
+  const [loginStatus, setLoginStatus] = useState<"error" | "loading" | "ready">(
+    onboardingFrame.includes("error")
+      ? "error"
+      : onboardingFrame.includes("loading")
+        ? "loading"
+        : "ready",
+  );
+  const [loginApiKey, setLoginApiKey] = useState("");
+  const [loginAction, setLoginAction] = useState("");
   const [integrationCatalogKind, setIntegrationCatalogKind] = useState<
     "plugins" | "skills"
   >(
@@ -13611,6 +13634,51 @@ export function App() {
       {shellRouteContent}
     </AppRouteOutlet>
   );
+  const onboardingRoute = (
+    <div
+      className="demo-onboarding-login-route"
+      data-action={loginAction || undefined}
+      data-testid="onboarding-login-route"
+    >
+      <LoginPage
+        apiKeyValue={loginApiKey}
+        canCopySignInLink={loginMode === "browser-pending"}
+        className="demo-onboarding-login"
+        deviceCode="ABCD-EFGH"
+        errorMessage="Sign-in failed. Check your connection and try again."
+        mode={loginMode}
+        onApiKeyChange={setLoginApiKey}
+        onApiKeySubmit={() => setLoginAction("api-key-submit")}
+        onCancel={() => {
+          setLoginAction("cancel");
+          setLoginMode("chatgpt");
+        }}
+        onCopySignInLink={() => setLoginAction("copy-sign-in-link")}
+        onDeviceCode={() => {
+          setLoginAction("device-code");
+          setLoginMode("device-code");
+        }}
+        onOpenBrowser={() => {
+          setLoginAction("open-browser");
+          setLoginMode("browser-pending");
+        }}
+        onProviderSignIn={(provider) => {
+          setLoginAction(`provider:${provider}`);
+          setLoginMode("browser-pending");
+        }}
+        onRetry={() => {
+          setLoginAction("retry");
+          setLoginStatus("ready");
+        }}
+        onShowApiKey={() => {
+          setLoginAction("api-key");
+          setLoginMode("api-key");
+        }}
+        onSignUp={() => setLoginAction("sign-up")}
+        status={loginStatus}
+      />
+    </div>
+  );
   const messageNavigationItems = currentWindowedFrame
     ? Array.from({ length: windowedHistorySize }, (_, index) => ({
         id: `current-windowed-user-${index + 1}`,
@@ -16656,7 +16724,7 @@ export function App() {
               : undefined
         }
         sidePanelOpen={
-          isCurrentPdfReplay ? pdfOpen && pdfAttached : view === "pull-request"
+          view === "onboarding" ? false : isCurrentPdfReplay ? pdfOpen && pdfAttached : view === "pull-request"
             ? pullRequestOpen
             : isCurrentCitations26825Replay
               ? citationSourcesOpen
@@ -16696,7 +16764,7 @@ export function App() {
               ? subagentPanelWidth
               : reviewPanelWidth
         }
-        sidebar={sidebar}
+        sidebar={view === "onboarding" ? null : sidebar}
         sidebarWidth={
           view === "plugins"
             ? 322.875
@@ -16725,7 +16793,7 @@ export function App() {
               ? 240
               : undefined
         }
-        sidebarOpen={isCurrentPdfReplay ? false : sidebarOpen}
+        sidebarOpen={view === "onboarding" ? false : isCurrentPdfReplay ? false : sidebarOpen}
         sidebarResizable
         windowChrome={
           view === "projects" ||
@@ -16886,7 +16954,9 @@ export function App() {
           ) : undefined
         }
       >
-        {view === "pull-request" ? (
+        {view === "onboarding" ? (
+          onboardingRoute
+        ) : view === "pull-request" ? (
           mode === "live" ? livePullRequestRoute.index : pullRequestIndex
         ) : view === "projects" ? (
           projectsRoute

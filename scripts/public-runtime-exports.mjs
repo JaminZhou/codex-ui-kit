@@ -78,6 +78,7 @@ export const publicRuntimeExports = [
   "KeyboardShortcutsPage",
   "LoadingShimmer",
   "LocalEnvironmentDialog",
+  "LoginPage",
   "MarkdownImage",
   "McpServerEditor",
   "McpServersPage",

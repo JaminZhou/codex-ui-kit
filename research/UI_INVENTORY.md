@@ -43,6 +43,13 @@ composition or state variant is covered. Current-build verification requires
 at least one runtime evidence record mapped to the current baseline; an
 observation from a previous build remains historical evidence.
 
+The current package also exposes a desktop login/onboarding route with
+provider buttons, API-key entry, device-code handoff, browser-pending, and
+loading/error states. `LoginPage` mirrors that public contract as a controlled
+surface; Browser/CDP, Electron, and wide/720 replay pixels cover the five
+states. Authentication, browser navigation, and first-run persistence remain
+host-owned and are intentionally not claimed by the playground.
+
 ## Current baseline
 
 - Codex Desktop `26.903.71938` (`8576`)
