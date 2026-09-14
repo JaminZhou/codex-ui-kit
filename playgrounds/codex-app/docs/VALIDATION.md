@@ -62,9 +62,13 @@ The temporary App Server auth link, protocol log, MCP server log, and images
 stay in the printed disposable directory and are never committed. This
 promotes a credential-free local MCP transport, the public MCP status-list
 mapping, and signed-in model-driven tool-call UI path; production MCP servers,
-OAuth/permissions, streaming/error variants,
-installed-product parity, and final pixel baselines remain separate
-boundaries.
+OAuth/permissions, streaming/error variants, installed-product parity, and final
+pixel baselines remain separate boundaries. Full acceptance also runs
+`check:live-mcp-tool-remote`, which serves the same deterministic tool over a
+loopback Streamable HTTP `/mcp` endpoint and requires the real
+`initialize`/`tools/list`/`tools/call` request sequence, completed card, and
+1180/720 no-overflow evidence. The loopback URL, request log, and screenshots
+remain in the printed disposable directory only.
 
 ### Live MCP elicitation — 2026-09-14
 
@@ -97,7 +101,8 @@ authorization link and `_blank` target, proves no browser opens implicitly, and
 also runs a timeout mode with a one-second tool limit and a deliberately slow
 real server, requiring a failed MCP item with the configured timeout evidence.
 It also runs an approval-denied mode, requiring the MCP approval request,
-zero server-side `tools/call` executions, and a failed UI item. OAuth provider behavior and
+zero server-side `tools/call` executions, and a failed UI item. The remote mode
+now covers a real loopback Streamable HTTP server; OAuth provider behavior and
 credential exchange remain host-owned boundaries.
 
 ### Live permissions-request bridge — 2026-09-13
