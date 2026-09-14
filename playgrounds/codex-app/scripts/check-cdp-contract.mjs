@@ -5824,6 +5824,16 @@ for (const scene of selectedScenes) {
           environmentSettingsPage?.querySelector('[role="status"]');
         const environmentSettingsMessage =
           environmentSettingsStatus?.querySelector("div");
+        const environmentEditor = document.querySelector(
+          ".codex-ui-environment-editor",
+        );
+        const environmentEditorTabs = Array.from(
+          environmentEditor?.querySelectorAll('[role="tab"]') ?? [],
+          (tab) => ({
+            active: tab.getAttribute("aria-selected"),
+            label: tab.textContent?.trim() ?? null,
+          }),
+        );
         const style = (element) => {
           if (!element) return null;
           const computed = getComputedStyle(element);
@@ -5963,6 +5973,20 @@ for (const scene of selectedScenes) {
                   style: style(environmentSettingsStatusHeading),
                   text: environmentSettingsStatusHeading?.textContent?.trim(),
                 },
+              }
+            : null,
+          environmentEditor: environmentEditor
+            ? {
+                actionCount: environmentEditor.querySelectorAll(
+                  ".codex-ui-environment-editor__action",
+                ).length,
+                fields: Array.from(
+                  environmentEditor.querySelectorAll("input, textarea"),
+                  (field) => field.getAttribute("aria-label"),
+                ),
+                page: rect(environmentEditor),
+                status: environmentEditor.getAttribute("data-status"),
+                tabs: environmentEditorTabs,
               }
             : null,
           environment: environmentMenu
@@ -6140,6 +6164,35 @@ for (const scene of selectedScenes) {
         await writeFile(
           join(artifactDirectory, `${scene.id}.json`),
           `${JSON.stringify(contract, null, 2)}\n`,
+        );
+        continue;
+      }
+      if (scene.frame.startsWith("workspace-environment-editor")) {
+        const editor = contract.environmentEditor;
+        if (
+          contract.view !== "workspace" ||
+          contract.frame !== scene.frame ||
+          contract.horizontalOverflow > 1 ||
+          !editor ||
+          editor.tabs.length !== 3 ||
+          !editor.tabs.some((tab) => tab.label === "Setup") ||
+          !editor.tabs.some((tab) => tab.label === "Cleanup") ||
+          !editor.tabs.some((tab) => tab.label === "Actions") ||
+          !editor.fields.includes("Environment name") ||
+          !editor.fields.includes("Simple setup") ||
+          editor.status !== (scene.frame.endsWith("-error") ? "error" : scene.frame.endsWith("-conflict") ? "conflict" : "ready")
+        ) {
+          throw new Error(
+            `${scene.id}: workspace environment editor contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        await page.getByRole("tab", { name: "Actions" }).click();
+        await page.getByRole("button", { name: "Add action" }).click();
+        await page.getByRole("button", { name: "Save" }).click();
+        await page.waitForSelector('.codex-ui-environment-editor[data-status="saved"]');
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify({ ...contract, afterSave: true }, null, 2)}\n`,
         );
         continue;
       }

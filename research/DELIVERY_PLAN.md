@@ -1653,6 +1653,14 @@ The same gate also injects one malformed `environment/info` response at 1180px
 and requires the visible details Retry action to recover on the next public
 call before the 720px reload. This closes one deterministic environment repair
 variant while leaving production outage/recovery semantics unclaimed.
+The public surface now also includes a controlled `EnvironmentEditorPage`.
+Its Setup/Cleanup/Actions tabs, name/script fields, action add/delete controls,
+Save/Discard actions, and conflict/error Retry states are covered by the wide,
+720px compact, Browser/CDP, Electron, and regional pixel scenes. These are
+host-owned editor and replay contracts: they intentionally do not claim that
+the installed product exposes the same save protocol or that a Remote
+environment can be provisioned without the product's private registry and
+relay services.
 
 ### 6. Perform global visual convergence
 

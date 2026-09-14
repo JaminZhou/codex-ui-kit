@@ -55,6 +55,7 @@ export const publicRuntimeExports = [
   "Dialog",
   "DialogChoice",
   "DocumentPreviewPanel",
+  "EnvironmentEditorPage",
   "EnvironmentSettingsPage",
   "FileChange",
   "FileChangeGroup",
