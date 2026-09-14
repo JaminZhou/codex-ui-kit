@@ -140,6 +140,7 @@ for (const scene of selectedScenes) {
   try {
     if (scene.id.startsWith("scheduled-current-26-903-detail")) {
       const compact = scene.id.endsWith("-compact");
+      const error = scene.id.includes("detail-error");
       const detail = page.getByRole("region", { name: "Scheduled task details" });
       await detail.waitFor();
       const contract = await page.evaluate(() => {
@@ -159,7 +160,7 @@ for (const scene of selectedScenes) {
       if (
         !contract.detail ||
         contract.facts !== 4 ||
-        contract.status !== (scene.id.endsWith("-error") ? "error" : "ready") ||
+        contract.status !== (error ? "error" : "ready") ||
         contract.title !== "Workspace brief" ||
         Math.abs(contract.horizontalOverflow) > 1 ||
         contract.viewport.width !== (compact ? 720 : 1180) ||
@@ -167,7 +168,7 @@ for (const scene of selectedScenes) {
       ) {
         throw new Error(`${scene.id}: scheduled detail contract failed: ${JSON.stringify(contract)}`);
       }
-      if (scene.id.endsWith("-error")) {
+      if (error) {
         await detail.getByRole("button", { name: "Retry" }).click();
         await page.locator('.codex-ui-scheduled-task-detail[data-status="ready"]').waitFor();
       } else {

@@ -1482,6 +1482,32 @@ for (const scheduledDetailScene of [
     theme: "dark",
     view: "automations",
   },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail",
+    id: "electron-current-scheduled-detail-light",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail",
+    id: "electron-current-scheduled-detail-light-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "light",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail-error",
+    id: "electron-current-scheduled-detail-error-light",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "automations",
+  },
 ]) {
   const { app: scheduledDetailApp, page: scheduledDetailPage } = await launchScene(
     scheduledDetailScene,
@@ -1499,7 +1525,7 @@ for (const scheduledDetailScene of [
         `${scheduledDetailScene.id}: scheduled detail width failed: ${JSON.stringify(bounds)}`,
       );
     }
-    if (scheduledDetailScene.id.endsWith("error")) {
+    if (scheduledDetailScene.id.includes("detail-error")) {
       await detail.getByRole("button", { name: "Retry" }).click();
     } else {
       await detail.getByRole("button", { name: "Run now" }).click();
