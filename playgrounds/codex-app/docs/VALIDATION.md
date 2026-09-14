@@ -105,6 +105,14 @@ zero server-side `tools/call` executions, and a failed UI item. The remote mode
 now covers a real loopback Streamable HTTP server; OAuth provider behavior and
 credential exchange remain host-owned boundaries.
 
+Full acceptance also runs the cancel mode. It holds a real stdio MCP
+`tools/call`, clicks the Composer `Stop` control while the call is active, and
+requires the public App Server turn to settle as `interrupted`, keeps the
+started MCP item from fabricating a completion, and records no server result.
+Wide/720 screenshots remain in the disposable directory; this proves the
+client cancellation lifecycle, not provider-specific server cancellation
+semantics.
+
 Full acceptance additionally runs `check:live-mcp-tool-oauth`. That probe hosts
 a disposable loopback OAuth provider with protected-resource metadata, DCR,
 authorization-code redirect, and token exchange, drives the public

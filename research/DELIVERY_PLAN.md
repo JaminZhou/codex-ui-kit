@@ -1079,6 +1079,12 @@ provider, runs DCR plus authorization-code/token exchange through the public
 `mcpServer/oauth/login` method, and proves the resulting authenticated remote
 MCP tool call with the same card and 1180/720 geometry. Production provider
 discovery, account policy, and installed-product parity remain open.
+The cancellation follow-up now holds a real stdio `tools/call`, drives the
+Composer `Stop` action while that item is active, and proves the public turn
+settles as `interrupted` while the started MCP item does not fabricate a
+completion or server result at 1180/720. This closes the sampled client
+cancellation lifecycle while leaving provider-specific server cancellation
+and installed-product parity as separate boundaries.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from
