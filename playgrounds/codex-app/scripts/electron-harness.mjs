@@ -957,6 +957,15 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-git-settings",
+    id: "workspace-git-settings-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-git-settings-compact",
     id: "workspace-git-settings-compact",
     maxPixelRatio: 0.01,
@@ -1340,6 +1349,15 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-worktree-settings",
+    id: "workspace-worktree-settings-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-worktree-settings-compact",
     id: "workspace-worktree-settings-compact",
     maxPixelRatio: 0.01,
@@ -1382,6 +1400,15 @@ export const visualScenes = [
     scenario: "workspace-workflow",
     theme: "light",
     view: "workspace",
+  },
+  {
+    frame: "workspace-hooks-settings",
+    id: "workspace-hooks-settings-light-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
   },
   {
     frame: "workspace-hooks-settings-compact",

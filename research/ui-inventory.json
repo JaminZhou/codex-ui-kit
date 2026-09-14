@@ -1949,7 +1949,11 @@
         "worktrees-settings-page",
         "stable-worktree-status-dialog",
         "worktree-setup-auto-fix",
-        "worktree-setup-status"
+        "worktree-setup-status",
+        "playground:workspace-worktree-settings-light-wide-compact",
+        "browser-cdp:workspace-worktree-settings-light-wide-compact",
+        "electron:workspace-worktree-settings-light-wide-compact",
+        "pixel:workspace-worktree-settings-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2150,7 +2154,11 @@
       "ownership": "app",
       "packageEvidence": [
         "git-settings",
-        "review-delivery-settings-row"
+        "review-delivery-settings-row",
+        "playground:workspace-git-settings-light-wide-compact",
+        "browser-cdp:workspace-git-settings-light-wide-compact",
+        "electron:workspace-git-settings-light-wide-compact",
+        "pixel:workspace-git-settings-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2173,7 +2181,11 @@
         "hooks-settings",
         "hooks-settings-copy",
         "code-review-settings",
-        "settings-route-registration"
+        "settings-route-registration",
+        "playground:workspace-hooks-settings-light-wide-compact",
+        "browser-cdp:workspace-hooks-settings-light-wide-compact",
+        "electron:workspace-hooks-settings-light-wide-compact",
+        "pixel:workspace-hooks-settings-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
