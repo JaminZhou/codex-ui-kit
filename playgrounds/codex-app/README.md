@@ -1145,9 +1145,10 @@ and isolated profile data are not.
 
 ## Current Plugin detail
 
-The `26.825.51511` Plugin detail route has eight deterministic installed and
+The `26.825.51511` Plugin detail route has ten deterministic installed and
 discovery scenes covering wide, 720px compact, bottom-scroll, Uninstall-menu,
-and connected-app menu states. CDP checks the scroller, identity/actions,
+connected-app menu, and installed light-theme states. CDP checks the scroller,
+identity/actions,
 suggestion rows, Apps, Information, disclosure, scroll extents, menu geometry,
 Escape dismissal, and zero overflow. Native Electron repeats installed,
 actions, connection, and compact discovery representatives. Product
@@ -1163,7 +1164,7 @@ CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_REFERENCE=/absolute/path/to/
 CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_BOTTOM_REFERENCE=/absolute/path/to/plugin-discovery-bottom-wide.png \
 CODEX_UI_KIT_CURRENT_PLUGIN_DETAIL_26_825_DISCOVERY_COMPACT_REFERENCE=/absolute/path/to/plugin-discovery-compact.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=integration-plugin-detail-current-26-825-installed,integration-plugin-detail-current-26-825-actions,integration-plugin-detail-current-26-825-connection,integration-plugin-detail-current-26-825-installed-bottom,integration-plugin-detail-current-26-825-installed-compact,integration-plugin-detail-current-26-825-discovery,integration-plugin-detail-current-26-825-discovery-bottom,integration-plugin-detail-current-26-825-discovery-compact
+  --scenes=integration-plugin-detail-current-26-825-installed,integration-plugin-detail-current-26-825-actions,integration-plugin-detail-current-26-825-connection,integration-plugin-detail-current-26-825-installed-bottom,integration-plugin-detail-current-26-825-installed-compact,integration-plugin-detail-current-26-825-installed-light,integration-plugin-detail-current-26-825-installed-light-compact,integration-plugin-detail-current-26-825-discovery,integration-plugin-detail-current-26-825-discovery-bottom,integration-plugin-detail-current-26-825-discovery-compact
 ```
 
 The comparison masks only host-supplied plugin artwork, hero artwork, and
@@ -1173,9 +1174,10 @@ failure effects remain host-owned.
 
 ## Current Skill detail and Try now entry
 
-Five deterministic `26.825.51511` scenes cover the installed Skill modal,
+Seven deterministic `26.825.51511` scenes cover the installed Skill modal,
 actions menu, bottom scroll, 720×680 compact modal, and the contenteditable
-unsent Try now draft. CDP and native Electron gate exact dialog, content,
+installed light-theme wide/compact modal, and the contenteditable unsent Try
+now draft. CDP and native Electron gate exact dialog, content,
 footer, control, menu, Composer, and mention geometry plus the two-step Escape
 order and host-controlled transition. Product screenshots remain optional
 local-only references:
@@ -1187,7 +1189,7 @@ CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_BOTTOM_REFERENCE=/absolute/path/to/skil
 CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_INSTALLED_COMPACT_REFERENCE=/absolute/path/to/skill-installed-compact.png \
 CODEX_UI_KIT_CURRENT_SKILL_DETAIL_26_825_TRY_NOW_REFERENCE=/absolute/path/to/skill-try-now-compact.png \
   pnpm --filter @codex-ui-kit/codex-app-playground check:visual -- \
-  --scenes=integration-skill-detail-current-26-825-installed,integration-skill-detail-current-26-825-actions,integration-skill-detail-current-26-825-bottom,integration-skill-detail-current-26-825-installed-compact,integration-skill-detail-current-26-825-try-now-compact
+  --scenes=integration-skill-detail-current-26-825-installed,integration-skill-detail-current-26-825-actions,integration-skill-detail-current-26-825-bottom,integration-skill-detail-current-26-825-installed-compact,integration-skill-detail-current-26-825-installed-light,integration-skill-detail-current-26-825-installed-light-compact,integration-skill-detail-current-26-825-try-now-compact
 ```
 
 The regional gate masks host-owned artwork, instruction prose, background

@@ -1296,7 +1296,10 @@ representatives, and eight reviewed replay baselines pair with current-product
 regional comparisons below an 8% ceiling. Product artwork, hero artwork, and
 suggestion-brand icons stay host-supplied. Clipboard/navigation, real install
 or uninstall, connection persistence, OAuth/permissions, external links, and
-failure effects stay open.
+failure effects stay open. The installed detail now also has explicit wide/720
+light-theme Browser/CDP, Electron, and regional-pixel coverage; it remains a
+read-only visual contract and does not promote install, uninstall, or OAuth
+side effects.
 
 The adjacent Skill detail/entry slice adds controlled `SkillDetailDialog` and
 `SkillPromptMention` primitives for the installed modal, enabled switch,
@@ -1304,9 +1307,11 @@ three-item actions menu, long instruction scroll, footer actions, two-step
 Escape dismissal, and the unsent Try now draft. One isolated same-build
 Renderer supplies wide/720 geometry and five local-only product frames.
 Browser/CDP gates all five scenes, Electron repeats them, and regional chrome
-comparisons remain below 1%. Enable/uninstall/menu effects, prompt submission,
-successful skill execution, failure/retry, Automations detail/mutation, and
-remaining Settings families stay open, so Stage 4 remains in progress.
+comparisons remain below 1%. The installed detail now also has explicit
+wide/720 light-theme Browser/CDP, Electron, and regional-pixel coverage.
+Enable/uninstall/menu effects, prompt submission, successful skill execution,
+failure/retry, Automations detail/mutation, and remaining Settings families
+stay open, so Stage 4 remains in progress.
 
 The current thread-overflow slice closes the former unsampled P1 root menu.
 `ThreadOverflowMenu` exposes the observed ten actions, three separators, four
