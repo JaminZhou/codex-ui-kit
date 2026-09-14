@@ -1068,7 +1068,9 @@ streaming beyond this bounded retry, installed-product pixels, and remote
 transport remain open follow-up boundaries. The live timeout mode now adds a
 deliberately slow MCP server with a one-second tool limit and verifies the
 failed item state without a retry; OAuth/permission variants and remote
-transport remain open.
+transport remain open. The approval-denied mode now verifies the real MCP
+approval request, rejects it before the server's `tools/call`, and locks the
+failed item and 1180/720 card geometry; OAuth credential exchange remains open.
 
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from
