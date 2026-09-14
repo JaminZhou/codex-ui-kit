@@ -1829,7 +1829,10 @@
         "artifact-preview-status",
         "document-preview-panel",
         "playground:workspace-document-preview-route",
-        "electron:workspace-document-preview-replay"
+        "electron:workspace-document-preview-replay",
+        "browser-cdp:workspace-artifact-shell-side-panel-contract",
+        "electron:workspace-artifact-shell-side-panel-contract",
+        "pixel:workspace-artifact-shell-current-pdf-owned-panel"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1837,7 +1840,7 @@
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
-      "electronStatus": "not_started",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {
