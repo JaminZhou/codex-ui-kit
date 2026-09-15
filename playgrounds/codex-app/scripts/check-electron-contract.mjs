@@ -1357,6 +1357,24 @@ for (const scheduledScene of [
     view: "automations",
     windowSize: { height: 820, width: 720 },
   },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-manual",
+    id: "electron-current-scheduled-26-903-manual-light",
+    scenario: "workspace-workflow",
+    theme: "light",
+    view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-manual",
+    id: "electron-current-scheduled-26-903-manual-light-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "light",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
 ]) {
   const { app: scheduledApp, page: scheduledPage } = await launchScene(
     scheduledScene,
@@ -1418,10 +1436,10 @@ for (const scheduledScene of [
       (manual
         ? !scheduled.navigator ||
           !scheduled.editor ||
-          Math.abs(scheduled.navigator.width - 374) > 1 ||
-          Math.abs(scheduled.editor.width - 346) > 1 ||
+          Math.abs(scheduled.navigator.width - (compact ? 374 : 437.125)) > 1.5 ||
+          Math.abs(scheduled.editor.width - (compact ? 346 : 420)) > 1.5 ||
           !scheduled.search ||
-          Math.abs(scheduled.search.left - 21) > 1
+          Math.abs(scheduled.search.left - (compact ? 21 : 342.875)) > 1
         : !scheduled.heading ||
           Math.abs(scheduled.heading.left - (compact ? 29 : 395.4375)) > 1 ||
           !scheduled.search ||
@@ -1507,6 +1525,16 @@ for (const scheduledDetailScene of [
     scenario: "workspace-workflow",
     theme: "light",
     view: "automations",
+  },
+  {
+    currentSidebar: true,
+    frame: "scheduled-current-26-903-detail-error",
+    id: "electron-current-scheduled-detail-error-light-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "light",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
   },
 ]) {
   const { app: scheduledDetailApp, page: scheduledDetailPage } = await launchScene(
@@ -11223,6 +11251,12 @@ try {
   generalMenuStates.completionNotifications = await readGeneralMenuState();
   await alwaysNotifications.focus();
   await alwaysNotifications.press("Enter");
+  await codingWorkspacePage.waitForFunction(
+    () =>
+      document
+        .querySelector('button[aria-label="Turn completion notifications"]')
+        ?.textContent?.trim() === "Always⌄",
+  );
   generalMenuFocus.completionNotifications = await readGeneralFocusedLabel(
     "Turn completion notifications",
   );

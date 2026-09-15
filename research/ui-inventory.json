@@ -2344,10 +2344,18 @@
         "browser-cdp:scheduled-current-26-903-light-wide-compact",
         "electron:scheduled-current-26-903-light-wide-compact",
         "pixel:scheduled-current-26-903-light-wide-compact",
+        "playground:scheduled-current-26-903-manual-light-wide-compact",
+        "browser-cdp:scheduled-current-26-903-manual-light-wide-compact",
+        "electron:scheduled-current-26-903-manual-light-wide-compact",
+        "pixel:scheduled-current-26-903-manual-light-wide-compact",
         "playground:scheduled-current-26-903-detail-light-wide-compact",
         "browser-cdp:scheduled-current-26-903-detail-light-wide-compact",
         "electron:scheduled-current-26-903-detail-light-wide-compact",
-        "pixel:scheduled-current-26-903-detail-light-wide-compact"
+        "pixel:scheduled-current-26-903-detail-light-wide-compact",
+        "playground:scheduled-current-26-903-detail-error-light-compact",
+        "browser-cdp:scheduled-current-26-903-detail-error-light-compact",
+        "electron:scheduled-current-26-903-detail-error-light-compact",
+        "pixel:scheduled-current-26-903-detail-error-light-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
