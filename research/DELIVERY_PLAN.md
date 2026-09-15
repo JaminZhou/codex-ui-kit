@@ -1953,7 +1953,10 @@ without confusing package readiness with full product reconstruction.
     ScheduledTaskDetail ready/error states now also have explicit wide/720
     light-theme Browser/CDP, Electron, and regional-pixel coverage; the light
     matrix is replay evidence and does not claim cloud persistence or mutation
-    reachability. Plugin detail
+    reachability. The current manual editor and permission-error detail now
+    also have explicit light wide/720 and compact-error Browser/CDP, Electron,
+    and regional-pixel coverage; controlled form mutation is covered while
+    cloud persistence and execution remain host-owned. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only
