@@ -2234,6 +2234,14 @@ pixel promotion is inferred. The evidence is stored in
 current-build observation while `composer.resources` and `composer.plugins`
 stay partial.
 
+The playground carries a matching `26.908.70816` replay variant with the
+latest public catalog vocabulary (`GitHub`, 19 retained options). Its
+Browser/Electron acceptance path checks listbox semantics, 736/688px wide/
+compact geometry, scroll containment, End → Enter dismissal, focus recovery,
+selected GitHub attachment state, and 0% repeated-capture drift. This is
+deterministic own-fixture evidence; installed-product selection, upload,
+authorization, execution, and product-region pixel parity remain unclaimed.
+
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
 current-build Browser/CDP, native Electron, and regional-pixel contracts now

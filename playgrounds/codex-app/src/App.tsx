@@ -1147,7 +1147,8 @@ function initialComposerOverlay(frame: string | null): ComposerOverlay {
     frame === "composer-resources-menu" ||
     frame === "composer-plugins-menu" ||
     frame === "workspace-composer-current-26-825-resources" ||
-    frame === "workspace-composer-current-26-908-resources"
+    frame === "workspace-composer-current-26-908-resources" ||
+    frame === "workspace-composer-current-26-908-70816-resources"
   ) {
     return "resources";
   }
@@ -1244,6 +1245,18 @@ interface DemoComposerAttachmentItem {
 function attachmentItemsForFrame(
   frame: string | null,
 ): DemoComposerAttachmentItem[] {
+  if (frame === "workspace-composer-current-26-908-70816-plugin-selected") {
+    return [
+      {
+        id: "current-plugin-github-26-908-70816",
+        kind: "file",
+        label: "GitHub",
+        layout: "card",
+        meta: "Plugin",
+        status: "ready",
+      },
+    ];
+  }
   if (frame === "workspace-composer-current-26-908-plugin-selected") {
     return [
       {
@@ -1633,6 +1646,135 @@ const currentComposerResourceGroups26908: readonly ComposerResourceGroup[] = [
         icon: "◎",
         id: "deep-research",
         label: "Deep Research",
+      },
+      {
+        description: "Discover and manage plugins",
+        icon: "◎",
+        id: "plugin-management",
+        label: "Plugin Management",
+      },
+      {
+        description: "Build and deploy websites",
+        icon: "◎",
+        id: "sites",
+        label: "Sites",
+      },
+    ],
+  },
+];
+
+// This is a sanitized public catalog observed on the current 26.908.70816
+// build. Account-dependent browser-tab and app rows stay excluded, and the
+// selected-plugin frame below remains a deterministic replay only.
+const currentComposerResourceGroups2690870816: readonly ComposerResourceGroup[] = [
+  {
+    id: "add",
+    options: [
+      {
+        icon: <CurrentComposerResourceIcon name="files" />,
+        id: "files",
+        label: "Files and folders",
+      },
+      {
+        description: "Choose project for new chats",
+        icon: <CurrentBuildIcon name="composer-project" />,
+        id: "project",
+        label: "Work in a project",
+      },
+      {
+        description: "Set a goal to keep pursuing",
+        icon: <CurrentComposerResourceIcon name="goal" />,
+        id: "goal",
+        label: "Goal",
+      },
+      {
+        description: "Turn plan mode on",
+        icon: <CurrentComposerResourceIcon name="plan" />,
+        id: "plan",
+        label: "Plan mode",
+      },
+      {
+        icon: <CurrentComposerResourceIcon name="skill" />,
+        id: "record-skill",
+        label: "Record a skill",
+      },
+      {
+        description: "Draw a sketch",
+        icon: <CurrentComposerResourceIcon name="skill" />,
+        id: "sketch",
+        label: "Sketch",
+      },
+    ],
+  },
+  {
+    id: "plugins",
+    label: "Plugins",
+    options: [
+      {
+        description: "Triage PRs, issues, CI, and publish flows",
+        icon: "◆",
+        id: "github",
+        label: "GitHub",
+      },
+      {
+        description: "Create and edit documents",
+        icon: "▤",
+        id: "documents",
+        label: "Documents",
+      },
+      {
+        description: "Read, create, and verify PDFs",
+        icon: "▧",
+        id: "pdf",
+        label: "PDF",
+      },
+      {
+        description: "Create and edit spreadsheets",
+        icon: "▦",
+        id: "spreadsheets",
+        label: "Spreadsheets",
+      },
+      {
+        description: "Create and edit presentations",
+        icon: "▥",
+        id: "presentations",
+        label: "Presentations",
+      },
+      {
+        description: "Create or update reusable templates from reference content",
+        icon: "◇",
+        id: "template-creator",
+        label: "Template Creator",
+      },
+      {
+        description: "Control the in-app browser",
+        icon: "◎",
+        id: "browser",
+        label: "Browser",
+      },
+      {
+        description: "Control Mac apps from ChatGPT",
+        icon: "◎",
+        id: "computer",
+        label: "Computer",
+      },
+      {
+        description: "Create interactive visuals",
+        icon: "◎",
+        id: "visualize",
+        label: "Visualize",
+      },
+      {
+        description: "Drive GitHub bot review rounds to a clean pass.",
+        icon: "◎",
+        id: "watch-pr",
+        label: "Watch PR",
+      },
+      {
+        description: "Inspect native macOS views in Codex Browser.",
+        icon: "◎",
+        id: "appkit-inspector",
+        label: "AppKit Inspector",
       },
       {
         description: "Discover and manage plugins",
@@ -3406,6 +3548,11 @@ const blankMcpEditorValue: McpServerEditorValue = {
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
+  const currentComposerControls2690870816Replay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame?.startsWith(
+      "workspace-composer-current-26-908-70816-",
+    );
   const currentComposerControls26825Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
@@ -9397,10 +9544,16 @@ export function App() {
       ? activeFrame
       : currentComposerControls26908Replay
         ? composerAttachments.length > 0
-          ? "workspace-composer-current-26-908-plugin-selected"
+          ? currentComposerControls2690870816Replay
+            ? "workspace-composer-current-26-908-70816-plugin-selected"
+            : "workspace-composer-current-26-908-plugin-selected"
           : composerOverlay === "resources"
-            ? "workspace-composer-current-26-908-resources"
-            : "workspace-composer-current-26-908-ready"
+            ? currentComposerControls2690870816Replay
+              ? "workspace-composer-current-26-908-70816-resources"
+              : "workspace-composer-current-26-908-resources"
+            : currentComposerControls2690870816Replay
+              ? "workspace-composer-current-26-908-70816-ready"
+              : "workspace-composer-current-26-908-ready"
       : currentComposerControls26825Replay
         ? currentComposerQueue26825Replay
           ? `workspace-composer-current-26-825-queue-${currentQueue26825Phase ?? "pending"}`
@@ -10530,13 +10683,17 @@ export function App() {
             }
             data-current-resource-catalog={
               currentComposerControls26908Replay
-                ? "26.908.40834"
+                ? currentComposerControls2690870816Replay
+                  ? "26.908.70816"
+                  : "26.908.40834"
                 : undefined
             }
             descriptionSeparator=""
             groups={
               currentComposerControls26908Replay
-                ? currentComposerResourceGroups26908
+                ? currentComposerControls2690870816Replay
+                  ? currentComposerResourceGroups2690870816
+                  : currentComposerResourceGroups26908
                 : currentComposerResourceGroups
             }
             heading={currentComposerControls26908Replay ? null : undefined}
@@ -10548,6 +10705,18 @@ export function App() {
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
               if (
+                currentComposerControls2690870816Replay &&
+                option.id === "github"
+              ) {
+                setComposerAttachments(
+                  attachmentItemsForFrame(
+                    "workspace-composer-current-26-908-70816-plugin-selected",
+                  ),
+                );
+                setActiveFrame(
+                  "workspace-composer-current-26-908-70816-plugin-selected",
+                );
+              } else if (
                 currentComposerControls26908Replay &&
                 option.id === "github-triage"
               ) {
