@@ -7512,6 +7512,14 @@ for (const scene of selectedScenes) {
           `${scene.id}: app shell continuity contract failed: ${JSON.stringify(contract)}`,
         );
       }
+      const notificationQueueScene =
+        scene.id === "shell-notification-queue" ||
+        scene.id === "shell-notification-queue-light" ||
+        scene.id === "shell-notification-queue-light-compact";
+      const notificationSuccessStackScene =
+        scene.id === "shell-notification-success-stack" ||
+        scene.id === "shell-notification-success-stack-light" ||
+        scene.id === "shell-notification-success-stack-light-compact";
       if (
         contract.outlet.busy !== null ||
         (scene.shellState === "reconnecting" &&
@@ -7520,15 +7528,15 @@ for (const scene of selectedScenes) {
           contract.outlet.contentBusy !== null) ||
         ((scene.shellState === "stale") !== contract.outlet.preserved) ||
         ((scene.id === "shell-restored" ||
-          scene.id === "shell-notification-queue" ||
-          scene.id === "shell-notification-success-stack") !==
-          Boolean(contract.notification))
+          notificationQueueScene ||
+          notificationSuccessStackScene) !== Boolean(contract.notification))
       ) {
         throw new Error(
           `${scene.id}: route lifecycle state failed: ${JSON.stringify(contract)}`,
         );
       }
-      if (scene.id === "shell-notification-queue") {
+      if (notificationQueueScene) {
+        const lightNotification = scene.id.includes("-light");
         const successPaths = [
           "M12.1599 7.63617C12.3713 7.33596 12.7863 7.26372 13.0866 7.47504C13.3867 7.68642 13.4589 8.10153 13.2477 8.40179L9.28876 14.0268C9.17264 14.1917 8.98808 14.2954 8.7868 14.308C8.61044 14.319 8.43764 14.2592 8.30634 14.144L8.25262 14.0912L6.16962 11.7993L6.08954 11.6918C5.93136 11.4259 5.97666 11.0761 6.21454 10.8598C6.45225 10.6439 6.80379 10.6326 7.05341 10.8149L7.15399 10.9047L8.67841 12.5815L12.1599 7.63617Z",
           "M9.99506 2.81226C14.3664 2.81226 17.9101 6.35596 17.9101 10.7273C17.9101 15.0986 14.3664 18.6423 9.99506 18.6423C5.62372 18.6423 2.08002 15.0986 2.08002 10.7273C2.08002 6.35596 5.62372 2.81226 9.99506 2.81226ZM9.99506 4.14233C6.35826 4.14233 3.4101 7.0905 3.4101 10.7273C3.4101 14.3641 6.35826 17.3123 9.99506 17.3123C13.6319 17.3123 16.58 14.3641 16.58 10.7273C16.58 7.0905 13.6319 4.14233 9.99506 4.14233Z",
@@ -7543,6 +7551,18 @@ for (const scene of selectedScenes) {
             tone,
           }),
         );
+        const expectedSuccessBackground = lightNotification
+          ? "rgb(237, 250, 242)"
+          : "rgb(1, 28, 11)";
+        const expectedSuccessColor = lightNotification
+          ? "rgb(0, 162, 64)"
+          : "rgb(64, 201, 119)";
+        const expectedWarningBackground = lightNotification
+          ? "rgb(255, 245, 240)"
+          : "rgb(40, 17, 5)";
+        const expectedWarningColor = lightNotification
+          ? "rgb(226, 85, 7)"
+          : "rgb(251, 106, 34)";
         if (
           JSON.stringify(notificationTones.map(({ tone }) => tone)) !==
             JSON.stringify(["success", "warning", "info", "neutral"]) ||
@@ -7555,10 +7575,10 @@ for (const scene of selectedScenes) {
           notificationTones.some(
             ({ backgroundColor, color }) => !backgroundColor || !color,
           ) ||
-          notificationTones[0].backgroundColor !== "rgb(1, 28, 11)" ||
-          notificationTones[0].color !== "rgb(64, 201, 119)" ||
-          notificationTones[1].backgroundColor !== "rgb(40, 17, 5)" ||
-          notificationTones[1].color !== "rgb(251, 106, 34)"
+          notificationTones[0].backgroundColor !== expectedSuccessBackground ||
+          notificationTones[0].color !== expectedSuccessColor ||
+          notificationTones[1].backgroundColor !== expectedWarningBackground ||
+          notificationTones[1].color !== expectedWarningColor
         ) {
           throw new Error(
             `${scene.id}: notification tone matrix failed: ${JSON.stringify(notificationTones)}`,
@@ -7596,11 +7616,12 @@ for (const scene of selectedScenes) {
           Math.abs(contract.notification.alert.rect.top - 48) > 1 ||
           Math.abs(contract.notification.alert.rect.height - 42) > 1 ||
           Math.abs(contract.notification.alert.rect.width - 170.4375) > 1 ||
-          contract.notification.alert.style.backgroundColor !== "rgb(1, 28, 11)" ||
+          contract.notification.alert.style.backgroundColor !==
+            expectedSuccessBackground ||
           contract.notification.alert.style.borderRadius !== "15px" ||
           contract.notification.alert.style.boxShadow !==
             "rgba(0, 0, 0, 0.1) 0px 4px 12px 0px" ||
-          contract.notification.alert.style.color !== "rgb(64, 201, 119)" ||
+          contract.notification.alert.style.color !== expectedSuccessColor ||
           contract.notification.alert.style.fontSize !== "14px" ||
           contract.notification.alert.style.fontWeight !== "400" ||
           contract.notification.alert.style.lineHeight !== "21px" ||
@@ -7712,7 +7733,7 @@ for (const scene of selectedScenes) {
         });
         contract.afterAction = focus;
       }
-      if (scene.id === "shell-notification-success-stack") {
+      if (notificationSuccessStackScene) {
         const expectedWidths = [170.4375, 161.9156, 153.3938, 144.8718];
         const expectedTops = [48, 57.05, 66.1, 75.15];
         if (

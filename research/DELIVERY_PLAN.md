@@ -763,7 +763,7 @@ exit gates; it does not replace the inventory.
   Browser, Electron, and regional pixel gates before the broader current
   Terminal refresh superseded them.
   Installed-product global notification tones beyond the sampled success path,
-  light-theme shell evidence, unsampled
+  live light-theme shell evidence, unsampled
   long-thread window sizes/eviction heuristics, direct-shell failure/restart
   semantics, background agent-process reopening, current-product review submission and
   mutating comment/merge transitions, and the remaining Markdown, tool, and
@@ -1799,7 +1799,11 @@ without confusing package readiness with full product reconstruction.
    tone/action matrix additionally covers success/warning/info/neutral entries,
    Review → Open → View transitions, focus restoration, computed colors, and
    1180/720 repeat pixels; installed-product evidence remains limited to the
-   sampled success/stack path and the complete response-stream
+  sampled success/stack path. A separate four-scene light wide/720 replay
+  matrix now locks the same queue/stack counts, success/warning colors,
+  zero-overflow shell geometry, and hover/action behavior; it remains
+  controlled replay evidence rather than installed-product reachability. The
+  complete response-stream
    retry/failure/follow-up state machine retains its recorded evidence level.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
