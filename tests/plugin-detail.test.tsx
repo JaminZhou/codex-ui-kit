@@ -109,6 +109,46 @@ describe("PluginDetail", () => {
     expect(onInstall).toHaveBeenCalledOnce();
   });
 
+  it("exposes controlled install progress and retryable failure", () => {
+    const onInstall = vi.fn();
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <PluginDetailPage
+        onInstall={onInstall}
+        status="installing"
+        title="Gmail"
+      />,
+    );
+    const page = screen.getByRole("main");
+    expect(page.getAttribute("data-status")).toBe("installing");
+    expect(page.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain("Installing…");
+    expect(
+      screen.getByRole("button", { name: "Installing…" }),
+    ).toHaveProperty("disabled", true);
+    fireEvent.click(screen.getByRole("button", { name: "Installing…" }));
+    expect(onInstall).not.toHaveBeenCalled();
+
+    rerender(
+      <PluginDetailPage
+        onInstall={onInstall}
+        onRetry={onRetry}
+        retryLabel="Try again"
+        status="error"
+        statusMessage="The provider is unavailable."
+        title="Gmail"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The provider is unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole("button", { name: "Install plugin" }),
+    ).toHaveProperty("disabled", false);
+  });
+
   it("exposes information links and privacy disclosure", () => {
     render(
       <PluginDetailPage

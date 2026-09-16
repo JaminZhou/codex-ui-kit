@@ -37,6 +37,8 @@ export interface PluginDetailBreadcrumbProps
   title: ReactNode;
 }
 
+export type PluginDetailStatus = "ready" | "installing" | "error";
+
 export interface PluginDetailPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   actionsMenuOpen?: boolean;
@@ -49,6 +51,7 @@ export interface PluginDetailPageProps
   heroBackdrop?: ReactNode;
   information?: readonly PluginDetailInformationItem[];
   installLabel?: ReactNode;
+  installingLabel?: ReactNode;
   installed?: boolean;
   onActionsMenuOpenChange?: (open: boolean) => void;
   onAppOpen?: (item: PluginDetailAppItem) => void;
@@ -56,10 +59,14 @@ export interface PluginDetailPageProps
   onCopyLink?: () => void;
   onDisconnect?: () => void;
   onInstall?: () => void;
+  onRetry?: () => void;
   onReconnect?: () => void;
   onSuggestionOpen?: (suggestion: PluginDetailSuggestion) => void;
   onTryNow?: () => void;
   onUninstall?: () => void;
+  retryLabel?: ReactNode;
+  status?: PluginDetailStatus;
+  statusMessage?: ReactNode;
   summary?: ReactNode;
   suggestions?: readonly PluginDetailSuggestion[];
   title: ReactNode;
@@ -174,6 +181,7 @@ export function PluginDetailPage({
   heroBackdrop,
   information = [],
   installLabel = "Install plugin",
+  installingLabel = "Installing…",
   installed = false,
   onActionsMenuOpenChange,
   onAppOpen,
@@ -181,17 +189,22 @@ export function PluginDetailPage({
   onCopyLink,
   onDisconnect,
   onInstall,
+  onRetry,
   onKeyDown,
   onReconnect,
   onSuggestionOpen,
   onTryNow,
   onUninstall,
+  retryLabel = "Retry",
   summary,
   suggestions = [],
+  status = "ready",
+  statusMessage,
   title,
   tryNowLabel = "Try now",
   ...props
 }: PluginDetailPageProps) {
+  const isInstalling = status === "installing";
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     onKeyDown?.(event);
     if (event.defaultPrevented || event.key !== "Escape") return;
@@ -201,10 +214,12 @@ export function PluginDetailPage({
 
   return (
     <main
+      aria-busy={isInstalling || undefined}
       className={["codex-ui-plugin-detail", className]
         .filter(Boolean)
         .join(" ")}
       data-installed={installed || undefined}
+      data-status={status}
       onKeyDown={handleKeyDown}
       {...props}
     >
@@ -257,7 +272,9 @@ export function PluginDetailPage({
                 <span>{copyLinkLabel}</span>
               </button>
               <button
+                aria-busy={isInstalling || undefined}
                 className="codex-ui-plugin-detail__action codex-ui-plugin-detail__action--primary"
+                disabled={isInstalling}
                 onClick={installed ? onTryNow : onInstall}
                 type="button"
               >
@@ -268,13 +285,43 @@ export function PluginDetailPage({
                 ) : (
                   <PluginDetailPlusGlyph />
                 )}
-                <span>{installed ? tryNowLabel : installLabel}</span>
+                <span>
+                  {isInstalling
+                    ? installingLabel
+                    : installed
+                      ? tryNowLabel
+                      : installLabel}
+                </span>
               </button>
             </div>
           </div>
           {description ? <p>{description}</p> : null}
         </div>
       </header>
+
+      {status === "installing" ? (
+        <p
+          aria-live="polite"
+          className="codex-ui-plugin-detail__status"
+          role="status"
+        >
+          {installingLabel}
+        </p>
+      ) : status === "error" ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-plugin-detail__status"
+          role="alert"
+        >
+          <strong>Couldn’t install plugin</strong>
+          <span>{statusMessage ?? "Check the connection and try again."}</span>
+          {onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       {suggestions.length > 0 ? (
         <section
