@@ -8,6 +8,13 @@ on:
     branches: [main]
   pull_request:
 
+# Keep only the newest run for a given PR or branch.  The Electron acceptance
+# job is intentionally expensive; stale pushes should not consume a runner and
+# leave the current commit waiting behind obsolete work.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     # Public pull requests must never execute untrusted code on a personal self-hosted runner.
