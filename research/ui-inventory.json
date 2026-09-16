@@ -1036,6 +1036,7 @@
         "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus",
         "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "replay:current-26.908.70816-public-resource-catalog-and-github-attachment",
+        "cdp-26.908.70816:github-selection-inline-mention-not-attachment",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",
@@ -1064,6 +1065,7 @@
         "browser-cdp:current-26.825-mixed-image-file-preview-zoom-remove-submit-complete",
         "electron:current-26.825-preview-focus-zoom-removal-and-completion",
         "electron:replay-attachment-uploading-progress-1180-and-error-retry-recovery-720",
+        "cdp-26.908.70816:github-selection-inline-mention-not-attachment",
         "pixel:current-26.825-wide-compact-post-picker-and-preview"
       ],
       "runtimeStatus": "runtime_observed",

@@ -1812,7 +1812,10 @@ local-only product comparisons cover the same wide/compact boundary, including
 the wide-only Outputs/Sources summary. The
 sanitized observation lives in `research/current-attachment-26-825.json`.
 Native upload progress/failure and plugin-provided attachment variants remain
-open.
+open. A separate current 26.908.70816 selection probe records that choosing
+the public GitHub resource inserts an inline editor mention rather than a
+ComposerAttachment card; replay-only plugin cards therefore remain explicitly
+separate from current product attachment evidence.
 
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests
