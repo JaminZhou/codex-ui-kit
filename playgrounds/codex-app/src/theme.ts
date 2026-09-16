@@ -21,7 +21,9 @@ export function isDemoThemeView(
 export function resolveDemoThemePreference(
   value: string | null | undefined,
   view: string | null | undefined,
+  allowExplicitLight = false,
 ): DemoThemePreference {
+  if (allowExplicitLight && value === "light") return "light";
   return isDemoThemeView(view) ? parseDemoThemePreference(value) : "dark";
 }
 

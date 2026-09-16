@@ -778,7 +778,11 @@ function querySelection() {
         : params.get("view") === "workspace"
             ? "workspace"
             : "conversation";
-  const theme = resolveDemoThemePreference(params.get("theme"), view);
+  const theme = resolveDemoThemePreference(
+    params.get("theme"),
+    view,
+    frame?.startsWith("sidebar-current") ?? false,
+  );
   const requestedShellState = params.get("shellState");
   const shellState: AppRouteOutletStatus = [
     "ready",
@@ -3660,7 +3664,11 @@ export function App() {
     setRouteHistory((current) => pushDemoRoute(current, nextView));
   const navigateRouteHistory = (delta: -1 | 1) =>
     setRouteHistory((current) => moveDemoRoute(current, delta));
-  const themeAvailable = isDemoThemeAvailable(view, mode);
+  const themeAvailable =
+    isDemoThemeAvailable(view, mode) ||
+    (mode === "replay" &&
+      initialSelection.theme === "light" &&
+      initialSelection.frame?.startsWith("sidebar-current"));
   const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null

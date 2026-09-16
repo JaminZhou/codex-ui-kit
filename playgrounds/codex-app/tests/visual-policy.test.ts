@@ -426,16 +426,16 @@ describe("lifecycle visual policy", () => {
       expect(electronHarness).toContain(`id: "${scene}"`);
     }
     expect(cdpContract).toContain(
-      'scene.id === "current-sidebar-collection-empty"',
+      'sidebarBaseId === "current-sidebar-collection-empty"',
     );
     expect(cdpContract).toContain(
-      'scene.id === "current-sidebar-collection-loading"',
+      'sidebarBaseId === "current-sidebar-collection-loading"',
     );
     expect(cdpContract).toContain(
-      'scene.id === "current-sidebar-collection-error"',
+      'sidebarBaseId === "current-sidebar-collection-error"',
     );
     expect(cdpContract).toContain(
-      'scene.id === "current-sidebar-collection-long-list"',
+      'sidebarBaseId === "current-sidebar-collection-long-list"',
     );
     expect(electronContract).toContain(
       'id: "electron-current-sidebar-collection-empty"',
@@ -621,7 +621,7 @@ describe("lifecycle visual policy", () => {
     );
     expect(electronHarness).toContain("CODEX_DEMO_NATIVE_THEME_SOURCE");
     expect(electronMain).toContain("!nativeTheme.shouldUseDarkColors");
-    expect(appSource).toContain("const themeAvailable = isDemoThemeAvailable(view, mode)");
+    expect(appSource).toContain("isDemoThemeAvailable(view, mode)");
     expect(appSource).toContain(
       'const appliedTheme = themeAvailable ? theme : "dark"',
     );

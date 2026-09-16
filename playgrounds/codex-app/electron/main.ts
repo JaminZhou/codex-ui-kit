@@ -983,8 +983,9 @@ function createWindow() {
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedTheme = process.env.CODEX_DEMO_THEME;
+  const allowSidebarLight = frame.startsWith("sidebar-current");
   const theme =
-    ["projects", "shell", "workspace"].includes(view) &&
+    (["projects", "shell", "workspace"].includes(view) || allowSidebarLight) &&
     ["system", "light", "dark"].includes(requestedTheme ?? "")
       ? requestedTheme!
       : "dark";
