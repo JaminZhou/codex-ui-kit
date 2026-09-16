@@ -16,6 +16,11 @@ export type McpServerPageStatus =
   | "loading"
   | "error"
   | "unavailable";
+export type McpServerToggleStatus =
+  | "ready"
+  | "enabling"
+  | "disabling"
+  | "error";
 export type McpServerType = "stdio" | "http";
 
 export interface PluginManagerTabItem {
@@ -30,6 +35,8 @@ export interface McpServerItem {
   name: ReactNode;
   settingsAvailable?: boolean;
   source?: "plugin" | "server";
+  toggleStatus?: McpServerToggleStatus;
+  toggleStatusMessage?: ReactNode;
 }
 
 export interface McpEditorPair {
@@ -198,21 +205,37 @@ export function IntegrationAddMenu({
 function McpServerRows({
   items,
   onEnabledChange,
+  onRetry,
   onSettings,
+  retryLabel,
 }: {
   items: readonly McpServerItem[];
   onEnabledChange?: (item: McpServerItem, enabled: boolean) => void;
+  onRetry?: (item: McpServerItem) => void;
   onSettings?: (item: McpServerItem) => void;
+  retryLabel?: ReactNode;
 }) {
   return (
     <div className="codex-ui-mcp-settings__rows">
       {items.map((item) => {
         const name = stringValue(item.name) || item.id;
         const source = item.source ?? "server";
+        const toggleStatus = item.toggleStatus ?? "ready";
+        const togglePending =
+          toggleStatus === "enabling" || toggleStatus === "disabling";
+        const toggleStatusLabel =
+          toggleStatus === "enabling"
+            ? "Enabling…"
+            : toggleStatus === "disabling"
+              ? "Disabling…"
+              : toggleStatus === "error"
+                ? (item.toggleStatusMessage ?? "Couldn’t update server")
+                : null;
         return (
           <div
             className="codex-ui-mcp-settings__row"
             data-source={source}
+            data-toggle-status={toggleStatus}
             key={item.id}
           >
             <span className="codex-ui-mcp-settings__server-name">
@@ -230,10 +253,30 @@ function McpServerRows({
                     <McpSettingsGlyph />
                   </button>
                 ) : null}
+                {toggleStatusLabel ? (
+                  <span
+                    aria-live="polite"
+                    className="codex-ui-mcp-settings__toggle-status"
+                    role={toggleStatus === "error" ? "alert" : "status"}
+                  >
+                    {toggleStatusLabel}
+                  </span>
+                ) : null}
+                {toggleStatus === "error" && onRetry ? (
+                  <button
+                    className="codex-ui-mcp-settings__retry"
+                    onClick={() => onRetry(item)}
+                    type="button"
+                  >
+                    {retryLabel ?? "Retry"}
+                  </button>
+                ) : null}
                 <button
                   aria-checked={Boolean(item.enabled)}
                   aria-label={`Enable ${name}`}
+                  aria-busy={togglePending || undefined}
                   className="codex-ui-mcp-settings__switch"
+                  disabled={togglePending}
                   onClick={() => onEnabledChange?.(item, !item.enabled)}
                   role="switch"
                   type="button"
@@ -261,10 +304,12 @@ export interface McpServersPageProps
   onQueryChange?: (query: string) => void;
   onRetry?: () => void;
   onServerEnabledChange?: (item: McpServerItem, enabled: boolean) => void;
+  onServerRetry?: (item: McpServerItem) => void;
   onServerSettings?: (item: McpServerItem) => void;
   pluginServers?: readonly McpServerItem[];
   query?: string;
   retryLabel?: ReactNode;
+  serverRetryLabel?: ReactNode;
   servers?: readonly McpServerItem[];
   status?: McpServerPageStatus;
   statusDescription?: ReactNode;
@@ -289,11 +334,13 @@ export function McpServersPage({
   onRecordSkill,
   onRetry,
   onServerEnabledChange,
+  onServerRetry,
   onServerSettings,
   pluginServers = [],
   query = "",
   retryLabel = "Retry",
   servers = [],
+  serverRetryLabel = "Retry",
   status = "ready",
   statusDescription,
   statusHeading,
@@ -375,7 +422,9 @@ export function McpServersPage({
               <McpServerRows
                 items={filteredServers}
                 onEnabledChange={onServerEnabledChange}
+                onRetry={onServerRetry}
                 onSettings={onServerSettings}
+                retryLabel={serverRetryLabel}
               />
             ) : (
               <p className="codex-ui-mcp-settings__empty">{emptyLabel}</p>

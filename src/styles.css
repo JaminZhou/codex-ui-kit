@@ -13440,6 +13440,34 @@ summary.codex-ui-activity__header::after {
   flex: 0 0 auto;
   gap: 0.5rem;
   margin-inline-start: 1.5rem;
+  min-width: 0;
+}
+
+.codex-ui-mcp-settings__toggle-status {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-mcp-settings__row[data-toggle-status="error"]
+  .codex-ui-mcp-settings__toggle-status {
+  color: var(--codex-ui-danger);
+}
+
+.codex-ui-mcp-settings__retry {
+  background: transparent;
+  border: 0;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding: 0;
+  white-space: nowrap;
 }
 
 .codex-ui-mcp-settings__settings {
@@ -13494,6 +13522,11 @@ summary.codex-ui-activity__header::after {
 
 .codex-ui-mcp-settings__switch[aria-checked="true"] > span {
   transform: translateX(0.75rem);
+}
+
+.codex-ui-mcp-settings__switch:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .codex-ui-mcp-settings__empty {
