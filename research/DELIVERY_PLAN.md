@@ -1902,7 +1902,10 @@ without confusing package readiness with full product reconstruction.
    preview are runtime-observed on `26.825.51511` and pass Browser/CDP,
    Electron, reviewed wide/compact baselines, and local-only product-region
    pixels through exact completion. Actual upload failure/progress and plugin
-   variants remain open. Current queue
+   variants remain open. The Electron contract now also drives the replay-only
+   uploading state at 1180×820 and upload-error → Retry → ready recovery at
+   720×680, asserting accessible progress, Send enablement, focus restoration,
+   and zero tray overflow. Current queue
    pause/Resume, resource-picker, and long-input paths are delivered on
    `26.825.51511`; retain the older automatic-continuation-only path as
    regression compatibility coverage.

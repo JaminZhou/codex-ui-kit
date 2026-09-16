@@ -1770,6 +1770,11 @@ now covers 81 frames and drives Remove → Add → Submit → completion; Electr
 repeats the lifecycle in a real 1180×820 `BrowserWindow`. Ownership-masked
 current-build 906×820 comparisons pass at `0.0038954396166478223` for ready
 and `0.007934905507995478` for completed, below independent 1.5% hard limits.
+The Electron contract now also drives the replay-only uploading state at
+1180×820 and upload-error → Retry → ready recovery at 720×680, asserting the
+accessible progress value, disabled/enabled Send boundary, focus restoration,
+and zero tray overflow. This strengthens deterministic acceptance without
+promoting synthetic upload transitions to installed-product runtime evidence.
 This promotes the current product runtime evidence only for the sampled
 pasted-image path. The later `26.803.41515` follow-up adds source-structural
 evidence for 256px file cards, 40px icon wells, extension/line/folder

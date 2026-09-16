@@ -1063,6 +1063,7 @@
         "message-attachment",
         "browser-cdp:current-26.825-mixed-image-file-preview-zoom-remove-submit-complete",
         "electron:current-26.825-preview-focus-zoom-removal-and-completion",
+        "electron:replay-attachment-uploading-progress-1180-and-error-retry-recovery-720",
         "pixel:current-26.825-wide-compact-post-picker-and-preview"
       ],
       "runtimeStatus": "runtime_observed",

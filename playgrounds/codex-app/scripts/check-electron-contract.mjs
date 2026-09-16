@@ -3383,6 +3383,159 @@ try {
   await attachmentApp.close();
 }
 
+const attachmentUploadingScene = {
+  frame: "attachment-uploading",
+  id: "electron-attachment-uploading",
+  scenario: "attachment-lifecycle",
+};
+const {
+  app: attachmentUploadingApp,
+  page: attachmentUploadingPage,
+} = await launchScene(attachmentUploadingScene, { capture: false });
+
+try {
+  await attachmentUploadingPage.waitForSelector(
+    '.demo-root[data-frame="attachment-uploading"] .codex-ui-composer-attachment[data-status="uploading"]',
+  );
+  const uploadingState = await attachmentUploadingPage.evaluate(() => {
+    const tray = document.querySelector(".codex-ui-composer__attachments");
+    const upload = document.querySelector(
+      '.codex-ui-composer-attachment[data-status="uploading"]',
+    );
+    const progress = upload?.querySelector('[role="progressbar"]');
+    return {
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+      progress: progress?.getAttribute("aria-valuenow") ?? null,
+      progressLabel: progress?.getAttribute("aria-label") ?? null,
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+      statusText: upload
+        ?.querySelector('[role="status"]')
+        ?.textContent?.trim() ?? null,
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    uploadingState.frame !== "attachment-uploading" ||
+    uploadingState.attachmentCount !== 5 ||
+    uploadingState.progress !== "62" ||
+    uploadingState.progressLabel !== "Uploading current-build.zip" ||
+    uploadingState.statusText !== "Uploading…" ||
+    uploadingState.submitDisabled !== true ||
+    (uploadingState.overflow ?? Infinity) > 1 ||
+    uploadingState.viewport.width !== 1180 ||
+    uploadingState.viewport.height !== 820
+  ) {
+    throw new Error(
+      `Electron attachment uploading contract failed: ${JSON.stringify(uploadingState)}`,
+    );
+  }
+} finally {
+  await attachmentUploadingApp.close();
+}
+
+const attachmentUploadRecoveryScene = {
+  frame: "attachment-upload-error",
+  id: "electron-attachment-upload-recovery",
+  scenario: "attachment-lifecycle",
+  windowSize: { height: 680, width: 720 },
+};
+const {
+  app: attachmentUploadRecoveryApp,
+  page: attachmentUploadRecoveryPage,
+} = await launchScene(attachmentUploadRecoveryScene, { capture: false });
+
+try {
+  const errorAttachment = attachmentUploadRecoveryPage.locator(
+    '.codex-ui-composer-attachment[data-status="error"]',
+  );
+  await errorAttachment.waitFor();
+  const errorState = await attachmentUploadRecoveryPage.evaluate(() => {
+    const tray = document.querySelector(".codex-ui-composer__attachments");
+    const failed = document.querySelector(
+      '.codex-ui-composer-attachment[data-status="error"]',
+    );
+    return {
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+      retryCount: document.querySelectorAll(
+        ".codex-ui-composer-attachment__retry",
+      ).length,
+      statusText: failed
+        ?.querySelector('[role="status"]')
+        ?.textContent?.trim() ?? null,
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    errorState.frame !== "attachment-upload-error" ||
+    errorState.attachmentCount !== 5 ||
+    errorState.retryCount !== 1 ||
+    errorState.statusText !== "Upload failed" ||
+    errorState.submitDisabled !== true ||
+    (errorState.overflow ?? Infinity) > 1 ||
+    errorState.viewport.width !== 720 ||
+    errorState.viewport.height !== 680
+  ) {
+    throw new Error(
+      `Electron attachment upload error contract failed: ${JSON.stringify(errorState)}`,
+    );
+  }
+
+  await attachmentUploadRecoveryPage
+    .getByRole("button", { name: "Retry current-build.zip" })
+    .click();
+  await attachmentUploadRecoveryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-uploading"] [role="progressbar"][aria-valuenow="18"]',
+  );
+  await attachmentUploadRecoveryPage.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "Message composer",
+  );
+  await attachmentUploadRecoveryPage.waitForSelector(
+    '.demo-root[data-frame="attachment-multi-ready"] .codex-ui-composer-attachment[data-status="ready"]',
+  );
+  const recoveredState = await attachmentUploadRecoveryPage.evaluate(() => {
+    const tray = document.querySelector(".codex-ui-composer__attachments");
+    return {
+      attachmentCount: document.querySelectorAll(
+        ".codex-ui-composer .codex-ui-composer-attachment",
+      ).length,
+      errorCount: document.querySelectorAll(
+        '.codex-ui-composer-attachment[data-status="error"]',
+      ).length,
+      overflow: tray ? tray.scrollWidth - tray.clientWidth : null,
+      progressCount: document.querySelectorAll('[role="progressbar"]').length,
+      submitDisabled: document
+        .querySelector('.codex-ui-composer [data-action="submit"]')
+        ?.hasAttribute("disabled"),
+    };
+  });
+  if (
+    recoveredState.attachmentCount !== 5 ||
+    recoveredState.errorCount !== 0 ||
+    recoveredState.progressCount !== 0 ||
+    recoveredState.submitDisabled !== false ||
+    (recoveredState.overflow ?? Infinity) > 1
+  ) {
+    throw new Error(
+      `Electron attachment upload recovery contract failed: ${JSON.stringify(recoveredState)}`,
+    );
+  }
+} finally {
+  await attachmentUploadRecoveryApp.close();
+}
+
 const currentAttachmentPickerScene = {
   currentSidebar: true,
   frame: "attachment-current-26-825-post-picker",
