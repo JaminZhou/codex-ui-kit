@@ -178,4 +178,59 @@ describe("MCP settings", () => {
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
     expect(onUninstall).toHaveBeenCalledOnce();
   });
+
+  it("exposes saving and retryable error states without owning MCP persistence", () => {
+    const onRetry = vi.fn();
+    const value = {
+      ...editorValue,
+      command: "sample-server",
+      name: "sample-server",
+    };
+    const { rerender } = render(
+      <McpServerEditor
+        onChange={vi.fn()}
+        onRetry={onRetry}
+        saveDisabled={false}
+        status="saving"
+        value={value}
+      />,
+    );
+    const editor = screen.getByRole("region", { name: "MCP server editor" });
+    expect(editor.getAttribute("data-status")).toBe("saving");
+    expect(editor.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain("Saving…");
+    expect(screen.getByPlaceholderText("MCP server name")).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Saving…" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <McpServerEditor
+        onChange={vi.fn()}
+        onRetry={onRetry}
+        retryLabel="Try again"
+        saveDisabled={false}
+        status="error"
+        statusMessage="The MCP endpoint is unavailable."
+        value={value}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The MCP endpoint is unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(screen.getByPlaceholderText("MCP server name")).toHaveProperty(
+      "disabled",
+      false,
+    );
+    expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
+      "disabled",
+      false,
+    );
+  });
 });

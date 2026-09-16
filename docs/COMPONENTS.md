@@ -335,10 +335,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   Settings callbacks, empty/loading/error states, and an editor slot that
   preserves the manager header and tabs.
 - `McpServerEditor`: controlled STDIO or Streamable HTTP create/update form
-  with list and key/value editors, type selection, disabled-save state,
-  documentation, Back, and optional Uninstall callbacks. Hosts own persisted
-  configuration, validation, credentials, OAuth, transport, and destructive
-  effects.
+  with list and key/value editors, type selection, saving/error/retry states,
+  disabled-save state, documentation, Back, and optional Uninstall callbacks.
+  Hosts own persisted configuration, validation, credentials, OAuth, transport,
+  and destructive effects.
 
 ## Workspace and pull-request workflow
 
