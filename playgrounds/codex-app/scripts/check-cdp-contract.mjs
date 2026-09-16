@@ -14595,7 +14595,8 @@ for (const scene of selectedScenes) {
           scene.id.startsWith("current-sidebar-worktree-lifecycle") ||
           scene.id.startsWith("current-worktree-setup-")
           ? 398
-          : scene.id === "terminal-current-26-825-compact-sidebar"
+          : scene.id === "terminal-current-26-825-compact-sidebar" ||
+              scene.id === "terminal-current-26-825-light-compact-sidebar"
             ? 398.5
             : 400
       : scene.scenario === "current-browser-26-825"
@@ -14655,8 +14656,9 @@ for (const scene of selectedScenes) {
           scene.scenario === "current-basic-message-26-825" ||
           scene.scenario === "current-citations-26-825"
           ? 321.875
-          : scene.id === "terminal-current-26-825-compact-sidebar"
-            ? 320.265625
+        : scene.id === "terminal-current-26-825-compact-sidebar" ||
+            scene.id === "terminal-current-26-825-light-compact-sidebar"
+          ? 320.265625
             : scene.id.startsWith("terminal-current-26-825-")
               ? 321.875
           : currentSidebarThreadLifecycleScene
@@ -16131,14 +16133,18 @@ for (const scene of selectedScenes) {
         scene.id === "terminal-compact" ||
         scene.id === "terminal-current-compact" ||
         scene.id === "terminal-current-26-825-compact" ||
-        scene.id === "terminal-current-26-825-compact-sidebar";
+        scene.id === "terminal-current-26-825-compact-sidebar" ||
+        scene.id === "terminal-current-26-825-light-compact" ||
+        scene.id === "terminal-current-26-825-light-compact-sidebar";
       const currentTerminal26825 = scene.id.startsWith(
         "terminal-current-26-825-",
       );
       const expectedTerminalWidth = currentTerminal26825
-        ? scene.id === "terminal-current-26-825-compact"
+        ? scene.id === "terminal-current-26-825-compact" ||
+          scene.id === "terminal-current-26-825-light-compact"
           ? 719
-          : scene.id === "terminal-current-26-825-compact-sidebar"
+          : scene.id === "terminal-current-26-825-compact-sidebar" ||
+              scene.id === "terminal-current-26-825-light-compact-sidebar"
             ? 399.734375
             : 857.125
         : compactTerminal
@@ -16173,6 +16179,14 @@ for (const scene of selectedScenes) {
         "terminal-current-26-825-picker": 1,
         "terminal-current-26-825-running": 1,
         "terminal-current-26-825-single": 1,
+        "terminal-current-26-825-single-light": 1,
+        "terminal-current-26-825-running-light": 1,
+        "terminal-current-26-825-completed-light": 1,
+        "terminal-current-26-825-multi-light": 3,
+        "terminal-current-26-825-picker-light": 1,
+        "terminal-current-26-825-mismatch-light": 1,
+        "terminal-current-26-825-light-compact": 3,
+        "terminal-current-26-825-light-compact-sidebar": 3,
       }[scene.id];
       const expectedTerminalStatuses = {
         "background-terminal": ["running"],
@@ -16198,10 +16212,23 @@ for (const scene of selectedScenes) {
         "terminal-current-26-825-picker": ["idle"],
         "terminal-current-26-825-running": ["idle"],
         "terminal-current-26-825-single": ["idle"],
+        "terminal-current-26-825-single-light": ["idle"],
+        "terminal-current-26-825-running-light": ["idle"],
+        "terminal-current-26-825-completed-light": ["idle"],
+        "terminal-current-26-825-multi-light": ["idle", "idle", "idle"],
+        "terminal-current-26-825-picker-light": ["idle"],
+        "terminal-current-26-825-mismatch-light": ["idle"],
+        "terminal-current-26-825-light-compact": ["idle", "idle", "idle"],
+        "terminal-current-26-825-light-compact-sidebar": [
+          "idle",
+          "idle",
+          "idle",
+        ],
       }[scene.id];
       const currentRunning =
         scene.id === "terminal-current-running" ||
-        scene.id === "terminal-current-26-825-running";
+        scene.id === "terminal-current-26-825-running" ||
+        scene.id === "terminal-current-26-825-running-light";
       const currentReload = scene.id === "terminal-current-reload";
       if (
         !terminal ||
@@ -16289,17 +16316,21 @@ for (const scene of selectedScenes) {
         );
       }
       if (currentTerminal26825) {
+        const lightTerminal = scene.id.includes("-light");
         const expectedPanelLeft =
           scene.id === "terminal-current-26-825-compact"
+            || scene.id === "terminal-current-26-825-light-compact"
             ? 1
-            : scene.id === "terminal-current-26-825-compact-sidebar"
+            : scene.id === "terminal-current-26-825-compact-sidebar" ||
+                scene.id === "terminal-current-26-825-light-compact-sidebar"
               ? 320.265625
               : 322.875;
         const tabLabels = terminal.tabGeometry.map(({ label }) => label);
         if (
           Math.abs(terminal.panel.left - expectedPanelLeft) > 0.1 ||
           Math.abs(terminal.panel.top - 541) > 0.1 ||
-          terminal.panelStyles.backgroundColor !== "rgb(24, 24, 24)" ||
+          terminal.panelStyles.backgroundColor !==
+            (lightTerminal ? "rgb(255, 255, 255)" : "rgb(24, 24, 24)") ||
           !terminal.inputRect ||
           Math.abs(terminal.inputRect.height - 16) > 0.1 ||
           Math.abs(terminal.inputRect.width - 7.21875) > 0.1 ||
@@ -16330,7 +16361,10 @@ for (const scene of selectedScenes) {
           );
         }
       }
-      if (scene.id === "terminal-current-26-825-picker") {
+      if (
+        scene.id === "terminal-current-26-825-picker" ||
+        scene.id === "terminal-current-26-825-picker-light"
+      ) {
         const picker = contract.terminalPicker;
         if (
           !picker ||
@@ -16362,7 +16396,10 @@ for (const scene of selectedScenes) {
           );
         }
       }
-      if (scene.id === "terminal-current-26-825-multi") {
+      if (
+        scene.id === "terminal-current-26-825-multi" ||
+        scene.id === "terminal-current-26-825-multi-light"
+      ) {
         await page
           .getByRole("button", { name: "Close codex-ui-kit 3 tab" })
           .click();
@@ -16402,7 +16439,10 @@ for (const scene of selectedScenes) {
           throw new Error(`${scene.id}: fresh reopen retained stale state.`);
         }
       }
-      if (scene.id === "terminal-current-26-825-mismatch") {
+      if (
+        scene.id === "terminal-current-26-825-mismatch" ||
+        scene.id === "terminal-current-26-825-mismatch-light"
+      ) {
         const panel = page.getByTestId("terminal-panel");
         await panel
           .getByRole("button", { name: "Open new terminal" })

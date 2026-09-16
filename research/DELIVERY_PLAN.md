@@ -1183,6 +1183,14 @@ exact cleanup. The current failure tail passes at 0%; ordinary sidebar error,
 collection loading, populated environment repair variants, and Remote
 connections remain independent work.
 
+The current 26.825 Terminal session, running/completed process, picker,
+worktree-mismatch, and compact sidebar contracts now have a matching light
+wide/720 replay matrix. Eight scenes reuse the current terminal state contract
+and pass CDP geometry, Electron native-window/zero-overflow checks, and
+regional pixel gates; terminal surfaces that intentionally retain their dark
+transcript paint remain host-owned visual behavior rather than a product-theme
+promotion.
+
 Current branch-entry slice: `26.803.61601` Browser/CDP now locks the 296×280
 branch menu and 400×190.56 create-and-checkout dialog. The public
 `BranchCreationDialog` replaces the previous local-environment reuse, and the

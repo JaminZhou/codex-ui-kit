@@ -1761,7 +1761,11 @@
         "replay:current-26.825-terminal-wide-compact-picker-multi-close-and-fresh-reopen",
         "browser-cdp:current-26.825-terminal-computed-geometry-session-lifecycle-and-picker",
         "electron:current-26.825-terminal-native-session-lifecycle-and-picker",
-        "pixel:current-26.825-terminal-wide-compact-hidden-and-pinned-product-regions"
+        "pixel:current-26.825-terminal-wide-compact-hidden-and-pinned-product-regions",
+        "replay:current-26.825-terminal-light-wide-compact-matrix",
+        "browser-cdp:current-26.825-terminal-light-wide-compact-matrix",
+        "electron:current-26.825-terminal-light-wide-compact-matrix",
+        "pixel:current-26.825-terminal-light-wide-compact-matrix"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1789,7 +1793,11 @@
         "background-process",
         "replay:current-26.825-terminal-running-completed-hide-reopen-persistence",
         "browser-cdp:current-26.825-terminal-running-completed-transcript-settlement",
-        "electron:current-26.825-terminal-close-reopen-and-session-isolation"
+        "electron:current-26.825-terminal-close-reopen-and-session-isolation",
+        "replay:current-26.825-terminal-light-running-completed-matrix",
+        "browser-cdp:current-26.825-terminal-light-running-completed-matrix",
+        "electron:current-26.825-terminal-light-running-completed-matrix",
+        "pixel:current-26.825-terminal-light-running-completed-matrix"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1813,7 +1821,11 @@
         "worktree-environment-dropdown",
         "replay:current-26.825-terminal-worktree-mismatch-open-new-and-dismiss",
         "browser-cdp:current-26.825-terminal-mismatch-session-preservation",
-        "electron:current-26.825-terminal-mismatch-session-preservation"
+        "electron:current-26.825-terminal-mismatch-session-preservation",
+        "replay:current-26.825-terminal-light-mismatch",
+        "browser-cdp:current-26.825-terminal-light-mismatch",
+        "electron:current-26.825-terminal-light-mismatch",
+        "pixel:current-26.825-terminal-light-mismatch"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
