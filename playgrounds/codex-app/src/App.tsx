@@ -781,7 +781,9 @@ function querySelection() {
   const theme = resolveDemoThemePreference(
     params.get("theme"),
     view,
-    frame?.startsWith("sidebar-current") ?? false,
+    (frame?.startsWith("sidebar-current") ?? false) ||
+      (frame?.startsWith("mcp-current-26-903-") &&
+        scenarioId.startsWith("mcp-current-26-903-")),
   );
   const requestedShellState = params.get("shellState");
   const shellState: AppRouteOutletStatus = [
@@ -3668,7 +3670,9 @@ export function App() {
     isDemoThemeAvailable(view, mode) ||
     (mode === "replay" &&
       initialSelection.theme === "light" &&
-      initialSelection.frame?.startsWith("sidebar-current"));
+      (initialSelection.frame?.startsWith("sidebar-current") ||
+        (initialSelection.frame?.startsWith("mcp-current-26-903-") &&
+          initialSelection.scenarioId.startsWith("mcp-current-26-903-"))));
   const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null

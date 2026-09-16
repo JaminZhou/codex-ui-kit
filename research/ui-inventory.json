@@ -459,7 +459,11 @@
         "browser-cdp:current-26.903-mcp-success-computed-style-and-geometry",
         "electron:current-26.903-mcp-success-summary-and-compact-lifecycle",
         "pixel:current-26.903-mcp-success-wide-compact-and-sources-regions",
-        "playground:mcp-elicitation-form-accept-decline-cancel"
+        "playground:mcp-elicitation-form-accept-decline-cancel",
+        "replay:current-26.903-mcp-success-light-wide-compact-sources",
+        "browser-cdp:current-26.903-mcp-success-light-wide-compact-sources",
+        "electron:current-26.903-mcp-success-light-wide-compact-sources",
+        "pixel:current-26.903-mcp-success-light-wide-compact-sources"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -500,7 +504,11 @@
         "replay:current-26.903-mcp-failure-search-fetch-recovery-wide-compact",
         "browser-cdp:current-26.903-mcp-failure-recovery-and-sources",
         "electron:current-26.903-mcp-failure-recovery-and-sources",
-        "pixel:current-26.903-mcp-recovery-wide-compact-and-sources-regions"
+        "pixel:current-26.903-mcp-recovery-wide-compact-and-sources-regions",
+        "replay:current-26.903-mcp-recovery-light-wide-compact-sources",
+        "browser-cdp:current-26.903-mcp-recovery-light-wide-compact-sources",
+        "electron:current-26.903-mcp-recovery-light-wide-compact-sources",
+        "pixel:current-26.903-mcp-recovery-light-wide-compact-sources"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

@@ -1116,6 +1116,12 @@ and long-input clamps, and pending/paused queue states. Sixteen light scenes
 reuse the public state contract and pass independent CDP geometry plus
 regional pixel gates; they remain replay evidence rather than installed-product
 theme promotion.
+The real 26.903 MCP success and same-thread recovery contracts now have a
+matching light wide/720 compact replay matrix, including the pinned Sources
+summary. Six scenes reuse the observed search/fetch and invalid-fetch recovery
+state contracts and pass independent CDP geometry, Electron lifecycle, and
+regional pixel gates; the light matrix remains replay evidence rather than
+installed-product theme promotion.
 This same evidence also promotes `app.new-thread-workspace-selection`; its
 remaining gaps are production Remote providers, repair variants, and
 branch-operation failure/recovery rather than the sampled entry composition.
