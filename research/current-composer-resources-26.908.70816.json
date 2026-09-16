@@ -1,0 +1,114 @@
+{
+  "baseline": {
+    "appAsarBytes": 322016890,
+    "appAsarSha256": "100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa",
+    "appVersion": "26.908.70816",
+    "buildNumber": "9275",
+    "chromiumVersion": "152.0.7977.83",
+    "observedOn": "2026-09-17"
+  },
+  "inventoryClassification": "scoped current-build observation; it does not replace the full 26.903.71938 package fingerprint baseline",
+  "capture": {
+    "method": "one temporary isolated loopback CDP process on port 9958",
+    "page": "app://-/index.html",
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 1312,
+      "width": 2554
+    },
+    "scope": "read-only DOM and computed-layout observation after opening Add files and more",
+    "cleanup": "listener, renderer children, temporary profile, and capture log were closed or moved to the macOS Trash before implementation",
+    "safetyBoundary": "The application-level profile exposed existing project and conversation text, so only an allowlisted public label set was retained; no menu item was selected and no prompt was sent."
+  },
+  "observed": {
+    "composer": {
+      "addTrigger": {
+        "label": "Add files and more",
+        "ariaExpanded": "true",
+        "dataState": "open",
+        "rect": {
+          "height": 28,
+          "left": 1078.4375,
+          "top": 1260,
+          "width": 28
+        },
+        "borderRadius": "9999px",
+        "color": "rgba(255, 255, 255, 0.498)"
+      },
+      "editor": {
+        "contentEditable": true,
+        "rect": {
+          "height": 44,
+          "left": 1082.4375,
+          "top": 1212,
+          "width": 712
+        },
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px",
+        "color": "rgb(255, 255, 255)"
+      }
+    },
+    "menu": {
+      "rect": {
+        "height": 320,
+        "left": 1070.4375,
+        "top": 874,
+        "width": 736
+      },
+      "scrollOwner": {
+        "clientHeight": 310,
+        "scrollHeight": 1065,
+        "rect": {
+          "height": 310,
+          "left": 1075.4375,
+          "top": 879,
+          "width": 726
+        },
+        "scrollTop": 0
+      },
+      "itemHeight": 28.5625,
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "lineHeight": "18.5714px",
+      "color": "rgb(255, 255, 255)",
+      "backgroundColor": "rgb(45, 45, 45)",
+      "borderRadius": "20px",
+      "publicSections": ["top-level actions", "Plugins", "Apps"],
+      "topLevelOptions": [
+        "Files and folders",
+        "Work in a project — Choose project for new chats",
+        "Goal — Set a goal to keep pursuing",
+        "Plan mode — Turn plan mode on",
+        "Record a skill",
+        "Sketch — Draw a sketch"
+      ],
+      "sampledPluginAndSkillOptions": [
+        "GitHub — Triage PRs, issues, CI, and publish flows",
+        "Documents — Create and edit documents",
+        "PDF — Read, create, and verify PDFs",
+        "Spreadsheets — Create and edit spreadsheets",
+        "Presentations — Create and edit presentations",
+        "Template Creator — Create or update reusable templates from reference content",
+        "Browser — Control the in-app browser",
+        "Computer — Control Mac apps from ChatGPT",
+        "Visualize — Create interactive visuals",
+        "Watch PR — Drive GitHub bot review rounds to a clean pass.",
+        "AppKit Inspector — Inspect native macOS views in Codex Browser.",
+        "Plugin Management — Discover and manage plugins",
+        "Sites — Build and deploy websites"
+      ],
+      "keyboardBoundary": "The menu is scroll-contained; the capture kept scrollTop at 0 and did not exercise selection or submission."
+    }
+  },
+  "excluded": [
+    "Account-dependent installed-skill and app rows after the public Apps heading",
+    "Browser-tab rows and other user-context rows",
+    "Plugin discovery, installation, OAuth, permissions, and execution",
+    "Selection result or a Composer attachment/pill lifecycle",
+    "Upload, provider errors, and long-term persistence",
+    "Product-region screenshots and Browser/Electron pixel promotion"
+  ]
+}

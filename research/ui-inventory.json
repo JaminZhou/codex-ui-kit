@@ -1034,6 +1034,7 @@
         "electron:current-26.825-wide-compact-resource-picker",
         "pixel:current-26.825-wide-compact-resource-picker",
         "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus",
+        "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",
@@ -1044,7 +1045,8 @@
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
         "cdp-26.727.40816:add-files-inline-resource-picker-736x320-scrollable-groups",
         "cdp-26.825.51511:add-files-inline-resource-picker-736-687x320-310-scroller-current-fixed-controls",
-        "cdp-26.908.40834:read-only-add-files-menu-seven-top-level-actions-and-sampled-scrollable-plugin-skill-catalog"
+        "cdp-26.908.40834:read-only-add-files-menu-seven-top-level-actions-and-sampled-scrollable-plugin-skill-catalog",
+        "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1087,12 +1089,14 @@
         "playground:composer-plugin-connect-controlled-replay",
         "electron:composer-plugin-connect-select-dismiss-focus",
         "pixel:composer-plugin-connect-own-fixture-1180-720-zero-drift",
-        "replay:current-26.908-sampled-plugin-skill-catalog-scroll-keyboard-focus"
+        "replay:current-26.908-sampled-plugin-skill-catalog-scroll-keyboard-focus",
+        "cdp-26.908.70816:read-only-public-plugin-skill-catalog-without-selection"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
-        "cdp-26.908.40834:read-only-add-files-menu-sampled-plugin-skill-options-without-selection"
+        "cdp-26.908.40834:read-only-add-files-menu-sampled-plugin-skill-options-without-selection",
+        "cdp-26.908.70816:read-only-public-plugin-skill-catalog-without-selection"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

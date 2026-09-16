@@ -2219,6 +2219,21 @@ replay-only evidence: installed-plugin authorization, network execution, and
 real product attachment persistence are not inferred, so the Composer resource
 and plugin rows remain partial.
 
+A same-day **26.908.70816 (9275)** isolated CDP observation refreshes the
+current menu geometry without changing that boundary. At the native 2554×1312
+viewport, `Add files and more` keeps a 712×44 editor and opens a 736×320 menu
+with a 726×310 scroll owner, 1065px scroll height, and 28.5625px rows. The
+sanitized public catalog retains Files and folders, Work in a project, Goal,
+Plan mode, Record a skill, Sketch, and the visible GitHub, Documents, PDF,
+Spreadsheets, Presentations, Template Creator, Browser, Computer, Visualize,
+Watch PR, AppKit Inspector, Plugin Management, and Sites rows. Account-,
+tab-, and app-specific rows were excluded; no option was selected and no
+upload, authorization, execution, product-region screenshot, or Browser/Electron
+pixel promotion is inferred. The evidence is stored in
+`research/current-composer-resources-26.908.70816.json` and remains a scoped
+current-build observation while `composer.resources` and `composer.plugins`
+stay partial.
+
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
 current-build Browser/CDP, native Electron, and regional-pixel contracts now
