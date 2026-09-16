@@ -772,11 +772,14 @@ exit gates; it does not replace the inventory.
   previous project/Local/main sample. Seven Browser/CDP, Electron, reviewed
   baseline, and local-only product-region gates cover the wide/compact project
   picker, five-action run-location menu, New local worktree controls,
-  Environment menu, and current non-radio Branches menu. This promotes the
-  sampled `conversation.context-controls`, `conversation.project-picker`, and
-  `composer.project-worktree-selection` paths while keeping populated
-  environment repair variants, production Remote, and branch-mutation
-  failures open.
+  Environment menu, and current non-radio Branches menu. A follow-up adds a
+  deterministic populated-environment registry replay at 1180px/720px in dark
+  and light themes, with saved local/remote records, edit/update, Forget, and
+  a disconnected repair → Retry path. Browser/CDP, Electron, and five reviewed
+  baselines pass for that replay. This promotes the sampled
+  `conversation.context-controls`, `conversation.project-picker`, and
+  `composer.project-worktree-selection` paths while keeping production Remote,
+  installed-product environment repair, and branch-mutation failures open.
 - Existing Browser and Electron results remain useful regression evidence, but
   they are `partial_legacy` until the affected surface is re-observed on the
   current build. The sampled unavailable-tool recovery is now current verified;

@@ -5991,6 +5991,21 @@ for (const scene of selectedScenes) {
                 },
               }
             : null,
+          environmentPopulated: environmentSettingsPage
+            ? {
+                savedCount: environmentSettingsPage.querySelectorAll(
+                  '[aria-label^="Use "]',
+                ).length,
+                savedText:
+                  environmentSettingsPage.querySelector(
+                    '[aria-label="Saved environments"]',
+                  )?.textContent?.trim() ?? null,
+                status:
+                  environmentSettingsPage
+                    .querySelector('[aria-label="Environment status result"]')
+                    ?.getAttribute("data-status") ?? null,
+              }
+            : null,
           environmentEditor: environmentEditor
             ? {
                 actionCount: environmentEditor.querySelectorAll(
@@ -6194,6 +6209,43 @@ for (const scene of selectedScenes) {
         await writeFile(
           join(artifactDirectory, `${scene.id}.json`),
           `${JSON.stringify(contract, null, 2)}\n`,
+        );
+        continue;
+      }
+      if (scene.frame.startsWith("workspace-environments-populated")) {
+        const populated = contract.environmentPopulated;
+        const expectedStatus = scene.frame.endsWith("-repair") ? "error" : "ready";
+        if (
+          contract.view !== "workspace" ||
+          contract.frame !== scene.frame ||
+          contract.horizontalOverflow > 1 ||
+          !populated ||
+          populated.savedCount < 2 ||
+          !populated.savedText?.includes("remote:staging") ||
+          populated.status !== expectedStatus
+        ) {
+          throw new Error(
+            `${scene.id}: workspace populated environment contract failed: ${JSON.stringify(contract)}`,
+          );
+        }
+        if (scene.frame.endsWith("-repair")) {
+          await page
+            .getByRole("button", { name: "Retry environment status", exact: true })
+            .click();
+        } else {
+          await page
+            .getByRole("button", { name: "Edit local", exact: true })
+            .click();
+          await page
+            .getByRole("button", { name: "Update environment", exact: true })
+            .click();
+          await page
+            .getByRole("status", { name: "Environment status result", exact: true })
+            .waitFor();
+        }
+        await writeFile(
+          join(artifactDirectory, `${scene.id}.json`),
+          `${JSON.stringify({ ...contract, afterRecovery: true }, null, 2)}\n`,
         );
         continue;
       }

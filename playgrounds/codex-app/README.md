@@ -1028,9 +1028,13 @@ the product's `Retry` control after its scoped blocker is removed. The current
 Electron continue to lock the deterministic phase, geometry, path, color,
 animation, and action-replacement contracts.
 
-This slice does not create an environment or claim populated environment
-editing/repair coverage. Raw product screenshots and capture records remain
-local-only.
+The current replay continuation adds a populated saved-environment registry at
+1180px and 720px in dark and light themes. It covers selecting and editing the
+local record, updating the endpoint, Forget, and a disconnected remote record
+that recovers through `Retry environment status`. Browser/CDP, Electron, and
+five reviewed internal baselines pass; the replay remains distinct from the
+host-owned production Remote registry. Raw product screenshots and capture
+records remain local-only.
 
 ## Current Projects Index slice
 

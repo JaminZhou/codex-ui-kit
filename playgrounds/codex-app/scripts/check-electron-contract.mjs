@@ -1658,6 +1658,45 @@ for (const environmentEditorScene of visualScenes.filter((candidate) =>
   }
 }
 
+for (const populatedEnvironmentScene of visualScenes.filter((candidate) =>
+  candidate.id.startsWith("workspace-environments-populated"),
+)) {
+  const { app: populatedEnvironmentApp, page: populatedEnvironmentPage } =
+    await launchScene(populatedEnvironmentScene, { capture: false });
+  try {
+    const route = populatedEnvironmentPage.getByRole("region", {
+      name: "Environments",
+      exact: true,
+    });
+    await route.waitFor();
+    if ((await route.getByRole("region", { name: "Saved environments" }).count()) !== 1) {
+      throw new Error(
+        `Electron populated environment contract is missing saved environments for ${populatedEnvironmentScene.id}.`,
+      );
+    }
+    if (populatedEnvironmentScene.frame.endsWith("-repair")) {
+      await route
+        .getByRole("button", { name: "Retry environment status", exact: true })
+        .click();
+    } else {
+      await route.getByRole("button", { name: "Edit local", exact: true }).click();
+      await route
+        .getByRole("button", { name: "Update environment", exact: true })
+        .click();
+    }
+    await route
+      .getByRole("status", { name: "Environment status result", exact: true })
+      .waitFor();
+    if (await populatedEnvironmentPage.evaluate(() => document.documentElement.scrollWidth > innerWidth)) {
+      throw new Error(
+        `Electron populated environment contract overflowed for ${populatedEnvironmentScene.id}.`,
+      );
+    }
+  } finally {
+    await populatedEnvironmentApp.close();
+  }
+}
+
 for (const remoteConnectionsScene of visualScenes.filter((candidate) =>
   candidate.id.startsWith("workspace-connections-settings"),
 )) {
