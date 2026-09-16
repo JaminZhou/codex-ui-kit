@@ -195,4 +195,64 @@ describe("ScheduledTasks", () => {
     expect(onSubmit).toHaveBeenCalledOnce();
     expect(onCancel).toHaveBeenCalledOnce();
   });
+
+  it("exposes saving and error lifecycle states without owning persistence", () => {
+    const onRetry = vi.fn();
+    const detailsField = {
+      id: "run-location",
+      label: "Runs on",
+      options: [
+        { label: "This device", value: "device" },
+        { label: "Cloud", value: "cloud" },
+      ],
+      value: "This device",
+      valueText: "device",
+    };
+    const { rerender } = render(
+      <ScheduledTaskEditor
+        detailsFields={[detailsField]}
+        name="Daily brief"
+        onRetry={onRetry}
+        prompt="Summarize priorities"
+        status="saving"
+      />,
+    );
+    const editor = screen.getByLabelText("Scheduled task editor");
+    expect(editor.getAttribute("data-status")).toBe("saving");
+    expect(editor.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Saving scheduled task…",
+    );
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen.getByRole("button", { name: "Runs on: device" }),
+    ).toHaveProperty("disabled", true);
+    expect(screen.getByRole("button", { name: "Create" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <ScheduledTaskEditor
+        name="Daily brief"
+        onRetry={onRetry}
+        prompt="Summarize priorities"
+        retryLabel="Try again"
+        status="error"
+        statusMessage="The workspace is offline."
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The workspace is offline.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveProperty(
+      "disabled",
+      false,
+    );
+  });
 });

@@ -24872,6 +24872,34 @@ button.codex-ui-generated-image-gallery__image {
   padding: 0 1.25rem 1.25rem;
 }
 
+.codex-ui-scheduled-task-editor__status {
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--codex-ui-focus) 12%, transparent);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8125rem;
+  gap: 0.25rem;
+  line-height: 1.25rem;
+  margin-block-end: 1rem;
+  padding: 0.625rem 0.75rem;
+}
+
+.codex-ui-scheduled-task-editor[data-status="error"]
+  .codex-ui-scheduled-task-editor__status {
+  background: color-mix(in srgb, #ef6b73 14%, transparent);
+}
+
+.codex-ui-scheduled-task-editor__status button {
+  background: transparent;
+  border: 0;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  padding: 0;
+}
+
 .codex-ui-scheduled-task-editor__name {
   display: block;
   height: 1.25rem;
@@ -24895,6 +24923,13 @@ button.codex-ui-generated-image-gallery__image {
 .codex-ui-scheduled-task-editor__prompt textarea::placeholder {
   color: color-mix(in srgb, var(--codex-ui-text) 30%, transparent);
   opacity: 1;
+}
+
+.codex-ui-scheduled-task-editor__name input:disabled,
+.codex-ui-scheduled-task-editor__prompt textarea:disabled,
+.codex-ui-scheduled-task-editor__field .codex-ui-popover-anchor > button:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .codex-ui-scheduled-task-editor__prompt {

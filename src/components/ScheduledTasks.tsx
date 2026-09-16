@@ -566,6 +566,8 @@ export interface ScheduledTaskEditorField {
   valueText?: string;
 }
 
+export type ScheduledTaskEditorStatus = "ready" | "saving" | "error";
+
 export interface ScheduledTaskEditorProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   detailsFields?: readonly ScheduledTaskEditorField[];
@@ -577,10 +579,15 @@ export interface ScheduledTaskEditorProps
   onFieldChange?: (field: ScheduledTaskEditorField, value: string) => void;
   onNameChange?: (name: string) => void;
   onPromptChange?: (prompt: string) => void;
+  onRetry?: () => void;
   onSubmit?: () => void;
   prompt?: string;
   promptLabel?: string;
   promptPlaceholder?: string;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: ScheduledTaskEditorStatus;
+  statusMessage?: ReactNode;
   submitDisabled?: boolean;
   submitLabel?: ReactNode;
   title?: ReactNode;
@@ -691,10 +698,12 @@ export function ScheduledTaskDetail({
 }
 
 function ScheduledTaskEditorSection({
+  disabled = false,
   fields,
   label,
   onFieldChange,
 }: {
+  disabled?: boolean;
   fields: readonly ScheduledTaskEditorField[];
   label: ReactNode;
   onFieldChange?: (field: ScheduledTaskEditorField, value: string) => void;
@@ -719,6 +728,7 @@ function ScheduledTaskEditorSection({
                 <Menu
                   align="end"
                   className="codex-ui-scheduled-task-editor__field-menu"
+                  disabled={disabled}
                   initialFocus="first"
                   label={typeof field.label === "string" ? field.label : field.id}
                   sideOffset={2}
@@ -729,6 +739,7 @@ function ScheduledTaskEditorSection({
                           ? `${field.label}: ${valueText}`
                           : field.id
                       }
+                      disabled={disabled}
                       type="button"
                     >
                       <span>{field.value}</span>
@@ -773,23 +784,32 @@ export function ScheduledTaskEditor({
   onFieldChange,
   onNameChange,
   onPromptChange,
+  onRetry,
   onSubmit,
   prompt = "",
   promptLabel = "Instructions",
   promptPlaceholder = "Describe what ChatGPT should do",
+  retryLabel = "Retry",
+  savingLabel = "Saving scheduled task…",
+  status = "ready",
+  statusMessage,
   submitDisabled,
   submitLabel = "Create",
   title = "New",
   ...props
 }: ScheduledTaskEditorProps) {
-  const disabled =
-    submitDisabled ?? (name.trim().length === 0 || prompt.trim().length === 0);
+  const isSaving = status === "saving";
+  const submitIsDisabled =
+    isSaving ||
+    (submitDisabled ?? (name.trim().length === 0 || prompt.trim().length === 0));
   return (
     <section
       aria-label="Scheduled task editor"
+      aria-busy={isSaving || undefined}
       className={["codex-ui-scheduled-task-editor", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
       {...props}
     >
       <span className="codex-ui-scheduled-task-editor__title">{title}</span>
@@ -804,10 +824,34 @@ export function ScheduledTaskEditor({
         </button>
       ) : null}
       <div className="codex-ui-scheduled-task-editor__body">
+        {status === "saving" ? (
+          <p
+            aria-live="polite"
+            className="codex-ui-scheduled-task-editor__status"
+            role="status"
+          >
+            {savingLabel}
+          </p>
+        ) : status === "error" ? (
+          <div
+            aria-live="polite"
+            className="codex-ui-scheduled-task-editor__status"
+            role="alert"
+          >
+            <strong>Couldn’t save scheduled task</strong>
+            <span>{statusMessage ?? "Check the task details and try again."}</span>
+            {onRetry ? (
+              <button onClick={onRetry} type="button">
+                {retryLabel}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         <label className="codex-ui-scheduled-task-editor__name">
           <span className="codex-ui-scheduled-tasks__sr-only">{nameLabel}</span>
           <input
             aria-label={nameLabel}
+            disabled={isSaving}
             onChange={(event) => onNameChange?.(event.currentTarget.value)}
             placeholder={namePlaceholder}
             value={name}
@@ -817,24 +861,27 @@ export function ScheduledTaskEditor({
           <span className="codex-ui-scheduled-tasks__sr-only">{promptLabel}</span>
           <textarea
             aria-label={promptLabel}
+            disabled={isSaving}
             onChange={(event) => onPromptChange?.(event.currentTarget.value)}
             placeholder={promptPlaceholder}
             value={prompt}
           />
         </label>
         <ScheduledTaskEditorSection
+          disabled={isSaving}
           fields={detailsFields}
           label="Details"
           onFieldChange={onFieldChange}
         />
         <ScheduledTaskEditorSection
+          disabled={isSaving}
           fields={frequencyFields}
           label="Frequency"
           onFieldChange={onFieldChange}
         />
       </div>
       <footer className="codex-ui-scheduled-task-editor__footer">
-        <button disabled={disabled} onClick={onSubmit} type="button">
+        <button disabled={submitIsDisabled} onClick={onSubmit} type="button">
           {submitLabel}
         </button>
       </footer>
