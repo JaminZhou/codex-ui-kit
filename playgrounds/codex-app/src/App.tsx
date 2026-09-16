@@ -32,6 +32,7 @@ import {
   ComposerContextBar,
   ComposerContextControl,
   ComposerDock,
+  ComposerEditor,
   ComposerModeIndicator,
   ComposerPermissionMenu,
   ComposerPlanProgress,
@@ -10796,15 +10797,12 @@ export function App() {
         data-resource-mention="GitHub"
         onSubmit={(event) => event.preventDefault()}
       >
-        <div
-          aria-label="Do anything"
+        <ComposerEditor
+          label="Do anything"
           className="demo-current-resource-mention-composer__textbox"
-          contentEditable
-          role="textbox"
-          suppressContentEditableWarning
         >
           <ComposerResourceMention label="GitHub" />
-        </div>
+        </ComposerEditor>
         <div className="demo-current-resource-mention-composer__actions">
           <button
             aria-label="Add files and more"

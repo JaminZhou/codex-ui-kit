@@ -13083,6 +13083,13 @@ summary.codex-ui-activity__header::after {
   white-space: break-spaces;
 }
 
+.codex-ui-composer-editor {
+  box-sizing: border-box;
+  min-width: 0;
+  outline: none;
+  white-space: normal;
+}
+
 .codex-ui-composer-resource-mention:focus-visible {
   outline: 2px solid var(--codex-ui-focus);
   outline-offset: 1px;

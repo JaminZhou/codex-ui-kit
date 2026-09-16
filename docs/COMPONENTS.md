@@ -410,6 +410,10 @@ kit never performs filesystem, network, account, or process mutations.
 
 ### Composer and content helpers
 
+- `ComposerEditor`: contenteditable editor shell with accessible textbox
+  semantics for host-owned rich content. Hosts own serialization, selection,
+  keyboard behavior, and submission; inline tokens can be composed as
+  non-editable children.
 - `ComposerPermissionMenu`: controlled Ask/Approve/Full (or host-defined)
   permission choices with checked state, descriptions, and `onChange`.
   Approval policy and persistence remain host-owned.
