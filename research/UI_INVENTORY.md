@@ -2147,8 +2147,8 @@ under independent ceilings. This promotes the sampled paths of
 `composer.project-worktree-selection`, and
 `app.new-thread-workspace-selection` to current Browser/Electron verification.
 Their implementation remains partial because populated
-environment creation/editing, Remote, branch-operation failures, and other
-provider-specific states are still open.
+environment creation/editing, production Remote, and other provider-specific
+states are still open.
 
 The adjacent current Composer-control follow-up supersedes the previous
 `26.820.60940` permission and mode anchors. The sampled permission overlay is
