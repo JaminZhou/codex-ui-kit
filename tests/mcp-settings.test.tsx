@@ -117,6 +117,52 @@ describe("MCP settings", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
+  it("keeps row toggle progress and failures host-controlled", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <McpServersPage
+        onServerRetry={onRetry}
+        serverRetryLabel="Try again"
+        servers={[{ ...servers[0], toggleStatus: "enabling" }]}
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain("Enabling…");
+    expect(screen.getByRole("switch", { name: "Enable local-browser" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen
+        .getByRole("switch", { name: "Enable local-browser" })
+        .getAttribute("aria-busy"),
+    ).toBe("true");
+
+    rerender(
+      <McpServersPage
+        onServerRetry={onRetry}
+        serverRetryLabel="Try again"
+        servers={[
+          {
+            ...servers[0],
+            toggleStatus: "error",
+            toggleStatusMessage: "The local MCP process stopped.",
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The local MCP process stopped.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "local-browser" }),
+    );
+    expect(screen.getByRole("switch", { name: "Enable local-browser" })).toHaveProperty(
+      "disabled",
+      false,
+    );
+  });
+
   it("keeps the create editor controlled across both server types", () => {
     const onBack = vi.fn();
     const onChange = vi.fn();
