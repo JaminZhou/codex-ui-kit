@@ -1,0 +1,56 @@
+{
+  "baseline": {
+    "appAsarBytes": 322016890,
+    "appAsarSha256": "100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa",
+    "appVersion": "26.908.70816",
+    "buildNumber": "9275",
+    "chromiumVersion": "152.0.7977.83",
+    "observedOn": "2026-09-17"
+  },
+  "inventoryClassification": "scoped current-build selection observation; it records a negative attachment boundary and does not promote product pixels",
+  "capture": {
+    "method": "one temporary isolated loopback CDP process on port 9960",
+    "page": "app:///-/index.html",
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 1312,
+      "width": 2554
+    },
+    "scope": "read-only opening of Add files and more followed by selecting the public GitHub row",
+    "cleanup": "renderer children, temporary profile, and loopback listener were closed; the profile was moved to the macOS Trash",
+    "safetyBoundary": "No prompt was sent, no plugin was connected or executed, and no account-, tab-, or app-specific rows were retained."
+  },
+  "observed": {
+    "trigger": {
+      "label": "Add files and more",
+      "action": "open public resource menu"
+    },
+    "resource": {
+      "label": "GitHub",
+      "description": "Triage PRs, issues, CI, and publish flows",
+      "selection": "selected once in the isolated profile"
+    },
+    "result": {
+      "composerAttachmentCount": 0,
+      "composerAttachmentCard": null,
+      "editor": {
+        "ariaLabel": "Do anything",
+        "contentEditable": true,
+        "role": "textbox"
+      },
+      "inlineMention": {
+        "label": "GitHub",
+        "kind": "public resource mention",
+        "containerClass": "_Mention_1jmov_2",
+        "editorRect": {
+          "height": 44,
+          "left": 1082.4375,
+          "top": 1212,
+          "width": 712
+        }
+      },
+      "horizontalOverflow": 0
+    }
+  },
+  "boundary": "The current product maps GitHub resource selection to an inline editor mention rather than a ComposerAttachment card. Replay-only GitHub attachment fixtures must not be promoted to current product attachment evidence until a real attachment-producing resource path is observed."
+}
