@@ -42,7 +42,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 92 surface groups: 59 P0, 22 P1, and 11 P2.
-- 16 groups have current-build runtime evidence, 67 have previous-build-only
+- 17 groups have current-build runtime evidence, 66 have previous-build-only
   runtime evidence, and 9 have not been sampled. Browser/Electron verified
   statuses remain intentionally scoped: the current 26.903 PDF slice is
   promoted, while older and broader families stay regression fixtures until
@@ -1128,8 +1128,8 @@ installed-product theme promotion.
 This same evidence also promotes `app.new-thread-workspace-selection`; its
 remaining gaps are production Remote providers, repair variants, and
 branch-operation failure/recovery rather than the sampled entry composition.
-Populated environments, Remote, and branch-operation failures remain Stage 3
-work rather than blockers for this sampled Stage 2 context path.
+Populated environments and installed-product Remote/branch mutation remain
+Stage 3 work rather than blockers for this sampled Stage 2 context path.
 
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
 structural evidence, Browser acceptance, and Electron acceptance.
@@ -1183,8 +1183,8 @@ regular-file `.git/worktrees` blocker scoped to one disposable repository.
 It observes the exact branch/error/unread three-track row, removes the blocker,
 uses the real `Retry` control, and verifies root plus one child worktree before
 exact cleanup. The current failure tail passes at 0%; ordinary sidebar error,
-collection loading, populated environment repair variants, and Remote
-connections remain independent work.
+collection loading, populated environment repair variants, and production
+Remote/branch mutation remain independent work.
 
 The current 26.825 Terminal session, running/completed process, picker,
 worktree-mismatch, and compact sidebar contracts now have a matching light
@@ -1225,6 +1225,15 @@ Git status are checked independently of the UI. Error and recovered screenshots
 are retained outside the repository. `check:branch-recovery` is included in full
 acceptance. This closes the sampled host dirty-checkout/retry path, not current
 installed-product evidence, user-facing conflict repair, or the full PR workflow.
+
+The companion branch-operation gate now exercises the host create path at both
+1180px and 720px with a real disposable repository: an invalid ref reports the
+Git validation error without changing HEAD, a duplicate ref reports the
+conflict without changing HEAD, and each error recovers through the same dialog
+to a successful create-and-checkout. The gate also asserts zero horizontal
+overflow and retains only local screenshots. This closes the host invalid/
+duplicate/retry lifecycle while leaving installed-product mutation and broader
+merge/worktree conflict semantics explicitly open.
 
 Exit: a protocol-backed coding task can travel from project selection through
 command, approval, file review, terminal, and PR review without fixture-only
@@ -1872,7 +1881,7 @@ without confusing package readiness with full product reconstruction.
    local worktree state, two-action Environment menu, and non-radio Branches
    menu through CDP, Electron, reviewed baselines, and local-only product
    regions. Continue with populated environment repair variants,
-   branch-operation failures, and real Remote connection lifecycles.
+   installed-product branch mutations, and production Remote lifecycles.
 7. **Review content variants — delivered for the sampled current card,
    workspace, and Undo/Reapply family**: `26.820.60940` now covers a real
    added/modified/deleted `+4 −4` group, marker-backed two-file rename,

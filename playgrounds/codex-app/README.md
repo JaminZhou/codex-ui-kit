@@ -941,6 +941,11 @@ untracked.
 - Three reviewed blank/error/created frames extend Browser/CDP and pixels to
   166 lifecycle frames. The untracked current-product dialog crop passes at
   3.0916% under the 8% external ceiling.
+- The host failure/recovery gate adds invalid-ref and duplicate-ref attempts at
+  1180px and 720px. Each alert leaves HEAD unchanged, then the same dialog
+  creates and checks out a valid branch; Git state and zero horizontal overflow
+  are asserted independently. Installed-product branch mutation, merge
+  conflicts, and remote/worktree semantics remain outside this claim.
 
 The current-product mutation itself remains a separate runtime gate until the
 isolated native project selector can attach the disposable repository. Raw

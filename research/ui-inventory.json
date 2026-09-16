@@ -907,6 +907,7 @@
         "replay:current-26.825-run-location-new-worktree-environment-and-branch-menus",
         "browser-cdp:current-26.825-menu-semantics-geometry-focus-and-computed-style",
         "electron:current-26.825-run-location-worktree-environment-branch-lifecycle",
+        "electron:live-branch-operation-failure-recovery-wide-compact",
         "pixel:reviewed-and-local-only-current-26.825-context-menu-family"
       ],
       "runtimeStatus": "runtime_observed",
@@ -928,7 +929,8 @@
         "cdp-26.818.41509:work-in-new-local-worktree-no-environment-main-context-and-current-menus",
         "cdp-26.820.60940:work-in-new-local-worktree-selection-no-environment-main-context-and-real-submit",
         "cdp-26.825.51511:work-in-five-action-menu-new-worktree-four-controls-and-two-action-environment-menu",
-        "cdp-26.825.51511:branch-menu-296x280-eight-menuitems-no-radio-state-no-local-environment-action-current-search"
+        "cdp-26.825.51511:branch-menu-296x280-eight-menuitems-no-radio-state-no-local-environment-action-current-search",
+        "cdp-26.903.71938:live-branch-invalid-duplicate-retry-wide-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
