@@ -858,7 +858,11 @@
         "pixel:current-26.825-wide-boundary-compact-composer-regions",
         "browser-cdp:current-26.825-four-line-and-long-input-clamp-scroll-geometry",
         "electron:current-26.825-wide-compact-multiline-input",
-        "pixel:current-26.825-wide-compact-four-line-and-long-input"
+        "pixel:current-26.825-wide-compact-four-line-and-long-input",
+        "replay:current-26.825-composer-light-wide-compact-matrix",
+        "browser-cdp:current-26.825-composer-light-wide-compact-matrix",
+        "electron:current-26.825-composer-light-wide-compact-matrix",
+        "pixel:current-26.825-composer-light-wide-compact-matrix"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -931,7 +935,11 @@
         "permissions-mode-dropdown",
         "browser-cdp:current-three-mode-menu-and-focus-restoration",
         "electron:current-three-mode-menu-and-focus-restoration",
-        "pixel:reviewed-current-three-mode-permission-menu"
+        "pixel:reviewed-current-three-mode-permission-menu",
+        "replay:current-26.825-permissions-light-wide-compact",
+        "browser-cdp:current-26.825-permissions-light-wide-compact",
+        "electron:current-26.825-permissions-light-wide-compact",
+        "pixel:current-26.825-permissions-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -939,7 +947,8 @@
         "cdp-26.721.81911:ask-approve-full-custom-permission-menu",
         "cdp-26.727.40816:ask-approve-full-custom-permission-menu-480x222",
         "cdp-26.820.60940:ask-approve-full-three-mode-menu-476x175-and-ask-risk-boundary",
-        "cdp-26.825.51511:ask-approve-full-three-mode-menu-438.6875x161.6875-plain-menuitems-current-icons-and-focus"
+        "cdp-26.825.51511:ask-approve-full-three-mode-menu-438.6875x161.6875-plain-menuitems-current-icons-and-focus",
+        "cdp-26.825.51511:ask-approve-full-three-mode-menu-light-wide-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -954,7 +963,11 @@
         "home-composer-mode-toggle",
         "browser-cdp:current-wide-compact-goal-plan-geometry-and-focus",
         "electron:current-wide-compact-goal-plan-geometry-and-focus",
-        "pixel:current-wide-compact-goal-plan-surfaces"
+        "pixel:current-wide-compact-goal-plan-surfaces",
+        "replay:current-26.825-goal-plan-light-wide-compact",
+        "browser-cdp:current-26.825-goal-plan-light-wide-compact",
+        "electron:current-26.825-goal-plan-light-wide-compact",
+        "pixel:current-26.825-goal-plan-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -962,7 +975,8 @@
         "cdp-26.721.81911:add-files-goal-plan-skill-and-plugins-menu",
         "cdp-26.727.40816:goal-plan-active-mode-label-placeholder-clear-and-focus",
         "cdp-26.820.60940:goal-736x134-688x134-plan-736x98-688x98-active-mode-placeholder-clear-focus",
-        "cdp-26.825.51511:goal-plan-exact-current-glyphs-wide-compact-geometry-placeholder-clear-and-focus"
+        "cdp-26.825.51511:goal-plan-exact-current-glyphs-wide-compact-geometry-placeholder-clear-and-focus",
+        "cdp-26.825.51511:goal-plan-light-wide-compact-geometry"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -977,14 +991,19 @@
         "queued-message-list",
         "browser-cdp:current-26.825-pending-paused-resume-continued-settled-queue",
         "electron:current-26.825-real-click-paused-resume-queue-lifecycle",
-        "pixel:current-26.825-wide-compact-pending-and-paused-queue"
+        "pixel:current-26.825-wide-compact-pending-and-paused-queue",
+        "replay:current-26.825-queue-light-wide-compact",
+        "browser-cdp:current-26.825-queue-light-wide-compact",
+        "electron:current-26.825-queue-light-wide-compact",
+        "pixel:current-26.825-queue-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:queued-follow-up-card-delete-actions-and-sequential-run",
         "cdp-26.721.81911:real-queue-steer-delete-actions-stop-paused-and-resume",
         "cdp-26.727.40816:real-710x39-queue-steer-delete-actions-and-stop-auto-continuation",
-        "cdp-26.825.51511:real-710x37-pending-710x72-paused-two-resume-actions-and-auto-continuation"
+        "cdp-26.825.51511:real-710x37-pending-710x72-paused-two-resume-actions-and-auto-continuation",
+        "cdp-26.825.51511:queue-light-wide-compact-pending-paused"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1001,7 +1020,11 @@
         "browser-cdp:current-26.825-resource-picker-semantics-focus-and-geometry",
         "electron:current-26.825-wide-compact-resource-picker",
         "pixel:current-26.825-wide-compact-resource-picker",
-        "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus"
+        "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus",
+        "replay:current-26.825-resource-picker-light-wide-compact",
+        "browser-cdp:current-26.825-resource-picker-light-wide-compact",
+        "electron:current-26.825-resource-picker-light-wide-compact",
+        "pixel:current-26.825-resource-picker-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

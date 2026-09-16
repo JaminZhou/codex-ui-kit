@@ -1110,6 +1110,12 @@ Project search and fixed actions, Local/New local worktree selection,
 No environment, starting branch, the current Branches search/roles, Escape
 focus return, exact overlay geometry/style, and the 720px boundary pass
 Browser/CDP, Electron, and seven reviewed/product-region pixel gates.
+The same Composer contract now has a light wide/720 compact replay matrix for
+the three-mode permissions menu, Goal/Plan modes, resource picker, multiline
+and long-input clamps, and pending/paused queue states. Sixteen light scenes
+reuse the public state contract and pass independent CDP geometry plus
+regional pixel gates; they remain replay evidence rather than installed-product
+theme promotion.
 This same evidence also promotes `app.new-thread-workspace-selection`; its
 remaining gaps are production Remote providers, repair variants, and
 branch-operation failure/recovery rather than the sampled entry composition.
