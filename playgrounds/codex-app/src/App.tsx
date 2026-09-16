@@ -231,6 +231,7 @@ import { LivePushPreview } from "./LivePushPreview";
 import { LivePullRequest } from "./LivePullRequest";
 import { useLivePullRequestRoute } from "./useLivePullRequestRoute";
 import { LiveEnvironmentStatus } from "./LiveEnvironmentStatus";
+import { ReplayEnvironmentSettings } from "./ReplayEnvironmentSettings";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
 import currentPullRequestSummaryPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-product.png";
@@ -3794,6 +3795,9 @@ export function App() {
   const isEnvironmentEditorReplay =
     initialSelection.view === "workspace" &&
     initialSelection.frame?.startsWith("workspace-environment-editor") === true;
+  const isEnvironmentPopulatedReplay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame?.startsWith("workspace-environments-populated") === true;
   const [environmentEditorTab, setEnvironmentEditorTab] =
     useState<EnvironmentEditorTab>(
       initialSelection.frame?.endsWith("-actions") ? "actions" : "setup",
@@ -3853,7 +3857,8 @@ export function App() {
   >(
     initialSelection.view === "workspace" &&
       (initialSelection.frame === "workspace-environments-unavailable" ||
-        isEnvironmentEditorReplay)
+        isEnvironmentEditorReplay ||
+        isEnvironmentPopulatedReplay)
       ? "environments"
       : initialSelection.view === "workspace" &&
           [
@@ -9299,7 +9304,11 @@ export function App() {
     );
   const workspaceBaseFrame =
     workspacePage === "environments"
-      ? isEnvironmentEditorReplay
+      ? isEnvironmentPopulatedReplay
+        ? activeFrame?.startsWith("workspace-environments-populated")
+          ? activeFrame
+          : "workspace-environments-populated"
+      : isEnvironmentEditorReplay
         ? activeFrame?.startsWith("workspace-environment-editor")
           ? activeFrame
           : "workspace-environment-editor"
@@ -10993,7 +11002,11 @@ export function App() {
   ) : null;
   const workspaceEnvironmentSettingsRoute = (
     <div className="demo-workspace-environment-settings-route">
-      {isEnvironmentEditorReplay ? (
+      {isEnvironmentPopulatedReplay ? (
+        <ReplayEnvironmentSettings
+          repair={activeFrame?.endsWith("-repair") === true}
+        />
+      ) : isEnvironmentEditorReplay ? (
         <EnvironmentEditorPage
           actions={environmentEditorActions}
           activeTab={environmentEditorTab}
