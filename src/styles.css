@@ -13090,6 +13090,14 @@ summary.codex-ui-activity__header::after {
   white-space: normal;
 }
 
+.codex-ui-composer-editor[data-placeholder]:empty::before {
+  color: var(--codex-ui-text-secondary);
+  content: attr(data-placeholder);
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
 .codex-ui-composer-resource-mention:focus-visible {
   outline: 2px solid var(--codex-ui-focus);
   outline-offset: 1px;
