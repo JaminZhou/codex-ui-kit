@@ -2487,12 +2487,14 @@
         "electron:workspace-connections-settings-light-compact",
         "pixel:workspace-connections-settings-wide-compact-error-form",
         "pixel:workspace-connections-settings-light",
-        "pixel:workspace-connections-settings-light-compact"
+        "pixel:workspace-connections-settings-light-compact",
+        "electron:live-remote-connections-registry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:connections-device-ssh-and-connection-controls",
-        "cdp:workspace-connections-settings-add-save-test-retry"
+        "cdp:workspace-connections-settings-add-save-test-retry",
+        "cdp-26.903.71938:live-remote-connections-loopback-persistence-edit-forget"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

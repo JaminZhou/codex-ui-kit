@@ -20,6 +20,10 @@ contextBridge.exposeInMainWorld("codexDemo", {
   addEnvironment: (input) => ipcRenderer.invoke("demo:environment:add", input),
   forgetEnvironment: (input) => ipcRenderer.invoke("demo:environment:forget", input),
   readEnvironmentInfo: (input) => ipcRenderer.invoke("demo:environment:info", input),
+  listRemoteConnections: () => ipcRenderer.invoke("demo:remote-connection:list"),
+  saveRemoteConnection: (input) => ipcRenderer.invoke("demo:remote-connection:save", input),
+  forgetRemoteConnection: (input) => ipcRenderer.invoke("demo:remote-connection:forget", input),
+  testRemoteConnection: (input) => ipcRenderer.invoke("demo:remote-connection:test", input),
   renameLiveThread: (input) => ipcRenderer.invoke("demo:live:thread:rename", input),
   setLiveThreadArchived: (input) => ipcRenderer.invoke("demo:live:thread:archive", input),
   createAndCheckoutBranch: (input) =>

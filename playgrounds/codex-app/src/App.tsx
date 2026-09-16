@@ -231,6 +231,7 @@ import { LivePushPreview } from "./LivePushPreview";
 import { LivePullRequest } from "./LivePullRequest";
 import { useLivePullRequestRoute } from "./useLivePullRequestRoute";
 import { LiveEnvironmentStatus } from "./LiveEnvironmentStatus";
+import { LiveRemoteConnections } from "./LiveRemoteConnections";
 import { ReplayEnvironmentSettings } from "./ReplayEnvironmentSettings";
 import { PtyTerminal, type PtyTerminalHandle } from "./PtyTerminal";
 import currentPullRequestSummaryExpandedPreview from "../tests/visual/fixtures/pr-detail-current-26-825-summary-expanded-product.png";
@@ -7530,6 +7531,18 @@ export function App() {
         >
           Environment status
         </AppSidebarItem>}
+        {mode === "live" && <AppSidebarItem
+          leading={<SidebarGlyph name="plugins" />}
+          onClick={() => {
+            setWorkspacePage("connections-settings");
+            setActiveFrame("workspace-connections-settings");
+            setView("workspace");
+            dismissSidebarAfterNavigation();
+          }}
+          selected={view === "workspace" && workspacePage === "connections-settings"}
+        >
+          Connections
+        </AppSidebarItem>}
         <AppSidebarItem
           disabled={!window.codexDemo}
           leading={<SidebarGlyph name="plugins" />}
@@ -11244,6 +11257,9 @@ export function App() {
       selectedId={selectedSettingsId}
     >
       {workspacePage === "connections-settings" ? (
+        mode === "live" ? (
+          <LiveRemoteConnections />
+        ) : (
         <>
           <RemoteConnectionsPage
             connections={remoteConnections}
@@ -11317,6 +11333,7 @@ export function App() {
             {remoteConnectionsAction}
           </span>
         </>
+        )
       ) : workspacePage === "mcp-settings" ? (
         <>
           <McpServersPage

@@ -62,6 +62,10 @@ interface CodexDemoBridge {
   addEnvironment(input: { projectToken: string; environmentId: string; execServerUrl: string }): Promise<import("../electron/live-environment-add").LiveEnvironmentAddResult>;
   forgetEnvironment(input: { projectToken: string; environmentId: string }): Promise<{ environmentId: string; forgotten: boolean }>;
   readEnvironmentInfo(input: { projectToken: string; environmentId: string }): Promise<import("../electron/live-environment-info").LiveEnvironmentInfoResult>;
+  listRemoteConnections(): Promise<ReadonlyArray<import("../electron/live-remote-connections").LiveRemoteConnection>>;
+  saveRemoteConnection(input: Omit<import("../electron/live-remote-connections").LiveRemoteConnection, "updatedAt">): Promise<import("../electron/live-remote-connections").LiveRemoteConnection>;
+  forgetRemoteConnection(input: { id: string }): Promise<{ id: string; forgotten: boolean }>;
+  testRemoteConnection(input: { id: string }): Promise<import("../electron/live-remote-connections").RemoteConnectionTestResult>;
   renameLiveThread(input: { projectToken: string; threadId: string; name: string }): Promise<{ threadId: string; title: string }>;
   setLiveThreadArchived(input: { projectToken: string; threadId: string; archived: boolean }): Promise<{ threadId: string; archived: boolean; changedThreadIds: string[] }>;
   selectProjectDirectory(): Promise<

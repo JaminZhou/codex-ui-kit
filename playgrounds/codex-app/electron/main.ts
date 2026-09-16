@@ -63,6 +63,12 @@ import {
 } from "./live-environment-add.js";
 import { readLiveEnvironmentInfo } from "./live-environment-info.js";
 import { LiveEnvironmentRegistry } from "./live-environment-registry.js";
+import {
+  LiveRemoteConnectionRegistry,
+  normalizeRemoteConnection,
+  testRemoteConnection,
+  type LiveRemoteConnection,
+} from "./live-remote-connections.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
   checkoutGitBranch,
@@ -141,6 +147,7 @@ const liveInputGate = new LiveUserInputGate();
 const liveMcpElicitationGate = new LiveMcpElicitationGate();
 let liveThreadRegistry: LiveThreadRegistry | null = null;
 let liveEnvironmentRegistry: LiveEnvironmentRegistry | null = null;
+let liveRemoteConnectionRegistry: LiveRemoteConnectionRegistry | null = null;
 function historyRegistry() {
   return liveThreadRegistry ??= new LiveThreadRegistry(
     process.env.CODEX_UI_KIT_LIVE_HISTORY_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-threads.json"),
@@ -150,6 +157,12 @@ function historyRegistry() {
 function environmentRegistry() {
   return liveEnvironmentRegistry ??= new LiveEnvironmentRegistry(
     process.env.CODEX_UI_KIT_LIVE_ENVIRONMENTS_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-environments.json"),
+  );
+}
+
+function remoteConnectionRegistry() {
+  return liveRemoteConnectionRegistry ??= new LiveRemoteConnectionRegistry(
+    process.env.CODEX_UI_KIT_LIVE_REMOTE_CONNECTIONS_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-remote-connections.json"),
   );
 }
 
@@ -1132,6 +1145,36 @@ ipcMain.handle("demo:environment:info", async (event, raw: unknown) => {
   if (client !== connectedClient || connectedClient.state !== "connected") {
     throw new Error("The live session closed while reading the environment.");
   }
+  return result;
+});
+ipcMain.handle("demo:remote-connection:list", async (event) => {
+  assertTrustedIpc(event);
+  return remoteConnectionRegistry().list();
+});
+ipcMain.handle("demo:remote-connection:save", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const input = raw as Partial<LiveRemoteConnection>;
+  const connection = normalizeRemoteConnection({
+    ...input,
+    status: "disconnected",
+    updatedAt: Date.now(),
+  });
+  return remoteConnectionRegistry().upsert(connection);
+});
+ipcMain.handle("demo:remote-connection:forget", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const id = raw && typeof raw === "object" ? (raw as { id?: unknown }).id : undefined;
+  if (typeof id !== "string") throw new TypeError("A remote connection id is required.");
+  return { forgotten: await remoteConnectionRegistry().forget(id), id };
+});
+ipcMain.handle("demo:remote-connection:test", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const id = raw && typeof raw === "object" ? (raw as { id?: unknown }).id : undefined;
+  if (typeof id !== "string") throw new TypeError("A remote connection id is required.");
+  const connection = (await remoteConnectionRegistry().list()).find((candidate) => candidate.id === id);
+  if (!connection) throw new Error("The remote connection no longer exists.");
+  const result = await testRemoteConnection(connection);
+  await remoteConnectionRegistry().updateStatus(id, result.status);
   return result;
 });
 ipcMain.handle("demo:git:commit-preview", async (event, raw: unknown) => {

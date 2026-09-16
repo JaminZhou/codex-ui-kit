@@ -308,7 +308,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 92 surface groups; 15 have current-build runtime evidence, 68 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 1 group and Electron verification covers 1.
+Current inventory: 92 surface groups; 16 have current-build runtime evidence, 67 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 1 group and Electron verification covers 1.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

@@ -42,7 +42,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 92 surface groups: 59 P0, 22 P1, and 11 P2.
-- 15 groups have current-build runtime evidence, 68 have previous-build-only
+- 16 groups have current-build runtime evidence, 67 have previous-build-only
   runtime evidence, and 9 have not been sampled. Browser/Electron verified
   statuses remain intentionally scoped: the current 26.903 PDF slice is
   promoted, while older and broader families stay regression fixtures until
@@ -1704,8 +1704,14 @@ with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,
 error, form, and light-theme wide/compact replays pass Browser/CDP, Electron,
 and regional pixel gates. The form deliberately keeps credentials outside the renderer;
-real account pairing, Noise relay, SSH key exchange, and Remote registry
-writes remain outside this public contract.
+real account pairing, Noise relay, SSH key exchange, and production Remote
+registry writes remain outside this public contract. The next host-backed slice
+adds a credential-free loopback registry with atomic persistence, Edit/Forget,
+and a real WebSocket Test path through Electron IPC. A disposable pair of
+loopback servers proves connected, updated-endpoint, and compact-width
+disconnect/Forget recovery at 1180px and 720px without touching production
+Remote state; installed-product pairing and relay-backed registry semantics
+remain explicitly open.
 
 ### 6. Perform global visual convergence
 
