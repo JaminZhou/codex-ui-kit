@@ -7,6 +7,7 @@ export * from "./components/ActivityTimeline.js";
 export * from "./components/AgentThread.js";
 export * from "./components/ConversationThreadShell.js";
 export * from "./components/AgentComposer.js";
+export * from "./components/ComposerEditor.js";
 export * from "./components/ComposerAuxiliary.js";
 export * from "./components/ComposerPlanProgress.js";
 export * from "./components/ApprovalRequest.js";
