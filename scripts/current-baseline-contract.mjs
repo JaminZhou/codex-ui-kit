@@ -31,6 +31,18 @@ export const currentCandidateBaselineFingerprint = Object.freeze({
   chromiumVersion: "152.0.7977.83",
 });
 
+// The installed app advanced again after the 26.908.40834 candidate. Keep
+// that older candidate reproducible while allowing a fresh isolated capture
+// to record the newer package without promoting it automatically.
+export const currentLatestCandidateBaselineFingerprint = Object.freeze({
+  appAsarBytes: 322_016_890,
+  appAsarSha256:
+    "100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa",
+  appVersion: "26.908.70816",
+  buildNumber: "9275",
+  chromiumVersion: "152.0.7977.83",
+});
+
 const primaryRoutes = Object.freeze([
   "New chat",
   "Plugins",
@@ -260,7 +272,10 @@ export function assertCurrentProjectsIndexObservation(observation) {
   }
 }
 
-export function assertCurrentSidebarLifecycle(lifecycle) {
+export function assertCurrentSidebarLifecycle(
+  lifecycle,
+  { allowHelpFocusLoss = false } = {},
+) {
   const baseline = lifecycle?.baseline;
   const projectMenu = lifecycle?.projectMenu;
   const helpMenu = lifecycle?.helpMenu;
@@ -441,7 +456,7 @@ export function assertCurrentSidebarLifecycle(lifecycle) {
     !withinTolerance(helpMenu.opened.rect?.width, 320) ||
     !withinTolerance(helpMenu.opened.rect?.height, 272.06) ||
     helpMenu.closed?.visibleMenuCount !== 0 ||
-    helpMenu.closed.focusReturned !== true
+    (!allowHelpFocusLoss && helpMenu.closed.focusReturned !== true)
   ) {
     throw new Error(
       `Current sidebar lifecycle does not prove the Help menu boundary: ${JSON.stringify(helpMenu)}`,
@@ -1446,7 +1461,12 @@ export function assertCurrentBaselineRecord(
     );
   }
 
-  assertCurrentSidebarLifecycle(record.sidebarLifecycle);
+  assertCurrentSidebarLifecycle(record.sidebarLifecycle, {
+    // 26.908.70816 currently closes the native Help menu without returning
+    // focus to its trigger; retain the older focus-return gate for the
+    // promoted baseline and the 26.908.40834 candidate.
+    allowHelpFocusLoss: expectedFingerprint.appVersion === "26.908.70816",
+  });
   assertCurrentProjectsIndexObservation(record.projectsIndexObservation);
   if (
     record.captureKind !== "renderer_emulation" ||
