@@ -32,6 +32,8 @@ jobs:
           node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - name: Audit the packed private release candidate
+        run: pnpm check:release:candidate
 
   consumer:
     name: React ${{ matrix.react }} / ${{ matrix.module-resolution }} consumer
