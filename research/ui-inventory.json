@@ -1531,7 +1531,11 @@
       "ownership": "cross-layer",
       "packageEvidence": [
         "app-main",
-        "app-main-current-global-notification-source"
+        "app-main-current-global-notification-source",
+        "replay:current-shell-notification-light-wide-compact-matrix",
+        "browser-cdp:current-shell-notification-light-wide-compact-matrix",
+        "electron:current-shell-notification-light-wide-compact-matrix",
+        "pixel:current-shell-notification-light-wide-compact-matrix"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
