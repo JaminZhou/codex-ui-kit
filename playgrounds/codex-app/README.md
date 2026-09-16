@@ -1036,6 +1036,15 @@ five reviewed internal baselines pass; the replay remains distinct from the
 host-owned production Remote registry. Raw product screenshots and capture
 records remain local-only.
 
+The live Remote follow-up keeps that boundary explicit while exercising the
+host path end to end. Electron owns a versioned, atomically persisted
+loopback-only registry; the renderer can Add/Edit/Forget a device or SSH
+record, and `Test` opens a real WebSocket to a disposable local server before
+reporting Connected or Disconnected. The 1180px and 720px gate also updates
+the endpoint, verifies the second server, and removes the record. No
+credentials, account pairing, Noise relay, or production Remote registry is
+used or written.
+
 ## Current Projects Index slice
 
 - A previously isolated Codex `26.810.52044` Renderer replaced the older-build
