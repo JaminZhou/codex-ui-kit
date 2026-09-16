@@ -1126,10 +1126,10 @@ state contracts and pass independent CDP geometry, Electron lifecycle, and
 regional pixel gates; the light matrix remains replay evidence rather than
 installed-product theme promotion.
 This same evidence also promotes `app.new-thread-workspace-selection`; its
-remaining gaps are production Remote providers, repair variants, and
-branch-operation failure/recovery rather than the sampled entry composition.
-Populated environments and installed-product Remote/branch mutation remain
-Stage 3 work rather than blockers for this sampled Stage 2 context path.
+remaining gaps are production Remote providers and repair variants rather than
+the sampled entry composition. Installed-product environment repair and
+Remote/branch mutation remain Stage 3 work rather than blockers for this
+sampled Stage 2 context path.
 
 Exit: every P0 turn/thread lifecycle has a deterministic replay, current-build
 structural evidence, Browser acceptance, and Electron acceptance.
@@ -1156,8 +1156,8 @@ independent host capability rather than the current New worktree entry path.
 The `26.825.51511` refresh supersedes its context-menu visuals and semantics:
 the current project picker, `Work in`, New local worktree, Environment, and
 Branches lifecycle now passes same-build wide/compact CDP, Electron, and
-product-region gates. Continue with populated environment repair variants,
-Remote connections, and real branch-operation failure/recovery.
+product-region gates. Continue with installed-product environment repair,
+Remote connections, and installed-product branch mutation.
 The previous `26.818.41509` Projects Index follow-up delivers the primary
 ready/expanded/sort/empty/compact route at both 1180×820 and explicitly
 collapsed 600×600, with sampled structural geometry and Browser/CDP evidence.
@@ -1176,15 +1176,15 @@ a 264×91.125 Environment menu containing only `Work without environment` and
 `Set up project`. Two isolated disposable repositories reach real success,
 controlled failure, Retry, and restored states. Browser/CDP, Electron, and
 three sampled-product tail comparisons now gate that entry/repair
-lifecycle. Projects-route loading/error/partial-error, populated environment
-repair variants, and Remote connections remain independent work.
+lifecycle. Projects-route loading/error/partial-error, installed-product
+environment repair, and Remote connections remain independent work.
 The previous `26.820.60940` continuation repeats the controlled failure with a
 regular-file `.git/worktrees` blocker scoped to one disposable repository.
 It observes the exact branch/error/unread three-track row, removes the blocker,
 uses the real `Retry` control, and verifies root plus one child worktree before
 exact cleanup. The current failure tail passes at 0%; ordinary sidebar error,
-collection loading, populated environment repair variants, and production
-Remote/branch mutation remain independent work.
+collection loading, and production Remote/branch mutation remain independent
+work.
 
 The current 26.825 Terminal session, running/completed process, picker,
 worktree-mismatch, and compact sidebar contracts now have a matching light
@@ -1699,7 +1699,13 @@ Remote registry parity.
 The same gate also injects one malformed `environment/info` response at 1180px
 and requires the visible details Retry action to recover on the next public
 call before the 720px reload. This closes one deterministic environment repair
-variant while leaving production outage/recovery semantics unclaimed.
+variant while leaving production outage/recovery semantics unclaimed. A
+companion saved-environment gate now keeps one real endpoint in the host-owned
+registry across two Electron processes, forces one `environment/status`
+disconnect at each 1180/720 width, and recovers the same selected environment
+on the next Check action without changing its ID or endpoint. This is current
+playground host evidence; production registry/relay outage recovery remains
+open.
 The public surface now also includes a controlled `EnvironmentEditorPage`.
 Its Setup/Cleanup/Actions tabs, name/script fields, action add/delete controls,
 Save/Discard actions, and conflict/error Retry states are covered by the wide,
@@ -1880,7 +1886,7 @@ without confusing package readiness with full product reconstruction.
    wide/compact project picker, five-action run-location menu, four-control New
    local worktree state, two-action Environment menu, and non-radio Branches
    menu through CDP, Electron, reviewed baselines, and local-only product
-   regions. Continue with populated environment repair variants,
+   regions. Continue with installed-product environment repair,
    installed-product branch mutations, and production Remote lifecycles.
 7. **Review content variants — delivered for the sampled current card,
    workspace, and Undo/Reapply family**: `26.820.60940` now covers a real

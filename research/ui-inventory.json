@@ -2022,6 +2022,7 @@
         "browser-cdp:workspace-environments-populated-wide-compact-repair-light",
         "electron:workspace-environment-editor-wide-compact-error",
         "electron:workspace-environments-populated-wide-compact-repair-light",
+        "electron:live-environment-repair-wide-compact",
         "pixel:workspace-environment-editor-wide-compact-error",
         "pixel:workspace-environments-populated-wide-compact-repair-light"
       ],
@@ -2032,7 +2033,8 @@
         "cdp-26.803.61601:no-environment-menu-and-local-environments-unavailable-settings-route",
         "cdp-26.803.61601:environment-settings-768x171-current-route-and-three-current-pixel-gates",
         "cdp:workspace-environment-editor-controlled-tabs-actions-save-retry",
-        "cdp:workspace-environments-populated-saved-edit-update-forget-repair"
+        "cdp:workspace-environments-populated-saved-edit-update-forget-repair",
+        "cdp-26.903.71938:live-saved-environment-disconnect-retry-wide-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
