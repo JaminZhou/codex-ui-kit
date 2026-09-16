@@ -428,6 +428,50 @@ export function ComposerResourcePicker({
   );
 }
 
+export interface ComposerResourceMentionProps
+  extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
+  artwork?: ReactNode;
+  label: ReactNode;
+}
+
+/**
+ * A non-editable inline resource token rendered inside a Composer editor.
+ * Hosts can use it for mentions produced by resource pickers without
+ * conflating the token with a file attachment card.
+ */
+export function ComposerResourceMention({
+  artwork,
+  className,
+  label,
+  ...props
+}: ComposerResourceMentionProps) {
+  return (
+    <span
+      className={[
+        "codex-ui-composer-resource-mention",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      contentEditable={false}
+      data-inline-mention-interactive=""
+      {...props}
+    >
+      {artwork ? (
+        <span
+          aria-hidden="true"
+          className="codex-ui-composer-resource-mention__artwork"
+        >
+          {artwork}
+        </span>
+      ) : null}
+      <span className="codex-ui-composer-resource-mention__label">
+        {label}
+      </span>
+    </span>
+  );
+}
+
 export interface ComposerMentionOption {
   description?: ReactNode;
   disabled?: boolean;

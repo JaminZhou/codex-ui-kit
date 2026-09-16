@@ -1454,6 +1454,14 @@ Escape/focus recovery, a selected GitHub card, and 0% own-fixture drift at
 selection, upload, authorization, execution, and product-pixel promotion stay
 host-owned boundaries.
 
+The follow-up also models the current-build GitHub selection as an inline
+editor mention, based on the isolated CDP observation that showed no attachment
+card. The public `ComposerResourceMention` API marks the token non-editable and
+replays the measured transparent 14px/20px/500 style. Electron coverage checks
+wide and compact action reachability, zero overflow, no attachment-card
+regression, and zero repeated-capture drift; this does not promote a product
+pixel baseline or claim plugin authorization/execution.
+
 The Browser workspace slice activates the historical one-tab shell only in an
 isolated controlled replay. It covers tab creation, selection, close-to-empty
 dismissal, toolbar event delegation, responsive panel reachability, and

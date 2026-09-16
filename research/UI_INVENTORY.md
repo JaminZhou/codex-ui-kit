@@ -2250,6 +2250,15 @@ selected GitHub attachment state, and 0% repeated-capture drift. This is
 deterministic own-fixture evidence; installed-product selection, upload,
 authorization, execution, and product-region pixel parity remain unclaimed.
 
+The same playground now carries a separate
+`workspace-composer-current-26-908-70816-github-mentioned` frame for the
+actual current-build selection semantics: a non-editable `GitHub` inline token
+inside the editor, with no `ComposerAttachment` card. Its Electron contract
+checks the measured 14px/20px/500 style, 1180px/720px responsive containment,
+action reachability, and zero repeated-capture drift. It is replay evidence for
+the observed structure only; it is not a product-pixel approval or a claim of
+plugin authorization/execution.
+
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
 current-build Browser/CDP, native Electron, and regional-pixel contracts now

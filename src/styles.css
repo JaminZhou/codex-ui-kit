@@ -13067,6 +13067,47 @@ summary.codex-ui-activity__header::after {
   text-overflow: ellipsis;
 }
 
+.codex-ui-composer-resource-mention {
+  align-items: baseline;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: color-mix(in srgb, var(--codex-ui-text) 52%, transparent);
+  display: inline-flex;
+  font: inherit;
+  gap: 0.25rem;
+  height: 1.25rem;
+  max-width: 100%;
+  padding: 0 0.125rem;
+  vertical-align: bottom;
+  white-space: break-spaces;
+}
+
+.codex-ui-composer-resource-mention:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
+.codex-ui-composer-resource-mention__artwork {
+  align-items: center;
+  display: inline-flex;
+  height: 0.875rem;
+  justify-content: center;
+  overflow: hidden;
+  width: 0.875rem;
+}
+
+.codex-ui-composer-resource-mention__artwork > img,
+.codex-ui-composer-resource-mention__artwork > svg {
+  height: 100%;
+  width: 100%;
+}
+
+.codex-ui-composer-resource-mention__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 37.5rem) {
   .codex-ui-skill-detail.codex-ui-dialog[data-size="wide"]
     .codex-ui-dialog__surface {
