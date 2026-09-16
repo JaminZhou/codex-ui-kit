@@ -340,6 +340,9 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
       <h2>{statusCopy(result)}</h2>
       <p><code>{result.environmentId}</code> is {result.status}.</p>
       {result.error && <p>{result.error}</p>}
+      {result.status === "disconnected" && (
+        <Button onClick={() => void read()}>Retry environment status</Button>
+      )}
     </section>}
   </EnvironmentSettingsPage>;
 }

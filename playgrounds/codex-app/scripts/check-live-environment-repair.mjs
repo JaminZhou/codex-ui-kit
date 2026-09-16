@@ -128,7 +128,7 @@ try {
       await disconnected.getByText("exec-server transport disconnected", { exact: true }).waitFor();
       assert.match(await disconnected.innerText(), /ui-kit-repair/);
 
-      await check.click();
+      await disconnected.getByRole("button", { name: "Retry environment status", exact: true }).click();
       const ready = route.getByRole("status", { name: "Environment status result", exact: true });
       await ready.getByRole("heading", { name: "Ready", exact: true }).waitFor();
       assert.match(await ready.innerText(), /ui-kit-repair/);

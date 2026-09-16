@@ -2148,7 +2148,8 @@ under independent ceilings. This promotes the sampled paths of
 `app.new-thread-workspace-selection` to current Browser/Electron verification.
 Their implementation remains partial because populated
 environment creation/editing, production Remote, and other provider-specific
-states are still open.
+states are still open; the live status route now exposes an explicit
+disconnect → `Retry environment status` recovery action.
 
 The adjacent current Composer-control follow-up supersedes the previous
 `26.820.60940` permission and mode anchors. The sampled permission overlay is

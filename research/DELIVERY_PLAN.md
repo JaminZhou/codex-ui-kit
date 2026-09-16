@@ -1703,9 +1703,9 @@ variant while leaving production outage/recovery semantics unclaimed. A
 companion saved-environment gate now keeps one real endpoint in the host-owned
 registry across two Electron processes, forces one `environment/status`
 disconnect at each 1180/720 width, and recovers the same selected environment
-on the next Check action without changing its ID or endpoint. This is current
-playground host evidence; production registry/relay outage recovery remains
-open.
+through the visible `Retry environment status` action without changing its ID
+or endpoint. This is current playground host evidence; production registry/
+relay outage recovery remains open.
 The public surface now also includes a controlled `EnvironmentEditorPage`.
 Its Setup/Cleanup/Actions tabs, name/script fields, action add/delete controls,
 Save/Discard actions, and conflict/error Retry states are covered by the wide,
