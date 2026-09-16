@@ -406,11 +406,13 @@ function updatePair(
 
 function PairEditor({
   addLabel,
+  disabled = false,
   entries,
   label,
   onChange,
 }: {
   addLabel: string;
+  disabled?: boolean;
   entries: readonly McpEditorPair[];
   label: string;
   onChange: (entries: readonly McpEditorPair[]) => void;
@@ -424,6 +426,7 @@ function PairEditor({
         <div className="codex-ui-mcp-editor__pair" key={entry.id}>
           <input
             aria-label={`${label} key`}
+            disabled={disabled}
             onChange={(event) =>
               onChange(
                 updatePair(
@@ -439,6 +442,7 @@ function PairEditor({
           />
           <input
             aria-label={`${label} value`}
+            disabled={disabled}
             onChange={(event) =>
               onChange(
                 updatePair(
@@ -454,6 +458,7 @@ function PairEditor({
           />
           <button
             aria-label={`Remove ${label} entry`}
+            disabled={disabled}
             onClick={() =>
               onChange(visibleEntries.filter((item) => item.id !== entry.id))
             }
@@ -465,6 +470,7 @@ function PairEditor({
       ))}
       <button
         className="codex-ui-mcp-editor__add-row"
+        disabled={disabled}
         onClick={() =>
           onChange([
             ...visibleEntries,
@@ -482,12 +488,14 @@ function PairEditor({
 
 function StringListEditor({
   addLabel,
+  disabled = false,
   label,
   onChange,
   placeholder,
   values,
 }: {
   addLabel: string;
+  disabled?: boolean;
   label: string;
   onChange: (values: readonly string[]) => void;
   placeholder?: string;
@@ -501,6 +509,7 @@ function StringListEditor({
         <div className="codex-ui-mcp-editor__single" key={`${label}-${index}`}>
           <input
             aria-label={`${label} ${index + 1}`}
+            disabled={disabled}
             onChange={(event) =>
               onChange(
                 visibleValues.map((item, itemIndex) =>
@@ -513,6 +522,7 @@ function StringListEditor({
           />
           <button
             aria-label={`Remove ${label} entry`}
+            disabled={disabled}
             onClick={() =>
               onChange(visibleValues.filter((_, itemIndex) => itemIndex !== index))
             }
@@ -524,6 +534,7 @@ function StringListEditor({
       ))}
       <button
         className="codex-ui-mcp-editor__add-row"
+        disabled={disabled}
         onClick={() => onChange([...visibleValues, ""])}
         type="button"
       >
@@ -540,11 +551,18 @@ export interface McpServerEditorProps
   mode?: "create" | "update";
   onBack?: () => void;
   onChange: (value: McpServerEditorValue) => void;
+  onRetry?: () => void;
   onSave?: () => void;
   onUninstall?: () => void;
+  retryLabel?: ReactNode;
   saveDisabled?: boolean;
+  savingLabel?: ReactNode;
+  status?: McpServerEditorStatus;
+  statusMessage?: ReactNode;
   value: McpServerEditorValue;
 }
+
+export type McpServerEditorStatus = "ready" | "saving" | "error";
 
 export function McpServerEditor({
   className,
@@ -552,12 +570,18 @@ export function McpServerEditor({
   mode = "create",
   onBack,
   onChange,
+  onRetry,
   onSave,
   onUninstall,
+  retryLabel = "Retry",
   saveDisabled = true,
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   ...props
 }: McpServerEditorProps) {
+  const isSaving = status === "saving";
   const set = <Key extends keyof McpServerEditorValue>(
     key: Key,
     next: McpServerEditorValue[Key],
@@ -566,9 +590,13 @@ export function McpServerEditor({
     mode === "update" ? `Update ${value.name} MCP` : "Connect to a custom MCP";
   return (
     <section
+      aria-busy={isSaving || undefined}
+      aria-label="MCP server editor"
       className={["codex-ui-mcp-editor", className].filter(Boolean).join(" ")}
       data-mode={mode}
+      data-status={status}
       data-type={value.type}
+      role="region"
       {...props}
     >
       <button
@@ -584,6 +612,7 @@ export function McpServerEditor({
         {mode === "update" && onUninstall ? (
           <button
             className="codex-ui-mcp-editor__uninstall"
+            disabled={isSaving}
             onClick={onUninstall}
             type="button"
           >
@@ -607,11 +636,35 @@ export function McpServerEditor({
           <McpExternalGlyph />
         </a>
       )}
+      {status === "saving" ? (
+        <p
+          aria-live="polite"
+          className="codex-ui-mcp-editor__status"
+          role="status"
+        >
+          {savingLabel}
+        </p>
+      ) : status === "error" ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-mcp-editor__status"
+          role="alert"
+        >
+          <strong>Couldn’t save MCP server</strong>
+          <span>{statusMessage ?? "Check the server details and try again."}</span>
+          {onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       {mode === "create" ? (
         <div className="codex-ui-mcp-editor__card">
           <label className="codex-ui-mcp-editor__field">
             <span>Name</span>
             <input
+              disabled={isSaving}
               onChange={(event) => set("name", event.currentTarget.value)}
               placeholder="MCP server name"
               value={value.name}
@@ -622,6 +675,7 @@ export function McpServerEditor({
             <span role="group" aria-label="MCP server type">
               <button
                 aria-pressed={value.type === "stdio"}
+                disabled={isSaving}
                 onClick={() => set("type", "stdio")}
                 type="button"
               >
@@ -629,6 +683,7 @@ export function McpServerEditor({
               </button>
               <button
                 aria-pressed={value.type === "http"}
+                disabled={isSaving}
                 onClick={() => set("type", "http")}
                 type="button"
               >
@@ -644,6 +699,7 @@ export function McpServerEditor({
             <label className="codex-ui-mcp-editor__field">
               <span>Command to launch</span>
               <input
+                disabled={isSaving}
                 onChange={(event) => set("command", event.currentTarget.value)}
                 placeholder="openai-dev-mcp serve-sqlite"
                 value={value.command}
@@ -651,18 +707,21 @@ export function McpServerEditor({
             </label>
             <StringListEditor
               addLabel="Add argument"
+              disabled={isSaving}
               label="Arguments"
               onChange={(next) => set("arguments", next)}
               values={value.arguments}
             />
             <PairEditor
               addLabel="Add environment variable"
+              disabled={isSaving}
               entries={value.environmentVariables}
               label="Environment variables"
               onChange={(next) => set("environmentVariables", next)}
             />
             <StringListEditor
               addLabel="Add variable"
+              disabled={isSaving}
               label="Environment variable passthrough"
               onChange={(next) => set("environmentPassthrough", next)}
               values={value.environmentPassthrough}
@@ -670,6 +729,7 @@ export function McpServerEditor({
             <label className="codex-ui-mcp-editor__field">
               <span>Working directory</span>
               <input
+                disabled={isSaving}
                 onChange={(event) =>
                   set("workingDirectory", event.currentTarget.value)
                 }
@@ -683,6 +743,7 @@ export function McpServerEditor({
             <label className="codex-ui-mcp-editor__field">
               <span>URL</span>
               <input
+                disabled={isSaving}
                 onChange={(event) => set("url", event.currentTarget.value)}
                 placeholder="https://mcp.example.com/mcp"
                 value={value.url}
@@ -691,6 +752,7 @@ export function McpServerEditor({
             <label className="codex-ui-mcp-editor__field">
               <span>Bearer token env var</span>
               <input
+                disabled={isSaving}
                 onChange={(event) =>
                   set(
                     "bearerTokenEnvironmentVariable",
@@ -703,12 +765,14 @@ export function McpServerEditor({
             </label>
             <PairEditor
               addLabel="Add header"
+              disabled={isSaving}
               entries={value.headers}
               label="Headers"
               onChange={(next) => set("headers", next)}
             />
             <PairEditor
               addLabel="Add variable"
+              disabled={isSaving}
               entries={value.headerEnvironmentVariables}
               label="Headers from environment variables"
               onChange={(next) => set("headerEnvironmentVariables", next)}
@@ -717,12 +781,13 @@ export function McpServerEditor({
         )}
       </div>
       <button
+        aria-busy={isSaving || undefined}
         className="codex-ui-mcp-editor__save"
-        disabled={saveDisabled}
+        disabled={isSaving || saveDisabled}
         onClick={onSave}
         type="button"
       >
-        Save
+        {isSaving ? savingLabel : "Save"}
       </button>
     </section>
   );

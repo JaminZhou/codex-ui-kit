@@ -13621,6 +13621,33 @@ summary.codex-ui-activity__header::after {
   width: 0.875rem;
 }
 
+.codex-ui-mcp-editor__status {
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--codex-ui-focus) 12%, transparent);
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8125rem;
+  gap: 0.25rem;
+  line-height: 1.25rem;
+  margin: 1rem 0 0;
+  padding: 0.625rem 0.75rem;
+}
+
+.codex-ui-mcp-editor[data-status="error"] .codex-ui-mcp-editor__status {
+  background: color-mix(in srgb, #ef6b73 14%, transparent);
+}
+
+.codex-ui-mcp-editor__status button {
+  background: transparent;
+  border: 0;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  padding: 0;
+}
+
 .codex-ui-mcp-editor__card {
   background: rgb(35 35 35);
   display: flex;
@@ -13701,6 +13728,12 @@ summary.codex-ui-activity__header::after {
 .codex-ui-mcp-editor input::placeholder {
   color: var(--codex-ui-text-tertiary);
   opacity: 1;
+}
+
+.codex-ui-mcp-editor input:disabled,
+.codex-ui-mcp-editor button:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .codex-ui-mcp-editor__type {
