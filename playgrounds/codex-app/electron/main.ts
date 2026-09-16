@@ -984,13 +984,15 @@ function createWindow() {
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
   const requestedTheme = process.env.CODEX_DEMO_THEME;
   const allowSidebarLight = frame.startsWith("sidebar-current");
-  const allowMcpLight =
-    scenario.startsWith("mcp-current-26-903-") &&
-    frame.startsWith("mcp-current-26-903-");
+  const allowScopedConversationLight =
+    (scenario.startsWith("mcp-current-26-903-") &&
+      frame.startsWith("mcp-current-26-903-")) ||
+    (scenario === "terminal-lifecycle" &&
+      frame.startsWith("terminal-current-26-825-"));
   const theme =
     (["projects", "shell", "workspace"].includes(view) ||
       allowSidebarLight ||
-      allowMcpLight) &&
+      allowScopedConversationLight) &&
     ["system", "light", "dark"].includes(requestedTheme ?? "")
       ? requestedTheme!
       : "dark";

@@ -783,7 +783,9 @@ function querySelection() {
     view,
     (frame?.startsWith("sidebar-current") ?? false) ||
       (frame?.startsWith("mcp-current-26-903-") &&
-        scenarioId.startsWith("mcp-current-26-903-")),
+        scenarioId.startsWith("mcp-current-26-903-")) ||
+      (frame?.startsWith("terminal-current-26-825-") &&
+        scenarioId === "terminal-lifecycle"),
   );
   const requestedShellState = params.get("shellState");
   const shellState: AppRouteOutletStatus = [
@@ -3672,7 +3674,9 @@ export function App() {
       initialSelection.theme === "light" &&
       (initialSelection.frame?.startsWith("sidebar-current") ||
         (initialSelection.frame?.startsWith("mcp-current-26-903-") &&
-          initialSelection.scenarioId.startsWith("mcp-current-26-903-"))));
+          initialSelection.scenarioId.startsWith("mcp-current-26-903-")) ||
+        (initialSelection.frame?.startsWith("terminal-current-26-825-") &&
+          initialSelection.scenarioId === "terminal-lifecycle")));
   const appliedTheme = themeAvailable ? theme : "dark";
   const [workspaceProjectId, setWorkspaceProjectId] = useState<
     string | null
