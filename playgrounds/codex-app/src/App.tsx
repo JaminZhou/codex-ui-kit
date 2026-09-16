@@ -35,6 +35,7 @@ import {
   ComposerModeIndicator,
   ComposerPermissionMenu,
   ComposerPlanProgress,
+  ComposerResourceMention,
   ComposerResourcePicker,
   ConversationContextBar,
   ConversationProjectListbox,
@@ -3553,6 +3554,10 @@ export function App() {
     initialSelection.frame?.startsWith(
       "workspace-composer-current-26-908-70816-",
     );
+  const currentComposerResourceMentionReplay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame ===
+      "workspace-composer-current-26-908-70816-github-mentioned";
   const currentComposerControls26825Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
@@ -9543,7 +9548,9 @@ export function App() {
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : currentComposerControls26908Replay
-        ? composerAttachments.length > 0
+        ? currentComposerResourceMentionReplay
+          ? "workspace-composer-current-26-908-70816-github-mentioned"
+          : composerAttachments.length > 0
           ? currentComposerControls2690870816Replay
             ? "workspace-composer-current-26-908-70816-plugin-selected"
             : "workspace-composer-current-26-908-plugin-selected"
@@ -10749,7 +10756,35 @@ export function App() {
       value={composerValue}
     />
   );
-  const workspaceComposer = currentComposerQueue26825Replay ? (
+  const workspaceResourceMentionComposer = (
+    <form
+      aria-label="GitHub resource draft"
+      className="demo-current-resource-mention-composer"
+      data-resource-mention="GitHub"
+      onSubmit={(event) => event.preventDefault()}
+    >
+      <div
+        aria-label="Do anything"
+        className="demo-current-resource-mention-composer__textbox"
+        contentEditable
+        role="textbox"
+        suppressContentEditableWarning
+      >
+        <ComposerResourceMention label="GitHub" />
+      </div>
+      <div className="demo-current-resource-mention-composer__actions">
+        <button aria-label="Add files and more" type="button">
+          <CurrentBuildIcon name="composer-add-files" />
+        </button>
+        <button aria-label="Send" type="submit">
+          <CurrentBuildIcon name="composer-send" />
+        </button>
+      </div>
+    </form>
+  );
+  const workspaceComposer = currentComposerResourceMentionReplay ? (
+    workspaceResourceMentionComposer
+  ) : currentComposerQueue26825Replay ? (
     <ComposerDock
       className="demo-current-composer-queue-dock"
       composer={workspaceComposerSurface}

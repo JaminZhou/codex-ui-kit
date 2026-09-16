@@ -11,6 +11,7 @@ import {
   ComposerMentionMenu,
   ComposerModeIndicator,
   ComposerPermissionMenu,
+  ComposerResourceMention,
   ComposerResourcePicker,
   QueuedPromptList,
 } from "../src";
@@ -330,6 +331,22 @@ describe("composer auxiliary surfaces", () => {
     );
     fireEvent.keyDown(picker, { key: "Escape" });
     expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders resource selections as non-editable inline mentions", () => {
+    const { container } = render(
+      <ComposerResourceMention label="GitHub" title="GitHub resource" />,
+    );
+
+    const mention = container.querySelector(
+      ".codex-ui-composer-resource-mention",
+    );
+    expect(mention?.getAttribute("contenteditable")).toBe("false");
+    expect(mention?.getAttribute("data-inline-mention-interactive")).toBe("");
+    expect(mention?.textContent).toBe("GitHub");
+    expect(mention?.querySelector(".codex-ui-composer-resource-mention__label")?.textContent).toBe(
+      "GitHub",
+    );
   });
 
   it("renders a host-owned plugin connection action outside resource selection", () => {

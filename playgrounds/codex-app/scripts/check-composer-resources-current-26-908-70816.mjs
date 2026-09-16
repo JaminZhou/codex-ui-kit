@@ -206,9 +206,166 @@ for (const width of [1180, 720]) {
   }
 }
 
+async function mentionGeometry(page) {
+  return page.evaluate(() => {
+    const bounds = (element) => {
+      if (!(element instanceof Element)) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        bottom: rect.bottom,
+        height: rect.height,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        width: rect.width,
+      };
+    };
+    const mention = document.querySelector(
+      ".codex-ui-composer-resource-mention",
+    );
+    const textbox = document.querySelector(
+      ".demo-current-resource-mention-composer__textbox",
+    );
+    const style = mention ? getComputedStyle(mention) : null;
+    return {
+      mention: bounds(mention),
+      root: bounds(document.querySelector(".demo-root")),
+      style: style
+        ? {
+            backgroundColor: style.backgroundColor,
+            borderRadius: style.borderRadius,
+            display: style.display,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            lineHeight: style.lineHeight,
+            padding: style.padding,
+            verticalAlign: style.verticalAlign,
+            whiteSpace: style.whiteSpace,
+          }
+        : null,
+      textbox: bounds(textbox),
+      overflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    };
+  });
+}
+
+async function captureMention(width, suffix) {
+  const { app, page } = await launchScene(
+    sceneFor(
+      width,
+      "workspace-composer-current-26-908-70816-github-mentioned",
+    ),
+    { capture: false },
+  );
+  try {
+    const root = page.locator(".demo-root");
+    const composer = page.locator(
+      ".demo-current-resource-mention-composer",
+    );
+    const mention = page.locator(".codex-ui-composer-resource-mention");
+    await composer.waitFor();
+    await mention.waitFor();
+    assert.equal(
+      await root.getAttribute("data-frame"),
+      "workspace-composer-current-26-908-70816-github-mentioned",
+    );
+    assert.equal(
+      await root.getAttribute("data-current-composer-controls-26-908"),
+      "true",
+    );
+    assert.equal(await root.getAttribute("data-composer-overlay"), null);
+    assert.equal(await root.getAttribute("data-composer-plugin-action"), null);
+    assert.equal(await mention.getAttribute("contenteditable"), "false");
+    assert.equal(
+      await mention.getAttribute("data-inline-mention-interactive"),
+      "",
+    );
+    assert.equal(
+      await mention.locator(".codex-ui-composer-resource-mention__label").textContent(),
+      "GitHub",
+    );
+    assert.equal(
+      await page.locator(".codex-ui-composer-attachment").count(),
+      0,
+    );
+    assert.equal(
+      await page.getByRole("textbox", { name: "Do anything" }).count(),
+      1,
+    );
+    assert.equal(
+      await page.getByRole("button", { name: "Add files and more" }).count(),
+      1,
+    );
+    assert.equal(await page.getByRole("button", { name: "Send" }).count(), 1);
+    const measured = await mentionGeometry(page);
+    assert.equal(measured.overflow, 0);
+    assert.ok(measured.mention && measured.root && measured.textbox);
+    assert.equal(measured.mention.height, 20);
+    assert.equal(measured.style?.backgroundColor, "rgba(0, 0, 0, 0)");
+    assert.equal(measured.style?.borderRadius, "0px");
+    assert.equal(measured.style?.display, "inline-flex");
+    assert.equal(measured.style?.fontSize, "14px");
+    assert.equal(measured.style?.fontWeight, "500");
+    assert.equal(measured.style?.lineHeight, "20px");
+    assert.equal(measured.style?.padding, "0px 2px");
+    assert.equal(measured.style?.verticalAlign, "bottom");
+    assert.equal(measured.style?.whiteSpace, "break-spaces");
+    const screenshot = await page.screenshot();
+    await writeFile(
+      join(
+        directory,
+        `composer-resource-mention-current-26-908-70816-${width}-${suffix}.png`,
+      ),
+      screenshot,
+    );
+    return { app, page, screenshot };
+  } catch (error) {
+    await app.close();
+    throw error;
+  }
+}
+
+for (const width of [1180, 720]) {
+  const first = await captureMention(width, "first");
+  try {
+    await first.page.getByRole("button", { name: "Send" }).click();
+    assert.equal(
+      await first.page.locator(".demo-root").getAttribute("data-frame"),
+      "workspace-composer-current-26-908-70816-github-mentioned",
+    );
+  } finally {
+    await first.app.close();
+  }
+
+  const second = await captureMention(width, "second");
+  try {
+    const firstImage = PNG.sync.read(first.screenshot);
+    const secondImage = PNG.sync.read(second.screenshot);
+    assert.equal(secondImage.width, firstImage.width);
+    assert.equal(secondImage.height, firstImage.height);
+    assert.equal(
+      pixelmatch(
+        firstImage.data,
+        secondImage.data,
+        null,
+        firstImage.width,
+        firstImage.height,
+        { threshold: 0 },
+      ),
+      0,
+      `${width}px own-fixture current 26.908.70816 resource mention drifted`,
+    );
+  } finally {
+    await second.app.close();
+  }
+}
+
 console.log(
   JSON.stringify({
     directory,
+    mentionPixelGate: "0% own-fixture drift at 1180 and 720",
     optionCount: expectedOptions.length,
     passed: true,
     pixelGate: "0% own-fixture drift at 1180 and 720",

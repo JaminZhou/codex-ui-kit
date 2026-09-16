@@ -9097,6 +9097,84 @@ textarea {
   width: 100%;
 }
 
+.demo-current-resource-mention-composer {
+  align-self: center;
+  background: color-mix(
+    in srgb,
+    var(--codex-ui-background-elevated-primary-opaque) 92%,
+    transparent
+  );
+  border: 0.5px solid color-mix(in srgb, var(--codex-ui-text) 9%, transparent);
+  border-radius: 1.25rem;
+  box-shadow: 0 0.25rem 1.5rem rgb(0 0 0 / 0.12);
+  box-sizing: border-box;
+  color: var(--codex-ui-text);
+  display: flex;
+  flex-direction: column;
+  height: 6.125rem;
+  margin: 0;
+  min-height: 6.125rem;
+  overflow: hidden;
+  padding: 0.21875rem;
+  width: 100%;
+}
+
+.demo-current-resource-mention-composer__textbox {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  min-height: 2.75rem;
+  outline: none;
+  overflow: hidden;
+  padding: 0.875rem 0.75rem 0.25rem;
+  white-space: normal;
+}
+
+.demo-current-resource-mention-composer__actions {
+  align-items: center;
+  display: flex;
+  height: 1.75rem;
+  justify-content: space-between;
+  margin-inline: -0.21875rem;
+  margin-top: 0.25rem;
+  width: calc(100% + 0.4375rem);
+}
+
+.demo-current-resource-mention-composer__actions > button {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0.78125rem;
+  color: var(--codex-ui-text-secondary);
+  display: inline-flex;
+  height: 1.75rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.75rem;
+}
+
+.demo-current-resource-mention-composer__actions > button:last-child {
+  background: var(--codex-ui-text);
+  color: var(--codex-ui-background);
+}
+
+.demo-current-resource-mention-composer__actions svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.demo-current-resource-mention-composer
+  .codex-ui-composer-resource-mention {
+  color: oklch(0.639247 0.00662057 none);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
 .demo-current-plugin-detail
   .codex-ui-plugin-detail__app-list
   article[data-status="locked"] {
