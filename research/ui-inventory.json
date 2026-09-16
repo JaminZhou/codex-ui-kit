@@ -1606,7 +1606,8 @@
       "ownership": "app",
       "packageEvidence": [
         "new-thread-panel-page",
-        "select-workspace-page"
+        "select-workspace-page",
+        "electron:live-branch-mutation-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2059,7 +2060,8 @@
         "playground:workspace-worktree-settings-light-wide-compact",
         "browser-cdp:workspace-worktree-settings-light-wide-compact",
         "electron:workspace-worktree-settings-light-wide-compact",
-        "pixel:workspace-worktree-settings-light-wide-compact"
+        "pixel:workspace-worktree-settings-light-wide-compact",
+        "electron:live-branch-mutation-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

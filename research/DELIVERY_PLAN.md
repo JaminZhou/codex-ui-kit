@@ -1243,6 +1243,14 @@ overflow and retains only local screenshots. This closes the host invalid/
 duplicate/retry lifecycle while leaving installed-product mutation and broader
 merge/worktree conflict semantics explicitly open.
 
+The companion `check:live-branch-mutation` gate now drives the same workspace
+context through the public Electron Git bridge against a fresh disposable
+repository. At both 1180px and 720px it creates and checks out a namespaced
+branch, switches back to `main`, verifies the real Git refs, and requires zero
+horizontal overflow. The gate is local-only host evidence: native directory
+selection, provider authentication, remote branch mutation, and installed
+Codex pixels remain separate boundaries.
+
 Exit: a protocol-backed coding task can travel from project selection through
 command, approval, file review, terminal, and PR review without fixture-only
 state jumps.
@@ -1894,7 +1902,9 @@ without confusing package readiness with full product reconstruction.
    wide/compact project picker, five-action run-location menu, four-control New
    local worktree state, two-action Environment menu, and non-radio Branches
    menu through CDP, Electron, reviewed baselines, and local-only product
-   regions. Continue with installed-product environment repair,
+   regions. The own-playground host-backed branch mutation gate now covers
+   create, checkout, and switch-back at 1180/720 without overflow; continue
+   with installed-product environment repair, native directory selection,
    installed-product branch mutations, and production Remote lifecycles.
 7. **Review content variants — delivered for the sampled current card,
    workspace, and Undo/Reapply family**: `26.820.60940` now covers a real
