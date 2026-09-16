@@ -1445,6 +1445,15 @@ authorization, network execution, or a real product attachment effect. The
 26.908 resource observation remains partial until those host-owned boundaries
 are captured safely on the installed product.
 
+The current-build replay now has a separate `26.908.70816` catalog variant.
+It uses the latest observed public labels (`GitHub` rather than the older
+`GitHub Triage` label), keeps account-dependent browser/app rows out of the
+fixture, and verifies 19 options, scroll containment, End → Enter dismissal,
+Escape/focus recovery, a selected GitHub card, and 0% own-fixture drift at
+1180px/720px. The installed product observation remains computed-layout only;
+selection, upload, authorization, execution, and product-pixel promotion stay
+host-owned boundaries.
+
 The Browser workspace slice activates the historical one-tab shell only in an
 isolated controlled replay. It covers tab creation, selection, close-to-empty
 dismissal, toolbar event delegation, responsive panel reachability, and
