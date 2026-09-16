@@ -312,6 +312,33 @@ async function captureMention(width, suffix) {
     assert.equal(measured.style?.padding, "0px 2px");
     assert.equal(measured.style?.verticalAlign, "bottom");
     assert.equal(measured.style?.whiteSpace, "break-spaces");
+    await page.getByRole("button", { name: "Add files and more" }).click();
+    const picker = page.locator(
+      '[data-current-resource-catalog="26.908.70816"]',
+    );
+    await picker.waitFor();
+    assert.equal(await root.getAttribute("data-composer-overlay"), "resources");
+    assert.equal(await picker.getByRole("option", { name: /^GitHub/ }).count(), 1);
+    await picker.getByRole("option", { name: /^GitHub/ }).click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector(".demo-root")?.getAttribute("data-composer-overlay") ===
+        null,
+    );
+    assert.equal(
+      await page.locator(".codex-ui-composer-resource-mention").count(),
+      1,
+    );
+    assert.equal(
+      await page.locator(".codex-ui-composer-attachment").count(),
+      0,
+    );
+    await page.waitForFunction(
+      () =>
+        document.activeElement?.classList.contains(
+          "demo-current-resource-mention-composer__textbox",
+        ),
+    );
     const screenshot = await page.screenshot();
     await writeFile(
       join(
