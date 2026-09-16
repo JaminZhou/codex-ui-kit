@@ -61,10 +61,12 @@ host-owned and are intentionally not claimed by the playground.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
-- The installed application now reports a newer `26.908.40834` (`8881`) build.
-  Its Composer resource-menu observation is intentionally scoped; the audited
-  package-fingerprint baseline remains `26.903.71938` until a full rebaseline
-  is captured.
+- The installed application now reports `26.908.70816` (`9275`) with the
+  Chromium `152.0.7977.83` runtime and ASAR SHA-256
+  `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
+  The prior `26.908.40834` (`8881`) Composer/resource observation remains
+  separately recorded; the audited package-fingerprint baseline remains
+  `26.903.71938` until a full cross-surface promotion.
 - A full isolated shell/sidebar candidate capture for `26.908.40834` is now
   available in [`current-baseline-26.908.json`](current-baseline-26.908.json)
   with the method and boundaries documented in
@@ -73,6 +75,11 @@ host-owned and are intentionally not claimed by the playground.
   lifecycle, Help menu geometry, and the native project-menu item-list
   boundary. This is candidate evidence only; it does not promote the global
   `26.903.71938` baseline or imply that untouched surface families are current.
+- A fresh isolated shell/sidebar candidate for `26.908.70816` is recorded in
+  [`current-baseline-26.908.70816.json`](current-baseline-26.908.70816.json)
+  and [`26.908.70816.md`](26.908.70816.md), with the same eight-state,
+  Projects, Help, responsive, and native-boundary contract. It is candidate
+  evidence only and does not overwrite the older candidate record.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
@@ -308,7 +315,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 92 surface groups; 17 have current-build runtime evidence, 66 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 1 group and Electron verification covers 1.
+Current inventory: 92 surface groups; 18 have current-build runtime evidence, 65 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 1 group and Electron verification covers 1.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

@@ -17,10 +17,11 @@ exit gates; it does not replace the inventory.
   `26.901.51231` note is superseded. Existing surface evidence remains tied to
   its recorded build until each affected surface is re-observed; old fixtures
   remain regression evidence rather than current-product proof.
-- The installed app now reports `26.908.40834` (`8881`). This PR records one
-  read-only Composer menu from that newer build, but does not silently promote
-  it to the full baseline: the package fingerprint and cross-surface matrix
-  remain `26.903.71938` until a dedicated rebaseline is completed.
+- The installed app now reports `26.908.70816` (`9275`), Chromium
+  `152.0.7977.83`, and ASAR SHA-256
+  `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
+  The earlier `26.908.40834` (`8881`) package remains recorded as a prior
+  candidate; neither newer package silently replaces the promoted baseline.
 - A dedicated isolated `26.908.40834` shell/sidebar candidate baseline is now
   recorded in [`current-baseline-26.908.json`](current-baseline-26.908.json)
   and [`26.908.40834.md`](26.908.40834.md). It covers eight renderer states,
@@ -32,6 +33,13 @@ exit gates; it does not replace the inventory.
   target appeared and recorded the content-dependent Recent chats/scroll-height
   changes instead of freezing prior row geometry; the latest capture refreshed
   the candidate identity and kept the scroll-owner assertion invariant.
+- A fresh isolated `26.908.70816` shell/sidebar candidate is now recorded in
+  [`current-baseline-26.908.70816.json`](current-baseline-26.908.70816.json)
+  and [`26.908.70816.md`](26.908.70816.md). It repeats the eight renderer
+  states, Projects wide/compact geometry, sidebar collapse/pin/keyboard
+  lifecycle, Help menu, and native project-menu boundary without claiming
+  untouched surface families. The promoted global baseline remains
+  `26.903.71938` until affected families are re-observed.
 - Stage 0 shell refresh is now captured at 26.903: the isolated Renderer was
   selected by URL, area, landmarks, and visible-control density; New chat,
   explicit Hide/Show, Pull requests → New chat restoration, sidebar
@@ -42,7 +50,7 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 92 surface groups: 59 P0, 22 P1, and 11 P2.
-- 17 groups have current-build runtime evidence, 66 have previous-build-only
+- 18 groups have current-build runtime evidence, 65 have previous-build-only
   runtime evidence, and 9 have not been sampled. Browser/Electron verified
   statuses remain intentionally scoped: the current 26.903 PDF slice is
   promoted, while older and broader families stay regression fixtures until
