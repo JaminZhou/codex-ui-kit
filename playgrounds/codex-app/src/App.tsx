@@ -10757,30 +10757,72 @@ export function App() {
     />
   );
   const workspaceResourceMentionComposer = (
-    <form
-      aria-label="GitHub resource draft"
-      className="demo-current-resource-mention-composer"
-      data-resource-mention="GitHub"
-      onSubmit={(event) => event.preventDefault()}
-    >
-      <div
-        aria-label="Do anything"
-        className="demo-current-resource-mention-composer__textbox"
-        contentEditable
-        role="textbox"
-        suppressContentEditableWarning
+    <div className="demo-current-resource-mention-stack">
+      {composerOverlay === "resources" ? (
+        <ComposerResourcePicker
+          activeId={composerResourceActiveId}
+          className="codex-ui-composer-resource-picker--current-26-908"
+          data-current-resource-catalog="26.908.70816"
+          descriptionSeparator=""
+          groups={currentComposerResourceGroups2690870816}
+          heading={null}
+          onActiveIdChange={setComposerResourceActiveId}
+          onDismiss={() => {
+            setComposerOverlay(null);
+            requestAnimationFrame(() =>
+              document
+                .querySelector<HTMLElement>(
+                  ".demo-current-resource-mention-composer__textbox",
+                )
+                ?.focus(),
+            );
+          }}
+          onSelect={(option) => {
+            setComposerResourceActiveId(option.id);
+            setComposerOverlay(null);
+            requestAnimationFrame(() =>
+              document
+                .querySelector<HTMLElement>(
+                  ".demo-current-resource-mention-composer__textbox",
+                )
+                ?.focus(),
+            );
+          }}
+        />
+      ) : null}
+      <form
+        aria-label="GitHub resource draft"
+        className="demo-current-resource-mention-composer"
+        data-resource-mention="GitHub"
+        onSubmit={(event) => event.preventDefault()}
       >
-        <ComposerResourceMention label="GitHub" />
-      </div>
-      <div className="demo-current-resource-mention-composer__actions">
-        <button aria-label="Add files and more" type="button">
-          <CurrentBuildIcon name="composer-add-files" />
-        </button>
-        <button aria-label="Send" type="submit">
-          <CurrentBuildIcon name="composer-send" />
-        </button>
-      </div>
-    </form>
+        <div
+          aria-label="Do anything"
+          className="demo-current-resource-mention-composer__textbox"
+          contentEditable
+          role="textbox"
+          suppressContentEditableWarning
+        >
+          <ComposerResourceMention label="GitHub" />
+        </div>
+        <div className="demo-current-resource-mention-composer__actions">
+          <button
+            aria-label="Add files and more"
+            onClick={() =>
+              setComposerOverlay((current) =>
+                current === "resources" ? null : "resources",
+              )
+            }
+            type="button"
+          >
+            <CurrentBuildIcon name="composer-add-files" />
+          </button>
+          <button aria-label="Send" type="submit">
+            <CurrentBuildIcon name="composer-send" />
+          </button>
+        </div>
+      </form>
+    </div>
   );
   const workspaceComposer = currentComposerResourceMentionReplay ? (
     workspaceResourceMentionComposer

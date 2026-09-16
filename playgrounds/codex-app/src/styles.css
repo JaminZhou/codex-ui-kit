@@ -9097,6 +9097,20 @@ textarea {
   width: 100%;
 }
 
+.demo-current-resource-mention-stack {
+  position: relative;
+  width: 100%;
+}
+
+.demo-current-resource-mention-stack
+  > .codex-ui-composer-resource-picker {
+  bottom: calc(100% + 0.25rem);
+  left: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+}
+
 .demo-current-resource-mention-composer {
   align-self: center;
   background: color-mix(
