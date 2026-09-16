@@ -1828,6 +1828,7 @@ const regionalFailures = [];
 
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
+  const sidebarBaseId = scene.id.replace(/-light(-compact)?$/, "$1");
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
   const baselinePath = join(baselineDirectory, `${scene.id}.png`);
   const diffPath = join(artifactDirectory, `${scene.id}.diff.png`);
@@ -1902,7 +1903,7 @@ for (const scene of selectedScenes) {
         ),
       );
     }
-    if (scene.id === "current-sidebar") {
+    if (sidebarBaseId === "current-sidebar") {
       sidebarSelectedTop = await page.evaluate(() => {
         const current = Array.from(
           document.querySelectorAll(
@@ -1917,7 +1918,7 @@ for (const scene of selectedScenes) {
         return Math.round(current[0].getBoundingClientRect().top);
       });
     }
-    if (scene.id === "current-sidebar-recents") {
+    if (sidebarBaseId === "current-sidebar-recents") {
       sidebarRecentsBounds = await page
         .locator(
           '.codex-ui-app-sidebar__section[data-kind="threads"]',
@@ -1932,7 +1933,7 @@ for (const scene of selectedScenes) {
           };
         });
     }
-    if (scene.id === "current-sidebar-status-lifecycle") {
+    if (sidebarBaseId === "current-sidebar-status-lifecycle") {
       sidebarStatusBounds = await page.evaluate(() =>
         Object.fromEntries(
           [
@@ -2030,7 +2031,7 @@ for (const scene of selectedScenes) {
             width: Math.round(value.width),
           };
         });
-      if (scene.id === "current-sidebar-collection-long-list") {
+      if (sidebarBaseId === "current-sidebar-collection-long-list") {
         sidebarShowMoreBounds = await page
           .locator(".codex-ui-app-sidebar__collection-toggle-item")
           .evaluate((element) => {
@@ -2045,13 +2046,13 @@ for (const scene of selectedScenes) {
       }
     }
     if (
-      scene.id === "current-sidebar-project-menu" ||
-      scene.id === "current-sidebar-project-section-submenu" ||
-      scene.id === "current-sidebar-help-menu" ||
+      sidebarBaseId === "current-sidebar-project-menu" ||
+      sidebarBaseId === "current-sidebar-project-section-submenu" ||
+      sidebarBaseId === "current-sidebar-help-menu" ||
       scene.id.startsWith("current-sidebar-account-menu")
     ) {
       const menu =
-        scene.id === "current-sidebar-project-section-submenu"
+        sidebarBaseId === "current-sidebar-project-section-submenu"
           ? page.getByRole("menu", { name: "session-browser project menu" })
           : page.locator('[role="menu"]');
       sidebarMenuBounds = await menu.evaluate((element) => {
@@ -2080,7 +2081,7 @@ for (const scene of selectedScenes) {
             };
           });
         });
-      if (scene.id === "current-sidebar-project-section-submenu") {
+      if (sidebarBaseId === "current-sidebar-project-section-submenu") {
         const submenu = page.getByRole("menu", { name: "Section submenu" });
         sidebarProjectSubmenuBounds = await submenu.evaluate((element) => {
           const value = element.getBoundingClientRect();
@@ -2115,7 +2116,7 @@ for (const scene of selectedScenes) {
         });
       }
     }
-    if (scene.id === "current-sidebar-project-collapsed") {
+    if (sidebarBaseId === "current-sidebar-project-collapsed") {
       await page
         .locator(
           ".codex-ui-app-sidebar__project-group > .codex-ui-app-sidebar__item-row > button",

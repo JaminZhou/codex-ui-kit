@@ -137,6 +137,7 @@ const currentPluginDetailContracts = [];
 
 for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
+  const sidebarBaseId = scene.id.replace(/-light(-compact)?$/, "$1");
   try {
     if (scene.id.startsWith("scheduled-current-26-903-detail")) {
       const compact = scene.id.endsWith("-compact");
@@ -9373,7 +9374,7 @@ for (const scene of selectedScenes) {
       continue;
     }
 
-    if (scene.id === "current-sidebar-compact-pinned") {
+    if (sidebarBaseId === "current-sidebar-compact-pinned") {
       const compactSidebar = await page.evaluate(() => {
         const shell = document.querySelector(".codex-ui-app-shell");
         const sidebar = document.querySelector(
@@ -14625,10 +14626,10 @@ for (const scene of selectedScenes) {
       scene.sidebarState === "compact-collapsed";
     const currentBuildSidebarScene =
       scene.currentSidebar === true ||
-      scene.id === "current-sidebar" ||
-      scene.id === "current-sidebar-recents";
+      sidebarBaseId === "current-sidebar" ||
+      sidebarBaseId === "current-sidebar-recents";
     const currentSidebarStatusScene =
-      scene.id === "current-sidebar-status-lifecycle";
+      sidebarBaseId === "current-sidebar-status-lifecycle";
     const currentSidebarThreadLifecycleScene = scene.id.startsWith(
       "current-sidebar-thread-lifecycle",
     );
@@ -14710,6 +14711,8 @@ for (const scene of selectedScenes) {
       );
     }
     if (currentSidebarStatusScene) {
+      const expectedAttentionColor =
+        scene.theme === "light" ? "rgb(51, 156, 255)" : "rgb(58, 131, 247)";
       const expectedStatuses = [
         ["session-browser:0", "active", "loading"],
         ["desktop-cleanup:0", "waiting", "loading"],
@@ -14768,7 +14771,7 @@ for (const scene of selectedScenes) {
           (fixture.visualStatus === "attention" &&
             (fixture.attentionRect?.width !== 8 ||
               fixture.attentionRect?.height !== 8 ||
-              fixture.attentionColor !== "rgb(58, 131, 247)")) ||
+              fixture.attentionColor !== expectedAttentionColor)) ||
           (fixture.visualStatus === "error" &&
             (fixture.errorRect?.width !== 16 ||
               fixture.errorRect?.height !== 16 ||
@@ -14786,7 +14789,7 @@ for (const scene of selectedScenes) {
               fixture.secondaryRightInset !== 8 ||
               fixture.secondaryAttentionRect?.width !== 8 ||
               fixture.secondaryAttentionRect?.height !== 8 ||
-              fixture.secondaryAttentionColor !== "rgb(58, 131, 247)")),
+              fixture.secondaryAttentionColor !== expectedAttentionColor)),
       );
       const worktreeGeometryInvalid =
         contract.sidebar.worktreeFixtures.some(
@@ -14858,6 +14861,8 @@ for (const scene of selectedScenes) {
       }
     }
     if (currentSidebarThreadLifecycleScene) {
+      const expectedAttentionColor =
+        scene.theme === "light" ? "rgb(51, 156, 255)" : "rgb(58, 131, 247)";
       const [active, unread, ...idle] =
         contract.sidebar.threadLifecycleFixtures;
       const geometryInvalid =
@@ -14891,7 +14896,7 @@ for (const scene of selectedScenes) {
         unread.visualStatus !== "attention" ||
         unread.selected ||
         unread.actionsOpacity !== "0" ||
-        unread.attentionColor !== "rgb(58, 131, 247)" ||
+        unread.attentionColor !== expectedAttentionColor ||
         unread.attentionRect?.height !== 8 ||
         unread.attentionRect?.width !== 8 ||
         idle.some(
@@ -14935,6 +14940,10 @@ for (const scene of selectedScenes) {
       await page.mouse.move(640, 100);
     }
     if (currentSidebarWorktreeLifecycleScene) {
+      const expectedAttentionColor =
+        scene.theme === "light" ? "rgb(51, 156, 255)" : "rgb(58, 131, 247)";
+      const expectedErrorColor =
+        scene.theme === "light" ? "rgb(186, 38, 35)" : "rgb(255, 103, 100)";
       // Worktree rows live in the scrollable sidebar navigation, so preserve
       // their 16px gutters after subtracting any native scrollbar slot.
       const expectedWorktreeRowWidth =
@@ -14997,7 +15006,7 @@ for (const scene of selectedScenes) {
         failed?.errorRect?.height !== 16 ||
         failed?.errorRect?.width !== 16 ||
         failed?.errorViewBox !== "0 0 21 21" ||
-        failed?.errorColor !== "rgb(255, 103, 100)" ||
+        failed?.errorColor !== expectedErrorColor ||
         JSON.stringify(failed?.errorPathData) !==
           JSON.stringify(currentSidebarErrorPathData) ||
         recovered?.fixture !== "current-worktree-recovered" ||
@@ -15010,7 +15019,7 @@ for (const scene of selectedScenes) {
         recovered?.statusRightInset !== 8 ||
         recovered?.attentionRect?.height !== 8 ||
         recovered?.attentionRect?.width !== 8 ||
-        recovered?.attentionColor !== "rgb(58, 131, 247)" ||
+        recovered?.attentionColor !== expectedAttentionColor ||
         restored?.fixture !== "current-worktree-restored" ||
         restored?.worktreeStatus !== "restored" ||
         restored?.status !== "idle" ||
@@ -15069,7 +15078,7 @@ for (const scene of selectedScenes) {
         throw new Error(`${scene.id}: sidebar collection fixture missing.`);
       }
       if (
-        scene.id === "current-sidebar-collection-empty" &&
+        sidebarBaseId === "current-sidebar-collection-empty" &&
         (collection.fixture !== "empty" ||
           collection.state !== "empty" ||
           collection.text !== "No chats" ||
@@ -15084,7 +15093,7 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "current-sidebar-collection-loading" &&
+        sidebarBaseId === "current-sidebar-collection-loading" &&
         (collection.fixture !== "loading" ||
           collection.state !== "loading" ||
           collection.accessibleLabelCount !== 1 ||
@@ -15100,7 +15109,7 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "current-sidebar-collection-error" &&
+        sidebarBaseId === "current-sidebar-collection-error" &&
         (collection.fixture !== "error" ||
           collection.state !== "error" ||
           collection.role !== "alert" ||
@@ -15115,7 +15124,7 @@ for (const scene of selectedScenes) {
         );
       }
       if (
-        scene.id === "current-sidebar-collection-long-list" &&
+        sidebarBaseId === "current-sidebar-collection-long-list" &&
         (collection.fixture !== "long-list" ||
           collection.itemCount !== 5 ||
           collection.toggle?.expanded !== null ||
@@ -15134,7 +15143,7 @@ for (const scene of selectedScenes) {
           `${scene.id}: current long collection contract failed: ${JSON.stringify(collection)}`,
         );
       }
-      if (scene.id === "current-sidebar-collection-long-list") {
+      if (sidebarBaseId === "current-sidebar-collection-long-list") {
         const toggle = page.getByRole("button", {
           exact: true,
           name: "Show more",
@@ -15177,9 +15186,9 @@ for (const scene of selectedScenes) {
         ? "481"
       : scene.id === "current-citations-26-825-sources-wide"
         ? "486"
-      : scene.id === "current-sidebar-thread-lifecycle-compact" ||
-          scene.id === "current-sidebar-worktree-lifecycle-compact" ||
-          scene.id === "current-worktree-setup-failed-compact"
+      : sidebarBaseId === "current-sidebar-thread-lifecycle-compact" ||
+          sidebarBaseId === "current-sidebar-worktree-lifecycle-compact" ||
+          sidebarBaseId === "current-worktree-setup-failed-compact"
         ? "480"
       : scene.id === "markdown-table-actions-narrow" ||
       ((scene.windowSize?.width ?? 1180) <= 720 &&

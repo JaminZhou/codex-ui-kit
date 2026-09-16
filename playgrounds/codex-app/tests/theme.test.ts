@@ -35,6 +35,7 @@ describe("demo theme preference", () => {
     expect(resolveDemoThemePreference("light", "workspace")).toBe("light");
     expect(resolveDemoThemePreference("system", "shell")).toBe("system");
     expect(resolveDemoThemePreference("light", "conversation")).toBe("dark");
+    expect(resolveDemoThemePreference("light", "conversation", true)).toBe("light");
     expect(resolveDemoThemePreference("system", "pull-request")).toBe("dark");
   });
 

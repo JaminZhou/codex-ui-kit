@@ -2041,10 +2041,25 @@ export const visualScenes = [
   },
   {
     frame: "sidebar-current",
+    id: "current-sidebar-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    theme: "light",
+  },
+  {
+    frame: "sidebar-current",
     id: "current-sidebar-recents",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarSectionKind: "threads",
+  },
+  {
+    frame: "sidebar-current",
+    id: "current-sidebar-recents-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarSectionKind: "threads",
+    theme: "light",
   },
   {
     currentSidebar: true,
@@ -2057,6 +2072,15 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-status-lifecycle-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "status-lifecycle",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-thread-lifecycle",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
@@ -2065,10 +2089,28 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-thread-lifecycle-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "thread-lifecycle-current",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-thread-lifecycle-hover",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarState: "thread-lifecycle-current",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-thread-lifecycle-hover-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "thread-lifecycle-current",
+    theme: "light",
   },
   {
     currentSidebar: true,
@@ -2082,6 +2124,16 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-thread-lifecycle-compact-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "thread-lifecycle-current",
+    theme: "light",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-worktree-lifecycle",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
@@ -2090,10 +2142,29 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-worktree-lifecycle-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-worktree-lifecycle-compact",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarState: "worktree-lifecycle-current",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-worktree-lifecycle-compact-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "worktree-lifecycle-current",
+    theme: "light",
     windowSize: { height: 680, width: 720 },
   },
   {
@@ -2148,6 +2219,15 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-collection-empty-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "collection-empty",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-collection-loading",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
@@ -2156,10 +2236,28 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-collection-loading-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "collection-loading",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-collection-error",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarState: "collection-error",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-collection-error-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "collection-error",
+    theme: "light",
   },
   {
     currentSidebar: true,
@@ -2173,10 +2271,29 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-collection-long-list-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarSectionKind: "threads",
+    sidebarState: "collection-long-list",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-project-collapsed",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarState: "project-collapsed",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-project-collapsed-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "project-collapsed",
+    theme: "light",
   },
   {
     currentSidebar: true,
@@ -2189,6 +2306,15 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-project-menu-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "project-menu",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-project-section-submenu",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
@@ -2197,10 +2323,28 @@ export const visualScenes = [
   {
     currentSidebar: true,
     frame: "sidebar-current",
+    id: "current-sidebar-project-section-submenu-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "project-menu",
+    theme: "light",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
     id: "current-sidebar-help-menu",
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarState: "help-menu",
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-help-menu-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "help-menu",
+    theme: "light",
   },
   {
     currentSidebar: true,
@@ -2251,6 +2395,16 @@ export const visualScenes = [
     maxPixelRatio: 0.0225,
     scenario: "streaming-recovery",
     sidebarState: "compact-pinned",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    currentSidebar: true,
+    frame: "sidebar-current",
+    id: "current-sidebar-compact-pinned-light",
+    maxPixelRatio: 0.0225,
+    scenario: "streaming-recovery",
+    sidebarState: "compact-pinned",
+    theme: "light",
     windowSize: { height: 680, width: 720 },
   },
   {
@@ -4405,7 +4559,10 @@ export async function launchScene(
         element.scrollIntoView({ block: "end", inline: "nearest" });
       });
   }
-  if (capture && scene.id === "current-sidebar-project-section-submenu") {
+  if (
+    capture &&
+    scene.id.startsWith("current-sidebar-project-section-submenu")
+  ) {
     const section = page.getByRole("menuitem", { name: "Section" });
     await section.focus();
     await section.press("ArrowRight");

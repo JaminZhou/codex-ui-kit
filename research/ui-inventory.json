@@ -1069,7 +1069,11 @@
       "ownership": "app",
       "packageEvidence": [
         "app-main",
-        "thread-app-shell-chrome"
+        "thread-app-shell-chrome",
+        "playground:current-sidebar-light-wide-compact",
+        "browser-cdp:current-sidebar-light-wide-compact",
+        "electron:current-sidebar-light-wide-compact",
+        "pixel:current-sidebar-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1099,7 +1103,11 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": [
-        "app-main"
+        "app-main",
+        "playground:current-sidebar-light-navigation",
+        "browser-cdp:current-sidebar-light-navigation",
+        "electron:current-sidebar-light-navigation",
+        "pixel:current-sidebar-light-navigation"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1135,7 +1143,11 @@
         "replay:current-project-expansion-actions-section-submenu-and-responsive-continuity",
         "browser-cdp:current-project-navigation-menu-focus-and-responsive-continuity",
         "electron:current-project-navigation-menu-focus-and-responsive-continuity",
-        "pixel:current-project-navigation-collapsed-menu-and-submenu-scenes"
+        "pixel:current-project-navigation-collapsed-menu-and-submenu-scenes",
+        "playground:current-sidebar-light-project-navigation",
+        "browser-cdp:current-sidebar-light-project-navigation",
+        "electron:current-sidebar-light-project-navigation",
+        "pixel:current-sidebar-light-project-navigation"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1161,7 +1173,11 @@
       "ownership": "app",
       "packageEvidence": [
         "app-main",
-        "projects-index-page"
+        "projects-index-page",
+        "playground:current-sidebar-light-project-group-lifecycle",
+        "browser-cdp:current-sidebar-light-project-group-lifecycle",
+        "electron:current-sidebar-light-project-group-lifecycle",
+        "pixel:current-sidebar-light-project-group-lifecycle"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1184,7 +1200,11 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": [
-        "app-main"
+        "app-main",
+        "playground:current-sidebar-light-project-actions",
+        "browser-cdp:current-sidebar-light-project-actions",
+        "electron:current-sidebar-light-project-actions",
+        "pixel:current-sidebar-light-project-actions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1210,7 +1230,11 @@
       "packageEvidence": [
         "app-main",
         "app-main-current-sidebar-loading-source",
-        "thread-app-shell-chrome"
+        "thread-app-shell-chrome",
+        "playground:current-sidebar-light-thread-history",
+        "browser-cdp:current-sidebar-light-thread-history",
+        "electron:current-sidebar-light-thread-history",
+        "pixel:current-sidebar-light-thread-history"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1239,7 +1263,11 @@
       "ownership": "app",
       "packageEvidence": [
         "app-main",
-        "thread-app-shell-chrome"
+        "thread-app-shell-chrome",
+        "playground:current-sidebar-light-item-actions",
+        "browser-cdp:current-sidebar-light-item-actions",
+        "electron:current-sidebar-light-item-actions",
+        "pixel:current-sidebar-light-item-actions"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1264,7 +1292,11 @@
       "packageEvidence": [
         "app-main",
         "app-main-current-task-status-source",
-        "thread-app-shell-chrome"
+        "thread-app-shell-chrome",
+        "playground:current-sidebar-light-status-matrix",
+        "browser-cdp:current-sidebar-light-status-matrix",
+        "electron:current-sidebar-light-status-matrix",
+        "pixel:current-sidebar-light-status-matrix"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1290,7 +1322,11 @@
       "ownership": "app",
       "packageEvidence": [
         "app-main",
-        "app-main-pending-worktrees"
+        "app-main-pending-worktrees",
+        "playground:current-sidebar-light-worktree-matrix",
+        "browser-cdp:current-sidebar-light-worktree-matrix",
+        "electron:current-sidebar-light-worktree-matrix",
+        "pixel:current-sidebar-light-worktree-matrix"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1316,7 +1352,11 @@
         "app-main",
         "browser-cdp:current-account-menu-dark-light-wide-compact-focus-and-zero-overflow",
         "electron:current-account-menu-dark-light-wide-compact-contract",
-        "pixel:four-reviewed-current-account-menu-baselines"
+        "pixel:four-reviewed-current-account-menu-baselines",
+        "playground:current-sidebar-light-footer-context",
+        "browser-cdp:current-sidebar-light-footer-context",
+        "electron:current-sidebar-light-footer-context",
+        "pixel:current-sidebar-light-footer-context"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1341,7 +1381,11 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": [
-        "app-main"
+        "app-main",
+        "playground:current-sidebar-light-help-menu",
+        "browser-cdp:current-sidebar-light-help-menu",
+        "electron:current-sidebar-light-help-menu",
+        "pixel:current-sidebar-light-help-menu"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

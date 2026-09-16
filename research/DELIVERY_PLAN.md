@@ -1721,7 +1721,12 @@ without confusing package readiness with full product reconstruction.
    fresh CDP capture, sidebar state contract, full-app playground scene,
    Browser/Electron interaction, and regional pixel gates. Light-theme
    current-product evidence and unsampled lifecycle variants remain separate
-   follow-up evidence rather than blockers for the observed dark contract.
+   follow-up evidence rather than blockers for the observed dark contract. The
+   own-playground sidebar now also has a light wide/720 compact matrix for
+   navigation, Recents, status/worktree lifecycle, collection loading/empty/
+   error, project menus, Help, and compact pinned states; each variant is
+   covered by the same CDP geometry and pixel gates without promoting replay
+   captures to installed-product evidence.
    The later `26.803.41515` action slice also replaces the sampled More, Pin,
    Archive, and Help glyphs with exact runtime primitives and removes
    Settings/thread-leading assumptions disproved by the current build.
