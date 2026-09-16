@@ -419,6 +419,11 @@ kit never performs filesystem, network, account, or process mutations.
 - `ComposerResourcePicker`: searchable, grouped resource picker with loading,
   empty, disabled, selected, footer, keyboard-dismissal, and `onSelect`/
   `onClose` callbacks. Hosts own attachment, plugin, and skill effects.
+- `ComposerResourceMention`: a non-editable inline resource token for a
+  contenteditable Composer editor. It accepts host-supplied label/artwork and
+  forwards span attributes; it is intentionally separate from
+  `ComposerAttachment`, so selecting a resource can remain an inline mention
+  without implying upload, persistence, authorization, or execution.
 - `MarkdownImage`: protocol-neutral image renderer with ready/loading/error
   status, source resolver, alt text, preview and retry callbacks. It never
   fetches or decodes a remote URL on behalf of the host.
