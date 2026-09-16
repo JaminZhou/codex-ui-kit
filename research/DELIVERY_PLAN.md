@@ -40,6 +40,16 @@ exit gates; it does not replace the inventory.
   lifecycle, Help menu, and native project-menu boundary without claiming
   untouched surface families. The promoted global baseline remains
   `26.903.71938` until affected families are re-observed.
+- The same isolated `26.908.70816` build now has a separate Composer resource
+  observation in
+  [`current-composer-resources-26.908.70816.json`](current-composer-resources-26.908.70816.json).
+  CDP computed layout records the unified `Add files and more` menu at
+  `736×320px`, its `726×310px` scroll owner, `28.5625px` rows, and a
+  sanitized public Plugins/skills catalog. Account-, tab-, and app-specific
+  rows are excluded; no selection, upload, authorization, execution, or
+  product-pixel promotion is inferred. `composer.resources` and
+  `composer.plugins` therefore remain partial until their host-owned selected
+  lifecycle and product-region pixels are captured safely.
 - Stage 0 shell refresh is now captured at 26.903: the isolated Renderer was
   selected by URL, area, landmarks, and visible-control density; New chat,
   explicit Hide/Show, Pull requests → New chat restoration, sidebar
