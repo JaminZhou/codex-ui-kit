@@ -13,10 +13,19 @@ export type IntegrationCatalogStatus =
   | "loading"
   | "error"
   | "unavailable";
+export type IntegrationCatalogActionStatus =
+  | "idle"
+  | "pending"
+  | "success"
+  | "error";
 
 export interface IntegrationCatalogItem {
   actionAriaLabel?: string;
   actionLabel?: ReactNode;
+  actionPendingLabel?: ReactNode;
+  actionRetryLabel?: ReactNode;
+  actionStatus?: IntegrationCatalogActionStatus;
+  actionStatusMessage?: ReactNode;
   description?: ReactNode;
   disabled?: boolean;
   icon?: ReactNode;
@@ -56,6 +65,7 @@ export interface IntegrationCatalogPageProps
   kind: IntegrationCatalogKind;
   loadingLabel?: ReactNode;
   onItemAction?: (item: IntegrationCatalogItem) => void;
+  onItemActionRetry?: (item: IntegrationCatalogItem) => void;
   onItemOpen?: (item: IntegrationCatalogItem) => void;
   onInstalledMore?: () => void;
   onManage?: () => void;
@@ -107,26 +117,39 @@ function CatalogItemRow({
   item,
   kind,
   onAction,
+  onActionRetry,
   onOpen,
 }: {
   item: IntegrationCatalogItem;
   kind: IntegrationCatalogKind;
   onAction?: (item: IntegrationCatalogItem) => void;
+  onActionRetry?: (item: IntegrationCatalogItem) => void;
   onOpen?: (item: IntegrationCatalogItem) => void;
 }) {
   const titleLabel = typeof item.title === "string" ? item.title : "integration";
+  const actionStatus = item.actionStatus ?? "idle";
+  const actionBusy = actionStatus === "pending";
+  const actionFeedback =
+    item.actionStatusMessage ??
+    (actionStatus === "pending"
+      ? item.actionPendingLabel ?? "Working…"
+      : actionStatus === "success"
+        ? "Done"
+        : "Couldn’t update integration.");
   return (
     <article
+      aria-busy={actionBusy || undefined}
       className="codex-ui-integration-catalog__item"
       data-disabled={item.disabled || undefined}
       data-installed={item.installed || undefined}
+      data-action-status={actionStatus}
       data-kind={kind}
     >
       {onOpen ? (
         <button
           aria-label={`Open ${titleLabel}`}
           className="codex-ui-integration-catalog__item-open"
-          disabled={item.disabled}
+          disabled={item.disabled || actionBusy}
           onClick={() => onOpen(item)}
           type="button"
         />
@@ -158,14 +181,33 @@ function CatalogItemRow({
       ) : null}
       {item.actionLabel ? (
         <button
-          aria-label={item.actionAriaLabel}
+          aria-label={actionBusy ? undefined : item.actionAriaLabel}
           className="codex-ui-integration-catalog__item-action"
-          disabled={item.disabled}
-          onClick={() => onAction?.(item)}
+          disabled={item.disabled || actionBusy}
+          onClick={() => {
+            if (!actionBusy) onAction?.(item);
+          }}
           type="button"
         >
-          {item.actionLabel}
+          {actionBusy ? item.actionPendingLabel ?? "Working…" : item.actionLabel}
         </button>
+      ) : null}
+      {actionStatus !== "idle" ? (
+        <span
+          className="codex-ui-integration-catalog__item-feedback"
+          role={actionStatus === "error" ? "alert" : "status"}
+        >
+          {actionFeedback}
+          {actionStatus === "error" && onActionRetry ? (
+            <button
+              aria-label={`Retry ${titleLabel}`}
+              onClick={() => onActionRetry(item)}
+              type="button"
+            >
+              {item.actionRetryLabel ?? "Retry"}
+            </button>
+          ) : null}
+        </span>
       ) : null}
     </article>
   );
@@ -219,6 +261,7 @@ export function IntegrationCatalogPage({
   kind,
   loadingLabel = "Loading…",
   onItemAction,
+  onItemActionRetry,
   onItemOpen,
   onInstalledMore,
   onManage,
@@ -348,11 +391,12 @@ export function IntegrationCatalogPage({
                   <div className="codex-ui-integration-catalog__grid">
                     {filteredInstalled.map((item) => (
                       <CatalogItemRow
-                        item={{ ...item, installed: true }}
-                        key={item.id}
-                        kind={kind}
-                        onAction={onItemAction}
-                        onOpen={onItemOpen}
+                      item={{ ...item, installed: true }}
+                      key={item.id}
+                      kind={kind}
+                      onAction={onItemAction}
+                      onActionRetry={onItemActionRetry}
+                      onOpen={onItemOpen}
                       />
                     ))}
                   </div>
@@ -411,6 +455,7 @@ export function IntegrationCatalogPage({
                       key={item.id}
                       kind={kind}
                       onAction={onItemAction}
+                      onActionRetry={onItemActionRetry}
                       onOpen={onItemOpen}
                     />
                   ))}

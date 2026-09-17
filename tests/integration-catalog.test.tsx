@@ -110,6 +110,66 @@ describe("IntegrationCatalog", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
+  it("locks per-item actions while pending and exposes retryable failures", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <IntegrationCatalogPage
+        kind="plugins"
+        onItemActionRetry={onRetry}
+        sections={[
+          {
+            id: "popular",
+            items: [
+              {
+                actionLabel: "Install",
+                actionPendingLabel: "Installing…",
+                actionStatus: "pending",
+                id: "github",
+                title: "GitHub",
+              },
+            ],
+            title: "Popular",
+          },
+        ]}
+      />,
+    );
+    const pendingRow = screen.getByText("GitHub").closest("article");
+    expect(pendingRow?.getAttribute("aria-busy")).toBe("true");
+    expect(
+      screen.getByRole("button", { name: "Installing…" }),
+    ).toHaveProperty("disabled", true);
+
+    rerender(
+      <IntegrationCatalogPage
+        kind="plugins"
+        onItemActionRetry={onRetry}
+        sections={[
+          {
+            id: "popular",
+            items: [
+              {
+                actionLabel: "Install",
+                actionRetryLabel: "Try again",
+                actionStatus: "error",
+                actionStatusMessage: "Plugin access is unavailable.",
+                id: "github",
+                title: "GitHub",
+              },
+            ],
+            title: "Popular",
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Plugin access is unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Retry GitHub" }));
+    expect(onRetry).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "github" }),
+    );
+  });
+
   it("switches the shared Plugins and Skills titlebar tabs", () => {
     const onChange = vi.fn();
     render(<IntegrationCatalogTabs active="plugins" onChange={onChange} />);
