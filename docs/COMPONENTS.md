@@ -339,9 +339,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   host-supplied artwork and hero backdrop, prompt suggestions, app rows,
   information links, privacy disclosure, controlled install progress/error/
   retry state, per-app connecting/disconnecting/error/retry state, and
-  controlled actions, uninstall, reconnect, and disconnect menus. The
-  component emits callbacks only; hosts own clipboard, navigation, installation,
-  connection, permission, OAuth, and persistence effects.
+  controlled actions, uninstall, reconnect, and disconnect menus. A host-wide
+  disabled lock covers navigation, suggestions, app rows, and primary actions.
+  The component emits callbacks only; hosts own clipboard, navigation,
+  installation, connection, permission, OAuth, and persistence effects.
 - `PluginManagerTabs`: controlled Plugins/Apps/MCPs/Skills/Marketplace tablist
   with count badges and host-owned route changes.
 - `IntegrationAddMenu`: controlled Create plugin, Add a marketplace, Add MCP
@@ -520,8 +521,9 @@ kit never performs filesystem, network, account, or process mutations.
   It does not call a Sites service or open external pages.
 - `SkillDetailDialog` and `SkillPromptMention`: controlled skill detail,
   enabled state, action menu, long instructions, unsent Try-now prompt, and
-  updating/error/retry lifecycle. Installation, execution, and prompt
-  submission are host-owned.
+  updating/error/retry lifecycle. A host-wide disabled lock covers modal
+  actions while the host coordinates persistence. Installation, execution, and
+  prompt submission are host-owned.
 - `PdfPreviewPanel`: controlled PDF page/zoom/annotation/expand state with
   page navigation, Open/Retry/Close callbacks, and an explicit renderer slot.
   PDF decoding and file access remain host-owned.

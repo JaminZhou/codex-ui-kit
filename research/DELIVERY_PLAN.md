@@ -1379,7 +1379,9 @@ representatives, and eight reviewed replay baselines pair with current-product
 regional comparisons below an 8% ceiling. Product artwork, hero artwork, and
 suggestion-brand icons stay host-supplied. Clipboard/navigation, real install
 or uninstall, connection persistence, OAuth/permissions, external links, and
-failure effects stay open. The installed detail now also has explicit wide/720
+failure effects stay open. The detail now exposes host-controlled disabled
+locking for navigation, suggestions, app rows, and primary actions. The
+installed detail now also has explicit wide/720
 light-theme Browser/CDP, Electron, and regional-pixel coverage; it remains a
 read-only visual contract and does not promote install, uninstall, or OAuth
 side effects.
@@ -1394,7 +1396,8 @@ comparisons remain below 1%. The installed detail now also has explicit
 wide/720 light-theme Browser/CDP, Electron, and regional-pixel coverage.
 Enable/uninstall/menu effects, prompt submission, successful skill execution,
 failure/retry, Automations detail/mutation, and remaining Settings families
-stay open, so Stage 4 remains in progress.
+stay open; the dialog now also exposes a host-wide disabled lock alongside its
+updating/error/retry lifecycle, so Stage 4 remains in progress.
 
 The current thread-overflow slice closes the former unsampled P1 root menu.
 `ThreadOverflowMenu` exposes the observed ten actions, three separators, four
