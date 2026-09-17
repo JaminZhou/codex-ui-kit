@@ -201,6 +201,7 @@ import {
   type ReactNode,
 } from "react";
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
+import type { LiveBackgroundTerminal } from "../electron/live-background-terminals";
 import {
   agentMessageStatus,
   hasActiveTurnWork,
@@ -3599,6 +3600,12 @@ export function App() {
     reduceLiveMcpElicitations,
     [] as PendingMcpElicitation[],
   );
+  const [liveBackgroundTerminals, setLiveBackgroundTerminals] = useState<
+    LiveBackgroundTerminal[]
+  >([]);
+  const [liveBackgroundTerminalSessionId, setLiveBackgroundTerminalSessionId] =
+    useState<string | null>(null);
+  const liveBackgroundRefreshId = useRef(0);
   const [liveHistoryLoading, setLiveHistoryLoading] = useState(false);
   const liveHistoryReadId = useRef(0);
   const [liveProjects, dispatchLive] = useReducer(
@@ -5015,6 +5022,37 @@ export function App() {
   const hasLiveInputRequests =
     mode === "live" &&
     liveInputs.some((request) => request.threadId === liveState.threadId);
+  const refreshLiveBackgroundTerminals = useCallback(async () => {
+    const bridge = window.codexDemo;
+    const projectToken = workspaceProjectToken;
+    const threadId = liveState.threadId;
+    if (mode !== "live" || !bridge || !projectToken || !threadId) {
+      setLiveBackgroundTerminals([]);
+      setLiveBackgroundTerminalSessionId(null);
+      return;
+    }
+    const requestId = ++liveBackgroundRefreshId.current;
+    try {
+      const terminals = await bridge.listLiveBackgroundTerminals({
+        projectToken,
+        threadId,
+      });
+      if (requestId !== liveBackgroundRefreshId.current) return;
+      setLiveBackgroundTerminals(terminals);
+      setLiveBackgroundTerminalSessionId((current) =>
+        current && terminals.some(({ itemId }) => itemId === current)
+          ? current
+          : null,
+      );
+    } catch {
+      if (requestId !== liveBackgroundRefreshId.current) return;
+      setLiveBackgroundTerminals([]);
+      setLiveBackgroundTerminalSessionId(null);
+    }
+  }, [liveState.threadId, mode, workspaceProjectToken]);
+  useEffect(() => {
+    void refreshLiveBackgroundTerminals();
+  }, [refreshLiveBackgroundTerminals, state.eventCount]);
   const isCurrentApprovalReplay =
     mode === "replay" &&
     (scenarioId === "approval-allow-once" ||
@@ -16863,11 +16901,25 @@ export function App() {
   );
   const backgroundTerminalCommand =
     "for i in $(seq 1 120); do printf 'terminal-background-handle-%03d\\n' \"$i\"; sleep 1; done";
+  const selectedLiveBackgroundTerminal =
+    liveBackgroundTerminalSessionId === null
+      ? undefined
+      : liveBackgroundTerminals.find(
+          ({ itemId }) => itemId === liveBackgroundTerminalSessionId,
+        );
+  const selectedLiveBackgroundCommand = selectedLiveBackgroundTerminal
+    ? state.commands.find(
+        ({ id, processId }) =>
+          id === selectedLiveBackgroundTerminal.itemId ||
+          processId === selectedLiveBackgroundTerminal.processId,
+      )
+    : undefined;
   const backgroundTerminalPanelSelected =
     view === "conversation" &&
-    scenarioId === "terminal-lifecycle" &&
-    (activeFrame === "terminal-current-background-list" ||
-      activeFrame === "terminal-current-background-open");
+    ((mode === "live" && selectedLiveBackgroundTerminal !== undefined) ||
+      (scenarioId === "terminal-lifecycle" &&
+        (activeFrame === "terminal-current-background-list" ||
+          activeFrame === "terminal-current-background-open")));
   const openBackgroundTerminal = () => {
     setTerminalSessionIds(["agent-background-terminal"]);
     setTerminalWorkspaceBySession({
@@ -16890,8 +16942,73 @@ export function App() {
     setTerminalOpen(false);
     setActiveFrame("terminal-current-background-list");
   };
+  const closeLiveBackgroundTerminalTab = () => {
+    setLiveBackgroundTerminalSessionId(null);
+    setTerminalOpen(false);
+  };
+  const openLiveBackgroundTerminal = (terminal: LiveBackgroundTerminal) => {
+    setTerminalSessionIds((sessionIds) =>
+      sessionIds.includes(terminal.itemId)
+        ? sessionIds
+        : [...sessionIds, terminal.itemId],
+    );
+    setTerminalWorkspaceBySession((labels) => ({
+      ...labels,
+      [terminal.itemId]: workspaceRunProjectLabel,
+    }));
+    setTerminalCommandId(terminal.itemId);
+    setTerminalOpen(false);
+    setLiveBackgroundTerminalSessionId(terminal.itemId);
+  };
+  const stopLiveBackgroundTerminal = (processId: string) => {
+    const bridge = window.codexDemo;
+    const projectToken = workspaceProjectToken;
+    const threadId = liveState.threadId;
+    if (!bridge || !projectToken || !threadId) return;
+    void bridge
+      .terminateLiveBackgroundTerminal({ processId, projectToken, threadId })
+      .then(() => refreshLiveBackgroundTerminals())
+      .catch(() => undefined);
+  };
   const backgroundTerminalSidePanel =
-    activeFrame === "terminal-current-background-open" ? (
+    mode === "live" && selectedLiveBackgroundTerminal ? (
+      <WorkspacePanel
+        activeTabId={selectedLiveBackgroundTerminal.itemId}
+        className="demo-background-terminal-panel"
+        data-testid="terminal-current-background-panel"
+        label="Background terminal"
+        onActiveTabChange={() => undefined}
+        onClose={closeLiveBackgroundTerminalTab}
+        onCloseTab={closeLiveBackgroundTerminalTab}
+        placement="side"
+        tabCloseButtons
+        tabs={[
+          {
+            closeLabel: `Close ${selectedLiveBackgroundTerminal.command} tab`,
+            content: (
+              <TerminalTranscript
+                entries={
+                  selectedLiveBackgroundCommand
+                    ? terminalEntriesBySession[
+                        selectedLiveBackgroundCommand.id
+                      ] ?? []
+                    : [
+                        {
+                          id: `${selectedLiveBackgroundTerminal.itemId}:command`,
+                          kind: "command" as const,
+                          text: `${selectedLiveBackgroundTerminal.cwd} % ${selectedLiveBackgroundTerminal.command}`,
+                        },
+                      ]
+                }
+                label="Background terminal output"
+              />
+            ),
+            id: selectedLiveBackgroundTerminal.itemId,
+            label: selectedLiveBackgroundTerminal.command,
+          },
+        ]}
+      />
+    ) : activeFrame === "terminal-current-background-open" ? (
       <WorkspacePanel
         activeTabId="agent-background-terminal"
         className="demo-background-terminal-panel"
@@ -17407,7 +17524,9 @@ export function App() {
             : isCurrentBrowser26825Replay
               ? browserPanelOpen
             : backgroundTerminalPanelSelected
-              ? backgroundTerminalPanelOpen
+              ? mode === "live"
+                ? selectedLiveBackgroundTerminal !== undefined
+                : backgroundTerminalPanelOpen
             : subagentPanelSelected
               ? subagentPanelOpen
               : reviewOpen && Boolean(reviewPanel)
@@ -17861,6 +17980,41 @@ export function App() {
                           : command.status === "pending"
                             ? "idle"
                             : command.status,
+                    }))}
+                  />
+                ) : null}
+
+                {mode === "live" && liveBackgroundTerminals.length > 0 ? (
+                  <TerminalProcessList
+                    className="demo-terminal-processes"
+                    data-testid="live-background-terminal-process-list"
+                    onOpenProcess={(itemId) => {
+                      const terminal = liveBackgroundTerminals.find(
+                        (candidate) => candidate.itemId === itemId,
+                      );
+                      if (terminal) openLiveBackgroundTerminal(terminal);
+                    }}
+                    onStopAll={() => {
+                      for (const terminal of liveBackgroundTerminals) {
+                        stopLiveBackgroundTerminal(terminal.processId);
+                      }
+                    }}
+                    onStopProcess={(itemId) => {
+                      const terminal = liveBackgroundTerminals.find(
+                        (candidate) => candidate.itemId === itemId,
+                      );
+                      if (terminal) {
+                        stopLiveBackgroundTerminal(terminal.processId);
+                      }
+                    }}
+                    processes={liveBackgroundTerminals.map((terminal) => ({
+                      detail: `${terminal.cwd}${
+                        terminal.osPid === null ? "" : ` · PID ${terminal.osPid}`
+                      }`,
+                      id: terminal.itemId,
+                      label: terminal.command,
+                      status: "running" as const,
+                      view: "background" as const,
                     }))}
                   />
                 ) : null}

@@ -220,8 +220,13 @@ startup files, command timeouts or a lifetime output cap. The renderer retains
 1 MiB of characters. Tabs own their emulator independently of panel mounting;
 closing a tab terminates its shell, while hiding the panel does not.
 The legacy command API keeps its 120-second timeout and 1 MiB output cap.
-Model-owned background-process integration and current-product PTY pixel
-comparison remain open. Functional local evidence is not full terminal parity.
+The Live renderer now consumes the public
+`thread/backgroundTerminals/list|terminate|clean` contract through a
+project-owned preload bridge. Real process rows can be opened in the existing
+side-panel transcript and terminated individually or as a group; the panel
+reuses the protocol command output rather than a replay fixture. A signed-in
+runtime capture of this bridge and current-product PTY pixel comparison remain
+open. Functional local evidence is not full terminal parity.
 
 ### Live runtime check — 2026-09-08
 

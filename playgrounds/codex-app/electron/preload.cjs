@@ -87,5 +87,11 @@ contextBridge.exposeInMainWorld("codexDemo", {
   compactLive: (input) => ipcRenderer.invoke("demo:live:compact", input),
   listLiveThreads: (input) => ipcRenderer.invoke("demo:live:threads", input),
   readLiveThread: (input) => ipcRenderer.invoke("demo:live:thread:read", input),
+  listLiveBackgroundTerminals: (input) =>
+    ipcRenderer.invoke("demo:live:background-terminals:list", input),
+  terminateLiveBackgroundTerminal: (input) =>
+    ipcRenderer.invoke("demo:live:background-terminals:terminate", input),
+  cleanLiveBackgroundTerminals: (input) =>
+    ipcRenderer.invoke("demo:live:background-terminals:clean", input),
   stopLive: (input) => ipcRenderer.invoke("demo:live:stop", input),
 });

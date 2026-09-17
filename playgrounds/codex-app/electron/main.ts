@@ -71,6 +71,10 @@ import {
 } from "./live-remote-connections.js";
 import { LiveTerminalManager } from "./live-terminal.js";
 import {
+  normalizeLiveBackgroundTerminals,
+  type LiveBackgroundTerminal,
+} from "./live-background-terminals.js";
+import {
   checkoutGitBranch,
   createAndCheckoutGitBranch,
   GitBranchCreationError,
@@ -172,6 +176,20 @@ function resolveHistoryProject(raw: unknown) {
   const directory = typeof input.projectToken === "string" ? trustedProjectDirectories.get(input.projectToken) : undefined;
   if (!directory) throw new Error("Select a host-owned local project.");
   return { input, directory };
+}
+
+function requireLiveThread(
+  directory: string,
+  threadId: unknown,
+) {
+  if (typeof threadId !== "string" || threadId.length === 0) {
+    throw new TypeError("A live thread is required.");
+  }
+  const session = liveSession.get(directory);
+  if (!session || session.thread.id !== threadId) {
+    throw new Error("The selected live thread is not owned by this project.");
+  }
+  return threadId;
 }
 
 interface ApprovalResponseInput {
@@ -1285,6 +1303,51 @@ ipcMain.handle("demo:live:thread:read", async (event, raw: unknown) => {
   if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed while reading history.");
   if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
   return { threadId: thread.id, turns: thread.turns };
+});
+ipcMain.handle("demo:live:background-terminals:list", async (event, raw: unknown): Promise<LiveBackgroundTerminal[]> => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  const threadId = requireLiveThread(directory, input.threadId);
+  const connectedClient = await ensureClient();
+  const response = await connectedClient.call("thread/backgroundTerminals/list", {
+    limit: 100,
+    threadId,
+  });
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session was closed while reading background terminals.");
+  }
+  return normalizeLiveBackgroundTerminals(response.data);
+});
+ipcMain.handle("demo:live:background-terminals:terminate", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  const threadId = requireLiveThread(directory, input.threadId);
+  const processId = (raw as { processId?: unknown }).processId;
+  if (typeof processId !== "string" || processId.length === 0) {
+    throw new TypeError("A background process is required.");
+  }
+  const connectedClient = await ensureClient();
+  const response = await connectedClient.call("thread/backgroundTerminals/terminate", {
+    processId,
+    threadId,
+  });
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session was closed while stopping the background terminal.");
+  }
+  return response;
+});
+ipcMain.handle("demo:live:background-terminals:clean", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  const threadId = requireLiveThread(directory, input.threadId);
+  const connectedClient = await ensureClient();
+  const response = await connectedClient.call("thread/backgroundTerminals/clean", {
+    threadId,
+  });
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session was closed while cleaning background terminals.");
+  }
+  return response;
 });
 ipcMain.handle("demo:live:thread:rename", async (event, raw: unknown) => {
   assertTrustedIpc(event);
