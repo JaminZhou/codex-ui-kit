@@ -1292,6 +1292,11 @@ Settings navigation assets retain their manifest provenance. General,
 Hooks/code-review, and the remaining Settings/integration pages stay separate
 open rows; these slices do not imply Stage 4 completion.
 
+Appearance now also exposes host-controlled loading, saving, saved, and error
+states with retry copy, status semantics, and a locked control surface while
+the host persists changes. This lifecycle contract remains presentation-only:
+hosts still own persistence, validation, import/copy effects, and Dock assets.
+
 The following General slice is now delivered independently: a controlled
 `GeneralSettingsPage` covers the 21 current rows in Permissions, General,
 Composer, Popout Window, and Notifications. Browser/CDP verifies five

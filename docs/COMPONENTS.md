@@ -296,9 +296,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   mutation, and dirty-state decisions.
 - `AppearanceSettingsPage`: controlled System/Light/Dark selection, responsive
   previews, Light/Dark theme editors, code-theme menus, contrast ranges, and
-  the complete Preferences card. Hosts own persistence, file import, copy
-  behavior, and optional Dock icon nodes; no proprietary Dock artwork is
-  bundled by the component.
+  the complete Preferences card. Loading, saving, saved, and error feedback,
+  retry copy, and busy-state locking are host-controlled. Hosts own
+  persistence, file import, copy behavior, and optional Dock icon nodes; no
+  proprietary Dock artwork is bundled by the component.
 - `GeneralSettingsPage`: controlled Permissions, General, Composer, Popout
   Window, and Notifications cards with host-supplied file destinations,
   searchable languages, menus, switches, keyboard-operable segmented choices,

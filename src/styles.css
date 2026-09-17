@@ -2074,6 +2074,32 @@ button.codex-ui-login-page__mark {
   margin: 0 0 2rem;
 }
 
+.codex-ui-appearance-settings__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: -1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-appearance-settings__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-appearance-settings__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-appearance-settings__content {
   display: flex;
   flex-direction: column;
@@ -2110,6 +2136,11 @@ button.codex-ui-login-page__mark {
   line-height: 1.125rem;
   min-width: 0;
   position: relative;
+}
+
+.codex-ui-appearance-settings__theme-choice:has(input:disabled) {
+  cursor: default;
+  opacity: 0.55;
 }
 
 .codex-ui-appearance-settings__theme-choice > input,
@@ -2543,6 +2574,21 @@ button.codex-ui-login-page__mark {
   transform: translateX(0.75rem);
 }
 
+.codex-ui-appearance-settings button:disabled,
+.codex-ui-appearance-settings input:disabled {
+  cursor: default;
+}
+
+.codex-ui-appearance-settings__switch:disabled,
+.codex-ui-appearance-settings__segmented button:disabled,
+.codex-ui-appearance-settings__dock-icons label:has(input:disabled) > span {
+  opacity: 0.45;
+}
+
+.codex-ui-appearance-settings__color-control > button:disabled {
+  cursor: default;
+}
+
 .codex-ui-appearance-settings__contrast-row {
   min-height: 3.25rem;
 }
@@ -2638,6 +2684,10 @@ button.codex-ui-login-page__mark {
     rgb(255 255 255 / 0.08)
   );
   color: var(--codex-ui-text);
+}
+
+.codex-ui-appearance-settings__segmented button:disabled {
+  cursor: default;
 }
 
 .codex-ui-appearance-settings__dock-icons {
