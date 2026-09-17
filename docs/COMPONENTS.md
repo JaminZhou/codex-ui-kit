@@ -467,13 +467,13 @@ kit never performs filesystem, network, account, or process mutations.
   limits.
 - `EnvironmentSettingsPage`: controlled environment list with ready/loading/
   error/empty states, `aria-busy`, host-configurable loading copy, and
-  host-owned Retry/edit callbacks. Registry, credentials, and provisioning stay
-  in the host.
+  host-owned Retry/edit callbacks. Disabled states keep retry explicit while
+  registry, credentials, and provisioning stay in the host.
 - `EnvironmentEditorPage`: Setup/Cleanup/Actions tabs with controlled name,
   script, action rows, dirty state, Save/Discard, and conflict/error Retry
-  callbacks. Saving exposes busy feedback and locks mutable controls while
-  preserving host-owned retry/discard actions. It is an editor contract, not a
-  remote environment client.
+  callbacks. Saving or a host-wide disabled state exposes busy feedback and
+  locks mutable controls while preserving host-owned retry/discard actions. It
+  is an editor contract, not a remote environment client.
 - `HooksSettingsPage`: controlled hook groups, trust/managed/changed states,
   config-open and reload callbacks, refresh busy state, and explicit error
   recovery with host-configurable copy. Refreshing locks mutable hook actions;
