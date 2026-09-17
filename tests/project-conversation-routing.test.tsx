@@ -1267,6 +1267,96 @@ describe("project conversation routing", () => {
     expect(screen.queryByText("No projects")).toBeNull();
   });
 
+  it("locks project navigation controls while the host is loading or disabled", () => {
+    const onExpandedChange = vi.fn();
+    const onOpenRecentChat = vi.fn();
+    const onSelect = vi.fn();
+    const onSortChange = vi.fn();
+    const items = [
+      {
+        expanded: true,
+        id: "ui-kit",
+        label: "UI Kit",
+        recentChats: [{ id: "parity", label: "Match project index" }],
+        status: "available" as const,
+      },
+    ];
+    const { rerender } = render(
+      <ProjectIndex
+        items={items}
+        layout="table"
+        onExpandedChange={onExpandedChange}
+        onOpenRecentChat={onOpenRecentChat}
+        onSelect={onSelect}
+        onSortChange={onSortChange}
+        status="loading"
+      />,
+    );
+
+    const index = screen.getByRole("navigation", { name: "Project index" });
+    expect(index.getAttribute("aria-disabled")).toBe("true");
+    expect(index.getAttribute("data-disabled")).toBeNull();
+    expect(
+      screen.getByRole("button", {
+        name: "Sort projects by updated, descending",
+      }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getByRole("button", { name: "Open project UI Kit" }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getByRole("button", { name: "Collapse project UI Kit" }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getByRole("button", { name: "Open chat Match project index" }),
+    ).toHaveProperty("disabled", true);
+
+    rerender(
+      <ProjectIndex
+        items={items}
+        layout="table"
+        onExpandedChange={onExpandedChange}
+        onOpenRecentChat={onOpenRecentChat}
+        onSelect={onSelect}
+        onSortChange={onSortChange}
+        status="error"
+      />,
+    );
+    expect(index.getAttribute("aria-disabled")).toBe("true");
+    expect(index.getAttribute("data-disabled")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Open project UI Kit" }),
+    ).toHaveProperty("disabled", true);
+
+    rerender(
+      <ProjectIndex
+        disabled
+        items={items}
+        layout="table"
+        onExpandedChange={onExpandedChange}
+        onOpenRecentChat={onOpenRecentChat}
+        onSelect={onSelect}
+        onSortChange={onSortChange}
+      />,
+    );
+
+    expect(index.getAttribute("aria-disabled")).toBe("true");
+    expect(index.getAttribute("data-disabled")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Open project UI Kit" }));
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Sort projects by updated, descending",
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open chat Match project index" }),
+    );
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(onSortChange).not.toHaveBeenCalled();
+    expect(onOpenRecentChat).not.toHaveBeenCalled();
+    expect(onExpandedChange).not.toHaveBeenCalled();
+  });
+
   it("supports radio keyboard navigation and skips unavailable routes", () => {
     function Fixture() {
       const [route, setRoute] = useState("local");

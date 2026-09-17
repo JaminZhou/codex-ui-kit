@@ -146,6 +146,7 @@ export interface ProjectIndexProps
   > {
   actions?: ReactNode;
   description?: ReactNode;
+  disabled?: boolean;
   emptyState?: ReactNode;
   items: readonly ProjectIndexItem[];
   label?: string;
@@ -186,6 +187,7 @@ export function ProjectIndex({
   actions,
   className,
   description,
+  disabled = false,
   emptyState = "No projects",
   items,
   label = "Project index",
@@ -208,6 +210,8 @@ export function ProjectIndex({
 }: ProjectIndexProps) {
   const projectIndexId = useId();
   const tableLayout = layout === "table";
+  const isLocked =
+    disabled || status === "loading" || status === "error";
   const defaultStatusMessage =
     status === "loading"
       ? "Loading projects"
@@ -236,6 +240,7 @@ export function ProjectIndex({
                 : `Sort projects by ${key}`
             }
             aria-pressed={active}
+            disabled={isLocked}
             onClick={() => onSortChange(key)}
             type="button"
           >
@@ -258,10 +263,12 @@ export function ProjectIndex({
       {...props}
       aria-label={label}
       aria-busy={status === "loading" || undefined}
+      aria-disabled={isLocked || undefined}
       className={["codex-ui-project-index", className]
         .filter(Boolean)
         .join(" ")}
       data-layout={layout}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <header className="codex-ui-project-index__header">
@@ -361,7 +368,7 @@ export function ProjectIndex({
                     aria-label={`Open project ${itemTextValue(item)}`}
                     className="codex-ui-project-index__item"
                     data-selected={selected || undefined}
-                    disabled={disabled}
+                    disabled={isLocked || disabled}
                     onClick={() => onSelect(item.id)}
                     type="button"
                   >
@@ -417,7 +424,7 @@ export function ProjectIndex({
                       aria-expanded={item.expanded || false}
                       aria-label={`${item.expanded ? "Collapse" : "Expand"} project ${itemTextValue(item)}`}
                       className="codex-ui-project-index__expand"
-                      disabled={disabled}
+                      disabled={isLocked || disabled}
                       onClick={() =>
                         onExpandedChange(item.id, !item.expanded)
                       }
@@ -474,7 +481,7 @@ export function ProjectIndex({
                     aria-label={`Open project ${itemTextValue(item)}`}
                     className="codex-ui-project-index__item"
                     data-selected={selected || undefined}
-                    disabled={disabled}
+                    disabled={isLocked || disabled}
                     onClick={() => onSelect(item.id)}
                     type="button"
                   >
@@ -546,6 +553,7 @@ export function ProjectIndex({
                       aria-expanded={item.expanded || false}
                       aria-label={`${item.expanded ? "Hide" : "Show"} recent chats in ${itemTextValue(item)}`}
                       className="codex-ui-project-index__expand"
+                      disabled={isLocked || disabled}
                       onClick={() =>
                         onExpandedChange(item.id, !item.expanded)
                       }
@@ -624,6 +632,7 @@ export function ProjectIndex({
                                       chatDescribedBy || undefined
                                     }
                                     aria-label={`Open chat ${chatTextValue}`}
+                                    disabled={isLocked || disabled}
                                     onClick={() =>
                                       onOpenRecentChat(item.id, chat.id)
                                     }
