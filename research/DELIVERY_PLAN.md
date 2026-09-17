@@ -308,6 +308,9 @@ exit gates; it does not replace the inventory.
   Git registration without a confirmation dialog. Native `Create permanent
   worktree` remains menu-observed but deliberately unactivated, so permanent
   creation and broader retention/pruning lifecycles keep the group partial.
+  The public `WorktreeSettingsPage` now also exposes host-controlled loading,
+  saving, saved, and error states with retry copy and a locked control surface;
+  filesystem, Git, refresh, and conversation effects remain host-owned.
   The current fixed-message task promotes `thread.shell` and
   `thread.messages-basic` on 26.825.51511: exact 1180×820, 721×680, and
   720×680 geometry, the separate project/title header composition, four exact

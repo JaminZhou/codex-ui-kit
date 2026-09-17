@@ -1,5 +1,6 @@
 import {
   useMemo,
+  useId,
   type HTMLAttributes,
   type ReactNode,
 } from "react";
@@ -10,6 +11,13 @@ export interface WorktreeSettingsValue {
   fetchUpstream: boolean;
   root: string;
 }
+
+export type WorktreeSettingsStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
 
 export interface ManagedWorktreeConversation {
   id: string;
@@ -30,16 +38,24 @@ export interface WorktreeSettingsPageProps
     HTMLAttributes<HTMLElement>,
     "children" | "onChange"
   > {
+  disabled?: boolean;
   emptyState?: ReactNode;
   entries: readonly ManagedWorktreeEntry[];
+  errorMessage?: ReactNode;
+  loadingLabel?: ReactNode;
   newChatIcon?: ReactNode;
   onChange: (value: WorktreeSettingsValue) => void;
   onDelete?: (entry: ManagedWorktreeEntry) => void;
   onNewChat?: (entry: ManagedWorktreeEntry) => void;
   onRefresh?: (projectTextValue: string) => void;
+  onRetry?: () => void;
   refreshIcon?: ReactNode;
   refreshing?: boolean;
+  retryLabel?: ReactNode;
   rootPlaceholder?: string;
+  savingLabel?: ReactNode;
+  status?: WorktreeSettingsStatus;
+  statusMessage?: ReactNode;
   value: WorktreeSettingsValue;
 }
 
@@ -78,12 +94,14 @@ function NewChatIcon() {
 
 interface WorktreeSwitchProps {
   checked: boolean;
+  disabled?: boolean;
   label: string;
   onChange: (checked: boolean) => void;
 }
 
 function WorktreeSwitch({
   checked,
+  disabled = false,
   label,
   onChange,
 }: WorktreeSwitchProps) {
@@ -92,6 +110,7 @@ function WorktreeSwitch({
       aria-checked={checked}
       aria-label={label}
       className="codex-ui-worktree-settings__switch"
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       role="switch"
       type="button"
@@ -151,20 +170,41 @@ function groupEntries(entries: readonly ManagedWorktreeEntry[]) {
 
 export function WorktreeSettingsPage({
   className,
+  disabled = false,
   emptyState = "No managed worktrees.",
   entries,
+  errorMessage = "Worktree settings could not be saved.",
+  loadingLabel = "Loading worktree settings…",
   newChatIcon,
   onChange,
   onDelete,
   onNewChat,
   onRefresh,
+  onRetry,
   refreshIcon,
   refreshing = false,
+  retryLabel = "Retry",
   rootPlaceholder = "Default location",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   ...props
 }: WorktreeSettingsPageProps) {
   const groups = useMemo(() => groupEntries(entries), [entries]);
+  const statusId = useId();
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const isBusy = refreshing || status === "loading" || status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "Worktree settings saved"
+          : errorMessage);
   const update = <Key extends keyof WorktreeSettingsValue,>(
     key: Key,
     nextValue: WorktreeSettingsValue[Key],
@@ -173,12 +213,29 @@ export function WorktreeSettingsPage({
   return (
     <article
       {...props}
-      aria-busy={refreshing || undefined}
+      aria-busy={isBusy || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-worktree-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>Worktrees</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-worktree-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="codex-ui-worktree-settings__content">
         <div
           aria-label="Worktree preferences"
@@ -190,6 +247,7 @@ export function WorktreeSettingsPage({
           >
             <input
               aria-label="Worktree root"
+              disabled={isLocked}
               onChange={(event) => update("root", event.currentTarget.value)}
               placeholder={rootPlaceholder}
               type="text"
@@ -202,6 +260,7 @@ export function WorktreeSettingsPage({
           >
             <WorktreeSwitch
               checked={value.fetchUpstream}
+              disabled={isLocked}
               label="Always fetch upstream before creating worktrees"
               onChange={(checked) => update("fetchUpstream", checked)}
             />
@@ -212,6 +271,7 @@ export function WorktreeSettingsPage({
           >
             <WorktreeSwitch
               checked={value.autoDelete}
+              disabled={isLocked}
               label="Automatically delete old worktrees"
               onChange={(checked) => update("autoDelete", checked)}
             />
@@ -222,6 +282,7 @@ export function WorktreeSettingsPage({
           >
             <input
               aria-label="Auto-delete limit"
+              disabled={isLocked}
               min={1}
               onChange={(event) => {
                 const nextValue = Number(event.currentTarget.value);
@@ -248,7 +309,7 @@ export function WorktreeSettingsPage({
                 <button
                   aria-label="Refresh"
                   className="codex-ui-worktree-settings__refresh"
-                  disabled={!onRefresh || refreshing}
+                  disabled={isBusy || !onRefresh}
                   onClick={() => onRefresh?.(group.key)}
                   type="button"
                 >
@@ -271,7 +332,7 @@ export function WorktreeSettingsPage({
                       </div>
                       <div className="codex-ui-worktree-settings__entry-actions">
                         <button
-                          disabled={!onNewChat}
+                          disabled={isLocked || !onNewChat}
                           onClick={() => onNewChat?.(entry)}
                           type="button"
                         >
@@ -280,7 +341,7 @@ export function WorktreeSettingsPage({
                         </button>
                         <button
                           className="codex-ui-worktree-settings__delete"
-                          disabled={!onDelete}
+                          disabled={isLocked || !onDelete}
                           onClick={() => onDelete?.(entry)}
                           type="button"
                         >

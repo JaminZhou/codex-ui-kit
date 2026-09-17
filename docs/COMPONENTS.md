@@ -483,8 +483,9 @@ kit never performs filesystem, network, account, or process mutations.
   dictionary, and recording states with host callbacks. Audio capture and
   permissions remain outside the package.
 - `WorktreeSettingsPage`: controlled managed-worktree preferences and project
-  groups with Refresh/Delete/New-chat callbacks. It never deletes a directory
-  or changes Git state itself.
+  groups with Refresh/Delete/New-chat callbacks. Loading, saving, saved, and
+  error feedback, retry copy, and busy-state locking are host-controlled. It
+  never deletes a directory or changes Git state itself.
 - `WorktreeSetupStatus`: created/creating/failed setup phases, ordered steps,
   sanitized log, and Retry/Cancel/Edit-environment actions. The host owns
   checkout, filesystem, and retry effects.
