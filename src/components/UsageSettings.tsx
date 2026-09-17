@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { useId, type HTMLAttributes, type ReactNode } from "react";
 
 export interface UsageLimit {
   id: string;
@@ -24,30 +24,47 @@ export interface UsageCreditsSummary {
   promotionLabel?: string;
 }
 
+export type UsageSettingsStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
+
 export interface UsageSettingsPageProps
   extends HTMLAttributes<HTMLElement> {
   billingSettingsHref?: string;
   cancelPlanContent?: ReactNode;
   credits: UsageCreditsSummary;
+  disabled?: boolean;
+  errorMessage?: ReactNode;
+  loadingLabel?: ReactNode;
   limitGroups: readonly UsageLimitGroup[];
   noResetsLabel?: string;
   onBuyCredits?: () => void;
   onGiftCredits?: () => void;
+  onRetry?: () => void;
   onViewPlans?: () => void;
   plan: UsagePlanSummary;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: UsageSettingsStatus;
+  statusMessage?: ReactNode;
 }
 
 function UsageActionButton({
   children,
+  disabled = false,
   onClick,
 }: {
   children: ReactNode;
+  disabled?: boolean;
   onClick?: () => void;
 }) {
   return (
     <button
       className="codex-ui-usage-settings__action"
-      disabled={!onClick}
+      disabled={disabled || !onClick}
       onClick={onClick}
       type="button"
     >
@@ -65,20 +82,44 @@ export function UsageSettingsPage({
   cancelPlanContent,
   className,
   credits,
+  disabled = false,
+  errorMessage = "Usage and billing settings could not be saved.",
+  loadingLabel = "Loading usage and billing…",
   limitGroups,
   noResetsLabel = "No resets available",
   onBuyCredits,
   onGiftCredits,
+  onRetry,
   onViewPlans,
   plan,
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   ...props
 }: UsageSettingsPageProps) {
+  const statusId = useId();
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "Usage and billing settings saved"
+          : errorMessage);
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-usage-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <header className="codex-ui-usage-settings__header">
         <h1>Usage &amp; billing</h1>
@@ -93,6 +134,21 @@ export function UsageSettingsPage({
           on Web
         </p>
       </header>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-usage-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <section className="codex-ui-usage-settings__section">
         <h2>Your plan</h2>
@@ -102,7 +158,7 @@ export function UsageSettingsPage({
               <strong>{plan.label}</strong>
               <span>{plan.price}</span>
             </div>
-            <UsageActionButton onClick={onViewPlans}>
+            <UsageActionButton disabled={isLocked} onClick={onViewPlans}>
               View plans
             </UsageActionButton>
           </div>
@@ -126,7 +182,7 @@ export function UsageSettingsPage({
                   {credits.promotionLabel}
                 </span>
               ) : null}
-              <UsageActionButton onClick={onBuyCredits}>
+              <UsageActionButton disabled={isLocked} onClick={onBuyCredits}>
                 Buy credits
               </UsageActionButton>
             </div>
@@ -134,7 +190,7 @@ export function UsageSettingsPage({
           {credits.giftLabel ? (
             <div className="codex-ui-usage-settings__row codex-ui-usage-settings__gift-row">
               <strong>{credits.giftLabel}</strong>
-              <UsageActionButton onClick={onGiftCredits}>
+              <UsageActionButton disabled={isLocked} onClick={onGiftCredits}>
                 Gift credits
               </UsageActionButton>
             </div>
