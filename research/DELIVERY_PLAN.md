@@ -2417,6 +2417,8 @@ advertise or activate the built-in edit gesture, while host-provided accessory
 content remains outside that component-owned boundary.
 The login shell now applies the same host boundary across provider, API-key,
 device-code, browser-pending, retry, copy, cancel, and sign-up states.
+Code-block presentation now locks copy and word-wrap actions under the same
+boundary without changing syntax-highlighting or streaming content.
 
 ## Planning rules
 

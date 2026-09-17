@@ -692,4 +692,27 @@ describe("CodeBlock", () => {
     );
     expect(button.getAttribute("data-copied")).toBeNull();
   });
+
+  it("locks copy and wrapping while disabled", () => {
+    const onCopy = vi.fn();
+    const onWrapChange = vi.fn();
+    const { container } = render(
+      <CodeBlock disabled onCopy={onCopy} onWrapChange={onWrapChange} wrapToggleable>
+        const value = true;
+      </CodeBlock>,
+    );
+
+    const block = container.querySelector(".codex-ui-code-block");
+    expect(block?.getAttribute("aria-disabled")).toBe("true");
+    expect(block?.getAttribute("data-disabled")).toBe("true");
+    const copy = screen.getByRole("button", { name: "Copy code" });
+    const wrap = screen.getByRole("button", { name: "Enable word wrap" });
+    expect(copy).toHaveProperty("disabled", true);
+    expect(wrap).toHaveProperty("disabled", true);
+    fireEvent.click(copy);
+    fireEvent.click(wrap);
+    expect(onCopy).not.toHaveBeenCalled();
+    expect(onWrapChange).not.toHaveBeenCalled();
+    expect(block?.getAttribute("data-wrap")).toBeNull();
+  });
 });
