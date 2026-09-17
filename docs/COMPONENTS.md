@@ -482,8 +482,9 @@ kit never performs filesystem, network, account, or process mutations.
   lifecycle feedback, retry copy, and busy-state locking are host-controlled;
   it does not access account memory or profile services.
 - `VoiceSettingsPage`: controlled microphone, voice, screen-context,
-  dictionary, and recording states with host callbacks. Audio capture and
-  permissions remain outside the package.
+  dictionary, and recording states with host callbacks. Loading, saving,
+  saved, and error feedback, retry copy, and busy-state locking are
+  host-controlled. Audio capture and permissions remain outside the package.
 - `WorktreeSettingsPage`: controlled managed-worktree preferences and project
   groups with Refresh/Delete/New-chat callbacks. Loading, saving, saved, and
   error feedback, retry copy, and busy-state locking are host-controlled. It

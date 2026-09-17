@@ -366,6 +366,13 @@ export interface VoiceOption {
   label: string;
 }
 
+export type VoiceSettingsStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
+
 export interface MicrophoneOption {
   id: string;
   label: string;
@@ -376,7 +383,10 @@ export interface VoiceSettingsPageProps
   addIcon?: ReactNode;
   capturingHotkey?: VoiceSettingsHotkeyId | null;
   closeIcon?: ReactNode;
+  disabled?: boolean;
   editIcon?: ReactNode;
+  errorMessage?: ReactNode;
+  loadingLabel?: ReactNode;
   microphoneMenuOpen?: boolean;
   microphoneOptions: readonly MicrophoneOption[];
   nextIcon?: ReactNode;
@@ -384,10 +394,15 @@ export interface VoiceSettingsPageProps
   onHotkeyCaptureChange?: (hotkey: VoiceSettingsHotkeyId | null) => void;
   onMicrophoneMenuOpenChange?: (open: boolean) => void;
   onPlayVoicePreview?: (voice: VoiceOption) => void;
+  onRetry?: () => void;
   onVoicePickerOpenChange?: (open: boolean) => void;
   previousIcon?: ReactNode;
   recentRecordings?: readonly string[];
   removeIcon?: ReactNode;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: VoiceSettingsStatus;
+  statusMessage?: ReactNode;
   value: VoiceSettingsValue;
   voiceOptions?: readonly VoiceOption[];
   voicePickerOpen?: boolean;
@@ -441,6 +456,7 @@ function VoiceRow({
 
 function VoiceHotkeyControl({
   capturing,
+  disabled = false,
   editIcon,
   hotkey,
   id,
@@ -449,6 +465,7 @@ function VoiceHotkeyControl({
   onChange,
 }: {
   capturing: boolean;
+  disabled?: boolean;
   editIcon?: ReactNode;
   hotkey: string | null;
   id: VoiceSettingsHotkeyId;
@@ -461,7 +478,9 @@ function VoiceHotkeyControl({
       <input
         aria-label={`Shortcut capture for ${label}`}
         autoFocus
+        disabled={disabled}
         onKeyDown={(event) => {
+          if (disabled) return;
           event.preventDefault();
           event.stopPropagation();
           if (event.key === "Escape") {
@@ -476,7 +495,11 @@ function VoiceHotkeyControl({
         readOnly
         value="Press shortcut"
       />
-      <button onClick={() => onCaptureChange(null)} type="button">
+      <button
+        disabled={disabled}
+        onClick={() => onCaptureChange(null)}
+        type="button"
+      >
         Cancel
       </button>
     </div>
@@ -485,6 +508,7 @@ function VoiceHotkeyControl({
       <span>{hotkey ?? "Off"}</span>
       <button
         aria-label={`Set shortcut for ${label}`}
+        disabled={disabled}
         onClick={() => onCaptureChange(id)}
         type="button"
       >
@@ -511,7 +535,10 @@ export function VoiceSettingsPage({
   capturingHotkey,
   className,
   closeIcon,
+  disabled = false,
   editIcon,
+  errorMessage = "Voice settings could not be saved.",
+  loadingLabel = "Loading voice settings…",
   microphoneMenuOpen,
   microphoneOptions,
   nextIcon,
@@ -519,10 +546,15 @@ export function VoiceSettingsPage({
   onHotkeyCaptureChange,
   onMicrophoneMenuOpenChange,
   onPlayVoicePreview,
+  onRetry,
   onVoicePickerOpenChange,
   previousIcon,
   recentRecordings = [],
   removeIcon,
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   voiceOptions = defaultVoiceOptions,
   voicePickerOpen,
@@ -543,6 +575,19 @@ export function VoiceSettingsPage({
   const selectedMicrophone =
     microphoneOptions.find((option) => option.id === value.microphoneId) ??
     microphoneOptions[0];
+  const statusId = useId();
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "Voice settings saved"
+          : errorMessage);
   const [pendingVoiceId, setPendingVoiceId] = useState(selectedVoice?.id ?? "");
   const voiceTriggerRef = useRef<HTMLButtonElement>(null);
   const dictionaryHeadingId = useId();
@@ -563,14 +608,17 @@ export function VoiceSettingsPage({
     nextValue: VoiceSettingsValue[K],
   ) => onChange({ ...value, [key]: nextValue });
   const setVoicePickerOpen = (open: boolean) => {
+    if (open && isLocked) return;
     if (voicePickerOpen === undefined) setInternalVoicePickerOpen(open);
     onVoicePickerOpenChange?.(open);
   };
   const setCapturingHotkey = (hotkey: VoiceSettingsHotkeyId | null) => {
+    if (hotkey !== null && isLocked) return;
     if (capturingHotkey === undefined) setInternalCapturingHotkey(hotkey);
     onHotkeyCaptureChange?.(hotkey);
   };
   const updateHotkey = (id: VoiceSettingsHotkeyId, hotkey: string) => {
+    if (isLocked) return;
     const key: Record<VoiceSettingsHotkeyId, keyof VoiceSettingsValue> = {
       holdToDictate: "holdToDictateHotkey",
       toggleDictation: "toggleDictationHotkey",
@@ -582,11 +630,29 @@ export function VoiceSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-voice-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>Voice</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-voice-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <section className="codex-ui-voice-settings__section">
         <h2>General</h2>
@@ -600,13 +666,14 @@ export function VoiceSettingsPage({
               className="codex-ui-voice-settings__microphone-menu"
               label="Microphone"
               onOpenChange={onMicrophoneMenuOpenChange}
-              open={microphoneMenuOpen}
+              open={isLocked ? false : microphoneMenuOpen}
               side="bottom"
               sideOffset={4}
               trigger={
                 <button
                   aria-label="Microphone"
                   className="codex-ui-voice-settings__menu-trigger"
+                  disabled={isLocked}
                   type="button"
                 >
                   <span>{selectedMicrophone?.label ?? "System default"}</span>
@@ -640,6 +707,7 @@ export function VoiceSettingsPage({
           >
             <button
               className="codex-ui-voice-settings__voice-trigger"
+              disabled={isLocked}
               onClick={() => setVoicePickerOpen(true)}
               ref={voiceTriggerRef}
               type="button"
@@ -654,6 +722,7 @@ export function VoiceSettingsPage({
           >
             <VoiceHotkeyControl
               capturing={resolvedCapturingHotkey === "voiceChat"}
+              disabled={isLocked}
               editIcon={editIcon}
               hotkey={value.voiceChatHotkey}
               id="voiceChat"
@@ -668,6 +737,7 @@ export function VoiceSettingsPage({
           >
             <VoiceSwitch
               checked={value.screenContext}
+              disabled={isLocked}
               label="Enable screen context for voice chat"
               onChange={(screenContext) => update("screenContext", screenContext)}
             />
@@ -684,6 +754,7 @@ export function VoiceSettingsPage({
           >
             <VoiceHotkeyControl
               capturing={resolvedCapturingHotkey === "holdToDictate"}
+              disabled={isLocked}
               editIcon={editIcon}
               hotkey={value.holdToDictateHotkey}
               id="holdToDictate"
@@ -698,6 +769,7 @@ export function VoiceSettingsPage({
           >
             <VoiceHotkeyControl
               capturing={resolvedCapturingHotkey === "toggleDictation"}
+              disabled={isLocked}
               editIcon={editIcon}
               hotkey={value.toggleDictationHotkey}
               id="toggleDictation"
@@ -712,7 +784,7 @@ export function VoiceSettingsPage({
           >
             <VoiceSwitch
               checked={value.keepDictationBarVisible}
-              disabled={!value.toggleDictationHotkey}
+              disabled={isLocked || !value.toggleDictationHotkey}
               label="Keep the dictation bar visible"
               onChange={(keepDictationBarVisible) =>
                 update("keepDictationBarVisible", keepDictationBarVisible)
@@ -732,6 +804,7 @@ export function VoiceSettingsPage({
             </div>
             <button
               className="codex-ui-voice-settings__add"
+              disabled={isLocked}
               onClick={() =>
                 update("dictionaryEntries", [...value.dictionaryEntries, ""])
               }
@@ -752,6 +825,7 @@ export function VoiceSettingsPage({
               >
                 <input
                   aria-label={`Dictionary entry ${index + 1}`}
+                  disabled={isLocked}
                   onChange={(event) => {
                     const entries = value.dictionaryEntries.length
                       ? [...value.dictionaryEntries]
@@ -764,7 +838,9 @@ export function VoiceSettingsPage({
                 />
                 <button
                   aria-label={`Remove dictionary entry ${index + 1}`}
-                  disabled={!entry && value.dictionaryEntries.length <= 1}
+                  disabled={
+                    isLocked || (!entry && value.dictionaryEntries.length <= 1)
+                  }
                   onClick={() =>
                     update(
                       "dictionaryEntries",
@@ -803,10 +879,15 @@ export function VoiceSettingsPage({
         closeLabel="Close voice picker"
         footer={
           <>
-            <button onClick={() => setVoicePickerOpen(false)} type="button">
+            <button
+              disabled={isLocked}
+              onClick={() => setVoicePickerOpen(false)}
+              type="button"
+            >
               Cancel
             </button>
             <button
+              disabled={isLocked}
               onClick={() => {
                 if (pendingVoice) update("voiceId", pendingVoice.id);
                 setVoicePickerOpen(false);
@@ -818,7 +899,7 @@ export function VoiceSettingsPage({
           </>
         }
         onOpenChange={setVoicePickerOpen}
-        open={resolvedVoicePickerOpen}
+        open={isLocked ? false : resolvedVoicePickerOpen}
         returnFocusRef={voiceTriggerRef}
         title="Choose a voice"
       >
@@ -827,6 +908,7 @@ export function VoiceSettingsPage({
             <button
               aria-label={`Play ${pendingVoice.label} preview`}
               className="codex-ui-voice-picker__artwork"
+              disabled={isLocked || !onPlayVoicePreview}
               onClick={() => onPlayVoicePreview?.(pendingVoice)}
               type="button"
             >
@@ -835,6 +917,7 @@ export function VoiceSettingsPage({
             <div className="codex-ui-voice-picker__selection">
               <button
                 aria-label="Previous voice"
+                disabled={isLocked}
                 onClick={() =>
                   setPendingVoiceId(
                     voiceOptions[
@@ -853,6 +936,7 @@ export function VoiceSettingsPage({
               </div>
               <button
                 aria-label="Next voice"
+                disabled={isLocked}
                 onClick={() =>
                   setPendingVoiceId(
                     voiceOptions[(pendingVoiceIndex + 1) % voiceOptions.length]!
@@ -873,6 +957,7 @@ export function VoiceSettingsPage({
                 <button
                   aria-checked={option.id === pendingVoice.id}
                   aria-label={`${option.label}: ${option.description}`}
+                  disabled={isLocked}
                   key={option.id}
                   onClick={() => setPendingVoiceId(option.id)}
                   role="radio"

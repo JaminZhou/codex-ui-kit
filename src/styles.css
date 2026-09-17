@@ -3760,6 +3760,32 @@ button.codex-ui-login-page__mark {
   margin-bottom: 2.5rem;
 }
 
+.codex-ui-voice-settings__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: -1.5rem 0 1.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-voice-settings__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-voice-settings__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-voice-settings__section + .codex-ui-voice-settings__section {
   margin-top: 3rem;
 }
@@ -3946,6 +3972,17 @@ button.codex-ui-login-page__mark {
 }
 
 .codex-ui-voice-settings__switch:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.codex-ui-voice-settings__menu-trigger:disabled,
+.codex-ui-voice-settings__voice-trigger:disabled,
+.codex-ui-voice-settings__add:disabled,
+.codex-ui-voice-settings__hotkey > button:disabled,
+.codex-ui-voice-settings__hotkey-capture button:disabled,
+.codex-ui-voice-settings__hotkey-capture input:disabled,
+.codex-ui-voice-settings__dictionary-entry > input:disabled {
   cursor: default;
   opacity: 0.55;
 }

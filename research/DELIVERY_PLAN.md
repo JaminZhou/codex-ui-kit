@@ -2093,7 +2093,9 @@ without confusing package readiness with full product reconstruction.
     nine-voice selection, screen context, hotkeys, dictionary, recordings,
     wide/compact scrolling, and host-supplied voice artwork boundaries. The
     keyboard surface now also exposes host-controlled loading, saving, saved,
-    and error states with retry copy and locked search/capture controls. Usage
+    and error states with retry copy and locked search/capture controls. The
+    voice surface follows the same lifecycle contract for microphone, voice,
+    hotkey, and dictionary controls. Usage
     & billing and its embedded Personal/Business plan surface are now a third
     delivered slice: plan/credits/reset cards, three meters, 5x/20x and
     annual/monthly selectors, host-owned checkout callbacks, wide/compact
