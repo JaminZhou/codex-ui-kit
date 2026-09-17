@@ -85,4 +85,45 @@ describe("SitesIndexPage", () => {
     expect(screen.getByText("No sites found")).toBeTruthy();
     expect(sites).toHaveLength(2);
   });
+
+  it("exposes page lifecycle status and locks site actions while loading", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <SitesIndexPage
+        items={sites}
+        loadingLabel="Loading hosted sites…"
+        onCreate={vi.fn()}
+        onRefresh={vi.fn()}
+        onRetry={onRetry}
+        query="brief"
+        status="loading"
+      />,
+    );
+    const page = screen.getByRole("main", { name: "Sites" });
+    expect(page.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Loading hosted sites…")).toBeTruthy();
+    expect(screen.getByRole("searchbox", { name: "Search sites" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Refresh" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <SitesIndexPage
+        onRetry={onRetry}
+        retryLabel="Try sites again"
+        status="error"
+        statusDescription="The sites service is temporarily unavailable."
+        statusHeading="Sites service unavailable"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The sites service is temporarily unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try sites again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
 });

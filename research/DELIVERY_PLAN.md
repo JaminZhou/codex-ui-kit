@@ -1435,7 +1435,9 @@ route boundary, and repeats the two own-fixture screenshots with zero pixel
 drift. This is deliberately only `partial_legacy`: the only runtime evidence
 is the older `26.715.72359` observation, the fixture is our own, and it does
 not invoke an installed Codex Sites list, creation, sharing, or removal flow.
-Stage 4 therefore remains in progress.
+The current index also exposes host-controlled busy/disabled locking for search,
+refresh, creation, row navigation, sharing, and overflow actions while keeping
+retry explicit. Stage 4 therefore remains in progress.
 
 The Composer plugin-connect slice makes the legacy-observed `Connect plugins`
 entry explicit without claiming to install or authorize a plugin. The shared

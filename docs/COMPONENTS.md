@@ -520,7 +520,8 @@ kit never performs filesystem, network, account, or process mutations.
   Persistence, permissions, delivery, and cloud execution belong to the host.
 - `SitesIndexPage`: controlled site search/index with ready/loading/empty/
   unavailable/error states and Create/Open/Share/Refresh/Overflow callbacks.
-  It does not call a Sites service or open external pages.
+  Page-level busy/disabled states lock search and all site actions while retry
+  remains explicit. It does not call a Sites service or open external pages.
 - `SkillDetailDialog` and `SkillPromptMention`: controlled skill detail,
   enabled state, action menu, long instructions, unsent Try-now prompt, and
   updating/error/retry lifecycle. A host-wide disabled lock covers modal
