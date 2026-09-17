@@ -11,6 +11,7 @@ export interface AgentMessageProps extends HTMLAttributes<HTMLElement> {
   actions?: ReactNode;
   attachments?: ReactNode;
   children: ReactNode;
+  disabled?: boolean;
   editable?: boolean;
   highlighted?: boolean;
   metadata?: ReactNode;
@@ -24,6 +25,7 @@ export function AgentMessage({
   attachments,
   children,
   className,
+  disabled = false,
   editable = false,
   highlighted = false,
   metadata,
@@ -34,7 +36,7 @@ export function AgentMessage({
 }: AgentMessageProps) {
   const classes = ["codex-ui-agent-message", className].filter(Boolean).join(" ");
   const userMessage = role === "user";
-  const canEdit = userMessage && (editable || Boolean(onEdit));
+  const canEdit = !disabled && userMessage && (editable || Boolean(onEdit));
   const hasContent =
     children !== null && children !== undefined && children !== "";
   const activateEdit = (event?: KeyboardEvent<HTMLDivElement>) => {
@@ -46,10 +48,12 @@ export function AgentMessage({
 
   return (
     <article
+      aria-disabled={disabled || undefined}
       aria-busy={status === "running" || undefined}
       aria-live={status === "running" ? "polite" : undefined}
       className={classes}
       data-highlighted={highlighted || undefined}
+      data-disabled={disabled || undefined}
       data-role={role}
       data-status={status}
       {...props}
@@ -71,7 +75,7 @@ export function AgentMessage({
           onDoubleClick={canEdit ? () => onEdit?.() : undefined}
           onKeyDown={canEdit ? activateEdit : undefined}
           role={canEdit ? "button" : undefined}
-          tabIndex={userMessage ? 0 : undefined}
+          tabIndex={userMessage && !disabled ? 0 : undefined}
         >
           {children}
         </div>

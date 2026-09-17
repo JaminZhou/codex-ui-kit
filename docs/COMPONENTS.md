@@ -14,7 +14,7 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `AgentThreadViewport`: focusable, follow-aware scroll surface with latest-turn detection, normal or reverse latest-origin scrolling, reduced-motion-safe auto-follow, direct-input cancellation for programmatic following, and a sticky footer.
 - `AgentTurn` and `ActivityGroup`: explicit standard and grouped spacing contracts.
 - `ThreadVirtualizedPlaceholder`: estimated-height placeholder for host-owned thread virtualization.
-- `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, target highlighting, and a message-owned attachment slot outside the editable user bubble.
+- `AgentMessage`: user, assistant, and system presentation with user-bubble geometry, edit activation, actions, running ARIA state, target highlighting, and a message-owned attachment slot outside the editable user bubble. A disabled lock removes built-in edit activation and keyboard focus from the user bubble.
 - `MessageAttachment`: sent image, file-card, and preview-unavailable
   presentation with an explicit host-owned open action and accessible label.
 - `ThreadLoadingState` and `ThreadThinkingPlaceholder`: loading, reconnecting, and thinking states.
