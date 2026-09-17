@@ -593,7 +593,11 @@ export interface ScheduledTaskEditorProps
   title?: ReactNode;
 }
 
-export type ScheduledTaskDetailStatus = "ready" | "running" | "error";
+export type ScheduledTaskDetailStatus =
+  | "ready"
+  | "running"
+  | "updating"
+  | "error";
 
 export interface ScheduledTaskDetailProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
@@ -604,10 +608,12 @@ export interface ScheduledTaskDetailProps
   onRetry?: () => void;
   onRun?: () => void;
   onToggle?: () => void;
+  retryLabel?: ReactNode;
   status?: ScheduledTaskDetailStatus;
   statusMessage?: ReactNode;
   task: ScheduledTaskItem;
   title?: ReactNode;
+  updatingLabel?: ReactNode;
 }
 
 /**
@@ -624,18 +630,23 @@ export function ScheduledTaskDetail({
   onRetry,
   onRun,
   onToggle,
+  retryLabel = "Retry",
   status = "ready",
   statusMessage,
   task,
   title = "Scheduled task",
+  updatingLabel = "Updating scheduled task…",
   ...props
 }: ScheduledTaskDetailProps) {
   const taskTitle =
     typeof task.title === "string" ? task.title : task.id;
   const actionLabel = task.status === "paused" ? "Resume" : "Pause";
+  const updating = status === "updating";
+  const busy = updating || status === "running";
   return (
     <section
       aria-label="Scheduled task details"
+      aria-busy={busy || undefined}
       className={["codex-ui-scheduled-task-detail", className]
         .filter(Boolean)
         .join(" ")}
@@ -655,7 +666,11 @@ export function ScheduledTaskDetail({
       </header>
       {status === "running" ? (
         <p className="codex-ui-scheduled-task-detail__status" role="status">
-          Running scheduled task…
+          {statusMessage ?? "Running scheduled task…"}
+        </p>
+      ) : status === "updating" ? (
+        <p className="codex-ui-scheduled-task-detail__status" role="status">
+          {updatingLabel}
         </p>
       ) : status === "error" ? (
         <div className="codex-ui-scheduled-task-detail__status" role="alert">
@@ -663,7 +678,7 @@ export function ScheduledTaskDetail({
           <span>{statusMessage ?? "Check the task configuration and try again."}</span>
           {onRetry ? (
             <button onClick={onRetry} type="button">
-              Retry
+              {retryLabel}
             </button>
           ) : null}
         </div>
@@ -687,9 +702,9 @@ export function ScheduledTaskDetail({
         </div>
       </dl>
       <footer className="codex-ui-scheduled-task-detail__actions">
-        <button onClick={onEdit} type="button">Edit</button>
-        <button onClick={onToggle} type="button">{actionLabel}</button>
-        <button disabled={status === "running"} onClick={onRun} type="button">
+        <button disabled={updating} onClick={onEdit} type="button">Edit</button>
+        <button disabled={updating} onClick={onToggle} type="button">{actionLabel}</button>
+        <button disabled={busy} onClick={onRun} type="button">
           Run now
         </button>
       </footer>

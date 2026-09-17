@@ -25315,6 +25315,11 @@ button.codex-ui-generated-image-gallery__image {
   width: 1.75rem;
 }
 
+.codex-ui-scheduled-task-detail__header > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .codex-ui-scheduled-task-detail__status {
   align-items: flex-start;
   background: color-mix(in srgb, var(--codex-ui-focus) 12%, transparent);
@@ -25330,6 +25335,10 @@ button.codex-ui-generated-image-gallery__image {
 
 .codex-ui-scheduled-task-detail[data-status="error"] .codex-ui-scheduled-task-detail__status {
   background: color-mix(in srgb, #ef6b73 14%, transparent);
+}
+
+.codex-ui-scheduled-task-detail[data-status="updating"] .codex-ui-scheduled-task-detail__status {
+  background: color-mix(in srgb, var(--codex-ui-focus) 16%, transparent);
 }
 
 .codex-ui-scheduled-task-detail__status button {
@@ -25390,6 +25399,11 @@ button.codex-ui-generated-image-gallery__image {
 .codex-ui-scheduled-task-detail__actions button:last-child {
   background: var(--codex-ui-text);
   color: var(--codex-ui-surface);
+}
+
+.codex-ui-scheduled-task-detail__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .codex-ui-scheduled-task-detail button:focus-visible {

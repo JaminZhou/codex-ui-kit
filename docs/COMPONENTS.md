@@ -486,9 +486,9 @@ kit never performs filesystem, network, account, or process mutations.
   suggestions, create choices, loading/error/unavailable states, and intent
   callbacks. They do not schedule or execute work.
 - `ScheduledTaskEditor` and `ScheduledTaskDetail`: controlled task name,
-  prompt, frequency/detail fields, facts, saving/error/retry state, and
-  Create/Save/Edit/Pause/Resume/Run callbacks. Persistence, permissions,
-  delivery, and cloud execution belong to the host.
+  prompt, frequency/detail fields, facts, saving/updating/running/error/retry
+  state, busy action locking, and Create/Save/Edit/Pause/Resume/Run callbacks.
+  Persistence, permissions, delivery, and cloud execution belong to the host.
 - `SitesIndexPage`: controlled site search/index with ready/loading/empty/
   unavailable/error states and Create/Open/Share/Refresh/Overflow callbacks.
   It does not call a Sites service or open external pages.
