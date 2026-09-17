@@ -351,7 +351,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   standalone and plugin-provided server groups, controlled enable switches,
   per-server enabling/disabling/error/retry states, Settings callbacks,
   empty/loading/error states, and an editor slot that preserves the manager
-  header and tabs.
+  header and tabs. Page-level busy/disabled states lock category tabs, search,
+  directory/add actions, settings, and switches while retry remains explicit.
 - `McpServerEditor`: controlled STDIO or Streamable HTTP create/update form
   with list and key/value editors, type selection, saving/error/retry states,
   disabled-save state, documentation, Back, and optional Uninstall callbacks.

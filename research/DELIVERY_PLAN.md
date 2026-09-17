@@ -1423,7 +1423,9 @@ limit. The same list/compact replay now has explicit light-theme
 Browser/CDP, Electron, and regional-pixel coverage; this remains controlled
 UI evidence rather than a claim about provider state. This delivers one
 read-only end-to-end `integrations.mcp` slice while keeping real
-save/toggle/uninstall, OAuth/permission, and failure effects open;
+save/toggle/uninstall, OAuth/permission, and failure effects open. The manager
+now also exposes host-controlled busy/disabled locking for tabs, search,
+directory/add actions, settings, and switches while preserving explicit retry;
 Stage 4 therefore remains in progress.
 
 The Sites index slice adds a controlled `SitesIndexPage` for the older
