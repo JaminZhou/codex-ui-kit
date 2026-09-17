@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   RemoteConnectionsPage,
   type RemoteConnection,
+  type RemoteConnectionFormStatus,
   type RemoteConnectionFormValue,
 } from "codex-ui-kit";
 import type {
@@ -28,7 +29,22 @@ export function LiveRemoteConnections() {
   const [formOpen, setFormOpen] = useState(false);
   const [formValue, setFormValue] = useState<RemoteConnectionFormValue>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [formStatus, setFormStatus] = useState<RemoteConnectionFormStatus>("idle");
+  const [operationBusy, setOperationBusy] = useState(false);
   const [action, setAction] = useState("");
+  const operationBusyRef = useRef(false);
+
+  const beginOperation = () => {
+    if (operationBusyRef.current) return false;
+    operationBusyRef.current = true;
+    setOperationBusy(true);
+    return true;
+  };
+
+  const endOperation = () => {
+    operationBusyRef.current = false;
+    setOperationBusy(false);
+  };
 
   const refresh = useCallback(async () => {
     if (!window.codexDemo?.listRemoteConnections) {
@@ -52,7 +68,18 @@ export function LiveRemoteConnections() {
   }, [refresh]);
 
   const save = async () => {
-    if (!window.codexDemo?.saveRemoteConnection || !formValue.label.trim() || !formValue.detail.trim()) return;
+    if (
+      !window.codexDemo?.saveRemoteConnection ||
+      !formValue.label.trim() ||
+      !formValue.detail.trim() ||
+      formStatus === "saving" ||
+      !beginOperation()
+    ) {
+      return;
+    }
+    const isEditing = editingId !== null;
+    setFormStatus("saving");
+    setAction("Saving connection…");
     const id = editingId ?? formValue.label.trim().toLocaleLowerCase().replace(/\s+/g, "-");
     try {
       const saved = await window.codexDemo.saveRemoteConnection({
@@ -67,16 +94,21 @@ export function LiveRemoteConnections() {
       setFormOpen(false);
       setEditingId(null);
       setFormValue(emptyForm);
-      setAction(editingId ? `Updated ${saved.label}` : `Saved ${saved.label}`);
+      setFormStatus("idle");
+      setAction(isEditing ? `Updated ${saved.label}` : `Saved ${saved.label}`);
       setStatus("ready");
     } catch {
+      setFormStatus("error");
       setStatus("error");
       setAction("Connection could not be saved");
+    } finally {
+      endOperation();
     }
   };
 
   const test = async (connection: RemoteConnection) => {
-    if (!window.codexDemo?.testRemoteConnection) return;
+    if (!window.codexDemo?.testRemoteConnection || !beginOperation()) return;
+    setAction(`Testing ${connection.label}…`);
     try {
       const result: RemoteConnectionTestResult = await window.codexDemo.testRemoteConnection({ id: connection.id });
       setConnections((current) =>
@@ -89,18 +121,24 @@ export function LiveRemoteConnections() {
     } catch {
       setStatus("error");
       setAction("Connection test failed");
+    } finally {
+      endOperation();
     }
   };
 
   const forget = async (connection: RemoteConnection) => {
-    if (!window.codexDemo?.forgetRemoteConnection) return;
+    if (!window.codexDemo?.forgetRemoteConnection || !beginOperation()) return;
+    setAction(`Forgetting ${connection.label}…`);
     try {
       await window.codexDemo.forgetRemoteConnection({ id: connection.id });
       setConnections((current) => current.filter((candidate) => candidate.id !== connection.id));
       setAction(`Forgot ${connection.label}`);
+      setStatus("ready");
     } catch {
       setStatus("error");
       setAction("Connection could not be forgotten");
+    } finally {
+      endOperation();
     }
   };
 
@@ -108,12 +146,17 @@ export function LiveRemoteConnections() {
     <>
       <RemoteConnectionsPage
         connections={connections}
+        disabled={operationBusy}
         errorMessage={action || "Connections could not be loaded."}
         formOpen={formOpen}
         formValue={formValue}
+        formStatus={formStatus}
+        formStatusMessage={formStatus === "error" ? action : undefined}
+        formRetryLabel="Try again"
         onAdd={() => {
           setFormValue(emptyForm);
           setEditingId(null);
+          setFormStatus("idle");
           setFormOpen(true);
           setAction("");
         }}
@@ -121,14 +164,17 @@ export function LiveRemoteConnections() {
           setFormOpen(false);
           setEditingId(null);
           setFormValue(emptyForm);
+          setFormStatus("idle");
           setAction("Form cancelled");
         }}
         onChangeForm={setFormValue}
         onEdit={(connection) => {
           setEditingId(connection.id);
           setFormValue({ detail: connection.detail, kind: connection.kind, label: connection.label });
+          setFormStatus("idle");
           setFormOpen(true);
         }}
+        onFormRetry={() => void save()}
         onForget={(connection) => void forget(connection)}
         onRetry={() => void refresh()}
         onSave={() => void save()}
