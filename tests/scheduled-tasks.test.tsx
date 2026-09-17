@@ -47,9 +47,19 @@ describe("ScheduledTasks", () => {
       status: "active",
       title: "Workspace brief",
     };
+    const onClose = vi.fn();
+    const onEdit = vi.fn();
+    const onRetry = vi.fn();
     const onRun = vi.fn();
+    const onToggle = vi.fn();
     const { rerender } = render(
-      <ScheduledTaskDetail onRun={onRun} task={task} />,
+      <ScheduledTaskDetail
+        onClose={onClose}
+        onEdit={onEdit}
+        onRun={onRun}
+        onToggle={onToggle}
+        task={task}
+      />,
     );
     expect(
       screen.getByRole("heading", { name: "Workspace brief" }),
@@ -58,6 +68,41 @@ describe("ScheduledTasks", () => {
     expect(onRun).toHaveBeenCalledOnce();
     rerender(
       <ScheduledTaskDetail
+        onClose={onClose}
+        onEdit={onEdit}
+        onRetry={onRetry}
+        onRun={onRun}
+        onToggle={onToggle}
+        status="updating"
+        task={task}
+        updatingLabel="Updating task configuration…"
+      />,
+    );
+    const detail = screen.getByLabelText("Scheduled task details");
+    expect(detail.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Updating task configuration…",
+    );
+    expect(screen.getByRole("button", { name: "Close details" })).toHaveProperty(
+      "disabled",
+      false,
+    );
+    expect(screen.getByRole("button", { name: "Edit" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Pause" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Run now" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    rerender(
+      <ScheduledTaskDetail
+        onRetry={onRetry}
+        retryLabel="Try again"
         status="error"
         statusMessage="The scheduled task needs permission."
         task={task}
@@ -66,6 +111,8 @@ describe("ScheduledTasks", () => {
     expect(screen.getByRole("alert").textContent).toContain(
       "The scheduled task needs permission.",
     );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
   });
 
   it("renders the current task route and delegates host-owned actions", () => {
