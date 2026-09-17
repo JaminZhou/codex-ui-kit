@@ -11,6 +11,7 @@ export interface LiveAppNotification {
 export type LiveNotificationEvent =
   | { kind: "live-reset" }
   | { kind: "dismiss"; id: string }
+  | { command?: string; kind: "background-terminal-stopped"; processId: string }
   | JsonRpcNotification
   | ProtocolEventRecord;
 
@@ -66,6 +67,14 @@ export function reduceLiveAppNotifications(
     if (event.kind === "live-reset") return [];
     if (event.kind === "dismiss") {
       return notifications.filter(({ id }) => id !== event.id);
+    }
+    if (event.kind === "background-terminal-stopped") {
+      return appendNotification(notifications, {
+        description: event.command ?? "The background terminal was stopped.",
+        heading: "Background task stopped",
+        id: `live-background-terminal:${event.processId}:stopped`,
+        tone: "info",
+      });
     }
   }
   const params = object("params" in event ? event.params : undefined);

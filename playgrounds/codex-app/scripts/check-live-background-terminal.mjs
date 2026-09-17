@@ -130,6 +130,15 @@ try {
     threadId,
     { timeout: 30_000 },
   );
+  const notifications = page.getByRole("region", {
+    name: "Notifications alt+T",
+    exact: true,
+  });
+  await notifications.getByText("Background task stopped", { exact: true }).waitFor({
+    state: "visible",
+    timeout: 30_000,
+  });
+  result.stopNotification = await notifications.textContent();
   await processList.waitFor({ state: "detached", timeout: 30_000 });
   result.passed = true;
 } finally {
