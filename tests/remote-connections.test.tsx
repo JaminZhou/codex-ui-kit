@@ -104,4 +104,53 @@ describe("remote connections surface", () => {
       screen.getByRole("button", { name: "Save connection" }),
     ).toHaveProperty("disabled", false);
   });
+
+  it("locks page actions while loading and supports a host-wide disabled lock", () => {
+    const onRetry = vi.fn();
+    const connection = {
+      detail: "build-host.example.com",
+      id: "build-host",
+      kind: "ssh" as const,
+      label: "Build host",
+      status: "connected" as const,
+    };
+    const { rerender } = render(
+      <RemoteConnectionsPage
+        connections={[connection]}
+        disabled
+        formOpen
+        onAdd={vi.fn()}
+        onEdit={vi.fn()}
+        onSave={vi.fn()}
+        onTest={vi.fn()}
+        status="loading"
+      />,
+    );
+    const page = screen
+      .getByRole("heading", { name: "Connections" })
+      .closest("section");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.getByRole("button", { name: "Add connection" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("textbox", { name: "Connection name" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <RemoteConnectionsPage
+        onRetry={onRetry}
+        status="error"
+        statusMessage="Connection service unavailable"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Connection service unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
 });

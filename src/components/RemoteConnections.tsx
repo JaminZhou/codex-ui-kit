@@ -26,6 +26,7 @@ export interface RemoteConnectionFormValue {
 export interface RemoteConnectionsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   connections?: readonly RemoteConnection[];
+  disabled?: boolean;
   emptyMessage?: ReactNode;
   errorMessage?: ReactNode;
   formOpen?: boolean;
@@ -51,6 +52,7 @@ export interface RemoteConnectionsPageProps
 export function RemoteConnectionsPage({
   className,
   connections = [],
+  disabled = false,
   emptyMessage = "No remote connections yet.",
   errorMessage = "Connections could not be loaded.",
   formOpen = false,
@@ -74,11 +76,14 @@ export function RemoteConnectionsPage({
   ...props
 }: RemoteConnectionsPageProps) {
   const titleId = useId();
+  const statusId = useId();
   const showStatus = status !== "ready";
+  const pageLocked = disabled || status === "loading";
   const resolvedStatusMessage =
     statusMessage ??
     (status === "loading" ? "Loading connections…" : errorMessage);
   const formBusy = formStatus === "saving";
+  const formLocked = disabled || formBusy;
   const resolvedFormStatusMessage =
     formStatusMessage ??
     (formStatus === "saving"
@@ -92,10 +97,13 @@ export function RemoteConnectionsPage({
   return (
     <section
       {...props}
+      aria-busy={status === "loading" || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       aria-labelledby={titleId}
       className={["codex-ui-remote-connections", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <header className="codex-ui-remote-connections__header">
@@ -105,7 +113,7 @@ export function RemoteConnectionsPage({
           <p>Allow ChatGPT apps signed into your account to use this device.</p>
         </div>
         {onAdd ? (
-          <button className="codex-ui-remote-connections__primary" onClick={onAdd} type="button">
+          <button className="codex-ui-remote-connections__primary" disabled={pageLocked} onClick={onAdd} type="button">
             Add connection
           </button>
         ) : null}
@@ -115,11 +123,12 @@ export function RemoteConnectionsPage({
           aria-live="polite"
           className="codex-ui-remote-connections__status"
           data-status={status}
+          id={statusId}
           role={status === "error" ? "alert" : "status"}
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">Retry</button>
+            <button disabled={disabled} onClick={onRetry} type="button">Retry</button>
           ) : null}
         </div>
       ) : null}
@@ -131,7 +140,7 @@ export function RemoteConnectionsPage({
           data-status={formStatus}
           onSubmit={(event) => {
             event.preventDefault();
-            if (!formBusy) onSave?.();
+            if (!formLocked) onSave?.();
           }}
         >
           <div className="codex-ui-remote-connections__form-header">
@@ -140,7 +149,7 @@ export function RemoteConnectionsPage({
               <p>Keep credentials in the host; only the connection label is rendered here.</p>
             </div>
             {onCancelForm ? (
-              <button aria-label="Close connection editor" onClick={onCancelForm} type="button">×</button>
+              <button aria-label="Close connection editor" disabled={formLocked} onClick={onCancelForm} type="button">×</button>
             ) : null}
           </div>
           {formStatus !== "idle" ? (
@@ -151,7 +160,7 @@ export function RemoteConnectionsPage({
             >
               <span>{resolvedFormStatusMessage}</span>
               {formStatus === "error" && onFormRetry ? (
-                <button onClick={onFormRetry} type="button">
+                <button disabled={disabled} onClick={onFormRetry} type="button">
                   {formRetryLabel}
                 </button>
               ) : null}
@@ -159,22 +168,22 @@ export function RemoteConnectionsPage({
           ) : null}
           <label>
             <span>Connection name</span>
-            <input aria-label="Connection name" disabled={formBusy} onChange={(event) => updateForm("label", event.target.value)} value={formValue.label} />
+            <input aria-label="Connection name" disabled={formLocked} onChange={(event) => updateForm("label", event.target.value)} value={formValue.label} />
           </label>
           <label>
             <span>Type</span>
-            <select aria-label="Connection type" disabled={formBusy} onChange={(event) => updateForm("kind", event.target.value)} value={formValue.kind}>
+            <select aria-label="Connection type" disabled={formLocked} onChange={(event) => updateForm("kind", event.target.value)} value={formValue.kind}>
               <option value="ssh">SSH</option>
               <option value="device">Device</option>
             </select>
           </label>
           <label>
             <span>Host or device</span>
-            <input aria-label="Host or device" disabled={formBusy} onChange={(event) => updateForm("detail", event.target.value)} placeholder="host.example.com" value={formValue.detail} />
+            <input aria-label="Host or device" disabled={formLocked} onChange={(event) => updateForm("detail", event.target.value)} placeholder="host.example.com" value={formValue.detail} />
           </label>
           <footer>
-            {onCancelForm ? <button onClick={onCancelForm} type="button">Cancel</button> : null}
-            <button className="codex-ui-remote-connections__primary" disabled={formBusy} type="submit">
+            {onCancelForm ? <button disabled={formLocked} onClick={onCancelForm} type="button">Cancel</button> : null}
+            <button className="codex-ui-remote-connections__primary" disabled={formLocked} type="submit">
               {formBusy ? formSavingLabel : "Save connection"}
             </button>
           </footer>
@@ -199,9 +208,9 @@ export function RemoteConnectionsPage({
                 </div>
                 <span className="codex-ui-remote-connections__row-status">{connection.status === "connected" ? "Connected" : connection.status === "connecting" ? "Connecting…" : connection.status === "error" ? "Needs attention" : "Disconnected"}</span>
                 <div className="codex-ui-remote-connections__row-actions">
-                  {onTest ? <button onClick={() => onTest(connection)} type="button">Test</button> : null}
-                  {onEdit ? <button onClick={() => onEdit(connection)} type="button">Edit</button> : null}
-                  {onForget ? <button onClick={() => onForget(connection)} type="button">Forget</button> : null}
+                  {onTest ? <button disabled={pageLocked} onClick={() => onTest(connection)} type="button">Test</button> : null}
+                  {onEdit ? <button disabled={pageLocked} onClick={() => onEdit(connection)} type="button">Edit</button> : null}
+                  {onForget ? <button disabled={pageLocked} onClick={() => onForget(connection)} type="button">Forget</button> : null}
                 </div>
               </article>
             ))
