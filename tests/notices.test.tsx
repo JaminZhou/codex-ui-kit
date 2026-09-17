@@ -24,7 +24,7 @@ describe("StatusBanner", () => {
   });
 
   it("renders the measured tone, layout, content, and status semantics", () => {
-    render(
+    const { container } = render(
       <StatusBanner
         aria-live="polite"
         heading="Workspace access changed"
@@ -128,6 +128,30 @@ describe("StatusBanner", () => {
     expect(
       container.querySelector(".codex-ui-status-banner__icon"),
     ).toBeNull();
+  });
+
+  it("locks built-in status-banner actions while disabled", () => {
+    const onRetry = vi.fn();
+    const onDismiss = vi.fn();
+    const { container } = render(
+      <StatusBanner
+        actions={[{ label: "Try again", onClick: onRetry }]}
+        disabled
+        onDismiss={onDismiss}
+      >
+        Connection unavailable.
+      </StatusBanner>,
+    );
+
+    const banner = container.querySelector(".codex-ui-status-banner");
+    expect(banner?.getAttribute("aria-disabled")).toBe("true");
+    expect(banner?.getAttribute("data-disabled")).toBe("true");
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(onRetry).not.toHaveBeenCalled();
+    expect(onDismiss).not.toHaveBeenCalled();
   });
 });
 
@@ -283,6 +307,30 @@ describe("StreamNotice", () => {
     expect(
       screen.queryByRole("button", { name: "Show connection details" }),
     ).toBeNull();
+  });
+
+  it("locks stream details and retry while disabled", () => {
+    const onExpandedChange = vi.fn();
+    const onRetry = vi.fn();
+    render(
+      <StreamNotice
+        additionalDetails="connection details"
+        disabled
+        onExpandedChange={onExpandedChange}
+        onRetry={onRetry}
+        status="failed"
+      />,
+    );
+
+    const notice = screen.getByRole("alert");
+    expect(notice.getAttribute("aria-disabled")).toBe("true");
+    expect(notice.getAttribute("data-disabled")).toBe("true");
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(onExpandedChange).not.toHaveBeenCalled();
+    expect(onRetry).not.toHaveBeenCalled();
   });
 });
 

@@ -29,6 +29,7 @@ export interface StatusBannerProps
   actions?: StatusBannerAction[];
   children?: ReactNode;
   customActions?: ReactNode;
+  disabled?: boolean;
   dismissLabel?: string;
   heading?: ReactNode;
   icon?: ReactNode;
@@ -108,6 +109,7 @@ export function StatusBanner({
   children,
   className,
   customActions,
+  disabled = false,
   dismissLabel = "Dismiss",
   heading,
   icon,
@@ -138,8 +140,10 @@ export function StatusBanner({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={classes}
       data-layout={layout}
+      data-disabled={disabled || undefined}
       data-stack-on-narrow={stackOnNarrow || undefined}
       data-tone={tone}
       {...props}
@@ -167,9 +171,11 @@ export function StatusBanner({
                   aria-busy={action.loading || undefined}
                   className="codex-ui-notice-action"
                   data-variant={action.variant ?? "secondary"}
-                  disabled={action.disabled || action.loading}
+                  disabled={disabled || action.disabled || action.loading}
                   key={action.id ?? index}
-                  onClick={action.onClick}
+                  onClick={(event) => {
+                    if (!disabled) action.onClick?.(event);
+                  }}
                   type="button"
                 >
                   {action.loading ? <LoadingIndicator /> : null}
@@ -181,7 +187,10 @@ export function StatusBanner({
                 aria-label={dismissLabel}
                 className="codex-ui-notice-action codex-ui-status-banner__dismiss"
                 data-variant="ghost"
-                onClick={onDismiss}
+                disabled={disabled}
+                onClick={(event) => {
+                  if (!disabled) onDismiss(event);
+                }}
                 title={dismissLabel}
                 type="button"
               >
@@ -318,6 +327,7 @@ export interface StreamNoticeProps
   additionalDetails?: ReactNode;
   children?: ReactNode;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   detailsLabel?: string;
   expanded?: boolean;
   icon?: ReactNode;
@@ -335,6 +345,7 @@ export function StreamNotice({
   children,
   className,
   defaultExpanded = false,
+  disabled = false,
   detailsLabel = "Show connection details",
   expanded,
   icon,
@@ -372,6 +383,7 @@ export function StreamNotice({
     .join(" ");
 
   function setExpanded(next: boolean) {
+    if (disabled) return;
     if (expanded === undefined) setInternalExpanded(next);
     onExpandedChange?.(next);
   }
@@ -379,8 +391,10 @@ export function StreamNotice({
   return (
     <div
       aria-live={status === "reconnecting" ? "polite" : undefined}
+      aria-disabled={disabled || undefined}
       className={classes}
       data-expanded={isExpanded || undefined}
+      data-disabled={disabled || undefined}
       data-status={status}
       role={status === "failed" ? "alert" : "status"}
       {...props}
@@ -406,6 +420,7 @@ export function StreamNotice({
             aria-expanded={isExpanded}
             aria-label={detailsLabel}
             className="codex-ui-stream-notice__toggle"
+            disabled={disabled}
             onClick={() => setExpanded(!isExpanded)}
             title={detailsLabel}
             type="button"
@@ -416,7 +431,10 @@ export function StreamNotice({
         {status === "failed" && onRetry ? (
           <button
             className="codex-ui-stream-notice__retry"
-            onClick={onRetry}
+            disabled={disabled}
+            onClick={(event) => {
+              if (!disabled) onRetry(event);
+            }}
             type="button"
           >
             {retryLabel}
