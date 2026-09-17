@@ -227,6 +227,7 @@ export interface CodeBlockProps
   copyLabel?: ReactNode;
   copyable?: boolean;
   deferHighlightUntilVisible?: boolean;
+  disabled?: boolean;
   language?: string;
   languageIcon?: ReactNode;
   label?: ReactNode;
@@ -480,6 +481,7 @@ export function CodeBlock({
   copyLabel = <CodeCopyIcon />,
   copyable = true,
   deferHighlightUntilVisible = true,
+  disabled = false,
   language,
   languageIcon,
   label,
@@ -655,6 +657,7 @@ export function CodeBlock({
   }, [wrap]);
 
   const handleCopy = async () => {
+    if (disabled) return;
     try {
       if (onCopy) {
         await onCopy(normalizedCode);
@@ -674,6 +677,7 @@ export function CodeBlock({
   };
 
   const handleWrapChange = () => {
+    if (disabled) return;
     const next = !resolvedWrap;
     setWrapped(next);
     onWrapChange?.(next);
@@ -681,11 +685,13 @@ export function CodeBlock({
 
   return (
     <figure
+      aria-disabled={disabled || undefined}
       ref={containerRef}
       className={classes}
       data-language={language}
       data-markdown-copy="code-block"
       data-markdown-copy-text={normalizedCode}
+      data-disabled={disabled || undefined}
       data-wrap={resolvedWrap || undefined}
       {...props}
     >
@@ -709,6 +715,7 @@ export function CodeBlock({
                 }
                 aria-pressed={resolvedWrap}
                 className="codex-ui-code-block__wrap"
+                disabled={disabled}
                 onClick={handleWrapChange}
                 type="button"
               >
@@ -720,6 +727,7 @@ export function CodeBlock({
                 aria-label={accessibleCopyLabel}
                 className="codex-ui-code-block__copy"
                 data-copied={copied || undefined}
+                disabled={disabled}
                 onClick={() => void handleCopy()}
                 type="button"
               >
