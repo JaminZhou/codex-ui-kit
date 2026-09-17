@@ -237,6 +237,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   one selected route, reusable expandable project/task groups,
   heading-preserving collapsible collections, lifecycle status, measured
   action columns, and an in-flow footer slot that cannot cover navigation.
+  Section, project-group, and bounded-collection controls accept a host-wide
+  disabled lock for route transitions; row-level action slots remain
+  host-owned.
   `AppSidebarFooter.renderAccountTrigger` lets a host wrap the component-owned
   account button in one `Menu` or other overlay element without duplicating its
   markup or shrinking the flexible account hit area.
@@ -420,7 +423,7 @@ kit never performs filesystem, network, account, or process mutations.
 - `AppSidebarCollection` and `AppSidebarCollectionState`: reusable grouped
   sidebar collections and loading/empty/error state rows. `items`, `status`,
   `onRetry`, and action slots are controlled; the collection does not fetch or
-  persist history.
+  persist history. Its disabled lock covers the bounded Show more transition.
 - `BrowserWorkspacePanel`: controlled browser-tab shell with active tab,
   close/open/expand callbacks, toolbar slots, and host-owned page content.
   It does not navigate, authenticate, download, or execute page scripts.
