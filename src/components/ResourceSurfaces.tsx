@@ -189,6 +189,7 @@ export interface ResourceListProps {
   children?: ReactNode;
   className?: string;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   expandLabel?: (remaining: number) => ReactNode;
   initialVisibleCount?: number;
 }
@@ -197,6 +198,7 @@ export function ResourceList({
   children,
   className,
   defaultExpanded = false,
+  disabled = false,
   expandLabel = (remaining) => `Show ${remaining} more`,
   initialVisibleCount = 3,
 }: ResourceListProps) {
@@ -210,13 +212,18 @@ export function ResourceList({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-resource-list", className].filter(Boolean).join(" ")}
+      data-disabled={disabled || undefined}
     >
       <div className="codex-ui-resource-list__items">{visibleItems}</div>
       {remaining > 0 ? (
         <button
           className="codex-ui-resource-list__expand"
-          onClick={() => setExpanded(true)}
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) setExpanded(true);
+          }}
           type="button"
         >
           {expandLabel(remaining)}
@@ -240,6 +247,7 @@ export interface ArtifactListProps extends ResourceListProps {
 
 export function ArtifactList({
   children,
+  disabled = false,
   emptyLabel = "No artifacts yet",
   errorLabel = "Artifacts unavailable",
   loadingLabel = "Loading artifacts…",
@@ -258,11 +266,13 @@ export function ArtifactList({
   return (
     <section
       aria-busy={isLoading || undefined}
+      aria-disabled={disabled || undefined}
       aria-label="Artifacts"
       className={["codex-ui-artifact-list", className]
         .filter(Boolean)
         .join(" ")}
       data-status={status}
+      data-disabled={disabled || undefined}
     >
       {isLoading ? (
         <div
@@ -279,7 +289,13 @@ export function ArtifactList({
           <strong>{errorLabel}</strong>
           {statusMessage ? <span>{statusMessage}</span> : null}
           {onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
@@ -289,7 +305,9 @@ export function ArtifactList({
           {emptyLabel}
         </p>
       ) : (
-        <ResourceList {...resourceListProps}>{children}</ResourceList>
+        <ResourceList {...resourceListProps} disabled={disabled}>
+          {children}
+        </ResourceList>
       )}
     </section>
   );
@@ -314,6 +332,7 @@ export type SourceListStatus = "empty" | "error" | "loading" | "ready";
 export interface SourceListProps {
   className?: string;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   emptyLabel?: ReactNode;
   errorLabel?: ReactNode;
   items: SourceItem[];
@@ -337,6 +356,7 @@ const sourceGlyphs: Record<SourceKind, string> = {
 export function SourceList({
   className,
   defaultExpanded = false,
+  disabled = false,
   emptyLabel = "No sources yet",
   errorLabel = "Sources unavailable",
   items,
@@ -359,14 +379,22 @@ export function SourceList({
   return (
     <section
       aria-busy={isLoading || undefined}
+      aria-disabled={disabled || undefined}
       aria-label={typeof title === "string" ? title : "Sources"}
       className={["codex-ui-source-list", className].filter(Boolean).join(" ")}
       data-status={status}
+      data-disabled={disabled || undefined}
     >
       <div className="codex-ui-source-list__header">
         <h3>{title}</h3>
         {showItems && !expanded && items.length > visibleItems.length ? (
-          <button onClick={() => setExpanded(true)} type="button">
+          <button
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) setExpanded(true);
+            }}
+            type="button"
+          >
             {viewAllLabel}
           </button>
         ) : null}
@@ -386,7 +414,13 @@ export function SourceList({
           <strong>{errorLabel}</strong>
           {statusMessage ? <span>{statusMessage}</span> : null}
           {onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
@@ -398,7 +432,7 @@ export function SourceList({
       ) : (
         <ol className="codex-ui-source-list__items">
           {visibleItems.map((item) => {
-            const interactive = Boolean(item.href || item.onOpen);
+            const interactive = !disabled && Boolean(item.href || item.onOpen);
             const content = (
               <>
                 <span className="codex-ui-source-list__visual" aria-hidden="true">
@@ -423,7 +457,7 @@ export function SourceList({
             );
             return (
               <li key={item.id}>
-                {item.href ? (
+                {item.href && !disabled ? (
                   <a
                     aria-label={item.openLabel}
                     href={item.href}
@@ -434,7 +468,10 @@ export function SourceList({
                 ) : item.onOpen ? (
                   <button
                     aria-label={item.openLabel}
-                    onClick={item.onOpen}
+                    disabled={disabled}
+                    onClick={() => {
+                      if (!disabled) item.onOpen?.();
+                    }}
                     type="button"
                   >
                     {content}
@@ -478,6 +515,7 @@ export interface SourceSearchActivityProps {
   className?: string;
   countLabel?: ReactNode;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   expanded?: boolean;
   leading?: ReactNode;
   onExpandedChange?: (expanded: boolean) => void;
@@ -489,6 +527,7 @@ export function SourceSearchActivity({
   className,
   countLabel,
   defaultExpanded = false,
+  disabled = false,
   expanded,
   leading,
   onExpandedChange,
@@ -501,15 +540,18 @@ export function SourceSearchActivity({
   const resolvedCountLabel =
     countLabel ?? `Searched ${queries.length} ${queries.length === 1 ? "time" : "times"}`;
   const setExpanded = (nextExpanded: boolean) => {
+    if (disabled) return;
     if (expanded === undefined) setInternalExpanded(nextExpanded);
     onExpandedChange?.(nextExpanded);
   };
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-source-search-activity", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-leading={leading ? true : undefined}
     >
       {leading ? (
@@ -526,6 +568,7 @@ export function SourceSearchActivity({
           aria-controls={contentId}
           aria-expanded={isExpanded}
           className="codex-ui-source-search-activity__trigger"
+          disabled={disabled}
           onClick={() => setExpanded(!isExpanded)}
           type="button"
         >

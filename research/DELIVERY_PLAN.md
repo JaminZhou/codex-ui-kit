@@ -976,6 +976,9 @@ ownership.
 CommandExecution and CommandOutput now expose the same boundary for command
 disclosure, command/output copy, and internal output rendering while leaving
 host-provided child surfaces explicitly host-owned.
+ResourceList, ArtifactList, SourceList, and SourceSearchActivity now expose the
+same boundary for progressive reveal, retry, source opening, and query
+expansion; static or caller-provided child content remains host-owned.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

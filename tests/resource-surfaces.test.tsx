@@ -253,6 +253,24 @@ describe("resource surfaces", () => {
     expect(screen.getAllByText(/Artifact/)).toHaveLength(5);
   });
 
+  it("locks resource-list expansion while disabled", () => {
+    render(
+      <ResourceList disabled>
+        {Array.from({ length: 5 }, (_, index) => (
+          <ResourceCard key={index} title={`Artifact ${index + 1}`} />
+        ))}
+      </ResourceList>,
+    );
+
+    const list = document.querySelector(".codex-ui-resource-list");
+    expect(list?.getAttribute("aria-disabled")).toBe("true");
+    expect(list?.getAttribute("data-disabled")).toBe("true");
+    const expand = screen.getByRole("button", { name: "Show 2 more" });
+    expect(expand).toHaveProperty("disabled", true);
+    fireEvent.click(expand);
+    expect(screen.getAllByText(/Artifact/)).toHaveLength(3);
+  });
+
   it("preserves the observed artifact empty state", () => {
     render(<ArtifactList />);
     expect(screen.getByText("No artifacts yet")).toBeTruthy();
@@ -296,6 +314,19 @@ describe("resource surfaces", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it("locks artifact retry while disabled", () => {
+    const onRetry = vi.fn();
+    render(<ArtifactList disabled onRetry={onRetry} status="error" />);
+
+    const region = screen.getByRole("region", { name: "Artifacts" });
+    expect(region.getAttribute("aria-disabled")).toBe("true");
+    expect(region.getAttribute("data-disabled")).toBe("true");
+    const retry = screen.getByRole("button", { name: "Retry" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
   });
 
   it("keeps source loading, empty, and error recovery explicit", () => {
@@ -369,6 +400,35 @@ describe("resource surfaces", () => {
     expect(onOpen).toHaveBeenCalledOnce();
   });
 
+  it("locks source expansion and item opening while disabled", () => {
+    const onOpen = vi.fn();
+    render(
+      <SourceList
+        disabled
+        items={[
+          { id: "source-1", onOpen, title: "Source 1" },
+          { id: "source-2", onOpen, title: "Source 2" },
+          { id: "source-3", onOpen, title: "Source 3" },
+          { id: "source-4", onOpen, title: "Source 4" },
+        ]}
+        visibleLimit={2}
+      />,
+    );
+
+    const region = screen.getByRole("region", { name: "Sources" });
+    expect(region.getAttribute("aria-disabled")).toBe("true");
+    expect(region.getAttribute("data-disabled")).toBe("true");
+    const viewAll = screen.getByRole("button", { name: "View all" });
+    expect(viewAll).toHaveProperty("disabled", true);
+    fireEvent.click(viewAll);
+    expect(screen.getAllByRole("button", { name: /Source/ })).toHaveLength(2);
+
+    const source = screen.getByRole("button", { name: "Source 1" });
+    expect(source).toHaveProperty("disabled", true);
+    fireEvent.click(source);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
   it("expands an observed source-search activity in uncontrolled mode", () => {
     render(
       <SourceActivityList>
@@ -412,6 +472,28 @@ describe("resource surfaces", () => {
       />,
     );
     expect(screen.getByText("controlled query")).toBeTruthy();
+  });
+
+  it("locks source-search expansion while disabled", () => {
+    const onExpandedChange = vi.fn();
+    render(
+      <SourceSearchActivity
+        disabled
+        onExpandedChange={onExpandedChange}
+        queries={["blocked query"]}
+      />,
+    );
+
+    const activity = document.querySelector(
+      ".codex-ui-source-search-activity",
+    );
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    expect(activity?.getAttribute("data-disabled")).toBe("true");
+    const trigger = screen.getByRole("button", { name: "Searched 1 time" });
+    expect(trigger).toHaveProperty("disabled", true);
+    fireEvent.click(trigger);
+    expect(onExpandedChange).not.toHaveBeenCalled();
+    expect(screen.queryByText("blocked query")).toBeNull();
   });
 });
 
