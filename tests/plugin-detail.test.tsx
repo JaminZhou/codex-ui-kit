@@ -149,6 +149,54 @@ describe("PluginDetail", () => {
     ).toHaveProperty("disabled", false);
   });
 
+  it("exposes controlled app connection progress and retryable failure", () => {
+    const onAppOpen = vi.fn();
+    const onAppRetry = vi.fn();
+    const connectingApp = {
+      id: "slack",
+      status: "connecting" as const,
+      title: "Slack",
+    };
+    const { rerender } = render(
+      <PluginDetailPage
+        apps={[connectingApp]}
+        onAppOpen={onAppOpen}
+        title="Workspace tools"
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain("Connecting…");
+    expect(screen.getByRole("button", { name: "Open Slack" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Open Slack" }));
+    expect(onAppOpen).not.toHaveBeenCalled();
+
+    rerender(
+      <PluginDetailPage
+        appRetryLabel="Reconnect"
+        apps={[
+          {
+            ...connectingApp,
+            status: "error",
+            statusLabel: "Slack needs authorization.",
+          },
+        ]}
+        onAppRetry={onAppRetry}
+        title="Workspace tools"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Slack needs authorization.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Reconnect" }));
+    expect(onAppRetry).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Open Slack" })).toHaveProperty(
+      "disabled",
+      false,
+    );
+  });
+
   it("exposes information links and privacy disclosure", () => {
     render(
       <PluginDetailPage

@@ -12587,7 +12587,7 @@ summary.codex-ui-activity__header::after {
   border-radius: 0.75rem;
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto auto;
   flex: 0 0 auto;
   min-height: 3.3828125rem;
   padding: 0.3125rem 0.5rem;
@@ -12641,6 +12641,39 @@ summary.codex-ui-activity__header::after {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.codex-ui-plugin-detail__app-status {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  max-width: 10rem;
+  overflow: hidden;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codex-ui-plugin-detail__app-list article[data-status="error"]
+  .codex-ui-plugin-detail__app-status {
+  color: var(--codex-ui-danger);
+}
+
+.codex-ui-plugin-detail__app-retry {
+  background: transparent;
+  border: 0;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding: 0;
+  position: relative;
+  white-space: nowrap;
+}
+
+.codex-ui-plugin-detail__app-open:disabled {
+  cursor: wait;
 }
 
 .codex-ui-plugin-detail__connection {
