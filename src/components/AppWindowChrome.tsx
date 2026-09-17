@@ -48,6 +48,7 @@ export interface AppWindowChromeAction
 export interface AppWindowChromeProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   backAction?: AppWindowChromeAction;
+  disabled?: boolean;
   endActions?: ReactNode;
   forwardAction?: AppWindowChromeAction;
   sidebarAction?: AppWindowChromeAction;
@@ -82,6 +83,7 @@ function WindowChromeAction({
 export function AppWindowChrome({
   backAction,
   className,
+  disabled = false,
   endActions,
   forwardAction,
   sidebarAction,
@@ -90,13 +92,25 @@ export function AppWindowChrome({
   ...props
 }: AppWindowChromeProps) {
   const resolvedSidebarAction = sidebarAction
-    ? { icon: <SidebarIcon />, ...sidebarAction }
+    ? {
+        icon: <SidebarIcon />,
+        ...sidebarAction,
+        disabled: disabled || sidebarAction.disabled,
+      }
     : undefined;
   const resolvedBackAction = backAction
-    ? { icon: <BackIcon />, ...backAction }
+    ? {
+        icon: <BackIcon />,
+        ...backAction,
+        disabled: disabled || backAction.disabled,
+      }
     : undefined;
   const resolvedForwardAction = forwardAction
-    ? { icon: <ForwardIcon />, ...forwardAction }
+    ? {
+        icon: <ForwardIcon />,
+        ...forwardAction,
+        disabled: disabled || forwardAction.disabled,
+      }
     : undefined;
 
   return (
@@ -108,6 +122,8 @@ export function AppWindowChrome({
         .filter(Boolean)
         .join(" ")}
       data-codex-ui-drag-region
+      data-disabled={disabled || undefined}
+      aria-disabled={disabled || undefined}
       {...props}
     >
       <div className="codex-ui-app-window-chrome__navigation">

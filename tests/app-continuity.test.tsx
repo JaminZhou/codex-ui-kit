@@ -60,6 +60,34 @@ describe("AppWindowChrome", () => {
     expect(onSidebar).toHaveBeenCalledOnce();
     expect(onBack).toHaveBeenCalledOnce();
   });
+
+  it("locks window navigation during a host-owned route transition", () => {
+    const onSidebar = vi.fn();
+    const onBack = vi.fn();
+    const onForward = vi.fn();
+    render(
+      <AppWindowChrome
+        backAction={{ label: "Back", onClick: onBack }}
+        disabled
+        forwardAction={{ label: "Forward", onClick: onForward }}
+        sidebarAction={{ label: "Hide sidebar", onClick: onSidebar }}
+      />,
+    );
+
+    const chrome = screen.getByRole("banner");
+    expect(chrome.getAttribute("aria-disabled")).toBe("true");
+    expect(chrome.getAttribute("data-disabled")).toBe("true");
+    for (const label of ["Hide sidebar", "Back", "Forward"]) {
+      expect(screen.getByRole("button", { name: label })).toHaveProperty(
+        "disabled",
+        true,
+      );
+      fireEvent.click(screen.getByRole("button", { name: label }));
+    }
+    expect(onSidebar).not.toHaveBeenCalled();
+    expect(onBack).not.toHaveBeenCalled();
+    expect(onForward).not.toHaveBeenCalled();
+  });
 });
 
 describe("AppServerCrashRecovery", () => {
