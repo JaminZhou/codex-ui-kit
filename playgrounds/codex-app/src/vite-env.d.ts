@@ -3,6 +3,7 @@
 import type { JsonRpcNotification } from "@jaminzhou/codex-app-server-client";
 import type { ProtocolEventRecord } from "./protocol-state";
 import type { LiveTerminalEvent } from "../electron/live-terminal";
+import type { LiveBackgroundTerminal } from "../electron/live-background-terminals";
 
 interface CodexDemoBridge {
   previewCommit(input: { projectToken: string }): Promise<import("../electron/git-commit-preview").GitCommitPreview>;
@@ -108,6 +109,9 @@ interface CodexDemoBridge {
   }): Promise<void>;
   listLiveThreads(input: { projectToken: string; cursor?: string; archived?: boolean }): Promise<{ threads: Array<{ id: string; title: string; updatedAt: number }>; nextCursor: string | null; archivedThreadIds: string[] }>;
   readLiveThread(input: { projectToken: string; threadId: string }): Promise<{ threadId: string; turns: import("./live-history-state").StoredLiveTurn[] }>;
+  listLiveBackgroundTerminals(input: { projectToken: string; threadId: string }): Promise<LiveBackgroundTerminal[]>;
+  terminateLiveBackgroundTerminal(input: { projectToken: string; threadId: string; processId: string }): Promise<{ terminated: boolean }>;
+  cleanLiveBackgroundTerminals(input: { projectToken: string; threadId: string }): Promise<Record<string, never>>;
   startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan"; threadId?: string | null }): Promise<{
     threadId: string;
     turnId: string;
