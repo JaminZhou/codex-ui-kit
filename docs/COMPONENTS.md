@@ -55,11 +55,14 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 ## Agent activity
 
 - `AgentActivity`: accessible expandable activity primitive.
-- `ActivityTimeline`: controlled or uncontrolled turn-level disclosure with persistent and historical content slots.
+- `ActivityTimeline`: controlled or uncontrolled turn-level disclosure with persistent and historical content slots; a disabled lock covers the timeline toggle.
 - `TurnDuration`: working, completed, and user-stopped duration language. `formatTurnDuration` exposes the same protocol-neutral formatter.
-- `AgentReasoning`: active and completed reasoning disclosure states.
-- `AgentPlan`: structured pending, in-progress, and completed plan steps.
-- `ProposedPlan`: writing and completed plan-card states with host-owned actions.
+- `AgentReasoning`: active and completed reasoning disclosure states with a
+  disabled lock for the disclosure boundary.
+- `AgentPlan`: structured pending, in-progress, and completed plan steps with a
+  disabled lock for plan disclosure.
+- `ProposedPlan`: writing and completed plan-card states with host-owned actions
+  and a disabled lock for built-in copy, download, and disclosure controls.
 - `SearchActivity`: code-search and grouped web-search states with controlled
   disclosure, bounded results, and a disabled lock for disclosure/result actions.
 - `BrowserActivity`: running, completed, and failed Browser disclosures with

@@ -10,6 +10,7 @@ export interface ActivityTimelineProps
   children?: ReactNode;
   collapsedCount?: number;
   defaultOpen?: boolean;
+  disabled?: boolean;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
   persistentContent?: ReactNode;
@@ -28,6 +29,7 @@ export function ActivityTimeline({
   className,
   collapsedCount = 0,
   defaultOpen = false,
+  disabled = false,
   onOpenChange,
   open,
   persistentContent,
@@ -48,14 +50,17 @@ export function ActivityTimeline({
   const resolvedSummary = summary ?? previousMessageSummary(collapsedCount);
 
   const setOpen = (nextOpen: boolean) => {
+    if (disabled) return;
     if (open === undefined) setInternalOpen(nextOpen);
     onOpenChange?.(nextOpen);
   };
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={classes}
       data-expanded={resolvedOpen || undefined}
+      data-disabled={disabled || undefined}
       data-show-toggle={showToggle || undefined}
       {...props}
     >
@@ -70,6 +75,7 @@ export function ActivityTimeline({
             aria-controls={contentId}
             aria-expanded={resolvedOpen}
             className="codex-ui-activity-timeline__toggle"
+            disabled={disabled}
             onClick={() => setOpen(!resolvedOpen)}
             type="button"
           >

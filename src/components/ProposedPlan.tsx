@@ -19,6 +19,7 @@ export interface ProposedPlanProps
   copiedLabel?: string;
   copyLabel?: string;
   defaultCollapsed?: boolean;
+  disabled?: boolean;
   downloadLabel?: string;
   expandLabel?: string;
   onCollapsedChange?: (collapsed: boolean) => void;
@@ -78,6 +79,7 @@ export function ProposedPlan({
   copiedLabel = "Copied",
   copyLabel = "Copy plan",
   defaultCollapsed,
+  disabled = false,
   downloadLabel = "Download plan",
   expandLabel = "Expand plan summary",
   onCollapsedChange,
@@ -113,11 +115,13 @@ export function ProposedPlan({
   );
 
   const setCollapsed = (nextCollapsed: boolean) => {
+    if (disabled) return;
     if (collapsed === undefined) setInternalCollapsed(nextCollapsed);
     onCollapsedChange?.(nextCollapsed);
   };
 
   const handleCopy = async () => {
+    if (disabled) return;
     if (!onCopy) return;
 
     try {
@@ -135,8 +139,10 @@ export function ProposedPlan({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={classes}
       data-collapsed={resolvedCollapsed || undefined}
+      data-disabled={disabled || undefined}
       data-status={status}
       {...props}
     >
@@ -149,7 +155,10 @@ export function ProposedPlan({
             <button
               aria-label={downloadLabel}
               className="codex-ui-proposed-plan__action"
-              onClick={onDownload}
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onDownload();
+              }}
               title={downloadLabel}
               type="button"
             >
@@ -161,6 +170,7 @@ export function ProposedPlan({
               aria-label={copied ? copiedLabel : copyLabel}
               className="codex-ui-proposed-plan__action"
               data-copied={copied || undefined}
+              disabled={disabled}
               onClick={() => void handleCopy()}
               title={copied ? copiedLabel : copyLabel}
               type="button"
@@ -173,6 +183,7 @@ export function ProposedPlan({
             aria-expanded={!resolvedCollapsed}
             aria-label={resolvedCollapsed ? expandLabel : collapseLabel}
             className="codex-ui-proposed-plan__action codex-ui-proposed-plan__toggle"
+            disabled={disabled}
             onClick={() => setCollapsed(!resolvedCollapsed)}
             type="button"
           >
