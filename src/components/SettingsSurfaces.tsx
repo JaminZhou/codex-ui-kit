@@ -553,8 +553,11 @@ export interface HookSettingsLoadIssue {
 
 export interface HooksSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  errorHeading?: ReactNode;
+  errorMessage?: ReactNode;
   entries?: readonly HookSettingsEntry[];
   learnMoreHref?: string;
+  loadingLabel?: ReactNode;
   loadIssues?: readonly HookSettingsLoadIssue[];
   onOpenConfig?: (entry: HookSettingsEntry) => void;
   onReload?: () => void;
@@ -562,6 +565,7 @@ export interface HooksSettingsPageProps
   onTrustHook?: (entry: HookSettingsEntry) => void;
   refreshing?: boolean;
   reloadIcon?: ReactNode;
+  retryLabel?: ReactNode;
   status?: HooksSettingsStatus;
 }
 
@@ -648,11 +652,11 @@ function hookSourceIdentity(entry: HookSettingsEntry) {
   return hookSourceLabel(entry);
 }
 
-function HooksLoadingState() {
+function HooksLoadingState({ label }: { label: ReactNode }) {
   return (
     <div className="codex-ui-hooks-settings__loading" role="status">
       <span aria-hidden="true" />
-      <span>Loading hooks…</span>
+      <span>{label}</span>
     </div>
   );
 }
@@ -667,11 +671,13 @@ function HooksEmptyState() {
 }
 
 function HookEntryDetails({
+  disabled = false,
   entry,
   onOpenConfig,
   onToggleHookEnabled,
   onTrustHook,
 }: {
+  disabled?: boolean;
   entry: HookSettingsEntry;
   onOpenConfig?: (entry: HookSettingsEntry) => void;
   onToggleHookEnabled?: (entry: HookSettingsEntry, enabled: boolean) => void;
@@ -707,7 +713,7 @@ function HookEntryDetails({
             aria-checked={entry.enabled}
             aria-label={`${entry.title ?? hookEventCopy[entry.event].label} enabled`}
             className="codex-ui-hooks-settings__switch"
-            disabled={entry.managed || needsTrust || !onToggleHookEnabled}
+            disabled={disabled || entry.managed || needsTrust || !onToggleHookEnabled}
             onClick={(event) => {
               event.preventDefault();
               onToggleHookEnabled?.(entry, !entry.enabled);
@@ -744,11 +750,11 @@ function HookEntryDetails({
         ) : null}
         <div className="codex-ui-hooks-settings__entry-actions">
           {needsTrust ? (
-            <button disabled={!onTrustHook} onClick={() => onTrustHook?.(entry)} type="button">
+            <button disabled={disabled || !onTrustHook} onClick={() => onTrustHook?.(entry)} type="button">
               Trust
             </button>
           ) : null}
-          <button disabled={!onOpenConfig} onClick={() => onOpenConfig?.(entry)} type="button">
+          <button disabled={disabled || !onOpenConfig} onClick={() => onOpenConfig?.(entry)} type="button">
             Open config file
           </button>
         </div>
@@ -759,8 +765,11 @@ function HookEntryDetails({
 
 export function HooksSettingsPage({
   className,
+  errorHeading = "Could not load hooks",
+  errorMessage = "Hooks can run outside of the sandbox so we ask you to review any recently installed or modified hooks",
   entries = [],
   learnMoreHref,
+  loadingLabel = "Loading hooks…",
   loadIssues = [],
   onOpenConfig,
   onReload,
@@ -768,6 +777,7 @@ export function HooksSettingsPage({
   onTrustHook,
   refreshing = false,
   reloadIcon,
+  retryLabel = "Retry",
   status = "ready",
   ...props
 }: HooksSettingsPageProps) {
@@ -797,6 +807,7 @@ export function HooksSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || refreshing || undefined}
       className={["codex-ui-hooks-settings", className]
         .filter(Boolean)
         .join(" ")}
@@ -828,22 +839,19 @@ export function HooksSettingsPage({
         </button>
       </header>
       {status === "loading" ? (
-        <HooksLoadingState />
+        <HooksLoadingState label={loadingLabel} />
       ) : status === "error" ? (
         <section className="codex-ui-hooks-settings__error" role="alert">
           <div>
-            <strong>Could not load hooks</strong>
-            <span>
-              Hooks can run outside of the sandbox so we ask you to review any
-              recently installed or modified hooks
-            </span>
+            <strong>{errorHeading}</strong>
+            <span>{errorMessage}</span>
           </div>
           <button
             disabled={!onReload || refreshing}
             onClick={onReload}
             type="button"
           >
-            Retry
+            {retryLabel}
           </button>
         </section>
       ) : groupedSources.length === 0 && loadIssues.length === 0 ? (
@@ -871,6 +879,7 @@ export function HooksSettingsPage({
                       </header>
                       {sourceEntries.map((entry) => (
                         <HookEntryDetails
+                          disabled={refreshing}
                           entry={entry}
                           key={entry.id}
                           onOpenConfig={onOpenConfig}
