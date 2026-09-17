@@ -323,9 +323,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `PluginDetailPage`: responsive installed/discovery detail shell with
   host-supplied artwork and hero backdrop, prompt suggestions, app rows,
   information links, privacy disclosure, controlled install progress/error/
-  retry state, and controlled actions, uninstall, reconnect, and disconnect
-  menus. The component emits callbacks only; hosts own clipboard, navigation,
-  installation, connection, permission, OAuth, and persistence effects.
+  retry state, per-app connecting/disconnecting/error/retry state, and
+  controlled actions, uninstall, reconnect, and disconnect menus. The
+  component emits callbacks only; hosts own clipboard, navigation, installation,
+  connection, permission, OAuth, and persistence effects.
 - `PluginManagerTabs`: controlled Plugins/Apps/MCPs/Skills/Marketplace tablist
   with count badges and host-owned route changes.
 - `IntegrationAddMenu`: controlled Create plugin, Add a marketplace, Add MCP

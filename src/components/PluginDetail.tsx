@@ -11,7 +11,13 @@ export interface PluginDetailSuggestion {
   title?: ReactNode;
 }
 
-export type PluginDetailAppStatus = "connected" | "locked" | "none";
+export type PluginDetailAppStatus =
+  | "connected"
+  | "locked"
+  | "none"
+  | "connecting"
+  | "disconnecting"
+  | "error";
 
 export interface PluginDetailAppItem {
   description?: ReactNode;
@@ -55,6 +61,7 @@ export interface PluginDetailPageProps
   installed?: boolean;
   onActionsMenuOpenChange?: (open: boolean) => void;
   onAppOpen?: (item: PluginDetailAppItem) => void;
+  onAppRetry?: (item: PluginDetailAppItem) => void;
   onConnectionMenuOpenChange?: (open: boolean) => void;
   onCopyLink?: () => void;
   onDisconnect?: () => void;
@@ -64,6 +71,7 @@ export interface PluginDetailPageProps
   onSuggestionOpen?: (suggestion: PluginDetailSuggestion) => void;
   onTryNow?: () => void;
   onUninstall?: () => void;
+  appRetryLabel?: ReactNode;
   retryLabel?: ReactNode;
   status?: PluginDetailStatus;
   statusMessage?: ReactNode;
@@ -170,6 +178,7 @@ export function PluginDetailBreadcrumb({
 }
 
 export function PluginDetailPage({
+  appRetryLabel = "Retry",
   actionsMenuOpen = false,
   apps = [],
   artwork,
@@ -185,6 +194,7 @@ export function PluginDetailPage({
   installed = false,
   onActionsMenuOpenChange,
   onAppOpen,
+  onAppRetry,
   onConnectionMenuOpenChange,
   onCopyLink,
   onDisconnect,
@@ -386,11 +396,21 @@ export function PluginDetailPage({
         <div className="codex-ui-plugin-detail__app-list">
           {apps.map((app) => {
             const status = app.status ?? "none";
+            const appBusy = status === "connecting" || status === "disconnecting";
+            const appStatusLabel =
+              status === "connecting"
+                ? (app.statusLabel ?? "Connecting…")
+                : status === "disconnecting"
+                  ? (app.statusLabel ?? "Disconnecting…")
+                  : status === "error"
+                    ? (app.statusLabel ?? "Connection unavailable")
+                    : null;
             return (
               <article key={app.id} data-status={status}>
                 <button
                   aria-label={`Open ${typeof app.title === "string" ? app.title : app.id}`}
                   className="codex-ui-plugin-detail__app-open"
+                  disabled={appBusy}
                   onClick={() => onAppOpen?.(app)}
                   type="button"
                 />
@@ -404,6 +424,24 @@ export function PluginDetailPage({
                   <strong>{app.title}</strong>
                   {app.description ? <span>{app.description}</span> : null}
                 </span>
+                {appStatusLabel ? (
+                  <span
+                    aria-live="polite"
+                    className="codex-ui-plugin-detail__app-status"
+                    role={status === "error" ? "alert" : "status"}
+                  >
+                    {appStatusLabel}
+                  </span>
+                ) : null}
+                {status === "error" && onAppRetry ? (
+                  <button
+                    className="codex-ui-plugin-detail__app-retry"
+                    onClick={() => onAppRetry(app)}
+                    type="button"
+                  >
+                    {appRetryLabel}
+                  </button>
+                ) : null}
                 {status === "connected" ? (
                   <span className="codex-ui-plugin-detail__menu-anchor">
                     <button
