@@ -3489,6 +3489,32 @@ button.codex-ui-login-page__mark {
   margin-bottom: 3.3125rem;
 }
 
+.codex-ui-keyboard-shortcuts__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: -2.3125rem 0 1.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-keyboard-shortcuts__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-keyboard-shortcuts__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-keyboard-shortcuts__search-sticky {
   background: var(--codex-ui-settings-main-background);
   padding-bottom: 1.75rem;
@@ -3576,7 +3602,10 @@ button.codex-ui-login-page__mark {
 
 .codex-ui-keyboard-shortcuts__keystroke-search:disabled,
 .codex-ui-keyboard-shortcuts__edit:disabled,
-.codex-ui-keyboard-shortcuts__clear:disabled {
+.codex-ui-keyboard-shortcuts__clear:disabled,
+.codex-ui-keyboard-shortcuts__search-clear:disabled,
+.codex-ui-keyboard-shortcuts__capture:disabled,
+.codex-ui-keyboard-shortcuts__cancel:disabled {
   cursor: default;
   opacity: 0.65;
 }

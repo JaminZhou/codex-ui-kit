@@ -156,6 +156,68 @@ describe("KeyboardShortcutsPage", () => {
     );
     expect(screen.queryByText("⇧⌘K")).toBeNull();
   });
+
+  it("exposes Keyboard shortcuts lifecycle copy and locks editing while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <KeyboardShortcutsPage
+        entries={initialShortcuts}
+        onCaptureTargetChange={() => undefined}
+        onQueryChange={() => undefined}
+        onRetry={onRetry}
+        onSearchByKeystrokes={() => undefined}
+        onShortcutChange={() => undefined}
+        onShortcutClear={() => undefined}
+        retryLabel="Try shortcuts again"
+        savingLabel="Saving shortcuts…"
+        status="saving"
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "Keyboard shortcuts" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving shortcuts…")).toBeTruthy();
+    expect(
+      (screen.getByRole("textbox", { name: "Search shortcuts" }) as HTMLInputElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "Search by keystrokes",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      screen
+        .getAllByRole("button", { name: "Change shortcut for New chat" })
+        .every((button) => (button as HTMLButtonElement).disabled),
+    ).toBe(true);
+    expect(
+      screen
+        .getAllByRole("button", { name: "Clear shortcut for New chat" })
+        .every((button) => (button as HTMLButtonElement).disabled),
+    ).toBe(true);
+
+    rerender(
+      <KeyboardShortcutsPage
+        entries={initialShortcuts}
+        errorMessage="Keyboard preferences unavailable"
+        onRetry={onRetry}
+        retryLabel="Try shortcuts again"
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Keyboard preferences unavailable",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Try shortcuts again" }),
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
 });
 
 describe("VoiceSettingsPage", () => {
