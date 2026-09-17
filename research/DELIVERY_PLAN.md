@@ -1475,6 +1475,11 @@ Enable/uninstall/menu effects, prompt submission, successful skill execution,
 failure/retry, Automations detail/mutation, and remaining Settings families
 stay open; the dialog now also exposes a host-wide disabled lock alongside its
 updating/error/retry lifecycle, so Stage 4 remains in progress.
+The own-playground route now drives the enabled switch and uninstall through a
+short replay-owned updating lock, settles the enabled state, closes the dialog
+after uninstall, and keeps a retry callback available. This remains renderer
+state evidence; skill installation, execution, and registry persistence stay
+host-owned.
 
 The current thread-overflow slice closes the former unsampled P1 root menu.
 `ThreadOverflowMenu` exposes the observed ten actions, three separators, four
