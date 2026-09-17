@@ -1940,6 +1940,7 @@ export interface AppSidebarSectionProps
   children: ReactNode;
   collapsible?: boolean;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   expanded?: boolean;
   kind?: "custom" | "pinned" | "projects" | "threads";
   onExpandedChange?: (expanded: boolean) => void;
@@ -1953,6 +1954,7 @@ export function AppSidebarSection({
   className,
   collapsible = false,
   defaultExpanded = true,
+  disabled = false,
   expanded,
   kind = "custom",
   onExpandedChange,
@@ -1977,8 +1979,10 @@ export function AppSidebarSection({
         .filter(Boolean)
         .join(" ")}
       data-collapsible={canCollapse || undefined}
+      data-disabled={disabled || undefined}
       data-expanded={canCollapse ? isExpanded : undefined}
       data-kind={kind}
+      aria-disabled={disabled || undefined}
       {...props}
     >
       {title || actions ? (
@@ -1994,6 +1998,7 @@ export function AppSidebarSection({
                   aria-expanded={isExpanded}
                   aria-label={toggleLabel}
                   className="codex-ui-app-sidebar__section-toggle"
+                  disabled={disabled}
                   onClick={() => setExpanded(!isExpanded)}
                   type="button"
                 >
@@ -2119,6 +2124,7 @@ export interface AppSidebarCollectionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   children?: ReactNode;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   emptyState?: ReactNode;
   error?: ReactNode;
   isLoading?: boolean;
@@ -2135,6 +2141,7 @@ export function AppSidebarCollection({
   children,
   className,
   defaultExpanded = false,
+  disabled = false,
   emptyState,
   error,
   isLoading = false,
@@ -2151,6 +2158,7 @@ export function AppSidebarCollection({
   const hasOverflow = items.length > boundedMaxItems;
   const visibleItems = expanded ? items : items.slice(0, boundedMaxItems);
   const expandCollection = () => {
+    if (disabled) return;
     setExpanded(true);
     onExpandedChange?.(true);
   };
@@ -2186,6 +2194,8 @@ export function AppSidebarCollection({
         .filter(Boolean)
         .join(" ")}
       data-expanded={expanded || undefined}
+      data-disabled={disabled || undefined}
+      aria-disabled={disabled || undefined}
       {...props}
     >
       <div className="codex-ui-app-sidebar__collection-items" role="list">
@@ -2205,6 +2215,7 @@ export function AppSidebarCollection({
           >
             <button
               className="codex-ui-app-sidebar__collection-toggle"
+              disabled={disabled}
               onClick={expandCollection}
               type="button"
             >
@@ -2373,6 +2384,7 @@ export interface AppSidebarProjectGroupProps
   actionsLabel?: string;
   children: ReactNode;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   expanded?: boolean;
   label: ReactNode;
   leading?: ReactNode;
@@ -2389,6 +2401,7 @@ export function AppSidebarProjectGroup({
   children,
   className,
   defaultExpanded = true,
+  disabled = false,
   expanded,
   label,
   leading,
@@ -2413,6 +2426,8 @@ export function AppSidebarProjectGroup({
         .filter(Boolean)
         .join(" ")}
       data-expanded={isExpanded || undefined}
+      data-disabled={disabled || undefined}
+      aria-disabled={disabled || undefined}
       {...props}
     >
       <AppSidebarItem
@@ -2423,6 +2438,7 @@ export function AppSidebarProjectGroup({
         aria-label={toggleLabel}
         leading={leading}
         onClick={() => setExpanded(!isExpanded)}
+        disabled={disabled}
         selected={selected}
         status={status}
         statusLabel={statusLabel}

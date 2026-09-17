@@ -3855,6 +3855,47 @@ describe("application sidebar", () => {
     expect(screen.getByText("3")).toBeTruthy();
   });
 
+  it("locks sidebar section and project toggles while disabled", () => {
+    const onSectionExpandedChange = vi.fn();
+    const onProjectExpandedChange = vi.fn();
+    render(
+      <AppSidebar>
+        <AppSidebarSection
+          collapsible
+          disabled
+          onExpandedChange={onSectionExpandedChange}
+          title="Projects"
+          toggleLabel="Toggle projects"
+        >
+          <AppSidebarProjectGroup
+            disabled
+            label="UI Kit"
+            onExpandedChange={onProjectExpandedChange}
+          >
+            <AppSidebarItem>Nested task</AppSidebarItem>
+          </AppSidebarProjectGroup>
+        </AppSidebarSection>
+      </AppSidebar>,
+    );
+
+    const section = document.querySelector(
+      ".codex-ui-app-sidebar__section",
+    );
+    expect(section?.getAttribute("aria-disabled")).toBe("true");
+    expect(section?.getAttribute("data-disabled")).toBe("true");
+    const sectionToggle = screen.getByRole("button", {
+      name: "Toggle projects",
+    });
+    expect(sectionToggle).toHaveProperty("disabled", true);
+    fireEvent.click(sectionToggle);
+    expect(onSectionExpandedChange).not.toHaveBeenCalled();
+
+    const project = screen.getByRole("button", { name: "UI Kit" });
+    expect(project).toHaveProperty("disabled", true);
+    fireEvent.click(project);
+    expect(onProjectExpandedChange).not.toHaveBeenCalled();
+  });
+
   it("models fixed primary navigation, collapsible collections, and footer account actions", () => {
     const onExpandedChange = vi.fn();
     render(
@@ -4120,6 +4161,31 @@ describe("application sidebar", () => {
     expect(onExpandedChange).toHaveBeenCalledWith(true);
     expect(screen.queryByRole("button", { name: "Show more" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Show less" })).toBeNull();
+  });
+
+  it("locks the bounded collection expansion while disabled", () => {
+    const onExpandedChange = vi.fn();
+    render(
+      <AppSidebarCollection
+        disabled
+        maxItems={1}
+        onExpandedChange={onExpandedChange}
+      >
+        <AppSidebarItem>First chat</AppSidebarItem>
+        <AppSidebarItem>Second chat</AppSidebarItem>
+      </AppSidebarCollection>,
+    );
+
+    const collection = document.querySelector(
+      ".codex-ui-app-sidebar__collection",
+    );
+    expect(collection?.getAttribute("aria-disabled")).toBe("true");
+    expect(collection?.getAttribute("data-disabled")).toBe("true");
+    const showMore = screen.getByRole("button", { name: "Show more" });
+    expect(showMore).toHaveProperty("disabled", true);
+    fireEvent.click(showMore);
+    expect(onExpandedChange).not.toHaveBeenCalled();
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 
   it("keeps pending worktree phases distinct while sharing current sidebar visuals", () => {
