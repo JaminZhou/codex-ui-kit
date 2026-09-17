@@ -511,7 +511,9 @@ kit never performs filesystem, network, account, or process mutations.
 - `ScheduledTasksPage`, `ScheduledTaskNavigator`, `ScheduledTaskFilterTabs`,
   and `ScheduledTaskCreateMenu`: controlled automation index, filters, search,
   suggestions, create choices, loading/error/unavailable states, and intent
-  callbacks. They do not schedule or execute work.
+  callbacks. Page and navigator disabled states lock search, filters, row
+  navigation, toggles, and suggestion actions while retry stays explicit. They
+  do not schedule or execute work.
 - `ScheduledTaskEditor` and `ScheduledTaskDetail`: controlled task name,
   prompt, frequency/detail fields, facts, saving/updating/running/error/retry
   state, busy action locking, and Create/Save/Edit/Pause/Resume/Run callbacks.

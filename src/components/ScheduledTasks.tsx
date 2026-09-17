@@ -37,6 +37,7 @@ export interface ScheduledTaskSuggestion {
 export interface ScheduledTaskFilterTabsProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onChange"> {
   active: ScheduledTaskFilter;
+  disabled?: boolean;
   labels?: Partial<Record<ScheduledTaskFilter, ReactNode>>;
   onChange?: (filter: ScheduledTaskFilter) => void;
 }
@@ -51,6 +52,7 @@ const scheduledTaskFilters: readonly ScheduledTaskFilter[] = [
 export function ScheduledTaskFilterTabs({
   active,
   className,
+  disabled = false,
   labels,
   onChange,
   ...props
@@ -68,6 +70,7 @@ export function ScheduledTaskFilterTabs({
         <button
           aria-selected={active === filter}
           data-active={active === filter || undefined}
+          disabled={disabled}
           key={filter}
           onClick={() => onChange?.(filter)}
           role="tab"
@@ -113,10 +116,12 @@ function searchableText(...values: ReactNode[]) {
 }
 
 function ScheduledTaskRows({
+  disabled = false,
   onOpen,
   onToggle,
   tasks,
 }: {
+  disabled?: boolean;
   onOpen?: (task: ScheduledTaskItem) => void;
   onToggle?: (task: ScheduledTaskItem) => void;
   tasks: readonly ScheduledTaskItem[];
@@ -136,6 +141,7 @@ function ScheduledTaskRows({
               <button
                 aria-label={title}
                 className="codex-ui-scheduled-tasks__row-open"
+                disabled={disabled}
                 onClick={() => onOpen(task)}
                 type="button"
               />
@@ -143,6 +149,7 @@ function ScheduledTaskRows({
             <button
               aria-label={actionLabel}
               className="codex-ui-scheduled-tasks__task-action"
+              disabled={disabled}
               onClick={() => onToggle?.(task)}
               type="button"
             >
@@ -170,10 +177,12 @@ function ScheduledTaskRows({
 }
 
 function ScheduledSuggestionRows({
+  disabled = false,
   onAdd,
   onOpen,
   suggestions,
 }: {
+  disabled?: boolean;
   onAdd?: (suggestion: ScheduledTaskSuggestion) => void;
   onOpen?: (suggestion: ScheduledTaskSuggestion) => void;
   suggestions: readonly ScheduledTaskSuggestion[];
@@ -192,6 +201,7 @@ function ScheduledSuggestionRows({
               <button
                 aria-label={title}
                 className="codex-ui-scheduled-tasks__row-open"
+                disabled={disabled}
                 onClick={() => onOpen(suggestion)}
                 type="button"
               />
@@ -220,6 +230,7 @@ function ScheduledSuggestionRows({
             <button
               aria-label={`Add ${title} scheduled task`}
               className="codex-ui-scheduled-tasks__suggestion-add"
+              disabled={disabled}
               onClick={() => onAdd?.(suggestion)}
               type="button"
             >
@@ -233,9 +244,11 @@ function ScheduledSuggestionRows({
 }
 
 function ScheduledTaskSearch({
+  disabled = false,
   onQueryChange,
   query,
 }: {
+  disabled?: boolean;
   onQueryChange?: (query: string) => void;
   query: string;
 }) {
@@ -248,6 +261,7 @@ function ScheduledTaskSearch({
         Search scheduled tasks
       </span>
       <input
+        disabled={disabled}
         onChange={handleChange}
         placeholder="Search scheduled tasks"
         type="search"
@@ -259,6 +273,7 @@ function ScheduledTaskSearch({
 
 interface ScheduledTaskCollectionProps {
   activeFilter: ScheduledTaskFilter;
+  disabled?: boolean;
   emptyLabel: ReactNode;
   onSuggestionAdd?: (suggestion: ScheduledTaskSuggestion) => void;
   onSuggestionOpen?: (suggestion: ScheduledTaskSuggestion) => void;
@@ -272,6 +287,7 @@ interface ScheduledTaskCollectionProps {
 
 function ScheduledTaskCollection({
   activeFilter,
+  disabled = false,
   emptyLabel,
   onSuggestionAdd,
   onSuggestionOpen,
@@ -320,6 +336,7 @@ function ScheduledTaskCollection({
   return (
     <>
       <ScheduledTaskRows
+        disabled={disabled}
         onOpen={onTaskOpen}
         onToggle={onTaskToggle}
         tasks={filteredTasks}
@@ -328,6 +345,7 @@ function ScheduledTaskCollection({
         <section className="codex-ui-scheduled-tasks__suggestions">
           <h2>Suggestions</h2>
           <ScheduledSuggestionRows
+            disabled={disabled}
             onAdd={onSuggestionAdd}
             onOpen={onSuggestionOpen}
             suggestions={filteredSuggestions}
@@ -342,6 +360,7 @@ export interface ScheduledTasksPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   activeFilter?: ScheduledTaskFilter;
   description?: ReactNode;
+  disabled?: boolean;
   emptyLabel?: ReactNode;
   loadingLabel?: ReactNode;
   onFilterChange?: (filter: ScheduledTaskFilter) => void;
@@ -366,6 +385,7 @@ export function ScheduledTasksPage({
   activeFilter = "all",
   className,
   description = "Ask ChatGPT to schedule tasks, set reminders, or monitor for updates",
+  disabled = false,
   emptyLabel = "No scheduled tasks found",
   loadingLabel = "Loading scheduled tasks…",
   onFilterChange,
@@ -386,13 +406,18 @@ export function ScheduledTasksPage({
   title = "Scheduled tasks",
   ...props
 }: ScheduledTasksPageProps) {
+  const statusId = useId();
+  const isLocked = disabled || status !== "ready";
   const fallbackHeading =
     status === "error" ? "Couldn’t load scheduled tasks" : "Scheduled tasks unavailable";
   return (
     <main
+      aria-busy={status === "loading" || undefined}
+      aria-describedby={status !== "ready" ? statusId : undefined}
       className={["codex-ui-scheduled-tasks", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
       {...props}
     >
@@ -401,25 +426,36 @@ export function ScheduledTasksPage({
           <h1>{title}</h1>
           {description ? <p>{description}</p> : null}
         </header>
-        <ScheduledTaskSearch onQueryChange={onQueryChange} query={query} />
+        <ScheduledTaskSearch
+          disabled={isLocked}
+          onQueryChange={onQueryChange}
+          query={query}
+        />
         <ScheduledTaskFilterTabs
           active={activeFilter}
+          disabled={isLocked}
           onChange={onFilterChange}
         />
         {status === "loading" ? (
           <div
             aria-live="polite"
             className="codex-ui-scheduled-tasks__status"
+            id={statusId}
             role="status"
           >
             {loadingLabel}
           </div>
         ) : status !== "ready" ? (
-          <section className="codex-ui-scheduled-tasks__status">
+          <section
+            aria-live="polite"
+            className="codex-ui-scheduled-tasks__status"
+            id={statusId}
+            role={status === "error" ? "alert" : "status"}
+          >
             <h2>{statusHeading ?? fallbackHeading}</h2>
             {statusDescription ? <p>{statusDescription}</p> : null}
             {onRetry ? (
-              <button onClick={onRetry} type="button">
+              <button disabled={disabled} onClick={onRetry} type="button">
                 {retryLabel}
               </button>
             ) : null}
@@ -428,6 +464,7 @@ export function ScheduledTasksPage({
           <div className="codex-ui-scheduled-tasks__collection">
             <ScheduledTaskCollection
               activeFilter={activeFilter}
+              disabled={disabled}
               emptyLabel={emptyLabel}
               onSuggestionAdd={onSuggestionAdd}
               onSuggestionOpen={onSuggestionOpen}
@@ -450,6 +487,7 @@ export interface ScheduledTaskNavigatorProps
     Pick<
       ScheduledTasksPageProps,
       | "activeFilter"
+      | "disabled"
       | "emptyLabel"
       | "onQueryChange"
       | "onTaskOpen"
@@ -461,6 +499,7 @@ export interface ScheduledTaskNavigatorProps
 export function ScheduledTaskNavigator({
   activeFilter = "all",
   className,
+  disabled = false,
   emptyLabel = "No scheduled tasks found",
   onQueryChange,
   onTaskOpen,
@@ -477,10 +516,15 @@ export function ScheduledTaskNavigator({
         .join(" ")}
       {...props}
     >
-      <ScheduledTaskSearch onQueryChange={onQueryChange} query={query} />
+      <ScheduledTaskSearch
+        disabled={disabled}
+        onQueryChange={onQueryChange}
+        query={query}
+      />
       <div className="codex-ui-scheduled-task-navigator__collection">
         <ScheduledTaskCollection
           activeFilter={activeFilter}
+          disabled={disabled}
           emptyLabel={emptyLabel}
           onTaskOpen={onTaskOpen}
           onTaskToggle={onTaskToggle}
