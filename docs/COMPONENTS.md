@@ -163,7 +163,7 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `DocumentPreviewPanel`: protocol-neutral PDF, document, notebook, spreadsheet,
   and presentation preview shell with ready, loading, empty, and error states;
   hosts provide the renderer and own file loading while retry/open callbacks
-  remain explicit.
+  remain explicit. A disabled lock covers open and retry actions.
 - `CitationMention`: inline external citation with optional favicon or supplied icon, deterministic new-tab security defaults, and the current `data-inline-mention-interactive` host hook.
 - `ResourceCard` and `ResourceList`: file, website, Drive, app, and image resources with previews, metadata, optional labelled opening actions, trailing actions, and progressive reveal. Cards without `href` or `onOpen` remain static content.
 - `SourceList`: compact file, web, tool, and external citation summaries with
@@ -543,6 +543,7 @@ kit never performs filesystem, network, account, or process mutations.
   prompt submission are host-owned.
 - `PdfPreviewPanel`: controlled PDF page/zoom/annotation/expand state with
   page navigation, Open/Retry/Close callbacks, and an explicit renderer slot.
+  A disabled lock covers paging, zoom, annotation, download, open, and retry;
   PDF decoding and file access remain host-owned.
 - `MenuLinkItem`: accessible menu item that renders a host-provided link or
   callback while preserving menu focus semantics; navigation is not inferred.

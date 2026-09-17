@@ -64,6 +64,31 @@ describe("resource surfaces", () => {
     expect(screen.getByRole("img", { name: "Preview page" })).toBeTruthy();
   });
 
+  it("locks document preview actions while disabled", () => {
+    const onOpen = vi.fn();
+    const onRetry = vi.fn();
+    render(
+      <DocumentPreviewPanel
+        disabled
+        onOpen={onOpen}
+        onRetry={onRetry}
+        status="error"
+        title="work.pdf"
+      />,
+    );
+
+    const panel = screen.getByRole("region", { name: "work.pdf" });
+    expect(panel.getAttribute("aria-disabled")).toBe("true");
+    expect(panel.getAttribute("data-disabled")).toBe("true");
+    for (const label of ["Open document", "Retry preview"]) {
+      const button = screen.getByRole("button", { name: label });
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
   it("renders current citation semantics with an optional favicon", () => {
     render(
       <CitationMention
