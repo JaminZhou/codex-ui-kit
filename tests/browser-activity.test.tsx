@@ -86,4 +86,27 @@ describe("BrowserActivity", () => {
     );
     expect(onStepOpen).toHaveBeenCalledWith(steps[1]);
   });
+
+  it("locks browser disclosure and step actions while disabled", () => {
+    const onStepOpen = vi.fn();
+    const { container } = render(
+      <BrowserActivity
+        defaultOpen
+        disabled
+        onStepOpen={onStepOpen}
+        status="completed"
+        steps={steps}
+      />,
+    );
+
+    const activity = container.querySelector(".codex-ui-activity");
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    expect(activity?.getAttribute("data-disabled")).toBe("true");
+    const step = screen.getByRole("button", {
+      name: "Connect to the browser",
+    });
+    expect(step).toHaveProperty("disabled", true);
+    fireEvent.click(step);
+    expect(onStepOpen).not.toHaveBeenCalled();
+  });
 });

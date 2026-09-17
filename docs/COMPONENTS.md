@@ -60,9 +60,11 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `AgentReasoning`: active and completed reasoning disclosure states.
 - `AgentPlan`: structured pending, in-progress, and completed plan steps.
 - `ProposedPlan`: writing and completed plan-card states with host-owned actions.
-- `SearchActivity`: code-search and grouped web-search states with controlled disclosure and bounded results.
+- `SearchActivity`: code-search and grouped web-search states with controlled
+  disclosure, bounded results, and a disabled lock for disclosure/result actions.
 - `BrowserActivity`: running, completed, and failed Browser disclosures with
-  ordered instruction, connection, and navigation steps.
+  ordered instruction, connection, and navigation steps; disabled locks keep
+  disclosure and step actions host-controlled.
 - `ConversationEventList` and `ConversationEvent`: protocol-neutral ordering,
   ownership (`turn` or `thread`), event-kind, progress, warning, failure, live
   status, metadata, content, and action slots for mixed session timelines.
@@ -88,11 +90,12 @@ failure/cancellation policy, pagination, and transcript streaming.
 
 - `McpToolCallGroup`: expandable integration-owned group for ordered MCP calls
   with running, recovered, and failed labels plus legacy `details` or current
-  content-button disclosure.
+  content-button disclosure and a disabled lock.
 - `ToolCallCard`: generic MCP, connector, and arbitrary tool-call row with
   structured, empty, danger-alert, neutral language/output-error, host-owned
   raw-output states, an independently localizable failed-state accessible name,
-  and legacy `details` or current content-width overlay-button disclosure.
+  and legacy `details` or current content-width overlay-button disclosure. A
+  disabled lock covers disclosure and raw-output actions.
 - `CommandExecution`: expandable command surface with duration, copy,
   optional `Shell`/host-defined shell label, background-terminal, success,
   failure, and interruption states. Completed expanded summaries preserve the

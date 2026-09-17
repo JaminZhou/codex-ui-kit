@@ -45,6 +45,7 @@ export interface ToolCallCardProps
   completedLabel?: ReactNode;
   collapsible?: boolean;
   defaultOpen?: boolean;
+  disabled?: boolean;
   disclosureIcon?: AgentActivityProps["disclosureIcon"];
   disclosureIndicator?: AgentActivityProps["disclosureIndicator"];
   disclosureMode?: AgentActivityProps["disclosureMode"];
@@ -76,6 +77,7 @@ export function ToolCallCard({
   completedLabel,
   collapsible = true,
   defaultOpen = false,
+  disabled = false,
   disclosureIcon,
   disclosureIndicator,
   disclosureMode,
@@ -162,7 +164,10 @@ export function ToolCallCard({
         <button
           aria-label={viewRawOutputLabel}
           className="codex-ui-tool-call__raw-output"
-          onClick={() => onViewRawOutput(rawOutput)}
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onViewRawOutput(rawOutput);
+          }}
           title={viewRawOutputLabel}
           type="button"
         >
@@ -177,6 +182,7 @@ export function ToolCallCard({
       className={classes}
       data-source={source}
       defaultOpen={defaultOpen}
+      disabled={disabled}
       disclosureIcon={disclosureIcon}
       disclosureIndicator={disclosureIndicator}
       disclosureMode={disclosureMode}

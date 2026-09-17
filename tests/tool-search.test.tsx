@@ -223,6 +223,31 @@ describe("ToolCallCard", () => {
     expect(onOpenChange).toHaveBeenCalledWith(true);
     expect(container.querySelector("details")?.open).toBe(false);
   });
+
+  it("locks tool disclosure and raw-output actions while disabled", () => {
+    const onViewRawOutput = vi.fn();
+    const { container } = render(
+      <ToolCallCard
+        defaultOpen
+        disabled
+        name="get_issue"
+        onViewRawOutput={onViewRawOutput}
+        rawOutput={{ callId: "call-1" }}
+        result="Fetched"
+        status="completed"
+      />,
+    );
+
+    const activity = container.querySelector(".codex-ui-activity");
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    expect(activity?.getAttribute("data-disabled")).toBe("true");
+    const rawOutput = screen.getByRole("button", {
+      name: "Show raw tool call output",
+    });
+    expect(rawOutput).toHaveProperty("disabled", true);
+    fireEvent.click(rawOutput);
+    expect(onViewRawOutput).not.toHaveBeenCalled();
+  });
 });
 
 describe("McpToolCallGroup", () => {
@@ -285,6 +310,28 @@ describe("McpToolCallGroup", () => {
     expect(active).toContain("Using Docs integration");
     expect(active).toContain('data-active="true"');
     expect(failed).toContain("Docs integration failed");
+  });
+
+  it("locks integration disclosure while disabled", () => {
+    const { container } = render(
+      <McpToolCallGroup
+        disabled
+        name="Docs"
+        status="completed"
+      >
+        <ToolCallCard name="Fetch" status="completed" />
+      </McpToolCallGroup>,
+    );
+
+    const activity = container.querySelector(".codex-ui-activity");
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    expect(activity?.getAttribute("data-disabled")).toBe("true");
+    const summary = container.querySelector("summary");
+    expect(summary).toBeTruthy();
+    const disclosure = container.querySelector("details");
+    expect(disclosure?.open).toBe(false);
+    fireEvent.click(summary!);
+    expect(disclosure?.open).toBe(false);
   });
 });
 
@@ -383,5 +430,29 @@ describe("SearchActivity", () => {
 
     expect(running).toContain("Searching for files");
     expect(completed).toContain("Searched for files");
+  });
+
+  it("locks search disclosure and result actions while disabled", () => {
+    const onEntryOpen = vi.fn();
+    const { container } = render(
+      <SearchActivity
+        defaultOpen
+        disabled
+        entries={webEntries}
+        kind="web"
+        onEntryOpen={onEntryOpen}
+        status="completed"
+      />,
+    );
+
+    const activity = container.querySelector(".codex-ui-activity");
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    expect(activity?.getAttribute("data-disabled")).toBe("true");
+    const entry = screen.getByRole("button", {
+      name: "Codex app-server protocol",
+    });
+    expect(entry).toHaveProperty("disabled", true);
+    fireEvent.click(entry);
+    expect(onEntryOpen).not.toHaveBeenCalled();
   });
 });

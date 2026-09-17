@@ -20,6 +20,7 @@ export interface BrowserActivityProps
   activeLabel?: ReactNode;
   completedLabel?: ReactNode;
   defaultOpen?: boolean;
+  disabled?: boolean;
   failedLabel?: ReactNode;
   indicator?: ReactNode;
   onOpenChange?: (open: boolean) => void;
@@ -86,6 +87,7 @@ export function BrowserActivity({
   className,
   completedLabel = "Used the browser",
   defaultOpen = false,
+  disabled = false,
   failedLabel = "Browser use failed",
   indicator,
   onOpenChange,
@@ -116,7 +118,13 @@ export function BrowserActivity({
           return (
             <li data-completed={step.completed || undefined} key={step.id}>
               {onStepOpen ? (
-                <button onClick={() => onStepOpen(step)} type="button">
+                <button
+                  disabled={disabled}
+                  onClick={() => {
+                    if (!disabled) onStepOpen(step);
+                  }}
+                  type="button"
+                >
                   {content}
                 </button>
               ) : (
@@ -132,6 +140,7 @@ export function BrowserActivity({
     <AgentActivity
       className={classes}
       defaultOpen={defaultOpen}
+      disabled={disabled}
       indicator={indicator ?? <BrowserIcon />}
       kind="tool"
       onOpenChange={onOpenChange}

@@ -29,6 +29,7 @@ export interface McpToolCallGroupProps
   children?: ReactNode;
   completedLabel?: ReactNode;
   defaultOpen?: boolean;
+  disabled?: boolean;
   disclosureIcon?: AgentActivityProps["disclosureIcon"];
   disclosureMode?: AgentActivityProps["disclosureMode"];
   failedLabel?: ReactNode;
@@ -46,6 +47,7 @@ export function McpToolCallGroup({
   className,
   completedLabel,
   defaultOpen = false,
+  disabled = false,
   disclosureIcon,
   disclosureMode,
   failedLabel,
@@ -72,6 +74,7 @@ export function McpToolCallGroup({
       className={classes}
       data-source={source}
       defaultOpen={defaultOpen}
+      disabled={disabled}
       disclosureIcon={disclosureIcon}
       disclosureIndicator={disclosureMode === "button"}
       disclosureMode={disclosureMode}
