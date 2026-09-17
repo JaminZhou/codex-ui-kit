@@ -2057,6 +2057,12 @@ export type GeneralSendShortcut =
   | "command-enter";
 export type GeneralFollowUpBehavior = "queue" | "steer";
 export type GeneralCompletionNotifications = "never" | "unfocused" | "always";
+export type GeneralSettingsStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
 
 export interface GeneralSettingsValue {
   /** @deprecated Not shown by the current General settings surface. */
@@ -2094,7 +2100,9 @@ export interface GeneralSettingsOption {
 
 export interface GeneralSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
+  disabled?: boolean;
   elevatedRiskHref?: string;
+  errorMessage?: ReactNode;
   fileDestinationOptions?: readonly GeneralSettingsOption[];
   hotkeyCaptureActive?: boolean;
   languageOptions?: readonly GeneralSettingsOption[];
@@ -2102,7 +2110,13 @@ export interface GeneralSettingsPageProps
   onChange: (value: GeneralSettingsValue) => void;
   onChangeProjectlessTaskFolder?: () => void;
   onOpenSourceLicenses?: () => void;
+  onRetry?: () => void;
   onStartHotkeyCapture?: () => void;
+  loadingLabel?: ReactNode;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: GeneralSettingsStatus;
+  statusMessage?: ReactNode;
   value: GeneralSettingsValue;
 }
 
@@ -2281,11 +2295,13 @@ function GeneralSettingsRow({
 }
 
 function GeneralSegmented<T extends string>({
+  disabled = false,
   label,
   onChange,
   options,
   value,
 }: {
+  disabled?: boolean;
   label: string;
   onChange: (value: T) => void;
   options: readonly { label: string; value: T }[];
@@ -2327,6 +2343,7 @@ function GeneralSegmented<T extends string>({
         <button
           aria-label={option.label}
           aria-pressed={option.value === value}
+          disabled={disabled}
           key={option.value}
           onClick={() => onChange(option.value)}
           onKeyDown={(event) => moveSelection(event, index)}
@@ -2341,11 +2358,13 @@ function GeneralSegmented<T extends string>({
 }
 
 function GeneralMenuControl({
+  disabled = false,
   label,
   onChange,
   options,
   value,
 }: {
+  disabled?: boolean;
   label: string;
   onChange: (value: string) => void;
   options: readonly GeneralSettingsOption[];
@@ -2354,31 +2373,34 @@ function GeneralMenuControl({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selectedValueId = useId();
   const selected = options.find((option) => option.value === value);
+  const trigger = (
+    <button
+      aria-describedby={selectedValueId}
+      aria-label={label}
+      className="codex-ui-general-settings__menu-trigger"
+      disabled={disabled}
+      ref={triggerRef}
+      type="button"
+    >
+      {selected?.icon ? (
+        <span aria-hidden="true" className="codex-ui-general-settings__menu-icon">
+          {selected.icon}
+        </span>
+      ) : null}
+      <span id={selectedValueId}>{selected?.label ?? value}</span>
+      <span aria-hidden="true" className="codex-ui-general-settings__chevron">
+        ⌄
+      </span>
+    </button>
+  );
+  if (disabled) return trigger;
   return (
     <Menu
       align="end"
       className="codex-ui-general-settings__menu"
       label={label}
       sideOffset={4}
-      trigger={
-        <button
-          aria-describedby={selectedValueId}
-          aria-label={label}
-          className="codex-ui-general-settings__menu-trigger"
-          ref={triggerRef}
-          type="button"
-        >
-          {selected?.icon ? (
-            <span aria-hidden="true" className="codex-ui-general-settings__menu-icon">
-              {selected.icon}
-            </span>
-          ) : null}
-          <span id={selectedValueId}>{selected?.label ?? value}</span>
-          <span aria-hidden="true" className="codex-ui-general-settings__chevron">
-            ⌄
-          </span>
-        </button>
-      }
+      trigger={trigger}
       width="menu-wide"
     >
       {options.map((option) => (
@@ -2402,10 +2424,12 @@ function GeneralMenuControl({
 }
 
 function GeneralLanguageControl({
+  disabled = false,
   onChange,
   options,
   value,
 }: {
+  disabled?: boolean;
   onChange: (value: string) => void;
   options: readonly GeneralSettingsOption[];
   value: string;
@@ -2429,6 +2453,22 @@ function GeneralLanguageControl({
     const items = languageOptions();
     (edge === "first" ? items[0] : items.at(-1))?.focus();
   };
+  const trigger = (
+    <button
+      aria-describedby={selectedValueId}
+      aria-label="Language"
+      className="codex-ui-general-settings__menu-trigger"
+      disabled={disabled}
+      ref={triggerRef}
+      type="button"
+    >
+      <span id={selectedValueId}>{selected?.label ?? value}</span>
+      <span aria-hidden="true" className="codex-ui-general-settings__chevron">
+        ⌄
+      </span>
+    </button>
+  );
+  if (disabled) return trigger;
   return (
     <Popover
       align="end"
@@ -2442,20 +2482,7 @@ function GeneralLanguageControl({
       open={open}
       role="dialog"
       sideOffset={4}
-      trigger={
-        <button
-          aria-describedby={selectedValueId}
-          aria-label="Language"
-          className="codex-ui-general-settings__menu-trigger"
-          ref={triggerRef}
-          type="button"
-        >
-          <span id={selectedValueId}>{selected?.label ?? value}</span>
-          <span aria-hidden="true" className="codex-ui-general-settings__chevron">
-            ⌄
-          </span>
-        </button>
-      }
+      trigger={trigger}
       width="menu-wide"
     >
       <label className="codex-ui-general-settings__language-search">
@@ -2552,7 +2579,9 @@ function GeneralLanguageControl({
 
 export function GeneralSettingsPage({
   className,
+  disabled = false,
   elevatedRiskHref,
+  errorMessage = "General settings could not be saved.",
   fileDestinationOptions = defaultGeneralFileDestinationOptions,
   hotkeyCaptureActive = false,
   languageOptions = defaultGeneralLanguageOptions,
@@ -2560,14 +2589,33 @@ export function GeneralSettingsPage({
   onChange,
   onChangeProjectlessTaskFolder,
   onOpenSourceLicenses,
+  onRetry,
   onStartHotkeyCapture,
+  loadingLabel = "Loading general settings…",
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   ...props
 }: GeneralSettingsPageProps) {
   const hotkeyValueId = useId();
+  const statusId = useId();
   const hotkeyEditRef = useRef<HTMLButtonElement>(null);
   const hotkeyRecordRef = useRef<HTMLButtonElement>(null);
   const hotkeyCaptureWasActiveRef = useRef(false);
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "General settings saved"
+          : errorMessage);
   useEffect(() => {
     const wasActive = hotkeyCaptureWasActiveRef.current;
     hotkeyCaptureWasActiveRef.current = hotkeyCaptureActive;
@@ -2595,11 +2643,29 @@ export function GeneralSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-general-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>General</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-general-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <GeneralSettingsSection label="Permissions">
         <GeneralSettingsRow
           description="By default, ChatGPT can read and edit files in its workspace. It can ask for additional access when needed"
@@ -2620,6 +2686,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.fullAccess}
+            disabled={isLocked}
             label="Show Full access in the composer"
             onChange={(fullAccess) => update("fullAccess", fullAccess)}
           />
@@ -2638,7 +2705,7 @@ export function GeneralSettingsPage({
             <button
               aria-label="Change projectless task folder"
               className="codex-ui-general-settings__secondary-action"
-              disabled={!onChangeProjectlessTaskFolder}
+              disabled={isLocked || !onChangeProjectlessTaskFolder}
               onClick={onChangeProjectlessTaskFolder}
               type="button"
             >
@@ -2651,6 +2718,7 @@ export function GeneralSettingsPage({
           label="Default file open destination"
         >
           <GeneralMenuControl
+            disabled={isLocked}
             label="Default file open destination"
             onChange={(defaultFileOpenDestination) =>
               update("defaultFileOpenDestination", defaultFileOpenDestination)
@@ -2661,6 +2729,7 @@ export function GeneralSettingsPage({
         </GeneralSettingsRow>
         <GeneralSettingsRow description="Language for the app UI" label="Language">
           <GeneralLanguageControl
+            disabled={isLocked}
             onChange={(language) => update("language", language)}
             options={languageOptions}
             value={value.language}
@@ -2672,6 +2741,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.showInMenuBar}
+            disabled={isLocked}
             label="Show ChatGPT in the menu bar"
             onChange={(showInMenuBar) => update("showInMenuBar", showInMenuBar)}
           />
@@ -2682,6 +2752,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.bottomPanel}
+            disabled={isLocked}
             label="Bottom panel"
             onChange={(bottomPanel) => update("bottomPanel", bottomPanel)}
           />
@@ -2691,6 +2762,7 @@ export function GeneralSettingsPage({
           label="Default terminal location"
         >
           <GeneralSegmented
+            disabled={isLocked}
             label="Default terminal location"
             onChange={(terminalLocation) => update("terminalLocation", terminalLocation)}
             options={[
@@ -2706,6 +2778,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.preventSleepWhileRunning}
+            disabled={isLocked}
             label="Prevent sleep while running"
             onChange={(preventSleepWhileRunning) =>
               update("preventSleepWhileRunning", preventSleepWhileRunning)
@@ -2717,6 +2790,7 @@ export function GeneralSettingsPage({
           label="Speed"
         >
           <GeneralMenuControl
+            disabled={isLocked}
             label="Speed"
             onChange={(speed) => update("speed", speed as GeneralSpeed)}
             options={[
@@ -2732,7 +2806,7 @@ export function GeneralSettingsPage({
         >
           <button
             className="codex-ui-general-settings__secondary-action"
-            disabled={!onOpenSourceLicenses}
+            disabled={isLocked || !onOpenSourceLicenses}
             onClick={onOpenSourceLicenses}
             type="button"
           >
@@ -2745,6 +2819,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.pluginsEnabled}
+            disabled={isLocked}
             label="Toggle plugins"
             onChange={(pluginsEnabled) => update("pluginsEnabled", pluginsEnabled)}
           />
@@ -2758,6 +2833,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.plainTextComposer}
+            disabled={isLocked}
             label="Plain text composer"
             onChange={(plainTextComposer) =>
               update("plainTextComposer", plainTextComposer)
@@ -2767,6 +2843,7 @@ export function GeneralSettingsPage({
         <GeneralSettingsRow label="Show context window usage">
           <GeneralSwitch
             checked={value.showContextWindowUsage}
+            disabled={isLocked}
             label="Show context window usage in the composer"
             onChange={(showContextWindowUsage) =>
               update("showContextWindowUsage", showContextWindowUsage)
@@ -2778,6 +2855,7 @@ export function GeneralSettingsPage({
           label="Send shortcut"
         >
           <GeneralMenuControl
+            disabled={isLocked}
             label="Send shortcut"
             onChange={(sendShortcut) =>
               update("sendShortcut", sendShortcut as GeneralSendShortcut)
@@ -2798,6 +2876,7 @@ export function GeneralSettingsPage({
           label="Follow-up behavior"
         >
           <GeneralSegmented
+            disabled={isLocked}
             label="Follow-up behavior"
             onChange={(followUpBehavior) =>
               update("followUpBehavior", followUpBehavior)
@@ -2821,6 +2900,7 @@ export function GeneralSettingsPage({
               <button
                 className="codex-ui-general-settings__hotkey-record"
                 onKeyDown={(event) => {
+                  if (isLocked) return;
                   if (event.key === "Escape") {
                     event.preventDefault();
                     event.stopPropagation();
@@ -2841,6 +2921,7 @@ export function GeneralSettingsPage({
                   update("popoutHotkey", hotkey);
                   onCancelHotkeyCapture?.();
                 }}
+                disabled={isLocked}
                 ref={hotkeyRecordRef}
                 type="button"
               >
@@ -2848,7 +2929,7 @@ export function GeneralSettingsPage({
               </button>
               <button
                 className="codex-ui-general-settings__secondary-action"
-                disabled={!onCancelHotkeyCapture}
+                disabled={isLocked || !onCancelHotkeyCapture}
                 onClick={onCancelHotkeyCapture}
                 type="button"
               >
@@ -2860,7 +2941,7 @@ export function GeneralSettingsPage({
               aria-describedby={hotkeyValueId}
               aria-label="Set shortcut for Popout Window hotkey"
               className="codex-ui-general-settings__hotkey-edit"
-              disabled={!onStartHotkeyCapture}
+              disabled={isLocked || !onStartHotkeyCapture}
               onClick={onStartHotkeyCapture}
               ref={hotkeyEditRef}
               type="button"
@@ -2876,6 +2957,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.popoutStandaloneChat}
+            disabled={isLocked}
             label="Default Popout Window to standalone chat"
             onChange={(popoutStandaloneChat) =>
               update("popoutStandaloneChat", popoutStandaloneChat)
@@ -2890,6 +2972,7 @@ export function GeneralSettingsPage({
           label="Turn completion notifications"
         >
           <GeneralMenuControl
+            disabled={isLocked}
             label="Turn completion notifications"
             onChange={(turnCompletionNotifications) =>
               update(
@@ -2911,6 +2994,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.permissionNotifications}
+            disabled={isLocked}
             label="Enable permission notifications"
             onChange={(permissionNotifications) =>
               update("permissionNotifications", permissionNotifications)
@@ -2923,6 +3007,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.questionNotifications}
+            disabled={isLocked}
             label="Enable question notifications"
             onChange={(questionNotifications) =>
               update("questionNotifications", questionNotifications)
@@ -2938,6 +3023,7 @@ export function GeneralSettingsPage({
         >
           <GeneralSwitch
             checked={value.confettiCannon}
+            disabled={isLocked}
             label="Confetti cannon"
             onChange={(confettiCannon) =>
               update("confettiCannon", confettiCannon)

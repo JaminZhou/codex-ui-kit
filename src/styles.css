@@ -2765,6 +2765,32 @@ button.codex-ui-login-page__mark {
   margin: 0 0 2.59375rem;
 }
 
+.codex-ui-general-settings__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: -1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-general-settings__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-general-settings__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-general-settings__section + .codex-ui-general-settings__section {
   margin-top: 3.09375rem;
 }
@@ -2890,6 +2916,13 @@ button.codex-ui-login-page__mark {
 .codex-ui-general-settings__switch:disabled {
   cursor: default;
   opacity: 0.68;
+}
+
+.codex-ui-general-settings__menu-trigger:disabled,
+.codex-ui-general-settings__segmented > button:disabled,
+.codex-ui-general-settings__hotkey-record:disabled {
+  cursor: default;
+  opacity: 0.45;
 }
 
 .codex-ui-general-settings__menu-trigger,

@@ -1315,6 +1315,12 @@ frame comparisons for wide, compact, shortcut-capture, and bottom states at
 4.6143%, 6.7412%, 4.7654%, and 4.8818%.
 Observed host selections are fixture evidence rather than product defaults.
 
+General now also exposes host-controlled loading, saving, saved, and error
+states with retry copy, status semantics, and a locked control surface while
+the host persists changes. This lifecycle remains presentation-only: hosts
+still own persistence, folder and license actions, global shortcut registration,
+and notification delivery.
+
 The Hooks/code-review family is now delivered with its evidence levels kept
 separate. An isolated current `26.803.61601` Renderer reaches the visible
 Hooks route, stable empty state, read-only reload feedback, exact 1180×820 and
