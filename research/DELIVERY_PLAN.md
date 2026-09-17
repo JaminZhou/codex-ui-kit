@@ -1775,6 +1775,10 @@ The Hooks settings surface now exposes host-configurable loading/error/retry
 copy and marks both initial loading and refresh with `aria-busy`; a refresh
 keeps the current rows visible but locks trust, enablement, and config-open
 actions until the host finishes. Hook discovery and execution remain host-owned.
+The Personalization settings surface now models saving/saved/error feedback,
+custom retry copy, and a busy contract that locks custom instructions, Memory,
+and Personality controls while the host persists changes. Local-memory storage,
+profile services, and persistence semantics remain outside the renderer.
 The Settings `Connections` slice now adds a controlled `RemoteConnectionsPage`
 with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,

@@ -1174,4 +1174,63 @@ describe("settings surfaces", () => {
     await waitFor(() => expect(document.activeElement).toBe(trigger));
     expect(screen.queryByRole("menu")).toBeNull();
   });
+
+  it("exposes personalization save lifecycle and locks controls while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <PersonalizationSettingsPage
+        customInstructionsDirty
+        onChange={() => undefined}
+        onDeleteLocalMemories={() => undefined}
+        onRetry={onRetry}
+        onSaveCustomInstructions={() => undefined}
+        retryLabel="Try again"
+        savingLabel="Saving personalization…"
+        status="saving"
+        value={initialPersonalizationValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { name: "Personalization" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Saving personalization…",
+    );
+    expect(screen.getByRole("textbox", { name: "Custom instructions" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen.getByRole("button", { name: "Saving personalization…" }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getByRole("switch", { name: "Enable local memories" }),
+    ).toHaveProperty("disabled", true);
+    expect(screen.getByRole("button", { name: "Delete" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Personality" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <PersonalizationSettingsPage
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try again"
+        status="error"
+        statusMessage="Personalization service unavailable"
+        value={initialPersonalizationValue}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Personalization service unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
 });
