@@ -180,8 +180,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
 
 - `AppWindowChrome`: 46px application-owned window navigation with
   traffic-light-safe Sidebar, Back, and Forward controls plus host-owned title
-  and trailing slots. Hosts retain history, routing, and native-window
-  behavior.
+  and trailing slots. A host-wide disabled lock covers the navigation actions;
+  hosts retain history, routing, and native-window behavior.
 - `AppRouteOutlet`: ready, loading, empty, error, offline, reconnecting, and
   stale-data presentation. Stale and reconnecting variants can preserve
   host-owned content while alert/live-region and busy semantics remain

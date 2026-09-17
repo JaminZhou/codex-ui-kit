@@ -946,6 +946,9 @@ observed geometry.
 The contenteditable ComposerEditor now exposes the same disabled boundary,
 including non-editable semantics and suppression of host editing callbacks
 during route or submission transitions.
+The AppWindowChrome navigation group now propagates the same disabled boundary
+to Sidebar, Back, and Forward actions without taking ownership of host routing
+or native-window behavior.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
