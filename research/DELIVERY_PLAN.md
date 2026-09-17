@@ -2405,6 +2405,11 @@ own-playground functional and responsive checks, not current installed-product
 pixel evidence. Project-wide and closed history, comments/reviews and broader
 PR workflows remain incomplete.
 
+The notification and composer-plan progress surfaces now share the same
+disabled boundary: queued notification action/dismiss controls and plan
+hover/focus/disclosure changes are locked without suppressing live status or
+protocol-derived progress content.
+
 ## Planning rules
 
 - Split an inventory ID whenever independently owned states or transitions can

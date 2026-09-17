@@ -28,6 +28,7 @@ export interface AppNotification {
 
 export interface AppNotificationRegionProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  disabled?: boolean;
   maxVisible?: number;
   notifications: readonly AppNotification[];
   /** @deprecated Current Codex keeps overflowed toasts mounted but visually collapsed. */
@@ -105,6 +106,7 @@ function DismissIcon() {
 export function AppNotificationRegion({
   "aria-label": ariaLabel = "Notifications",
   className,
+  disabled = false,
   maxVisible = 3,
   notifications,
   overflowLabel,
@@ -230,12 +232,14 @@ export function AppNotificationRegion({
   return createPortal(
     <section
       {...props}
+      aria-disabled={disabled || undefined}
       aria-label={`${ariaLabel} alt+T`}
       aria-live="polite"
       className={["codex-ui-app-notification-region", className]
         .filter(Boolean)
         .join(" ")}
       data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
+      data-disabled={disabled || undefined}
       data-hidden-count={hiddenCount}
       data-position={position}
       data-theme={portalTheme}
@@ -267,7 +271,9 @@ export function AppNotificationRegion({
           const action = notification.onAction ? (
             <button
               className="codex-ui-app-notification__action"
+              disabled={disabled}
               onClick={(event) => {
+                if (disabled) return;
                 notification.onAction?.(event);
                 preserveQueueFocus(index, "action");
               }}
@@ -321,7 +327,9 @@ export function AppNotificationRegion({
                     <button
                       aria-label={notification.dismissLabel ?? "Close"}
                       className="codex-ui-app-notification__dismiss"
+                      disabled={disabled}
                       onClick={(event) => {
+                        if (disabled) return;
                         notification.onDismiss?.(event);
                         preserveQueueFocus(index, "dismiss");
                       }}

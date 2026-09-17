@@ -14,6 +14,7 @@ export interface ComposerPlanProgressProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   closeDelayMs?: number;
   defaultOpen?: boolean;
+  disabled?: boolean;
   open?: boolean;
   openDelayMs?: number;
   onOpenChange?: (open: boolean) => void;
@@ -84,6 +85,7 @@ export function ComposerPlanProgress({
   className,
   closeDelayMs = 80,
   defaultOpen = false,
+  disabled = false,
   onOpenChange,
   open,
   openDelayMs = 150,
@@ -113,10 +115,12 @@ export function ComposerPlanProgress({
     }
   };
   const setOpen = (nextOpen: boolean) => {
+    if (disabled) return;
     if (open === undefined) setInternalOpen(nextOpen);
     onOpenChange?.(nextOpen);
   };
   const scheduleOpen = () => {
+    if (disabled) return;
     clearTimers();
     openTimerRef.current = window.setTimeout(() => {
       openTimerRef.current = null;
@@ -124,6 +128,7 @@ export function ComposerPlanProgress({
     }, openDelayMs);
   };
   const scheduleClose = () => {
+    if (disabled) return;
     clearTimers();
     closeTimerRef.current = window.setTimeout(() => {
       closeTimerRef.current = null;
@@ -142,10 +147,12 @@ export function ComposerPlanProgress({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-composer-plan-progress", className]
         .filter(Boolean)
         .join(" ")}
       data-open={resolvedOpen || undefined}
+      data-disabled={disabled || undefined}
       onMouseEnter={scheduleOpen}
       onMouseLeave={scheduleClose}
       {...props}
@@ -155,6 +162,7 @@ export function ComposerPlanProgress({
         aria-expanded={resolvedOpen}
         aria-label={`${summary}. Show plan`}
         className="codex-ui-composer-plan-progress__trigger"
+        disabled={disabled}
         onBlur={scheduleClose}
         onClick={() => {
           clearTimers();
