@@ -493,8 +493,9 @@ kit never performs filesystem, network, account, or process mutations.
   unavailable/error states and Create/Open/Share/Refresh/Overflow callbacks.
   It does not call a Sites service or open external pages.
 - `SkillDetailDialog` and `SkillPromptMention`: controlled skill detail,
-  enabled state, action menu, long instructions, and unsent Try-now prompt.
-  Installation, execution, and prompt submission are host-owned.
+  enabled state, action menu, long instructions, unsent Try-now prompt, and
+  updating/error/retry lifecycle. Installation, execution, and prompt
+  submission are host-owned.
 - `PdfPreviewPanel`: controlled PDF page/zoom/annotation/expand state with
   page navigation, Open/Retry/Close callbacks, and an explicit renderer slot.
   PDF decoding and file access remain host-owned.

@@ -75,6 +75,58 @@ describe("SkillDetail", () => {
     expect(onTryNow).toHaveBeenCalledOnce();
   });
 
+  it("exposes controlled updating and retryable error states", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <SkillDetailDialog
+        onOpenChange={vi.fn()}
+        onRetry={onRetry}
+        open
+        status="updating"
+        title="OpenAI Docs"
+      >
+        Instructions
+      </SkillDetailDialog>,
+    );
+    const dialog = screen.getByRole("dialog", { name: "OpenAI Docs" });
+    expect(dialog.getAttribute("data-status")).toBe("updating");
+    expect(dialog.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Updating skill…",
+    );
+    expect(screen.getByRole("switch", { name: "Disable skill" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Try now" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <SkillDetailDialog
+        onOpenChange={vi.fn()}
+        onRetry={onRetry}
+        open
+        retryLabel="Try again"
+        status="error"
+        statusMessage="The skill could not be enabled."
+        title="OpenAI Docs"
+      >
+        Instructions
+      </SkillDetailDialog>,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The skill could not be enabled.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(screen.getByRole("switch", { name: "Disable skill" })).toHaveProperty(
+      "disabled",
+      false,
+    );
+  });
+
   it("exposes the read-only actions menu through controlled callbacks", () => {
     const onActionsMenuOpenChange = vi.fn();
     const onCopyMarkdown = vi.fn();

@@ -12855,6 +12855,34 @@ summary.codex-ui-activity__header::after {
   outline: none;
 }
 
+.codex-ui-skill-detail__status {
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--codex-ui-focus) 12%, transparent);
+  border-radius: 0.75rem;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  font-size: 0.8125rem;
+  gap: 0.25rem;
+  line-height: 1.25rem;
+  margin: 0.75rem 0 0;
+  padding: 0.625rem 0.75rem;
+}
+
+.codex-ui-skill-detail[data-status="error"] .codex-ui-skill-detail__status {
+  background: color-mix(in srgb, #ef6b73 14%, transparent);
+}
+
+.codex-ui-skill-detail__status button {
+  background: transparent;
+  border: 0;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  padding: 0;
+}
+
 .codex-ui-skill-detail__artwork {
   align-items: center;
   border-radius: 0.625rem;
@@ -12975,6 +13003,14 @@ summary.codex-ui-activity__header::after {
 .codex-ui-skill-detail__uninstall {
   background: color-mix(in srgb, var(--codex-ui-danger) 10%, transparent);
   color: var(--codex-ui-danger);
+}
+
+.codex-ui-skill-detail__uninstall:disabled,
+.codex-ui-skill-detail__try:disabled,
+.codex-ui-skill-detail__switch:disabled,
+.codex-ui-skill-detail__more:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
 .codex-ui-skill-detail__try {
