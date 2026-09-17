@@ -88,6 +88,7 @@ describe("environment settings surfaces", () => {
     render(
       <EnvironmentEditorPage
         onRetry={onRetry}
+        retryLabel="Review again"
         status="conflict"
         statusMessage="The environment is out of date"
       />,
@@ -96,7 +97,54 @@ describe("environment settings surfaces", () => {
     expect(screen.getByRole("alert").textContent).toContain(
       "The environment is out of date",
     );
-    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    fireEvent.click(screen.getByRole("button", { name: "Review again" }));
     expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it("locks mutable controls while saving and exposes custom feedback labels", () => {
+    const onActionAdd = vi.fn();
+    const onActionDelete = vi.fn();
+    render(
+      <EnvironmentEditorPage
+        actions={[
+          { command: "pnpm test", id: "verify", name: "Verify", platforms: "macOS" },
+        ]}
+        activeTab="actions"
+        onActionAdd={onActionAdd}
+        onActionDelete={onActionDelete}
+        retryLabel="Try again"
+        savingLabel="Saving environment now…"
+        status="saving"
+      />,
+    );
+
+    const editor = screen.getByRole("heading", { name: "Environment" }).closest("section");
+    expect(editor?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Saving environment now…",
+    );
+    expect(screen.getByRole("textbox", { name: "Environment name" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("tab", { name: "Setup" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Add action" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("textbox", { name: "verify action name" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Delete" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen.getByRole("button", { name: "Saving environment now…" }),
+    ).toHaveProperty("disabled", true);
   });
 });

@@ -1766,6 +1766,11 @@ host-owned editor and replay contracts: they intentionally do not claim that
 the installed product exposes the same save protocol or that a Remote
 environment can be provisioned without the product's private registry and
 relay services.
+The editor contract now also exposes saving feedback and retry-label overrides;
+while a save is in flight its mutable fields, tabs, and action controls are
+locked behind `aria-busy`, while host-owned discard and conflict/error retry
+actions remain explicit. This validates the renderer lifecycle boundary without
+claiming production environment persistence.
 The Settings `Connections` slice now adds a controlled `RemoteConnectionsPage`
 with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,
