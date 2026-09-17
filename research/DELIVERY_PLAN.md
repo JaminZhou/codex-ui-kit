@@ -985,6 +985,9 @@ Escape remain explicit host-owned escape hatches.
 AgentReasoning, AgentPlan, ProposedPlan, and ActivityTimeline now expose the
 same boundary for their built-in disclosure, copy, download, and plan actions;
 caller-provided child/action slots remain host-owned.
+StatusBanner and StreamNotice now expose the same boundary for built-in status
+actions, dismiss, detail disclosure, and retry while custom action slots remain
+explicitly host-owned.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

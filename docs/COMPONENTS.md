@@ -138,9 +138,11 @@ failure/cancellation policy, pagination, and transcript streaming.
   performs or bypasses an approval.
 - `ApprovalCommandPreview`: bounded command preview with explicit expansion
   controls and a disabled lock for the collapse/expand action.
-- `StatusBanner`: neutral, info, warning, and error shell with actions, dismissal, and compact reflow.
+- `StatusBanner`: neutral, info, warning, and error shell with actions,
+  dismissal, compact reflow, and a disabled lock for built-in actions.
 - `InlineNotice`: transcript divider with tone, guidance, wrapping, and active shimmer.
-- `StreamNotice`: reconnecting, server-busy, failed, retry, progress, and additional-detail states.
+- `StreamNotice`: reconnecting, server-busy, failed, retry, progress, and
+  additional-detail states with a disabled lock for details/retry controls.
 - `StatusIndicator`: compact pending, running, completed, warning, and failed state primitive.
 
 All privileged behavior remains host-owned. The components never auto-approve commands, file changes, network access, or permissions.
