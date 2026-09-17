@@ -416,6 +416,13 @@ exit gates; it does not replace the inventory.
   contract. It is own-playground App Server evidence only; it does not promote
   installed-product elicitation or current-build pixel parity. Authentication,
   approval, and cancellation therefore remain open product work.
+  The MCP settings manager now also exercises its replay-owned mutation boundary:
+  create and update validate the selected transport, expose a short saving lock,
+  persist the edited row in local replay state, and return to the list;
+  uninstall removes only the selected replay row, while enable/disable reports
+  an explicit pending state before settling. This does not claim a public App
+  Server configuration-write API or installed-product persistence; those remain
+  separate integration work.
   The current citations follow-up separately
   reaches three real inline OpenAI citations and the five-query Web Search
   Sources workspace. Six wide/compact replay frames pass Browser/CDP,

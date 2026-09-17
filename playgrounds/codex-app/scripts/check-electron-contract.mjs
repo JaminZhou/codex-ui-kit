@@ -20998,7 +20998,7 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
       contract.description?.height !== 18.5625 ||
       JSON.stringify(contract.cards) !==
         JSON.stringify([{ height: 414, top: 346.359375, width: 768 }]) ||
-      contract.saveDisabled !== true
+      contract.saveDisabled !== false
     ) {
       throw new Error(
         `Electron MCP detail editor drifted: ${JSON.stringify(contract)}.`,

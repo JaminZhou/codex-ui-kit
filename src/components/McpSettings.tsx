@@ -685,6 +685,7 @@ export function McpServerEditor({
     >
       <button
         className="codex-ui-mcp-editor__back"
+        disabled={isSaving}
         onClick={onBack}
         type="button"
       >

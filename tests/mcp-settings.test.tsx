@@ -246,6 +246,7 @@ describe("MCP settings", () => {
         mode="update"
         onChange={vi.fn()}
         onUninstall={onUninstall}
+        saveDisabled={false}
         value={{
           ...editorValue,
           name: "docs-reference",
@@ -263,6 +264,10 @@ describe("MCP settings", () => {
       ),
     ).toBeTruthy();
     expect(screen.queryByPlaceholderText("MCP server name")).toBeNull();
+    expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
+      "disabled",
+      false,
+    );
     fireEvent.click(screen.getByRole("button", { name: "Uninstall" }));
     expect(onUninstall).toHaveBeenCalledOnce();
   });
@@ -288,6 +293,10 @@ describe("MCP settings", () => {
     expect(editor.getAttribute("aria-busy")).toBe("true");
     expect(screen.getByRole("status").textContent).toContain("Saving…");
     expect(screen.getByPlaceholderText("MCP server name")).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Back" })).toHaveProperty(
       "disabled",
       true,
     );
