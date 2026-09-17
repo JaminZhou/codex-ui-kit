@@ -1909,6 +1909,11 @@ loopback servers proves connected, updated-endpoint, and compact-width
 disconnect/Forget recovery at 1180px and 720px without touching production
 Remote state; installed-product pairing and relay-backed registry semantics
 remain explicitly open.
+The Live Electron route now serializes save, test, and forget operations at
+the renderer boundary as well: duplicate clicks are rejected before IPC,
+save keeps the editor draft locked behind `aria-busy`, and a failed save
+keeps an explicit retry path. This strengthens the host-backed lifecycle
+without implying production pairing, credentials, or relay ownership.
 
 ### 6. Perform global visual convergence
 
