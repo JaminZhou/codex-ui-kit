@@ -177,6 +177,7 @@ import {
   type ScheduledTaskPageStatus,
   type ScheduledTaskSuggestion,
   type SiteIndexItem,
+  type SkillDetailStatus,
   type SitesIndexStatus,
   type SubagentItem,
   type WorktreeSetupPhase,
@@ -3709,6 +3710,11 @@ export function App() {
   );
   const [skillDetailEnabled, setSkillDetailEnabled] = useState(true);
   const [skillDetailAction, setSkillDetailAction] = useState("");
+  const [skillDetailStatus, setSkillDetailStatus] =
+    useState<SkillDetailStatus>("ready");
+  const [skillDetailUpdatingLabel, setSkillDetailUpdatingLabel] =
+    useState("Updating skill…");
+  const skillDetailMutationTimerRef = useRef<number | null>(null);
   const [skillTryNowActive, setSkillTryNowActive] = useState(
     isCurrentSkillTryNowReplay,
   );
@@ -12912,8 +12918,19 @@ export function App() {
       }}
       onCopyMarkdown={() => setSkillDetailAction("copy-markdown-requested")}
       onEnabledChange={(enabled) => {
-        setSkillDetailEnabled(enabled);
-        setSkillDetailAction(enabled ? "enable-requested" : "disable-requested");
+        if (skillDetailStatus === "updating") return;
+        if (skillDetailMutationTimerRef.current !== null) {
+          window.clearTimeout(skillDetailMutationTimerRef.current);
+        }
+        setSkillDetailStatus("updating");
+        setSkillDetailUpdatingLabel("Updating skill…");
+        setSkillDetailAction(enabled ? "enabling" : "disabling");
+        skillDetailMutationTimerRef.current = window.setTimeout(() => {
+          setSkillDetailEnabled(enabled);
+          setSkillDetailStatus("ready");
+          setSkillDetailAction(enabled ? "enabled" : "disabled");
+          skillDetailMutationTimerRef.current = null;
+        }, 180);
       }}
       onOpen={() => setSkillDetailAction("open-requested")}
       onOpenChange={(open) => {
@@ -12923,6 +12940,7 @@ export function App() {
       }}
       onReveal={() => setSkillDetailAction("reveal-requested")}
       onTryNow={() => {
+        if (skillDetailStatus === "updating") return;
         setSkillDetailActionsOpen(false);
         setSkillDetailOpen(false);
         setSkillTryNowActive(true);
@@ -12932,9 +12950,33 @@ export function App() {
         );
         setView("conversation");
       }}
-      onUninstall={() => setSkillDetailAction("uninstall-requested")}
+      onRetry={() => {
+        setSkillDetailStatus("ready");
+        setSkillDetailUpdatingLabel("Updating skill…");
+        setSkillDetailAction("retry-update");
+      }}
+      onUninstall={() => {
+        if (skillDetailStatus === "updating") return;
+        if (skillDetailMutationTimerRef.current !== null) {
+          window.clearTimeout(skillDetailMutationTimerRef.current);
+        }
+        setSkillDetailStatus("updating");
+        setSkillDetailUpdatingLabel("Uninstalling…");
+        setSkillDetailAction("uninstalling");
+        skillDetailMutationTimerRef.current = window.setTimeout(() => {
+          setSkillDetailEnabled(false);
+          setSkillDetailActionsOpen(false);
+          setSkillDetailStatus("ready");
+          setSkillDetailOpen(false);
+          setSkillDetailAction("uninstalled");
+          skillDetailMutationTimerRef.current = null;
+        }, 180);
+      }}
       open={skillDetailOpen}
       title="OpenAI Docs"
+      status={skillDetailStatus}
+      statusMessage="The skill update did not complete."
+      updatingLabel={skillDetailUpdatingLabel}
     >
       <p>
         Use this skill when a task needs official product documentation or
