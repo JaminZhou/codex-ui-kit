@@ -272,13 +272,16 @@ All privileged behavior remains host-owned. The components never auto-approve co
   actions, section collapse, outside dismissal, Escape focus return, and
   viewport-clamped 300px geometry. Host code owns every environment, branch,
   commit, and pull-request mutation.
-- `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks.
+- `ThreadNavigationControls`: sidebar and optional Back/Forward toolbar controls with shortcuts, disabled states, and transient-navigation hover hooks. A host-wide disabled lock covers all navigation controls.
 - `ThreadMessageNavigationRail`: message overview with a current-build default
   threshold of ten user messages, active markers, keyboard and pointer
   previews, click navigation, pointer scrubbing, regular or compact row
-  density, and optional initial end positioning for long histories.
+  density, optional initial end positioning for long histories, and a
+  host-controlled disabled lock.
 - `FloatingThreadPanel`: non-modal, inert-when-closed panel with host-controlled contents and inset.
-- `ThreadFloatingButton`: latest-message control with chevron, working dots, hidden-interaction removal, and reduced-motion behavior.
+- `ThreadFloatingButton`: latest-message control with chevron, working dots,
+  hidden-interaction removal, reduced-motion behavior, and a host-controlled
+  disabled lock.
 
 ## Settings
 

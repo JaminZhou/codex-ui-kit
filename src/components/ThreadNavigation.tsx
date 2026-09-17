@@ -57,6 +57,7 @@ export interface ThreadNavigationControlsProps {
   canGoBack?: boolean;
   canGoForward?: boolean;
   className?: string;
+  disabled?: boolean;
   forwardShortcut?: ReactNode;
   historyControls?: boolean;
   onGoBack?: () => void;
@@ -73,6 +74,7 @@ export function ThreadNavigationControls({
   canGoBack = false,
   canGoForward = false,
   className,
+  disabled = false,
   forwardShortcut,
   historyControls = true,
   onGoBack,
@@ -92,9 +94,10 @@ export function ThreadNavigationControls({
       <Tooltip content="Toggle sidebar" shortcut={sidebarShortcut}>
         <IconButton
           data-app-shell-sidebar-trigger="true"
-          icon={sidebarOpen ? <SidebarOpenIcon /> : <SidebarClosedIcon />}
-          label={sidebarLabel}
-          onClick={onToggleSidebar}
+            icon={sidebarOpen ? <SidebarOpenIcon /> : <SidebarClosedIcon />}
+            label={sidebarLabel}
+            disabled={disabled}
+            onClick={onToggleSidebar}
           onPointerEnter={onSidebarPointerEnter}
           onPointerLeave={onSidebarPointerLeave}
         />
@@ -103,7 +106,7 @@ export function ThreadNavigationControls({
         <>
           <Tooltip content="Back" shortcut={backShortcut}>
             <IconButton
-              disabled={!canGoBack}
+              disabled={disabled || !canGoBack}
               icon={<BackIcon />}
               label="Back"
               onClick={onGoBack}
@@ -111,7 +114,7 @@ export function ThreadNavigationControls({
           </Tooltip>
           <Tooltip content="Forward" shortcut={forwardShortcut}>
             <IconButton
-              disabled={!canGoForward}
+              disabled={disabled || !canGoForward}
               icon={<BackIcon forward />}
               label="Forward"
               onClick={onGoForward}
@@ -136,6 +139,7 @@ export interface ThreadMessageNavigationRailProps {
   activeIds?: readonly string[];
   className?: string;
   density?: "compact" | "regular";
+  disabled?: boolean;
   initialScroll?: "end" | "start";
   insetInlineStart?: CSSProperties["insetInlineStart"];
   items: readonly ThreadMessageNavigationItem[];
@@ -156,6 +160,7 @@ export function ThreadMessageNavigationRail({
   activeIds = [],
   className,
   density = "compact",
+  disabled = false,
   initialScroll = "start",
   insetInlineStart = "var(--codex-ui-message-navigation-inset)",
   items,
@@ -311,6 +316,7 @@ export function ThreadMessageNavigationRail({
 
   return (
     <nav
+      aria-disabled={disabled || undefined}
       aria-label={label}
       className={["codex-ui-message-navigation-rail", className]
         .filter(Boolean)
@@ -319,6 +325,7 @@ export function ThreadMessageNavigationRail({
         density === "compact" ? "dense-message-navigation" : undefined
       }
       data-density={density}
+      data-disabled={disabled || undefined}
       data-initial-scroll={initialScroll}
       style={{ ...style, insetInlineStart }}
       ref={navRef}
@@ -352,6 +359,7 @@ export function ThreadMessageNavigationRail({
                 aria-label={`Jump to user message ${index + 1}`}
                 className="codex-ui-message-navigation-rail__button"
                 data-active={isActive || undefined}
+                disabled={disabled}
                 onBlur={() => {
                   if (activePointerIdRef.current === null) setRevealedId(null);
                 }}
@@ -361,7 +369,7 @@ export function ThreadMessageNavigationRail({
                     event.preventDefault();
                     return;
                   }
-                  onNavigate?.(item, "smooth");
+                  if (!disabled) onNavigate?.(item, "smooth");
                 }}
                 onFocus={() => setRevealedId(item.id)}
                 onPointerCancel={finishScrub}
@@ -384,6 +392,7 @@ export function ThreadMessageNavigationRail({
                   }
                 }}
                 onPointerMove={(event) => {
+                  if (disabled) return;
                   if (activePointerIdRef.current !== event.pointerId) return;
                   const scrubbedItem = findItemAtPointer(event);
                   if (
@@ -507,6 +516,7 @@ export function ThreadHeader({
 
 export interface ThreadFloatingButtonProps {
   className?: string;
+  disabled?: boolean;
   label?: string;
   onClick?: () => void;
   show: boolean;
@@ -515,6 +525,7 @@ export interface ThreadFloatingButtonProps {
 
 export function ThreadFloatingButton({
   className,
+  disabled = false,
   label = "Scroll to bottom",
   onClick,
   show,
@@ -524,12 +535,15 @@ export function ThreadFloatingButton({
     <button
       aria-hidden={!show}
       aria-label={label}
+      aria-disabled={disabled || undefined}
       className={["codex-ui-thread-floating-button", className]
         .filter(Boolean)
         .join(" ")}
       data-show={show || undefined}
+      data-disabled={disabled || undefined}
       data-working={working || undefined}
-      onClick={show ? onClick : undefined}
+      disabled={disabled}
+      onClick={show && !disabled ? onClick : undefined}
       tabIndex={show ? undefined : -1}
       type="button"
     >
