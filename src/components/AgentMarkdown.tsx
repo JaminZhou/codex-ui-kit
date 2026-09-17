@@ -338,6 +338,7 @@ interface MarkdownTableProps
   allowWideTables: boolean;
   children: ReactNode;
   copyable: boolean;
+  disabled: boolean;
   markdownSource: string;
   onTableCopy?: MarkdownTableCopyHandler;
 }
@@ -346,6 +347,7 @@ function MarkdownTable({
   allowWideTables,
   children,
   copyable,
+  disabled,
   markdownSource,
   onTableCopy,
   ...tableProps
@@ -366,6 +368,7 @@ function MarkdownTable({
   );
 
   const handleCopy = async () => {
+    if (disabled) return;
     const payload = {
       html: tableRef.current?.outerHTML ?? "",
       markdown: markdownSource,
@@ -398,8 +401,10 @@ function MarkdownTable({
   return (
     <>
       <div
+        aria-disabled={disabled || undefined}
         className="codex-ui-markdown__table-container"
         data-markdown-table=""
+        data-disabled={disabled || undefined}
         data-wide-block={allowWideTables || undefined}
         tabIndex={-1}
       >
@@ -416,7 +421,10 @@ function MarkdownTable({
                 aria-expanded={previewOpen}
                 aria-haspopup="dialog"
                 aria-label="Expand table"
-                onClick={() => setPreviewOpen(true)}
+                disabled={disabled}
+                onClick={() => {
+                  if (!disabled) setPreviewOpen(true);
+                }}
                 ref={expandButtonRef}
                 type="button"
               >
@@ -427,6 +435,7 @@ function MarkdownTable({
               <button
                 aria-label={copied ? "Copied" : "Copy table"}
                 data-copied={copied || undefined}
+                disabled={disabled}
                 onClick={() => void handleCopy()}
                 type="button"
               >
@@ -837,6 +846,7 @@ export type MarkdownImageStatusResolver = (
 export interface MarkdownImageProps
   extends Omit<ImgHTMLAttributes<HTMLImageElement>, "children"> {
   allowWide?: boolean;
+  disabled?: boolean;
   loadingLabel?: string;
   preview?: boolean;
   previewDialogLabel?: string;
@@ -866,6 +876,7 @@ export function MarkdownImage({
   allowWide = false,
   alt = "",
   className,
+  disabled = false,
   loadingLabel = "Image loading",
   onError,
   onLoad,
@@ -948,10 +959,13 @@ export function MarkdownImage({
           "codex-ui-markdown-image__trigger",
           allowWide && "codex-ui-markdown-image__trigger--wide",
         ]
-          .filter(Boolean)
-          .join(" ")}
+        .filter(Boolean)
+        .join(" ")}
         data-markdown-image-preview-trigger="true"
-        onClick={() => preview && setOpen(true)}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled && preview) setOpen(true);
+        }}
         type="button"
       >
         <img
@@ -979,6 +993,7 @@ export function MarkdownImage({
       {preview ? (
         <ImagePreviewDialog
           className="codex-ui-markdown-image-preview"
+          disabled={disabled}
           downloadable={false}
           imageId={src}
           images={[image]}
@@ -1050,6 +1065,7 @@ function remarkPreserveUnsupportedFootnotes() {
 
 interface MarkdownRenderBoundaryProps {
   children: ReactNode;
+  disabled: boolean;
   onRetry?: () => void;
   resetKey: string;
   retryLabel: ReactNode;
@@ -1082,12 +1098,19 @@ class MarkdownRenderBoundary extends Component<
   render() {
     if (!this.state.failed) return this.props.children;
     return (
-      <div className="codex-ui-markdown__render-error" role="alert">
+      <div
+        aria-disabled={this.props.disabled || undefined}
+        className="codex-ui-markdown__render-error"
+        data-disabled={this.props.disabled || undefined}
+        role="alert"
+      >
         <div className="codex-ui-markdown__render-error-title">
           {this.props.title}
         </div>
         <button
+          disabled={this.props.disabled}
           onClick={() => {
+            if (this.props.disabled) return;
             this.setState({ failed: false });
             this.props.onRetry?.();
           }}
@@ -1120,6 +1143,7 @@ export interface AgentMarkdownProps
   codeBlockWrapToggleable?: boolean;
   components?: Components;
   density?: "compact" | "regular";
+  disabled?: boolean;
   expandWideMedia?: boolean;
   imageLoadingLabel?: string;
   imagePreview?: boolean;
@@ -1157,6 +1181,7 @@ export function AgentMarkdown({
   codeBlockWrapToggleable = false,
   components,
   density = "regular",
+  disabled = false,
   expandWideMedia = false,
   imageLoadingLabel = "Image loading",
   imagePreview = true,
@@ -1231,6 +1256,7 @@ export function AgentMarkdown({
           <MarkdownImage
             allowWide={allowWideMedia}
             alt={alt}
+            disabled={disabled}
             loadingLabel={imageLoadingLabel}
             preview={imagePreview}
             previewDialogLabel={imagePreviewDialogLabel}
@@ -1279,6 +1305,7 @@ export function AgentMarkdown({
                 copyAriaLabel={codeBlockCopyAriaLabel}
                 copyLabel={codeBlockCopyLabel}
                 copyable={codeBlockCopyable}
+                disabled={disabled}
                 language={language}
                 languageIcon={
                   typeof codeBlockLanguageIcon === "function"
@@ -1370,6 +1397,7 @@ export function AgentMarkdown({
             <MarkdownTable
               allowWideTables={allowWideTables}
               copyable={tableCopyable}
+              disabled={disabled}
               markdownSource={markdownSource}
               {...tableProps}
               onTableCopy={handleTableCopy}
@@ -1397,6 +1425,7 @@ export function AgentMarkdown({
       codeHighlighter,
       components,
       expandWideMedia,
+      disabled,
       hasCodeCopyHandler,
       hasTableCopyHandler,
       imageLoadingLabel,
@@ -1434,12 +1463,15 @@ export function AgentMarkdown({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={classes}
       data-density={density}
+      data-disabled={disabled || undefined}
       data-streaming={streaming || undefined}
       {...props}
     >
       <MarkdownRenderBoundary
+        disabled={disabled}
         onRetry={onRetryRender}
         resetKey={source}
         retryLabel={retryRenderLabel}
