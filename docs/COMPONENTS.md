@@ -376,12 +376,14 @@ All privileged behavior remains host-owned. The components never auto-approve co
   expansion, status, and disabled semantics.
 - `ConversationProjectListbox`: linked project options with selected/disabled
   states, initial focus, arrow/Home/End navigation, Escape dismissal, and
-  outside-pointer dismissal. `selectedIcon` lets a host supply its observed
-  selection primitive while the listbox continues to own option semantics and
-  focus behavior.
+  outside-pointer dismissal. A host-wide disabled lock covers option
+  selection and keyboard focus while dismissal remains available. `selectedIcon`
+  lets a host supply its observed selection primitive while the listbox
+  continues to own option semantics and focus behavior.
 - `LocalEnvironmentDialog`: searchable, grouped local checkout/worktree
   selection with branch, metadata, repair/loading states, scrolling, and a
-  host-owned create action.
+  host-owned create action. A disabled lock covers search and environment
+  selection without taking ownership of the host-provided footer action.
 - `BranchCreationDialog`: current compact branch-name modal with an optional
   Git-prefix action, empty/creating/error states, host-owned validation and
   mutation, focus containment on the modal surface while creating, dismissal
