@@ -373,6 +373,12 @@ export function ApprovalRequest({
     setOptionsOpen(false);
     if (!primaryDisabled) onApprove?.();
   };
+  const rejectOnce = () => {
+    if (!actionsDisabled) onReject?.();
+  };
+  const leadingOnce = () => {
+    if (!actionsDisabled) leadingAction?.onClick();
+  };
   const optionsMenu =
     optionsVisible && isPending && scopedApproveAction && optionsPortalTarget
       ? createPortal(
@@ -396,6 +402,7 @@ export function ApprovalRequest({
             <button
               disabled={actionsDisabled}
               onClick={() => {
+                if (actionsDisabled) return;
                 setOptionsOpen(false);
                 scopedApproveAction.onClick();
               }}
@@ -425,11 +432,13 @@ export function ApprovalRequest({
     <section
       aria-busy={loading || undefined}
       aria-label={ariaLabel}
+      aria-disabled={disabled || undefined}
       className={classes}
       data-codex-approval-surface
       data-decision={decision}
+      data-disabled={disabled || undefined}
       data-hotkeys-disabled={
-        disableHotkeys || surfaceBlocked || undefined
+        disableHotkeys || surfaceBlocked || actionsDisabled || undefined
       }
       data-kind={kind}
       data-presentation={presentation}
@@ -489,7 +498,7 @@ export function ApprovalRequest({
               className="codex-ui-approval-request__button"
               data-action="leading"
               disabled={actionsDisabled}
-              onClick={leadingAction.onClick}
+              onClick={leadingOnce}
               title={leadingAction.info}
               type="button"
             >
@@ -502,7 +511,7 @@ export function ApprovalRequest({
               className="codex-ui-approval-request__button"
               data-action="reject"
               disabled={actionsDisabled || !onReject}
-              onClick={onReject}
+              onClick={rejectOnce}
               type="button"
             >
               <span className="codex-ui-approval-request__button-label">
@@ -610,6 +619,7 @@ export interface ApprovalCommandPreviewProps
   collapsedLines?: number;
   command: ReactNode;
   defaultExpanded?: boolean;
+  disabled?: boolean;
   expandLabel?: ReactNode;
   forceCollapsible?: boolean;
 }
@@ -667,6 +677,7 @@ export function ApprovalCommandPreview({
   collapsedLines = 3,
   command,
   defaultExpanded = false,
+  disabled = false,
   expandLabel = "Expand",
   forceCollapsible,
   style,
@@ -707,9 +718,11 @@ export function ApprovalCommandPreview({
   return (
     <div
       aria-label="Command preview"
+      aria-disabled={disabled || undefined}
       className={["codex-ui-approval-command", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-expanded={visuallyExpanded || undefined}
       role="region"
       style={
@@ -724,7 +737,13 @@ export function ApprovalCommandPreview({
         <code ref={contentRef}>{command}</code>
         {collapsible ? (
           <div className="codex-ui-approval-command__actions">
-            <button onClick={() => setExpanded((value) => !value)} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) setExpanded((value) => !value);
+              }}
+              type="button"
+            >
               {expanded ? collapseLabel : expandLabel}
             </button>
           </div>

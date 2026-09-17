@@ -965,6 +965,10 @@ The FileReview and FileReviewWorkspace compositions now expose the same
 host-controlled disabled boundary across file selection, scope/filter/layout
 controls, diff disclosure, copy/open actions, and Git actions while preserving
 host-owned review content and effects.
+ApprovalRequest now exposes that boundary on its root semantics, decision
+buttons, scoped approval menu, and document-level hotkeys; ApprovalCommandPreview
+also locks its collapse/expand action while preserving host-owned approval
+decisions and command content.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

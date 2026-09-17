@@ -225,6 +225,42 @@ describe("ApprovalRequest", () => {
     }
   });
 
+  it("locks approval decisions and hotkeys while disabled", () => {
+    const onApprove = vi.fn();
+    const onReject = vi.fn();
+    const onScope = vi.fn();
+    const onLeading = vi.fn();
+    render(
+      <ApprovalRequest
+        disabled
+        kind="permission"
+        leadingAction={{ onClick: onLeading }}
+        onApprove={onApprove}
+        onReject={onReject}
+        scopedApproveAction={{ onClick: onScope }}
+        title="Grant permissions?"
+      />,
+    );
+
+    const request = screen.getByRole("region", { name: "Approval request" });
+    expect(request.getAttribute("aria-disabled")).toBe("true");
+    expect(request.getAttribute("data-disabled")).toBe("true");
+    expect(request.getAttribute("data-hotkeys-disabled")).toBe("true");
+
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    fireEvent.keyDown(document, { key: "Enter" });
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    expect(onApprove).not.toHaveBeenCalled();
+    expect(onReject).not.toHaveBeenCalled();
+    expect(onScope).not.toHaveBeenCalled();
+    expect(onLeading).not.toHaveBeenCalled();
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("exposes the one-shot and scoped choices through the split menu", () => {
     const onApprove = vi.fn();
     const onScope = vi.fn();
@@ -437,6 +473,24 @@ describe("ApprovalRequest", () => {
 });
 
 describe("ApprovalCommandPreview", () => {
+  it("locks command expansion while disabled", () => {
+    render(
+      <ApprovalCommandPreview
+        disabled
+        command={"line one\nline two\nline three\nline four"}
+        forceCollapsible
+      />,
+    );
+
+    const preview = screen.getByRole("region", { name: "Command preview" });
+    expect(preview.getAttribute("aria-disabled")).toBe("true");
+    expect(preview.getAttribute("data-disabled")).toBe("true");
+    const toggle = screen.getByRole("button", { name: "Expand" });
+    expect(toggle).toHaveProperty("disabled", true);
+    fireEvent.click(toggle);
+    expect(preview.hasAttribute("data-expanded")).toBe(false);
+  });
+
   it("expands and collapses the measured three-line command preview", () => {
     render(
       <ApprovalCommandPreview
