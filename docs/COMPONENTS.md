@@ -310,8 +310,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   fixtures rather than declared defaults.
 - `UsageSettingsPage`: controlled plan, credits, usage-limit meters, reset,
   and cancellation presentation with independent host callbacks for View
-  plans, Buy credits, and Gift credits. Hosts own account data, billing,
-  checkout, gifting, and cancellation effects.
+  plans, Buy credits, and Gift credits. Loading, saving, saved, and error
+  feedback, retry copy, and busy-state locking are host-controlled. Hosts own
+  account data, billing, checkout, gifting, and cancellation effects.
 - `PlanSelectionPage`: full-height Personal/Business plan composition with
   controlled audience, 5x/20x or annual/monthly per-card selectors,
   responsive cards, a host-owned Back transition, supplied pricing/features,

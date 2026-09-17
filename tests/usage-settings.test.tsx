@@ -55,6 +55,53 @@ function PlanFixture({ onAction = () => undefined }) {
 }
 
 describe("UsageSettingsPage", () => {
+  it("exposes Usage lifecycle copy and locks billing actions while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <UsageSettingsPage
+        credits={{ balance: "$0", giftLabel: "Gift credits" }}
+        limitGroups={[]}
+        onBuyCredits={() => undefined}
+        onGiftCredits={() => undefined}
+        onRetry={onRetry}
+        onViewPlans={() => undefined}
+        plan={{ label: "Pro", price: "$100/mo" }}
+        retryLabel="Try billing again"
+        savingLabel="Saving billing settings…"
+        status="saving"
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "Usage & billing" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving billing settings…")).toBeTruthy();
+    for (const label of ["View plans", "Buy credits", "Gift credits"]) {
+      expect(
+        (screen.getByRole("button", { name: label }) as HTMLButtonElement)
+          .disabled,
+      ).toBe(true);
+    }
+
+    rerender(
+      <UsageSettingsPage
+        credits={{ balance: "$0" }}
+        errorMessage="Billing preferences unavailable"
+        limitGroups={[]}
+        onRetry={onRetry}
+        plan={{ label: "Pro", price: "$100/mo" }}
+        retryLabel="Try billing again"
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Billing preferences unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try billing again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("renders plan, credits, limits, reset, and cancellation semantics", () => {
     render(
       <UsageSettingsPage
