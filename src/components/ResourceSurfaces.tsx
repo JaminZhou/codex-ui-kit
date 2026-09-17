@@ -226,19 +226,73 @@ export function ResourceList({
   );
 }
 
+export type ArtifactListStatus = "empty" | "error" | "loading" | "ready";
+
 export interface ArtifactListProps extends ResourceListProps {
   emptyLabel?: ReactNode;
+  errorLabel?: ReactNode;
+  loadingLabel?: ReactNode;
+  onRetry?: () => void;
+  retryLabel?: ReactNode;
+  status?: ArtifactListStatus;
+  statusMessage?: ReactNode;
 }
 
 export function ArtifactList({
   children,
   emptyLabel = "No artifacts yet",
+  errorLabel = "Artifacts unavailable",
+  loadingLabel = "Loading artifacts…",
+  onRetry,
+  retryLabel = "Retry",
+  status = "ready",
+  statusMessage,
   ...props
 }: ArtifactListProps) {
-  if (Children.count(children) === 0) {
+  const { className, ...resourceListProps } = props;
+  const hasChildren = Children.count(children) > 0;
+  const isLoading = status === "loading";
+  if (status === "ready" && !hasChildren) {
     return <p className="codex-ui-artifact-list__empty">{emptyLabel}</p>;
   }
-  return <ResourceList {...props}>{children}</ResourceList>;
+  return (
+    <section
+      aria-busy={isLoading || undefined}
+      aria-label="Artifacts"
+      className={["codex-ui-artifact-list", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-status={status}
+    >
+      {isLoading ? (
+        <div
+          aria-label={typeof loadingLabel === "string" ? loadingLabel : undefined}
+          className="codex-ui-artifact-list__state"
+          role="status"
+        >
+          <span className="codex-ui-artifact-list__skeleton" />
+          <span className="codex-ui-artifact-list__skeleton" />
+          <span className="codex-ui-artifact-list__skeleton" />
+        </div>
+      ) : status === "error" ? (
+        <div className="codex-ui-artifact-list__state" role="alert">
+          <strong>{errorLabel}</strong>
+          {statusMessage ? <span>{statusMessage}</span> : null}
+          {onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : status === "empty" || !hasChildren ? (
+        <p className="codex-ui-artifact-list__state" role="status">
+          {emptyLabel}
+        </p>
+      ) : (
+        <ResourceList {...resourceListProps}>{children}</ResourceList>
+      )}
+    </section>
+  );
 }
 
 export type SourceKind = "external" | "file" | "tool" | "web";
