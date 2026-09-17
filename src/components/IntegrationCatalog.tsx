@@ -49,6 +49,7 @@ export interface IntegrationCatalogScope {
 export interface IntegrationCatalogTabsProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onChange"> {
   active: IntegrationCatalogKind;
+  disabled?: boolean;
   onChange?: (kind: IntegrationCatalogKind) => void;
   pluginsLabel?: ReactNode;
   skillsLabel?: ReactNode;
@@ -58,6 +59,7 @@ export interface IntegrationCatalogPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   activeScope?: string;
   description?: ReactNode;
+  disabled?: boolean;
   emptyLabel?: ReactNode;
   installedItems?: readonly IntegrationCatalogItem[];
   installedLabel?: ReactNode;
@@ -114,12 +116,14 @@ function searchableText(item: IntegrationCatalogItem) {
 }
 
 function CatalogItemRow({
+  disabled = false,
   item,
   kind,
   onAction,
   onActionRetry,
   onOpen,
 }: {
+  disabled?: boolean;
   item: IntegrationCatalogItem;
   kind: IntegrationCatalogKind;
   onAction?: (item: IntegrationCatalogItem) => void;
@@ -140,7 +144,7 @@ function CatalogItemRow({
     <article
       aria-busy={actionBusy || undefined}
       className="codex-ui-integration-catalog__item"
-      data-disabled={item.disabled || undefined}
+      data-disabled={disabled || item.disabled || undefined}
       data-installed={item.installed || undefined}
       data-action-status={actionStatus}
       data-kind={kind}
@@ -149,7 +153,7 @@ function CatalogItemRow({
         <button
           aria-label={`Open ${titleLabel}`}
           className="codex-ui-integration-catalog__item-open"
-          disabled={item.disabled || actionBusy}
+          disabled={disabled || item.disabled || actionBusy}
           onClick={() => onOpen(item)}
           type="button"
         />
@@ -183,7 +187,7 @@ function CatalogItemRow({
         <button
           aria-label={actionBusy ? undefined : item.actionAriaLabel}
           className="codex-ui-integration-catalog__item-action"
-          disabled={item.disabled || actionBusy}
+          disabled={disabled || item.disabled || actionBusy}
           onClick={() => {
             if (!actionBusy) onAction?.(item);
           }}
@@ -201,6 +205,7 @@ function CatalogItemRow({
           {actionStatus === "error" && onActionRetry ? (
             <button
               aria-label={`Retry ${titleLabel}`}
+              disabled={disabled || item.disabled}
               onClick={() => onActionRetry(item)}
               type="button"
             >
@@ -216,6 +221,7 @@ function CatalogItemRow({
 export function IntegrationCatalogTabs({
   active,
   className,
+  disabled = false,
   onChange,
   pluginsLabel = "Plugins",
   skillsLabel = "Skills",
@@ -238,6 +244,7 @@ export function IntegrationCatalogTabs({
           aria-selected={active === kind}
           className="codex-ui-integration-catalog-tabs__tab"
           data-active={active === kind || undefined}
+          disabled={disabled}
           key={kind}
           onClick={() => onChange?.(kind)}
           role="tab"
@@ -254,6 +261,7 @@ export function IntegrationCatalogPage({
   activeScope,
   className,
   description,
+  disabled = false,
   emptyLabel = "No results",
   installedItems = [],
   installedLabel = "Installed",
@@ -280,6 +288,8 @@ export function IntegrationCatalogPage({
   ...props
 }: IntegrationCatalogPageProps) {
   const installedHeadingId = useId();
+  const statusId = useId();
+  const isLocked = disabled || status !== "ready";
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const matches = (item: IntegrationCatalogItem) =>
     !normalizedQuery || searchableText(item).includes(normalizedQuery);
@@ -313,7 +323,15 @@ export function IntegrationCatalogPage({
     onQueryChange?.(event.currentTarget.value);
 
   return (
-    <main className={classes} data-kind={kind} data-status={status} {...props}>
+    <main
+      aria-busy={status === "loading" || undefined}
+      aria-describedby={status !== "ready" ? statusId : undefined}
+      className={classes}
+      data-disabled={disabled || undefined}
+      data-kind={kind}
+      data-status={status}
+      {...props}
+    >
       <div className="codex-ui-integration-catalog__intro">
         <h1>{title}</h1>
         {description ? <p>{description}</p> : null}
@@ -324,6 +342,7 @@ export function IntegrationCatalogPage({
           {placeholder}
         </span>
         <input
+          disabled={isLocked}
           onChange={handleQueryChange}
           placeholder={placeholder}
           type="search"
@@ -335,12 +354,18 @@ export function IntegrationCatalogPage({
         <div
           aria-live="polite"
           className="codex-ui-integration-catalog__status"
+          id={statusId}
           role="status"
         >
           {loadingLabel}
         </div>
       ) : status !== "ready" ? (
-        <section className="codex-ui-integration-catalog__status">
+        <section
+          aria-live="polite"
+          className="codex-ui-integration-catalog__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
           <h2>{statusHeading ?? fallbackHeading}</h2>
           {statusDescription ? <p>{statusDescription}</p> : null}
           {onRetry ? (
@@ -362,6 +387,7 @@ export function IntegrationCatalogPage({
                   <button
                     aria-label="Manage installed integrations"
                     className="codex-ui-integration-catalog__manage"
+                    disabled={isLocked}
                     onClick={onManage}
                     type="button"
                   >
@@ -377,7 +403,7 @@ export function IntegrationCatalogPage({
                         typeof item.title === "string" ? item.title : item.id
                       }
                       className="codex-ui-integration-catalog__installed-icon"
-                      disabled={item.disabled}
+                      disabled={isLocked || item.disabled}
                       key={item.id}
                       onClick={() => onItemOpen?.(item)}
                       type="button"
@@ -394,6 +420,7 @@ export function IntegrationCatalogPage({
                       item={{ ...item, installed: true }}
                       key={item.id}
                       kind={kind}
+                      disabled={disabled}
                       onAction={onItemAction}
                       onActionRetry={onItemActionRetry}
                       onOpen={onItemOpen}
@@ -404,6 +431,7 @@ export function IntegrationCatalogPage({
                     <button
                       className="codex-ui-integration-catalog__installed-more"
                       onClick={onInstalledMore}
+                      disabled={isLocked}
                       type="button"
                     >
                       {installedMoreLabel}
@@ -424,6 +452,7 @@ export function IntegrationCatalogPage({
                 <button
                   aria-selected={scope.id === activeScope}
                   data-active={scope.id === activeScope || undefined}
+                  disabled={isLocked}
                   key={scope.id}
                   onClick={() => onScopeChange?.(scope)}
                   role="tab"
@@ -454,6 +483,7 @@ export function IntegrationCatalogPage({
                       item={item}
                       key={item.id}
                       kind={kind}
+                      disabled={disabled}
                       onAction={onItemAction}
                       onActionRetry={onItemActionRetry}
                       onOpen={onItemOpen}
@@ -463,6 +493,7 @@ export function IntegrationCatalogPage({
                 {section.moreLabel ? (
                   <button
                     className="codex-ui-integration-catalog__more"
+                    disabled={isLocked}
                     onClick={() => onMore?.(section)}
                     type="button"
                   >
