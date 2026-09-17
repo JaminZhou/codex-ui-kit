@@ -235,6 +235,18 @@ printed temporary-directory path and are not committed. Current-product PTY
 pixel comparison remains open. Functional local evidence is not full terminal
 parity.
 
+### Live global notifications — 2026-09-18
+
+The Live renderer now feeds real App Server approval, user-input, and
+`turn/completed` events into the shared `AppNotificationRegion`. Request ids
+are read from the public JSON-RPC request envelope, so repeated delivery is
+deduplicated correctly; resolved requests remove their warning, turn outcomes
+retain the latest four entries, and each entry can be dismissed. This is
+covered by the focused `live-notification-state` reducer tests and the normal
+playground typecheck/build. Replay shell notifications remain on their
+existing path. This promotes Live notification reachability in the playground,
+not installed-product parity or the complete production notification matrix.
+
 ### Live runtime check — 2026-09-08
 
 The previous pinned client bundled Codex CLI 0.145.0. A real live turn using

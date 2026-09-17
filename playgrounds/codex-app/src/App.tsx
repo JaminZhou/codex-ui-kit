@@ -221,6 +221,10 @@ import {
 } from "./protocol-state";
 import { changeStats, reviewContent } from "./diff-lines";
 import { initialLiveProjectState, liveProjectState, reduceLiveProjectState } from "./live-project-state";
+import {
+  reduceLiveAppNotifications,
+  type LiveAppNotification,
+} from "./live-notification-state";
 import { reduceLiveInputs } from "./live-input-state";
 import { LiveUserInput } from "./LiveUserInput";
 import { LiveMcpElicitation } from "./LiveMcpElicitation";
@@ -3600,6 +3604,10 @@ export function App() {
     reduceLiveMcpElicitations,
     [] as PendingMcpElicitation[],
   );
+  const [liveNotifications, dispatchLiveNotification] = useReducer(
+    reduceLiveAppNotifications,
+    [] as LiveAppNotification[],
+  );
   const [liveBackgroundTerminals, setLiveBackgroundTerminals] = useState<
     LiveBackgroundTerminal[]
   >([]);
@@ -5362,16 +5370,19 @@ export function App() {
       dispatchLive(event);
       dispatchLiveInput(event);
       dispatchLiveMcpElicitation(event);
+      if (event.kind === "live-reset") dispatchLiveNotification(event);
     });
     const removeNotification = window.codexDemo.onNotification((notification) => {
       dispatchLive(notification);
       dispatchLiveInput(notification);
       dispatchLiveMcpElicitation(notification);
+      dispatchLiveNotification(notification);
     });
     const removeServerRequest = window.codexDemo.onServerRequest((request) => {
       dispatchLive(request);
       dispatchLiveInput(request);
       dispatchLiveMcpElicitation(request);
+      dispatchLiveNotification(request);
     });
     return () => {
       removeNotification();
@@ -5917,6 +5928,7 @@ export function App() {
     }
     cancelReplaySubmitTimer();
     setView("conversation");
+    if (nextMode !== "live") dispatchLiveNotification({ kind: "live-reset" });
     setMode(nextMode);
     setActiveFrame(null);
     setBrowserPanelOpen(false);
@@ -17349,7 +17361,16 @@ export function App() {
                   };
                 }),
               ]
-            : []
+            : mode === "live"
+              ? liveNotifications.map((notification) => ({
+                  ...notification,
+                  onDismiss: () =>
+                    dispatchLiveNotification({
+                      id: notification.id,
+                      kind: "dismiss",
+                    }),
+                }))
+              : []
         }
         style={
           initialSelection.frame === "shell-notification-queue" ||
@@ -17780,6 +17801,7 @@ export function App() {
                     if (!window.codexDemo) throw new Error("Live host unavailable.");
                     await window.codexDemo.respondToUserInput({ requestId: request.requestId, threadId: request.threadId, answers });
                     dispatchLiveInput({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
+                    dispatchLiveNotification({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
                   }} />
                 ))}
                 {visibleMcpElicitations.map((request) => (
@@ -17796,6 +17818,7 @@ export function App() {
                           threadId: request.threadId,
                         });
                         dispatchLiveMcpElicitation({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
+                        dispatchLiveNotification({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
                       } else {
                         setReplayMcpElicitationResolution({ action, content, requestId: request.requestId, threadId: request.threadId });
                       }

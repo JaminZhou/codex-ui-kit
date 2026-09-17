@@ -1,0 +1,94 @@
+import { describe, expect, it } from "vitest";
+import {
+  reduceLiveAppNotifications,
+  type LiveAppNotification,
+} from "../src/live-notification-state";
+
+describe("live app notifications", () => {
+  it("surfaces approval and input requests with stable deduplication", () => {
+    const approval = {
+      id: 4,
+      kind: "request",
+      method: "item/commandExecution/requestApproval",
+      params: {},
+    } as const;
+    const withApproval = reduceLiveAppNotifications([], approval);
+    expect(withApproval).toEqual([
+      {
+        description: "A local action is waiting for approval.",
+        heading: "Permission required",
+        id: "live-approval:number:4",
+        tone: "warning",
+      },
+    ]);
+    expect(reduceLiveAppNotifications(withApproval, approval)).toEqual(
+      withApproval,
+    );
+    expect(
+      reduceLiveAppNotifications([], {
+        id: "question-1",
+        kind: "request",
+        method: "item/tool/requestUserInput",
+        params: {},
+      }),
+    ).toMatchObject([
+      {
+        heading: "Input required",
+        id: "live-input:string:question-1",
+        tone: "warning",
+      },
+    ]);
+    expect(
+      reduceLiveAppNotifications(withApproval, {
+        method: "serverRequest/resolved",
+        params: { requestId: 4 },
+      }),
+    ).toEqual([]);
+  });
+
+  it("keeps the latest four turn outcomes and can dismiss one", () => {
+    let notifications: LiveAppNotification[] = [];
+    for (let index = 1; index <= 5; index += 1) {
+      notifications = reduceLiveAppNotifications(notifications, {
+        method: "turn/completed",
+        params: {
+          threadId: "thread-1",
+          turn: { id: `turn-${index}`, status: "completed" },
+        },
+      });
+    }
+    expect(notifications).toHaveLength(4);
+    expect(notifications[0]?.id).toBe("live-turn:thread-1:turn-2:completed");
+    expect(notifications.at(-1)?.heading).toBe("Response ready");
+    expect(
+      reduceLiveAppNotifications(notifications, {
+        kind: "dismiss",
+        id: "live-turn:thread-1:turn-3:completed",
+      }),
+    ).toHaveLength(3);
+  });
+
+  it("distinguishes interrupted and failed turns and resets on live close", () => {
+    const interrupted = reduceLiveAppNotifications([], {
+      method: "turn/completed",
+      params: {
+        threadId: "thread-1",
+        turn: { id: "turn-stop", status: "interrupted" },
+      },
+    });
+    const failed = reduceLiveAppNotifications(interrupted, {
+      method: "turn/completed",
+      params: {
+        threadId: "thread-1",
+        turn: { id: "turn-failed", status: "failed" },
+      },
+    });
+    expect(failed.map(({ heading }) => heading)).toEqual([
+      "Turn stopped",
+      "Turn failed",
+    ]);
+    expect(
+      reduceLiveAppNotifications(failed, { kind: "live-reset" }),
+    ).toEqual([]);
+  });
+});
