@@ -469,8 +469,9 @@ kit never performs filesystem, network, account, or process mutations.
   controlled capture/edit/clear/cancel state and `onShortcutChange`. Native
   registration and persistence remain host-owned.
 - `PersonalizationSettingsPage`: controlled custom instructions, Memory
-  controls, warning, and Personality choice with save/reset callbacks. It
-  does not access account memory or profile services.
+  controls, warning, and Personality choice with save/reset callbacks. Save
+  lifecycle feedback, retry copy, and busy-state locking are host-controlled;
+  it does not access account memory or profile services.
 - `VoiceSettingsPage`: controlled microphone, voice, screen-context,
   dictionary, and recording states with host callbacks. Audio capture and
   permissions remain outside the package.

@@ -2806,6 +2806,12 @@ export interface PersonalizationSettingsValue {
   toolAssistedMemoryGeneration: boolean;
 }
 
+export type PersonalizationSettingsStatus =
+  | "error"
+  | "ready"
+  | "saved"
+  | "saving";
+
 export interface PersonalizationSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
   customInstructionsDirty?: boolean;
@@ -2814,7 +2820,12 @@ export interface PersonalizationSettingsPageProps
   onDeleteLocalMemories?: () => void;
   onSaveCustomInstructions?: () => void;
   onPersonalityMenuOpenChange?: (open: boolean) => void;
+  onRetry?: () => void;
   personalityMenuOpen?: boolean;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: PersonalizationSettingsStatus;
+  statusMessage?: ReactNode;
   value: PersonalizationSettingsValue;
 }
 
@@ -2837,10 +2848,12 @@ const personalizationOptions: readonly {
 
 function PersonalizationSwitch({
   checked,
+  disabled = false,
   label,
   onChange,
 }: {
   checked: boolean;
+  disabled?: boolean;
   label: string;
   onChange: (checked: boolean) => void;
 }) {
@@ -2849,6 +2862,7 @@ function PersonalizationSwitch({
       aria-checked={checked}
       aria-label={label}
       className="codex-ui-personalization-settings__switch"
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       role="switch"
       type="button"
@@ -2887,12 +2901,27 @@ export function PersonalizationSettingsPage({
   onChange,
   onDeleteLocalMemories,
   onPersonalityMenuOpenChange,
+  onRetry,
   onSaveCustomInstructions,
   personalityMenuOpen,
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   ...props
 }: PersonalizationSettingsPageProps) {
   const personalityDescriptionId = useId();
+  const statusId = useId();
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "saving"
+      ? savingLabel
+      : status === "saved"
+        ? "Custom instructions saved"
+        : "Custom instructions could not be saved.");
   const selectedPersonality =
     personalizationOptions.find((option) => option.value === value.personality) ??
     personalizationOptions[0];
@@ -2910,11 +2939,29 @@ export function PersonalizationSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-personalization-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>Personalization</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-personalization-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <section className="codex-ui-personalization-settings__custom">
         <header>
@@ -2927,15 +2974,16 @@ export function PersonalizationSettingsPage({
           </div>
           <button
             className="codex-ui-personalization-settings__save"
-            disabled={!customInstructionsDirty || !onSaveCustomInstructions}
+            disabled={isSaving || !customInstructionsDirty || !onSaveCustomInstructions}
             onClick={onSaveCustomInstructions}
             type="button"
           >
-            Save
+            {isSaving ? savingLabel : "Save"}
           </button>
         </header>
         <textarea
           aria-label="Custom instructions"
+          disabled={isSaving}
           onChange={(event) =>
             update("customInstructions", event.currentTarget.value)
           }
@@ -2958,6 +3006,7 @@ export function PersonalizationSettingsPage({
           >
             <PersonalizationSwitch
               checked={value.localMemories}
+              disabled={isSaving}
               label="Enable local memories"
               onChange={(localMemories) =>
                 update("localMemories", localMemories)
@@ -2970,6 +3019,7 @@ export function PersonalizationSettingsPage({
           >
             <PersonalizationSwitch
               checked={value.toolAssistedMemoryGeneration}
+              disabled={isSaving}
               label="Allow local memory generation from tool-assisted chats"
               onChange={(toolAssistedMemoryGeneration) =>
                 update(
@@ -2985,7 +3035,7 @@ export function PersonalizationSettingsPage({
           >
             <button
               className="codex-ui-personalization-settings__delete"
-              disabled={!onDeleteLocalMemories}
+              disabled={isSaving || !onDeleteLocalMemories}
               onClick={onDeleteLocalMemories}
               type="button"
             >
@@ -3023,6 +3073,7 @@ export function PersonalizationSettingsPage({
               aria-describedby={personalityDescriptionId}
               aria-label="Personality"
               className="codex-ui-personalization-settings__personality-trigger"
+              disabled={isSaving}
               type="button"
             >
               <span>{selectedPersonality.label}</span>
@@ -3039,6 +3090,7 @@ export function PersonalizationSettingsPage({
                 option.value === value.personality ? <span>✓</span> : undefined
               }
               key={option.value}
+              disabled={isSaving}
               onSelect={() => update("personality", option.value)}
               role="menuitemradio"
               subText={option.description}
