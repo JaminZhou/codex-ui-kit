@@ -969,6 +969,10 @@ ApprovalRequest now exposes that boundary on its root semantics, decision
 buttons, scoped approval menu, and document-level hotkeys; ApprovalCommandPreview
 also locks its collapse/expand action while preserving host-owned approval
 decisions and command content.
+SearchActivity, BrowserActivity, McpToolCallGroup, and ToolCallCard now pass the
+same boundary through AgentActivity and their result/step/raw-output actions,
+preventing host callbacks while preserving protocol content and disclosure
+ownership.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

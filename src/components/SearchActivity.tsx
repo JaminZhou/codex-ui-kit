@@ -15,6 +15,7 @@ export interface SearchActivityEntry {
 export interface SearchActivityProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   defaultOpen?: boolean;
+  disabled?: boolean;
   entries?: readonly SearchActivityEntry[];
   kind: SearchActivityKind;
   onEntryOpen?: (entry: SearchActivityEntry) => void;
@@ -66,6 +67,7 @@ function codeSearchSummary(
 export function SearchActivity({
   className,
   defaultOpen = false,
+  disabled = false,
   entries = [],
   kind,
   onEntryOpen,
@@ -136,7 +138,13 @@ export function SearchActivity({
         return (
           <li data-completed={entry.completed || undefined} key={entry.id}>
             {onEntryOpen ? (
-              <button onClick={() => onEntryOpen(entry)} type="button">
+              <button
+                disabled={disabled}
+                onClick={() => {
+                  if (!disabled) onEntryOpen(entry);
+                }}
+                type="button"
+              >
                 {content}
               </button>
             ) : (
@@ -153,6 +161,7 @@ export function SearchActivity({
       className={classes}
       data-search-kind={kind}
       defaultOpen={defaultOpen}
+      disabled={disabled}
       indicator={<SearchIcon kind={kind} />}
       kind="search"
       onOpenChange={onOpenChange}
