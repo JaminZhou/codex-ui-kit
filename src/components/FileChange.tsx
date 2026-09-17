@@ -110,6 +110,7 @@ export interface FileChangeGroupProps
   changes: readonly FileChangeGroupItem[];
   description?: ReactNode;
   detail?: ReactNode;
+  disabled?: boolean;
   indicator?: ReactNode;
   onOpenFile?: (change: FileChangeGroupItem, index: number) => void;
   status?: FileChangeStatus;
@@ -121,6 +122,7 @@ export function FileChangeGroup({
   className,
   description,
   detail,
+  disabled = false,
   indicator,
   onOpenFile,
   status = "applied",
@@ -157,9 +159,11 @@ export function FileChangeGroup({
   return (
     <div
       aria-label={resolvedAriaLabel}
+      aria-disabled={disabled || undefined}
       className={classes}
       data-file-count={count}
       data-file-status={normalizedStatus}
+      data-disabled={disabled || undefined}
       data-kind="file-change-group"
       role="group"
       {...props}
@@ -214,7 +218,10 @@ export function FileChangeGroup({
               {onOpenFile ? (
                 <button
                   aria-label={`Open ${change.path}`}
-                  onClick={() => onOpenFile(change, index)}
+                  disabled={disabled}
+                  onClick={() => {
+                    if (!disabled) onOpenFile(change, index);
+                  }}
                   type="button"
                 >
                   {content}
@@ -239,6 +246,7 @@ export interface FileChangeProps
   defaultOpen?: boolean;
   deletions?: number;
   detail?: ReactNode;
+  disabled?: boolean;
   diffText?: string;
   emptyLabel?: ReactNode;
   indicator?: ReactNode;
@@ -261,6 +269,7 @@ export function FileChange({
   defaultOpen = false,
   deletions,
   detail,
+  disabled = false,
   diffText,
   emptyLabel,
   indicator,
@@ -346,7 +355,13 @@ export function FileChange({
       <div className="codex-ui-file-change__shell-header">
         <div className="codex-ui-file-change__shell-identity">
           {onOpenFile ? (
-            <button onClick={() => onOpenFile(path)} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onOpenFile(path);
+              }}
+              type="button"
+            >
               {path}
             </button>
           ) : (
@@ -358,7 +373,10 @@ export function FileChange({
           <button
             aria-label={copyDiffLabel}
             className="codex-ui-file-change__copy"
-            onClick={handleCopy}
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) handleCopy();
+            }}
             title={copyDiffLabel}
             type="button"
           >
@@ -382,6 +400,7 @@ export function FileChange({
       detail={resolvedDetail}
       indicator={indicator ?? null}
       kind="file-change"
+      disabled={disabled}
       onOpenChange={setOpen}
       open={resolvedOpen}
       status={toAgentStatus(status)}

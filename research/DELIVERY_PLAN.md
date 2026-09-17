@@ -958,6 +958,9 @@ host-owned.
 Document and PDF preview chrome now propagates the same disabled boundary to
 open/retry, paging, zoom, annotation, download, and external-open actions while
 leaving renderer and file effects host-owned.
+File-change disclosure, changed-file opening, and diff-copy controls now use
+the same disabled boundary while preserving host-owned diff text and file
+effects.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

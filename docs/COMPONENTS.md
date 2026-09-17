@@ -103,8 +103,8 @@ failure/cancellation policy, pagination, and transcript streaming.
   copy behavior. The current failure/recovery acceptance preserves a mixed
   160-record transcript, `Exit code 7`, exact copy output, and a successful
   later turn without treating command failure as thread failure.
-- `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks.
-- `FileChangeGroup`: one protocol item's aggregate changed-files card with group status/actions, independent file rows, statistics, rename paths, and host-owned file opening.
+- `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks. A disabled lock covers disclosure, file-open, and diff-copy actions.
+- `FileChangeGroup`: one protocol item's aggregate changed-files card with group status/actions, independent file rows, statistics, rename paths, and host-owned file opening. Its disabled lock covers changed-file opening.
 - `FileReview`: a scrollable workspace composition that stacks every changed
   file with an independent header, statistics, focusable text/binary/conflict
   content, optional controlled file selection, and a selected-file marker.
