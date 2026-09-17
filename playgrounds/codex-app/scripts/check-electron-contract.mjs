@@ -19632,7 +19632,10 @@ for (const settingsLightScene of [
       );
       await settingsLightPage.waitForFunction((rootSelector) => {
         const root = document.querySelector(rootSelector);
-        return root instanceof HTMLElement && root.getBoundingClientRect().width > 0;
+        return (
+          root instanceof HTMLElement &&
+          Math.abs(root.getBoundingClientRect().width - 358.125) <= 1
+        );
       }, settingsLightScene.root);
     }
     const contract = await settingsLightPage.evaluate((rootSelector) => {
