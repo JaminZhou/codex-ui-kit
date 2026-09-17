@@ -275,23 +275,40 @@ export interface PlanSelectionCard {
   title: string;
 }
 
+export type PlanSelectionStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
+
 export interface PlanSelectionPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onSelect"> {
   audience: "business" | "personal";
   backIcon?: ReactNode;
   businessCards: readonly PlanSelectionCard[];
+  disabled?: boolean;
+  errorMessage?: ReactNode;
+  loadingLabel?: ReactNode;
   onAudienceChange?: (audience: "business" | "personal") => void;
   onBack?: () => void;
   onCardAction?: (card: PlanSelectionCard) => void;
+  onRetry?: () => void;
   onSelectorChange?: (card: PlanSelectionCard, value: string) => void;
   personalCards: readonly PlanSelectionCard[];
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: PlanSelectionStatus;
+  statusMessage?: ReactNode;
 }
 
 function PlanSegment({
+  disabled = false,
   label,
   onSelect,
   selected,
 }: {
+  disabled?: boolean;
   label: string;
   onSelect?: () => void;
   selected: boolean;
@@ -299,7 +316,7 @@ function PlanSegment({
   return (
     <button
       aria-checked={selected}
-      disabled={!onSelect}
+      disabled={disabled || !onSelect}
       onClick={onSelect}
       role="radio"
       tabIndex={selected ? 0 : -1}
@@ -312,10 +329,12 @@ function PlanSegment({
 
 function PlanCard({
   card,
+  disabled = false,
   onAction,
   onSelectorChange,
 }: {
   card: PlanSelectionCard;
+  disabled?: boolean;
   onAction?: () => void;
   onSelectorChange?: (value: string) => void;
 }) {
@@ -347,6 +366,7 @@ function PlanCard({
                     : undefined
                 }
                 selected={option.value === card.selector?.value}
+                disabled={disabled}
               />
             ))}
           </div>
@@ -370,7 +390,7 @@ function PlanCard({
       <p className="codex-ui-plan-selection__tagline">{card.tagline}</p>
       <button
         className="codex-ui-plan-selection__action"
-        disabled={!onAction}
+        disabled={disabled || !onAction}
         onClick={onAction}
         type="button"
       >
@@ -400,17 +420,39 @@ export function PlanSelectionPage({
   backIcon,
   businessCards,
   className,
+  disabled = false,
+  errorMessage = "Plans could not be loaded.",
+  loadingLabel = "Loading plans…",
   onAudienceChange,
   onBack,
   onCardAction,
+  onRetry,
   onSelectorChange,
   personalCards,
+  retryLabel = "Retry",
+  savingLabel = "Saving plan selection…",
+  status = "ready",
+  statusMessage,
   ...props
 }: PlanSelectionPageProps) {
+  const statusId = useId();
   const cards = audience === "personal" ? personalCards : businessCards;
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "Plan selection saved"
+          : errorMessage);
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || status === "saving" || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={[
         "codex-ui-plan-selection",
         `codex-ui-plan-selection--${audience}`,
@@ -418,13 +460,29 @@ export function PlanSelectionPage({
       ]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <header className="codex-ui-plan-selection__topbar">
-        <button disabled={!onBack} onClick={onBack} type="button">
+        <button disabled={isLocked || !onBack} onClick={onBack} type="button">
           <span aria-hidden="true">{backIcon ?? "←"}</span>
           Back to ChatGPT
         </button>
       </header>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-plan-selection__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="codex-ui-plan-selection__scroll">
         <div className="codex-ui-plan-selection__content">
           <h2>Choose your plan</h2>
@@ -441,6 +499,7 @@ export function PlanSelectionPage({
                   : undefined
               }
               selected={audience === "personal"}
+              disabled={isLocked}
             />
             <PlanSegment
               label="Business"
@@ -450,12 +509,14 @@ export function PlanSelectionPage({
                   : undefined
               }
               selected={audience === "business"}
+              disabled={isLocked}
             />
           </div>
           <div className="codex-ui-plan-selection__grid">
             {cards.map((card) => (
               <PlanCard
                 card={card}
+                disabled={isLocked}
                 key={card.id}
                 onAction={
                   onCardAction ? () => onCardAction(card) : undefined
