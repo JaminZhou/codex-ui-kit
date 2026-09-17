@@ -87,6 +87,79 @@ describe("WorktreeSettingsPage", () => {
     ).toBe("21");
   });
 
+  it("exposes Worktrees lifecycle copy and locks controls while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <WorktreeSettingsPage
+        entries={[entry]}
+        onChange={() => undefined}
+        onDelete={() => undefined}
+        onNewChat={() => undefined}
+        onRefresh={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try worktrees again"
+        savingLabel="Saving worktree settings…"
+        status="saving"
+        value={initialValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "Worktrees" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving worktree settings…")).toBeTruthy();
+    expect(
+      (screen.getByRole("textbox", { name: "Worktree root" }) as HTMLInputElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("switch", {
+          name: "Always fetch upstream before creating worktrees",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("spinbutton", { name: "Auto-delete limit" }) as HTMLInputElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Refresh" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "New chat in this worktree",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Delete" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+
+    rerender(
+      <WorktreeSettingsPage
+        entries={[entry]}
+        errorMessage="Worktree preferences unavailable"
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try worktrees again"
+        status="error"
+        value={initialValue}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Worktree preferences unavailable",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Try worktrees again" }),
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("routes refresh, new-chat, and immediate delete actions", () => {
     const onDelete = vi.fn();
     const onNewChat = vi.fn();
