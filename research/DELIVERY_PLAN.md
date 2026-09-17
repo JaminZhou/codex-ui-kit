@@ -930,7 +930,13 @@ collection state component. This closes the implementation/acceptance gap for
 the failed collection branch without promoting a synthetic failure to current
 installed-product evidence. Remaining Stage 1 work includes re-observing
 ordinary error and collection loading on the installed build, plus broader
-route lifecycle feedback and installed-product notification reachability. Previous 26.820 Projects → Back → Forward now preserves the product
+route lifecycle feedback and installed-product notification reachability. The
+shared ProjectIndex implementation now also exposes host-controlled
+loading/error/disabled locks for project sorting, selection, expansion, and
+recent-chat opening; partial-error data remains selectable so hosts can keep
+recovery-oriented navigation available.
+
+Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
 independent Browser/Electron route stack additionally preserves a selected
 project chat through Back/Forward, closing the previous selection-continuity

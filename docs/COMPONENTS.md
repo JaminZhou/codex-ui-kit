@@ -365,7 +365,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
   an application-owned project index to conversation and workspace setup.
 - `ProjectIndex`: controlled project navigation with selected, available,
   loading, unavailable, error, search-toolbar, metadata, path, and empty
-  states.
+  states. Page-level loading/error/disabled locks cover sorting, project
+  selection, expansion, and recent-chat opening while partial-error data stays
+  selectable for recovery-oriented hosts.
 - `NewConversationStart`: centered new-chat composition with an independent
   destination, composer, context controls, and optional worktree prompt.
 - `ConversationContextBar`: compact, controlled project, run-location,
