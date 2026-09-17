@@ -2154,7 +2154,11 @@ without confusing package readiness with full product reconstruction.
     request notices, caps outcomes at four, and supports dismissal; replay
     shell notifications remain unchanged. This is current playground
     reachability evidence, not installed-product parity or a complete
-    production notification matrix. The
+    production notification matrix. Retry `error` events now show a
+    deduplicated Reconnecting notice, final turn settlement removes transient
+    recovery notices, and `thread/compacted` produces an informational
+    notice. Provider-specific failures and installed-product pixels remain
+    open. The
     real active `commandExecution` Stop follow-up now also settles an in-flight
     `sleep 30` command as an interrupted turn without a successful completion;
     provider-specific process-group behavior and installed-product evidence

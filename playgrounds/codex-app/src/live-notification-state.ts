@@ -23,8 +23,11 @@ function appendNotification(
   notifications: readonly LiveAppNotification[],
   notification: LiveAppNotification,
 ): LiveAppNotification[] {
-  if (notifications.some(({ id }) => id === notification.id)) {
-    return [...notifications];
+  const existingIndex = notifications.findIndex(({ id }) => id === notification.id);
+  if (existingIndex >= 0) {
+    return notifications.map((entry, index) =>
+      index === existingIndex ? notification : entry,
+    );
   }
   return [...notifications, notification].slice(-4);
 }
@@ -42,6 +45,16 @@ function removeRequestNotification(
     ({ id: notificationId }) =>
       !(notificationId.startsWith("live-approval:") || notificationId.startsWith("live-input:")) ||
       !notificationId.endsWith(suffix),
+  );
+}
+
+function removeTurnRecoveryNotifications(
+  notifications: readonly LiveAppNotification[],
+  turnId: string,
+): LiveAppNotification[] {
+  return notifications.filter(
+    ({ id }) =>
+      id !== `live-reconnecting:${turnId}` && id !== `live-error:${turnId}`,
   );
 }
 
@@ -63,6 +76,35 @@ export function reduceLiveAppNotifications(
     return resolvedId === undefined
       ? [...notifications]
       : removeRequestNotification(notifications, resolvedId);
+  }
+
+  if (method === "error") {
+    const error = object(params.error);
+    const message =
+      typeof error.message === "string" && error.message.trim().length > 0
+        ? error.message
+        : "The turn failed.";
+    const turnId = String(params.turnId ?? "unknown");
+    const retrying = params.willRetry === true;
+    return appendNotification(notifications, {
+      description: message,
+      heading: retrying ? "Reconnecting" : "Turn error",
+      id: retrying
+        ? `live-reconnecting:${turnId}`
+        : `live-error:${turnId}`,
+      tone: retrying ? "info" : "warning",
+    });
+  }
+
+  if (method === "thread/compacted") {
+    const threadId = String(params.threadId ?? "unknown");
+    const turnId = String(params.turnId ?? "unknown");
+    return appendNotification(notifications, {
+      description: "Earlier context was compacted for this conversation.",
+      heading: "Context compacted",
+      id: `live-compaction:${threadId}:${turnId}`,
+      tone: "info",
+    });
   }
 
   if (
@@ -100,8 +142,12 @@ export function reduceLiveAppNotifications(
   const threadId = String(params.threadId ?? "unknown");
   const turnId = String(turn.id ?? params.turnId ?? "unknown");
   const status = String(turn.status ?? "");
+  const settledNotifications = removeTurnRecoveryNotifications(
+    notifications,
+    turnId,
+  );
   if (status === "interrupted") {
-    return appendNotification(notifications, {
+    return appendNotification(settledNotifications, {
       description: "The active turn was stopped.",
       heading: "Turn stopped",
       id: `live-turn:${threadId}:${turnId}:interrupted`,
@@ -109,7 +155,7 @@ export function reduceLiveAppNotifications(
     });
   }
   if (status === "failed") {
-    return appendNotification(notifications, {
+    return appendNotification(settledNotifications, {
       description: "Codex could not finish the active turn.",
       heading: "Turn failed",
       id: `live-turn:${threadId}:${turnId}:failed`,
@@ -117,9 +163,9 @@ export function reduceLiveAppNotifications(
     });
   }
   if (status !== "completed" && status !== "complete") {
-    return [...notifications];
+    return [...settledNotifications];
   }
-  return appendNotification(notifications, {
+  return appendNotification(settledNotifications, {
     description: "Your Codex response is ready.",
     heading: "Response ready",
     id: `live-turn:${threadId}:${turnId}:completed`,

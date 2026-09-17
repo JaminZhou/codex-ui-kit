@@ -91,4 +91,49 @@ describe("live app notifications", () => {
       reduceLiveAppNotifications(failed, { kind: "live-reset" }),
     ).toEqual([]);
   });
+
+  it("shows retry recovery and compaction, then settles transient errors", () => {
+    const reconnecting = reduceLiveAppNotifications([], {
+      method: "error",
+      params: {
+        error: { message: "Network unavailable" },
+        threadId: "thread-1",
+        turnId: "turn-1",
+        willRetry: true,
+      },
+    });
+    expect(reconnecting).toMatchObject([
+      {
+        description: "Network unavailable",
+        heading: "Reconnecting",
+        id: "live-reconnecting:turn-1",
+        tone: "info",
+      },
+    ]);
+    const withFailure = reduceLiveAppNotifications(reconnecting, {
+      method: "error",
+      params: {
+        error: { message: "The turn failed." },
+        turnId: "turn-1",
+        willRetry: false,
+      },
+    });
+    const settled = reduceLiveAppNotifications(withFailure, {
+      method: "turn/completed",
+      params: {
+        threadId: "thread-1",
+        turn: { id: "turn-1", status: "failed" },
+      },
+    });
+    expect(settled.map(({ heading }) => heading)).toEqual(["Turn failed"]);
+    expect(
+      reduceLiveAppNotifications(settled, {
+        method: "thread/compacted",
+        params: { threadId: "thread-1", turnId: "turn-2" },
+      }),
+    ).toMatchObject([
+      { heading: "Turn failed" },
+      { heading: "Context compacted", tone: "info" },
+    ]);
+  });
 });
