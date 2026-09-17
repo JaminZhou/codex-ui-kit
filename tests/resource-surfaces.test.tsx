@@ -233,6 +233,46 @@ describe("resource surfaces", () => {
     expect(screen.getByText("No artifacts yet")).toBeTruthy();
   });
 
+  it("keeps artifact loading, empty, and error recovery explicit", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <ArtifactList
+        loadingLabel="Loading generated files…"
+        status="loading"
+      />,
+    );
+    const region = screen.getByRole("region", { name: "Artifacts" });
+    expect(region.getAttribute("aria-busy")).toBe("true");
+    expect(
+      screen.getByRole("status", { name: "Loading generated files…" }),
+    ).toBeTruthy();
+
+    rerender(
+      <ArtifactList
+        emptyLabel="No generated files"
+        status="empty"
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain(
+      "No generated files",
+    );
+
+    rerender(
+      <ArtifactList
+        errorLabel="Generated files unavailable"
+        onRetry={onRetry}
+        retryLabel="Try again"
+        status="error"
+        statusMessage="The artifact service is offline."
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The artifact service is offline.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("keeps source loading, empty, and error recovery explicit", () => {
     const onRetry = vi.fn();
     const { rerender } = render(

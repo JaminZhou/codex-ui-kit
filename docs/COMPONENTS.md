@@ -171,7 +171,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   loading/empty/error/retry states. Sources without `href` or `onOpen` remain
   static rows.
 - `SourceActivityList` and `SourceSearchActivity`: Sources-workspace activity composition with optional leading identity, controlled or uncontrolled disclosure, exact search counts, and host-supplied query rows.
-- `ArtifactList`: resource-list composition with an explicit empty state.
+- `ArtifactList`: resource-list composition with explicit empty, loading, and
+  retryable error states; the host owns artifact discovery and file loading.
 - `GeneratedImageGallery`: one-to-four-slot natural or square image geometry, pending placeholders, retry/error handling, overflow paging, and reduced-motion support. Images become focusable actions only when `onOpenImage` is provided.
 - `ImagePreviewDialog`: portalled lightbox with focus trapping/restoration, Escape and arrow navigation, download, backdrop dismissal, and previous/next controls.
 

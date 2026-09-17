@@ -1488,6 +1488,9 @@ wide/compact format matrix for DOCX, notebooks, spreadsheets, and
 presentations. Browser/CDP, Electron, and owned-pixel contracts gate that
 matrix as a controlled replay regression; they do not claim installed-product
 runtime decoding parity.
+The public ArtifactList composition now also exposes controlled loading,
+empty, and retryable error states so artifact discovery failures do not collapse
+into a missing region; file decoding and provider effects remain host-owned.
 The subsequent [26.903 real PDF capture](26.903.71938-pdf.md) now reaches the
 product through an unsent synthetic draft attachment. It disproves the
 centered-card layout as a PDF reconstruction: the actual surface is a right
