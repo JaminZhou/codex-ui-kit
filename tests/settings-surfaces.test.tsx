@@ -1065,6 +1065,75 @@ describe("settings surfaces", () => {
     expect(showContext.getAttribute("aria-checked")).toBe("true");
   });
 
+  it("exposes General lifecycle copy and locks controls while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <GeneralSettingsPage
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try general settings again"
+        savingLabel="Saving general settings…"
+        status="saving"
+        value={initialGeneralValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "General" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving general settings…")).toBeTruthy();
+    expect(
+      (screen.getByRole("switch", {
+        name: "Show Full access in the composer",
+      }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "Default file open destination",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Language" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Bottom" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "Set shortcut for Popout Window hotkey",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "View" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+
+    rerender(
+      <GeneralSettingsPage
+        errorMessage="General preferences unavailable"
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try general settings again"
+        status="error"
+        value={initialGeneralValue}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "General preferences unavailable",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Try general settings again" }),
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("exposes current General menus, searchable languages, and selections", () => {
     render(<GeneralFixture />);
 
