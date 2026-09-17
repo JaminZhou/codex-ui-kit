@@ -199,6 +199,37 @@ describe("FileChange", () => {
     expect(html).toContain("data-file-indicator");
     expect(html).toContain(">file</span>");
   });
+
+  it("locks disclosure, file-open, and diff-copy actions while disabled", () => {
+    const onCopyDiff = vi.fn();
+    const onOpenChange = vi.fn();
+    const onOpenFile = vi.fn();
+    render(
+      <FileChange
+        change="modified"
+        defaultOpen
+        diffText="@@ diff"
+        disabled
+        onCopyDiff={onCopyDiff}
+        onOpenChange={onOpenChange}
+        onOpenFile={onOpenFile}
+        path="src/status.ts"
+      />,
+    );
+
+    const activity = document.querySelector(".codex-ui-file-change");
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    expect(activity?.getAttribute("data-disabled")).toBe("true");
+    for (const label of ["src/status.ts", "Copy diff"]) {
+      const button = screen.getByRole("button", { name: label });
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    fireEvent.click(document.querySelector("summary")!);
+    expect(onCopyDiff).not.toHaveBeenCalled();
+    expect(onOpenFile).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });
 
 describe("FileChangeGroup", () => {
@@ -257,6 +288,22 @@ describe("FileChangeGroup", () => {
     expect(streaming).toContain("Editing 2 files");
     expect(streaming).not.toContain("Review changes");
     expect(rejected).toContain("Rejected 2 files");
+  });
+
+  it("locks changed-file group opening while disabled", () => {
+    const onOpenFile = vi.fn();
+    render(
+      <FileChangeGroup disabled changes={changes} onOpenFile={onOpenFile} />,
+    );
+    const group = screen.getByRole("group");
+    expect(group.getAttribute("aria-disabled")).toBe("true");
+    expect(group.getAttribute("data-disabled")).toBe("true");
+    const file = screen.getByRole("button", {
+      name: "Open .research/probe/beta.txt",
+    });
+    expect(file).toHaveProperty("disabled", true);
+    fireEvent.click(file);
+    expect(onOpenFile).not.toHaveBeenCalled();
   });
 });
 

@@ -18,6 +18,7 @@ export interface AgentActivityProps
   defaultOpen?: boolean;
   description?: ReactNode;
   detail?: ReactNode;
+  disabled?: boolean;
   disclosureIcon?: ReactNode;
   disclosureIndicator?: boolean;
   disclosureMode?: "button" | "details" | "overlay-button";
@@ -35,6 +36,7 @@ export function AgentActivity({
   defaultOpen = false,
   description,
   detail,
+  disabled = false,
   disclosureIcon,
   disclosureIndicator = false,
   disclosureMode = "details",
@@ -89,9 +91,11 @@ export function AgentActivity({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={classes}
       data-kind={kind}
       data-status={status}
+      data-disabled={disabled || undefined}
       data-expandable={hasBody || undefined}
       {...props}
     >
@@ -108,7 +112,10 @@ export function AgentActivity({
               aria-expanded={resolvedOpen}
               aria-labelledby={summaryId}
               className="codex-ui-activity__overlay-toggle"
-              onClick={() => updateOpen(!resolvedOpen)}
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) updateOpen(!resolvedOpen);
+              }}
               type="button"
             />
           </div>
@@ -129,7 +136,10 @@ export function AgentActivity({
           <button
             aria-expanded={resolvedOpen}
             className="codex-ui-activity__header"
-            onClick={() => updateOpen(!resolvedOpen)}
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) updateOpen(!resolvedOpen);
+            }}
             type="button"
           >
             {header}
@@ -147,6 +157,10 @@ export function AgentActivity({
         <details
           className="codex-ui-activity__disclosure"
           onToggle={(event) => {
+            if (disabled) {
+              event.currentTarget.open = resolvedOpen;
+              return;
+            }
             const nextOpen = event.currentTarget.open;
             if (open !== undefined) {
               if (nextOpen !== open) {
@@ -164,6 +178,10 @@ export function AgentActivity({
             aria-expanded={resolvedOpen}
             className="codex-ui-activity__header"
             onClick={(event) => {
+              if (disabled) {
+                event.preventDefault();
+                return;
+              }
               if (open === undefined) return;
               event.preventDefault();
               updateOpen(!open);
