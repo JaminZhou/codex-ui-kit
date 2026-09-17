@@ -23,6 +23,7 @@ export interface BrowserWorkspacePanelIcons {
 export interface BrowserWorkspacePanelProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   children?: ReactNode;
+  disabled?: boolean;
   icons?: BrowserWorkspacePanelIcons;
   onAction?: (action: BrowserWorkspaceAction) => void;
   onCloseTab?: (tab: BrowserWorkspaceTab) => void;
@@ -88,11 +89,13 @@ function BrowserGlyph({ name }: { name: BrowserWorkspaceAction | "close" }) {
 function ActionButton({
   action,
   children,
+  disabled = false,
   label,
   onAction,
 }: {
   action: BrowserWorkspaceAction;
   children: ReactNode;
+  disabled?: boolean;
   label: string;
   onAction?: (action: BrowserWorkspaceAction) => void;
 }) {
@@ -100,7 +103,10 @@ function ActionButton({
     <button
       aria-label={label}
       className="codex-ui-browser-workspace__action"
-      onClick={() => onAction?.(action)}
+      disabled={disabled}
+      onClick={() => {
+        if (!disabled) onAction?.(action);
+      }}
       type="button"
     >
       {children}
@@ -111,6 +117,7 @@ function ActionButton({
 export function BrowserWorkspacePanel({
   children,
   className,
+  disabled = false,
   icons = {},
   onAction,
   onCloseTab,
@@ -124,7 +131,13 @@ export function BrowserWorkspacePanel({
   const activeTab = tabs.find(({ active }) => active) ?? tabs[0];
 
   return (
-    <aside aria-label="Browser" className={classes} {...props}>
+    <aside
+      aria-disabled={disabled || undefined}
+      aria-label="Browser"
+      className={classes}
+      data-disabled={disabled || undefined}
+      {...props}
+    >
       <div className="codex-ui-browser-workspace__tabs" role="tablist">
         {tabs.map((tab) => (
           <div
@@ -135,7 +148,10 @@ export function BrowserWorkspacePanel({
             <button
               aria-selected={tab.id === activeTab?.id}
               className="codex-ui-browser-workspace__tab"
-              onClick={() => onSelectTab?.(tab)}
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onSelectTab?.(tab);
+              }}
               role="tab"
               type="button"
             >
@@ -144,32 +160,35 @@ export function BrowserWorkspacePanel({
             <button
               aria-label={`Close ${typeof tab.title === "string" ? tab.title : "browser"} tab`}
               className="codex-ui-browser-workspace__tab-close"
-              onClick={() => onCloseTab?.(tab)}
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onCloseTab?.(tab);
+              }}
               type="button"
             >
               {icons.close ?? <BrowserGlyph name="close" />}
             </button>
           </div>
         ))}
-        <ActionButton action="new-tab" label="New tab" onAction={onAction}>
+        <ActionButton action="new-tab" disabled={disabled} label="New tab" onAction={onAction}>
           {icons.newTab ?? <BrowserGlyph name="new-tab" />}
         </ActionButton>
         <span className="codex-ui-browser-workspace__tab-spacer" />
-        <ActionButton action="expand" label="Expand panel" onAction={onAction}>
+        <ActionButton action="expand" disabled={disabled} label="Expand panel" onAction={onAction}>
           {icons.expand ?? <BrowserGlyph name="expand" />}
         </ActionButton>
       </div>
 
       <div aria-label="Browser navigation" className="codex-ui-browser-workspace__toolbar">
-        <ActionButton action="back" label="Back" onAction={onAction}>{icons.back ?? <BrowserGlyph name="back" />}</ActionButton>
-        <ActionButton action="forward" label="Next" onAction={onAction}>{icons.forward ?? <BrowserGlyph name="forward" />}</ActionButton>
-        <ActionButton action="reload" label="Reload" onAction={onAction}>{icons.reload ?? <BrowserGlyph name="reload" />}</ActionButton>
-        <ActionButton action="site-info" label="Site information" onAction={onAction}>{icons.siteInfo ?? <BrowserGlyph name="site-info" />}</ActionButton>
-        <ActionButton action="site-tools" label="Site tools" onAction={onAction}>{icons.siteTools ?? <BrowserGlyph name="site-tools" />}</ActionButton>
+        <ActionButton action="back" disabled={disabled} label="Back" onAction={onAction}>{icons.back ?? <BrowserGlyph name="back" />}</ActionButton>
+        <ActionButton action="forward" disabled={disabled} label="Next" onAction={onAction}>{icons.forward ?? <BrowserGlyph name="forward" />}</ActionButton>
+        <ActionButton action="reload" disabled={disabled} label="Reload" onAction={onAction}>{icons.reload ?? <BrowserGlyph name="reload" />}</ActionButton>
+        <ActionButton action="site-info" disabled={disabled} label="Site information" onAction={onAction}>{icons.siteInfo ?? <BrowserGlyph name="site-info" />}</ActionButton>
+        <ActionButton action="site-tools" disabled={disabled} label="Site tools" onAction={onAction}>{icons.siteTools ?? <BrowserGlyph name="site-tools" />}</ActionButton>
         <span className="codex-ui-browser-workspace__toolbar-spacer" />
-        <ActionButton action="external" label="Open in external browser" onAction={onAction}>{icons.external ?? <BrowserGlyph name="external" />}</ActionButton>
-        <ActionButton action="annotate" label="Annotate" onAction={onAction}>{icons.annotate ?? <BrowserGlyph name="annotate" />}</ActionButton>
-        <ActionButton action="options" label="Browser options" onAction={onAction}>{icons.options ?? <BrowserGlyph name="options" />}</ActionButton>
+        <ActionButton action="external" disabled={disabled} label="Open in external browser" onAction={onAction}>{icons.external ?? <BrowserGlyph name="external" />}</ActionButton>
+        <ActionButton action="annotate" disabled={disabled} label="Annotate" onAction={onAction}>{icons.annotate ?? <BrowserGlyph name="annotate" />}</ActionButton>
+        <ActionButton action="options" disabled={disabled} label="Browser options" onAction={onAction}>{icons.options ?? <BrowserGlyph name="options" />}</ActionButton>
       </div>
 
       <div className="codex-ui-browser-workspace__content" role="tabpanel">

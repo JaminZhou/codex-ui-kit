@@ -426,7 +426,8 @@ kit never performs filesystem, network, account, or process mutations.
   persist history. Its disabled lock covers the bounded Show more transition.
 - `BrowserWorkspacePanel`: controlled browser-tab shell with active tab,
   close/open/expand callbacks, toolbar slots, and host-owned page content.
-  It does not navigate, authenticate, download, or execute page scripts.
+  A host-wide disabled lock covers tab and toolbar actions. It does not
+  navigate, authenticate, download, or execute page scripts.
 - `ThreadSummaryDock`: docked variant of the thread-summary surface with
   controlled open state, labels, and close/focus callbacks; environment, Git,
   and pull-request values remain host data.
