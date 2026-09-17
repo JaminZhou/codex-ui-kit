@@ -16979,7 +16979,19 @@ export function App() {
     if (!bridge || !projectToken || !threadId) return;
     void bridge
       .terminateLiveBackgroundTerminal({ processId, projectToken, threadId })
-      .then(() => refreshLiveBackgroundTerminals())
+      .then(({ terminated }) => {
+        if (terminated) {
+          const terminal = liveBackgroundTerminals.find(
+            (candidate) => candidate.processId === processId,
+          );
+          dispatchLiveNotification({
+            command: terminal?.command,
+            kind: "background-terminal-stopped",
+            processId,
+          });
+        }
+        return refreshLiveBackgroundTerminals();
+      })
       .catch(() => undefined);
   };
   const backgroundTerminalSidePanel =

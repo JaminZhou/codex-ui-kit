@@ -2165,6 +2165,11 @@ without confusing package readiness with full product reconstruction.
     recovery notices, and `thread/compacted` produces an informational
     notice. Provider-specific failures and installed-product pixels remain
     open. The
+    same Live route now also reports a confirmed background-terminal Stop/Stop
+    all through the global notification region, while failed or no-op
+    termination responses stay silent. This is host-confirmed lifecycle
+    feedback, not a claim that every provider background-process completion
+    emits a product toast.
     real active `commandExecution` Stop follow-up now also settles an in-flight
     `sleep 30` command as an interrupted turn without a successful completion;
     provider-specific process-group behavior and installed-product evidence

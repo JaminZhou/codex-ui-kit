@@ -145,4 +145,27 @@ describe("live app notifications", () => {
       { heading: "Context compacted", tone: "info" },
     ]);
   });
+
+  it("surfaces only confirmed background-terminal stops", () => {
+    const stopped = reduceLiveAppNotifications([], {
+      command: "npm run dev",
+      kind: "background-terminal-stopped",
+      processId: "process-1",
+    });
+    expect(stopped).toEqual([
+      {
+        description: "npm run dev",
+        heading: "Background task stopped",
+        id: "live-background-terminal:process-1:stopped",
+        tone: "info",
+      },
+    ]);
+    expect(
+      reduceLiveAppNotifications(stopped, {
+        command: "npm run dev",
+        kind: "background-terminal-stopped",
+        processId: "process-1",
+      }),
+    ).toEqual(stopped);
+  });
 });
