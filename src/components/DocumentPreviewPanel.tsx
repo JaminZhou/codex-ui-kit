@@ -13,6 +13,7 @@ export type DocumentPreviewStatus = "empty" | "error" | "loading" | "ready";
 export interface DocumentPreviewPanelProps
   extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   children?: ReactNode;
+  disabled?: boolean;
   errorDescription?: ReactNode;
   kind?: DocumentPreviewKind;
   onOpen?: () => void;
@@ -42,6 +43,7 @@ const kindLabels: Record<DocumentPreviewKind, string> = {
 export function DocumentPreviewPanel({
   children,
   className,
+  disabled = false,
   errorDescription = "This preview could not be loaded.",
   kind = "document",
   onOpen,
@@ -60,18 +62,21 @@ export function DocumentPreviewPanel({
       : status === "error"
         ? "Preview unavailable"
         : status === "empty"
-          ? "No preview available"
-          : undefined;
+        ? "No preview available"
+        : undefined;
+  const openDisabled = disabled || status === "loading";
 
   return (
     <section
       {...props}
       aria-busy={status === "loading" ? true : undefined}
+      aria-disabled={disabled || undefined}
       aria-label={typeof title === "string" ? title : undefined}
       className={["codex-ui-document-preview", className]
         .filter(Boolean)
         .join(" ")}
       data-kind={kind}
+      data-disabled={disabled || undefined}
       data-status={status}
       role="region"
     >
@@ -93,7 +98,10 @@ export function DocumentPreviewPanel({
             <button
               aria-label={openLabel}
               className="codex-ui-document-preview__open"
-              onClick={onOpen}
+              disabled={openDisabled}
+              onClick={() => {
+                if (!openDisabled) onOpen();
+              }}
               type="button"
             >
               Open
@@ -120,7 +128,10 @@ export function DocumentPreviewPanel({
             {onRetry ? (
               <button
                 className="codex-ui-document-preview__retry"
-                onClick={onRetry}
+                disabled={disabled}
+                onClick={() => {
+                  if (!disabled) onRetry();
+                }}
                 type="button"
               >
                 {retryLabel}

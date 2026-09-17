@@ -49,6 +49,25 @@ describe("PDF preview chrome", () => {
     fireEvent.click(screen.getByRole("button", { name: "Retry preview" }));
     expect(retry).toHaveBeenCalledOnce();
   });
+  it("locks PDF actions while disabled", () => {
+    const page = vi.fn(); const zoom = vi.fn(); const annotate = vi.fn();
+    const download = vi.fn(); const open = vi.fn(); const options = vi.fn(); const retry = vi.fn();
+    render(<PdfPreviewPanel {...defaults} disabled onAnnotatingChange={annotate} onDownload={download} onOpen={open} onOpenOptions={options} onPageChange={page} onRetry={retry} onZoomChange={zoom} status="error" />);
+    const panel = screen.getByRole("region", { name: "design-spec" });
+    expect(panel.getAttribute("aria-disabled")).toBe("true");
+    expect(panel.getAttribute("data-disabled")).toBe("true");
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(page).not.toHaveBeenCalled();
+    expect(zoom).not.toHaveBeenCalled();
+    expect(annotate).not.toHaveBeenCalled();
+    expect(download).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+    expect(options).not.toHaveBeenCalled();
+    expect(retry).not.toHaveBeenCalled();
+  });
   it("represents loading without fabricating document pages", () => {
     render(<PdfPreviewPanel {...defaults} pageCount={0} status="loading" />);
     expect(screen.getByRole("region").getAttribute("aria-busy")).toBe("true");
