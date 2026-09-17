@@ -490,6 +490,32 @@
   margin: 0 0 2rem;
 }
 
+.codex-ui-git-settings__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: -1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-git-settings__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-git-settings__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-git-settings__card {
   background: var(--codex-ui-settings-card-background);
   border: 1px solid
@@ -546,6 +572,13 @@
   height: 2.1875rem;
   min-width: 0;
   padding: 0 0.75rem;
+}
+
+.codex-ui-git-settings input:disabled,
+.codex-ui-git-settings textarea:disabled,
+.codex-ui-git-settings button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .codex-ui-git-settings__segmented {
