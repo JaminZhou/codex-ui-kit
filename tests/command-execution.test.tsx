@@ -293,9 +293,54 @@ describe("CommandExecution", () => {
     );
     expect(onCopyOutput).toHaveBeenCalledWith("Renderer built");
   });
+
+  it("locks command disclosure and copy actions while disabled", () => {
+    const onCopyCommand = vi.fn();
+    const { container } = render(
+      <CommandExecution
+        defaultOpen
+        disabled
+        command="pnpm check"
+        onCopyCommand={onCopyCommand}
+        status="completed"
+      />,
+    );
+
+    const activity = container.querySelector(".codex-ui-activity");
+    expect(activity?.getAttribute("aria-disabled")).toBe("true");
+    const commandLine = screen.getByRole("button", { name: "$ pnpm check" });
+    const copy = screen.getByRole("button", { name: "Copy command" });
+    expect(commandLine.getAttribute("aria-disabled")).toBe("true");
+    expect(copy).toHaveProperty("disabled", true);
+    fireEvent.keyDown(commandLine, { key: "Enter" });
+    fireEvent.click(commandLine);
+    fireEvent.click(copy);
+
+    expect(
+      container
+        .querySelector(".codex-ui-command-execution__shell")
+        ?.hasAttribute("data-command-expanded"),
+    ).toBe(false);
+    expect(onCopyCommand).not.toHaveBeenCalled();
+  });
 });
 
 describe("CommandOutput", () => {
+  it("locks output copy while disabled", () => {
+    const onCopy = vi.fn();
+    const { container } = render(
+      <CommandOutput disabled onCopy={onCopy}>Renderer built</CommandOutput>,
+    );
+
+    const root = container.querySelector(".codex-ui-command-output");
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    const copy = screen.getByRole("button", { name: "Copy output" });
+    expect(copy).toHaveProperty("disabled", true);
+    fireEvent.click(copy);
+    expect(onCopy).not.toHaveBeenCalled();
+  });
+
   it("uses the no-output placeholder for empty and whitespace-only streams", () => {
     const empty = renderToStaticMarkup(<CommandOutput />);
     const whitespace = renderToStaticMarkup(<CommandOutput>{"  \n"}</CommandOutput>);

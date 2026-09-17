@@ -98,6 +98,7 @@ export interface CommandExecutionProps
   cwd?: string;
   defaultOpen?: boolean;
   detail?: ReactNode;
+  disabled?: boolean;
   durationMs?: number;
   exitCode?: number;
   footer?: ReactNode;
@@ -126,6 +127,7 @@ export function CommandExecution({
   cwd,
   defaultOpen = false,
   detail,
+  disabled = false,
   durationMs,
   exitCode,
   footer,
@@ -223,11 +225,13 @@ export function CommandExecution({
     onOpenChange?.(nextOpen);
   };
   const handleCommandKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
     setCommandExpanded(true);
   };
   const handleCopyCommand = () => {
+    if (disabled) return;
     if (rawCommandText === undefined) return;
     if (onCopyCommand) {
       void onCopyCommand(rawCommandText);
@@ -274,9 +278,12 @@ export function CommandExecution({
       <div className="codex-ui-command-execution__command-row">
         <div
           aria-label={resolvedCommandLabel}
+          aria-disabled={disabled || undefined}
           aria-expanded={commandExpanded}
           className="codex-ui-command-execution__command-line"
-          onClick={() => setCommandExpanded(true)}
+          onClick={() => {
+            if (!disabled) setCommandExpanded(true);
+          }}
           onKeyDown={handleCommandKeyDown}
           role="button"
           tabIndex={0}
@@ -288,6 +295,7 @@ export function CommandExecution({
           <button
             aria-label={copyCommandLabel}
             className="codex-ui-command-execution__copy-command"
+            disabled={disabled}
             onClick={handleCopyCommand}
             title={copyCommandLabel}
             type="button"
@@ -296,7 +304,7 @@ export function CommandExecution({
           </button>
         ) : null}
       </div>
-      {children ?? <CommandOutput emptyLabel={noOutputLabel} />}
+      {children ?? <CommandOutput disabled={disabled} emptyLabel={noOutputLabel} />}
       {footer ?? defaultFooter}
     </div>
   );
@@ -306,6 +314,7 @@ export function CommandExecution({
       className={classes}
       data-execution-status={status}
       detail={detail}
+      disabled={disabled}
       indicator={indicator ?? <TerminalIcon>{terminalIcon}</TerminalIcon>}
       kind="command"
       onOpenChange={handleOpenChange}
@@ -326,6 +335,7 @@ export interface CommandOutputProps
   children?: ReactNode;
   copyLabel?: string;
   copyText?: string;
+  disabled?: boolean;
   emptyLabel?: ReactNode;
   onCopy?: (output: string) => void | Promise<void>;
   stream?: CommandOutputStream;
@@ -336,6 +346,7 @@ export function CommandOutput({
   className,
   copyLabel = "Copy output",
   copyText,
+  disabled = false,
   emptyLabel = "No output",
   onCopy,
   stream = "stdout",
@@ -389,6 +400,7 @@ export function CommandOutput({
   }, [children]);
 
   const handleCopy = () => {
+    if (disabled) return;
     if (rawOutputText === undefined) return;
     if (onCopy) {
       void onCopy(rawOutputText);
@@ -399,11 +411,13 @@ export function CommandOutput({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={classes}
       data-empty={!hasOutput || undefined}
       data-fade-bottom={fade.bottom || undefined}
       data-fade-top={fade.top || undefined}
       data-stream={stream}
+      data-disabled={disabled || undefined}
       {...props}
     >
       <pre
@@ -419,6 +433,7 @@ export function CommandOutput({
         <button
           aria-label={copyLabel}
           className="codex-ui-command-output__copy"
+          disabled={disabled}
           onClick={handleCopy}
           title={copyLabel}
           type="button"

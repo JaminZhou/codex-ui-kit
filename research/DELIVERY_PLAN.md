@@ -973,6 +973,9 @@ SearchActivity, BrowserActivity, McpToolCallGroup, and ToolCallCard now pass the
 same boundary through AgentActivity and their result/step/raw-output actions,
 preventing host callbacks while preserving protocol content and disclosure
 ownership.
+CommandExecution and CommandOutput now expose the same boundary for command
+disclosure, command/output copy, and internal output rendering while leaving
+host-provided child surfaces explicitly host-owned.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
