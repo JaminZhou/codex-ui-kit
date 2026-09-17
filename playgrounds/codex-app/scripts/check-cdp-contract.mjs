@@ -6198,9 +6198,10 @@ for (const scene of selectedScenes) {
           Math.abs(settings.status.rect.height - 44.56) > 0.2 ||
           settings.status.style.backgroundColor !== "rgb(35, 35, 35)" ||
           settings.status.style.borderRadius !== "20px" ||
+          settings.status.style.padding !== "12px" ||
           settings.message.style.fontSize !== "13px" ||
           settings.message.style.fontWeight !== "445" ||
-          settings.message.style.padding !== "12px"
+          settings.message.style.padding !== "0px"
         ) {
           throw new Error(
             `${scene.id}: workspace environment settings contract failed: ${JSON.stringify(contract)}`,

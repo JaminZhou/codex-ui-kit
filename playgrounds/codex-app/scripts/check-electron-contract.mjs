@@ -10572,9 +10572,10 @@ try {
     environmentUnavailable.status.style.backgroundColor !==
       "rgb(35, 35, 35)" ||
     environmentUnavailable.status.style.borderRadius !== "20px" ||
+    environmentUnavailable.status.style.padding !== "12px" ||
     environmentUnavailable.message.style.fontSize !== "13px" ||
     environmentUnavailable.message.style.fontWeight !== "445" ||
-    environmentUnavailable.message.style.padding !== "12px"
+    environmentUnavailable.message.style.padding !== "0px"
   ) {
     throw new Error(
       `Electron environment settings route is invalid: ${JSON.stringify(environmentUnavailable)}.`,
