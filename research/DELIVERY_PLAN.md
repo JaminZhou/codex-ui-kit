@@ -2148,7 +2148,13 @@ without confusing package readiness with full product reconstruction.
     owning-thread Stop settlement; the Live playground now also owns and
     probes the background-terminal list/open/terminate bridge, while
     installed-product process evidence remains open. Continue with broader real
-    global notification reachability. The
+    global notification reachability. The Live playground now routes real
+    approval, user-input, and turn-completion events into the shared global
+    notification region, deduplicates JSON-RPC request ids, removes resolved
+    request notices, caps outcomes at four, and supports dismissal; replay
+    shell notifications remain unchanged. This is current playground
+    reachability evidence, not installed-product parity or a complete
+    production notification matrix. The
     real active `commandExecution` Stop follow-up now also settles an in-flight
     `sleep 30` command as an interrupted turn without a successful completion;
     provider-specific process-group behavior and installed-product evidence
