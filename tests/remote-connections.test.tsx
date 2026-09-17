@@ -60,4 +60,48 @@ describe("remote connections surface", () => {
     expect(onSave).toHaveBeenCalledOnce();
     expect(screen.getByRole("form", { name: "Connection editor" })).toBeTruthy();
   });
+
+  it("locks the form while saving and exposes retryable save errors", () => {
+    const onFormRetry = vi.fn();
+    const { rerender } = render(
+      <RemoteConnectionsPage
+        formOpen
+        formStatus="saving"
+        formSavingLabel="Saving remote host…"
+        onFormRetry={onFormRetry}
+      />,
+    );
+    const form = screen.getByRole("form", { name: "Connection editor" });
+    expect(form.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Saving remote host…",
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Connection name" }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getByRole("combobox", { name: "Connection type" }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getByRole("button", { name: "Saving remote host…" }),
+    ).toHaveProperty("disabled", true);
+
+    rerender(
+      <RemoteConnectionsPage
+        formOpen
+        formRetryLabel="Try again"
+        formStatus="error"
+        formStatusMessage="The remote host rejected the connection."
+        onFormRetry={onFormRetry}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The remote host rejected the connection.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onFormRetry).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole("button", { name: "Save connection" }),
+    ).toHaveProperty("disabled", false);
+  });
 });

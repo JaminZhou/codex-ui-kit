@@ -476,8 +476,9 @@ kit never performs filesystem, network, account, or process mutations.
   browser navigation, and account persistence are never handled by the kit.
 - `RemoteConnectionsPage`: device/SSH rows with connected/connecting/
   disconnected/error status plus Add/Edit/Forget/Test/Retry and a controlled
-  connection form. Credentials, pairing, Noise relay, SSH exchange, and
-  registry writes remain host-owned.
+  connection form with saving/error/retry feedback and busy-field locking.
+  Credentials, pairing, Noise relay, SSH exchange, and registry writes remain
+  host-owned.
 
 ### Integrations, automations, and previews
 

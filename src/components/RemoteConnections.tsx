@@ -7,6 +7,7 @@ export type RemoteConnectionStatus =
   | "disconnected"
   | "error";
 export type RemoteConnectionsPageStatus = "error" | "loading" | "ready";
+export type RemoteConnectionFormStatus = "error" | "idle" | "saving";
 
 export interface RemoteConnection {
   detail: string;
@@ -28,12 +29,17 @@ export interface RemoteConnectionsPageProps
   emptyMessage?: ReactNode;
   errorMessage?: ReactNode;
   formOpen?: boolean;
+  formRetryLabel?: ReactNode;
+  formSavingLabel?: ReactNode;
+  formStatus?: RemoteConnectionFormStatus;
+  formStatusMessage?: ReactNode;
   formValue?: RemoteConnectionFormValue;
   onAdd?: () => void;
   onCancelForm?: () => void;
   onChangeForm?: (value: RemoteConnectionFormValue) => void;
   onEdit?: (connection: RemoteConnection) => void;
   onForget?: (connection: RemoteConnection) => void;
+  onFormRetry?: () => void;
   onRetry?: () => void;
   onSave?: () => void;
   onTest?: (connection: RemoteConnection) => void;
@@ -48,12 +54,17 @@ export function RemoteConnectionsPage({
   emptyMessage = "No remote connections yet.",
   errorMessage = "Connections could not be loaded.",
   formOpen = false,
+  formRetryLabel = "Retry",
+  formSavingLabel = "Saving connection…",
+  formStatus = "idle",
+  formStatusMessage,
   formValue = { detail: "", kind: "ssh", label: "" },
   onAdd,
   onCancelForm,
   onChangeForm,
   onEdit,
   onForget,
+  onFormRetry,
   onRetry,
   onSave,
   onTest,
@@ -67,6 +78,12 @@ export function RemoteConnectionsPage({
   const resolvedStatusMessage =
     statusMessage ??
     (status === "loading" ? "Loading connections…" : errorMessage);
+  const formBusy = formStatus === "saving";
+  const resolvedFormStatusMessage =
+    formStatusMessage ??
+    (formStatus === "saving"
+      ? formSavingLabel
+      : "The connection could not be saved.");
   const updateForm = (
     field: "detail" | "kind" | "label",
     value: string,
@@ -109,10 +126,12 @@ export function RemoteConnectionsPage({
       {formOpen ? (
         <form
           aria-label="Connection editor"
+          aria-busy={formBusy || undefined}
           className="codex-ui-remote-connections__form"
+          data-status={formStatus}
           onSubmit={(event) => {
             event.preventDefault();
-            onSave?.();
+            if (!formBusy) onSave?.();
           }}
         >
           <div className="codex-ui-remote-connections__form-header">
@@ -124,24 +143,40 @@ export function RemoteConnectionsPage({
               <button aria-label="Close connection editor" onClick={onCancelForm} type="button">×</button>
             ) : null}
           </div>
+          {formStatus !== "idle" ? (
+            <div
+              aria-live="polite"
+              className="codex-ui-remote-connections__form-status"
+              role={formStatus === "error" ? "alert" : "status"}
+            >
+              <span>{resolvedFormStatusMessage}</span>
+              {formStatus === "error" && onFormRetry ? (
+                <button onClick={onFormRetry} type="button">
+                  {formRetryLabel}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
           <label>
             <span>Connection name</span>
-            <input aria-label="Connection name" onChange={(event) => updateForm("label", event.target.value)} value={formValue.label} />
+            <input aria-label="Connection name" disabled={formBusy} onChange={(event) => updateForm("label", event.target.value)} value={formValue.label} />
           </label>
           <label>
             <span>Type</span>
-            <select aria-label="Connection type" onChange={(event) => updateForm("kind", event.target.value)} value={formValue.kind}>
+            <select aria-label="Connection type" disabled={formBusy} onChange={(event) => updateForm("kind", event.target.value)} value={formValue.kind}>
               <option value="ssh">SSH</option>
               <option value="device">Device</option>
             </select>
           </label>
           <label>
             <span>Host or device</span>
-            <input aria-label="Host or device" onChange={(event) => updateForm("detail", event.target.value)} placeholder="host.example.com" value={formValue.detail} />
+            <input aria-label="Host or device" disabled={formBusy} onChange={(event) => updateForm("detail", event.target.value)} placeholder="host.example.com" value={formValue.detail} />
           </label>
           <footer>
             {onCancelForm ? <button onClick={onCancelForm} type="button">Cancel</button> : null}
-            <button className="codex-ui-remote-connections__primary" type="submit">Save connection</button>
+            <button className="codex-ui-remote-connections__primary" disabled={formBusy} type="submit">
+              {formBusy ? formSavingLabel : "Save connection"}
+            </button>
           </footer>
         </form>
       ) : (

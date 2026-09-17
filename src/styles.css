@@ -8316,6 +8316,22 @@ button.codex-ui-login-page__mark {
   border-color: rgb(255 102 102 / 24%);
 }
 
+.codex-ui-remote-connections__form-status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-remote-connections__form-status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
 .codex-ui-remote-connections__list,
 .codex-ui-remote-connections__form {
   background: var(--codex-ui-surface, rgb(30 30 30));
@@ -8401,6 +8417,13 @@ button.codex-ui-login-page__mark {
   border: 1px solid rgb(255 255 255 / 12%);
   min-height: 2.5rem;
   padding: 0.65rem 0.75rem;
+}
+
+.codex-ui-remote-connections__form input:disabled,
+.codex-ui-remote-connections__form select:disabled,
+.codex-ui-remote-connections__form button:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .codex-ui-remote-connections__form footer {
