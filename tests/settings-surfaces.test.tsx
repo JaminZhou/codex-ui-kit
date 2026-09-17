@@ -346,10 +346,13 @@ describe("settings surfaces", () => {
         query=""
         sections={sections}
         selectedId="git"
+        loadingLabel="Loading settings index…"
         status="loading"
       />,
     );
-    expect(screen.getByRole("status").textContent).toBe("Loading settings…");
+    const shell = screen.getByRole("navigation", { name: "Settings" }).closest("div");
+    expect(shell?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toBe("Loading settings index…");
 
     rerender(
       <SettingsShell
