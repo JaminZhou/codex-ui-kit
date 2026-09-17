@@ -804,6 +804,7 @@ export function FileReviewNotice({
 
 export interface FileReviewProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  disabled?: boolean;
   files: readonly FileReviewItem[];
   /** Change this key to reveal the selected path again after repeated activation. */
   selectionKey?: number | string;
@@ -814,6 +815,7 @@ export interface FileReviewProps
 
 export function FileReview({
   className,
+  disabled = false,
   files,
   selectionKey,
   onSelectFile,
@@ -882,7 +884,9 @@ export function FileReview({
   return (
     <div
       aria-label={ariaLabel}
+      aria-disabled={disabled || undefined}
       className={classes}
+      data-disabled={disabled || undefined}
       data-file-count={files.length}
       role="list"
       {...props}
@@ -909,7 +913,10 @@ export function FileReview({
               {onSelectFile ? (
                 <button
                   aria-label={`Select review for ${file.path}`}
-                  onClick={() => onSelectFile(file, index)}
+                  disabled={disabled}
+                  onClick={() => {
+                    if (!disabled) onSelectFile(file, index);
+                  }}
                   type="button"
                 >
                   <code>{pathContent}</code>
@@ -981,6 +988,7 @@ export interface FileReviewWorkspaceProps
   defaultFilesVisible?: boolean;
   defaultScope?: FileReviewWorkspaceScope;
   defaultSplit?: boolean;
+  disabled?: boolean;
   files: readonly FileReviewItem[];
   icons?: FileReviewWorkspaceIcons;
   onCommit?: () => void;
@@ -1072,6 +1080,7 @@ export function FileReviewWorkspace({
   defaultFilesVisible = true,
   defaultScope = "Last Turn",
   defaultSplit = false,
+  disabled = false,
   files,
   icons = {},
   onCommit,
@@ -1144,6 +1153,7 @@ export function FileReviewWorkspace({
     window.setTimeout(() => returnFocus.current?.focus());
   };
   const selectFile = (file: FileReviewItem, index: number) => {
+    if (disabled) return;
     setInternalSelectedPath(file.path);
     onOpenFile?.(file, index);
     fileElementsRef.current
@@ -1229,7 +1239,9 @@ export function FileReviewWorkspace({
   return (
     <div
       aria-label={ariaLabel}
+      aria-disabled={disabled || undefined}
       className={classes}
+      data-disabled={disabled || undefined}
       data-files-visible={filesVisible || undefined}
       data-layout={split ? "split" : "unified"}
       role="region"
@@ -1254,7 +1266,9 @@ export function FileReviewWorkspace({
             aria-expanded={scopeOpen}
             aria-haspopup="menu"
             className="codex-ui-file-review-workspace__scope"
+            disabled={disabled}
             onClick={() => {
+              if (disabled) return;
               setJumpOpen(false);
               setScopeOpen((open) => !open);
             }}
@@ -1287,8 +1301,10 @@ export function FileReviewWorkspace({
               {fileReviewWorkspaceScopes.map((item) => (
                 <button
                   aria-checked={item === resolvedScope}
+                  disabled={disabled}
                   key={item}
                   onClick={() => {
+                    if (disabled) return;
                     if (scope === undefined) setInternalScope(item);
                     onScopeChange?.(item);
                     closePopup(setScopeOpen, scopeButtonRef);
@@ -1311,7 +1327,10 @@ export function FileReviewWorkspace({
           <button
             aria-label="Review options"
             className="codex-ui-file-review-workspace__optional-action"
-            onClick={onReviewOptions}
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) onReviewOptions?.();
+            }}
             type="button"
           >
             {icon("options")}
@@ -1321,7 +1340,9 @@ export function FileReviewWorkspace({
               allDiffsCollapsed ? "Expand all diffs" : "Collapse all diffs"
             }
             className="codex-ui-file-review-workspace__optional-action"
+            disabled={disabled}
             onClick={() =>
+              !disabled &&
               setCollapsedPaths(() =>
                 allDiffsCollapsed
                   ? new Set()
@@ -1340,7 +1361,9 @@ export function FileReviewWorkspace({
               aria-expanded={jumpOpen}
               aria-haspopup="listbox"
               aria-label="Jump to file"
+              disabled={disabled}
               onClick={() => {
+                if (disabled) return;
                 setScopeOpen(false);
                 setJumpOpen((open) => !open);
               }}
@@ -1372,8 +1395,10 @@ export function FileReviewWorkspace({
                 {files.map((file, index) => (
                   <button
                     aria-selected={file.path === resolvedSelectedPath}
+                    disabled={disabled}
                     key={file.path}
                     onClick={() => {
+                      if (disabled) return;
                       selectFile(file, index);
                       closePopup(setJumpOpen, jumpButtonRef);
                     }}
@@ -1390,26 +1415,42 @@ export function FileReviewWorkspace({
           <button
             aria-label={split ? "Switch to unified diff" : "Switch to split diff"}
             className="codex-ui-file-review-workspace__optional-action"
-            onClick={() => setSplit((value) => !value)}
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) setSplit((value) => !value);
+            }}
             type="button"
           >
             {icon("splitDiff")}
           </button>
           <button
             aria-label={filesVisible ? "Hide files" : "Show files"}
-            onClick={() => setFilesVisible((visible) => !visible)}
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) setFilesVisible((visible) => !visible);
+            }}
             type="button"
           >
             {icon("filesToggle")}
           </button>
           <span className="codex-ui-file-review-workspace__git-actions">
-            <button aria-label="Commit or push" onClick={onCommit} type="button">
+            <button
+              aria-label="Commit or push"
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onCommit?.();
+              }}
+              type="button"
+            >
               {icon("commit")}
               <span>Commit or push</span>
             </button>
             <button
               aria-label="More Git actions"
-              onClick={onMoreGitActions}
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onMoreGitActions?.();
+              }}
               type="button"
             >
               {icon("moreGit")}
@@ -1453,7 +1494,9 @@ export function FileReviewWorkspace({
                   <span className="codex-ui-file-review-workspace__file-actions">
                     <button
                       aria-label="Copy path"
+                      disabled={disabled}
                       onClick={() => {
+                        if (disabled) return;
                         if (onCopyPath) void onCopyPath(file, index);
                         else copyWithClipboard(file.path);
                       }}
@@ -1464,7 +1507,9 @@ export function FileReviewWorkspace({
                     <button
                       aria-expanded={!collapsed}
                       aria-label="Toggle file diff"
+                      disabled={disabled}
                       onClick={() =>
+                        !disabled &&
                         setCollapsedPaths((current) => {
                           const next = new Set(current);
                           if (next.has(file.path)) next.delete(file.path);
@@ -1478,7 +1523,10 @@ export function FileReviewWorkspace({
                     </button>
                     <button
                       aria-label="Open in"
-                      onClick={() => onOpenFile?.(file, index)}
+                      disabled={disabled}
+                      onClick={() => {
+                        if (!disabled) onOpenFile?.(file, index);
+                      }}
                       type="button"
                     >
                       {icon("openIn")}
@@ -1515,7 +1563,10 @@ export function FileReviewWorkspace({
               {icon("search")}
               <input
                 aria-label="Filter files"
-                onChange={(event) => setFilter(event.currentTarget.value)}
+                disabled={disabled}
+                onChange={(event) => {
+                  if (!disabled) setFilter(event.currentTarget.value);
+                }}
                 placeholder="Filter files…"
                 type="search"
                 value={filter}
@@ -1535,8 +1586,11 @@ export function FileReviewWorkspace({
                     data-selected={
                       resolvedSelectedPath === file.path || undefined
                     }
+                    disabled={disabled}
                     key={file.path}
-                    onClick={() => selectFile(file, index)}
+                    onClick={() => {
+                      if (!disabled) selectFile(file, index);
+                    }}
                     role="treeitem"
                     type="button"
                   >

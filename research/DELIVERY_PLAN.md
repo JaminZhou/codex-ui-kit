@@ -961,6 +961,10 @@ leaving renderer and file effects host-owned.
 File-change disclosure, changed-file opening, and diff-copy controls now use
 the same disabled boundary while preserving host-owned diff text and file
 effects.
+The FileReview and FileReviewWorkspace compositions now expose the same
+host-controlled disabled boundary across file selection, scope/filter/layout
+controls, diff disclosure, copy/open actions, and Git actions while preserving
+host-owned review content and effects.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
