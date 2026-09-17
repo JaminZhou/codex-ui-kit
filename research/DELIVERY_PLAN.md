@@ -943,6 +943,9 @@ Thread navigation controls, the message rail, and the latest-message floating
 button now expose the same disabled boundary, preventing route transitions from
 emitting sidebar, history, scrub, or jump callbacks while preserving their
 observed geometry.
+The contenteditable ComposerEditor now exposes the same disabled boundary,
+including non-editable semantics and suppression of host editing callbacks
+during route or submission transitions.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

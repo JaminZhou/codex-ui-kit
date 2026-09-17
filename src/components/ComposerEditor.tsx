@@ -3,6 +3,7 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
 export interface ComposerEditorProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "aria-label"> {
   children?: ReactNode;
+  disabled?: boolean;
   label?: string;
   placeholder?: string;
 }
@@ -19,7 +20,16 @@ export const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     {
       children,
       className,
+      disabled = false,
       label = "Message composer",
+      onBeforeInput,
+      onCompositionEnd,
+      onCompositionStart,
+      onDrop,
+      onInput,
+      onKeyDown,
+      onKeyUp,
+      onPaste,
       placeholder,
       ...props
     },
@@ -28,14 +38,24 @@ export const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     return (
       <div
         {...props}
+        aria-disabled={disabled || undefined}
         aria-label={label}
         aria-multiline="true"
         aria-placeholder={placeholder}
         className={["codex-ui-composer-editor", className]
           .filter(Boolean)
           .join(" ")}
-        contentEditable
+        contentEditable={!disabled}
         data-placeholder={placeholder || undefined}
+        data-disabled={disabled || undefined}
+        onBeforeInput={disabled ? undefined : onBeforeInput}
+        onCompositionEnd={disabled ? undefined : onCompositionEnd}
+        onCompositionStart={disabled ? undefined : onCompositionStart}
+        onDrop={disabled ? undefined : onDrop}
+        onInput={disabled ? undefined : onInput}
+        onKeyDown={disabled ? undefined : onKeyDown}
+        onKeyUp={disabled ? undefined : onKeyUp}
+        onPaste={disabled ? undefined : onPaste}
         ref={forwardedRef}
         role="textbox"
         suppressContentEditableWarning
