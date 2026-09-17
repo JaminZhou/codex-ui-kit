@@ -40,7 +40,8 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
   `imageSourceResolver` resolves the inline source, and
   `imagePreviewSourceResolver` can independently model a source-owned preview
   payload while preserving measured geometry, caption, zoom, and focus
-  behavior. `stabilizeStreamingMarkdown` exposes the package's standalone
+  behavior. A disabled lock covers built-in code copy/word-wrap, table
+  copy/expand, image preview, and render-retry controls. `stabilizeStreamingMarkdown` exposes the package's standalone
   streaming helper; `CodeHighlighter` is the public contract for supplying a
   custom escaped-code highlighter.
 - `InlineCode`: standalone inline-code treatment.

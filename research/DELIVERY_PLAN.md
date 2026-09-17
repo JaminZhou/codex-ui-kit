@@ -2419,6 +2419,9 @@ The login shell now applies the same host boundary across provider, API-key,
 device-code, browser-pending, retry, copy, cancel, and sign-up states.
 Code-block presentation now locks copy and word-wrap actions under the same
 boundary without changing syntax-highlighting or streaming content.
+The Markdown surface now propagates that boundary through table copy/expand,
+image preview, and render-retry actions while retaining host-owned links and
+custom renderer content.
 
 ## Planning rules
 

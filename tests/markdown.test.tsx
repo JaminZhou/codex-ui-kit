@@ -165,6 +165,53 @@ Footnote reference.[^1]
     expect(dialog.querySelector("img")?.getAttribute("src")).toBeNull();
   });
 
+  it("locks built-in Markdown actions while disabled", () => {
+    const onCopyCode = vi.fn();
+    const onCopyTable = vi.fn<(payload: MarkdownTableCopyPayload) => void>();
+    const markdown = [
+      "| Surface | State |",
+      "| --- | --- |",
+      "| Code | 3 |",
+      "",
+      "![Preview](https://example.com/preview.png)",
+      "",
+      "```ts",
+      "const ready = true;",
+      "```",
+    ].join("\n");
+    const { container } = render(
+      <AgentMarkdown
+        allowWideTables
+        codeBlockWrapToggleable
+        disabled
+        imagePreviewSourceResolver={() => ""}
+        onCopyCode={onCopyCode}
+        onCopyTable={onCopyTable}
+      >
+        {markdown}
+      </AgentMarkdown>,
+    );
+
+    const root = container.querySelector(".codex-ui-markdown");
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    const controls = [
+      screen.getByRole("button", { name: "Copy table" }),
+      screen.getByRole("button", { name: "Expand table" }),
+      screen.getByRole("button", { name: "Copy code" }),
+      screen.getByRole("button", { name: "Enable word wrap" }),
+      screen.getByRole("button", { name: "Preview" }),
+    ];
+    controls.forEach((control) => {
+      expect(control).toHaveProperty("disabled", true);
+      fireEvent.click(control);
+    });
+    expect(onCopyCode).not.toHaveBeenCalled();
+    expect(onCopyTable).not.toHaveBeenCalled();
+    expect(screen.queryByRole("dialog", { name: "Table preview" })).toBeNull();
+    expect(screen.queryByRole("dialog", { name: "Image preview" })).toBeNull();
+  });
+
   it("offers a retry boundary when a host Markdown component throws", async () => {
     const onRetryRender = vi.fn();
     vi.spyOn(console, "error").mockImplementation(() => undefined);
