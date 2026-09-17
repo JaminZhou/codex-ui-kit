@@ -19884,6 +19884,55 @@ button.codex-ui-subagent-panel__item:focus-visible {
   padding: 0;
 }
 
+.codex-ui-source-list__state {
+  align-items: flex-start;
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  flex-direction: column;
+  font-size: var(--codex-ui-font-size-xs);
+  gap: 0.375rem;
+  line-height: var(--codex-ui-line-height-xs);
+  padding: 0.5rem;
+}
+
+.codex-ui-source-list__state[role="alert"] {
+  color: var(--codex-ui-danger, #ef6b73);
+}
+
+.codex-ui-source-list__state button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-sm);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--codex-ui-font-weight-medium);
+  padding: 0.125rem 0;
+}
+
+.codex-ui-source-list__state button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-source-list__skeleton {
+  background: var(--codex-ui-background-button-secondary);
+  border-radius: 999px;
+  display: block;
+  height: 0.75rem;
+  max-width: 16rem;
+  width: 100%;
+}
+
+.codex-ui-source-list__skeleton:nth-child(2) {
+  max-width: 13rem;
+}
+
+.codex-ui-source-list__skeleton:nth-child(3) {
+  max-width: 15rem;
+}
+
 .codex-ui-source-list__items a,
 .codex-ui-source-list__items button,
 .codex-ui-source-list__item {

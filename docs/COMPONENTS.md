@@ -166,7 +166,10 @@ All privileged behavior remains host-owned. The components never auto-approve co
   remain explicit.
 - `CitationMention`: inline external citation with optional favicon or supplied icon, deterministic new-tab security defaults, and the current `data-inline-mention-interactive` host hook.
 - `ResourceCard` and `ResourceList`: file, website, Drive, app, and image resources with previews, metadata, optional labelled opening actions, trailing actions, and progressive reveal. Cards without `href` or `onOpen` remain static content.
-- `SourceList`: compact file, web, tool, and external citation summaries with metadata, optional labelled opening actions, and expansion. Sources without `href` or `onOpen` remain static rows.
+- `SourceList`: compact file, web, tool, and external citation summaries with
+  metadata, optional labelled opening actions, expansion, and controlled
+  loading/empty/error/retry states. Sources without `href` or `onOpen` remain
+  static rows.
 - `SourceActivityList` and `SourceSearchActivity`: Sources-workspace activity composition with optional leading identity, controlled or uncontrolled disclosure, exact search counts, and host-supplied query rows.
 - `ArtifactList`: resource-list composition with an explicit empty state.
 - `GeneratedImageGallery`: one-to-four-slot natural or square image geometry, pending placeholders, retry/error handling, overflow paging, and reduced-motion support. Images become focusable actions only when `onOpenImage` is provided.
