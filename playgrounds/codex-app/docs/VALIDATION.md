@@ -247,6 +247,13 @@ playground typecheck/build. Replay shell notifications remain on their
 existing path. This promotes Live notification reachability in the playground,
 not installed-product parity or the complete production notification matrix.
 
+The same reducer now covers real `error` recovery: retrying turns surface a
+deduplicated Reconnecting notice, final `turn/completed` settlement removes
+that transient state, and `thread/compacted` is announced as an informational
+notice. The focused tests assert the recovery-to-settlement transition; this
+still does not claim every provider-specific error or installed-product pixel
+parity.
+
 ### Live runtime check — 2026-09-08
 
 The previous pinned client bundled Codex CLI 0.145.0. A real live turn using
