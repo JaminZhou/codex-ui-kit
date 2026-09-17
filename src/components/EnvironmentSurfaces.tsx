@@ -49,9 +49,11 @@ export interface EnvironmentEditorPageProps
   onDiscard?: () => void;
   onEnvironmentNameChange?: (value: string) => void;
   onRetry?: () => void;
+  retryLabel?: ReactNode;
   onSave?: () => void;
   onSetupScriptChange?: (value: string) => void;
   onTabChange?: (tab: EnvironmentEditorTab) => void;
+  savingLabel?: ReactNode;
   setupScript?: string;
   status?: EnvironmentEditorStatus;
   statusMessage?: ReactNode;
@@ -72,9 +74,11 @@ export function EnvironmentEditorPage({
   onDiscard,
   onEnvironmentNameChange,
   onRetry,
+  retryLabel = "Retry",
   onSave,
   onSetupScriptChange,
   onTabChange,
+  savingLabel = "Saving…",
   setupScript = "",
   status = "ready",
   statusMessage,
@@ -88,7 +92,7 @@ export function EnvironmentEditorPage({
   const resolvedStatusMessage =
     statusMessage ??
     (status === "saving"
-      ? "Saving environment…"
+      ? savingLabel
       : status === "saved"
         ? "Environment saved"
         : status === "conflict"
@@ -98,6 +102,8 @@ export function EnvironmentEditorPage({
   return (
     <section
       {...props}
+      aria-busy={isBusy || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       aria-labelledby={titleId}
       className={["codex-ui-environment-editor", className]
         .filter(Boolean)
@@ -122,7 +128,7 @@ export function EnvironmentEditorPage({
           {resolvedStatusMessage}
           {(status === "error" || status === "conflict") && onRetry ? (
             <button onClick={onRetry} type="button">
-              Retry
+              {retryLabel}
             </button>
           ) : null}
         </div>
@@ -133,6 +139,7 @@ export function EnvironmentEditorPage({
           <input
             aria-label="Environment name"
             onChange={(event) => onEnvironmentNameChange?.(event.target.value)}
+            disabled={isBusy}
             value={environmentName}
           />
         </label>
@@ -142,6 +149,7 @@ export function EnvironmentEditorPage({
               aria-selected={activeTab === tab}
               className={activeTab === tab ? "is-active" : undefined}
               onClick={() => onTabChange?.(tab)}
+              disabled={isBusy}
               role="tab"
               type="button"
               key={tab}
@@ -156,6 +164,7 @@ export function EnvironmentEditorPage({
             <textarea
               aria-label="Simple setup"
               onChange={(event) => onSetupScriptChange?.(event.target.value)}
+              disabled={isBusy}
               value={setupScript}
             />
             <small>Use one command per line to prepare the environment.</small>
@@ -166,6 +175,7 @@ export function EnvironmentEditorPage({
             <textarea
               aria-label="Cleanup"
               onChange={(event) => onCleanupScriptChange?.(event.target.value)}
+              disabled={isBusy}
               value={cleanupScript}
             />
             <small>Cleanup runs after the environment is discarded.</small>
@@ -178,19 +188,20 @@ export function EnvironmentEditorPage({
                 <small>Reusable commands for this environment.</small>
               </div>
               {onActionAdd ? (
-                <button onClick={onActionAdd} type="button">Add action</button>
+                <button disabled={isBusy} onClick={onActionAdd} type="button">Add action</button>
               ) : null}
             </div>
             {actions.length === 0 ? (
               <p className="codex-ui-environment-editor__empty">No actions yet.</p>
             ) : (
               actions.map((action) => (
-                <fieldset className="codex-ui-environment-editor__action" key={action.id}>
+                <fieldset className="codex-ui-environment-editor__action" disabled={isBusy} key={action.id}>
                   <legend>{action.name || "Action"}</legend>
                   <label className="codex-ui-environment-editor__field">
                     <span>Action</span>
                     <input
                       aria-label={`${action.id} action name`}
+                      disabled={isBusy}
                       onChange={(event) => onActionChange?.(action.id, "name", event.target.value)}
                       value={action.name}
                     />
@@ -199,6 +210,7 @@ export function EnvironmentEditorPage({
                     <span>Platforms</span>
                     <input
                       aria-label={`${action.id} platforms`}
+                      disabled={isBusy}
                       onChange={(event) => onActionChange?.(action.id, "platforms", event.target.value)}
                       value={action.platforms}
                     />
@@ -207,12 +219,13 @@ export function EnvironmentEditorPage({
                     <span>Command</span>
                     <input
                       aria-label={`${action.id} command`}
+                      disabled={isBusy}
                       onChange={(event) => onActionChange?.(action.id, "command", event.target.value)}
                       value={action.command}
                     />
                   </label>
                   {onActionDelete ? (
-                    <button onClick={() => onActionDelete(action.id)} type="button">Delete</button>
+                    <button disabled={isBusy} onClick={() => onActionDelete(action.id)} type="button">Delete</button>
                   ) : null}
                 </fieldset>
               ))
@@ -223,7 +236,7 @@ export function EnvironmentEditorPage({
       <footer className="codex-ui-environment-editor__footer">
         <button disabled={isBusy} onClick={onDiscard} type="button">Discard changes</button>
         <button disabled={isBusy} onClick={onSave} type="button">
-          {isBusy ? "Saving…" : "Save"}
+          {isBusy ? savingLabel : "Save"}
         </button>
       </footer>
     </section>

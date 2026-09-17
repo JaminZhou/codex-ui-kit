@@ -458,7 +458,9 @@ kit never performs filesystem, network, account, or process mutations.
   credentials, and provisioning stay in the host.
 - `EnvironmentEditorPage`: Setup/Cleanup/Actions tabs with controlled name,
   script, action rows, dirty state, Save/Discard, and conflict/error Retry
-  callbacks. It is an editor contract, not a remote environment client.
+  callbacks. Saving exposes busy feedback and locks mutable controls while
+  preserving host-owned retry/discard actions. It is an editor contract, not a
+  remote environment client.
 - `HooksSettingsPage`: controlled hook groups, trust/managed/changed states,
   config-open and reload callbacks, and explicit error recovery. It does not
   read or write hook files.
