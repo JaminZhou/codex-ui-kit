@@ -180,4 +180,54 @@ describe("environment settings surfaces", () => {
       screen.getByRole("button", { name: "Saving environment now…" }),
     ).toHaveProperty("disabled", true);
   });
+
+  it("supports host-wide disabled locks for settings and editor surfaces", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <EnvironmentSettingsPage
+        disabled
+        onRetry={onRetry}
+        status="error"
+        statusHeading="Environment access unavailable"
+      />,
+    );
+    expect(
+      screen
+        .getByRole("heading", { name: "Environments" })
+        .closest("section")
+        ?.getAttribute("data-disabled"),
+    ).toBe("true");
+    expect(screen.getByRole("button", { name: "Retry" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <EnvironmentEditorPage
+        actions={[
+          { command: "pnpm test", id: "verify", name: "Verify", platforms: "macOS" },
+        ]}
+        activeTab="actions"
+        disabled
+        onActionAdd={vi.fn()}
+        onSave={vi.fn()}
+      />,
+    );
+    const editor = screen
+      .getByRole("heading", { name: "Environment" })
+      .closest("section");
+    expect(editor?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.getByRole("textbox", { name: "Environment name" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Add action" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
 });
