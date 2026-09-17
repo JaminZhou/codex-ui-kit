@@ -71,6 +71,25 @@ describe("SubagentActivity", () => {
     );
     expect(onOpen).toHaveBeenCalledWith(item);
   });
+
+  it("locks activity opening while disabled", () => {
+    const onOpen = vi.fn();
+    const item: SubagentActivityItem = {
+      activityStatus: "updated",
+      id: "thread-builder",
+      name: "Builder",
+    };
+    const { container } = render(
+      <SubagentActivity disabled item={item} onOpen={onOpen} />,
+    );
+
+    expect(container.firstElementChild?.getAttribute("aria-disabled")).toBe("true");
+    expect(container.firstElementChild?.getAttribute("data-disabled")).toBe("true");
+    const button = screen.getByRole("button", { name: "Open Builder subagent" });
+    expect((button as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(button);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
 });
 
 describe("SubagentActivityGroup", () => {
@@ -102,6 +121,23 @@ describe("SubagentActivityGroup", () => {
     );
 
     expect(html).toContain("interrupted");
+  });
+
+  it("locks grouped activity chips while disabled", () => {
+    const onOpen = vi.fn();
+    const { container } = render(
+      <SubagentActivityGroup
+        disabled
+        items={[{ activityStatus: "active", id: "one", name: "Researcher" }]}
+        onOpen={onOpen}
+      />,
+    );
+
+    expect(container.firstElementChild?.getAttribute("aria-disabled")).toBe("true");
+    const chip = screen.getByRole("button", { name: "Open Researcher subagent" });
+    expect((chip as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(chip);
+    expect(onOpen).not.toHaveBeenCalled();
   });
 });
 
@@ -312,6 +348,43 @@ describe("SubagentSummary", () => {
         name: "Open subagents, 1 working, 1 done",
       }),
     ).toBeTruthy();
+  });
+
+  it("locks disclosure and subagent actions while disabled", () => {
+    const onOpenChange = vi.fn();
+    const onOpenSubagent = vi.fn();
+    const onOpenSummary = vi.fn();
+    render(
+      <SubagentSummary
+        defaultOpen
+        disabled
+        items={[
+          { ...activeAgent, presentation: "grouped" },
+          { ...doneAgent, presentation: "grouped" },
+          { ...doneAgent, id: "thread-reviewer", name: "Reviewer" },
+        ]}
+        onOpenChange={onOpenChange}
+        onOpenSubagent={onOpenSubagent}
+        onOpenSummary={onOpenSummary}
+      />,
+    );
+
+    const heading = screen.getByRole("button", { name: /Subagents/ });
+    expect((heading as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(heading);
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    const overview = screen.getByRole("button", {
+      name: "Open subagents, 1 working, 1 done",
+    });
+    expect((overview as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(overview);
+    expect(onOpenSummary).not.toHaveBeenCalled();
+
+    const row = screen.getByRole("button", { name: /Reviewer/ });
+    expect((row as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(row);
+    expect(onOpenSubagent).not.toHaveBeenCalled();
   });
 });
 
@@ -536,6 +609,29 @@ describe("SubagentPanel", () => {
     expect(replacementCallback).toHaveBeenCalledOnce();
     expect(replacementCallback).toHaveBeenCalledWith([activeAgent]);
   });
+
+  it("locks selection and pagination while disabled", () => {
+    const onSelect = vi.fn();
+    const items = Array.from({ length: 5 }, (_, index) => ({
+      id: `disabled-agent-${index}`,
+      name: `Disabled agent ${index + 1}`,
+      status: "active" as const,
+    }));
+    const { container } = render(
+      <SubagentPanel disabled items={items} onSelect={onSelect} />,
+    );
+
+    expect(container.firstElementChild?.getAttribute("aria-disabled")).toBe("true");
+    const rows = screen.getAllByRole("button", { name: /Disabled agent/ });
+    expect((rows[0] as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(rows[0]);
+    expect(onSelect).not.toHaveBeenCalled();
+
+    const pagination = screen.getByRole("button", { name: "Show 1 more" });
+    expect((pagination as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(pagination);
+    expect(screen.getAllByRole("button", { name: /Disabled agent/ })).toHaveLength(4);
+  });
 });
 
 describe("SubagentPanelIcon", () => {
@@ -559,5 +655,18 @@ describe("SubagentTranscriptHeader", () => {
     expect(screen.getByText("Researcher")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Back to subagents" }));
     expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it("locks back navigation while disabled", () => {
+    const onBack = vi.fn();
+    const { container } = render(
+      <SubagentTranscriptHeader disabled item={activeAgent} onBack={onBack} />,
+    );
+
+    expect(container.firstElementChild?.getAttribute("aria-disabled")).toBe("true");
+    const back = screen.getByRole("button", { name: "Back to subagents" });
+    expect((back as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(back);
+    expect(onBack).not.toHaveBeenCalled();
   });
 });

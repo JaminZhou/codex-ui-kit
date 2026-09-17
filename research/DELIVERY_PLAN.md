@@ -605,6 +605,10 @@ exit gates; it does not replace the inventory.
   panel/summary/transcript comparisons pass between 1.3329% and 4.6708%, and
   the compact nested main-activity band passes at 11.4952% under its separate
   12.5% limit.
+- The subagent component family now exposes a consistent disabled boundary:
+  activity rows/chips, summary disclosure and overflow, panel selection and
+  pagination, and transcript back navigation are locked while host-owned data
+  callbacks and visibility reporting remain available.
 - A source-structural follow-up on the unchanged `26.803.41515` fingerprint
   confirms `pendingInit`, `running`, `interrupted`, `completed`, `errored`,
   `shutdown`, and `notFound` agent states; Active/Done grouping by the public

@@ -151,12 +151,14 @@ function groupStatus(items: SubagentActivityItem[]) {
 
 export interface SubagentActivityProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+  disabled?: boolean;
   item: SubagentActivityItem;
   onOpen?: (item: SubagentActivityItem) => void;
 }
 
 export function SubagentActivity({
   className,
+  disabled = false,
   item,
   onOpen,
   ...props
@@ -171,9 +173,11 @@ export function SubagentActivity({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-subagent-activity", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={item.activityStatus}
       {...props}
     >
@@ -181,7 +185,10 @@ export function SubagentActivity({
         <button
           aria-label={`Open ${displayName(item.name)} subagent`}
           className="codex-ui-subagent-activity__row"
-          onClick={() => onOpen(item)}
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onOpen(item);
+          }}
           type="button"
         >
           {content}
@@ -196,6 +203,7 @@ export function SubagentActivity({
 export interface SubagentActivityGroupProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   animateEntrance?: boolean;
+  disabled?: boolean;
   items: SubagentActivityItem[];
   maxVisible?: number;
   onOpen?: (item: SubagentActivityItem) => void;
@@ -205,6 +213,7 @@ export interface SubagentActivityGroupProps
 export function SubagentActivityGroup({
   animateEntrance = true,
   className,
+  disabled = false,
   items,
   maxVisible = 3,
   onOpen,
@@ -218,9 +227,11 @@ export function SubagentActivityGroup({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-subagent-activity-group", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-testid="subagent-activity-inline-group"
       {...props}
     >
@@ -238,8 +249,11 @@ export function SubagentActivityGroup({
             aria-label={`Open ${displayName(item.name)} subagent`}
             className={classes}
             data-animate-entrance={animateEntrance || undefined}
+            disabled={disabled}
             key={item.id}
-            onClick={() => onOpen(item)}
+            onClick={() => {
+              if (!disabled) onOpen(item);
+            }}
             type="button"
           >
             {content}
@@ -315,9 +329,11 @@ function DiffStats({
 }
 
 function SummaryAvatarGroup({
+  disabled,
   items,
   onOpenItem,
 }: {
+  disabled: boolean;
   items: SubagentItem[];
   onOpenItem?: (item: SubagentItem) => void;
 }) {
@@ -344,8 +360,11 @@ function SummaryAvatarGroup({
           <button
             aria-label={displayName(item.name)}
             className="codex-ui-subagent-summary__avatar-button"
+            disabled={disabled}
             key={item.id}
-            onClick={() => onOpenItem(item)}
+            onClick={() => {
+              if (!disabled) onOpenItem(item);
+            }}
             type="button"
           >
             {avatar}
@@ -367,6 +386,7 @@ function SummaryAvatarGroup({
                   overflowItems.length === 1 ? "subagent" : "subagents"
                 }`}
                 className="codex-ui-subagent-summary__overflow-toggle"
+                disabled={disabled}
                 ref={overflowTrigger}
                 type="button"
               >
@@ -377,8 +397,10 @@ function SummaryAvatarGroup({
             {overflowItems.map((item) => (
               <MenuItem
                 className="codex-ui-subagent-summary__overflow-item"
+                disabled={disabled}
                 key={item.id}
                 onSelect={() => {
+                  if (disabled) return;
                   onOpenItem(item);
                   if (typeof window !== "undefined") {
                     window.setTimeout(() => overflowTrigger.current?.focus());
@@ -406,6 +428,7 @@ function SummaryAvatarGroup({
 export interface SubagentSummaryProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   defaultOpen?: boolean;
+  disabled?: boolean;
   items: SubagentItem[];
   onOpenChange?: (open: boolean) => void;
   onOpenSubagent?: (item: SubagentItem) => void;
@@ -417,6 +440,7 @@ export interface SubagentSummaryProps
 export function SubagentSummary({
   className,
   defaultOpen,
+  disabled = false,
   items,
   onOpenChange,
   onOpenSubagent,
@@ -456,22 +480,26 @@ export function SubagentSummary({
   if (items.length === 0) return null;
 
   const setOpen = (nextOpen: boolean) => {
+    if (disabled) return;
     if (open === undefined) setInternalOpen(nextOpen);
     onOpenChange?.(nextOpen);
   };
 
   return (
     <section
+      aria-disabled={disabled || undefined}
       className={["codex-ui-subagent-summary", className]
         .filter(Boolean)
         .join(" ")}
       data-expanded={resolvedOpen || undefined}
+      data-disabled={disabled || undefined}
       {...props}
     >
       <button
         aria-controls={contentId}
         aria-expanded={resolvedOpen}
         className="codex-ui-subagent-summary__heading"
+        disabled={disabled}
         onClick={() => setOpen(!resolvedOpen)}
         type="button"
       >
@@ -488,6 +516,7 @@ export function SubagentSummary({
             const content = (
               <>
                 <SummaryAvatarGroup
+                  disabled={disabled}
                   items={grouped}
                   onOpenItem={onOpenSummary ? undefined : onOpenSubagent}
                 />
@@ -512,7 +541,10 @@ export function SubagentSummary({
               <button
                 {...sharedProps}
                 aria-label={`Open subagents, ${groupedStatusLabel}`}
-                onClick={onOpenSummary}
+                disabled={disabled}
+                onClick={() => {
+                  if (!disabled) onOpenSummary();
+                }}
                 type="button"
               >
                 {content}
@@ -554,8 +586,11 @@ export function SubagentSummary({
             return onOpenSubagent ? (
               <button
                 {...sharedProps}
+                disabled={disabled}
                 key={item.id}
-                onClick={() => onOpenSubagent(item)}
+                onClick={() => {
+                  if (!disabled) onOpenSubagent(item);
+                }}
                 type="button"
               >
                 {content}
@@ -573,6 +608,7 @@ export function SubagentSummary({
 }
 
 interface SubagentPanelSectionProps {
+  disabled: boolean;
   emptyState?: ReactNode;
   items: SubagentItem[];
   limit: number;
@@ -585,6 +621,7 @@ interface SubagentPanelSectionProps {
 }
 
 function SubagentPanelSection({
+  disabled,
   emptyState,
   items,
   limit,
@@ -637,8 +674,11 @@ function SubagentPanelSection({
             return onSelect ? (
               <button
                 className="codex-ui-subagent-panel__item"
+                disabled={disabled}
                 key={item.id}
-                onClick={() => onSelect(item)}
+                onClick={() => {
+                  if (!disabled) onSelect(item);
+                }}
                 type="button"
               >
                 {content}
@@ -654,7 +694,10 @@ function SubagentPanelSection({
       {visibleCount < items.length ? (
         <button
           className="codex-ui-subagent-panel__pagination"
-          onClick={() => onVisibleCountChange(visibleCount + limit)}
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onVisibleCountChange(visibleCount + limit);
+          }}
           type="button"
         >
           Show {Math.min(limit, items.length - visibleCount)} more
@@ -671,6 +714,7 @@ export interface SubagentPanelProps
   > {
   activeLimit?: number;
   activeTitle?: ReactNode;
+  disabled?: boolean;
   doneLimit?: number;
   doneTitle?: ReactNode;
   emptyActiveState?: ReactNode;
@@ -684,6 +728,7 @@ export function SubagentPanel({
   activeLimit = 4,
   activeTitle = "Active",
   className,
+  disabled = false,
   doneLimit = 10,
   doneTitle,
   emptyActiveState = "No active subagents",
@@ -749,12 +794,15 @@ export function SubagentPanel({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-subagent-panel", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       {...props}
     >
       <SubagentPanelSection
+        disabled={disabled}
         emptyState={emptyActiveState}
         items={active}
         limit={activeLimit}
@@ -766,6 +814,7 @@ export function SubagentPanel({
         visibleCount={activeVisibleCount}
       />
       <SubagentPanelSection
+        disabled={disabled}
         items={done}
         limit={doneLimit}
         onSelect={onSelect}
@@ -801,27 +850,34 @@ export function SubagentPanelIcon({
 
 export interface SubagentTranscriptHeaderProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
+  disabled?: boolean;
   item: Pick<SubagentItem, "id" | "name">;
   onBack: () => void;
 }
 
 export function SubagentTranscriptHeader({
   className,
+  disabled = false,
   item,
   onBack,
   ...props
 }: SubagentTranscriptHeaderProps) {
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-subagent-transcript-header", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       {...props}
     >
       <button
         aria-label="Back to subagents"
         className="codex-ui-subagent-transcript-header__back"
-        onClick={onBack}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) onBack();
+        }}
         type="button"
       >
         <span aria-hidden="true" />
