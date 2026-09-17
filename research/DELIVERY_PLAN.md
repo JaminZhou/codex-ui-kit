@@ -952,6 +952,9 @@ or native-window behavior.
 Sidebar sections, project groups, and bounded history collections now expose
 the same host-controlled lock for collapse, project expansion, and Show more;
 row and footer action slots remain host-owned.
+The Browser workspace shell now propagates the same disabled boundary to tab,
+close, and toolbar actions while keeping page content and browser effects
+host-owned.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

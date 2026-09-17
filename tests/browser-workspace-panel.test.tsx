@@ -62,4 +62,30 @@ describe("BrowserWorkspacePanel", () => {
     expect(onCloseTab).toHaveBeenCalledWith(tab);
     expect(onAction).toHaveBeenCalledWith("new-tab");
   });
+
+  it("locks browser tabs and toolbar actions while disabled", () => {
+    const onAction = vi.fn();
+    const onCloseTab = vi.fn();
+    const onSelectTab = vi.fn();
+    render(
+      <BrowserWorkspacePanel
+        disabled
+        onAction={onAction}
+        onCloseTab={onCloseTab}
+        onSelectTab={onSelectTab}
+        tabs={[{ active: true, id: "codex", title: "Codex" }]}
+      />,
+    );
+
+    const panel = screen.getByRole("complementary", { name: "Browser" });
+    expect(panel.getAttribute("aria-disabled")).toBe("true");
+    expect(panel.getAttribute("data-disabled")).toBe("true");
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(onAction).not.toHaveBeenCalled();
+    expect(onCloseTab).not.toHaveBeenCalled();
+    expect(onSelectTab).not.toHaveBeenCalled();
+  });
 });
