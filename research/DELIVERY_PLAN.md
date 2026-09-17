@@ -1714,9 +1714,11 @@ hidden-panel output, tab ownership, theme switching, and Live/Replay cleanup.
 The Live renderer now consumes the public
 `thread/backgroundTerminals/list|terminate|clean` contract through the
 project-owned preload bridge, opens real process output in the side panel, and
-supports individual/all termination. Signed-in runtime capture and
-current-product PTY visual evidence remain open; this does not close the
-complete-workflow exit gate.
+supports individual/all termination. The targeted
+`check:live-background-terminal` probe now proves one real model-created
+background process, list/open/close, and Stop all settlement in a disposable
+workspace. Current-product PTY visual evidence remains open; this does not
+close the complete-workflow exit gate.
 
 The user-input follow-up registers public `item/tool/requestUserInput` with a
 thread-owned host answer gate and a pending-question form (options, free text,
@@ -2143,9 +2145,9 @@ without confusing package readiness with full product reconstruction.
     attachment, Markdown error, terminal transport-failure, populated summary,
     and notification tone/action slices are now delivered. The opt-in live
     playground probe now covers real public-protocol subagent delegation and
-    owning-thread Stop settlement; the Live playground now also owns the
-    background-terminal list/open/terminate bridge, while signed-in runtime and
-    installed-product process evidence remain open. Continue with broader real
+    owning-thread Stop settlement; the Live playground now also owns and
+    probes the background-terminal list/open/terminate bridge, while
+    installed-product process evidence remains open. Continue with broader real
     global notification reachability. The
     real active `commandExecution` Stop follow-up now also settles an in-flight
     `sleep 30` command as an interrupted turn without a successful completion;
