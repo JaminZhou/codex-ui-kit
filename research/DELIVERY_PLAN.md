@@ -979,6 +979,9 @@ host-provided child surfaces explicitly host-owned.
 ResourceList, ArtifactList, SourceList, and SourceSearchActivity now expose the
 same boundary for progressive reveal, retry, source opening, and query
 expansion; static or caller-provided child content remains host-owned.
+GeneratedImageGallery and ImagePreviewDialog now expose the same boundary for
+image opening, paging, download/edit, navigation, and zoom; dialog close and
+Escape remain explicit host-owned escape hatches.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The

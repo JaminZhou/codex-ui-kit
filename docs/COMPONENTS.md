@@ -185,8 +185,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `ArtifactList`: resource-list composition with explicit empty, loading, and
   retryable error states; a disabled lock covers retry and reveal while the
   host owns artifact discovery and file loading.
-- `GeneratedImageGallery`: one-to-four-slot natural or square image geometry, pending placeholders, retry/error handling, overflow paging, and reduced-motion support. Images become focusable actions only when `onOpenImage` is provided.
-- `ImagePreviewDialog`: portalled lightbox with focus trapping/restoration, Escape and arrow navigation, download, backdrop dismissal, and previous/next controls.
+- `GeneratedImageGallery`: one-to-four-slot natural or square image geometry, pending placeholders, retry/error handling, overflow paging, and reduced-motion support. Images become focusable actions only when `onOpenImage` is provided; a disabled lock covers image opening and paging.
+- `ImagePreviewDialog`: portalled lightbox with focus trapping/restoration, Escape and arrow navigation, download, backdrop dismissal, and previous/next controls. A disabled lock covers image actions, navigation, and zoom while close/Escape remain host-owned escape hatches.
 
 ## Navigation and shell
 
