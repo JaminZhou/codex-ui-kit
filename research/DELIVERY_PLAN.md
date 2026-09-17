@@ -1771,6 +1771,10 @@ while a save is in flight its mutable fields, tabs, and action controls are
 locked behind `aria-busy`, while host-owned discard and conflict/error retry
 actions remain explicit. This validates the renderer lifecycle boundary without
 claiming production environment persistence.
+The Hooks settings surface now exposes host-configurable loading/error/retry
+copy and marks both initial loading and refresh with `aria-busy`; a refresh
+keeps the current rows visible but locks trust, enablement, and config-open
+actions until the host finishes. Hook discovery and execution remain host-owned.
 The Settings `Connections` slice now adds a controlled `RemoteConnectionsPage`
 with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,

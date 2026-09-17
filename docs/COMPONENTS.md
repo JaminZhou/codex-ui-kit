@@ -462,8 +462,9 @@ kit never performs filesystem, network, account, or process mutations.
   preserving host-owned retry/discard actions. It is an editor contract, not a
   remote environment client.
 - `HooksSettingsPage`: controlled hook groups, trust/managed/changed states,
-  config-open and reload callbacks, and explicit error recovery. It does not
-  read or write hook files.
+  config-open and reload callbacks, refresh busy state, and explicit error
+  recovery with host-configurable copy. Refreshing locks mutable hook actions;
+  it does not read or write hook files.
 - `KeyboardShortcutsPage`: searchable, grouped shortcut catalogue with
   controlled capture/edit/clear/cancel state and `onShortcutChange`. Native
   registration and persistence remain host-owned.

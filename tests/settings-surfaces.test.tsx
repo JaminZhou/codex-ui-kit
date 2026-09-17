@@ -542,6 +542,58 @@ describe("settings surfaces", () => {
     expect(onReload).not.toHaveBeenCalled();
   });
 
+  it("exposes hook loading labels and refresh busy state", () => {
+    const onReload = vi.fn();
+    const onToggleHookEnabled = vi.fn();
+    const { rerender } = render(
+      <HooksSettingsPage
+        entries={hookEntries}
+        errorHeading="Hook configuration failed"
+        errorMessage="The hook manifest could not be read."
+        loadingLabel="Loading configured hooks…"
+        onReload={onReload}
+        onToggleHookEnabled={onToggleHookEnabled}
+        retryLabel="Load again"
+        status="loading"
+      />,
+    );
+    const page = screen.getByRole("heading", { name: "Hooks" }).closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Loading configured hooks…",
+    );
+
+    rerender(
+      <HooksSettingsPage
+        errorHeading="Hook configuration failed"
+        errorMessage="The hook manifest could not be read."
+        onReload={onReload}
+        retryLabel="Load again"
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The hook manifest could not be read.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Load again" }));
+    expect(onReload).toHaveBeenCalledOnce();
+
+    rerender(
+      <HooksSettingsPage
+        entries={hookEntries}
+        onOpenConfig={() => undefined}
+        onReload={onReload}
+        onToggleHookEnabled={onToggleHookEnabled}
+        refreshing
+      />,
+    );
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    const stopSwitch = screen.getByRole("switch", { name: "Stop enabled" });
+    expect(stopSwitch).toHaveProperty("disabled", true);
+    fireEvent.click(stopSwitch);
+    expect(onToggleHookEnabled).not.toHaveBeenCalled();
+  });
+
   it("keeps package-observed Code review preferences controlled", () => {
     render(<CodeReviewFixture />);
 
