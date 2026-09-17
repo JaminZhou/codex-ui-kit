@@ -699,6 +699,51 @@ describe("settings surfaces", () => {
     expect(credits.getAttribute("aria-checked")).toBe("true");
   });
 
+  it("exposes Code review loading and error copy with busy semantics", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <CodeReviewSettingsPage
+        loadingLabel="Loading review preferences…"
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Load again"
+        status="loading"
+        value={{
+          allowCreditsForCodeReviews: false,
+          automaticReview: true,
+          exhaustiveCodeReview: false,
+          triggerPolicy: "pr_open",
+        }}
+      />,
+    );
+    const page = screen.getByRole("heading", { name: "Code review" }).closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Loading review preferences…",
+    );
+
+    rerender(
+      <CodeReviewSettingsPage
+        errorMessage="Review preferences unavailable"
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Load again"
+        status="error"
+        value={{
+          allowCreditsForCodeReviews: false,
+          automaticReview: true,
+          exhaustiveCodeReview: false,
+          triggerPolicy: "pr_open",
+        }}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Review preferences unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Load again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("keeps Appearance theme selection and editors fully controlled", () => {
     render(<AppearanceFixture />);
 

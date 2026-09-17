@@ -453,8 +453,9 @@ kit never performs filesystem, network, account, or process mutations.
 ### Settings, environment, and account surfaces
 
 - `CodeReviewSettingsPage`: controlled review-trigger policy, credits option,
-  loading/error/retry state, and `onChange`/`onRetry` callbacks. It never
-  starts a review or changes account limits.
+  loading/error/retry state with `aria-busy` and host-configurable copy, and
+  `onChange`/`onRetry` callbacks. It never starts a review or changes account
+  limits.
 - `EnvironmentSettingsPage`: controlled environment list with ready/loading/
   error/empty states, selection, refresh, and edit callbacks. Registry,
   credentials, and provisioning stay in the host.
