@@ -572,6 +572,24 @@ describe("FileReview", () => {
     ).toBeTruthy();
   });
 
+  it("locks file selection while disabled", () => {
+    const onSelectFile = vi.fn();
+    render(
+      <FileReview disabled files={files} onSelectFile={onSelectFile} />,
+    );
+
+    const review = screen.getByRole("list", { name: "File review" });
+    expect(review.getAttribute("aria-disabled")).toBe("true");
+    expect(review.getAttribute("data-disabled")).toBe("true");
+
+    const selection = screen.getByRole("button", {
+      name: "Select review for .research/probe/alpha.txt",
+    });
+    expect(selection).toHaveProperty("disabled", true);
+    fireEvent.click(selection);
+    expect(onSelectFile).not.toHaveBeenCalled();
+  });
+
   it("scrolls a newly selected file into the visible review region", () => {
     const originalScrollIntoView = Object.getOwnPropertyDescriptor(
       HTMLElement.prototype,
@@ -762,6 +780,49 @@ describe("FileReviewWorkspace", () => {
     ).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Hide files" }));
     expect(screen.queryByRole("complementary", { name: "Changed files" })).toBeNull();
+  });
+
+  it("locks review workspace controls while disabled", () => {
+    const onCommit = vi.fn();
+    const onCopyPath = vi.fn();
+    const onMoreGitActions = vi.fn();
+    const onOpenFile = vi.fn();
+    const onReviewOptions = vi.fn();
+    const onScopeChange = vi.fn();
+    render(
+      <FileReviewWorkspace
+        disabled
+        files={files}
+        onCommit={onCommit}
+        onCopyPath={onCopyPath}
+        onMoreGitActions={onMoreGitActions}
+        onOpenFile={onOpenFile}
+        onReviewOptions={onReviewOptions}
+        onScopeChange={onScopeChange}
+      />,
+    );
+
+    const workspace = screen.getByRole("region", { name: "Review workspace" });
+    expect(workspace.getAttribute("aria-disabled")).toBe("true");
+    expect(workspace.getAttribute("data-disabled")).toBe("true");
+    expect(screen.getByPlaceholderText("Filter files…")).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(onCopyPath).not.toHaveBeenCalled();
+    expect(onMoreGitActions).not.toHaveBeenCalled();
+    expect(onOpenFile).not.toHaveBeenCalled();
+    expect(onReviewOptions).not.toHaveBeenCalled();
+    expect(onScopeChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole("menu", { name: "Review scope" })).toBeNull();
+    expect(screen.queryByRole("listbox", { name: "Changed files" })).toBeNull();
   });
 
   it("supports a product-observed initial collapsed-path set", () => {

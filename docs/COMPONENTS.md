@@ -109,11 +109,13 @@ failure/cancellation policy, pagination, and transcript streaming.
   file with an independent header, statistics, focusable text/binary/conflict
   content, optional controlled file selection, and a selected-file marker.
   Existing `lines` items remain supported; `FileReviewContent` makes non-text
-  states explicit, and `FileReviewNotice` can also be composed independently.
+  states explicit, `FileReviewNotice` can also be composed independently, and
+  a disabled lock suppresses file selection.
 - `FileReviewWorkspace`: the current Review toolbar/body/tree composition with
   controlled or uncontrolled six-way scope selection, aggregate statistics,
   filtering, collapse/expand, jump selection, unified/split presentation,
-  changed-files visibility, Git-action hooks, and host-supplied exact icons.
+  changed-files visibility, Git-action hooks, host-supplied exact icons, and a
+  disabled lock covering review controls, file selection, and Git actions.
 - `FileRevertErrorDialog`: controlled current-style Undo failure dialog with
   replaceable title, description, and close icon; file mutation and recovery
   policy remain host-owned.
