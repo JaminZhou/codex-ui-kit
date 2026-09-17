@@ -167,6 +167,67 @@ describe("UsageSettingsPage", () => {
 });
 
 describe("PlanSelectionPage", () => {
+  it("exposes lifecycle feedback and locks plan controls while saving", () => {
+    const onRetry = vi.fn();
+    const onBack = vi.fn();
+    const onAudienceChange = vi.fn();
+    const onCardAction = vi.fn();
+    const onSelectorChange = vi.fn();
+    const props = {
+      audience: "personal" as const,
+      businessCards: [planCard("business", "Business")],
+      onAudienceChange,
+      onBack,
+      onCardAction,
+      onSelectorChange,
+      personalCards: [planCard("go", "Go"), planCard("pro", "Pro", "20x")],
+    };
+    const { rerender } = render(
+      <PlanSelectionPage
+        {...props}
+        savingLabel="Saving plan changes…"
+        status="saving"
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { name: "Choose your plan" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving plan changes…")).toBeTruthy();
+    for (const label of [
+      "Back to ChatGPT",
+      "Personal",
+      "Business",
+      "Choose Go",
+      "Choose Pro",
+      "20x",
+    ]) {
+      const control = screen.getByRole(
+        label === "Personal" || label === "Business" || label === "20x"
+          ? "radio"
+          : "button",
+        { name: label },
+      ) as HTMLButtonElement;
+      expect(control.disabled).toBe(true);
+    }
+
+    rerender(
+      <PlanSelectionPage
+        {...props}
+        errorMessage="Plans are temporarily unavailable"
+        onRetry={onRetry}
+        retryLabel="Try plans again"
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Plans are temporarily unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try plans again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("controls audience, card selectors, and host-owned actions", () => {
     const onAction = vi.fn();
     render(<PlanFixture onAction={onAction} />);

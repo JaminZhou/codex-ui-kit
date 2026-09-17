@@ -2100,8 +2100,9 @@ without confusing package readiness with full product reconstruction.
     account, billing, and checkout effects outside the renderer. Usage
     & billing and its embedded Personal/Business plan surface are now a third
     delivered slice: plan/credits/reset cards, three meters, 5x/20x and
-    annual/monthly selectors, host-owned checkout callbacks, wide/compact
-    scrolling, CDP, Electron, and current-product pixel gates. Real purchase,
+    annual/monthly selectors, host-owned checkout callbacks, matching
+    loading/saving/saved/error boundaries, wide/compact scrolling, CDP,
+    Electron, and current-product pixel gates. Real purchase,
     gifting, and billing-provider flows stay open. The Scheduled tasks slice is
     now delivered for wide/compact index layout, status/search empty states,
     suggestions, split Create choices, navigator/manual editor, unavailable

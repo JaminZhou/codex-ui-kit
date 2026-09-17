@@ -316,8 +316,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `PlanSelectionPage`: full-height Personal/Business plan composition with
   controlled audience, 5x/20x or annual/monthly per-card selectors,
   responsive cards, a host-owned Back transition, supplied pricing/features,
-  and host-owned plan actions. It does not load an embedded webview or perform
-  a purchase.
+  and host-owned plan actions. Loading, saving, saved, and error feedback,
+  retry copy, and busy-state locking are host-controlled. It does not load an
+  embedded webview or perform a purchase.
 
 ## Integration catalogs
 

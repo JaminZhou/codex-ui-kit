@@ -1396,6 +1396,32 @@ button.codex-ui-login-page__mark {
   padding: 0 0.6875rem;
 }
 
+.codex-ui-plan-selection__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: 1rem 5.875rem 0;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-plan-selection__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-plan-selection__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
 .codex-ui-plan-selection__scroll {
   flex: 1 1 auto;
   min-height: 0;
