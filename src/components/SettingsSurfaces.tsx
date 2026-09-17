@@ -992,8 +992,11 @@ export interface CodeReviewSettingsValue {
 export interface CodeReviewSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
   disabled?: boolean;
+  errorMessage?: ReactNode;
   onChange: (value: CodeReviewSettingsValue) => void;
   onRetry?: () => void;
+  loadingLabel?: ReactNode;
+  retryLabel?: ReactNode;
   showCreditPreference?: boolean;
   status?: CodeReviewSettingsStatus;
   value: CodeReviewSettingsValue;
@@ -1054,8 +1057,11 @@ function CodeReviewRow({
 export function CodeReviewSettingsPage({
   className,
   disabled = false,
+  errorMessage = "Unable to load code review settings",
   onChange,
   onRetry,
+  loadingLabel = "Loading code review settings…",
+  retryLabel = "Retry",
   showCreditPreference = false,
   status = "ready",
   value,
@@ -1071,6 +1077,7 @@ export function CodeReviewSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || undefined}
       className={["codex-ui-code-review-settings", className]
         .filter(Boolean)
         .join(" ")}
@@ -1083,13 +1090,13 @@ export function CodeReviewSettingsPage({
       {status === "loading" ? (
         <div className="codex-ui-code-review-settings__loading" role="status">
           <span aria-hidden="true" />
-          <span>Loading code review settings…</span>
+          <span>{loadingLabel}</span>
         </div>
       ) : status === "error" ? (
         <section className="codex-ui-code-review-settings__error" role="alert">
-          <strong>Unable to load code review settings</strong>
+          <strong>{errorMessage}</strong>
           <button disabled={!onRetry} onClick={onRetry} type="button">
-            Retry
+            {retryLabel}
           </button>
         </section>
       ) : (

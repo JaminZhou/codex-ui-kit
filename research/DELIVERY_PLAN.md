@@ -1787,6 +1787,10 @@ outside this renderer contract.
 The shared Settings shell now exposes host-configurable loading copy and marks
 the navigation frame `aria-busy` while its section index is loading; route
 selection and private settings ownership remain with the host.
+The Code review preferences surface now exposes host-configurable loading and
+error/retry copy and marks its page busy while preferences load; review
+trigger/credits mutations remain controlled callbacks and never start a review
+or alter account limits in the renderer.
 The Settings `Connections` slice now adds a controlled `RemoteConnectionsPage`
 with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,
