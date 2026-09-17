@@ -1825,7 +1825,9 @@ Test connection recovery, and a host-owned connection form. Wide, 720px,
 error, form, and light-theme wide/compact replays pass Browser/CDP, Electron,
 and regional pixel gates. The form deliberately keeps credentials outside the renderer;
 The public form contract now also models saving/error/retry feedback and locks
-its fields while a host-owned save is in flight; this remains replay/component
+its fields while a host-owned save is in flight; page loading and a host-wide
+disabled state now lock the corresponding page/form actions while preserving
+explicit retry. This remains replay/component
 evidence rather than a claim about production pairing or registry mutation.
 real account pairing, Noise relay, SSH key exchange, and production Remote
 registry writes remain outside this public contract. The next host-backed slice

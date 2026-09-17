@@ -504,8 +504,9 @@ kit never performs filesystem, network, account, or process mutations.
 - `RemoteConnectionsPage`: device/SSH rows with connected/connecting/
   disconnected/error status plus Add/Edit/Forget/Test/Retry and a controlled
   connection form with saving/error/retry feedback and busy-field locking.
-  Credentials, pairing, Noise relay, SSH exchange, and registry writes remain
-  host-owned.
+  Loading and host-wide disabled states lock page and form actions while retry
+  remains explicit. Credentials, pairing, Noise relay, SSH exchange, and
+  registry writes remain host-owned.
 
 ### Integrations, automations, and previews
 
