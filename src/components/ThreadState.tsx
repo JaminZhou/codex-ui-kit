@@ -340,6 +340,7 @@ export function ThreadSkeleton({
 export interface ThreadRenderErrorProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "title"> {
   children?: ReactNode;
+  disabled?: boolean;
   onRetry?: () => void;
   retryLabel?: string;
   title?: ReactNode;
@@ -348,6 +349,7 @@ export interface ThreadRenderErrorProps
 export function ThreadRenderError({
   children,
   className,
+  disabled = false,
   onRetry,
   retryLabel = "Try again",
   title = "This turn could not be displayed",
@@ -355,9 +357,11 @@ export function ThreadRenderError({
 }: ThreadRenderErrorProps) {
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-thread-render-error", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       role="alert"
       {...props}
     >
@@ -368,7 +372,10 @@ export function ThreadRenderError({
       {onRetry ? (
         <button
           className="codex-ui-thread-render-error__retry"
-          onClick={onRetry}
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onRetry();
+          }}
           type="button"
         >
           {retryLabel}

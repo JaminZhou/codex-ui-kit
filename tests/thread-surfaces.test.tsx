@@ -390,4 +390,19 @@ describe("complete thread surfaces", () => {
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(onRetry).toHaveBeenCalledOnce();
   });
+
+  it("locks turn retry while disabled", () => {
+    const onRetry = vi.fn();
+    const { container } = render(
+      <ThreadRenderError disabled onRetry={onRetry}>Renderer failed.</ThreadRenderError>,
+    );
+
+    const error = container.querySelector(".codex-ui-thread-render-error");
+    expect(error?.getAttribute("aria-disabled")).toBe("true");
+    expect(error?.getAttribute("data-disabled")).toBe("true");
+    const retry = screen.getByRole("button", { name: "Try again" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
+  });
 });

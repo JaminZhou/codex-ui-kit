@@ -2422,6 +2422,7 @@ boundary without changing syntax-highlighting or streaming content.
 The Markdown surface now propagates that boundary through table copy/expand,
 image preview, and render-retry actions while retaining host-owned links and
 custom renderer content.
+Turn-level render errors now use the same explicit disabled retry boundary.
 
 ## Planning rules
 

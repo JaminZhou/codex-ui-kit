@@ -24,7 +24,7 @@ Codex UI Kit exposes protocol-neutral React components. Hosts own data fetching,
 - `ThreadContextEvent`: current-build manual compaction composition, including
   the running `Working` divider and running/completed optimization row.
 - `LoadingShimmer` and `ThreadSkeleton`: streaming-safe progress surfaces with reduced-motion fallbacks.
-- `ThreadRenderError`: compact turn-level failure with a host-owned retry hook.
+- `ThreadRenderError`: compact turn-level failure with a host-owned retry hook; a disabled lock covers the built-in retry action.
 
 ## Rich content
 
