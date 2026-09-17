@@ -1348,6 +1348,10 @@ light-theme Browser/CDP, Electron, and regional-pixel coverage; this remains
 controlled read-only evidence and does not promote install, permission, or
 connection side effects.
 
+The index item contract now also models per-item pending/success/error/retry
+feedback and busy locking; this is a host-controlled UI state and does not
+claim installation, authorization, or execution reachability.
+
 The follow-up Plugin detail slice adds controlled `PluginDetailPage` and
 `PluginDetailBreadcrumb` primitives for installed/discovery identity,
 suggestions, Apps, Information, disclosure, bottom scrolling, and the

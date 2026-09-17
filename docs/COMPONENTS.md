@@ -315,9 +315,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
   host-owned route transition.
 - `IntegrationCatalogPage`: controlled catalog shell for search, scopes,
   sections, installed icon rows, public cards, loading, error, and unavailable
-  states. Hosts supply catalog data, exact third-party artwork, installation
-  state, search persistence, discovery, permission checks, and every
-  privileged action. The component does not fetch or install integrations.
+  states. Item actions expose pending/success/error/retry feedback and lock
+  their row while a host-owned operation is in flight. Hosts supply catalog
+  data, exact third-party artwork, installation state, search persistence,
+  discovery, permission checks, and every privileged action. The component does
+  not fetch or install integrations.
 - `PluginDetailBreadcrumb`: controlled Plugins-to-detail breadcrumb with a
   host-owned Back transition.
 - `PluginDetailPage`: responsive installed/discovery detail shell with
