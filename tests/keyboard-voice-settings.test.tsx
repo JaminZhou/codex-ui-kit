@@ -221,6 +221,78 @@ describe("KeyboardShortcutsPage", () => {
 });
 
 describe("VoiceSettingsPage", () => {
+  it("exposes Voice lifecycle copy and locks controls while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <VoiceSettingsPage
+        microphoneOptions={[{ id: "system-default", label: "System default" }]}
+        onChange={() => undefined}
+        onHotkeyCaptureChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try voice settings again"
+        savingLabel="Saving voice settings…"
+        status="saving"
+        value={initialVoiceValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "Voice" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving voice settings…")).toBeTruthy();
+    expect(
+      (screen.getByRole("button", { name: "Microphone" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Sol" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("switch", {
+          name: "Enable screen context for voice chat",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "Set shortcut for Toggle dictation hotkey",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Add entry" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("textbox", { name: "Dictionary entry 1" }) as HTMLInputElement
+      ).disabled,
+    ).toBe(true);
+
+    rerender(
+      <VoiceSettingsPage
+        errorMessage="Voice preferences unavailable"
+        microphoneOptions={[{ id: "system-default", label: "System default" }]}
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try voice settings again"
+        status="error"
+        value={initialVoiceValue}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Voice preferences unavailable",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Try voice settings again" }),
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("controls microphone, hotkeys, switches, and dictionary entries", () => {
     render(<VoiceFixture />);
 
