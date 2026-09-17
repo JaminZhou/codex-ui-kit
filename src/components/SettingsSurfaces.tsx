@@ -37,6 +37,7 @@ export interface SettingsShellProps
   children?: ReactNode;
   emptyLabel?: ReactNode;
   error?: ReactNode;
+  loadingLabel?: ReactNode;
   navigationLabel?: string;
   onBack: () => void;
   onQueryChange: (query: string) => void;
@@ -69,6 +70,7 @@ export function SettingsShell({
   className,
   emptyLabel = "No settings found",
   error = "Settings could not be loaded.",
+  loadingLabel = "Loading settings…",
   navigationLabel = "Settings",
   onBack,
   onQueryChange,
@@ -97,6 +99,7 @@ export function SettingsShell({
   return (
     <div
       {...props}
+      aria-busy={status === "loading" || undefined}
       className={["codex-ui-settings-shell", className]
         .filter(Boolean)
         .join(" ")}
@@ -156,7 +159,7 @@ export function SettingsShell({
               className="codex-ui-settings-shell__state"
               role="status"
             >
-              Loading settings…
+              {loadingLabel}
             </div>
           ) : status === "error" ? (
             <div className="codex-ui-settings-shell__state" role="alert">
