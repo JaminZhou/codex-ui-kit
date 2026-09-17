@@ -605,6 +605,7 @@ export interface GeneratedImageItem {
 
 export interface GeneratedImageGalleryProps {
   className?: string;
+  disabled?: boolean;
   images: GeneratedImageItem[];
   nextLabel?: string;
   onOpenImage?: (image: GeneratedImageItem, index: number) => void;
@@ -725,6 +726,7 @@ function getGalleryLayout(
 
 export function GeneratedImageGallery({
   className,
+  disabled = false,
   images,
   nextLabel = "Next images",
   onOpenImage,
@@ -773,9 +775,11 @@ export function GeneratedImageGallery({
 
   return (
     <div
+      aria-disabled={disabled || undefined}
       className={["codex-ui-generated-image-gallery", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       ref={containerRef}
       style={style}
     >
@@ -820,8 +824,11 @@ export function GeneratedImageGallery({
               <button
                 {...imageProps}
                 aria-label={image.alt ?? `Generated image ${index + 1}`}
+                disabled={disabled}
                 key={image.id}
-                onClick={() => onOpenImage(image, index)}
+                onClick={() => {
+                  if (!disabled) onOpenImage(image, index);
+                }}
                 tabIndex={hidden ? -1 : 0}
                 type="button"
               >
@@ -852,18 +859,24 @@ export function GeneratedImageGallery({
           <div className="codex-ui-generated-image-gallery__paging">
             <button
               aria-label={previousLabel}
-              disabled={startIndex === 0}
-              onClick={() => setStartIndex((current) => Math.max(0, current - 1))}
+              disabled={disabled || startIndex === 0}
+              onClick={() => {
+                if (!disabled) {
+                  setStartIndex((current) => Math.max(0, current - 1));
+                }
+              }}
               type="button"
             >
               ‹
             </button>
             <button
               aria-label={nextLabel}
-              disabled={startIndex >= maxStart}
-              onClick={() =>
-                setStartIndex((current) => Math.min(maxStart, current + 1))
-              }
+              disabled={disabled || startIndex >= maxStart}
+              onClick={() => {
+                if (!disabled) {
+                  setStartIndex((current) => Math.min(maxStart, current + 1));
+                }
+              }}
               type="button"
             >
               ›
@@ -878,6 +891,7 @@ export function GeneratedImageGallery({
 export interface ImagePreviewDialogProps {
   className?: string;
   closeLabel?: string;
+  disabled?: boolean;
   downloadable?: boolean;
   downloadLabel?: string;
   editLabel?: string;
@@ -955,6 +969,7 @@ function ImagePreviewZoomInIcon() {
 export function ImagePreviewDialog({
   className,
   closeLabel = "Close image preview",
+  disabled = false,
   downloadable = true,
   downloadLabel = "Download",
   editLabel = "Edit image",
@@ -1090,6 +1105,7 @@ export function ImagePreviewDialog({
   const displayedWidth = intrinsicSize.width || activeImage.width || 0;
 
   const downloadActiveImage = () => {
+    if (disabled) return;
     if (onDownload) {
       onDownload(activeImage);
       return;
@@ -1107,11 +1123,11 @@ export function ImagePreviewDialog({
       event.preventDefault();
       onOpenChange(false);
     }
-    if (event.key === "ArrowLeft") {
+    if (!disabled && event.key === "ArrowLeft") {
       event.preventDefault();
       setActiveIndex((current) => Math.max(0, current - 1));
     }
-    if (event.key === "ArrowRight") {
+    if (!disabled && event.key === "ArrowRight") {
       event.preventDefault();
       setActiveIndex((current) => Math.min(images.length - 1, current + 1));
     }
@@ -1145,11 +1161,13 @@ export function ImagePreviewDialog({
       <div
         aria-labelledby={titleId}
         aria-modal="true"
+        aria-disabled={disabled || undefined}
         className={["codex-ui-image-preview", className]
           .filter(Boolean)
           .join(" ")}
         data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
         data-codex-ui-overlay-layer={overlayEnvironment.layer}
+        data-disabled={disabled || undefined}
         data-image-source-empty={!activeImage.src || undefined}
         data-presentation="immersive"
         data-theme={portalTheme}
@@ -1174,7 +1192,10 @@ export function ImagePreviewDialog({
               <button
                 aria-label={editLabel}
                 data-edit-action=""
-                onClick={() => onEdit(activeImage)}
+                disabled={disabled}
+                onClick={() => {
+                  if (!disabled) onEdit(activeImage);
+                }}
                 ref={firstActionRef}
                 type="button"
               >
@@ -1184,6 +1205,7 @@ export function ImagePreviewDialog({
             {downloadable && (activeImage.downloadSrc ?? activeImage.src) ? (
               <button
                 aria-label={downloadLabel}
+                disabled={disabled}
                 onClick={downloadActiveImage}
                 type="button"
               >
@@ -1249,8 +1271,9 @@ export function ImagePreviewDialog({
           <div className="codex-ui-image-preview__zoom-toolbar">
             <button
               aria-label={zoomOutLabel}
-              disabled={zoomScale <= 10}
+              disabled={disabled || zoomScale <= 10}
               onClick={() => {
+                if (disabled) return;
                 hasManualZoomRef.current = true;
                 setZoomScale((current) => Math.max(10, current / 1.2));
               }}
@@ -1261,8 +1284,9 @@ export function ImagePreviewDialog({
             <span>{Math.round(zoomScale)}%</span>
             <button
               aria-label={zoomInLabel}
-              disabled={zoomScale >= 400}
+              disabled={disabled || zoomScale >= 400}
               onClick={() => {
+                if (disabled) return;
                 hasManualZoomRef.current = true;
                 setZoomScale((current) => Math.min(400, current * 1.2));
               }}
@@ -1281,9 +1305,11 @@ export function ImagePreviewDialog({
     <div
       aria-labelledby={titleId}
       aria-modal="true"
+      aria-disabled={disabled || undefined}
       className="codex-ui-image-preview"
       data-codex-ui-dialog-owner={overlayEnvironment.ownerId}
       data-codex-ui-overlay-layer={overlayEnvironment.layer}
+      data-disabled={disabled || undefined}
       data-theme={portalTheme}
       onKeyDown={handleKeyDown}
       ref={previewRef}
@@ -1301,9 +1327,13 @@ export function ImagePreviewDialog({
           <h2 id={titleId}>{title}</h2>
           <div>
             {activeImage.downloadSrc ?? activeImage.src ? (
+              disabled ? (
+                <span aria-disabled="true">{downloadLabel}</span>
+              ) : (
               <a download href={activeImage.downloadSrc ?? activeImage.src}>
                 {downloadLabel}
               </a>
+              )
             ) : null}
             <button
               aria-label={closeLabel}
@@ -1324,10 +1354,14 @@ export function ImagePreviewDialog({
           {images.length > 1 ? (
             <>
               <button
-                aria-label={previousLabel}
-                className="codex-ui-image-preview__previous"
-                disabled={activeIndex === 0}
-                onClick={() => setActiveIndex((current) => Math.max(0, current - 1))}
+              aria-label={previousLabel}
+              className="codex-ui-image-preview__previous"
+                disabled={disabled || activeIndex === 0}
+                onClick={() => {
+                  if (!disabled) {
+                    setActiveIndex((current) => Math.max(0, current - 1));
+                  }
+                }}
                 type="button"
               >
                 ‹
@@ -1335,10 +1369,14 @@ export function ImagePreviewDialog({
               <button
                 aria-label={nextLabel}
                 className="codex-ui-image-preview__next"
-                disabled={activeIndex === images.length - 1}
-                onClick={() =>
-                  setActiveIndex((current) => Math.min(images.length - 1, current + 1))
-                }
+                disabled={disabled || activeIndex === images.length - 1}
+                onClick={() => {
+                  if (!disabled) {
+                    setActiveIndex((current) =>
+                      Math.min(images.length - 1, current + 1),
+                    );
+                  }
+                }}
                 type="button"
               >
                 ›

@@ -538,6 +538,31 @@ describe("generated images", () => {
     expect((previous as HTMLButtonElement).disabled).toBe(false);
   });
 
+  it("locks generated-image opening and paging while disabled", () => {
+    const onOpenImage = vi.fn();
+    const { container } = render(
+      <GeneratedImageGallery
+        disabled
+        images={images}
+        onOpenImage={onOpenImage}
+      />,
+    );
+
+    const gallery = container.querySelector(
+      ".codex-ui-generated-image-gallery",
+    );
+    expect(gallery?.getAttribute("aria-disabled")).toBe("true");
+    expect(gallery?.getAttribute("data-disabled")).toBe("true");
+    const image = screen.getByRole("button", { name: "Preview 1" });
+    expect(image).toHaveProperty("disabled", true);
+    fireEvent.click(image);
+    expect(onOpenImage).not.toHaveBeenCalled();
+    const next = screen.getByRole("button", { name: "Next images" });
+    expect(next).toHaveProperty("disabled", true);
+    fireEvent.click(next);
+    expect(screen.getByRole("button", { name: "Preview 1" })).toBe(image);
+  });
+
   it("reserves a four-slot gallery while generation is pending", () => {
     render(
       <GeneratedImageGallery images={images.slice(0, 1)} pendingCount={1} />,
@@ -649,6 +674,43 @@ describe("generated images", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "Close image preview" }),
     );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it("locks immersive image actions while disabled but keeps close available", () => {
+    const onDownload = vi.fn();
+    const onEdit = vi.fn();
+    const onOpenChange = vi.fn();
+    render(
+      <ImagePreviewDialog
+        disabled
+        images={images.slice(0, 2)}
+        onDownload={onDownload}
+        onEdit={onEdit}
+        onOpenChange={onOpenChange}
+        open
+        presentation="immersive"
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Generated image" });
+    expect(dialog.getAttribute("aria-disabled")).toBe("true");
+    expect(dialog.getAttribute("data-disabled")).toBe("true");
+    for (const label of [
+      "Edit image",
+      "Download",
+      "Zoom out image",
+      "Zoom in image",
+    ]) {
+      const button = screen.getByRole("button", { name: label });
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(onDownload).not.toHaveBeenCalled();
+    expect(onEdit).not.toHaveBeenCalled();
+    fireEvent.keyDown(dialog, { key: "ArrowRight" });
+    expect(screen.getByRole("img", { name: "Preview 1" })).toBeTruthy();
+    fireEvent.keyDown(dialog, { key: "Escape" });
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
