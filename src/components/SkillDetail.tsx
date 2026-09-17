@@ -2,6 +2,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  useId,
 } from "react";
 import { Dialog, type DialogProps } from "./Dialog.js";
 
@@ -21,6 +22,7 @@ export interface SkillDetailDialogProps
   artwork?: ReactNode;
   children: ReactNode;
   description?: ReactNode;
+  disabled?: boolean;
   enabled?: boolean;
   onActionsMenuOpenChange?: (open: boolean) => void;
   onCopyMarkdown?: () => void;
@@ -112,6 +114,7 @@ export function SkillDetailDialog({
   className,
   closeIcon = <CloseGlyph />,
   description,
+  disabled = false,
   enabled = true,
   initialFocusSelector,
   onActionsMenuOpenChange,
@@ -134,7 +137,9 @@ export function SkillDetailDialog({
   updatingLabel = "Updating skill…",
   ...props
 }: SkillDetailDialogProps) {
+  const statusId = useId();
   const isUpdating = status === "updating";
+  const isLocked = disabled || isUpdating;
   const dismissMenu = () => onActionsMenuOpenChange?.(false);
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event);
@@ -154,15 +159,16 @@ export function SkillDetailDialog({
         .filter(Boolean)
         .join(" ")}
       closeIcon={closeIcon}
-      closeDisabled={isUpdating}
+      closeDisabled={isLocked}
       closeOnEscape={!actionsMenuOpen}
       data-status={status}
+      data-disabled={disabled || undefined}
       description={description}
       footer={
         <>
           <button
             className="codex-ui-skill-detail__uninstall"
-            disabled={isUpdating}
+            disabled={isLocked}
             onClick={onUninstall}
             type="button"
           >
@@ -171,7 +177,7 @@ export function SkillDetailDialog({
           <button
             aria-busy={isUpdating || undefined}
             className="codex-ui-skill-detail__try"
-            disabled={isUpdating}
+            disabled={isLocked}
             onClick={onTryNow}
             type="button"
           >
@@ -186,7 +192,7 @@ export function SkillDetailDialog({
             aria-checked={enabled}
             aria-label={enabled ? "Disable skill" : "Enable skill"}
             className="codex-ui-skill-detail__switch"
-            disabled={isUpdating}
+            disabled={isLocked}
             onClick={() => onEnabledChange?.(!enabled)}
             role="switch"
             type="button"
@@ -199,7 +205,7 @@ export function SkillDetailDialog({
               aria-haspopup="menu"
               aria-label="More actions"
               className="codex-ui-skill-detail__more"
-              disabled={isUpdating}
+              disabled={isLocked}
               onClick={() => onActionsMenuOpenChange?.(!actionsMenuOpen)}
               type="button"
             >
@@ -208,6 +214,7 @@ export function SkillDetailDialog({
             {actionsMenuOpen ? (
               <span className="codex-ui-skill-detail__menu" role="menu">
                 <button
+                  disabled={isLocked}
                   onClick={() => runMenuAction(onOpen, dismissMenu)}
                   role="menuitem"
                   type="button"
@@ -215,6 +222,7 @@ export function SkillDetailDialog({
                   Open
                 </button>
                 <button
+                  disabled={isLocked}
                   onClick={() => runMenuAction(onReveal, dismissMenu)}
                   role="menuitem"
                   type="button"
@@ -222,6 +230,7 @@ export function SkillDetailDialog({
                   Reveal in Finder
                 </button>
                 <button
+                  disabled={isLocked}
                   onClick={() => runMenuAction(onCopyMarkdown, dismissMenu)}
                   role="menuitem"
                   type="button"
@@ -259,6 +268,7 @@ export function SkillDetailDialog({
         <p
           aria-live="polite"
           className="codex-ui-skill-detail__status"
+          id={statusId}
           role="status"
         >
           {updatingLabel}
@@ -267,12 +277,13 @@ export function SkillDetailDialog({
         <div
           aria-live="polite"
           className="codex-ui-skill-detail__status"
+          id={statusId}
           role="alert"
         >
           <strong>Couldn’t update skill</strong>
           <span>{statusMessage ?? "Check the skill and try again."}</span>
           {onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button disabled={disabled} onClick={onRetry} type="button">
               {retryLabel}
             </button>
           ) : null}

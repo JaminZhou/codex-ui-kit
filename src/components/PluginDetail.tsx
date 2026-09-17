@@ -2,6 +2,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  useId,
 } from "react";
 
 export interface PluginDetailSuggestion {
@@ -53,6 +54,7 @@ export interface PluginDetailPageProps
   connectionMenuOpen?: boolean;
   copyLinkLabel?: ReactNode;
   description?: ReactNode;
+  disabled?: boolean;
   disclosure?: ReactNode;
   heroBackdrop?: ReactNode;
   information?: readonly PluginDetailInformationItem[];
@@ -186,6 +188,7 @@ export function PluginDetailPage({
   connectionMenuOpen = false,
   copyLinkLabel = "Copy link",
   description,
+  disabled = false,
   disclosure,
   heroBackdrop,
   information = [],
@@ -214,7 +217,9 @@ export function PluginDetailPage({
   tryNowLabel = "Try now",
   ...props
 }: PluginDetailPageProps) {
+  const statusId = useId();
   const isInstalling = status === "installing";
+  const isLocked = disabled || isInstalling;
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     onKeyDown?.(event);
     if (event.defaultPrevented || event.key !== "Escape") return;
@@ -225,10 +230,12 @@ export function PluginDetailPage({
   return (
     <main
       aria-busy={isInstalling || undefined}
+      aria-describedby={status !== "ready" ? statusId : undefined}
       className={["codex-ui-plugin-detail", className]
         .filter(Boolean)
         .join(" ")}
       data-installed={installed || undefined}
+      data-disabled={disabled || undefined}
       data-status={status}
       onKeyDown={handleKeyDown}
       {...props}
@@ -248,6 +255,7 @@ export function PluginDetailPage({
                     aria-haspopup="menu"
                     aria-label="More actions"
                     className="codex-ui-plugin-detail__icon-button"
+                    disabled={isLocked}
                     onClick={() =>
                       onActionsMenuOpenChange?.(!actionsMenuOpen)
                     }
@@ -262,6 +270,7 @@ export function PluginDetailPage({
                     >
                       <button
                         className="codex-ui-plugin-detail__danger"
+                        disabled={isLocked}
                         onClick={onUninstall}
                         role="menuitem"
                         type="button"
@@ -275,6 +284,7 @@ export function PluginDetailPage({
               ) : null}
               <button
                 className="codex-ui-plugin-detail__action"
+                disabled={isLocked}
                 onClick={onCopyLink}
                 type="button"
               >
@@ -284,7 +294,7 @@ export function PluginDetailPage({
               <button
                 aria-busy={isInstalling || undefined}
                 className="codex-ui-plugin-detail__action codex-ui-plugin-detail__action--primary"
-                disabled={isInstalling}
+                disabled={isLocked}
                 onClick={installed ? onTryNow : onInstall}
                 type="button"
               >
@@ -313,6 +323,7 @@ export function PluginDetailPage({
         <p
           aria-live="polite"
           className="codex-ui-plugin-detail__status"
+          id={statusId}
           role="status"
         >
           {installingLabel}
@@ -321,12 +332,13 @@ export function PluginDetailPage({
         <div
           aria-live="polite"
           className="codex-ui-plugin-detail__status"
+          id={statusId}
           role="alert"
         >
           <strong>Couldn’t install plugin</strong>
           <span>{statusMessage ?? "Check the connection and try again."}</span>
           {onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button disabled={disabled} onClick={onRetry} type="button">
               {retryLabel}
             </button>
           ) : null}
@@ -350,6 +362,7 @@ export function PluginDetailPage({
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion.id}
+                disabled={isLocked}
                 onClick={() => onSuggestionOpen?.(suggestion)}
                 type="button"
               >
@@ -410,7 +423,7 @@ export function PluginDetailPage({
                 <button
                   aria-label={`Open ${typeof app.title === "string" ? app.title : app.id}`}
                   className="codex-ui-plugin-detail__app-open"
-                  disabled={appBusy}
+                  disabled={isLocked || appBusy}
                   onClick={() => onAppOpen?.(app)}
                   type="button"
                 />
@@ -436,6 +449,7 @@ export function PluginDetailPage({
                 {status === "error" && onAppRetry ? (
                   <button
                     className="codex-ui-plugin-detail__app-retry"
+                    disabled={disabled}
                     onClick={() => onAppRetry(app)}
                     type="button"
                   >
@@ -448,6 +462,7 @@ export function PluginDetailPage({
                       aria-expanded={connectionMenuOpen}
                       aria-haspopup="menu"
                       className="codex-ui-plugin-detail__connection"
+                      disabled={isLocked}
                       onClick={() =>
                         onConnectionMenuOpenChange?.(!connectionMenuOpen)
                       }
@@ -462,12 +477,18 @@ export function PluginDetailPage({
                         className="codex-ui-plugin-detail__menu codex-ui-plugin-detail__menu--connection"
                         role="menu"
                       >
-                        <button onClick={onReconnect} role="menuitem" type="button">
+                        <button
+                          disabled={isLocked}
+                          onClick={onReconnect}
+                          role="menuitem"
+                          type="button"
+                        >
                           <PluginDetailReconnectGlyph />
                           <span>Reconnect</span>
                         </button>
                         <button
                           className="codex-ui-plugin-detail__danger"
+                          disabled={isLocked}
                           onClick={onDisconnect}
                           role="menuitem"
                           type="button"

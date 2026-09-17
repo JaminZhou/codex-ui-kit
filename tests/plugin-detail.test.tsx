@@ -149,6 +149,41 @@ describe("PluginDetail", () => {
     ).toHaveProperty("disabled", false);
   });
 
+  it("locks detail actions when the host disables the surface", () => {
+    render(
+      <PluginDetailPage
+        apps={[apps[0]]}
+        disabled
+        installed
+        onAppOpen={vi.fn()}
+        onCopyLink={vi.fn()}
+        onSuggestionOpen={vi.fn()}
+        onTryNow={vi.fn()}
+        suggestions={suggestions}
+        title="GitHub"
+      />,
+    );
+
+    expect(screen.getByRole("main").getAttribute("data-disabled")).toBe(
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "Copy link" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Try now" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen.getByRole("button", { name: /GitHub Summarize/ }),
+    ).toHaveProperty("disabled", true);
+    expect(screen.getByRole("button", { name: "Open GitHub" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
   it("exposes controlled app connection progress and retryable failure", () => {
     const onAppOpen = vi.fn();
     const onAppRetry = vi.fn();

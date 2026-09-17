@@ -127,6 +127,38 @@ describe("SkillDetail", () => {
     );
   });
 
+  it("supports a host-wide disabled lock", () => {
+    render(
+      <SkillDetailDialog
+        disabled
+        onEnabledChange={vi.fn()}
+        onOpenChange={vi.fn()}
+        onTryNow={vi.fn()}
+        onUninstall={vi.fn()}
+        open
+        title="OpenAI Docs"
+      >
+        Instructions
+      </SkillDetailDialog>,
+    );
+
+    expect(screen.getByRole("dialog").getAttribute("data-disabled")).toBe(
+      "true",
+    );
+    expect(screen.getByRole("switch", { name: "Disable skill" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Uninstall" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Try now" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
   it("exposes the read-only actions menu through controlled callbacks", () => {
     const onActionsMenuOpenChange = vi.fn();
     const onCopyMarkdown = vi.fn();
