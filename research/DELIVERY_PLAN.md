@@ -1454,10 +1454,14 @@ suggestion-brand icons stay host-supplied. Clipboard/navigation, real install
 or uninstall, connection persistence, OAuth/permissions, external links, and
 failure effects stay open. The detail now exposes host-controlled disabled
 locking for navigation, suggestions, app rows, and primary actions. The
-installed detail now also has explicit wide/720
+The installed detail now also has explicit wide/720
 light-theme Browser/CDP, Electron, and regional-pixel coverage; it remains a
 read-only visual contract and does not promote install, uninstall, or OAuth
-side effects.
+side effects. The own-playground route now adds a replay-owned install/
+uninstall lifecycle: the primary action enters a short installing lock,
+settles the installed/discovery identity, closes stale menus on uninstall,
+and exposes an explicit retry boundary. This is renderer/replay evidence,
+not a claim of real plugin registry, OAuth, permission, or connection writes.
 
 The adjacent Skill detail/entry slice adds controlled `SkillDetailDialog` and
 `SkillPromptMention` primitives for the installed modal, enabled switch,
