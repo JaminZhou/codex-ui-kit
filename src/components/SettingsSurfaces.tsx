@@ -236,22 +236,31 @@ export interface GitSettingsValue {
   reviewDelivery: GitSettingsReviewDelivery;
 }
 
+export type GitSettingsStatus = "error" | "ready" | "saved" | "saving";
+
 export interface GitSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
   commitInstructionsDirty?: boolean;
   onChange: (value: GitSettingsValue) => void;
+  onRetry?: () => void;
   onSaveCommitInstructions?: () => void;
   onSavePullRequestInstructions?: () => void;
   pullRequestInstructionsDirty?: boolean;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: GitSettingsStatus;
+  statusMessage?: ReactNode;
   value: GitSettingsValue;
 }
 
 function SegmentedControl<T extends string>({
+  disabled = false,
   label,
   onChange,
   options,
   value,
 }: {
+  disabled?: boolean;
   label: string;
   onChange: (value: T) => void;
   options: readonly { label: string; value: T }[];
@@ -296,6 +305,7 @@ function SegmentedControl<T extends string>({
       {options.map((option, index) => (
         <button
           aria-checked={value === option.value}
+          disabled={disabled}
           key={option.value}
           onClick={() => onChange(option.value)}
           onKeyDown={(event) => moveSelection(event, index)}
@@ -312,10 +322,12 @@ function SegmentedControl<T extends string>({
 
 function SettingsSwitch({
   checked,
+  disabled = false,
   label,
   onChange,
 }: {
   checked: boolean;
+  disabled?: boolean;
   label: string;
   onChange: (checked: boolean) => void;
 }) {
@@ -324,6 +336,7 @@ function SettingsSwitch({
       aria-checked={checked}
       aria-label={label}
       className="codex-ui-git-settings__switch"
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       role="switch"
       type="button"
@@ -335,19 +348,23 @@ function SettingsSwitch({
 
 function InstructionSection({
   description,
+  disabled = false,
   dirty,
   label,
   onChange,
   onSave,
   placeholder,
+  savingLabel = "Saving…",
   value,
 }: {
   description: string;
+  disabled?: boolean;
   dirty: boolean;
   label: string;
   onChange: TextareaHTMLAttributes<HTMLTextAreaElement>["onChange"];
   onSave?: () => void;
   placeholder: string;
+  savingLabel?: ReactNode;
   value: string;
 }) {
   const descriptionId = useId();
@@ -358,13 +375,14 @@ function InstructionSection({
           <h2>{label}</h2>
           <p id={descriptionId}>{description}</p>
         </div>
-        <button disabled={!dirty || !onSave} onClick={onSave} type="button">
-          Save
+        <button disabled={disabled || !dirty || !onSave} onClick={onSave} type="button">
+          {disabled ? savingLabel : "Save"}
         </button>
       </header>
       <textarea
         aria-describedby={descriptionId}
         aria-label={label}
+        disabled={disabled}
         onChange={onChange}
         placeholder={placeholder}
         value={value}
@@ -377,13 +395,28 @@ export function GitSettingsPage({
   className,
   commitInstructionsDirty = false,
   onChange,
+  onRetry,
   onSaveCommitInstructions,
   onSavePullRequestInstructions,
   pullRequestInstructionsDirty = false,
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   ...props
 }: GitSettingsPageProps) {
   const prefixId = useId();
+  const statusId = useId();
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "saving"
+      ? savingLabel
+      : status === "saved"
+        ? "Git settings saved"
+        : "Git settings could not be saved.");
   const update = <K extends keyof GitSettingsValue>(
     key: K,
     nextValue: GitSettingsValue[K],
@@ -392,11 +425,29 @@ export function GitSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-git-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>Git</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-git-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <section
         aria-label="Git preferences"
         className="codex-ui-git-settings__card"
@@ -408,6 +459,7 @@ export function GitSettingsPage({
           </div>
           <input
             aria-label="Branch prefix"
+            disabled={isSaving}
             id={prefixId}
             onChange={(event) => update("branchPrefix", event.currentTarget.value)}
             placeholder="codex/"
@@ -422,6 +474,7 @@ export function GitSettingsPage({
             <p>Choose how ChatGPT merges pull requests</p>
           </div>
           <SegmentedControl
+            disabled={isSaving}
             label="Pull request merge method"
             onChange={(mergeMethod) => update("mergeMethod", mergeMethod)}
             options={[
@@ -438,6 +491,7 @@ export function GitSettingsPage({
           </div>
           <SettingsSwitch
             checked={value.alwaysForcePush}
+            disabled={isSaving}
             label="Always force push"
             onChange={(alwaysForcePush) =>
               update("alwaysForcePush", alwaysForcePush)
@@ -451,6 +505,7 @@ export function GitSettingsPage({
           </div>
           <SettingsSwitch
             checked={value.createDraftPullRequests}
+            disabled={isSaving}
             label="Create draft pull requests"
             onChange={(createDraftPullRequests) =>
               update("createDraftPullRequests", createDraftPullRequests)
@@ -466,6 +521,7 @@ export function GitSettingsPage({
             </p>
           </div>
           <SegmentedControl
+            disabled={isSaving}
             label="Review delivery"
             onChange={(reviewDelivery) =>
               update("reviewDelivery", reviewDelivery)
@@ -480,6 +536,7 @@ export function GitSettingsPage({
       </section>
       <InstructionSection
         description="Added to commit message generation prompts"
+        disabled={isSaving}
         dirty={commitInstructionsDirty}
         label="Commit instructions"
         onChange={(event) =>
@@ -487,10 +544,12 @@ export function GitSettingsPage({
         }
         onSave={onSaveCommitInstructions}
         placeholder="Add commit message guidance…"
+        savingLabel={savingLabel}
         value={value.commitInstructions}
       />
       <InstructionSection
         description="Added to PR title/description generation prompts"
+        disabled={isSaving}
         dirty={pullRequestInstructionsDirty}
         label="Pull request instructions"
         onChange={(event) =>
@@ -498,6 +557,7 @@ export function GitSettingsPage({
         }
         onSave={onSavePullRequestInstructions}
         placeholder="Add pull request guidance…"
+        savingLabel={savingLabel}
         value={value.pullRequestInstructions}
       />
     </article>

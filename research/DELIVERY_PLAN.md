@@ -1779,6 +1779,11 @@ The Personalization settings surface now models saving/saved/error feedback,
 custom retry copy, and a busy contract that locks custom instructions, Memory,
 and Personality controls while the host persists changes. Local-memory storage,
 profile services, and persistence semantics remain outside the renderer.
+The Git settings surface now follows the same persistence boundary for branch,
+merge/review preferences, and commit/PR instructions: saving is announced with
+`aria-busy`, mutable controls are locked, and error recovery can use host-owned
+retry copy. Git configuration writes and credential/remote semantics remain
+outside this renderer contract.
 The Settings `Connections` slice now adds a controlled `RemoteConnectionsPage`
 with device/SSH rows, connected/disconnected status, Add/Edit/Forget actions,
 Test connection recovery, and a host-owned connection form. Wide, 720px,

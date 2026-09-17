@@ -404,6 +404,64 @@ describe("settings surfaces", () => {
     expect(onSave).toHaveBeenCalledOnce();
   });
 
+  it("exposes Git save lifecycle and locks preferences while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <GitSettingsPage
+        commitInstructionsDirty
+        onChange={() => undefined}
+        onRetry={onRetry}
+        onSaveCommitInstructions={() => undefined}
+        onSavePullRequestInstructions={() => undefined}
+        pullRequestInstructionsDirty
+        retryLabel="Try again"
+        savingLabel="Saving Git settings…"
+        status="saving"
+        value={initialValue}
+      />,
+    );
+
+    const page = screen.getByRole("heading", { name: "Git" }).closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Saving Git settings…",
+    );
+    expect(screen.getByRole("textbox", { name: "Branch prefix" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("switch", { name: "Always force push" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("radio", { name: "Merge" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen.getByRole("textbox", { name: "Commit instructions" }),
+    ).toHaveProperty("disabled", true);
+    expect(
+      screen.getAllByRole("button", { name: "Saving Git settings…" }),
+    ).toHaveLength(2);
+
+    rerender(
+      <GitSettingsPage
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try again"
+        status="error"
+        statusMessage="Git settings service unavailable"
+        value={initialValue}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Git settings service unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("keeps field ids instance-safe and disables saves without a host action", () => {
     render(
       <>
