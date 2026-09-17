@@ -225,8 +225,15 @@ The Live renderer now consumes the public
 project-owned preload bridge. Real process rows can be opened in the existing
 side-panel transcript and terminated individually or as a group; the panel
 reuses the protocol command output rather than a replay fixture. A signed-in
-runtime capture of this bridge and current-product PTY pixel comparison remain
-open. Functional local evidence is not full terminal parity.
+runtime capture now runs independently through
+`pnpm --filter @codex-ui-kit/codex-app-playground check:live-background-terminal`.
+The 2026-09-17 probe used one disposable workspace and one real Composer turn:
+it observed a model-created `commandExecution`, read the public background
+terminal row, opened and closed the side-panel transcript, and used Stop all to
+terminate it until the list was empty. Wide/open screenshots remain in the
+printed temporary-directory path and are not committed. Current-product PTY
+pixel comparison remains open. Functional local evidence is not full terminal
+parity.
 
 ### Live runtime check — 2026-09-08
 
