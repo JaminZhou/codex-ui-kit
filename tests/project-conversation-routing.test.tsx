@@ -155,6 +155,49 @@ describe("project conversation routing", () => {
     expect(onCreate).not.toHaveBeenCalled();
   });
 
+  it("locks branch creation controls while disabled", async () => {
+    const onBranchNameChange = vi.fn();
+    const onCreate = vi.fn();
+    const onOpenChange = vi.fn();
+    const onSetPrefix = vi.fn();
+    render(
+      <BranchCreationDialog
+        branchName="feat/disabled"
+        disabled
+        onBranchNameChange={onBranchNameChange}
+        onCreate={onCreate}
+        onOpenChange={onOpenChange}
+        onSetPrefix={onSetPrefix}
+        open
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Create and checkout branch",
+    });
+    expect(dialog.getAttribute("aria-disabled")).toBe("true");
+    expect(dialog.getAttribute("data-disabled")).toBe("true");
+    const input = within(dialog).getByRole("textbox", { name: "Branch name" });
+    const prefix = within(dialog).getByRole("button", { name: "Set prefix" });
+    const close = within(dialog).getByRole("button", {
+      name: "Close branch creation dialog",
+    });
+    const submit = within(dialog).getByRole("button", {
+      name: "Create and checkout",
+    });
+    expect(input).toHaveProperty("disabled", true);
+    expect(prefix).toHaveProperty("disabled", true);
+    expect(close).toHaveProperty("disabled", true);
+    expect(submit).toHaveProperty("disabled", true);
+    fireEvent.click(prefix);
+    fireEvent.click(close);
+    fireEvent.submit(input.closest("form")!);
+    expect(onBranchNameChange).not.toHaveBeenCalled();
+    expect(onSetPrefix).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(onCreate).not.toHaveBeenCalled();
+  });
+
   it("returns focus to the branch input when creation fails", async () => {
     const onOpenChange = vi.fn();
     const { rerender } = render(

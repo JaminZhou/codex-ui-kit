@@ -1301,6 +1301,9 @@ project cwd when the Composer was previously set to Codex web.
 Current-product create submission is still pending the isolated native
 directory selection, so this is not yet a claim that branch mutation/
 persistence is complete in the product runtime.
+The public dialog now also exposes a disabled boundary for input, prefix,
+submit, cancel, and close controls while retaining host-owned validation and
+mutation callbacks.
 
 The playground's real dirty-checkout recovery gate now uses an isolated Git
 repository at 1180/720px. Switching through the rendered branch menu fails on

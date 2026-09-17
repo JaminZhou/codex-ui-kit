@@ -20,6 +20,7 @@ export interface BranchCreationDialogProps
   branchNameLabel?: string;
   closeLabel?: string;
   createLabel?: string;
+  disabled?: boolean;
   error?: ReactNode;
   onBranchNameChange: (branchName: string) => void;
   onCreate: (branchName: string) => void;
@@ -44,6 +45,7 @@ export function BranchCreationDialog({
   className,
   closeLabel = "Close",
   createLabel = "Create and checkout",
+  disabled = false,
   error,
   onBranchNameChange,
   onCreate,
@@ -63,24 +65,28 @@ export function BranchCreationDialog({
   const creating = status === "creating";
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!normalizedBranchName || creating) return;
+    if (!normalizedBranchName || creating || disabled) return;
     onCreate(normalizedBranchName);
   };
 
   return (
     <Dialog
       {...props}
+      aria-disabled={disabled || undefined}
       className={["codex-ui-branch-creation-dialog", className]
         .filter(Boolean)
         .join(" ")}
-      closeDisabled={creating}
+      closeDisabled={disabled || creating}
       closeLabel="Close branch creation dialog"
+      data-disabled={disabled || undefined}
       footer={
         <>
           <Button
             className="codex-ui-branch-creation-dialog__cancel"
-            disabled={creating}
-            onClick={() => onOpenChange(false)}
+            disabled={disabled || creating}
+            onClick={() => {
+              if (!disabled) onOpenChange(false);
+            }}
             size="medium"
             tone="secondary"
           >
@@ -88,7 +94,7 @@ export function BranchCreationDialog({
           </Button>
           <Button
             className="codex-ui-branch-creation-dialog__submit"
-            disabled={!normalizedBranchName}
+            disabled={disabled || !normalizedBranchName}
             form={formId}
             loading={creating}
             loadingLabel="Creating and checking out branch"
@@ -117,8 +123,10 @@ export function BranchCreationDialog({
           {onSetPrefix ? (
             <button
               className="codex-ui-branch-creation-dialog__prefix"
-              disabled={creating}
-              onClick={onSetPrefix}
+              disabled={disabled || creating}
+              onClick={() => {
+                if (!disabled) onSetPrefix();
+              }}
               type="button"
             >
               {setPrefixLabel}
@@ -130,9 +138,11 @@ export function BranchCreationDialog({
           aria-invalid={error ? true : undefined}
           aria-label={branchNameLabel}
           className="codex-ui-branch-creation-dialog__input"
-          disabled={creating}
+          disabled={disabled || creating}
           id={`${formId}-name`}
-          onChange={(event) => onBranchNameChange(event.currentTarget.value)}
+          onChange={(event) => {
+            if (!disabled) onBranchNameChange(event.currentTarget.value);
+          }}
           placeholder={placeholder}
           spellCheck={false}
           type="text"

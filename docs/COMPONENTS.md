@@ -412,7 +412,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `BranchCreationDialog`: current compact branch-name modal with an optional
   Git-prefix action, empty/creating/error states, host-owned validation and
   mutation, focus containment on the modal surface while creating, dismissal
-  blocking while creating, and launcher focus return.
+  blocking while creating, and launcher focus return. A disabled lock also
+  covers input, prefix, submit, cancel, and close controls.
 - `ConversationRouteSelector`: keyboard-navigable radio-card selection for
   host-defined products that use one mutually exclusive route choice. It is
   protocol-neutral and is not the current Codex new-chat destination/context
