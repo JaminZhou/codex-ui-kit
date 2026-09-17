@@ -152,6 +152,24 @@ describe("ActivityTimeline", () => {
         .getAttribute("aria-expanded"),
     ).toBe("true");
   });
+
+  it("locks activity disclosure while disabled", () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(
+      <ActivityTimeline disabled onOpenChange={onOpenChange} summary="Working">
+        <span>Hidden work</span>
+      </ActivityTimeline>,
+    );
+
+    const root = container.querySelector(".codex-ui-activity-timeline");
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    const toggle = screen.getByRole("button", { name: "Working" });
+    expect(toggle).toHaveProperty("disabled", true);
+    fireEvent.click(toggle);
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.queryByText("Hidden work")).toBeNull();
+  });
 });
 
 describe("AgentActivity disclosure", () => {

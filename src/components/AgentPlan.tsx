@@ -18,6 +18,7 @@ export interface AgentPlanStep {
 export interface AgentPlanProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   defaultOpen?: boolean;
+  disabled?: boolean;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
   steps: readonly AgentPlanStep[];
@@ -32,6 +33,7 @@ function defaultSummary(completed: number, total: number) {
 export function AgentPlan({
   className,
   defaultOpen = true,
+  disabled = false,
   onOpenChange,
   open,
   steps,
@@ -74,14 +76,17 @@ export function AgentPlan({
   }, [currentIndex, resolvedOpen, steps.length]);
 
   const setOpen = (nextOpen: boolean) => {
+    if (disabled) return;
     if (open === undefined) setInternalOpen(nextOpen);
     onOpenChange?.(nextOpen);
   };
 
   return (
     <section
+      aria-disabled={disabled || undefined}
       className={classes}
       data-complete={isComplete || undefined}
+      data-disabled={disabled || undefined}
       data-expanded={resolvedOpen || undefined}
       {...props}
     >
@@ -89,6 +94,7 @@ export function AgentPlan({
         aria-controls={contentId}
         aria-expanded={resolvedOpen}
         className="codex-ui-plan__header"
+        disabled={disabled}
         onClick={() => setOpen(!resolvedOpen)}
         type="button"
       >

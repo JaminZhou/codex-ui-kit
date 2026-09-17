@@ -6,6 +6,7 @@ export interface AgentReasoningProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   children: ReactNode;
   defaultOpen?: boolean;
+  disabled?: boolean;
   label?: ReactNode;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
@@ -16,6 +17,7 @@ export function AgentReasoning({
   children,
   className,
   defaultOpen,
+  disabled = false,
   label,
   onOpenChange,
   open,
@@ -32,10 +34,20 @@ export function AgentReasoning({
   const resolvedLabel = label ?? (status === "running" ? "Thinking" : "Thought");
 
   return (
-    <div className={classes} data-status={status} {...props}>
+    <div
+      aria-disabled={disabled || undefined}
+      className={classes}
+      data-disabled={disabled || undefined}
+      data-status={status}
+      {...props}
+    >
       <details
         className="codex-ui-reasoning__disclosure"
         onToggle={(event) => {
+          if (disabled) {
+            event.currentTarget.open = resolvedOpen;
+            return;
+          }
           const nextOpen = event.currentTarget.open;
           if (open !== undefined) {
             if (nextOpen !== open) {
@@ -54,6 +66,10 @@ export function AgentReasoning({
           aria-expanded={resolvedOpen}
           className="codex-ui-reasoning__summary"
           onClick={(event) => {
+            if (disabled) {
+              event.preventDefault();
+              return;
+            }
             if (open === undefined) return;
             event.preventDefault();
             onOpenChange?.(!open);

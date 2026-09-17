@@ -54,6 +54,29 @@ describe("AgentReasoning", () => {
     expect(details.open).toBe(false);
     expect(summary.getAttribute("aria-expanded")).toBe("false");
   });
+
+  it("locks reasoning disclosure while disabled", () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(
+      <AgentReasoning
+        disabled
+        onOpenChange={onOpenChange}
+        status="completed"
+      >
+        Finished reasoning.
+      </AgentReasoning>,
+    );
+
+    const root = container.querySelector(".codex-ui-reasoning");
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    const details = container.querySelector("details")!;
+    const summary = container.querySelector("summary")!;
+    expect(details.open).toBe(false);
+    fireEvent.click(summary);
+    expect(details.open).toBe(false);
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });
 
 describe("AgentPlan", () => {
@@ -103,6 +126,24 @@ describe("AgentPlan", () => {
 
     fireEvent.click(button);
     expect(screen.getByText("Run desktop acceptance")).toBeTruthy();
+  });
+
+  it("locks plan disclosure while disabled", () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(
+      <AgentPlan disabled onOpenChange={onOpenChange} steps={steps} />,
+    );
+
+    const root = container.querySelector(".codex-ui-plan");
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    const button = screen.getByRole("button", {
+      name: "1 out of 3 tasks completed",
+    });
+    expect(button).toHaveProperty("disabled", true);
+    fireEvent.click(button);
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 });
 
@@ -211,5 +252,31 @@ describe("ProposedPlan", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Download plan" }));
     expect(onDownload).toHaveBeenCalledOnce();
+  });
+
+  it("locks proposed-plan actions while disabled", () => {
+    const onCopy = vi.fn();
+    const onDownload = vi.fn();
+    const { container } = render(
+      <ProposedPlan
+        disabled
+        onCopy={onCopy}
+        onDownload={onDownload}
+        status="completed"
+      >
+        <p>Completed plan content</p>
+      </ProposedPlan>,
+    );
+
+    const root = container.querySelector(".codex-ui-proposed-plan");
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    for (const label of ["Copy plan", "Download plan", "Collapse plan summary"]) {
+      const button = screen.getByRole("button", { name: label });
+      expect(button).toHaveProperty("disabled", true);
+      fireEvent.click(button);
+    }
+    expect(onCopy).not.toHaveBeenCalled();
+    expect(onDownload).not.toHaveBeenCalled();
   });
 });

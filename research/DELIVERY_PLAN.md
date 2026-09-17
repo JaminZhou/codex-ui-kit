@@ -982,6 +982,9 @@ expansion; static or caller-provided child content remains host-owned.
 GeneratedImageGallery and ImagePreviewDialog now expose the same boundary for
 image opening, paging, download/edit, navigation, and zoom; dialog close and
 Escape remain explicit host-owned escape hatches.
+AgentReasoning, AgentPlan, ProposedPlan, and ActivityTimeline now expose the
+same boundary for their built-in disclosure, copy, download, and plan actions;
+caller-provided child/action slots remain host-owned.
 
 Previous 26.820 Projects → Back → Forward now preserves the product
 location key across 1180/720, explicit Hide/Show, and width restoration. The
