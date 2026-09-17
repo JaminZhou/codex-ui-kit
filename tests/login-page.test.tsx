@@ -85,4 +85,59 @@ describe("LoginPage", () => {
     expect(onCopySignInLink).toHaveBeenCalledOnce();
     expect(onRetry).toHaveBeenCalledOnce();
   });
+
+  it("locks authentication controls while disabled across modes", () => {
+    const onCancel = vi.fn();
+    const onDeviceCode = vi.fn();
+    const onProviderSignIn = vi.fn();
+    const onShowApiKey = vi.fn();
+    const onSignUp = vi.fn();
+    const { container, rerender } = render(
+      <LoginPage
+        disabled
+        onCancel={onCancel}
+        onDeviceCode={onDeviceCode}
+        onProviderSignIn={onProviderSignIn}
+        onShowApiKey={onShowApiKey}
+        onSignUp={onSignUp}
+      />,
+    );
+
+    expect(container.firstElementChild?.getAttribute("aria-disabled")).toBe("true");
+    expect(container.firstElementChild?.getAttribute("data-disabled")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Continue to sign in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Sign in another way" }));
+    fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
+    expect(screen.getByRole("button", { name: "Continue to sign in" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(<LoginPage apiKeyValue="sk-test" disabled mode="api-key" />);
+    expect(screen.getByLabelText("Enter your OpenAI API key")).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Continue" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(<LoginPage disabled mode="device-code" />);
+    expect(screen.getByRole("button", { name: "Open browser" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(<LoginPage disabled status="error" />);
+    expect(screen.getByRole("button", { name: "Try again" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(onCancel).not.toHaveBeenCalled();
+    expect(onDeviceCode).not.toHaveBeenCalled();
+    expect(onProviderSignIn).not.toHaveBeenCalled();
+    expect(onShowApiKey).not.toHaveBeenCalled();
+    expect(onSignUp).not.toHaveBeenCalled();
+  });
 });

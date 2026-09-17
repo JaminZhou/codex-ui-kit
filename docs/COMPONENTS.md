@@ -533,7 +533,9 @@ kit never performs filesystem, network, account, or process mutations.
   checkout, filesystem, and retry effects.
 - `LoginPage`: ready/loading/error login shell with provider list, API-key and
   device-code modes, browser-pending state, and host callbacks. Credentials,
-  browser navigation, and account persistence are never handled by the kit.
+  browser navigation, and account persistence are never handled by the kit. A
+  disabled lock covers provider, API-key, device-code, retry, cancel, copy, and
+  sign-up controls across every mode.
 - `RemoteConnectionsPage`: device/SSH rows with connected/connecting/
   disconnected/error status plus Add/Edit/Forget/Test/Retry and a controlled
   connection form with saving/error/retry feedback and busy-field locking.
