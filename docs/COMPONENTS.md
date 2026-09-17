@@ -71,13 +71,14 @@ The built-in highlighter escapes untrusted code. A custom `CodeHighlighter` retu
 - `ConversationEventList` and `ConversationEvent`: protocol-neutral ordering,
   ownership (`turn` or `thread`), event-kind, progress, warning, failure, live
   status, metadata, content, and action slots for mixed session timelines.
-- `SubagentActivity` and `SubagentActivityGroup`: delegated-work rows and compact grouped activity.
-- `SubagentSummary`: controlled working/done summary with agent metadata and diff statistics.
+- `SubagentActivity` and `SubagentActivityGroup`: delegated-work rows and compact grouped activity with a disabled lock for built-in opening actions.
+- `SubagentSummary`: controlled working/done summary with agent metadata and diff statistics; disabled locks disclosure, overflow, and agent-opening actions.
 - `SubagentPanel`: active and completed agent sections with pagination and
-  selection hooks. Summary avatars and rows can use host-provided protocol
-  timestamps to keep active work ahead of completed work and newer agents ahead
-  of older peers.
-- `SubagentTranscriptHeader` and `SubagentAvatar`: nested transcript navigation and asset-free agent identity.
+  selection hooks plus a disabled lock for selection and pagination. Summary
+  avatars and rows can use host-provided protocol timestamps to keep active work
+  ahead of completed work and newer agents ahead of older peers.
+- `SubagentTranscriptHeader` and `SubagentAvatar`: nested transcript navigation
+  (with a disabled back-action lock) and asset-free agent identity.
 
 The protocol-backed playground composes these primitives in Replay and Live
 for current single-agent, concurrent-sibling, and nested-delegation success
