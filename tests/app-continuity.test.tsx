@@ -266,6 +266,39 @@ describe("AppNotificationRegion", () => {
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 
+  it("locks notification actions while disabled", async () => {
+    const onAction = vi.fn();
+    const onDismiss = vi.fn();
+    render(
+      <AppNotificationRegion
+        disabled
+        notifications={[
+          {
+            actionLabel: "Open",
+            heading: "Connection lost",
+            id: "connection",
+            onAction,
+            onDismiss,
+          },
+        ]}
+      />,
+    );
+
+    const region = await screen.findByRole("region", {
+      name: "Notifications alt+T",
+    });
+    expect(region.getAttribute("aria-disabled")).toBe("true");
+    expect(region.getAttribute("data-disabled")).toBe("true");
+    const action = screen.getByRole("button", { name: "Open" });
+    const dismiss = screen.getByRole("button", { name: "Close" });
+    expect(action).toHaveProperty("disabled", true);
+    expect(dismiss).toHaveProperty("disabled", true);
+    fireEvent.click(action);
+    fireEvent.click(dismiss);
+    expect(onAction).not.toHaveBeenCalled();
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
   it("keeps overflowed notifications mounted while collapsing visibility", async () => {
     render(
       <AppNotificationRegion

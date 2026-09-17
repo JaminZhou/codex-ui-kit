@@ -210,7 +210,8 @@ All privileged behavior remains host-owned. The components never auto-approve co
   dismissal, alert/status semantics, and explicit or trigger-inferred theme
   propagation across the portal boundary. Inferred theme ownership is
   recomputed when the visible notification set changes, including one-for-one
-  replacement.
+  replacement. A disabled lock keeps queued action and dismissal callbacks
+  host-controlled while preserving the live region.
 - `AppShell`: the application-level grid for a persistent navigation sidebar,
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces
@@ -468,7 +469,8 @@ kit never performs filesystem, network, account, or process mutations.
   permission choices with checked state, descriptions, and `onChange`.
   Approval policy and persistence remain host-owned.
 - `ComposerPlanProgress`: pending, active, completed, and failed plan-step
-  progress with controlled steps and an optional `onDismiss`/action slot. It
+  progress with controlled steps and an optional `onDismiss`/action slot. A
+  disabled lock keeps hover, focus, and disclosure changes host-controlled. It
   renders protocol state and does not run a plan.
 - `ComposerResourcePicker`: searchable, grouped resource picker with loading,
   empty, disabled, selected, footer, keyboard-dismissal, and `onSelect`/

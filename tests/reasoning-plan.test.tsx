@@ -185,6 +185,31 @@ describe("ComposerPlanProgress", () => {
 
     expect(container.innerHTML).toBe("");
   });
+
+  it("locks plan progress disclosure while disabled", () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(
+      <ComposerPlanProgress
+        defaultOpen
+        disabled
+        onOpenChange={onOpenChange}
+        steps={steps}
+      />,
+    );
+
+    const root = container.querySelector(
+      ".codex-ui-composer-plan-progress",
+    );
+    expect(root?.getAttribute("aria-disabled")).toBe("true");
+    expect(root?.getAttribute("data-disabled")).toBe("true");
+    const trigger = screen.getByRole("button", {
+      name: "Step 2 / 3. Show plan",
+    });
+    expect(trigger).toHaveProperty("disabled", true);
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
 });
 
 describe("ProposedPlan", () => {
