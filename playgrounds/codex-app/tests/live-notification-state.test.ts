@@ -46,26 +46,35 @@ describe("live app notifications", () => {
     ).toEqual([]);
   });
 
-  it("keeps the latest four turn outcomes and can dismiss one", () => {
+  it("keeps the latest four actionable turn outcomes and can dismiss one", () => {
     let notifications: LiveAppNotification[] = [];
     for (let index = 1; index <= 5; index += 1) {
       notifications = reduceLiveAppNotifications(notifications, {
         method: "turn/completed",
         params: {
           threadId: "thread-1",
-          turn: { id: `turn-${index}`, status: "completed" },
+          turn: { id: `turn-${index}`, status: "failed" },
         },
       });
     }
     expect(notifications).toHaveLength(4);
-    expect(notifications[0]?.id).toBe("live-turn:thread-1:turn-2:completed");
-    expect(notifications.at(-1)?.heading).toBe("Response ready");
+    expect(notifications[0]?.id).toBe("live-turn:thread-1:turn-2:failed");
+    expect(notifications.at(-1)?.heading).toBe("Turn failed");
     expect(
       reduceLiveAppNotifications(notifications, {
         kind: "dismiss",
-        id: "live-turn:thread-1:turn-3:completed",
+        id: "live-turn:thread-1:turn-3:failed",
       }),
     ).toHaveLength(3);
+    expect(
+      reduceLiveAppNotifications([], {
+        method: "turn/completed",
+        params: {
+          threadId: "thread-1",
+          turn: { id: "turn-success", status: "completed" },
+        },
+      }),
+    ).toEqual([]);
   });
 
   it("distinguishes interrupted and failed turns and resets on live close", () => {
