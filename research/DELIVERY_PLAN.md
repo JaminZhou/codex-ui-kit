@@ -2412,6 +2412,9 @@ The notification and composer-plan progress surfaces now share the same
 disabled boundary: queued notification action/dismiss controls and plan
 hover/focus/disclosure changes are locked without suppressing live status or
 protocol-derived progress content.
+Message presentation now follows the same rule: disabled user bubbles no longer
+advertise or activate the built-in edit gesture, while host-provided accessory
+content remains outside that component-owned boundary.
 
 ## Planning rules
 

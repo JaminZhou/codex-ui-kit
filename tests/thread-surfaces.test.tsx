@@ -227,6 +227,25 @@ describe("complete thread surfaces", () => {
     expect(screen.getByRole("button", { name: "Copy" })).toBeTruthy();
   });
 
+  it("locks editable message activation while disabled", () => {
+    const onEdit = vi.fn();
+    const { container } = render(
+      <AgentMessage disabled editable onEdit={onEdit} role="user">
+        Update the tests.
+      </AgentMessage>,
+    );
+
+    const message = container.querySelector(".codex-ui-agent-message");
+    expect(message?.getAttribute("aria-disabled")).toBe("true");
+    expect(message?.getAttribute("data-disabled")).toBe("true");
+    const bubble = screen.getByText("Update the tests.");
+    expect(bubble.getAttribute("role")).toBeNull();
+    expect(bubble.getAttribute("tabindex")).toBeNull();
+    fireEvent.keyDown(bubble, { key: "Enter" });
+    fireEvent.doubleClick(bubble);
+    expect(onEdit).not.toHaveBeenCalled();
+  });
+
   it("marks running messages busy without replacing their content", () => {
     const { container } = render(
       <AgentMessage role="assistant" status="running">
