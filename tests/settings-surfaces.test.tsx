@@ -812,6 +812,104 @@ describe("settings surfaces", () => {
     expect(onCopyTheme).toHaveBeenCalledWith("Dark");
   });
 
+  it("exposes Appearance lifecycle copy and locks controls while saving", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <AppearanceSettingsPage
+        loadingLabel="Loading appearance…"
+        onChange={() => undefined}
+        onCopyTheme={() => undefined}
+        onImportTheme={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try appearance again"
+        savingLabel="Saving appearance…"
+        status="saving"
+        value={initialAppearanceValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { name: "Appearance" })
+      .closest("article");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Saving appearance…")).toBeTruthy();
+    expect(
+      (screen.getByRole("radio", { name: "Dark" }) as HTMLInputElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Import Light theme" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Copy Dark theme" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Light code theme" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "Light accent color" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("textbox", {
+          name: "Light background color",
+        }) as HTMLInputElement
+      )
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("switch", {
+          name: "Light translucent sidebar",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("slider", { name: "Light contrast" }) as HTMLInputElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("switch", { name: "Use pointer cursors" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (
+        screen.getByRole("radio", {
+          name: "Use Codex Dock icon",
+        }) as HTMLInputElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "On" }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("spinbutton", { name: "Sans font size" }) as HTMLInputElement)
+        .disabled,
+    ).toBe(true);
+
+    rerender(
+      <AppearanceSettingsPage
+        errorMessage="Appearance preferences unavailable"
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try appearance again"
+        status="error"
+        value={initialAppearanceValue}
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Appearance preferences unavailable",
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Try appearance again" }),
+    );
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("preserves Preferences semantics, bounds, and keyboard selection", () => {
     render(<AppearanceFixture />);
 

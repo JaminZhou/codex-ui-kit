@@ -1197,6 +1197,12 @@ export type AppearanceDockIcon = "chatgpt" | "codex";
 export type AppearanceReduceMotion = "system" | "on" | "off";
 export type AppearanceDiffMarkers = "color" | "symbols";
 export type AppearanceThemeKind = "Light" | "Dark";
+export type AppearanceSettingsStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
 
 export interface AppearanceThemeConfig {
   accent: string;
@@ -1230,11 +1236,19 @@ export interface AppearanceSettingsPageProps
   chatGptDockIcon?: ReactNode;
   codeThemeOptions?: readonly string[];
   codexDockIcon?: ReactNode;
+  disabled?: boolean;
+  errorMessage?: ReactNode;
   fontOptions?: readonly string[];
   fontStyleOptions?: readonly string[];
   onChange: (value: AppearanceSettingsValue) => void;
   onCopyTheme?: (theme: AppearanceThemeKind) => void;
   onImportTheme?: (theme: AppearanceThemeKind) => void;
+  onRetry?: () => void;
+  loadingLabel?: ReactNode;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  status?: AppearanceSettingsStatus;
+  statusMessage?: ReactNode;
   value: AppearanceSettingsValue;
 }
 
@@ -1274,12 +1288,14 @@ const defaultAppearanceFontStyleOptions = ["Regular"] as const;
 
 function AppearanceThemePreview({
   checked,
+  disabled = false,
   label,
   name,
   onChange,
   value,
 }: {
   checked: boolean;
+  disabled?: boolean;
   label: string;
   name: string;
   onChange: (value: AppearanceThemeMode) => void;
@@ -1290,6 +1306,7 @@ function AppearanceThemePreview({
       <input
         aria-label={label}
         checked={checked}
+        disabled={disabled}
         name={name}
         onChange={() => onChange(value)}
         type="radio"
@@ -1341,10 +1358,12 @@ function AppearanceDiffPreview() {
 
 function AppearanceSwitch({
   checked,
+  disabled = false,
   label,
   onChange,
 }: {
   checked: boolean;
+  disabled?: boolean;
   label: string;
   onChange: (checked: boolean) => void;
 }) {
@@ -1353,6 +1372,7 @@ function AppearanceSwitch({
       aria-checked={checked}
       aria-label={label}
       className="codex-ui-appearance-settings__switch"
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       role="switch"
       type="button"
@@ -1423,6 +1443,7 @@ function AppearanceThemeEditor({
   accentOptions,
   codeThemeOptions,
   config,
+  disabled = false,
   fontOptions,
   fontStyleOptions,
   kind,
@@ -1433,6 +1454,7 @@ function AppearanceThemeEditor({
   accentOptions: readonly string[];
   codeThemeOptions: readonly string[];
   config: AppearanceThemeConfig;
+  disabled?: boolean;
   fontOptions: readonly string[];
   fontStyleOptions: readonly string[];
   kind: AppearanceThemeKind;
@@ -1461,7 +1483,7 @@ function AppearanceThemeEditor({
         <div className="codex-ui-appearance-settings__editor-actions">
           <button
             aria-label={`Import ${kind} theme`}
-            disabled={!onImport}
+            disabled={disabled || !onImport}
             onClick={onImport}
             type="button"
           >
@@ -1469,7 +1491,7 @@ function AppearanceThemeEditor({
           </button>
           <button
             aria-label={`Copy ${kind} theme`}
-            disabled={!onCopy}
+            disabled={disabled || !onCopy}
             onClick={onCopy}
             type="button"
           >
@@ -1484,6 +1506,7 @@ function AppearanceThemeEditor({
               <button
                 aria-label={`${kind} code theme`}
                 className="codex-ui-appearance-settings__code-theme-trigger"
+                disabled={disabled}
                 type="button"
               >
                 <span aria-hidden="true">Aa</span>
@@ -1508,6 +1531,7 @@ function AppearanceThemeEditor({
         <span>Accent</span>
         <AppearanceMenuControl
           className="codex-ui-appearance-settings__accent-trigger"
+          disabled={disabled}
           label={`${kind} accent color`}
           onChange={(accent) => update("accent", accent)}
           options={accentOptions}
@@ -1520,6 +1544,7 @@ function AppearanceThemeEditor({
           <div className="codex-ui-appearance-settings__color-control">
             <button
               aria-label={`Choose ${kind} ${key} color`}
+              disabled={disabled}
               onClick={() => inputRef.current?.click()}
               style={{ backgroundColor: config[key] }}
               type="button"
@@ -1527,6 +1552,7 @@ function AppearanceThemeEditor({
             <input
               aria-hidden="true"
               className="codex-ui-appearance-settings__native-color"
+              disabled={disabled}
               onChange={(event) => update(key, event.currentTarget.value)}
               ref={inputRef}
               tabIndex={-1}
@@ -1537,6 +1563,7 @@ function AppearanceThemeEditor({
             />
             <input
               aria-label={`${kind} ${key === "foreground" ? "ink" : key} color`}
+              disabled={disabled}
               onChange={(event) => update(key, event.currentTarget.value)}
               spellCheck={false}
               type="text"
@@ -1550,6 +1577,7 @@ function AppearanceThemeEditor({
         <div className="codex-ui-appearance-settings__font-controls">
           <AppearanceMenuControl
             className="codex-ui-appearance-settings__font-trigger"
+            disabled={disabled}
             label={`${kind} UI font`}
             onChange={(uiFont) => update("uiFont", uiFont)}
             options={fontOptions}
@@ -1557,7 +1585,7 @@ function AppearanceThemeEditor({
           />
           <AppearanceMenuControl
             className="codex-ui-appearance-settings__font-style-trigger"
-            disabled={config.uiFont === "System default"}
+            disabled={disabled || config.uiFont === "System default"}
             label={`${kind} UI font style`}
             onChange={(uiFontStyle) => update("uiFontStyle", uiFontStyle)}
             options={fontStyleOptions}
@@ -1570,6 +1598,7 @@ function AppearanceThemeEditor({
         <div className="codex-ui-appearance-settings__font-controls">
           <AppearanceMenuControl
             className="codex-ui-appearance-settings__font-trigger"
+            disabled={disabled}
             label={`${kind} code font`}
             onChange={(codeFont) => update("codeFont", codeFont)}
             options={fontOptions}
@@ -1577,7 +1606,7 @@ function AppearanceThemeEditor({
           />
           <AppearanceMenuControl
             className="codex-ui-appearance-settings__font-style-trigger"
-            disabled={config.codeFont === "System default"}
+            disabled={disabled || config.codeFont === "System default"}
             label={`${kind} code font style`}
             onChange={(codeFontStyle) =>
               update("codeFontStyle", codeFontStyle)
@@ -1591,6 +1620,7 @@ function AppearanceThemeEditor({
         <span>Translucent sidebar</span>
         <AppearanceSwitch
           checked={config.translucentSidebar}
+          disabled={disabled}
           label={`${kind} translucent sidebar`}
           onChange={(translucentSidebar) =>
             update("translucentSidebar", translucentSidebar)
@@ -1602,6 +1632,7 @@ function AppearanceThemeEditor({
         <span className="codex-ui-appearance-settings__range-control">
           <input
             aria-label={`${kind} contrast`}
+            disabled={disabled}
             max="100"
             min="0"
             onChange={(event) =>
@@ -1619,11 +1650,13 @@ function AppearanceThemeEditor({
 }
 
 function AppearanceToggleGroup<T extends string>({
+  disabled = false,
   label,
   onChange,
   options,
   value,
 }: {
+  disabled?: boolean;
   label: string;
   onChange: (value: T) => void;
   options: readonly { ariaLabel?: string; label: string; value: T }[];
@@ -1666,6 +1699,7 @@ function AppearanceToggleGroup<T extends string>({
         <button
           aria-label={option.ariaLabel ?? option.label}
           aria-pressed={option.value === value}
+          disabled={disabled}
           key={option.value}
           onClick={() => onChange(option.value)}
           onKeyDown={(event) => moveSelection(event, index)}
@@ -1700,12 +1734,14 @@ function AppearancePreferenceRow({
 }
 
 function AppearanceNumberInput({
+  disabled = false,
   label,
   max,
   min,
   onCommit,
   value,
 }: {
+  disabled?: boolean;
   label: string;
   max: number;
   min: number;
@@ -1734,6 +1770,7 @@ function AppearanceNumberInput({
   return (
     <input
       aria-label={label}
+      disabled={disabled}
       max={max}
       min={min}
       onBlur={commit}
@@ -1757,17 +1794,38 @@ export function AppearanceSettingsPage({
   className,
   codeThemeOptions = defaultCodeThemeOptions,
   codexDockIcon,
+  disabled = false,
+  errorMessage = "Appearance settings could not be saved.",
   fontOptions = defaultAppearanceFontOptions,
   fontStyleOptions = defaultAppearanceFontStyleOptions,
   onChange,
   onCopyTheme,
   onImportTheme,
+  onRetry,
+  loadingLabel = "Loading appearance settings…",
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
+  status = "ready",
+  statusMessage,
   value,
   ...props
 }: AppearanceSettingsPageProps) {
   const dockGroupName = useId();
   const themeGroupName = useId();
   const themeHeadingId = useId();
+  const statusId = useId();
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "Appearance settings saved"
+          : errorMessage);
   const update = <K extends keyof AppearanceSettingsValue>(
     key: K,
     nextValue: AppearanceSettingsValue[K],
@@ -1776,11 +1834,29 @@ export function AppearanceSettingsPage({
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-appearance-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>Appearance</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-appearance-settings__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="codex-ui-appearance-settings__content">
         <section
           aria-labelledby={themeHeadingId}
@@ -1795,6 +1871,7 @@ export function AppearanceSettingsPage({
             {(["system", "light", "dark"] as const).map((theme) => (
               <AppearanceThemePreview
                 checked={value.theme === theme}
+                disabled={isLocked}
                 key={theme}
                 label={`${theme[0]?.toUpperCase()}${theme.slice(1)}`}
                 name={themeGroupName}
@@ -1805,27 +1882,25 @@ export function AppearanceSettingsPage({
           </div>
           <AppearanceDiffPreview />
         </section>
-          <AppearanceThemeEditor
-            accentOptions={accentOptions}
-            codeThemeOptions={codeThemeOptions}
-            config={value.light}
-            fontOptions={fontOptions}
-            fontStyleOptions={fontStyleOptions}
+        <AppearanceThemeEditor
+          accentOptions={accentOptions}
+          codeThemeOptions={codeThemeOptions}
+          config={value.light}
+          disabled={isLocked}
+          fontOptions={fontOptions}
+          fontStyleOptions={fontStyleOptions}
           kind="Light"
           onChange={(light) => update("light", light)}
-          onCopy={
-            onCopyTheme ? () => onCopyTheme("Light") : undefined
-          }
-          onImport={
-            onImportTheme ? () => onImportTheme("Light") : undefined
-          }
+          onCopy={onCopyTheme ? () => onCopyTheme("Light") : undefined}
+          onImport={onImportTheme ? () => onImportTheme("Light") : undefined}
         />
-          <AppearanceThemeEditor
-            accentOptions={accentOptions}
-            codeThemeOptions={codeThemeOptions}
-            config={value.dark}
-            fontOptions={fontOptions}
-            fontStyleOptions={fontStyleOptions}
+        <AppearanceThemeEditor
+          accentOptions={accentOptions}
+          codeThemeOptions={codeThemeOptions}
+          config={value.dark}
+          disabled={isLocked}
+          fontOptions={fontOptions}
+          fontStyleOptions={fontStyleOptions}
           kind="Dark"
           onChange={(dark) => update("dark", dark)}
           onCopy={onCopyTheme ? () => onCopyTheme("Dark") : undefined}
@@ -1845,6 +1920,7 @@ export function AppearanceSettingsPage({
             >
               <AppearanceSwitch
                 checked={value.usePointerCursors}
+                disabled={isLocked}
                 label="Use pointer cursors"
                 onChange={(usePointerCursors) =>
                   update("usePointerCursors", usePointerCursors)
@@ -1868,6 +1944,7 @@ export function AppearanceSettingsPage({
                     <input
                       aria-label={label}
                       checked={value.dockIcon === dockIcon}
+                      disabled={isLocked}
                       name={dockGroupName}
                       onChange={() => update("dockIcon", dockIcon)}
                       type="radio"
@@ -1884,6 +1961,7 @@ export function AppearanceSettingsPage({
               label="Reduce motion"
             >
               <AppearanceToggleGroup
+                disabled={isLocked}
                 label="Reduce motion"
                 onChange={(reduceMotion) => update("reduceMotion", reduceMotion)}
                 options={[
@@ -1900,6 +1978,7 @@ export function AppearanceSettingsPage({
             >
               <label className="codex-ui-appearance-settings__number-control">
                 <AppearanceNumberInput
+                  disabled={isLocked}
                   label="Sans font size"
                   max={16}
                   min={11}
@@ -1915,6 +1994,7 @@ export function AppearanceSettingsPage({
             >
               <label className="codex-ui-appearance-settings__number-control">
                 <AppearanceNumberInput
+                  disabled={isLocked}
                   label="Code font size"
                   max={24}
                   min={8}
@@ -1931,6 +2011,7 @@ export function AppearanceSettingsPage({
               label="Diff markers"
             >
               <AppearanceToggleGroup
+                disabled={isLocked}
                 label="Diff markers"
                 onChange={(diffMarkers) => update("diffMarkers", diffMarkers)}
                 options={[
@@ -1954,6 +2035,7 @@ export function AppearanceSettingsPage({
             >
               <AppearanceSwitch
                 checked={value.fontSmoothing}
+                disabled={isLocked}
                 label="Font smoothing"
                 onChange={(fontSmoothing) =>
                   update("fontSmoothing", fontSmoothing)
