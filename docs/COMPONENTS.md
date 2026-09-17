@@ -473,8 +473,10 @@ kit never performs filesystem, network, account, or process mutations.
   recovery with host-configurable copy. Refreshing locks mutable hook actions;
   it does not read or write hook files.
 - `KeyboardShortcutsPage`: searchable, grouped shortcut catalogue with
-  controlled capture/edit/clear/cancel state and `onShortcutChange`. Native
-  registration and persistence remain host-owned.
+  controlled capture/edit/clear/cancel state and `onShortcutChange`.
+  Loading, saving, saved, and error feedback, retry copy, and busy-state
+  locking are host-controlled. Native registration and persistence remain
+  host-owned.
 - `PersonalizationSettingsPage`: controlled custom instructions, Memory
   controls, warning, and Personality choice with save/reset callbacks. Save
   lifecycle feedback, retry copy, and busy-state locking are host-controlled;

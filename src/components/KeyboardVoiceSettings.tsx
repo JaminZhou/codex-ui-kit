@@ -23,17 +23,28 @@ export interface KeyboardShortcutCaptureTarget {
   shortcutIndex: number;
 }
 
+export type KeyboardShortcutsStatus =
+  | "error"
+  | "loading"
+  | "ready"
+  | "saved"
+  | "saving";
+
 export interface KeyboardShortcutsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
   captureTarget?: KeyboardShortcutCaptureTarget | null;
   clearIcon?: ReactNode;
+  disabled?: boolean;
   editIcon?: ReactNode;
   entries: readonly KeyboardShortcutEntry[];
+  errorMessage?: ReactNode;
   keystrokeSearchIcon?: ReactNode;
+  loadingLabel?: ReactNode;
   onCaptureTargetChange?: (
     target: KeyboardShortcutCaptureTarget | null,
   ) => void;
   onQueryChange?: (query: string) => void;
+  onRetry?: () => void;
   onSearchByKeystrokes?: () => void;
   onShortcutChange?: (
     entry: KeyboardShortcutEntry,
@@ -45,7 +56,11 @@ export interface KeyboardShortcutsPageProps
     shortcutIndex: number,
   ) => void;
   query?: string;
+  retryLabel?: ReactNode;
+  savingLabel?: ReactNode;
   searchIcon?: ReactNode;
+  status?: KeyboardShortcutsStatus;
+  statusMessage?: ReactNode;
 }
 
 function normalizeShortcutSearch(value: string) {
@@ -87,16 +102,24 @@ export function KeyboardShortcutsPage({
   captureTarget,
   className,
   clearIcon,
+  disabled = false,
   editIcon,
   entries,
+  errorMessage = "Keyboard shortcuts could not be saved.",
   keystrokeSearchIcon,
+  loadingLabel = "Loading keyboard shortcuts…",
   onCaptureTargetChange,
   onQueryChange,
   onSearchByKeystrokes,
+  onRetry,
   onShortcutChange,
   onShortcutClear,
   query,
+  retryLabel = "Retry",
+  savingLabel = "Saving…",
   searchIcon,
+  status = "ready",
+  statusMessage,
   ...props
 }: KeyboardShortcutsPageProps) {
   const [internalQuery, setInternalQuery] = useState("");
@@ -105,6 +128,19 @@ export function KeyboardShortcutsPage({
   const resolvedQuery = query ?? internalQuery;
   const resolvedCaptureTarget =
     captureTarget === undefined ? internalCaptureTarget : captureTarget;
+  const statusId = useId();
+  const isLocked = disabled || status === "loading" || status === "saving";
+  const isSaving = status === "saving";
+  const showStatus = status !== "ready";
+  const resolvedStatusMessage =
+    statusMessage ??
+    (status === "loading"
+      ? loadingLabel
+      : status === "saving"
+        ? savingLabel
+        : status === "saved"
+          ? "Keyboard shortcuts saved"
+          : errorMessage);
   const normalizedQuery = normalizeShortcutSearch(resolvedQuery);
   const filteredEntries = entries.filter((entry) =>
     [
@@ -128,11 +164,29 @@ export function KeyboardShortcutsPage({
   return (
     <article
       {...props}
+      aria-busy={status === "loading" || isSaving || undefined}
+      aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-keyboard-shortcuts", className]
         .filter(Boolean)
         .join(" ")}
+      data-status={status}
     >
       <h1>Keyboard shortcuts</h1>
+      {showStatus ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-keyboard-shortcuts__status"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
+          <span>{resolvedStatusMessage}</span>
+          {status === "error" && onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="codex-ui-keyboard-shortcuts__search-sticky">
         <label className="codex-ui-keyboard-shortcuts__search">
           <ShortcutIcon>{searchIcon}</ShortcutIcon>
@@ -140,6 +194,7 @@ export function KeyboardShortcutsPage({
             Search shortcuts
           </span>
           <input
+            disabled={isLocked}
             onChange={(event) => setQuery(event.currentTarget.value)}
             placeholder="Search shortcuts"
             type="text"
@@ -149,6 +204,7 @@ export function KeyboardShortcutsPage({
             <button
               aria-label="Clear shortcut search"
               className="codex-ui-keyboard-shortcuts__search-clear"
+              disabled={isLocked}
               onClick={() => setQuery("")}
               type="button"
             >
@@ -158,7 +214,7 @@ export function KeyboardShortcutsPage({
           <button
             aria-label="Search by keystrokes"
             className="codex-ui-keyboard-shortcuts__keystroke-search"
-            disabled={!onSearchByKeystrokes}
+            disabled={isLocked || !onSearchByKeystrokes}
             onClick={onSearchByKeystrokes}
             type="button"
           >
@@ -202,7 +258,9 @@ export function KeyboardShortcutsPage({
                               aria-label={`Shortcut capture for ${entry.name}`}
                               autoFocus
                               className="codex-ui-keyboard-shortcuts__capture"
+                              disabled={isLocked}
                               onKeyDown={(event) => {
+                                if (isLocked) return;
                                 event.preventDefault();
                                 event.stopPropagation();
                                 if (event.key === "Escape") {
@@ -223,6 +281,7 @@ export function KeyboardShortcutsPage({
                             />
                             <button
                               className="codex-ui-keyboard-shortcuts__cancel"
+                              disabled={isLocked}
                               onClick={() => setCaptureTarget(null)}
                               type="button"
                             >
@@ -241,7 +300,7 @@ export function KeyboardShortcutsPage({
                             <button
                               aria-label={`${shortcut ? "Change" : "Set"} shortcut for ${entry.name}`}
                               className="codex-ui-keyboard-shortcuts__edit"
-                              disabled={!onShortcutChange}
+                              disabled={isLocked || !onShortcutChange}
                               onClick={() =>
                                 setCaptureTarget({
                                   entryId: entry.id,
@@ -256,7 +315,7 @@ export function KeyboardShortcutsPage({
                               <button
                                 aria-label={`Clear shortcut for ${entry.name}`}
                                 className="codex-ui-keyboard-shortcuts__clear"
-                                disabled={!onShortcutClear}
+                                disabled={isLocked || !onShortcutClear}
                                 onClick={() =>
                                   onShortcutClear?.(entry, shortcutIndex)
                                 }

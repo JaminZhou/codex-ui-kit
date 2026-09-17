@@ -2091,7 +2091,9 @@ without confusing package readiness with full product reconstruction.
     gates all 129 visible commands, filtering, edit/capture, sticky scrolling,
     and the current narrow-column behavior; the second gates microphone and
     nine-voice selection, screen context, hotkeys, dictionary, recordings,
-    wide/compact scrolling, and host-supplied voice artwork boundaries. Usage
+    wide/compact scrolling, and host-supplied voice artwork boundaries. The
+    keyboard surface now also exposes host-controlled loading, saving, saved,
+    and error states with retry copy and locked search/capture controls. Usage
     & billing and its embedded Personal/Business plan surface are now a third
     delivered slice: plan/credits/reset cards, three meters, 5x/20x and
     annual/monthly selectors, host-owned checkout callbacks, wide/compact
