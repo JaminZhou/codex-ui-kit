@@ -1360,7 +1360,7 @@ for (const scene of selectedScenes) {
           ) > 0.1 ||
           Math.abs(mcp.editorHeading.height - 26.59375) > 0.1 ||
           JSON.stringify(mcp.fieldLabels) !== JSON.stringify(expectedLabels) ||
-          mcp.saveDisabled !== true ||
+          mcp.saveDisabled !== (detail ? false : true) ||
           mcp.cards.length !== (detail ? 1 : 2) ||
           (detail &&
             (!mcp.description ||

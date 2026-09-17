@@ -163,8 +163,10 @@ import {
   type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
   type McpServerEditorValue,
+  type McpServerEditorStatus,
   type McpServerItem,
   type McpServerPageStatus,
+  type McpServerToggleStatus,
   type PersonalizationSettingsValue,
   type PlanSelectionCard,
   type QueuedPrompt,
@@ -3804,6 +3806,13 @@ export function App() {
         ? "update"
         : null,
   );
+  const [mcpEditingServerId, setMcpEditingServerId] = useState<string | null>(
+    initialSelection.frame?.endsWith("-detail") ? "workspace-tools" : null,
+  );
+  const [mcpEditorStatus, setMcpEditorStatus] =
+    useState<McpServerEditorStatus>("ready");
+  const [mcpEditorStatusMessage, setMcpEditorStatusMessage] = useState("");
+  const mcpMutationTimerRef = useRef<number | null>(null);
   const [mcpEditorValue, setMcpEditorValue] = useState<McpServerEditorValue>(
     initialSelection.frame?.endsWith("-detail")
       ? {
@@ -11639,6 +11648,9 @@ export function App() {
             }
             onAddMcpServer={() => {
               setMcpEditorValue(blankMcpEditorValue);
+              setMcpEditingServerId(null);
+              setMcpEditorStatus("ready");
+              setMcpEditorStatusMessage("");
               setMcpEditorMode("create");
               setMcpSettingsAction("");
               setActiveFrame("workspace-mcp-settings-current-26-825-stdio-create");
@@ -11661,16 +11673,41 @@ export function App() {
               setMcpSettingsAction("MCP servers reloaded");
             }}
             onServerEnabledChange={(item, enabled) => {
+              const toggleStatus: McpServerToggleStatus = enabled
+                ? "enabling"
+                : "disabling";
               setMcpServers((servers) =>
                 servers.map((candidate) =>
                   candidate.id === item.id
-                    ? { ...candidate, enabled }
+                    ? { ...candidate, enabled, toggleStatus }
                     : candidate,
                 ),
               );
               setMcpSettingsAction(
-                `${String(item.name)} ${enabled ? "enabled" : "disabled"}`,
+                `${String(item.name)} ${enabled ? "enabling" : "disabling"}`,
               );
+              window.setTimeout(() => {
+                setMcpServers((servers) =>
+                  servers.map((candidate) =>
+                    candidate.id === item.id
+                      ? { ...candidate, enabled, toggleStatus: "ready" }
+                      : candidate,
+                  ),
+                );
+                setMcpSettingsAction(
+                  `${String(item.name)} ${enabled ? "enabled" : "disabled"}`,
+                );
+              }, 180);
+            }}
+            onServerRetry={(item) => {
+              setMcpServers((servers) =>
+                servers.map((candidate) =>
+                  candidate.id === item.id
+                    ? { ...candidate, toggleStatus: "ready" }
+                    : candidate,
+                ),
+              );
+              setMcpSettingsAction(`${String(item.name)} MCP retry requested`);
             }}
             onServerSettings={(item) => {
               setMcpEditorValue({
@@ -11679,10 +11716,14 @@ export function App() {
                 type: "http",
                 url: "https://mcp.example.com/mcp",
               });
+              setMcpEditingServerId(item.id);
+              setMcpEditorStatus("ready");
+              setMcpEditorStatusMessage("");
               setMcpEditorMode("update");
               setMcpSettingsAction("");
               setActiveFrame("workspace-mcp-settings-current-26-825-detail");
             }}
+            disabled={mcpEditorStatus === "saving"}
             pluginServers={currentPluginMcpServers}
             query={mcpQuery}
             servers={mcpServers}
@@ -11695,7 +11736,11 @@ export function App() {
                 data-evidence="runtime-observed"
                 mode={mcpEditorMode}
                 onBack={() => {
+                  if (mcpEditorStatus === "saving") return;
                   setMcpEditorMode(null);
+                  setMcpEditingServerId(null);
+                  setMcpEditorStatus("ready");
+                  setMcpEditorStatusMessage("");
                   setMcpSettingsAction("");
                   setActiveFrame("workspace-mcp-settings-current-26-825");
                 }}
@@ -11707,19 +11752,109 @@ export function App() {
                     );
                   }
                 }}
-                onSave={() => setMcpSettingsAction("Save MCP requested")}
+                onRetry={() => {
+                  setMcpEditorStatus("ready");
+                  setMcpEditorStatusMessage("");
+                  setMcpSettingsAction("Retry MCP save");
+                }}
+                onSave={() => {
+                  const name = mcpEditorValue.name.trim();
+                  const endpoint =
+                    mcpEditorValue.type === "stdio"
+                      ? mcpEditorValue.command.trim()
+                      : mcpEditorValue.url.trim();
+                  if (!name || !endpoint) {
+                    setMcpEditorStatus("error");
+                    setMcpEditorStatusMessage(
+                      "Add a server name and connection details before saving.",
+                    );
+                    return;
+                  }
+                  if (mcpMutationTimerRef.current !== null) {
+                    window.clearTimeout(mcpMutationTimerRef.current);
+                  }
+                  setMcpEditorStatus("saving");
+                  setMcpEditorStatusMessage("");
+                  setMcpSettingsAction(`Saving ${name}`);
+                  mcpMutationTimerRef.current = window.setTimeout(() => {
+                    setMcpServers((servers) => {
+                      if (mcpEditingServerId) {
+                        return servers.map((candidate) =>
+                          candidate.id === mcpEditingServerId
+                            ? {
+                                ...candidate,
+                                name,
+                                settingsAvailable: true,
+                                source: "server",
+                              }
+                            : candidate,
+                        );
+                      }
+                      const idBase = name
+                        .toLocaleLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/^-|-$/g, "") || "custom-mcp";
+                      const existingIds = new Set(
+                        servers.map((candidate) => candidate.id),
+                      );
+                      let id = idBase;
+                      let suffix = 2;
+                      while (existingIds.has(id)) {
+                        id = `${idBase}-${suffix}`;
+                        suffix += 1;
+                      }
+                      return [
+                        ...servers,
+                        {
+                          enabled: false,
+                          id,
+                          name,
+                          settingsAvailable: true,
+                          source: "server" as const,
+                        },
+                      ];
+                    });
+                    setMcpEditorStatus("ready");
+                    setMcpEditorMode(null);
+                    setMcpEditingServerId(null);
+                    setActiveFrame("workspace-mcp-settings-current-26-825");
+                    setMcpSettingsAction(`Saved ${name}`);
+                    mcpMutationTimerRef.current = null;
+                  }, 180);
+                }}
                 onUninstall={
                   mcpEditorMode === "update"
-                    ? () => setMcpSettingsAction("Uninstall MCP requested")
+                    ? () => {
+                        if (!mcpEditingServerId) return;
+                        if (mcpMutationTimerRef.current !== null) {
+                          window.clearTimeout(mcpMutationTimerRef.current);
+                        }
+                        setMcpEditorStatus("saving");
+                        setMcpSettingsAction("Uninstalling MCP");
+                        mcpMutationTimerRef.current = window.setTimeout(() => {
+                          setMcpServers((servers) =>
+                            servers.filter(
+                              (candidate) => candidate.id !== mcpEditingServerId,
+                            ),
+                          );
+                          setMcpEditorStatus("ready");
+                          setMcpEditorMode(null);
+                          setMcpEditingServerId(null);
+                          setActiveFrame("workspace-mcp-settings-current-26-825");
+                          setMcpSettingsAction("Uninstalled MCP");
+                          mcpMutationTimerRef.current = null;
+                        }, 180);
+                      }
                     : undefined
                 }
                 saveDisabled={
-                  mcpEditorMode === "update" ||
                   !mcpEditorValue.name.trim() ||
                   (mcpEditorValue.type === "stdio"
                     ? !mcpEditorValue.command.trim()
                     : !mcpEditorValue.url.trim())
                 }
+                status={mcpEditorStatus}
+                statusMessage={mcpEditorStatusMessage}
                 value={mcpEditorValue}
               />
             ) : null}
