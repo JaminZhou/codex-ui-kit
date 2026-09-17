@@ -2415,6 +2415,8 @@ protocol-derived progress content.
 Message presentation now follows the same rule: disabled user bubbles no longer
 advertise or activate the built-in edit gesture, while host-provided accessory
 content remains outside that component-owned boundary.
+The login shell now applies the same host boundary across provider, API-key,
+device-code, browser-pending, retry, copy, cancel, and sign-up states.
 
 ## Planning rules
 

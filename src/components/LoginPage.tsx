@@ -22,6 +22,7 @@ export interface LoginPageProps
   browserPendingMessage?: ReactNode;
   canCopySignInLink?: boolean;
   deviceCode?: string;
+  disabled?: boolean;
   errorMessage?: ReactNode;
   mode?: LoginPageMode;
   onApiKeyChange?: (value: string) => void;
@@ -54,6 +55,7 @@ export function LoginPage({
   canCopySignInLink = false,
   className,
   deviceCode = "",
+  disabled = false,
   errorMessage = "Sign-in failed. Try again.",
   mode = "chatgpt",
   onApiKeyChange,
@@ -79,8 +81,10 @@ export function LoginPage({
       <main
         {...props}
         aria-busy="true"
+        aria-disabled={disabled || undefined}
         className={["codex-ui-login-page", className].filter(Boolean).join(" ")}
         data-mode={mode}
+        data-disabled={disabled || undefined}
         data-status={status}
       >
         <div className="codex-ui-login-page__loading" role="status">
@@ -95,7 +99,9 @@ export function LoginPage({
     return (
       <main
         {...props}
+        aria-disabled={disabled || undefined}
         className={["codex-ui-login-page", className].filter(Boolean).join(" ")}
+        data-disabled={disabled || undefined}
         data-mode={mode}
         data-status={status}
       >
@@ -106,10 +112,24 @@ export function LoginPage({
           <h1>{title}</h1>
           <p className="codex-ui-login-page__description">{errorMessage}</p>
           <div className="codex-ui-login-page__actions">
-            <button className="codex-ui-login-page__primary" onClick={onRetry} type="button">
+            <button
+              className="codex-ui-login-page__primary"
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry?.();
+              }}
+              type="button"
+            >
               Try again
             </button>
-            <button className="codex-ui-login-page__secondary" onClick={onCancel} type="button">
+            <button
+              className="codex-ui-login-page__secondary"
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onCancel?.();
+              }}
+              type="button"
+            >
               Cancel
             </button>
           </div>
@@ -123,8 +143,11 @@ export function LoginPage({
       <label htmlFor="codex-ui-login-api-key">Enter your OpenAI API key</label>
       <input
         autoComplete="off"
+        disabled={disabled}
         id="codex-ui-login-api-key"
-        onChange={(event) => onApiKeyChange?.(event.target.value)}
+        onChange={(event) => {
+          if (!disabled) onApiKeyChange?.(event.target.value);
+        }}
         placeholder={apiKeyPlaceholder}
         spellCheck={false}
         type="password"
@@ -132,13 +155,22 @@ export function LoginPage({
       />
       <p className="codex-ui-login-page__hint">Cloud chats disabled with API key</p>
       <div className="codex-ui-login-page__button-row">
-        <button className="codex-ui-login-page__secondary" onClick={onCancel} type="button">
+        <button
+          className="codex-ui-login-page__secondary"
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onCancel?.();
+          }}
+          type="button"
+        >
           Cancel
         </button>
         <button
           className="codex-ui-login-page__primary"
-          disabled={isLoading || apiKeyValue.trim().length === 0}
-          onClick={onApiKeySubmit}
+          disabled={disabled || isLoading || apiKeyValue.trim().length === 0}
+          onClick={() => {
+            if (!disabled) onApiKeySubmit?.();
+          }}
           type="button"
         >
           Continue
@@ -157,14 +189,35 @@ export function LoginPage({
         <code>{deviceCode || "------"}</code>
       </div>
       <div className="codex-ui-login-page__button-row">
-        <button className="codex-ui-login-page__secondary" onClick={onCancel} type="button">
+        <button
+          className="codex-ui-login-page__secondary"
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onCancel?.();
+          }}
+          type="button"
+        >
           Cancel
         </button>
-        <button className="codex-ui-login-page__primary" onClick={onOpenBrowser} type="button">
+        <button
+          className="codex-ui-login-page__primary"
+          disabled={disabled}
+          onClick={() => {
+            if (!disabled) onOpenBrowser?.();
+          }}
+          type="button"
+        >
           Open browser
         </button>
       </div>
-      <button className="codex-ui-login-page__text-action" onClick={onCopySignInLink} type="button">
+      <button
+        className="codex-ui-login-page__text-action"
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) onCopySignInLink?.();
+        }}
+        type="button"
+      >
         Copy sign-in link
       </button>
       {verificationUrl ? <span className="codex-ui-login-page__sr-only">{verificationUrl}</span> : null}
@@ -175,13 +228,27 @@ export function LoginPage({
     <div className="codex-ui-login-page__pending">
       <span aria-hidden="true" className="codex-ui-login-page__mark">C</span>
       <p className="codex-ui-login-page__description">{browserPendingMessage}</p>
-      <button className="codex-ui-login-page__secondary" onClick={onCancel} type="button">
+      <button
+        className="codex-ui-login-page__secondary"
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) onCancel?.();
+        }}
+        type="button"
+      >
         Cancel sign-in
       </button>
       {canCopySignInLink ? (
         <div className="codex-ui-login-page__copy-row">
           <span>Browser didn&apos;t open?</span>
-          <button className="codex-ui-login-page__text-action" onClick={onCopySignInLink} type="button">
+          <button
+            className="codex-ui-login-page__text-action"
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) onCopySignInLink?.();
+            }}
+            type="button"
+          >
             Copy sign-in link
           </button>
         </div>
@@ -192,8 +259,10 @@ export function LoginPage({
   return (
     <main
       {...props}
+      aria-disabled={disabled || undefined}
       className={["codex-ui-login-page", className].filter(Boolean).join(" ")}
       data-mode={mode}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <div className="codex-ui-login-page__panel">
@@ -201,7 +270,15 @@ export function LoginPage({
           renderBrowserPending()
         ) : (
           <>
-            <button aria-label="Play Snake" className="codex-ui-login-page__mark" onClick={onDeviceCode} type="button">
+            <button
+              aria-label="Play Snake"
+              className="codex-ui-login-page__mark"
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onDeviceCode?.();
+              }}
+              type="button"
+            >
               C
             </button>
             <h1>{title}</h1>
@@ -212,7 +289,14 @@ export function LoginPage({
             ) : (
               <>
                 <div className="codex-ui-login-page__actions">
-                  <button className="codex-ui-login-page__primary" onClick={() => onProviderSignIn?.("google")} type="button">
+                  <button
+                    className="codex-ui-login-page__primary"
+                    disabled={disabled}
+                    onClick={() => {
+                      if (!disabled) onProviderSignIn?.("google");
+                    }}
+                    type="button"
+                  >
                     Continue to sign in
                   </button>
                   {moreOptions ? (
@@ -220,26 +304,57 @@ export function LoginPage({
                       {(Object.keys(providerLabels) as LoginProvider[]).map((provider) => (
                         <button
                           className="codex-ui-login-page__secondary"
+                          disabled={disabled}
                           key={provider}
-                          onClick={() => onProviderSignIn?.(provider)}
+                          onClick={() => {
+                            if (!disabled) onProviderSignIn?.(provider);
+                          }}
                           type="button"
                         >
                           {providerLabels[provider]}
                         </button>
                       ))}
-                      <button className="codex-ui-login-page__secondary" onClick={onDeviceCode} type="button">
+                      <button
+                        className="codex-ui-login-page__secondary"
+                        disabled={disabled}
+                        onClick={() => {
+                          if (!disabled) onDeviceCode?.();
+                        }}
+                        type="button"
+                      >
                         Use device code
                       </button>
                     </>
                   ) : null}
-                  <button className="codex-ui-login-page__secondary" onClick={onShowApiKey} type="button">
+                  <button
+                    className="codex-ui-login-page__secondary"
+                    disabled={disabled}
+                    onClick={() => {
+                      if (!disabled) onShowApiKey?.();
+                    }}
+                    type="button"
+                  >
                     {moreOptions ? "Sign in with an API key" : "Sign in another way"}
                   </button>
-                  <button className="codex-ui-login-page__text-action" onClick={() => setMoreOptions((open) => !open)} type="button">
+                  <button
+                    className="codex-ui-login-page__text-action"
+                    disabled={disabled}
+                    onClick={() => {
+                      if (!disabled) setMoreOptions((open) => !open);
+                    }}
+                    type="button"
+                  >
                     {moreOptions ? "Less options" : "More options"}
                   </button>
                 </div>
-                <button className="codex-ui-login-page__text-action" onClick={onSignUp} type="button">
+                <button
+                  className="codex-ui-login-page__text-action"
+                  disabled={disabled}
+                  onClick={() => {
+                    if (!disabled) onSignUp?.();
+                  }}
+                  type="button"
+                >
                   Sign up
                 </button>
               </>
