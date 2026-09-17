@@ -8071,20 +8071,36 @@ button.codex-ui-login-page__mark {
 }
 
 .codex-ui-environment-settings-page__status-card {
+  align-items: center;
   background: rgb(35 35 35);
   border: 1px solid rgb(255 255 255 / 8.2%);
   border-radius: 1.25rem;
   color: rgb(255 255 255 / 65%);
+  display: flex;
   font-size: 0.8125rem;
   font-weight: 445;
   line-height: 1.1607125rem;
+  padding: 0.75rem;
   margin-block-start: 0.96875rem;
   min-height: 2.785rem;
   overflow: hidden;
 }
 
 .codex-ui-environment-settings-page__status-card > div {
-  padding: 0.75rem;
+  flex: 1;
+}
+
+.codex-ui-environment-settings-page__status-card[role="alert"] {
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-environment-settings-page__status-card button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
 }
 
 .codex-ui-environment-settings-page__content {

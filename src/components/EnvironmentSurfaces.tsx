@@ -9,7 +9,10 @@ export type EnvironmentSettingsStatus =
 export interface EnvironmentSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   children?: ReactNode;
+  loadingLabel?: ReactNode;
   message?: ReactNode;
+  onRetry?: () => void;
+  retryLabel?: ReactNode;
   status?: EnvironmentSettingsStatus;
   statusHeading?: ReactNode;
   title?: ReactNode;
@@ -246,7 +249,10 @@ export function EnvironmentEditorPage({
 export function EnvironmentSettingsPage({
   children,
   className,
+  loadingLabel = "Loading…",
   message = "We could not load local environment settings for this project",
+  onRetry,
+  retryLabel = "Retry",
   status = "ready",
   statusHeading,
   title = "Environments",
@@ -268,6 +274,7 @@ export function EnvironmentSettingsPage({
   return (
     <section
       {...props}
+      aria-busy={status === "loading" || undefined}
       aria-labelledby={titleId}
       className={["codex-ui-environment-settings-page", className]
         .filter(Boolean)
@@ -285,8 +292,13 @@ export function EnvironmentSettingsPage({
             role={role}
           >
             <div id={statusMessageId}>
-              {status === "loading" ? "Loading…" : message}
+              {status === "loading" ? loadingLabel : message}
             </div>
+            {onRetry ? (
+              <button onClick={onRetry} type="button">
+                {retryLabel}
+              </button>
+            ) : null}
           </div>
         </div>
       ) : (
