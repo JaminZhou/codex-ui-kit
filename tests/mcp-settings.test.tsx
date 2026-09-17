@@ -40,6 +40,48 @@ const editorValue: McpServerEditorValue = {
 };
 
 describe("MCP settings", () => {
+  it("exposes page lifecycle status and locks manager controls while loading", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <McpServersPage
+        loadingLabel="Loading MCP integrations…"
+        onRetry={onRetry}
+        query="docs"
+        status="loading"
+      />,
+    );
+    const page = screen.getByRole("heading", { name: "Plugins" }).closest("section");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Loading MCP integrations…")).toBeTruthy();
+    expect(screen.getByPlaceholderText("Search MCP servers")).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("tab", { name: /^MCPs\s*0$/ })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Add" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <McpServersPage
+        onRetry={onRetry}
+        retryLabel="Try MCPs again"
+        status="error"
+        statusDescription="MCP management is temporarily unavailable."
+        statusHeading="MCP service unavailable"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "MCP management is temporarily unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try MCPs again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("renders the current manager and delegates host-owned interactions", () => {
     const onAddMcpServer = vi.fn();
     const onCategoryChange = vi.fn();

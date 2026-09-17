@@ -2,6 +2,7 @@ import {
   type ChangeEvent,
   type HTMLAttributes,
   type ReactNode,
+  useId,
 } from "react";
 import { Menu, MenuItem } from "./InteractivePrimitives.js";
 
@@ -131,6 +132,7 @@ function stringValue(value: ReactNode) {
 export interface PluginManagerTabsProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onChange"> {
   active: PluginManagerCategory;
+  disabled?: boolean;
   onChange?: (category: PluginManagerCategory) => void;
   tabs?: readonly PluginManagerTabItem[];
 }
@@ -138,6 +140,7 @@ export interface PluginManagerTabsProps
 export function PluginManagerTabs({
   active,
   className,
+  disabled = false,
   onChange,
   tabs = defaultManagerTabs,
   ...props
@@ -155,6 +158,7 @@ export function PluginManagerTabs({
         <button
           aria-selected={tab.id === active}
           data-active={tab.id === active || undefined}
+          disabled={disabled}
           key={tab.id}
           onClick={() => onChange?.(tab.id)}
           role="tab"
@@ -169,6 +173,7 @@ export function PluginManagerTabs({
 }
 
 export interface IntegrationAddMenuProps {
+  disabled?: boolean;
   onAddMarketplace?: () => void;
   onAddMcpServer?: () => void;
   onCreatePlugin?: () => void;
@@ -176,6 +181,7 @@ export interface IntegrationAddMenuProps {
 }
 
 export function IntegrationAddMenu({
+  disabled = false,
   onAddMarketplace,
   onAddMcpServer,
   onCreatePlugin,
@@ -187,28 +193,34 @@ export function IntegrationAddMenu({
       className="codex-ui-plugin-manager__add-menu"
       label="Add integration"
       trigger={
-        <button className="codex-ui-plugin-manager__add" type="button">
+        <button
+          className="codex-ui-plugin-manager__add"
+          disabled={disabled}
+          type="button"
+        >
           <span>Add</span>
           <McpChevronGlyph />
         </button>
       }
       width="auto"
     >
-      <MenuItem onSelect={onCreatePlugin}>Create plugin</MenuItem>
-      <MenuItem onSelect={onAddMarketplace}>Add a marketplace</MenuItem>
-      <MenuItem onSelect={onAddMcpServer}>Add MCP server</MenuItem>
-      <MenuItem onSelect={onRecordSkill}>Record a skill</MenuItem>
+      <MenuItem disabled={disabled} onSelect={onCreatePlugin}>Create plugin</MenuItem>
+      <MenuItem disabled={disabled} onSelect={onAddMarketplace}>Add a marketplace</MenuItem>
+      <MenuItem disabled={disabled} onSelect={onAddMcpServer}>Add MCP server</MenuItem>
+      <MenuItem disabled={disabled} onSelect={onRecordSkill}>Record a skill</MenuItem>
     </Menu>
   );
 }
 
 function McpServerRows({
+  disabled = false,
   items,
   onEnabledChange,
   onRetry,
   onSettings,
   retryLabel,
 }: {
+  disabled?: boolean;
   items: readonly McpServerItem[];
   onEnabledChange?: (item: McpServerItem, enabled: boolean) => void;
   onRetry?: (item: McpServerItem) => void;
@@ -247,6 +259,7 @@ function McpServerRows({
                   <button
                     aria-label={`Settings for ${name}`}
                     className="codex-ui-mcp-settings__settings"
+                    disabled={disabled}
                     onClick={() => onSettings?.(item)}
                     type="button"
                   >
@@ -265,6 +278,7 @@ function McpServerRows({
                 {toggleStatus === "error" && onRetry ? (
                   <button
                     className="codex-ui-mcp-settings__retry"
+                    disabled={disabled}
                     onClick={() => onRetry(item)}
                     type="button"
                   >
@@ -276,7 +290,7 @@ function McpServerRows({
                   aria-label={`Enable ${name}`}
                   aria-busy={togglePending || undefined}
                   className="codex-ui-mcp-settings__switch"
-                  disabled={togglePending}
+                  disabled={disabled || togglePending}
                   onClick={() => onEnabledChange?.(item, !item.enabled)}
                   role="switch"
                   type="button"
@@ -297,6 +311,7 @@ export interface McpServersPageProps
     IntegrationAddMenuProps {
   activeCategory?: PluginManagerCategory;
   description?: ReactNode;
+  disabled?: boolean;
   emptyLabel?: ReactNode;
   loadingLabel?: ReactNode;
   onBrowseDirectory?: () => void;
@@ -323,6 +338,7 @@ export function McpServersPage({
   children,
   className,
   description = "Manage plugins, skills, and MCPs",
+  disabled = false,
   emptyLabel = "No MCP servers found",
   loadingLabel = "Loading MCP servers…",
   onAddMarketplace,
@@ -348,6 +364,8 @@ export function McpServersPage({
   title = "Plugins",
   ...props
 }: McpServersPageProps) {
+  const statusId = useId();
+  const isLocked = disabled || status !== "ready";
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const matches = (item: McpServerItem) =>
     !normalizedQuery ||
@@ -358,7 +376,10 @@ export function McpServersPage({
     status === "error" ? "Couldn’t load MCP servers" : "MCP servers unavailable";
   return (
     <section
+      aria-busy={status === "loading" || undefined}
+      aria-describedby={status !== "ready" ? statusId : undefined}
       className={["codex-ui-mcp-settings", className].filter(Boolean).join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
       {...props}
     >
@@ -368,10 +389,11 @@ export function McpServersPage({
           <p>{description}</p>
         </span>
         <span className="codex-ui-plugin-manager__actions">
-          <button onClick={onBrowseDirectory} type="button">
+          <button disabled={isLocked} onClick={onBrowseDirectory} type="button">
             Browse directory
           </button>
           <IntegrationAddMenu
+            disabled={isLocked}
             onAddMarketplace={onAddMarketplace}
             onAddMcpServer={onAddMcpServer}
             onCreatePlugin={onCreatePlugin}
@@ -382,6 +404,7 @@ export function McpServersPage({
       <div className="codex-ui-plugin-manager__toolbar">
         <PluginManagerTabs
           active={activeCategory}
+          disabled={isLocked}
           onChange={onCategoryChange}
           tabs={tabs}
         />
@@ -391,6 +414,7 @@ export function McpServersPage({
             Search MCP servers
           </span>
           <input
+            disabled={isLocked}
             onChange={(event) => onQueryChange?.(event.currentTarget.value)}
             placeholder="Search MCP servers"
             type="search"
@@ -401,15 +425,25 @@ export function McpServersPage({
       {children ? (
         children
       ) : status === "loading" ? (
-        <div className="codex-ui-mcp-settings__state" role="status">
+        <div
+          aria-live="polite"
+          className="codex-ui-mcp-settings__state"
+          id={statusId}
+          role="status"
+        >
           {loadingLabel}
         </div>
       ) : status !== "ready" ? (
-        <section className="codex-ui-mcp-settings__state">
+        <section
+          aria-live="polite"
+          className="codex-ui-mcp-settings__state"
+          id={statusId}
+          role={status === "error" ? "alert" : "status"}
+        >
           <h2>{statusHeading ?? fallbackHeading}</h2>
           {statusDescription ? <p>{statusDescription}</p> : null}
           {onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button disabled={disabled} onClick={onRetry} type="button">
               {retryLabel}
             </button>
           ) : null}
@@ -420,6 +454,7 @@ export function McpServersPage({
             <h2>Servers</h2>
             {filteredServers.length > 0 ? (
               <McpServerRows
+                disabled={disabled}
                 items={filteredServers}
                 onEnabledChange={onServerEnabledChange}
                 onRetry={onServerRetry}
@@ -433,7 +468,7 @@ export function McpServersPage({
           {filteredPluginServers.length > 0 ? (
             <section className="codex-ui-mcp-settings__section">
               <h2>From plugins</h2>
-              <McpServerRows items={filteredPluginServers} />
+              <McpServerRows disabled={disabled} items={filteredPluginServers} />
             </section>
           ) : null}
         </div>
