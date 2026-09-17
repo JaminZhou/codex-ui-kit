@@ -159,6 +159,7 @@ import {
   type PluginDetailAppItem,
   type PluginDetailInformationItem,
   type PluginDetailSuggestion,
+  type PluginDetailStatus,
   type KeyboardShortcutCaptureTarget,
   type KeyboardShortcutEntry,
   type ManagedWorktreeEntry,
@@ -3689,6 +3690,9 @@ export function App() {
   const [pluginDetailConnectionOpen, setPluginDetailConnectionOpen] =
     useState(initialSelection.frame?.endsWith("-connection") ?? false);
   const [pluginDetailAction, setPluginDetailAction] = useState("");
+  const [pluginDetailStatus, setPluginDetailStatus] =
+    useState<PluginDetailStatus>("ready");
+  const pluginDetailMutationTimerRef = useRef<number | null>(null);
   const isCurrentSkillDetailReplay =
     initialSelection.frame?.startsWith(
       "integration-skill-detail-current-26-825",
@@ -12822,6 +12826,9 @@ export function App() {
           : currentDiscoveryPluginInformation
       }
       installed={pluginDetailInstalled}
+      installingLabel={
+        pluginDetailInstalled ? "Uninstalling…" : "Installing…"
+      }
       onActionsMenuOpenChange={(open) => {
         setPluginDetailActionsOpen(open);
         if (open) setPluginDetailConnectionOpen(false);
@@ -12835,13 +12842,45 @@ export function App() {
       }}
       onCopyLink={() => setPluginDetailAction("copy-link")}
       onDisconnect={() => setPluginDetailAction("disconnect-requested")}
-      onInstall={() => setPluginDetailAction("install-requested")}
+      onInstall={() => {
+        if (pluginDetailStatus === "installing") return;
+        if (pluginDetailMutationTimerRef.current !== null) {
+          window.clearTimeout(pluginDetailMutationTimerRef.current);
+        }
+        setPluginDetailStatus("installing");
+        setPluginDetailAction("installing");
+        pluginDetailMutationTimerRef.current = window.setTimeout(() => {
+          setPluginDetailInstalled(true);
+          setPluginDetailStatus("ready");
+          setPluginDetailAction("installed");
+          pluginDetailMutationTimerRef.current = null;
+        }, 180);
+      }}
       onReconnect={() => setPluginDetailAction("reconnect-requested")}
+      onRetry={() => {
+        setPluginDetailStatus("ready");
+        setPluginDetailAction("retry-install");
+      }}
       onSuggestionOpen={(suggestion) =>
         setPluginDetailAction(`suggestion:${suggestion.id}`)
       }
       onTryNow={() => setPluginDetailAction("try-now")}
-      onUninstall={() => setPluginDetailAction("uninstall-requested")}
+      onUninstall={() => {
+        if (pluginDetailStatus === "installing") return;
+        if (pluginDetailMutationTimerRef.current !== null) {
+          window.clearTimeout(pluginDetailMutationTimerRef.current);
+        }
+        setPluginDetailStatus("installing");
+        setPluginDetailAction("uninstalling");
+        pluginDetailMutationTimerRef.current = window.setTimeout(() => {
+          setPluginDetailInstalled(false);
+          setPluginDetailActionsOpen(false);
+          setPluginDetailConnectionOpen(false);
+          setPluginDetailStatus("ready");
+          setPluginDetailAction("uninstalled");
+          pluginDetailMutationTimerRef.current = null;
+        }, 180);
+      }}
       suggestions={
         pluginDetailInstalled
           ? currentInstalledPluginSuggestions
@@ -12853,6 +12892,8 @@ export function App() {
           : "Use Gmail to summarize inbox activity, draft replies, and organize email threads through the connected Gmail app."
       }
       title={currentPluginDetailTitle}
+      status={pluginDetailStatus}
+      statusMessage="The plugin installation did not complete."
     />
   );
 
