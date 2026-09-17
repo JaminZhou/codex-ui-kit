@@ -1,6 +1,7 @@
 import {
   type HTMLAttributes,
   type ReactNode,
+  useId,
   useMemo,
 } from "react";
 import { Menu, MenuItem } from "./InteractivePrimitives.js";
@@ -72,6 +73,7 @@ function siteLabel(site: SiteIndexItem) {
 export interface SitesIndexPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   createLabel?: ReactNode;
+  disabled?: boolean;
   emptyLabel?: ReactNode;
   items?: readonly SiteIndexItem[];
   loadingLabel?: ReactNode;
@@ -95,6 +97,7 @@ export interface SitesIndexPageProps
 export function SitesIndexPage({
   className,
   createLabel = "Create",
+  disabled = false,
   emptyLabel = "No sites found",
   items = [],
   loadingLabel = "Loading sites…",
@@ -114,6 +117,8 @@ export function SitesIndexPage({
   title = "Sites",
   ...props
 }: SitesIndexPageProps) {
+  const statusId = useId();
+  const isLocked = disabled || status !== "ready";
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const visibleItems = useMemo(
     () => items.filter((site) =>
@@ -132,7 +137,10 @@ export function SitesIndexPage({
   return (
     <main
       aria-label="Sites"
+      aria-busy={status === "loading" || undefined}
+      aria-describedby={status !== "ready" ? statusId : undefined}
       className={["codex-ui-sites-index", className].filter(Boolean).join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
       {...props}
     >
@@ -140,11 +148,11 @@ export function SitesIndexPage({
         <header className="codex-ui-sites-index__header">
           <h1>{title}</h1>
           <div className="codex-ui-sites-index__actions">
-            <button aria-label={typeof refreshLabel === "string" ? refreshLabel : "Refresh sites"} onClick={onRefresh} type="button">
+            <button aria-label={typeof refreshLabel === "string" ? refreshLabel : "Refresh sites"} disabled={isLocked} onClick={onRefresh} type="button">
               <RefreshGlyph />
               <span>{refreshLabel}</span>
             </button>
-            <button className="codex-ui-sites-index__create" onClick={onCreate} type="button">
+            <button className="codex-ui-sites-index__create" disabled={isLocked} onClick={onCreate} type="button">
               <AddGlyph />
               <span>{createLabel}</span>
             </button>
@@ -155,6 +163,7 @@ export function SitesIndexPage({
           <span className="codex-ui-sites-index__sr-only">Search sites</span>
           <input
             aria-label="Search sites"
+            disabled={isLocked}
             onChange={(event) => onQueryChange?.(event.currentTarget.value)}
             placeholder="Search sites"
             type="search"
@@ -162,12 +171,17 @@ export function SitesIndexPage({
           />
         </label>
         {status === "loading" ? (
-          <p aria-live="polite" className="codex-ui-sites-index__status" role="status">{loadingLabel}</p>
+          <p aria-live="polite" className="codex-ui-sites-index__status" id={statusId} role="status">{loadingLabel}</p>
         ) : status !== "ready" ? (
-          <section className="codex-ui-sites-index__status">
+          <section
+            aria-live="polite"
+            className="codex-ui-sites-index__status"
+            id={statusId}
+            role={status === "error" ? "alert" : "status"}
+          >
             <h2>{statusHeading ?? fallbackHeading}</h2>
             {statusDescription ? <p>{statusDescription}</p> : null}
-            {onRetry ? <button onClick={onRetry} type="button">{retryLabel}</button> : null}
+            {onRetry ? <button disabled={disabled} onClick={onRetry} type="button">{retryLabel}</button> : null}
           </section>
         ) : visibleItems.length === 0 ? (
           <p className="codex-ui-sites-index__empty">{emptyLabel}</p>
@@ -177,7 +191,7 @@ export function SitesIndexPage({
               const label = siteLabel(site);
               return (
                 <article className="codex-ui-sites-index__site" key={site.id}>
-                  <button aria-label={`Open ${label}`} className="codex-ui-sites-index__site-open" onClick={() => onOpen?.(site)} type="button" />
+                  <button aria-label={`Open ${label}`} className="codex-ui-sites-index__site-open" disabled={isLocked} onClick={() => onOpen?.(site)} type="button" />
                   <span aria-hidden="true" className="codex-ui-sites-index__site-leading">{site.leading ?? "⌘"}</span>
                   <span className="codex-ui-sites-index__site-copy">
                     <span className="codex-ui-sites-index__site-name">{site.name}</span>
@@ -191,18 +205,18 @@ export function SitesIndexPage({
                     ) : null}
                   </span>
                   <div className="codex-ui-sites-index__site-actions">
-                    <button aria-label={`Share ${label}`} onClick={() => onShare?.(site)} type="button">
+                    <button aria-label={`Share ${label}`} disabled={isLocked} onClick={() => onShare?.(site)} type="button">
                       <ShareGlyph />
                       <span>Share</span>
                     </button>
                     <Menu
                       align="end"
                       label={`Site actions for ${label}`}
-                      trigger={<button aria-label={`More actions for ${label}`} type="button"><MoreGlyph /></button>}
+                      trigger={<button aria-label={`More actions for ${label}`} disabled={isLocked} type="button"><MoreGlyph /></button>}
                     >
-                      <MenuItem onSelect={() => onOverflowAction?.(site, "open")}>Open</MenuItem>
-                      <MenuItem onSelect={() => onOverflowAction?.(site, "copy-link")}>Copy link</MenuItem>
-                      <MenuItem onSelect={() => onOverflowAction?.(site, "remove")} tone="danger">Remove</MenuItem>
+                      <MenuItem disabled={isLocked} onSelect={() => onOverflowAction?.(site, "open")}>Open</MenuItem>
+                      <MenuItem disabled={isLocked} onSelect={() => onOverflowAction?.(site, "copy-link")}>Copy link</MenuItem>
+                      <MenuItem disabled={isLocked} onSelect={() => onOverflowAction?.(site, "remove")} tone="danger">Remove</MenuItem>
                     </Menu>
                   </div>
                 </article>
