@@ -255,10 +255,19 @@ export interface SourceItem {
   title: ReactNode;
 }
 
+export type SourceListStatus = "empty" | "error" | "loading" | "ready";
+
 export interface SourceListProps {
   className?: string;
   defaultExpanded?: boolean;
+  emptyLabel?: ReactNode;
+  errorLabel?: ReactNode;
   items: SourceItem[];
+  loadingLabel?: ReactNode;
+  onRetry?: () => void;
+  retryLabel?: ReactNode;
+  status?: SourceListStatus;
+  statusMessage?: ReactNode;
   title?: ReactNode;
   viewAllLabel?: ReactNode;
   visibleLimit?: number;
@@ -274,78 +283,116 @@ const sourceGlyphs: Record<SourceKind, string> = {
 export function SourceList({
   className,
   defaultExpanded = false,
+  emptyLabel = "No sources yet",
+  errorLabel = "Sources unavailable",
   items,
+  loadingLabel = "Loading sources…",
+  onRetry,
+  retryLabel = "Retry",
+  status = "ready",
+  statusMessage,
   title = "Sources",
   viewAllLabel = "View all",
   visibleLimit = 3,
 }: SourceListProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const isLoading = status === "loading";
+  const isError = status === "error";
+  const showItems = status === "ready" && items.length > 0;
   const visibleItems = expanded ? items : items.slice(0, Math.max(0, visibleLimit));
-  if (items.length === 0) return null;
+  if (status === "ready" && items.length === 0) return null;
 
   return (
     <section
+      aria-busy={isLoading || undefined}
       aria-label={typeof title === "string" ? title : "Sources"}
       className={["codex-ui-source-list", className].filter(Boolean).join(" ")}
+      data-status={status}
     >
       <div className="codex-ui-source-list__header">
         <h3>{title}</h3>
-        {!expanded && items.length > visibleItems.length ? (
+        {showItems && !expanded && items.length > visibleItems.length ? (
           <button onClick={() => setExpanded(true)} type="button">
             {viewAllLabel}
           </button>
         ) : null}
       </div>
-      <ol className="codex-ui-source-list__items">
-        {visibleItems.map((item) => {
-          const interactive = Boolean(item.href || item.onOpen);
-          const content = (
-            <>
-              <span className="codex-ui-source-list__visual" aria-hidden="true">
-                {item.previewSrc ? (
-                  <img alt="" draggable={false} src={item.previewSrc} />
-                ) : (
-                  item.icon ?? <span>{sourceGlyphs[item.kind ?? "external"]}</span>
-                )}
-              </span>
-              <span className="codex-ui-source-list__content">
-                <span className="codex-ui-source-list__title">{item.title}</span>
-                {item.meta ? (
-                  <span className="codex-ui-source-list__meta">{item.meta}</span>
-                ) : null}
-              </span>
-              {interactive ? (
-                <span className="codex-ui-source-list__arrow" aria-hidden="true">
-                  ↗
+      {isLoading ? (
+        <div
+          aria-label={typeof loadingLabel === "string" ? loadingLabel : undefined}
+          className="codex-ui-source-list__state"
+          role="status"
+        >
+          <span className="codex-ui-source-list__skeleton" />
+          <span className="codex-ui-source-list__skeleton" />
+          <span className="codex-ui-source-list__skeleton" />
+        </div>
+      ) : isError ? (
+        <div className="codex-ui-source-list__state" role="alert">
+          <strong>{errorLabel}</strong>
+          {statusMessage ? <span>{statusMessage}</span> : null}
+          {onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : status === "empty" || !showItems ? (
+        <p className="codex-ui-source-list__state" role="status">
+          {emptyLabel}
+        </p>
+      ) : (
+        <ol className="codex-ui-source-list__items">
+          {visibleItems.map((item) => {
+            const interactive = Boolean(item.href || item.onOpen);
+            const content = (
+              <>
+                <span className="codex-ui-source-list__visual" aria-hidden="true">
+                  {item.previewSrc ? (
+                    <img alt="" draggable={false} src={item.previewSrc} />
+                  ) : (
+                    item.icon ?? <span>{sourceGlyphs[item.kind ?? "external"]}</span>
+                  )}
                 </span>
-              ) : null}
-            </>
-          );
-          return (
-            <li key={item.id}>
-              {item.href ? (
-                <a
-                  aria-label={item.openLabel}
-                  href={item.href}
-                  onClick={item.onOpen}
-                >
-                  {content}
-                </a>
-              ) : item.onOpen ? (
-                <button
-                  aria-label={item.openLabel}
-                  onClick={item.onOpen}
-                  type="button"
-                >
-                  {content}
-                </button>
-              ) : (
-                <div className="codex-ui-source-list__item">{content}</div>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+                <span className="codex-ui-source-list__content">
+                  <span className="codex-ui-source-list__title">{item.title}</span>
+                  {item.meta ? (
+                    <span className="codex-ui-source-list__meta">{item.meta}</span>
+                  ) : null}
+                </span>
+                {interactive ? (
+                  <span className="codex-ui-source-list__arrow" aria-hidden="true">
+                    ↗
+                  </span>
+                ) : null}
+              </>
+            );
+            return (
+              <li key={item.id}>
+                {item.href ? (
+                  <a
+                    aria-label={item.openLabel}
+                    href={item.href}
+                    onClick={item.onOpen}
+                  >
+                    {content}
+                  </a>
+                ) : item.onOpen ? (
+                  <button
+                    aria-label={item.openLabel}
+                    onClick={item.onOpen}
+                    type="button"
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div className="codex-ui-source-list__item">{content}</div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </section>
   );
 }

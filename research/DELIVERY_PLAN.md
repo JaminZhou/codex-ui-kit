@@ -420,7 +420,9 @@ exit gates; it does not replace the inventory.
   compact layout locks the 374.328125/345.671875px conversation/Sources split.
   This closes the sampled inline-citation and Web Search Sources slice without
   generalizing to other providers, failure/empty/loading states, or live
-  media. A separate previous
+  media. The public SourceList contract now also models loading, empty, and
+  retryable error states without promoting a provider or product pixel claim.
+  A separate previous
   26.818 no-tool task remains regression evidence for
   `thread.messages-markdown`. It reaches heading,
   strong text, inline code, blockquote, list, a narrow table, and TypeScript

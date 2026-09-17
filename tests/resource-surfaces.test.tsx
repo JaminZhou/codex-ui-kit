@@ -233,6 +233,50 @@ describe("resource surfaces", () => {
     expect(screen.getByText("No artifacts yet")).toBeTruthy();
   });
 
+  it("keeps source loading, empty, and error recovery explicit", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <SourceList
+        items={[]}
+        loadingLabel="Loading citations…"
+        status="loading"
+        title="Sources"
+      />,
+    );
+    const region = screen.getByRole("region", { name: "Sources" });
+    expect(region.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status", { name: "Loading citations…" })).toBeTruthy();
+
+    rerender(
+      <SourceList
+        emptyLabel="No citations in this answer"
+        items={[]}
+        status="empty"
+        title="Sources"
+      />,
+    );
+    expect(screen.getByRole("status").textContent).toContain(
+      "No citations in this answer",
+    );
+
+    rerender(
+      <SourceList
+        errorLabel="Citations unavailable"
+        items={[]}
+        onRetry={onRetry}
+        retryLabel="Try again"
+        status="error"
+        statusMessage="The source service is offline."
+        title="Sources"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The source service is offline.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("summarizes sources and expands to the full list", () => {
     const onOpen = vi.fn();
     render(
