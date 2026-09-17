@@ -453,6 +453,34 @@ describe("project conversation routing", () => {
     );
   });
 
+  it("locks the project listbox while the host is unavailable", () => {
+    const onSelect = vi.fn();
+    render(
+      <ConversationProjectListbox
+        disabled
+        initialFocus="none"
+        items={[{ id: "ui-kit", label: "UI Kit" }]}
+        onSelect={onSelect}
+        pinnedItems={[{ id: "new-project", label: "New project" }]}
+        selectedId="ui-kit"
+      />,
+    );
+
+    const listbox = screen.getByRole("listbox", {
+      name: "Conversation projects",
+    });
+    expect(listbox.getAttribute("aria-disabled")).toBe("true");
+    expect(listbox.getAttribute("data-disabled")).toBe("true");
+    for (const option of within(listbox).getAllByRole("option")) {
+      expect(option).toHaveProperty("disabled", true);
+      expect(option).toHaveProperty("tabIndex", -1);
+    }
+    fireEvent.click(
+      screen.getByRole("option", { name: "Select project UI Kit" }),
+    );
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   it("renders an observed project-selection icon without changing option semantics", () => {
     render(
       <ConversationProjectListbox
@@ -938,6 +966,46 @@ describe("project conversation routing", () => {
         name: "Use local environment Desktop checkout",
       }),
     ).toBeNull();
+  });
+
+  it("locks local-environment search and selection while disabled", () => {
+    const onQueryChange = vi.fn();
+    const onSelect = vi.fn();
+    render(
+      <LocalEnvironmentDialog
+        disabled
+        groups={[
+          {
+            id: "ui-kit",
+            items: [{ id: "main", label: "Main" }],
+            label: "UI Kit",
+          },
+        ]}
+        onOpenChange={() => undefined}
+        onQueryChange={onQueryChange}
+        onSelect={onSelect}
+        open
+        query=""
+      />,
+    );
+
+    const dialog = screen.getByRole("dialog", {
+      name: "Create local environment",
+    });
+    expect(dialog.getAttribute("aria-disabled")).toBe("true");
+    expect(dialog.getAttribute("data-disabled")).toBe("true");
+    const search = within(dialog).getByRole("searchbox", {
+      name: "Search local environments",
+    });
+    expect(search).toHaveProperty("disabled", true);
+    fireEvent.change(search, { target: { value: "main" } });
+    expect(onQueryChange).not.toHaveBeenCalled();
+    const main = within(dialog).getByRole("button", {
+      name: "Use local environment Main",
+    });
+    expect(main).toHaveProperty("disabled", true);
+    fireEvent.click(main);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 
   it("returns focus to the environment trigger when the dialog closes", async () => {

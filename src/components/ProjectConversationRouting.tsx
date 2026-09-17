@@ -1309,6 +1309,7 @@ export interface ConversationProjectListboxProps
     HTMLAttributes<HTMLDivElement>,
     "children" | "onSelect"
   > {
+  disabled?: boolean;
   dismissBoundaryId?: string;
   initialFocus?: "first" | "none" | "selected";
   items: readonly ProjectIndexItem[];
@@ -1367,6 +1368,7 @@ function moveProjectListboxFocus(
 
 export function ConversationProjectListbox({
   className,
+  disabled = false,
   dismissBoundaryId,
   initialFocus = "selected",
   items,
@@ -1385,7 +1387,7 @@ export function ConversationProjectListbox({
   const initialFocusCompleteRef = useRef(initialFocus === "none");
   const allItems = [...items, ...pinnedItems];
   const enabledItems = allItems.filter(
-    (item) => !projectIndexItemDisabled(item),
+    (item) => !disabled && !projectIndexItemDisabled(item),
   );
   const enabledItemKey = enabledItems
     .map((item) => item.id)
@@ -1518,7 +1520,7 @@ export function ConversationProjectListbox({
   }, [dismissBoundaryId, onDismiss, triggerId]);
 
   const renderOption = (item: ProjectIndexItem, index: number) => {
-    const disabled = projectIndexItemDisabled(item);
+    const itemDisabled = disabled || projectIndexItemDisabled(item);
     const selected = item.id === selectedId;
     const descriptionId = item.description
       ? `${listboxId}-description-${index}`
@@ -1543,7 +1545,7 @@ export function ConversationProjectListbox({
         className="codex-ui-conversation-project-options__item"
         data-project-id={item.id}
         data-status={item.status}
-        disabled={disabled}
+        disabled={itemDisabled}
         key={item.id}
         onClick={() => {
           onSelect(item.id);
@@ -1569,7 +1571,7 @@ export function ConversationProjectListbox({
           if (nextId) setActiveId(nextId);
         }}
         role="option"
-        tabIndex={!disabled && item.id === resolvedActiveId ? 0 : -1}
+        tabIndex={!itemDisabled && item.id === resolvedActiveId ? 0 : -1}
         type="button"
       >
         {item.icon ? (
@@ -1607,6 +1609,7 @@ export function ConversationProjectListbox({
   return (
     <div
       {...props}
+      aria-disabled={disabled || undefined}
       aria-label={label}
       className={[
         "codex-ui-conversation-project-options",
@@ -1614,6 +1617,7 @@ export function ConversationProjectListbox({
       ]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       onBlur={(event: FocusEvent<HTMLDivElement>) => {
         onBlur?.(event);
         if (!onDismiss || event.defaultPrevented) return;
@@ -1690,6 +1694,7 @@ export interface LocalEnvironmentDialogProps
   > {
   createAction?: ReactNode;
   description?: ReactNode;
+  disabled?: boolean;
   emptyState?: ReactNode;
   groups: readonly LocalEnvironmentGroup[];
   onOpenChange: (open: boolean) => void;
@@ -1739,6 +1744,7 @@ export function LocalEnvironmentDialog({
   className,
   createAction,
   description = "Choose a worktree or create a local environment.",
+  disabled = false,
   emptyState = "No local environments",
   groups,
   onOpenChange,
@@ -1793,6 +1799,8 @@ export function LocalEnvironmentDialog({
         .join(" ")}
       description={description}
       footer={createAction}
+      aria-disabled={disabled || undefined}
+      data-disabled={disabled || undefined}
       initialFocusSelector=".codex-ui-local-environment-dialog__search"
       onOpenChange={onOpenChange}
       open={open}
@@ -1804,7 +1812,10 @@ export function LocalEnvironmentDialog({
         <input
           aria-label={searchLabel}
           className="codex-ui-local-environment-dialog__search"
-          onChange={(event) => onQueryChange(event.currentTarget.value)}
+          disabled={disabled}
+          onChange={(event) => {
+            if (!disabled) onQueryChange(event.currentTarget.value);
+          }}
           type="search"
           value={query}
         />
@@ -1861,10 +1872,10 @@ export function LocalEnvironmentDialog({
                                 aria-label={`Use local environment ${accessibleValue}`}
                                 className="codex-ui-local-environment-dialog__item"
                                 data-status={item.status}
-                                disabled={itemDisabled}
-                                onClick={() =>
-                                  onSelect(group.id, item.id)
-                                }
+                                disabled={disabled || itemDisabled}
+                                onClick={() => {
+                                  if (!disabled) onSelect(group.id, item.id);
+                                }}
                                 type="button"
                               >
                                 <span className="codex-ui-local-environment-dialog__item-copy">
