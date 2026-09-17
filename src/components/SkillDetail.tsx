@@ -28,12 +28,17 @@ export interface SkillDetailDialogProps
   onOpen?: () => void;
   onOpenChange: (open: boolean) => void;
   onReveal?: () => void;
+  onRetry?: () => void;
   onTryNow?: () => void;
   onUninstall?: () => void;
+  retryLabel?: ReactNode;
   suffix?: ReactNode;
+  status?: SkillDetailStatus;
+  statusMessage?: ReactNode;
   title: ReactNode;
   tryNowLabel?: ReactNode;
   uninstallLabel?: ReactNode;
+  updatingLabel?: ReactNode;
 }
 
 export interface SkillPromptMentionProps
@@ -41,6 +46,8 @@ export interface SkillPromptMentionProps
   artwork?: ReactNode;
   label: ReactNode;
 }
+
+export type SkillDetailStatus = "ready" | "updating" | "error";
 
 function MoreGlyph() {
   return (
@@ -114,14 +121,20 @@ export function SkillDetailDialog({
   onOpen,
   onOpenChange,
   onReveal,
+  onRetry,
   onTryNow,
   onUninstall,
+  retryLabel = "Retry",
   suffix = "Skill",
+  status = "ready",
+  statusMessage,
   title,
   tryNowLabel = "Try now",
   uninstallLabel = "Uninstall",
+  updatingLabel = "Updating skill…",
   ...props
 }: SkillDetailDialogProps) {
+  const isUpdating = status === "updating";
   const dismissMenu = () => onActionsMenuOpenChange?.(false);
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event);
@@ -136,23 +149,29 @@ export function SkillDetailDialog({
   return (
     <Dialog
       {...props}
+      aria-busy={isUpdating || undefined}
       className={["codex-ui-skill-detail", className]
         .filter(Boolean)
         .join(" ")}
       closeIcon={closeIcon}
+      closeDisabled={isUpdating}
       closeOnEscape={!actionsMenuOpen}
+      data-status={status}
       description={description}
       footer={
         <>
           <button
             className="codex-ui-skill-detail__uninstall"
+            disabled={isUpdating}
             onClick={onUninstall}
             type="button"
           >
             {uninstallLabel}
           </button>
           <button
+            aria-busy={isUpdating || undefined}
             className="codex-ui-skill-detail__try"
+            disabled={isUpdating}
             onClick={onTryNow}
             type="button"
           >
@@ -167,6 +186,7 @@ export function SkillDetailDialog({
             aria-checked={enabled}
             aria-label={enabled ? "Disable skill" : "Enable skill"}
             className="codex-ui-skill-detail__switch"
+            disabled={isUpdating}
             onClick={() => onEnabledChange?.(!enabled)}
             role="switch"
             type="button"
@@ -179,6 +199,7 @@ export function SkillDetailDialog({
               aria-haspopup="menu"
               aria-label="More actions"
               className="codex-ui-skill-detail__more"
+              disabled={isUpdating}
               onClick={() => onActionsMenuOpenChange?.(!actionsMenuOpen)}
               type="button"
             >
@@ -234,6 +255,29 @@ export function SkillDetailDialog({
           {suffix ? <span>{suffix}</span> : null}
         </div>
       </div>
+      {status === "updating" ? (
+        <p
+          aria-live="polite"
+          className="codex-ui-skill-detail__status"
+          role="status"
+        >
+          {updatingLabel}
+        </p>
+      ) : status === "error" ? (
+        <div
+          aria-live="polite"
+          className="codex-ui-skill-detail__status"
+          role="alert"
+        >
+          <strong>Couldn’t update skill</strong>
+          <span>{statusMessage ?? "Check the skill and try again."}</span>
+          {onRetry ? (
+            <button onClick={onRetry} type="button">
+              {retryLabel}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="codex-ui-skill-detail__content">
         <div className="codex-ui-skill-detail__document">{children}</div>
       </div>
