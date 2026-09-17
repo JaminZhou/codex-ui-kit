@@ -42,10 +42,12 @@ export interface ThreadSummaryDockProps
   anchorRef?: RefObject<HTMLElement | null>;
   children: ReactNode;
   defaultOpen?: boolean;
+  dismissOnEscape?: boolean;
   dismissOnOutsidePointerDown?: boolean;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
   pinned?: boolean;
+  restoreFocusOnDismiss?: boolean;
 }
 
 export function ThreadSummaryDock({
@@ -53,10 +55,13 @@ export function ThreadSummaryDock({
   children,
   className,
   defaultOpen = false,
+  dismissOnEscape = true,
   dismissOnOutsidePointerDown = true,
+  onKeyDown: onDockKeyDown,
   onOpenChange,
   open,
   pinned = false,
+  restoreFocusOnDismiss = true,
   ...props
 }: ThreadSummaryDockProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -65,6 +70,10 @@ export function ThreadSummaryDock({
   const updateOpen = (nextOpen: boolean) => {
     if (open === undefined) setInternalOpen(nextOpen);
     onOpenChange?.(nextOpen);
+  };
+  const restoreFocus = () => {
+    if (!restoreFocusOnDismiss || typeof window === "undefined") return;
+    window.setTimeout(() => anchorRef?.current?.focus());
   };
 
   useEffect(() => {
@@ -90,6 +99,21 @@ export function ThreadSummaryDock({
       data-open={resolvedOpen}
       data-pinned={pinned}
       data-slot="thread-summary-dock"
+      onKeyDown={(event) => {
+        onDockKeyDown?.(event);
+        if (
+          event.defaultPrevented ||
+          event.key !== "Escape" ||
+          !dismissOnEscape ||
+          pinned ||
+          !resolvedOpen
+        ) {
+          return;
+        }
+        event.preventDefault();
+        updateOpen(false);
+        restoreFocus();
+      }}
       ref={dockRef}
     >
       <div className="codex-ui-thread-summary-dock__surface">{children}</div>

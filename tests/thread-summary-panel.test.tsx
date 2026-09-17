@@ -43,10 +43,10 @@ function SummaryFixture({ defaultOpen = true }: { defaultOpen?: boolean }) {
   );
 }
 
-function DockFixture() {
+function DockFixture({ initialPinned = true }: { initialPinned?: boolean }) {
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(true);
-  const [pinned, setPinned] = useState(true);
+  const [pinned, setPinned] = useState(initialPinned);
   return (
     <div>
       <button
@@ -155,5 +155,22 @@ describe("thread summary panel", () => {
     fireEvent.click(trigger);
     expect(dock?.getAttribute("data-open")).toBe("true");
     expect(dock?.getAttribute("data-pinned")).toBe("true");
+  });
+
+  it("dismisses a floating dock on Escape and restores anchor focus", () => {
+    vi.useFakeTimers();
+    render(<DockFixture initialPinned={false} />);
+    const dock = screen.getByLabelText("Docked summary").closest(
+      '[data-slot="thread-summary-dock"]',
+    );
+    const trigger = screen.getByRole("button", {
+      name: "Toggle pinned summary",
+    });
+
+    fireEvent.keyDown(dock!, { key: "Escape" });
+    vi.runAllTimers();
+
+    expect(dock?.getAttribute("data-open")).toBe("false");
+    expect(document.activeElement).toBe(trigger);
   });
 });
