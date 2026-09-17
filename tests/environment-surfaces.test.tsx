@@ -48,6 +48,39 @@ describe("environment settings surfaces", () => {
     );
   });
 
+  it("exposes environment loading busy state and host-owned retry copy", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <EnvironmentSettingsPage
+        loadingLabel="Loading environment registry…"
+        onRetry={onRetry}
+        retryLabel="Load again"
+        status="loading"
+      />,
+    );
+    const page = screen
+      .getByRole("heading", { name: "Environments" })
+      .closest("section");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByRole("status").textContent).toContain(
+      "Loading environment registry…",
+    );
+
+    rerender(
+      <EnvironmentSettingsPage
+        message="Environment registry unavailable"
+        onRetry={onRetry}
+        retryLabel="Load again"
+        status="error"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Environment registry unavailable",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Load again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("supports controlled setup and action editing", () => {
     const onTabChange = vi.fn();
     const onActionAdd = vi.fn();

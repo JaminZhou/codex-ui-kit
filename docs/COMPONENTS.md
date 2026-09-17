@@ -457,8 +457,9 @@ kit never performs filesystem, network, account, or process mutations.
   `onChange`/`onRetry` callbacks. It never starts a review or changes account
   limits.
 - `EnvironmentSettingsPage`: controlled environment list with ready/loading/
-  error/empty states, selection, refresh, and edit callbacks. Registry,
-  credentials, and provisioning stay in the host.
+  error/empty states, `aria-busy`, host-configurable loading copy, and
+  host-owned Retry/edit callbacks. Registry, credentials, and provisioning stay
+  in the host.
 - `EnvironmentEditorPage`: Setup/Cleanup/Actions tabs with controlled name,
   script, action rows, dirty state, Save/Discard, and conflict/error Retry
   callbacks. Saving exposes busy feedback and locks mutable controls while
