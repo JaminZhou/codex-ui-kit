@@ -55,6 +55,36 @@ describe("thread navigation surfaces", () => {
     expect(screen.queryByRole("button", { name: "Back" })).toBeNull();
   });
 
+  it("locks sidebar and history controls during a host-owned transition", () => {
+    const onToggleSidebar = vi.fn();
+    const onGoBack = vi.fn();
+    const onGoForward = vi.fn();
+    render(
+      <ThreadNavigationControls
+        canGoBack
+        canGoForward
+        disabled
+        onGoBack={onGoBack}
+        onGoForward={onGoForward}
+        onToggleSidebar={onToggleSidebar}
+        sidebarOpen
+      />,
+    );
+
+    for (const label of ["Hide sidebar", "Back", "Forward"]) {
+      expect(screen.getByRole("button", { name: label })).toHaveProperty(
+        "disabled",
+        true,
+      );
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Hide sidebar" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    fireEvent.click(screen.getByRole("button", { name: "Forward" }));
+    expect(onToggleSidebar).not.toHaveBeenCalled();
+    expect(onGoBack).not.toHaveBeenCalled();
+    expect(onGoForward).not.toHaveBeenCalled();
+  });
+
   it("renders draggable header identity and all action alignments", () => {
     render(
       <ThreadHeader
@@ -97,6 +127,16 @@ describe("thread navigation surfaces", () => {
     expect(button.querySelectorAll(".codex-ui-thread-floating-button__dots > span")).toHaveLength(3);
     fireEvent.click(button);
     expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the latest-message control inert while disabled", () => {
+    const onClick = vi.fn();
+    render(<ThreadFloatingButton disabled onClick={onClick} show />);
+    const button = screen.getByRole("button", { name: "Scroll to bottom" });
+    expect(button).toHaveProperty("disabled", true);
+    expect(button.getAttribute("aria-disabled")).toBe("true");
+    fireEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it("keeps a closed floating panel mounted but inert", () => {
@@ -190,6 +230,35 @@ describe("thread navigation surfaces", () => {
     expect(screen.getByRole("tooltip").textContent).toContain("+1 more");
     fireEvent.click(first);
     expect(onNavigate).toHaveBeenCalledWith(items[0], "smooth");
+  });
+
+  it("locks message rail jumps and scrubbing while disabled", () => {
+    const onNavigate = vi.fn();
+    const items = Array.from({ length: 4 }, (_, index) => ({
+      id: `message-${index + 1}`,
+      label: `Message ${index + 1}`,
+    }));
+    render(
+      <ThreadMessageNavigationRail
+        disabled
+        items={items}
+        minItems={4}
+        onNavigate={onNavigate}
+      />,
+    );
+
+    const rail = screen.getByRole("navigation", { name: "User messages" });
+    expect(rail.getAttribute("aria-disabled")).toBe("true");
+    expect(rail.getAttribute("data-disabled")).toBe("true");
+    const first = screen.getByRole("button", {
+      name: "Jump to user message 1",
+    });
+    expect(first).toHaveProperty("disabled", true);
+    fireEvent.click(first);
+    fireEvent.pointerDown(first, { button: 0, pointerId: 4 });
+    fireEvent.pointerMove(first, { clientX: 8, clientY: 24, pointerId: 4 });
+    fireEvent.pointerUp(first, { pointerId: 4 });
+    expect(onNavigate).not.toHaveBeenCalled();
   });
 
   it("clamps edge previews inside the navigation overlay boundary", () => {
