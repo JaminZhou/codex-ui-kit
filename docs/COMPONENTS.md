@@ -99,11 +99,12 @@ failure/cancellation policy, pagination, and transcript streaming.
 - `CommandExecution`: expandable command surface with duration, copy,
   optional `Shell`/host-defined shell label, background-terminal, success,
   failure, and interruption states. Completed expanded summaries preserve the
-  command identity. `formatCommandDuration` exposes its standalone duration
-  formatter.
+  command identity. A disabled lock covers disclosure, command copy, and the
+  internal output surface. `formatCommandDuration` exposes the standalone
+  duration formatter.
 - `CommandOutput`: labeled stdout/stderr with no-output, 144px bounded
   reverse-tail following, overflow, fade, collapse/reopen restoration, and
-  copy behavior. The current failure/recovery acceptance preserves a mixed
+  copy behavior with an explicit disabled lock. The current failure/recovery acceptance preserves a mixed
   160-record transcript, `Exit code 7`, exact copy output, and a successful
   later turn without treating command failure as thread failure.
 - `FileChange`: one-file create, apply, stop, reject, delete, and rename activities with disclosure, statistics, path opening, and copy hooks. A disabled lock covers disclosure, file-open, and diff-copy actions.
