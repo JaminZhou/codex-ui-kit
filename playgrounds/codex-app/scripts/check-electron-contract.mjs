@@ -10539,6 +10539,7 @@ try {
         style: {
           backgroundColor: getComputedStyle(status).backgroundColor,
           borderRadius: getComputedStyle(status).borderRadius,
+          padding: getComputedStyle(status).padding,
         },
       },
       statusHeading: {

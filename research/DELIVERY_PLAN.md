@@ -2151,9 +2151,10 @@ without confusing package readiness with full product reconstruction.
     global notification reachability. The Live playground now routes real
     approval, user-input, and turn-completion events into the shared global
     notification region, deduplicates JSON-RPC request ids, removes resolved
-    request notices, caps outcomes at four, and supports dismissal; replay
-    shell notifications remain unchanged. This is current playground
-    reachability evidence, not installed-product parity or a complete
+    request notices, caps actionable outcomes at four, and supports dismissal;
+    successful turns remain represented by the conversation rather than a
+    persistent overlay; replay shell notifications remain unchanged. This is
+    current playground reachability evidence, not installed-product parity or a complete
     production notification matrix. Retry `error` events now show a
     deduplicated Reconnecting notice, final turn settlement removes transient
     recovery notices, and `thread/compacted` produces an informational

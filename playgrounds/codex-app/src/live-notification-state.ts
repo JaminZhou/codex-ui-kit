@@ -162,13 +162,5 @@ export function reduceLiveAppNotifications(
       tone: "warning",
     });
   }
-  if (status !== "completed" && status !== "complete") {
-    return [...settledNotifications];
-  }
-  return appendNotification(settledNotifications, {
-    description: "Your Codex response is ready.",
-    heading: "Response ready",
-    id: `live-turn:${threadId}:${turnId}:completed`,
-    tone: "success",
-  });
+  return [...settledNotifications];
 }
