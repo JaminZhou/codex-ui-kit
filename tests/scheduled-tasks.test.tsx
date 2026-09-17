@@ -150,6 +150,46 @@ describe("ScheduledTasks", () => {
     expect(onSuggestionAdd).toHaveBeenCalledWith(suggestions[0]);
   });
 
+  it("exposes page lifecycle status and locks controls while loading", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <ScheduledTasksPage
+        loadingLabel="Loading automation tasks…"
+        onRetry={onRetry}
+        query="brief"
+        status="loading"
+      />,
+    );
+    const page = screen
+      .getByRole("heading", { name: "Scheduled tasks" })
+      .closest("main");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Loading automation tasks…")).toBeTruthy();
+    expect(screen.getByPlaceholderText("Search scheduled tasks")).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("tab", { name: "Active" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <ScheduledTasksPage
+        onRetry={onRetry}
+        retryLabel="Try tasks again"
+        status="error"
+        statusDescription="Scheduled tasks are temporarily unavailable."
+        statusHeading="Task service unavailable"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Scheduled tasks are temporarily unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try tasks again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("filters without mutating source data and exposes the exact empty state", () => {
     render(
       <ScheduledTasksPage

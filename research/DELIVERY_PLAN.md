@@ -2124,7 +2124,9 @@ without confusing package readiness with full product reconstruction.
     ScheduledTaskDetail ready/error states now also have explicit wide/720
     light-theme Browser/CDP, Electron, and regional-pixel coverage; the light
     matrix is replay evidence and does not claim cloud persistence or mutation
-    reachability. The current manual editor and permission-error detail now
+    reachability. The Scheduled tasks index now also exposes host-controlled
+    page/navigator disabled locking for search, filters, row navigation, toggles,
+    and suggestion actions while preserving explicit retry. The current manual editor and permission-error detail now
     also have explicit light wide/720 and compact-error Browser/CDP, Electron,
     and regional-pixel coverage; controlled form mutation is covered while
     cloud persistence and execution remain host-owned. Plugin detail
