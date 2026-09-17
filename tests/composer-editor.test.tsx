@@ -1,8 +1,8 @@
 // @vitest-environment happy-dom
 
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createRef } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ComposerEditor, ComposerResourceMention } from "../src";
 
 afterEach(cleanup);
@@ -39,5 +39,22 @@ describe("ComposerEditor", () => {
     expect(editorRef.current?.contentEditable).toBe("true");
     editorRef.current?.focus();
     expect(document.activeElement).toBe(editorRef.current);
+  });
+
+  it("locks editing and host callbacks while disabled", () => {
+    const onInput = vi.fn();
+    const onKeyDown = vi.fn();
+    render(
+      <ComposerEditor disabled onInput={onInput} onKeyDown={onKeyDown} />,
+    );
+
+    const editor = screen.getByRole("textbox", { name: "Message composer" });
+    expect(editor.getAttribute("aria-disabled")).toBe("true");
+    expect(editor.getAttribute("data-disabled")).toBe("true");
+    expect(editor.getAttribute("contenteditable")).toBe("false");
+    fireEvent.input(editor);
+    fireEvent.keyDown(editor, { key: "Enter" });
+    expect(onInput).not.toHaveBeenCalled();
+    expect(onKeyDown).not.toHaveBeenCalled();
   });
 });
