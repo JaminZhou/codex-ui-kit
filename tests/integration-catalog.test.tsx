@@ -16,6 +16,42 @@ const installed: readonly IntegrationCatalogItem[] = [
 ];
 
 describe("IntegrationCatalog", () => {
+  it("exposes page lifecycle status and locks search while unavailable", () => {
+    const onRetry = vi.fn();
+    const { rerender } = render(
+      <IntegrationCatalogPage
+        kind="plugins"
+        loadingLabel="Loading integrations…"
+        onRetry={onRetry}
+        query="github"
+        status="loading"
+      />,
+    );
+    const page = screen.getByRole("heading", { name: "Plugins" }).closest("main");
+    expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(screen.getByText("Loading integrations…")).toBeTruthy();
+    expect(screen.getByPlaceholderText("Search plugins")).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <IntegrationCatalogPage
+        kind="plugins"
+        onRetry={onRetry}
+        retryLabel="Try catalog again"
+        status="error"
+        statusDescription="The catalog service is unavailable."
+        statusHeading="Catalog unavailable"
+      />,
+    );
+    expect(screen.getByRole("alert").textContent).toContain(
+      "The catalog service is unavailable.",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Try catalog again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
   it("renders the plugin catalog and delegates host-owned actions", () => {
     const onAction = vi.fn();
     const onManage = vi.fn();

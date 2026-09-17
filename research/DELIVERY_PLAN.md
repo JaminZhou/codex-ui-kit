@@ -1353,8 +1353,10 @@ The current Plugins/Skills index slice adds a shared controlled
 settings completion. An isolated `26.825.51511` Renderer
 records wide/720 navigation, 728px bounded search, Installed/Public/Personal
 plugin groups, Installed/Personal/System/Project/Recommended skill groups,
-two-column wrapping, and visible search/scope/action behavior. Browser/CDP and
-native Electron replay both routes and unavailable-to-retry recovery. Four
+two-column wrapping, and visible search/scope/action behavior. The catalog
+now also exposes host-controlled page busy/disabled locking while preserving
+explicit retry recovery. Browser/CDP and native Electron replay both routes
+and unavailable-to-retry recovery. Four
 reviewed wide/compact baselines are paired with optional local-only current
 product comparisons; their main-region differences range from 3.3067% to
 5.1784%, including host-owned third-party icon differences. The public
