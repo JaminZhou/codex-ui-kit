@@ -2280,6 +2280,14 @@ excluded, and no option is selected; the artifact remains structural CDP
 evidence only, so Browser/Electron and product-pixel statuses stay
 `partial_legacy`.
 
+The playground now carries a named `workspace-composer-current-26-911-resources`
+variant for this installed-build vocabulary. Its focused Electron contract
+checks all 19 titles/descriptions, the 736/688px responsive menu, a 726/310px
+scroll owner, Escape focus recovery, zero overflow, and 0% repeated-capture
+drift. It remains a deterministic replay of the structural observation; no
+host selection, upload, authorization, execution, or product-pixel approval
+is inferred.
+
 The playground carries a matching `26.908.70816` replay variant with the
 latest public catalog vocabulary (`GitHub`, 19 retained options). Its
 Browser/Electron acceptance path checks listbox semantics, 736/688px wide/

@@ -1161,7 +1161,8 @@ function initialComposerOverlay(frame: string | null): ComposerOverlay {
     frame === "composer-plugins-menu" ||
     frame === "workspace-composer-current-26-825-resources" ||
     frame === "workspace-composer-current-26-908-resources" ||
-    frame === "workspace-composer-current-26-908-70816-resources"
+    frame === "workspace-composer-current-26-908-70816-resources" ||
+    frame === "workspace-composer-current-26-911-resources"
   ) {
     return "resources";
   }
@@ -1804,6 +1805,12 @@ const currentComposerResourceGroups2690870816: readonly ComposerResourceGroup[] 
     ],
   },
 ];
+
+// 26.911 keeps the public resource vocabulary and row descriptions observed
+// by the installed CDP capture. Keep this as a named current-build variant so
+// the playground cannot silently substitute the older baseline in its route.
+const currentComposerResourceGroups2691161220 =
+  currentComposerResourceGroups2690870816;
 
 const composerResourceGroups: readonly ComposerResourceGroup[] = [
   {
@@ -3567,11 +3574,17 @@ const blankMcpEditorValue: McpServerEditorValue = {
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
-  const currentComposerControls2690870816Replay =
+  const currentComposerControls2691161220Replay =
     initialSelection.view === "workspace" &&
     initialSelection.frame?.startsWith(
-      "workspace-composer-current-26-908-70816-",
+      "workspace-composer-current-26-911-",
     );
+  const currentComposerControls2690870816Replay =
+    initialSelection.view === "workspace" &&
+    (initialSelection.frame?.startsWith(
+      "workspace-composer-current-26-908-70816-",
+    ) ||
+      currentComposerControls2691161220Replay);
   const currentComposerResourceMentionReplay =
     initialSelection.view === "workspace" &&
     initialSelection.frame ===
@@ -3583,12 +3596,16 @@ export function App() {
     ) ||
       initialSelection.frame?.startsWith(
         "workspace-composer-current-26-908-",
-      ));
+      ) ||
+      currentComposerControls2691161220Replay);
   const currentComposerControls26908Replay =
     initialSelection.view === "workspace" &&
     initialSelection.frame?.startsWith(
       "workspace-composer-current-26-908-",
     );
+  const currentComposerControlsCurrentCatalogReplay =
+    currentComposerControls26908Replay ||
+    currentComposerControls2691161220Replay;
   const currentComposerMultiline26825Replay =
     initialSelection.frame ===
       "workspace-composer-current-26-825-multiline-four" ||
@@ -9611,7 +9628,7 @@ export function App() {
         ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
-      : currentComposerControls26908Replay
+      : currentComposerControlsCurrentCatalogReplay
         ? currentComposerResourceMentionReplay
           ? "workspace-composer-current-26-908-70816-github-mentioned"
           : composerAttachments.length > 0
@@ -9619,10 +9636,14 @@ export function App() {
             ? "workspace-composer-current-26-908-70816-plugin-selected"
             : "workspace-composer-current-26-908-plugin-selected"
           : composerOverlay === "resources"
-            ? currentComposerControls2690870816Replay
+            ? currentComposerControls2691161220Replay
+              ? "workspace-composer-current-26-911-resources"
+              : currentComposerControls2690870816Replay
               ? "workspace-composer-current-26-908-70816-resources"
               : "workspace-composer-current-26-908-resources"
-            : currentComposerControls2690870816Replay
+            : currentComposerControls2691161220Replay
+              ? "workspace-composer-current-26-911-ready"
+              : currentComposerControls2690870816Replay
               ? "workspace-composer-current-26-908-70816-ready"
               : "workspace-composer-current-26-908-ready"
       : currentComposerControls26825Replay
@@ -10739,7 +10760,8 @@ export function App() {
       }
       ref={composerInputRef}
       submitDisabled={
-        currentComposerControls26908Replay && composerAttachments.length > 0
+        currentComposerControlsCurrentCatalogReplay &&
+        composerAttachments.length > 0
       }
       attachments={composerAttachmentNodes}
       suggestions={
@@ -10748,26 +10770,32 @@ export function App() {
           <ComposerResourcePicker
             activeId={composerResourceActiveId}
             className={
-              currentComposerControls26908Replay
+              currentComposerControlsCurrentCatalogReplay
                 ? "codex-ui-composer-resource-picker--current-26-908"
                 : "codex-ui-composer-resource-picker--current-26-825"
             }
             data-current-resource-catalog={
-              currentComposerControls26908Replay
+              currentComposerControlsCurrentCatalogReplay
                 ? currentComposerControls2690870816Replay
-                  ? "26.908.70816"
+                  ? currentComposerControls2691161220Replay
+                    ? "26.911.61220"
+                    : "26.908.70816"
                   : "26.908.40834"
                 : undefined
             }
             descriptionSeparator=""
             groups={
-              currentComposerControls26908Replay
+              currentComposerControlsCurrentCatalogReplay
                 ? currentComposerControls2690870816Replay
-                  ? currentComposerResourceGroups2690870816
+                  ? currentComposerControls2691161220Replay
+                    ? currentComposerResourceGroups2691161220
+                    : currentComposerResourceGroups2690870816
                   : currentComposerResourceGroups26908
                 : currentComposerResourceGroups
             }
-            heading={currentComposerControls26908Replay ? null : undefined}
+            heading={
+              currentComposerControlsCurrentCatalogReplay ? null : undefined
+            }
             onActiveIdChange={setComposerResourceActiveId}
             onDismiss={() => {
               setComposerOverlay(null);
@@ -10777,6 +10805,7 @@ export function App() {
               setComposerResourceActiveId(option.id);
               if (
                 currentComposerControls2690870816Replay &&
+                !currentComposerControls2691161220Replay &&
                 option.id === "github"
               ) {
                 setComposerAttachments(
@@ -17506,23 +17535,30 @@ export function App() {
       data-current-home={currentHomeFrame || undefined}
       data-current-context={currentContext26825Replay || undefined}
       data-current-context-26-825={
-        currentContext26825Replay && !currentComposerControls26908Replay
+        currentContext26825Replay && !currentComposerControlsCurrentCatalogReplay
           ? true
           : undefined
       }
       data-current-context-26-908={
         currentComposerControls26908Replay || undefined
       }
+      data-current-context-26-911={
+        currentComposerControls2691161220Replay || undefined
+      }
       data-current-composer-controls={
         currentComposerControls26825Replay || undefined
       }
       data-current-composer-controls-26-825={
-        currentComposerControls26825Replay && !currentComposerControls26908Replay
+        currentComposerControls26825Replay &&
+        !currentComposerControlsCurrentCatalogReplay
           ? true
           : undefined
       }
       data-current-composer-controls-26-908={
         currentComposerControls26908Replay || undefined
+      }
+      data-current-composer-controls-26-911={
+        currentComposerControls2691161220Replay || undefined
       }
       data-route-history-index={routeHistory.index}
       data-route-history-length={routeHistory.entries.length}
