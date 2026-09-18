@@ -1932,7 +1932,9 @@ selection and private settings ownership remain with the host.
 The Code review preferences surface now exposes host-configurable loading and
 error/retry copy and marks its page busy while preferences load; review
 trigger/credits mutations remain controlled callbacks and never start a review
-or alter account limits in the renderer.
+or alter account limits in the renderer. Its host-wide disabled boundary now
+also locks the trigger menu items and error retry while retaining the visible
+preference state.
 The Environment settings list now marks initial loading with `aria-busy`,
 supports host-configurable loading/retry copy, and exposes a controlled Retry
 callback for error and unavailable states while keeping registry/provisioning
