@@ -59,8 +59,8 @@ importers:
         specifier: 0.3.24
         version: 0.3.24
       puppeteer-core:
-        specifier: 25.10.0
-        version: 25.10.0(yauzl@2.10.0)
+        specifier: 25.11.0
+        version: 25.11.0(yauzl@2.10.0)
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -123,8 +123,8 @@ importers:
         specifier: 7.2.0
         version: 7.2.0
       playwright-core:
-        specifier: 1.62.1
-        version: 1.62.1
+        specifier: 1.63.0
+        version: 1.63.0
       pngjs:
         specifier: 7.0.0
         version: 7.0.0
@@ -1421,8 +1421,8 @@ packages:
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
-  devtools-protocol@0.0.1666840:
-    resolution: {integrity: sha512-gCcO42XCHKEs7Ag0S7aGYsnJ7hlgrO3qderYqeiY0Eqk+0GFfuvT13IA0hHreJTa2KCdDVyGMeOhdMNmrrTjVg==}
+  devtools-protocol@0.0.1680125:
+    resolution: {integrity: sha512-rVARKAvOFJCFkvgX01VLvYqKIvt+cRCqvUxIhB2oAqVGPalxk3w3sb5TUGDagpow/EFblBpm/Zl/29QA2dd+jA==}
 
   dom-accessibility-api@0.5.16:
     resolution: {integrity: sha512-X7BJ2yElsnOJ30pZF4uIIDfBEVgF4XEBxL9Bxhy6dnrm5hkzqmsWHGTiHqRiITNhMyFLyAiWndIJP7Z1NTteDg==}
@@ -1887,8 +1887,8 @@ packages:
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
-  modern-tar@0.8.4:
-    resolution: {integrity: sha512-gN54ddmyzEg10orwZ2u4OOv+bjpMWdIl5jIkodK97bMq8QBSL5c0D7YX0lT1Ooz+99S7+PvFbnxzdjgHo1r41g==}
+  modern-tar@0.8.5:
+    resolution: {integrity: sha512-snEhs+6G5Tjd4I7tLCDOaoln2RgE0bD19RzEKgvgK2hZ5VKy3MpLhLTZ2fWpXSTg4K2cyPwp+VHATFJhxfnOeA==}
     engines: {node: '>=18.0.0'}
 
   mri@1.2.0:
@@ -1962,8 +1962,8 @@ packages:
     resolution: {integrity: sha512-xhcb4yHu9sM/G7foGzoLtXYcC0zHEaOXXjRKhGup0fw78Nf2Tkiapv4EQyMzrbcmQPsllAI7DbFY2UT7PlI9Pg==}
     hasBin: true
 
-  playwright-core@1.62.1:
-    resolution: {integrity: sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==}
+  playwright-core@1.63.0:
+    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -1991,8 +1991,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  puppeteer-core@25.10.0:
-    resolution: {integrity: sha512-Hy5eMQshOEMil4JUUx03h5pw1HYkYCso1RG/gcpPlFSd4cYPOcopxcXEAxpLPOkOPJb9LIJtwxuj66bSdvknFg==}
+  puppeteer-core@25.11.0:
+    resolution: {integrity: sha512-Ujym7JbxoAqanaxGcHgmTomfhC01HfDCSuGZ8Hs9boHrDjzbNVMnFRJo2KtbDT9LCRgeJoFnkn9JQZ41eEUrLw==}
     engines: {node: '>=22.12.0'}
 
   react-dom@19.2.8:
@@ -2864,7 +2864,7 @@ snapshots:
 
   '@puppeteer/browsers@3.2.2(yauzl@2.10.0)':
     dependencies:
-      modern-tar: 0.8.4
+      modern-tar: 0.8.5
       yargs: 18.1.0
     optionalDependencies:
       yauzl: 2.10.0
@@ -3252,9 +3252,9 @@ snapshots:
 
   character-reference-invalid@2.0.1: {}
 
-  chromium-bidi@17.0.2(devtools-protocol@0.0.1666840):
+  chromium-bidi@17.0.2(devtools-protocol@0.0.1680125):
     dependencies:
-      devtools-protocol: 0.0.1666840
+      devtools-protocol: 0.0.1680125
       mitt: 3.0.1
       zod: 3.25.76
 
@@ -3321,7 +3321,7 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  devtools-protocol@0.0.1666840: {}
+  devtools-protocol@0.0.1680125: {}
 
   dom-accessibility-api@0.5.16: {}
 
@@ -4049,7 +4049,7 @@ snapshots:
 
   mitt@3.0.1: {}
 
-  modern-tar@0.8.4: {}
+  modern-tar@0.8.5: {}
 
   mri@1.2.0: {}
 
@@ -4117,7 +4117,7 @@ snapshots:
     dependencies:
       pngjs: 7.0.0
 
-  playwright-core@1.62.1: {}
+  playwright-core@1.63.0: {}
 
   pngjs@7.0.0: {}
 
@@ -4144,11 +4144,11 @@ snapshots:
       picocolors: 1.1.1
       sade: 1.8.1
 
-  puppeteer-core@25.10.0(yauzl@2.10.0):
+  puppeteer-core@25.11.0(yauzl@2.10.0):
     dependencies:
       '@puppeteer/browsers': 3.2.2(yauzl@2.10.0)
-      chromium-bidi: 17.0.2(devtools-protocol@0.0.1666840)
-      devtools-protocol: 0.0.1666840
+      chromium-bidi: 17.0.2(devtools-protocol@0.0.1680125)
+      devtools-protocol: 0.0.1680125
       typed-query-selector: 2.12.2
       webdriver-bidi-protocol: 0.4.3
       ws: 8.21.3
