@@ -11,12 +11,29 @@ assert.ok(scene, "The pull-request detail scene is required for Live mode.");
 const prompt =
   "Do not reply with a plan. Immediately invoke the spawnAgent collaboration tool exactly once to spawn one subagent. Ask it to read only this disposable workspace package.json, then wait for the parent to interrupt it; do not send a result before the parent asks. The first and only tool call must be the collaboration spawn. Do not use Sites, MCP, browser, GitHub, connectors, approvals, shell, network, file writes, or any other tools. Keep this turn active while the subagent is waiting.";
 
+async function readRateLimits() {
+  const client = new CodexAppServerClient({
+    capabilities: { experimentalApi: true },
+    protocolValidation: "strict",
+  });
+  try {
+    await client.connect();
+    const response = await client.call("account/rateLimits/read");
+    return response.rateLimitsByLimitId?.codex ?? response.rateLimits ?? null;
+  } catch (error) {
+    return { readError: String(error) };
+  } finally {
+    await client.close().catch(() => undefined);
+  }
+}
+
 async function runAttempt(attempt) {
   const directory = await realpath(
     await mkdtemp(join(tmpdir(), "ui-kit-live-subagent-recovery-")),
   );
   const registryPath = join(directory, "registry.json");
   const evidence = [];
+  const rateLimits = await readRateLimits();
   const { app, page } = await launchScene(scene, {
     capture: false,
     environment: {
@@ -33,6 +50,7 @@ async function runAttempt(attempt) {
     modelTurns: 1,
     passed: false,
     workspaceWrite: false,
+    rateLimits,
   };
   let threadId;
 
@@ -59,7 +77,7 @@ async function runAttempt(attempt) {
             event.params?.item?.type === "collabAgentToolCall",
         ),
       undefined,
-      { timeout: 180_000 },
+      { timeout: rateLimits?.credits?.hasCredits === false ? 30_000 : 180_000 },
     );
     const beforeStop = await page.evaluate(() => window.__liveSubagentEvidence);
     evidence.push(...beforeStop);
@@ -91,7 +109,7 @@ async function runAttempt(attempt) {
               Object.keys(event.params.item.agentsStates ?? {}).length > 0),
         ),
       callId,
-      { timeout: 120_000 },
+      { timeout: rateLimits?.credits?.hasCredits === false ? 30_000 : 120_000 },
     );
     const collabWithReceiver = await page.evaluate((expectedCallId) => {
       return window.__liveSubagentEvidence.findLast(
