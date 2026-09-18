@@ -110,4 +110,20 @@ describe("ThreadOverflowMenu", () => {
       screen.getByRole("menuitem", { name: /^Unpin\s+⌥⌘P$/ }),
     ).toBeTruthy();
   });
+
+  it("keeps host-disabled actions visible without invoking their callbacks", () => {
+    const onArchive = vi.fn();
+    renderMenu({
+      defaultOpen: true,
+      disabledActions: { archive: true },
+      onArchive,
+    });
+
+    const archive = screen.getByRole("menuitem", {
+      name: /^Archive\s+⇧⌘A$/,
+    });
+    expect(archive).toHaveProperty("disabled", true);
+    fireEvent.click(archive);
+    expect(onArchive).not.toHaveBeenCalled();
+  });
 });

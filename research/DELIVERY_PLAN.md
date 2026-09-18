@@ -1504,8 +1504,10 @@ and focus contracts, reviewed wide/720 baselines, and an unmasked tight-menu
 comparison under a dedicated 9.5% native-vs-Renderer budget. The trigger and
 menu now also have explicit wide/720 light-theme Browser/CDP, Electron, and
 regional-pixel coverage. Submenu contents, real effects, disabled variants,
-and keyboard-only native opening remain open; `thread.overflow-actions` is
-therefore still `partial` rather than complete.
+and keyboard-only native opening remain open. The public component now exposes
+host-controlled disabled actions for the root mutations without changing the
+initial geometry; native menu disabled styling and the real effects remain open,
+so `thread.overflow-actions` is still `partial` rather than complete.
 
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
