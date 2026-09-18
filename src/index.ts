@@ -46,6 +46,7 @@ export * from "./components/ThreadNavigation.js";
 export * from "./components/ThreadState.js";
 export * from "./components/ThreadSummaryPanel.js";
 export * from "./components/ThreadOverflowMenu.js";
+export * from "./components/SidebarHelpMenu.js";
 export * from "./components/AppShell.js";
 export * from "./components/AppWindowChrome.js";
 export * from "./components/AppRouteOutlet.js";

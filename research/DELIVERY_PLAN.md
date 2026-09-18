@@ -919,6 +919,14 @@ slot. It is split into:
 - `app.sidebar-help-menu`: current release-note grouping, support/setup actions,
   geometry, dismissal, and focus return.
 
+The public `SidebarHelpMenu` now exposes that observed release grouping and the
+five host-owned support/setup intents as a controlled package component. It
+keeps release dates, icons, disabled entries, trigger state, and Escape/focus
+behavior in the shared menu primitives; navigation, external links, and
+release effects remain host-owned. The current playground route remains the
+runtime evidence source for this row, so the new component does not promote
+unobserved installed-product content.
+
 Previous-build progress: 26.818 thread history, hover actions, ordinary
 active/completed/unread/waiting/error presentation, worktree-specific
 create/failure/Retry status, and empty/loading/long-list collection states were
