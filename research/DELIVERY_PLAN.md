@@ -1920,7 +1920,9 @@ actions until the host finishes. Hook discovery and execution remain host-owned.
 The Personalization settings surface now models saving/saved/error feedback,
 custom retry copy, and a busy contract that locks custom instructions, Memory,
 and Personality controls while the host persists changes. Local-memory storage,
-profile services, and persistence semantics remain outside the renderer.
+profile services, and persistence semantics remain outside the renderer. Its
+host-wide disabled boundary now also locks save/delete/menu/retry and external
+help actions while preserving the current values.
 The Git settings surface now follows the same persistence boundary for branch,
 merge/review preferences, and commit/PR instructions: saving is announced with
 `aria-busy`, mutable controls are locked, and error recovery can use host-owned

@@ -1629,4 +1629,64 @@ describe("settings surfaces", () => {
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(onRetry).toHaveBeenCalledOnce();
   });
+
+  it("locks Personalization actions and retry when the host disables it", () => {
+    const onDeleteLocalMemories = vi.fn();
+    const onRetry = vi.fn();
+    const onSaveCustomInstructions = vi.fn();
+    const { rerender } = render(
+      <PersonalizationSettingsPage
+        customInstructionsDirty
+        disabled
+        learnMoreHref="https://help.openai.com/"
+        onChange={() => undefined}
+        onDeleteLocalMemories={onDeleteLocalMemories}
+        onRetry={onRetry}
+        onSaveCustomInstructions={onSaveCustomInstructions}
+        value={initialPersonalizationValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { name: "Personalization" })
+      .closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.queryByRole("link", { name: "Learn more" })).toBeNull();
+    expect(screen.getByRole("textbox", { name: "Custom instructions" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("switch", { name: "Enable local memories" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    const deleteButton = screen.getByRole("button", { name: "Delete" });
+    expect(deleteButton).toHaveProperty("disabled", true);
+    expect(screen.getByRole("button", { name: "Personality" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    fireEvent.click(deleteButton);
+    expect(onDeleteLocalMemories).not.toHaveBeenCalled();
+
+    rerender(
+      <PersonalizationSettingsPage
+        disabled
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Load again"
+        status="error"
+        value={initialPersonalizationValue}
+      />,
+    );
+    const retry = screen.getByRole("button", { name: "Load again" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
+  });
 });

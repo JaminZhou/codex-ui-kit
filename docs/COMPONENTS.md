@@ -523,7 +523,9 @@ kit never performs filesystem, network, account, or process mutations.
 - `PersonalizationSettingsPage`: controlled custom instructions, Memory
   controls, warning, and Personality choice with save/reset callbacks. Save
   lifecycle feedback, retry copy, and busy-state locking are host-controlled;
-  it does not access account memory or profile services.
+  a host-wide disabled state also locks the fields, actions, menu, and retry
+  without changing their values. It does not access account memory or profile
+  services.
 - `VoiceSettingsPage`: controlled microphone, voice, screen-context,
   dictionary, and recording states with host callbacks. Loading, saving,
   saved, and error feedback, retry copy, and busy-state locking are
