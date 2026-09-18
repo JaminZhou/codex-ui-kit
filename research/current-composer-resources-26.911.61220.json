@@ -1,0 +1,128 @@
+{
+  "baseline": {
+    "appVersion": "26.911.61220",
+    "buildNumber": "9647",
+    "chromiumVersion": "153.0.8010.36",
+    "appAsarBytes": 342674749,
+    "appAsarSha256": "f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f",
+    "observedOn": "2026-09-18"
+  },
+  "inventoryClassification": "scoped current-build observation; it does not replace the full 26.903.71938 package fingerprint baseline",
+  "capture": {
+    "method": "one temporary isolated loopback CDP process on port 9974",
+    "page": "app://-/index.html",
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 820,
+      "width": 1180
+    },
+    "scope": "read-only DOM and computed-layout observation after opening the New chat Add files and more menu",
+    "cleanup": "listener, renderer children, temporary profile, and capture log were closed or moved to the macOS Trash before implementation",
+    "safetyBoundary": "Only an allowlisted public title and description set was retained; the account-dependent Chrome row, recent conversation rows, and no resource/plugin item were selected. No prompt, upload, authorization, or execution was performed."
+  },
+  "observed": {
+    "composer": {
+      "addTrigger": {
+        "label": "Add files and more",
+        "ariaExpanded": "true",
+        "dataState": "open",
+        "rect": {
+          "height": 28,
+          "left": 391.4375,
+          "top": 768,
+          "width": 28
+        }
+      },
+      "editor": {
+        "contentEditable": true,
+        "rect": {
+          "height": 44,
+          "left": 395.4375,
+          "top": 720,
+          "width": 712
+        },
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px",
+        "color": "rgb(255, 255, 255)"
+      }
+    },
+    "menu": {
+      "rect": {
+        "height": 320,
+        "left": 383.4375,
+        "top": 382,
+        "width": 736
+      },
+      "scrollOwner": {
+        "clientHeight": 310,
+        "scrollHeight": 1065,
+        "rect": {
+          "height": 310,
+          "left": 388.4375,
+          "top": 387,
+          "width": 726
+        },
+        "scrollTop": 0
+      },
+      "itemHeight": 28.5625,
+      "visibleItemCount": 30,
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "backgroundColor": "rgb(45, 45, 45)",
+      "borderRadius": "20px",
+      "publicItems": [
+        "Files and folders",
+        "Work in a project",
+        "Goal",
+        "Plan mode",
+        "Record a skill",
+        "Sketch",
+        "GitHub",
+        "Documents",
+        "PDF",
+        "Spreadsheets",
+        "Presentations",
+        "Template Creator",
+        "Browser",
+        "Computer",
+        "Visualize",
+        "Watch PR",
+        "AppKit Inspector",
+        "Plugin Management",
+        "Sites"
+      ],
+      "publicItemDetails": [
+        { "title": "Files and folders", "description": null },
+        { "title": "Work in a project", "description": "Choose project for new chats" },
+        { "title": "Goal", "description": "Set a goal to keep pursuing" },
+        { "title": "Plan mode", "description": "Turn plan mode on" },
+        { "title": "Record a skill", "description": null },
+        { "title": "Sketch", "description": "Draw a sketch" },
+        { "title": "GitHub", "description": "Triage PRs, issues, CI, and publish flows" },
+        { "title": "Documents", "description": "Create and edit documents" },
+        { "title": "PDF", "description": "Read, create, and verify PDFs" },
+        { "title": "Spreadsheets", "description": "Create and edit spreadsheets" },
+        { "title": "Presentations", "description": "Create and edit presentations" },
+        { "title": "Template Creator", "description": "Create or update reusable templates from reference content" },
+        { "title": "Browser", "description": "Control the in-app browser" },
+        { "title": "Computer", "description": "Control Mac apps from ChatGPT" },
+        { "title": "Visualize", "description": "Create interactive visuals" },
+        { "title": "Watch PR", "description": "Drive GitHub bot review rounds to a clean pass." },
+        { "title": "AppKit Inspector", "description": "Inspect native macOS views in Codex Browser." },
+        { "title": "Plugin Management", "description": "Discover and manage plugins" },
+        { "title": "Sites", "description": "Build and deploy websites" }
+      ],
+      "horizontalOverflow": 0
+    }
+  },
+  "excluded": [
+    "Attach Google Chrome and other account-, tab-, or app-context rows",
+    "Recent conversation rows shown after the public catalog",
+    "Plugin discovery, installation, OAuth, permissions, and execution",
+    "Selection result, Composer attachment/pill, upload, or provider-error lifecycle",
+    "Product-region screenshots and Browser/Electron pixel promotion"
+  ]
+}

@@ -32,6 +32,8 @@ const expectedProfile = process.env.CODEX_CURRENT_BASELINE_PROFILE;
 const outputPath = process.env.CODEX_CURRENT_BASELINE_OUTPUT;
 const allowNavigation =
   process.env.CODEX_CURRENT_BASELINE_ALLOW_NAVIGATION === "1";
+const captureComposerResources =
+  process.env.CODEX_CURRENT_BASELINE_CAPTURE_COMPOSER_RESOURCES === "1";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -659,6 +661,168 @@ try {
         visibleMenuCount: menus.length,
       };
     });
+  const inspectComposerResourceMenu = async () => {
+    await setViewport(currentBaselineViewports.wide);
+    await showSidebar();
+    if ((await readMemoryRouterPath()) !== "/") {
+      await newChat().click();
+      await waitForNewChat();
+    }
+    const trigger = page
+      .locator('[aria-label="Add files and more"]:visible')
+      .first();
+    if ((await trigger.count()) !== 1) {
+      throw new Error("The current Composer resource trigger was unavailable.");
+    }
+    await trigger.click();
+    await page.waitForSelector(
+      '[data-composer-overlay-floating-ui="true"] .composer-home-top-menu:visible',
+      { timeout: 15_000 },
+    );
+    await page.waitForTimeout(100);
+    const observation = await page.evaluate(() => {
+      const visible = (element) =>
+        element instanceof Element &&
+        element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+        });
+      const round = (value) => Math.round(value * 10000) / 10000;
+      const rect = (element) => {
+        if (!(element instanceof Element)) return null;
+        const bounds = element.getBoundingClientRect();
+        return {
+          height: round(bounds.height),
+          left: round(bounds.left),
+          top: round(bounds.top),
+          width: round(bounds.width),
+        };
+      };
+      const menus = [
+        ...document.querySelectorAll(
+          '[data-composer-overlay-floating-ui="true"] .composer-home-top-menu',
+        ),
+      ].filter(visible);
+      const menu = menus[0];
+      const scrollOwner = menu
+        ? [...menu.querySelectorAll("*")].find(
+            (element) =>
+              visible(element) &&
+              ["auto", "scroll"].includes(getComputedStyle(element).overflowY) &&
+              element.scrollHeight > element.clientHeight,
+          )
+        : null;
+      const editor = [
+        ...document.querySelectorAll(
+          'textarea, [contenteditable="true"], [role="textbox"]',
+        ),
+      ].find(visible);
+      const editorStyle = editor ? getComputedStyle(editor) : null;
+      const trigger = [...document.querySelectorAll('[aria-label="Add files and more"]')].find(visible);
+      const publicPattern = /^(Files and folders|Work in a project|Goal|Plan mode|Record a skill|Sketch|GitHub|Documents|PDF|Spreadsheets|Presentations|Template Creator|Browser|Computer|Visualize|Watch PR|AppKit Inspector|Plugin Management|Sites)(?:\s+—.*)?$/;
+      const items = [
+        ...(menu?.querySelectorAll('button[data-list-navigation-item="true"]') ?? []),
+      ]
+        .filter(visible)
+        .map((item) => {
+          const title =
+            item.querySelector("span.min-w-0.truncate.shrink-0") ??
+            item.querySelector("span.flex-1.min-w-0.truncate");
+          const description = item.querySelector("span.text-codex-description");
+          return {
+            description: description?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+            label: item.textContent?.replace(/\s+/g, " ").trim() ?? "",
+            rect: rect(item),
+            title: title?.textContent?.replace(/\s+/g, " ").trim() ?? "",
+          };
+        });
+      return {
+        editor: editor
+          ? {
+              contentEditable: editor.getAttribute("contenteditable") === "true",
+              rect: rect(editor),
+              style: {
+                color: editorStyle?.color ?? null,
+                fontFamily: editorStyle?.fontFamily ?? null,
+                fontSize: editorStyle?.fontSize ?? null,
+                fontWeight: editorStyle?.fontWeight ?? null,
+                lineHeight: editorStyle?.lineHeight ?? null,
+              },
+            }
+          : null,
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        menu: menu
+          ? {
+              backgroundColor: getComputedStyle(menu).backgroundColor,
+              borderRadius: getComputedStyle(menu).borderRadius,
+              fontFamily: getComputedStyle(menu).fontFamily,
+              fontSize: getComputedStyle(menu).fontSize,
+              fontWeight: getComputedStyle(menu).fontWeight,
+              itemHeight: items[0]?.rect?.height ?? null,
+              publicItems: items
+                .filter((item) => publicPattern.test(item.title))
+                .map((item) => item.title),
+              publicItemDetails: items
+                .filter((item) => publicPattern.test(item.title))
+                .map(({ description, rect: itemRect, title }) => ({
+                  description,
+                  rect: itemRect,
+                  title,
+                })),
+              rect: rect(menu),
+              scrollOwner: scrollOwner
+                ? {
+                    clientHeight: scrollOwner.clientHeight,
+                    rect: rect(scrollOwner),
+                    scrollHeight: scrollOwner.scrollHeight,
+                    scrollTop: scrollOwner.scrollTop,
+                  }
+                : null,
+              visibleItemCount: items.length,
+            }
+          : null,
+        trigger: trigger
+          ? {
+              ariaExpanded: trigger.getAttribute("aria-expanded"),
+              dataState: trigger.getAttribute("data-state"),
+              rect: rect(trigger),
+            }
+          : null,
+        viewport: { devicePixelRatio, height: innerHeight, width: innerWidth },
+      };
+    });
+    if (
+      observation.trigger?.ariaExpanded !== "true" ||
+      !observation.menu?.rect ||
+      !observation.menu.scrollOwner ||
+      observation.menu.publicItems.length === 0 ||
+      observation.horizontalOverflow !== 0
+    ) {
+      throw new Error(
+        `The current Composer resource menu contract was incomplete: ${JSON.stringify(observation)}`,
+      );
+    }
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(
+      () =>
+        [
+          ...document.querySelectorAll(
+            '[data-composer-overlay-floating-ui="true"] .composer-home-top-menu',
+          ),
+        ].every(
+          (element) =>
+            !element.checkVisibility({
+              checkOpacity: true,
+              checkVisibilityCSS: true,
+            }),
+        ),
+      undefined,
+      { timeout: 5_000 },
+    );
+    return observation;
+  };
   const inspectNativeProjectMenu = (trigger) =>
     trigger.evaluate((element) => {
       const round = (value) => Math.round(value * 100) / 100;
@@ -1405,11 +1569,17 @@ try {
 
   const projectsIndexObservation =
     await captureProjectsIndexObservation();
+  const composerResourceObservation = captureComposerResources
+    ? await inspectComposerResourceMenu()
+    : null;
   await hideSidebar();
   const afterCaptureBundle = readAppAsarSnapshot();
   const record = {
     baseline,
     captureKind: "renderer_emulation",
+    ...(composerResourceObservation
+      ? { composerResourceObservation }
+      : {}),
     runtimeBundleIdentity: {
       afterCapture: afterCaptureBundle,
       beforeCapture: beforeCaptureBundle,

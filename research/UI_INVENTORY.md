@@ -100,6 +100,14 @@ host-owned and are intentionally not claimed by the playground.
   remains separate from the promoted `26.903.71938` baseline until those
   families receive current-build Browser/CDP, Electron, and regional-pixel
   refreshes.
+- The same isolated `26.911.61220` build now has a separate read-only Composer
+  resource observation in
+  [`current-composer-resources-26.911.61220.json`](current-composer-resources-26.911.61220.json).
+  It records the unified `Add files and more` menu at `736×320px`, its
+  `726×310px` scroll owner, `28.5625px` rows, and 19 sanitized public resource
+  and skill titles. Account-, tab-, and history-specific rows are excluded;
+  no selection, upload, authorization, execution, or product-pixel promotion
+  is inferred.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
@@ -2261,6 +2269,16 @@ pixel promotion is inferred. The evidence is stored in
 `research/current-composer-resources-26.908.70816.json` and remains a scoped
 current-build observation while `composer.resources` and `composer.plugins`
 stay partial.
+
+The newer **26.911.61220 (9647)** observation keeps the same public resource
+catalog boundary on the installed build. At `1180×820`, the unified menu is
+`736×320px` with a `726×310px` scroll owner, `1065px` scroll height, and
+`28.5625px` rows. It retains 19 public titles from Files and folders through
+Sites, with current descriptions for project, goal, plan, and skill/plugin
+entries. The account-dependent Chrome row and recent conversation rows are
+excluded, and no option is selected; the artifact remains structural CDP
+evidence only, so Browser/Electron and product-pixel statuses stay
+`partial_legacy`.
 
 The playground carries a matching `26.908.70816` replay variant with the
 latest public catalog vocabulary (`GitHub`, 19 retained options). Its
