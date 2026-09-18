@@ -2305,6 +2305,15 @@ action reachability, Add-menu open/selection/focus recovery, and zero
 repeated-capture drift. It is replay evidence for the observed structure only;
 it is not a product-pixel approval or a claim of plugin authorization/execution.
 
+The 26.911.61220 catalog now has a matching named
+`workspace-composer-current-26-911-github-mentioned` replay. It keeps the
+public `GitHub` resource as a non-editable inline mention, uses the 26.911
+catalog marker, and repeats the wide/compact Add-menu open → dismiss → focus
+return lifecycle. The focused Electron contract records zero overflow and
+0% repeated-capture drift at 1180px/720px. This is controlled replay evidence
+for the observed public structure; it does not claim installed-plugin
+authorization, network execution, or product-pixel promotion.
+
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
 current-build Browser/CDP, native Electron, and regional-pixel contracts now
