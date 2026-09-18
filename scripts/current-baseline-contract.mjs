@@ -43,6 +43,17 @@ export const currentLatestCandidateBaselineFingerprint = Object.freeze({
   chromiumVersion: "152.0.7977.83",
 });
 
+// Keep the newest installed build isolated until its affected shell/sidebar
+// families are re-observed and the candidate record has been reviewed.
+export const currentNewestCandidateBaselineFingerprint = Object.freeze({
+  appAsarBytes: 342_674_749,
+  appAsarSha256:
+    "f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f",
+  appVersion: "26.911.61220",
+  buildNumber: "9647",
+  chromiumVersion: "153.0.8010.36",
+});
+
 const primaryRoutes = Object.freeze([
   "New chat",
   "Plugins",

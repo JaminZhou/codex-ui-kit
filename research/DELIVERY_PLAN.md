@@ -17,6 +17,15 @@ exit gates; it does not replace the inventory.
   `26.901.51231` note is superseded. Existing surface evidence remains tied to
   its recorded build until each affected surface is re-observed; old fixtures
   remain regression evidence rather than current-product proof.
+- The installed app now reports `26.911.61220` (`9647`), Chromium
+  `153.0.8010.36`, and ASAR SHA-256
+  `f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f`.
+  A fresh isolated shell/sidebar capture is recorded in
+  [`current-baseline-26.911.61220.json`](current-baseline-26.911.61220.json)
+  and [`26.911.61220.md`](26.911.61220.md). It is a candidate-only refresh;
+  the promoted global baseline remains `26.903.71938` until the affected
+  surface families receive their own current-build Browser/CDP, Electron, and
+  regional-pixel evidence.
 - The installed app now reports `26.908.70816` (`9275`), Chromium
   `152.0.7977.83`, and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
