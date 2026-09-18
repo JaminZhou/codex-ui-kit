@@ -2389,11 +2389,13 @@
         "playground:workspace-mcp-settings-current-26-825-light-wide-compact",
         "browser-cdp:workspace-mcp-settings-current-26-825-light-wide-compact",
         "electron:workspace-mcp-settings-current-26-825-light-wide-compact",
-        "pixel:workspace-mcp-settings-current-26-825-light-wide-compact"
+        "pixel:workspace-mcp-settings-current-26-825-light-wide-compact",
+        "capture:current-mcp-settings-26.911-read-only"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.825.51511:plugins-mcps-manager-wide-compact-empty-add-stdio-http-detail"
+        "cdp-26.825.51511:plugins-mcps-manager-wide-compact-empty-add-stdio-http-detail",
+        "cdp-26.911.61220:plugins-mcps-manager-wide-compact-create-update-read-only"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

@@ -5,6 +5,7 @@ import { basename, dirname, resolve } from "node:path";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
   currentBaselineFingerprint,
+  currentNewestCandidateBaselineFingerprint,
   currentBaselineViewports,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
@@ -18,6 +19,10 @@ const requestedOutputDirectory =
   process.env.CODEX_CURRENT_MCP_SETTINGS_OUTPUT_DIR;
 const allowCapture =
   process.env.CODEX_CURRENT_MCP_SETTINGS_ALLOW_CAPTURE === "1";
+const expectedFingerprint =
+  process.env.CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT === "26.911.61220"
+    ? currentNewestCandidateBaselineFingerprint
+    : currentBaselineFingerprint;
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -84,12 +89,12 @@ const readInstalledFingerprint = async () => {
 };
 const fingerprint = await readInstalledFingerprint();
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match the requested baseline: ${JSON.stringify(fingerprint)}`,
   );
 }
 

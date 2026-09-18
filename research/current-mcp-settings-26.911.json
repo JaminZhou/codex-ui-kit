@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-18T05:45:00.319Z",
+  "baseline": {
+    "appAsarBytes": 342674749,
+    "appAsarSha256": "f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f",
+    "appVersion": "26.911.61220",
+    "buildNumber": "9647",
+    "chromiumVersion": "153.0.8010.36",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "profileKind": "unique-private-tmp-profile",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "navigation-and-read-only-form-inspection"
+  },
+  "route": {
+    "settingsItem": "Plugins",
+    "title": "Plugins",
+    "description": "Manage plugins, skills, and MCPs",
+    "tabs": [
+      { "label": "Plugins", "count": 13, "width": 82.65625 },
+      { "label": "Apps", "count": 6, "width": 63.625 },
+      { "label": "MCPs", "count": 4, "width": 67.78125 },
+      { "label": "Skills", "count": 2, "width": 63.65625 },
+      { "label": "Marketplace", "count": 2, "width": 107.03125 }
+    ],
+    "actions": ["Browse directory", "Add"],
+    "addMenu": [
+      "Create plugin",
+      "Add a marketplace",
+      "Add MCP server",
+      "Record a skill"
+    ]
+  },
+  "list": {
+    "serverRows": 4,
+    "fromPluginRows": 2,
+    "serverToggleStates": [false, true, true, true],
+    "settingsButtonCount": 4,
+    "wide": {
+      "viewport": { "width": 1180, "height": 820 },
+      "root": { "left": 366.9375, "top": 46, "width": 768 },
+      "tabsTop": 155.796875,
+      "search": {
+        "left": 910.9375,
+        "top": 153.796875,
+        "width": 224,
+        "height": 32
+      },
+      "cards": [
+        { "top": 271.796875, "width": 768, "height": 210 },
+        { "top": 547.796875, "width": 768, "height": 87.125 }
+      ]
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "root": { "left": 341.875, "top": 46, "width": 358.125 },
+      "tabsTop": 197.796875,
+      "searchMounted": false,
+      "cards": [
+        { "top": 311.796875, "width": 358.125, "height": 210 },
+        { "top": 587.796875, "width": 358.125, "height": 87.125 }
+      ]
+    },
+    "serverRowHeight": 52,
+    "fromPluginRowHeight": 42.5625,
+    "emptyMessage": "No MCP servers found"
+  },
+  "editor": {
+    "create": {
+      "title": "Connect to a custom MCP",
+      "wide": { "stdioHeight": 539, "httpHeight": 414 },
+      "compact": { "httpHeight": 414 },
+      "stdioFields": [
+        "MCP server name",
+        "openai-dev-mcp serve-sqlite",
+        "Key",
+        "Value",
+        "~/code"
+      ],
+      "httpFields": [
+        "MCP server name",
+        "https://mcp.example.com/mcp",
+        "MCP_BEARER_TOKEN",
+        "Key",
+        "Value"
+      ],
+      "docsVisible": true,
+      "saveInitiallyDisabled": true
+    },
+    "update": {
+      "titlePattern": "Update <server> MCP",
+      "uninstallVisible": true,
+      "form": { "left": 366.9375, "top": 321.796875, "width": 768, "height": 472.5625 },
+      "fields": [
+        "URL",
+        "Bearer token env var",
+        "Headers",
+        "Headers from environment variables"
+      ],
+      "saveInitiallyDisabled": true
+    }
+  },
+  "remainingBoundary": [
+    "real create and save",
+    "enable and disable persistence",
+    "uninstall",
+    "OAuth and permission prompts",
+    "transport and validation failures",
+    "installed-product pixel promotion"
+  ]
+}
