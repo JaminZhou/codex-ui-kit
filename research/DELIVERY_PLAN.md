@@ -1453,8 +1453,8 @@ regional comparisons below an 8% ceiling. Product artwork, hero artwork, and
 suggestion-brand icons stay host-supplied. Clipboard/navigation, real install
 or uninstall, connection persistence, OAuth/permissions, external links, and
 failure effects stay open. The detail now exposes host-controlled disabled
-locking for navigation, suggestions, app rows, and primary actions. The
-The installed detail now also has explicit wide/720
+locking for navigation, suggestions, app rows, and primary actions. The installed
+detail now also has explicit wide/720
 light-theme Browser/CDP, Electron, and regional-pixel coverage; it remains a
 read-only visual contract and does not promote install, uninstall, or OAuth
 side effects. The own-playground route now adds a replay-owned install/
@@ -1484,7 +1484,9 @@ host-owned.
 The current thread-overflow slice closes the former unsampled P1 root menu.
 `ThreadOverflowMenu` exposes the observed ten actions, three separators, four
 shortcuts, and host-supplied Copy/Fork/Open-in submenus without performing any
-thread mutation. The product uses a native macOS menu, so the acceptance stack
+thread mutation. The replay route now carries controlled pin state and records
+the selected action for CDP/Electron assertions while keeping real thread
+effects host-owned. The product uses a native macOS menu, so the acceptance stack
 combines exact CDP trigger/computed-style evidence, Browser/Electron keyboard
 and focus contracts, reviewed wide/720 baselines, and an unmasked tight-menu
 comparison under a dedicated 9.5% native-vs-Renderer budget. The trigger and

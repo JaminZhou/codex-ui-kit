@@ -3724,6 +3724,7 @@ export function App() {
   const [threadOverflowOpen, setThreadOverflowOpen] = useState(
     initialSelection.frame === "thread-overflow-current-26-825-open",
   );
+  const [threadOverflowPinned, setThreadOverflowPinned] = useState(false);
   const [threadOverflowAction, setThreadOverflowAction] = useState("");
   const [scheduledFilter, setScheduledFilter] =
     useState<ScheduledTaskFilter>(
@@ -8426,6 +8427,7 @@ export function App() {
           <span
             className="demo-current-thread-overflow-anchor"
             data-thread-overflow-action={threadOverflowAction || undefined}
+            data-thread-overflow-pinned={threadOverflowPinned ? "true" : "false"}
           >
             <ThreadOverflowMenu
               copySubmenu={
@@ -8478,9 +8480,10 @@ export function App() {
               onOpenInNewWindow={() =>
                 setThreadOverflowAction("open-in-new-window")
               }
-              onPinChange={(pinned) =>
-                setThreadOverflowAction(pinned ? "pin" : "unpin")
-              }
+              onPinChange={(pinned) => {
+                setThreadOverflowPinned(pinned);
+                setThreadOverflowAction(pinned ? "pin" : "unpin");
+              }}
               onRename={() => setThreadOverflowAction("rename")}
               onShare={() => setThreadOverflowAction("share")}
               open={threadOverflowOpen}
@@ -8498,6 +8501,7 @@ export function App() {
                   </ThreadOverflowMenuOption>
                 </>
               }
+              pinned={threadOverflowPinned}
             />
           </span>
         ) : usesCurrent26825ThreadHeader ||
