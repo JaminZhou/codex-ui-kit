@@ -28,6 +28,12 @@ exit gates; it does not replace the inventory.
   regional-pixel evidence. The capture also records the 26.911 New chat
   Composer anchor (`712×44px`, 14px/20px/430), but not Composer lifecycle or
   product-pixel promotion.
+- The same isolated 26.911 capture now records the Composer resource boundary
+  in [`current-composer-resources-26.911.61220.json`](current-composer-resources-26.911.61220.json):
+  a `736×320px` unified Add menu, `726×310px` scroll owner, `28.5625px`
+  rows, and 19 sanitized public resource/skill titles. This is current-build
+  structural CDP evidence only; selection, upload, authorization, execution,
+  Browser/Electron, and product-pixel promotion remain open.
 - The installed app now reports `26.908.70816` (`9275`), Chromium
   `152.0.7977.83`, and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
@@ -1606,6 +1612,14 @@ Escape/focus recovery, a selected GitHub card, and 0% own-fixture drift at
 1180px/720px. The installed product observation remains computed-layout only;
 selection, upload, authorization, execution, and product-pixel promotion stay
 host-owned boundaries.
+
+The newer 26.911.61220 capture repeats that boundary on the installed build:
+the unified menu remains `736×320px` with a `726×310px` scroller and
+`28.5625px` rows, while the public catalog is normalized to 19 titles with
+current descriptions. Chrome/tab/history rows are excluded. This refresh
+improves current-build resource evidence but does not promote
+`composer.resources` or `composer.plugins` beyond partial verification and
+does not replace the promoted 26.903 package baseline.
 
 The follow-up also models the current-build GitHub selection as an inline
 editor mention, based on the isolated CDP observation that showed no attachment
