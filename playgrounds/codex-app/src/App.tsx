@@ -153,6 +153,7 @@ import {
   type GeneralSettingsValue,
   type GitSettingsValue,
   type HookSettingsEntry,
+  type IntegrationCatalogActionStatus,
   type IntegrationCatalogItem,
   type IntegrationCatalogSection,
   type IntegrationCatalogStatus,
@@ -3294,6 +3295,11 @@ const currentSkillSectionsByScope: Record<string, readonly IntegrationCatalogSec
   ],
 };
 
+type IntegrationCatalogItemLifecycle = {
+  installed: boolean;
+  status: IntegrationCatalogActionStatus;
+};
+
 const currentWorktreeSetupFailureLog = `[info] Starting worktree creation
 Preparing worktree (detached HEAD COMMIT)
 fatal: could not create leading directories of '.git/worktrees/PROJECT': Not a directory
@@ -3674,6 +3680,17 @@ export function App() {
     );
   const [integrationCatalogAction, setIntegrationCatalogAction] =
     useState("");
+  const [integrationCatalogItemLifecycles, setIntegrationCatalogItemLifecycles] =
+    useState<Record<string, IntegrationCatalogItemLifecycle>>({});
+  const integrationCatalogMutationTimerRef = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (integrationCatalogMutationTimerRef.current !== null) {
+        window.clearTimeout(integrationCatalogMutationTimerRef.current);
+      }
+    },
+    [],
+  );
   const isCurrentPluginDetailReplay =
     initialSelection.view === "plugins" &&
     initialSelection.frame?.startsWith(
@@ -13020,6 +13037,82 @@ export function App() {
     integrationCatalogKind === "plugins"
       ? pluginCatalogScope
       : skillCatalogScope;
+  const integrationCatalogSourceSections =
+    integrationCatalogKind === "plugins"
+      ? pluginCatalogScope === "public"
+        ? currentPluginSections
+        : currentPersonalPluginSections
+      : currentSkillSectionsByScope[skillCatalogScope] ?? [];
+  const integrationCatalogView = useMemo(() => {
+    const lifecycleFor = (item: IntegrationCatalogItem) =>
+      integrationCatalogItemLifecycles[item.id];
+    const decorate = (item: IntegrationCatalogItem): IntegrationCatalogItem => {
+      const lifecycle = lifecycleFor(item);
+      if (!lifecycle) return item;
+      const keepInstalledAction = item.actionLabel === "…";
+      return {
+        ...item,
+        actionLabel:
+          lifecycle.installed && !keepInstalledAction
+            ? undefined
+            : item.actionLabel,
+        actionPendingLabel: "Installing…",
+        actionStatus: lifecycle.status,
+        actionStatusMessage:
+          lifecycle.status === "pending"
+            ? "Installing in this replay…"
+            : lifecycle.status === "success"
+              ? "Installed in this replay."
+              : item.actionStatusMessage,
+        installed: lifecycle.installed,
+      };
+    };
+    const sections = integrationCatalogSourceSections.map((section) => ({
+      ...section,
+      items: section.items.map(decorate),
+    }));
+    const installedItems = (
+      integrationCatalogKind === "plugins"
+        ? currentPluginInstalledItems
+        : currentSkillInstalledItems
+    ).map(decorate);
+    const installedIds = new Set(installedItems.map((item) => item.id));
+    for (const section of sections) {
+      for (const item of section.items) {
+        if (item.installed && !installedIds.has(item.id)) {
+          installedItems.push(item);
+          installedIds.add(item.id);
+        }
+      }
+    }
+    return { installedItems, sections };
+  }, [
+    integrationCatalogItemLifecycles,
+    integrationCatalogKind,
+    integrationCatalogSourceSections,
+  ]);
+  const runIntegrationCatalogItemAction = (item: IntegrationCatalogItem) => {
+    if (item.installed) {
+      setIntegrationCatalogAction(`action:${item.id}`);
+      return;
+    }
+    if (integrationCatalogMutationTimerRef.current !== null) {
+      window.clearTimeout(integrationCatalogMutationTimerRef.current);
+    }
+    setIntegrationCatalogAction(`action:${item.id}`);
+    setIntegrationCatalogItemLifecycles((current) => ({
+      ...current,
+      [item.id]: { installed: false, status: "pending" },
+    }));
+    integrationCatalogMutationTimerRef.current = window.setTimeout(() => {
+      setIntegrationCatalogItemLifecycles((current) => ({
+        ...current,
+        [item.id]: { installed: true, status: "success" },
+      }));
+      setIntegrationCatalogAction(`action:${item.id}:success`);
+      integrationCatalogMutationTimerRef.current = null;
+    }, 180);
+  };
   const integrationCatalogRoute = (
     <IntegrationCatalogPage
       activeScope={activeIntegrationScope}
@@ -13032,9 +13125,7 @@ export function App() {
           : "Extend Codex with task-specific skills"
       }
       installedItems={
-        integrationCatalogKind === "plugins"
-          ? currentPluginInstalledItems
-          : currentSkillInstalledItems
+        integrationCatalogView.installedItems
       }
       installedMoreLabel={
         integrationCatalogKind === "skills"
@@ -13043,9 +13134,8 @@ export function App() {
       }
       kind={integrationCatalogKind}
       onInstalledMore={() => setIntegrationCatalogAction("installed-more")}
-      onItemAction={(item) =>
-        setIntegrationCatalogAction(`action:${item.id}`)
-      }
+      onItemAction={runIntegrationCatalogItemAction}
+      onItemActionRetry={runIntegrationCatalogItemAction}
       onItemOpen={(item) => {
         setIntegrationCatalogAction(`open:${item.id}`);
         if (
@@ -13096,11 +13186,7 @@ export function App() {
             ]
       }
       sections={
-        integrationCatalogKind === "plugins"
-          ? pluginCatalogScope === "public"
-            ? currentPluginSections
-            : currentPersonalPluginSections
-          : currentSkillSectionsByScope[skillCatalogScope] ?? []
+        integrationCatalogView.sections
       }
       status={integrationCatalogStatus}
       statusDescription={

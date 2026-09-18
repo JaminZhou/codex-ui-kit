@@ -10531,6 +10531,29 @@ for (const scene of selectedScenes) {
               .querySelector(".codex-ui-integration-catalog")
               ?.getAttribute("data-action") === "action:gmail",
         );
+        const gmailRow = page
+          .locator(".codex-ui-integration-catalog__item")
+          .filter({ hasText: "Gmail" });
+        await gmailRow.waitFor();
+        await page.waitForFunction(() =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-integration-catalog__item"),
+          ).some(
+            (row) =>
+              row.textContent?.includes("Gmail") &&
+              row.getAttribute("data-action-status") === "pending",
+          ),
+        );
+        await page.waitForFunction(() =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-integration-catalog__item"),
+          ).some(
+            (row) =>
+              row.textContent?.includes("Gmail") &&
+              row.getAttribute("data-action-status") === "success",
+          ),
+        );
+        await page.getByRole("button", { exact: true, name: "Gmail" }).waitFor();
         await page
           .locator(".codex-ui-integration-catalog-tabs")
           .getByText("Skills", { exact: true })
@@ -10550,9 +10573,35 @@ for (const scene of selectedScenes) {
               .querySelector(".codex-ui-integration-catalog")
               ?.getAttribute("data-action") === "action:recommended-watch-pr",
         );
+        const recommendedWatchPrRow = page
+          .locator(".codex-ui-integration-catalog__item")
+          .filter({ hasText: "Watch PR" });
+        await recommendedWatchPrRow.waitFor();
+        await page.waitForFunction(() =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-integration-catalog__item"),
+          ).some(
+            (row) =>
+              row.textContent?.includes("Watch PR") &&
+              row.getAttribute("data-action-status") === "pending",
+          ),
+        );
+        await page.waitForFunction(() =>
+          Array.from(
+            document.querySelectorAll(".codex-ui-integration-catalog__item"),
+          ).some(
+            (row) =>
+              row.textContent?.includes("Watch PR") &&
+              row.getAttribute("data-action-status") === "success",
+          ),
+        );
         integrationCatalog.interactions = {
           finalAction: "action:recommended-watch-pr",
           finalKind: "skills",
+          installStates: {
+            gmail: "success",
+            recommendedWatchPr: "success",
+          },
           search: searchState,
         };
       }
