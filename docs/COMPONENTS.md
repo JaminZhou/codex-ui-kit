@@ -331,10 +331,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
   Window, and Notifications cards with host-supplied file destinations,
   searchable languages, menus, switches, keyboard-operable segmented choices,
   and shortcut-capture state. Loading, saving, saved, and error feedback,
-  retry copy, and busy-state locking are host-controlled. Hosts own
-  persistence, file opening, license presentation, global shortcut
-  registration, and notification delivery; observed playground values are
-  fixtures rather than declared defaults.
+  retry copy, and busy-state locking are host-controlled. A host-wide disabled
+  state also locks callbacks, retry, and elevated-risk help without changing
+  values. Hosts own persistence, file opening, license presentation, global
+  shortcut registration, and notification delivery; observed playground values
+  are fixtures rather than declared defaults.
 - `UsageSettingsPage`: controlled plan, credits, usage-limit meters, reset,
   and cancellation presentation with independent host callbacks for View
   plans, Buy credits, and Gift credits. Loading, saving, saved, and error

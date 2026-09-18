@@ -2666,11 +2666,13 @@ export function GeneralSettingsPage({
   const riskDescription = (copy: string) => (
     <>
       {copy}
-      {elevatedRiskHref ? (
+      {elevatedRiskHref && !disabled ? (
         <>
           {" "}
           <a href={elevatedRiskHref}>Learn more</a> about elevated risks.
         </>
+      ) : elevatedRiskHref ? (
+        <> about elevated risks.</>
       ) : null}
     </>
   );
@@ -2678,10 +2680,12 @@ export function GeneralSettingsPage({
     <article
       {...props}
       aria-busy={status === "loading" || isSaving || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-general-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <h1>General</h1>
@@ -2694,7 +2698,13 @@ export function GeneralSettingsPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}

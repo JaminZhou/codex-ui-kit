@@ -1257,6 +1257,42 @@ describe("settings surfaces", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
+  it("locks General retry and host actions when disabled", () => {
+    const onChangeProjectlessTaskFolder = vi.fn();
+    const onOpenSourceLicenses = vi.fn();
+    const onRetry = vi.fn();
+    render(
+      <GeneralSettingsPage
+        disabled
+        elevatedRiskHref="https://help.openai.com/"
+        onChange={vi.fn()}
+        onChangeProjectlessTaskFolder={onChangeProjectlessTaskFolder}
+        onOpenSourceLicenses={onOpenSourceLicenses}
+        onRetry={onRetry}
+        status="error"
+        value={initialGeneralValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "General" })
+      .closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.queryByRole("link", { name: "Learn more" })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Change projectless task folder" }),
+    ).toHaveProperty("disabled", true);
+    const view = screen.getByRole("button", { name: "View" });
+    expect(view).toHaveProperty("disabled", true);
+    const retry = screen.getByRole("button", { name: "Retry" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(view);
+    fireEvent.click(retry);
+    expect(onOpenSourceLicenses).not.toHaveBeenCalled();
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
   it("exposes current General menus, searchable languages, and selections", () => {
     render(<GeneralFixture />);
 
