@@ -465,6 +465,45 @@ describe("settings surfaces", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
+  it("locks the full Git surface when the host disables it", () => {
+    const onRetry = vi.fn();
+    render(
+      <GitSettingsPage
+        commitInstructionsDirty
+        disabled
+        onChange={() => undefined}
+        onRetry={onRetry}
+        onSaveCommitInstructions={() => undefined}
+        onSavePullRequestInstructions={() => undefined}
+        pullRequestInstructionsDirty
+        status="error"
+        value={initialValue}
+      />,
+    );
+
+    const page = screen.getByRole("heading", { name: "Git" }).closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.getByRole("textbox", { name: "Branch prefix" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("radio", { name: "Merge" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("switch", { name: "Always force push" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(screen.getByRole("textbox", { name: "Commit instructions" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
   it("keeps field ids instance-safe and disables saves without a host action", () => {
     render(
       <>
@@ -653,6 +692,40 @@ describe("settings surfaces", () => {
     expect(stopSwitch).toHaveProperty("disabled", true);
     fireEvent.click(stopSwitch);
     expect(onToggleHookEnabled).not.toHaveBeenCalled();
+  });
+
+  it("locks hook reload, trust, and toggle actions when the host disables it", () => {
+    const onReload = vi.fn();
+    const onToggleHookEnabled = vi.fn();
+    const onTrustHook = vi.fn();
+    render(
+      <HooksSettingsPage
+        disabled
+        entries={hookEntries}
+        onOpenConfig={() => undefined}
+        onReload={onReload}
+        onToggleHookEnabled={onToggleHookEnabled}
+        onTrustHook={onTrustHook}
+      />,
+    );
+
+    const page = screen.getByRole("heading", { name: "Hooks" }).closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    const reload = screen.getByRole("button", { name: "Reload hooks" });
+    expect(reload).toHaveProperty("disabled", true);
+    const stopSwitch = screen.getByRole("switch", { name: "Stop enabled" });
+    expect(stopSwitch).toHaveProperty("disabled", true);
+    fireEvent.click(stopSwitch);
+    expect(onToggleHookEnabled).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText("PreToolUse", { exact: true }));
+    const trust = screen.getByRole("button", { name: "Trust" });
+    expect(trust).toHaveProperty("disabled", true);
+    fireEvent.click(trust);
+    expect(onTrustHook).not.toHaveBeenCalled();
+    fireEvent.click(reload);
+    expect(onReload).not.toHaveBeenCalled();
   });
 
   it("keeps package-observed Code review preferences controlled", () => {
