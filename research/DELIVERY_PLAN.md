@@ -1576,6 +1576,15 @@ now also exposes host-controlled busy/disabled locking for tabs, search,
 directory/add actions, settings, and switches while preserving explicit retry;
 Stage 4 therefore remains in progress.
 
+The installed `26.911.61220` follow-up re-observes the same MCP manager on the
+current build: four server rows, two plugin-provided rows, the five tab counts,
+wide/720 root geometry, compact search unmount, exact Add menu, and the
+STDIO/Streamable HTTP create plus update-detail field boundaries. It is retained
+as read-only current-build evidence in
+[`current-mcp-settings-26.911.json`](26.911.61220-mcp-settings.md); save,
+toggle, uninstall, OAuth/permission, provider failure, and product-pixel
+effects remain host-owned and unsampled.
+
 The Sites index slice adds a controlled `SitesIndexPage` for the older
 runtime-observed search, refresh, create, share, and overflow affordances.
 The replay fixture covers two site rows plus loading, empty, unavailable, and

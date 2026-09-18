@@ -2464,3 +2464,16 @@ only content-dependent server names, the update title name, and its real URL.
 The implementation remains `partial`: real create/save, persisted enable or
 disable, uninstall, OAuth/permission prompts, and validation/transport failure
 effects were deliberately not executed by this read-only slice.
+
+### Current 26.911 MCP Settings refresh
+
+The installed `26.911.61220` build was re-observed in an isolated process at
+1180×820 and 720×680. It keeps 13 Plugins, 6 Apps, 4 MCPs, 2 Skills, and 2
+Marketplace entries; four server rows, two plugin-provided rows, the four-item
+Add menu, exact empty-search state, STDIO/Streamable HTTP editor fields, and
+the update-detail boundary. The compact route unmounts search and retains a
+358.125px content root; the wide root is 768px. Sanitized geometry and field
+evidence are retained in `research/current-mcp-settings-26.911.json`, while
+server identity and screenshots remain local-only. This is current-build
+read-only evidence; no save, toggle, uninstall, OAuth, provider failure, or
+installed-product pixel claim is made.
