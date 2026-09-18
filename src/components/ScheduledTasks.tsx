@@ -542,6 +542,7 @@ export interface ScheduledTaskCreateMenuProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   createLabel?: ReactNode;
   createWithCodexLabel?: ReactNode;
+  disabled?: boolean;
   manualLabel?: ReactNode;
   onCreateWithCodex?: () => void;
   onManualSetup?: () => void;
@@ -551,6 +552,7 @@ export function ScheduledTaskCreateMenu({
   className,
   createLabel = "Create",
   createWithCodexLabel = "Create with Codex",
+  disabled = false,
   manualLabel = "Set up manually",
   onCreateWithCodex,
   onManualSetup,
@@ -566,6 +568,7 @@ export function ScheduledTaskCreateMenu({
       <button
         aria-label="Create"
         className="codex-ui-scheduled-task-create-menu__primary"
+        disabled={disabled}
         onClick={onCreateWithCodex}
         type="button"
       >
@@ -574,12 +577,14 @@ export function ScheduledTaskCreateMenu({
       <Menu
         align="end"
         className="codex-ui-scheduled-task-create-menu__popover"
+        disabled={disabled}
         label="Create scheduled task"
         sideOffset={1}
         trigger={
           <button
             aria-label="Create scheduled task options"
             className="codex-ui-scheduled-task-create-menu__trigger"
+            disabled={disabled}
             type="button"
           >
             <ScheduledChevronGlyph />
@@ -587,10 +592,12 @@ export function ScheduledTaskCreateMenu({
         }
         width="auto"
       >
-        <MenuItem onSelect={onCreateWithCodex}>
+        <MenuItem disabled={disabled} onSelect={onCreateWithCodex}>
           {createWithCodexLabel}
         </MenuItem>
-        <MenuItem onSelect={onManualSetup}>{manualLabel}</MenuItem>
+        <MenuItem disabled={disabled} onSelect={onManualSetup}>
+          {manualLabel}
+        </MenuItem>
       </Menu>
     </div>
   );
