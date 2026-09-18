@@ -126,4 +126,21 @@ describe("ThreadOverflowMenu", () => {
     fireEvent.click(archive);
     expect(onArchive).not.toHaveBeenCalled();
   });
+
+  it("keeps host-disabled submenus visible without opening them", () => {
+    renderMenu({
+      defaultOpen: true,
+      disabledSubmenus: { copy: true, fork: true, "open-in": true },
+    });
+
+    for (const name of ["Copy", "Fork", "Open in"]) {
+      const submenu = screen.getByRole("menuitem", { name });
+      expect(submenu).toHaveProperty("disabled", true);
+      fireEvent.click(submenu);
+    }
+
+    expect(screen.queryByRole("menu", { name: "Copy options" })).toBeNull();
+    expect(screen.queryByRole("menu", { name: "Fork options" })).toBeNull();
+    expect(screen.queryByRole("menu", { name: "Open in options" })).toBeNull();
+  });
 });

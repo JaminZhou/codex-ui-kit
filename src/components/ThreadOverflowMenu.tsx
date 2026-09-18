@@ -33,11 +33,18 @@ export type ThreadOverflowMenuDisabledActions = Partial<
   Record<ThreadOverflowMenuAction, boolean>
 >;
 
+export type ThreadOverflowMenuSubmenu = "copy" | "fork" | "open-in";
+
+export type ThreadOverflowMenuDisabledSubmenus = Partial<
+  Record<ThreadOverflowMenuSubmenu, boolean>
+>;
+
 export interface ThreadOverflowMenuProps {
   copySubmenu: ReactNode;
   defaultOpen?: boolean;
   disabled?: boolean;
   disabledActions?: ThreadOverflowMenuDisabledActions;
+  disabledSubmenus?: ThreadOverflowMenuDisabledSubmenus;
   forkSubmenu: ReactNode;
   icons?: ThreadOverflowMenuIcons;
   onAddScheduledTask?: () => void;
@@ -59,6 +66,7 @@ export function ThreadOverflowMenu({
   defaultOpen,
   disabled = false,
   disabledActions,
+  disabledSubmenus,
   forkSubmenu,
   icons = {},
   onAddScheduledTask,
@@ -130,6 +138,7 @@ export function ThreadOverflowMenu({
         Share
       </MenuItem>
       <MenuSubmenu
+        disabled={disabledSubmenus?.copy}
         label="Copy"
         startIcon={icons.copy}
         submenuClassName="codex-ui-thread-overflow-menu__submenu"
@@ -147,6 +156,7 @@ export function ThreadOverflowMenu({
         New side chat
       </MenuItem>
       <MenuSubmenu
+        disabled={disabledSubmenus?.fork}
         label="Fork"
         startIcon={icons.fork}
         submenuClassName="codex-ui-thread-overflow-menu__submenu"
@@ -163,6 +173,7 @@ export function ThreadOverflowMenu({
       </MenuItem>
       <MenuSeparator />
       <MenuSubmenu
+        disabled={disabledSubmenus?.["open-in"]}
         label="Open in"
         startIcon={icons.openIn}
         submenuClassName="codex-ui-thread-overflow-menu__submenu"
