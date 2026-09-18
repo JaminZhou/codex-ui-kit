@@ -817,6 +817,56 @@ describe("settings surfaces", () => {
     expect(onRetry).toHaveBeenCalledOnce();
   });
 
+  it("locks Code review controls and retry when the host disables it", () => {
+    const onChange = vi.fn();
+    const onRetry = vi.fn();
+    const value = {
+      allowCreditsForCodeReviews: true,
+      automaticReview: true,
+      exhaustiveCodeReview: false,
+      triggerPolicy: "pr_open" as const,
+    };
+    const { rerender } = render(
+      <CodeReviewSettingsPage
+        disabled
+        onChange={onChange}
+        onRetry={onRetry}
+        showCreditPreference
+        value={value}
+      />,
+    );
+
+    const page = screen.getByRole("heading", { name: "Code review" }).closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.getByRole("switch", { name: "Enable automatic code review" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    const trigger = screen.getByRole("button", { name: "Review trigger" });
+    expect(trigger).toHaveProperty("disabled", true);
+    expect(screen.getByRole("switch", { name: "Allow credits for code reviews" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+
+    rerender(
+      <CodeReviewSettingsPage
+        disabled
+        errorMessage="Review preferences unavailable"
+        onChange={onChange}
+        onRetry={onRetry}
+        retryLabel="Load again"
+        status="error"
+        value={value}
+      />,
+    );
+    const retry = screen.getByRole("button", { name: "Load again" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
+  });
+
   it("keeps Appearance theme selection and editors fully controlled", () => {
     render(<AppearanceFixture />);
 

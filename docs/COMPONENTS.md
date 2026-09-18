@@ -498,8 +498,9 @@ kit never performs filesystem, network, account, or process mutations.
 
 - `CodeReviewSettingsPage`: controlled review-trigger policy, credits option,
   loading/error/retry state with `aria-busy` and host-configurable copy, and
-  `onChange`/`onRetry` callbacks. It never starts a review or changes account
-  limits.
+  `onChange`/`onRetry` callbacks. A host-wide disabled state locks the trigger,
+  menu items, switches, and retry without changing their values. It never
+  starts a review or changes account limits.
 - `EnvironmentSettingsPage`: controlled environment list with ready/loading/
   error/empty states, `aria-busy`, host-configurable loading copy, and
   host-owned Retry/edit callbacks. Disabled states keep retry explicit while

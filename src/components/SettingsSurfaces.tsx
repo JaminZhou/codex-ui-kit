@@ -1097,14 +1097,17 @@ export function CodeReviewSettingsPage({
     key: K,
     nextValue: CodeReviewSettingsValue[K],
   ) => onChange({ ...value, [key]: nextValue });
+  const isLocked = disabled || status === "loading";
 
   return (
     <article
       {...props}
       aria-busy={status === "loading" || undefined}
+      aria-disabled={disabled || undefined}
       className={["codex-ui-code-review-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <header>
@@ -1119,7 +1122,13 @@ export function CodeReviewSettingsPage({
       ) : status === "error" ? (
         <section className="codex-ui-code-review-settings__error" role="alert">
           <strong>{errorMessage}</strong>
-          <button disabled={!onRetry} onClick={onRetry} type="button">
+          <button
+            disabled={!onRetry || disabled}
+            onClick={() => {
+              if (!disabled) onRetry?.();
+            }}
+            type="button"
+          >
             {retryLabel}
           </button>
         </section>
@@ -1149,11 +1158,11 @@ export function CodeReviewSettingsPage({
                 label="Review trigger options"
                 sideOffset={4}
                 trigger={
-                  <button
+                <button
                     aria-describedby={triggerValueId}
                     aria-label="Review trigger"
                     className="codex-ui-code-review-settings__trigger"
-                    disabled={disabled}
+                    disabled={isLocked}
                     ref={triggerRef}
                     type="button"
                   >
@@ -1168,6 +1177,7 @@ export function CodeReviewSettingsPage({
                   (policy) => (
                     <MenuItem
                       aria-checked={value.triggerPolicy === policy}
+                      disabled={disabled}
                       key={policy}
                       onSelect={() => {
                         update("triggerPolicy", policy);
@@ -1187,7 +1197,7 @@ export function CodeReviewSettingsPage({
             >
               <CodeReviewSwitch
                 checked={value.exhaustiveCodeReview}
-                disabled={disabled}
+                disabled={isLocked}
                 label="Enable exhaustive code review"
                 onChange={(exhaustiveCodeReview) =>
                   update("exhaustiveCodeReview", exhaustiveCodeReview)
@@ -1201,7 +1211,7 @@ export function CodeReviewSettingsPage({
               >
                 <CodeReviewSwitch
                   checked={value.allowCreditsForCodeReviews}
-                  disabled={disabled}
+                  disabled={isLocked}
                   label="Allow credits for code reviews"
                   onChange={(allowCreditsForCodeReviews) =>
                     update("allowCreditsForCodeReviews", allowCreditsForCodeReviews)
