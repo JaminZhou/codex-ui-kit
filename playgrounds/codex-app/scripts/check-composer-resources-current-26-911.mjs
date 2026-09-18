@@ -79,10 +79,18 @@ async function geometry(page) {
     const picker = document.querySelector(
       '[data-current-resource-catalog="26.911.61220"]',
     );
+    const aside = document.querySelector(".codex-ui-app-shell__sidebar");
+    const editor = document.querySelector(".codex-ui-composer__input");
+    const addTrigger = document.querySelector(
+      'button[aria-label="Add files and more"]',
+    );
     const scroller = picker?.querySelector(
       ".codex-ui-composer-resource-picker__scroller",
     );
     return {
+      aside: bounds(aside),
+      editor: bounds(editor),
+      addTrigger: bounds(addTrigger),
       overflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
@@ -120,6 +128,18 @@ async function capture(width, suffix) {
     const measured = await geometry(page);
     assert.equal(measured.overflow, 0);
     assert.ok(measured.picker && measured.root && measured.scroller);
+    assert.ok(measured.aside && measured.editor && measured.addTrigger);
+    if (width === 1180) {
+      assert.ok(Math.abs(measured.aside.width - 321.875) <= 1);
+      assert.ok(Math.abs(measured.editor.left - 383.4375) <= 1);
+      assert.ok(Math.abs(measured.addTrigger.left - 391.4375) <= 1);
+      assert.ok(Math.abs(measured.picker.left - 383.4375) <= 1);
+    } else {
+      assert.ok(measured.aside.left <= -320);
+      assert.ok(Math.abs(measured.editor.left - 16) <= 1);
+      assert.ok(Math.abs(measured.addTrigger.left - 24) <= 1);
+      assert.ok(Math.abs(measured.picker.left - 16) <= 1);
+    }
     assert.equal(measured.picker.width, width === 720 ? 688 : 736);
     assert.equal(measured.picker.height, 320);
     assert.equal(measured.scroller.clientHeight, 310);

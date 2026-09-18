@@ -34,6 +34,13 @@ exit gates; it does not replace the inventory.
   rows, and 19 sanitized public resource/skill titles. This is current-build
   structural CDP evidence only; selection, upload, authorization, execution,
   Browser/Electron, and product-pixel promotion remain open.
+- The 26.911 resource replay now uses the captured `321.875px` expanded left
+  rail instead of the older `274px` fixture width. Its focused Electron/CDP
+  contract checks the wide editor, Add trigger, and menu origins against the
+  current capture (with the hidden-rail `720px` compact boundary), and repeats
+  the own-fixture screenshot at zero drift. This closes a replay-shell offset
+  that could otherwise hide Composer pixel regressions; it does not promote
+  installed-product pixels or selection/execution behavior.
 - The installed app now reports `26.908.70816` (`9275`), Chromium
   `152.0.7977.83`, and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
