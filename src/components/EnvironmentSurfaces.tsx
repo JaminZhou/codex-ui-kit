@@ -110,6 +110,7 @@ export function EnvironmentEditorPage({
     <section
       {...props}
       aria-busy={isBusy || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       aria-labelledby={titleId}
       className={["codex-ui-environment-editor", className]
@@ -135,7 +136,13 @@ export function EnvironmentEditorPage({
         >
           {resolvedStatusMessage}
           {(status === "error" || status === "conflict") && onRetry ? (
-            <button disabled={disabled} onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
@@ -281,6 +288,7 @@ export function EnvironmentSettingsPage({
     <section
       {...props}
       aria-busy={status === "loading" || undefined}
+      aria-disabled={disabled || undefined}
       aria-labelledby={titleId}
       className={["codex-ui-environment-settings-page", className]
         .filter(Boolean)
@@ -302,7 +310,13 @@ export function EnvironmentSettingsPage({
               {status === "loading" ? loadingLabel : message}
             </div>
             {onRetry ? (
-              <button disabled={disabled} onClick={onRetry} type="button">
+              <button
+                disabled={disabled}
+                onClick={() => {
+                  if (!disabled) onRetry();
+                }}
+                type="button"
+              >
                 {retryLabel}
               </button>
             ) : null}

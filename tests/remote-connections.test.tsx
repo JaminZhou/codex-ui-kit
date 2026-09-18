@@ -130,6 +130,7 @@ describe("remote connections surface", () => {
       .getByRole("heading", { name: "Connections" })
       .closest("section");
     expect(page?.getAttribute("aria-busy")).toBe("true");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
     expect(page?.getAttribute("data-disabled")).toBe("true");
     expect(screen.getByRole("button", { name: "Add connection" })).toHaveProperty(
       "disabled",
@@ -142,6 +143,7 @@ describe("remote connections surface", () => {
 
     rerender(
       <RemoteConnectionsPage
+        disabled
         onRetry={onRetry}
         status="error"
         statusMessage="Connection service unavailable"
@@ -150,7 +152,13 @@ describe("remote connections surface", () => {
     expect(screen.getByRole("alert").textContent).toContain(
       "Connection service unavailable",
     );
+    expect(
+      screen
+        .getByRole("heading", { name: "Connections" })
+        .closest("section")
+        ?.getAttribute("aria-disabled"),
+    ).toBe("true");
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
-    expect(onRetry).toHaveBeenCalledOnce();
+    expect(onRetry).not.toHaveBeenCalled();
   });
 });

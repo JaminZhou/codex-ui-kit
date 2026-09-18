@@ -195,12 +195,20 @@ describe("environment settings surfaces", () => {
       screen
         .getByRole("heading", { name: "Environments" })
         .closest("section")
+        ?.getAttribute("aria-disabled"),
+    ).toBe("true");
+    expect(
+      screen
+        .getByRole("heading", { name: "Environments" })
+        .closest("section")
         ?.getAttribute("data-disabled"),
     ).toBe("true");
     expect(screen.getByRole("button", { name: "Retry" })).toHaveProperty(
       "disabled",
       true,
     );
+    fireEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(onRetry).not.toHaveBeenCalled();
 
     rerender(
       <EnvironmentEditorPage
@@ -216,6 +224,7 @@ describe("environment settings surfaces", () => {
     const editor = screen
       .getByRole("heading", { name: "Environment" })
       .closest("section");
+    expect(editor?.getAttribute("aria-disabled")).toBe("true");
     expect(editor?.getAttribute("data-disabled")).toBe("true");
     expect(screen.getByRole("textbox", { name: "Environment name" })).toHaveProperty(
       "disabled",

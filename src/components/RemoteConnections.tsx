@@ -98,6 +98,7 @@ export function RemoteConnectionsPage({
     <section
       {...props}
       aria-busy={status === "loading" || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       aria-labelledby={titleId}
       className={["codex-ui-remote-connections", className]
@@ -128,7 +129,15 @@ export function RemoteConnectionsPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button disabled={disabled} onClick={onRetry} type="button">Retry</button>
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
+              Retry
+            </button>
           ) : null}
         </div>
       ) : null}
