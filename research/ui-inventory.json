@@ -1136,7 +1136,10 @@
         "playground:current-sidebar-light-wide-compact",
         "browser-cdp:current-sidebar-light-wide-compact",
         "electron:current-sidebar-light-wide-compact",
-        "pixel:current-sidebar-light-wide-compact"
+        "pixel:current-sidebar-light-wide-compact",
+        "replay:current-26.911-shell-wide-compact-321.875-rail",
+        "electron:current-26.911-shell-wide-compact-geometry",
+        "pixel:current-26.911-shell-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1156,10 +1159,7 @@
         "cdp-26.825.51511:wide-medium-721-720-visible-before-explicit-hide-show-321.875-persistence-zero-overflow",
         "cdp-26.903.71938:shell-wide-medium-721-720-hide-show-zero-overflow",
         "cdp-26.908.70816:shell-wide-medium-721-720-hide-show-zero-overflow",
-        "cdp-26.911.61220:shell-wide-medium-721-720-hide-show-zero-overflow",
-        "replay:current-26.911-shell-wide-compact-321.875-rail",
-        "electron:current-26.911-shell-wide-compact-geometry",
-        "pixel:current-26.911-shell-own-fixture-zero-drift"
+        "cdp-26.911.61220:shell-wide-medium-721-720-hide-show-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
