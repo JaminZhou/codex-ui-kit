@@ -3587,8 +3587,14 @@ export function App() {
       currentComposerControls2691161220Replay);
   const currentComposerResourceMentionReplay =
     initialSelection.view === "workspace" &&
+    (initialSelection.frame ===
+      "workspace-composer-current-26-908-70816-github-mentioned" ||
+      initialSelection.frame ===
+        "workspace-composer-current-26-911-github-mentioned");
+  const currentComposerResourceMention2691161220Replay =
+    initialSelection.view === "workspace" &&
     initialSelection.frame ===
-      "workspace-composer-current-26-908-70816-github-mentioned";
+      "workspace-composer-current-26-911-github-mentioned";
   const currentComposerControls26825Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
@@ -9630,7 +9636,9 @@ export function App() {
       ? activeFrame
       : currentComposerControlsCurrentCatalogReplay
         ? currentComposerResourceMentionReplay
-          ? "workspace-composer-current-26-908-70816-github-mentioned"
+          ? currentComposerResourceMention2691161220Replay
+            ? "workspace-composer-current-26-911-github-mentioned"
+            : "workspace-composer-current-26-908-70816-github-mentioned"
           : composerAttachments.length > 0
           ? currentComposerControls2690870816Replay
             ? "workspace-composer-current-26-908-70816-plugin-selected"
@@ -10854,10 +10862,22 @@ export function App() {
       {composerOverlay === "resources" ? (
         <ComposerResourcePicker
           activeId={composerResourceActiveId}
-          className="codex-ui-composer-resource-picker--current-26-908"
-          data-current-resource-catalog="26.908.70816"
+          className={
+            currentComposerResourceMention2691161220Replay
+              ? "codex-ui-composer-resource-picker--current-26-911"
+              : "codex-ui-composer-resource-picker--current-26-908"
+          }
+          data-current-resource-catalog={
+            currentComposerResourceMention2691161220Replay
+              ? "26.911.61220"
+              : "26.908.70816"
+          }
           descriptionSeparator=""
-          groups={currentComposerResourceGroups2690870816}
+          groups={
+            currentComposerResourceMention2691161220Replay
+              ? currentComposerResourceGroups2691161220
+              : currentComposerResourceGroups2690870816
+          }
           heading={null}
           onActiveIdChange={setComposerResourceActiveId}
           onDismiss={() => {

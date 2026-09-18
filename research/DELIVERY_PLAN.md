@@ -1628,13 +1628,21 @@ capture stability. This closes the evidence-to-replay bookkeeping gap without
 claiming a host-owned selection, upload, authorization, execution, or product
 pixel lifecycle.
 
-The follow-up also models the current-build GitHub selection as an inline
-editor mention, based on the isolated CDP observation that showed no attachment
-card. The public `ComposerResourceMention` API marks the token non-editable and
-replays the measured transparent 14px/20px/500 style. Electron coverage checks
-wide and compact action reachability, zero overflow, no attachment-card
-regression, and zero repeated-capture drift; this does not promote a product
-pixel baseline or claim plugin authorization/execution.
+The same current catalog now has a named
+`workspace-composer-current-26-911-github-mentioned` replay. It models the
+observed public GitHub selection as a non-editable inline Composer mention,
+keeps the `26.911.61220` catalog marker, and gates Add-menu dismissal, focus
+return, zero overflow, and 0% repeated-capture drift at 1180px/720px through
+the focused Electron contract. This remains controlled replay evidence only;
+installed-plugin authorization, network execution, and product-pixel promotion
+are still excluded.
+
+This extends the earlier 26.908 mention replay rather than replacing it. The
+public `ComposerResourceMention` API marks the token non-editable and replays
+the measured transparent 14px/20px/500 style. Electron coverage checks wide and
+compact action reachability, zero overflow, no attachment-card regression, and
+zero repeated-capture drift; this does not promote a product pixel baseline or
+claim plugin authorization/execution.
 
 The Browser workspace slice activates the historical one-tab shell only in an
 isolated controlled replay. It covers tab creation, selection, close-to-empty
