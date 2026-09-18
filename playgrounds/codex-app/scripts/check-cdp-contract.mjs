@@ -6315,6 +6315,9 @@ for (const scene of selectedScenes) {
       const currentComposerControlsExpected = scene.frame.startsWith(
         "workspace-composer-current-26-825-",
       );
+      const currentShell26_911Expected = scene.frame.startsWith(
+        "workspace-current-26-911-",
+      );
       const currentContextExpected =
         scene.frame.startsWith("workspace-context-current-26-825-") ||
         currentComposerControlsExpected;
@@ -6347,7 +6350,8 @@ for (const scene of selectedScenes) {
       const compactExpected =
         scene.frame === "workspace-compact-ready" ||
         projectCompactExpected ||
-        (currentComposerControlsExpected && scene.id.endsWith("-compact"));
+        ((currentComposerControlsExpected || currentShell26_911Expected) &&
+          scene.id.endsWith("-compact"));
       const composerGoalExpected =
         scene.frame === "workspace-composer-current-26-825-goal";
       const composerPlanExpected =
@@ -6382,7 +6386,8 @@ for (const scene of selectedScenes) {
           : 736;
       const expectedComposerLeft = currentHomeCompactExpected
         ? 339.40625
-        : currentContextExpected && !compactExpected
+        : (currentContextExpected || currentShell26_911Expected) &&
+            !compactExpected
           ? 382.9375
         : currentHomeExpected
           ? 383.953125
@@ -6402,6 +6407,10 @@ for (const scene of selectedScenes) {
             : 98;
       const expectedHeadingTop = currentHomeCompactExpected
         ? 259.796875
+        : currentShell26_911Expected
+          ? compactExpected
+            ? 299
+            : 363.40625
         : currentContextExpected
           ? compactExpected
             ? 293.40625
