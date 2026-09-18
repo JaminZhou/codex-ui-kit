@@ -36,6 +36,7 @@
     "check:composer-resources-current-26-908-70816": "node scripts/check-composer-resources-current-26-908-70816.mjs",
     "check:composer-resources-current-26-911": "node scripts/check-composer-resources-current-26-911.mjs",
     "check:composer-resource-mention-current-26-911": "node scripts/check-composer-resource-mention-current-26-911.mjs",
+    "check:current-shell-26-911": "node scripts/check-current-shell-26-911.mjs",
     "check:sites-index": "node scripts/check-sites-index.mjs",
     "check:live-file-content": "node scripts/check-live-file-content.mjs",
     "check:live-terminal": "node scripts/check-live-pty.mjs && node scripts/check-live-pty-ui.mjs",
