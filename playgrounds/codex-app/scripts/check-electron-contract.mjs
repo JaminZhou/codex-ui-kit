@@ -999,8 +999,20 @@ for (const pluginDetailScene of visualScenes.filter(({ id }) =>
         () =>
           document
             .querySelector('[data-testid="current-plugin-detail"]')
-            ?.getAttribute("data-action") === "install-requested",
+            ?.getAttribute("data-action") === "installed",
       );
+      await pluginDetailPage
+        .getByRole("button", { exact: true, name: "Try now" })
+        .waitFor();
+      if (
+        (await pluginDetailPage
+          .getByRole("button", { exact: true, name: "Install plugin" })
+          .count()) !== 0
+      ) {
+        throw new Error(
+          `${pluginDetailScene.id}: Electron plugin installation did not update the available actions.`,
+        );
+      }
     }
   } finally {
     await pluginDetailApp.close();
