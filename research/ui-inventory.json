@@ -1040,6 +1040,7 @@
         "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus",
         "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
+        "playground:current-26.911-resource-catalog-contract",
         "replay:current-26.908.70816-public-resource-catalog-and-github-attachment",
         "cdp-26.908.70816:github-selection-inline-mention-not-attachment",
         "replay:current-26.908.70816-github-inline-resource-mention",
@@ -1104,6 +1105,7 @@
         "pixel:composer-plugin-connect-own-fixture-1180-720-zero-drift",
         "replay:current-26.908-sampled-plugin-skill-catalog-scroll-keyboard-focus",
         "cdp-26.908.70816:read-only-public-plugin-skill-catalog-without-selection",
+        "playground:current-26.911-resource-catalog-contract",
         "cdp-26.911.61220:read-only-public-plugin-skill-catalog-without-selection"
       ],
       "runtimeStatus": "runtime_observed",

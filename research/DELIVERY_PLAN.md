@@ -1621,6 +1621,13 @@ improves current-build resource evidence but does not promote
 `composer.resources` or `composer.plugins` beyond partial verification and
 does not replace the promoted 26.903 package baseline.
 
+The playground now exposes the named `workspace-composer-current-26-911-resources`
+variant and a focused Electron contract for the same 19 titles, responsive
+geometry, scroll containment, Escape focus return, zero overflow, and repeated
+capture stability. This closes the evidence-to-replay bookkeeping gap without
+claiming a host-owned selection, upload, authorization, execution, or product
+pixel lifecycle.
+
 The follow-up also models the current-build GitHub selection as an inline
 editor mention, based on the isolated CDP observation that showed no attachment
 card. The public `ComposerResourceMention` API marks the token non-editable and
