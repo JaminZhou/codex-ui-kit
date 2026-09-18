@@ -61,6 +61,16 @@ host-owned and are intentionally not claimed by the playground.
 - Scoped CDP automation: available through a user-authorized second process;
   the Chromium profile is separate, but Codex application data and navigation
   are not fully isolated
+- The installed application now reports `26.911.61220` (`9647`) with
+  Chromium `153.0.8010.36` and ASAR SHA-256
+  `f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f`.
+  A fresh isolated shell/sidebar candidate is recorded in
+  [`current-baseline-26.911.61220.json`](current-baseline-26.911.61220.json)
+  and [`26.911.61220.md`](26.911.61220.md). It repeats the eight renderer
+  states, Projects Index wide/compact geometry, sidebar focus and
+  collapse/pin lifecycle, Help menu geometry, and the native project-menu
+  boundary. This candidate does not overwrite the promoted `26.903.71938`
+  baseline or imply untouched surface families are current.
 - The installed application now reports `26.908.70816` (`9275`) with the
   Chromium `152.0.7977.83` runtime and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
@@ -80,6 +90,14 @@ host-owned and are intentionally not claimed by the playground.
   and [`26.908.70816.md`](26.908.70816.md), with the same eight-state,
   Projects, Help, responsive, and native-boundary contract. It is candidate
   evidence only and does not overwrite the older candidate record.
+- A newer isolated shell/sidebar candidate for `26.911.61220` is recorded in
+  [`current-baseline-26.911.61220.json`](current-baseline-26.911.61220.json)
+  and [`26.911.61220.md`](26.911.61220.md). It repeats the eight renderer
+  states, Projects, Help, responsive, and native-boundary contract. The
+  machine-readable inventory maps the exact CDP observations to the affected
+  shell/sidebar and Projects surfaces, but the candidate remains separate
+  from the promoted `26.903.71938` baseline until those families receive
+  current-build Browser/CDP, Electron, and regional-pixel refreshes.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to

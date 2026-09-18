@@ -10,6 +10,7 @@ import {
   currentBaselineViewports,
   currentCandidateBaselineFingerprint,
   currentLatestCandidateBaselineFingerprint,
+  currentNewestCandidateBaselineFingerprint,
   currentBaselineFingerprint,
   resolveCurrentBaselineOutputPath,
   runBestEffortCurrentBaselineCleanup,
@@ -18,11 +19,13 @@ import {
 } from "./current-baseline-contract.mjs";
 
 const expectedFingerprint =
-  process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.70816"
-    ? currentLatestCandidateBaselineFingerprint
-    : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.40834"
-      ? currentCandidateBaselineFingerprint
-      : currentBaselineFingerprint;
+  process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.911.61220"
+    ? currentNewestCandidateBaselineFingerprint
+    : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.70816"
+      ? currentLatestCandidateBaselineFingerprint
+      : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.40834"
+        ? currentCandidateBaselineFingerprint
+        : currentBaselineFingerprint;
 
 const port = Number(process.env.CODEX_CURRENT_BASELINE_CDP_PORT);
 const expectedProfile = process.env.CODEX_CURRENT_BASELINE_PROFILE;
