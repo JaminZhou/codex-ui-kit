@@ -1655,6 +1655,13 @@ the focused Electron contract. This remains controlled replay evidence only;
 installed-plugin authorization, network execution, and product-pixel promotion
 are still excluded.
 
+The isolated 26.911 Documents selection now has the same explicit boundary:
+the installed Composer inserts a non-editable `Documents` plugin mention and
+shows a Templates heading, but does not open a preview route or Renderer file
+input. This promotes current resource-selection semantics only; document
+decoding, preview rendering, template execution, and product pixels remain
+host-owned and unsampled.
+
 This extends the earlier 26.908 mention replay rather than replacing it. The
 public `ComposerResourceMention` API marks the token non-editable and replays
 the measured transparent 14px/20px/500 style. Electron coverage checks wide and

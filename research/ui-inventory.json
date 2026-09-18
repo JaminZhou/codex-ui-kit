@@ -1040,6 +1040,7 @@
         "replay:current-26.908-resource-skill-menu-scroll-keyboard-focus",
         "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
+        "cdp-26.911.61220:documents-selection-inline-mention-and-templates",
         "playground:current-26.911-resource-catalog-contract",
         "replay:current-26.908.70816-public-resource-catalog-and-github-attachment",
         "cdp-26.908.70816:github-selection-inline-mention-not-attachment",
@@ -1063,7 +1064,8 @@
         "cdp-26.825.51511:add-files-inline-resource-picker-736-687x320-310-scroller-current-fixed-controls",
         "cdp-26.908.40834:read-only-add-files-menu-seven-top-level-actions-and-sampled-scrollable-plugin-skill-catalog",
         "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
-        "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller"
+        "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
+        "cdp-26.911.61220:documents-selection-inline-mention-and-templates"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
