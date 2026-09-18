@@ -2355,6 +2355,19 @@ comparisons pass at 4.4911%/5.1784% for Plugins and 3.3067%/3.8461% for Skills.
 Exact third-party icons and install/discovery effects remain host-owned, so
 both inventory rows are `partial` rather than complete.
 
+An isolated `26.911.61220` Renderer refreshes the same settings surface against
+the newest installed package. The current route now uses the shared title
+`Plugins` and description `Manage plugins, skills, and MCPs` for both tabs;
+Plugins reports 13 items and Skills reports 2. Native-wide CDP records a
+768px content root and 224×32 search field, while an emulated 720×680 compact
+viewport records the 358.125px root, one-column grids, and zero horizontal
+overflow. The compact build unmounts the catalog search field, which is
+recorded as observed behavior. Sanitized geometry and public item labels are
+in `research/current-integrations-26.911.json`; raw product frames remain
+local-only. This refresh is read-only and does not promote installation,
+enablement, OAuth, permission, registry, network, execution, or
+third-party-artwork behavior.
+
 ## Current Plugin detail slice
 
 A second isolated same-build `26.825.51511` Renderer reached one installed and

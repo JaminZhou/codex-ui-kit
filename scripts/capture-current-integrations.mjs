@@ -1,7 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { realpathSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
-import { currentBaselineFingerprint } from "./current-baseline-contract.mjs";
+import {
+  currentBaselineFingerprint,
+  currentNewestCandidateBaselineFingerprint,
+} from "./current-baseline-contract.mjs";
 
 // Capture-only. Open Plugins or Skills in an isolated current-build process
 // before running this script. It samples only fixed catalog labels, geometry,
@@ -13,6 +16,14 @@ const requestedOutput = process.env.CODEX_CURRENT_INTEGRATIONS_OUTPUT;
 const kind = process.env.CODEX_CURRENT_INTEGRATIONS_KIND;
 const allowCapture =
   process.env.CODEX_CURRENT_INTEGRATIONS_ALLOW_CAPTURE === "1";
+const expectedFingerprint =
+  process.env.CODEX_CURRENT_INTEGRATIONS_FINGERPRINT === "26.911.61220"
+    ? currentNewestCandidateBaselineFingerprint
+    : currentBaselineFingerprint;
+const outputPrefix =
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint
+    ? "current-integrations-26-911-"
+    : "current-integrations-26-825-";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -42,11 +53,11 @@ if (!profile.startsWith("/private/tmp/codex-ui-kit-")) {
 }
 if (
   dirname(output) !== profile ||
-  !basename(output).startsWith(`current-integrations-26-825-${kind}-`) ||
+  !basename(output).startsWith(`${outputPrefix}${kind}-`) ||
   !basename(output).endsWith(".json")
 ) {
   throw new Error(
-    "The output must be a current-integrations-26-825-<kind>-*.json direct child of the isolated profile.",
+    `The output must be a ${outputPrefix}<kind>-*.json direct child of the isolated profile.`,
   );
 }
 
@@ -67,7 +78,7 @@ const fingerprint = {
   chromiumVersion: plistValue("ChromiumBaseVersion"),
 };
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
@@ -157,11 +168,18 @@ const call = (method, params = {}) =>
     socket.send(JSON.stringify({ id, method, params }));
   });
 
-const expectedTitle = kind === "plugins" ? "Plugins" : "Skills";
+const expectedTitle =
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint
+    ? "Plugins"
+    : kind === "plugins"
+      ? "Plugins"
+      : "Skills";
 const expectedDescription =
-  kind === "plugins"
-    ? "Work with Codex across your favorite tools"
-    : "Extend Codex with task-specific skills";
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint
+    ? "Manage plugins, skills, and MCPs"
+    : kind === "plugins"
+      ? "Work with Codex across your favorite tools"
+      : "Extend Codex with task-specific skills";
 const expression = `(() => {
   const visible = (element) =>
     element instanceof HTMLElement &&
@@ -212,7 +230,13 @@ const expression = `(() => {
   );
   const searchFrame = search?.parentElement;
   const installed = exact("Installed");
-  const body = installed?.closest("section")?.parentElement;
+  const catalogAnchor =
+    installed ??
+    exact(${JSON.stringify(kind === "plugins" ? "GitHub" : "ASC Tooling")});
+  const body =
+    installed?.closest("section")?.parentElement ??
+    searchFrame?.parentElement?.parentElement?.parentElement ??
+    catalogAnchor?.closest('[class*="grid-cols"]')?.parentElement?.parentElement;
   const sections = [...(body?.querySelectorAll("section") ?? [])]
     .filter(inViewport)
     .map((section) => ({
@@ -234,7 +258,7 @@ const expression = `(() => {
     headingStyle: style(title),
     horizontalOverflow:
       document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    installedHeading: metric(installed),
+    installedHeading: metric(catalogAnchor),
     itemTitles: [...(body?.querySelectorAll('[class*="font-medium"]') ?? [])]
       .filter(inViewport)
       .map((element) => element.textContent?.trim())
@@ -260,7 +284,10 @@ const capture = response.result?.result?.value;
 if (
   capture?.title !== expectedTitle ||
   capture?.description !== expectedDescription ||
-  !capture.search ||
+  (expectedFingerprint !== currentNewestCandidateBaselineFingerprint ||
+    capture.viewport.width > 720
+      ? !capture.search
+      : false) ||
   !capture.installedHeading ||
   Math.abs(capture.horizontalOverflow) > 1
 ) {

@@ -1496,6 +1496,16 @@ The index item contract now also models per-item pending/success/error/retry
 feedback and busy locking; this is a host-controlled UI state and does not
 claim installation, authorization, or execution reachability.
 
+The newest installed `26.911.61220` package has now been re-observed for the
+Plugins and Skills index routes. The isolated CDP capture records the shared
+current title/description, 13 Plugins, 2 Skills, native-wide 768px content,
+the 224×32 wide search field, compact one-column grids, and the current
+compact behavior where search is unmounted at 720px. This refresh lives in
+`research/current-integrations-26.911.json` and is intentionally read-only;
+installation, enablement, OAuth, permissions, registry/network effects,
+execution, and third-party artwork remain host-owned. The P1 rows stay
+`partial` until those boundaries have an explicit product contract.
+
 The follow-up Plugin detail slice adds controlled `PluginDetailPage` and
 `PluginDetailBreadcrumb` primitives for installed/discovery identity,
 suggestions, Apps, Information, disclosure, bottom scrolling, and the
