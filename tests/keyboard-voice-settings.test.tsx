@@ -218,6 +218,29 @@ describe("KeyboardShortcutsPage", () => {
     );
     expect(onRetry).toHaveBeenCalledOnce();
   });
+
+  it("locks Keyboard shortcuts retry and page semantics when disabled", () => {
+    const onRetry = vi.fn();
+    render(
+      <KeyboardShortcutsPage
+        disabled
+        entries={initialShortcuts}
+        onRetry={onRetry}
+        retryLabel="Try shortcuts again"
+        status="error"
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "Keyboard shortcuts" })
+      .closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    const retry = screen.getByRole("button", { name: "Try shortcuts again" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
+  });
 });
 
 describe("VoiceSettingsPage", () => {
@@ -291,6 +314,31 @@ describe("VoiceSettingsPage", () => {
       screen.getByRole("button", { name: "Try voice settings again" }),
     );
     expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it("locks Voice retry and page semantics when disabled", () => {
+    const onRetry = vi.fn();
+    render(
+      <VoiceSettingsPage
+        disabled
+        microphoneOptions={[{ id: "system-default", label: "System default" }]}
+        onChange={() => undefined}
+        onRetry={onRetry}
+        retryLabel="Try voice settings again"
+        status="error"
+        value={initialVoiceValue}
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { level: 1, name: "Voice" })
+      .closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    const retry = screen.getByRole("button", { name: "Try voice settings again" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
   });
 
   it("controls microphone, hotkeys, switches, and dictionary entries", () => {
