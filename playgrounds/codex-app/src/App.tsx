@@ -100,6 +100,7 @@ import {
   ScheduledTaskFilterTabs,
   ScheduledTaskNavigator,
   ScheduledTasksPage,
+  SidebarHelpMenu,
   SitesIndexPage,
   SourceActivityList,
   SourceSearchActivity,
@@ -7049,94 +7050,52 @@ export function App() {
                   <CurrentBuildIcon name="sidebar-voice" />
                   <span>Voice</span>
                 </button>
-                <Menu
-                  align="start"
+                <SidebarHelpMenu
                   className="demo-current-sidebar-menu demo-current-sidebar-help-menu"
-                  label="Help menu"
+                  headingClassName="demo-current-sidebar-help-menu__heading"
+                  icons={{
+                    changelog: (
+                      <CurrentBuildIcon name="sidebar-help-menu-changelog" />
+                    ),
+                    changelogExternal: (
+                      <CurrentBuildIcon name="sidebar-help-menu-changelog-external" />
+                    ),
+                    chrome: <CurrentBuildIcon name="sidebar-help-menu-chrome" />,
+                    help: <CurrentBuildIcon name="sidebar-help-menu-support" />,
+                    keyboard: (
+                      <CurrentBuildIcon name="sidebar-help-menu-keyboard" />
+                    ),
+                    release: (
+                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
+                    ),
+                    remote: <CurrentBuildIcon name="sidebar-help-menu-remote" />,
+                    trigger: <SidebarGlyph name="help-current" />,
+                  }}
                   onOpenChange={(open) => {
                     setCurrentSidebarHelpMenuOpen(open);
                     if (open) setCurrentSidebarAccountMenuOpen(false);
                   }}
                   open={currentSidebarHelpMenuOpen}
-                  side="top"
-                  sideOffset={7}
+                  releases={[
+                    {
+                      date: "13 Aug",
+                      id: "computer-history",
+                      label: "Computer History",
+                    },
+                    {
+                      date: "11 Aug",
+                      id: "linux-desktop-preview",
+                      label: "Linux desktop preview and agent imports",
+                    },
+                    {
+                      date: "31 Jul",
+                      id: "record-replay-regions",
+                      label: "Record & Replay expands to the EU, UK, and Switzerland",
+                    },
+                  ]}
+                  releasesClassName="demo-current-sidebar-help-menu__releases"
                   style={{ width: 320 }}
-                  trigger={
-                    <button aria-label="Open help menu" type="button">
-                      <SidebarGlyph name="help-current" />
-                    </button>
-                  }
-                  width="auto"
-                >
-                <div className="demo-current-sidebar-help-menu__heading">
-                  What&apos;s new
-                </div>
-                <div className="demo-current-sidebar-help-menu__releases">
-                  <MenuItem
-                    shortcut="13 Aug"
-                    startIcon={
-                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
-                    }
-                  >
-                    Computer History
-                  </MenuItem>
-                  <MenuItem
-                    shortcut="11 Aug"
-                    startIcon={
-                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
-                    }
-                  >
-                    Linux desktop preview and agent imports
-                  </MenuItem>
-                  <MenuItem
-                    shortcut="31 Jul"
-                    startIcon={
-                      <CurrentBuildIcon name="sidebar-help-menu-release-note" />
-                    }
-                  >
-                    Record &amp; Replay expands to the EU, UK, and Switzerland
-                  </MenuItem>
-                </div>
-                <MenuItem
-                  endIcon={
-                    <CurrentBuildIcon name="sidebar-help-menu-changelog-external" />
-                  }
-                  startIcon={
-                    <CurrentBuildIcon name="sidebar-help-menu-changelog" />
-                  }
-                >
-                  Full changelog
-                </MenuItem>
-                <MenuSeparator />
-                <MenuItem
-                  startIcon={
-                    <CurrentBuildIcon name="sidebar-help-menu-chrome" />
-                  }
-                >
-                  Set up Chrome extension
-                </MenuItem>
-                <MenuItem
-                  startIcon={
-                    <CurrentBuildIcon name="sidebar-help-menu-remote" />
-                  }
-                >
-                  Set up remote
-                </MenuItem>
-                <MenuItem
-                  startIcon={
-                    <CurrentBuildIcon name="sidebar-help-menu-keyboard" />
-                  }
-                >
-                  Keyboard shortcuts
-                </MenuItem>
-                <MenuItem
-                  startIcon={
-                    <CurrentBuildIcon name="sidebar-help-menu-support" />
-                  }
-                >
-                  Help
-                </MenuItem>
-                </Menu>
+                />
               </>
             ) : (
               <button aria-label="Open settings" type="button">
