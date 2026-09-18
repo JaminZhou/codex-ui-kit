@@ -134,6 +134,7 @@ export const publicRuntimeExports = [
   "SearchActivity",
   "Select",
   "SettingsShell",
+  "SidebarHelpMenu",
   "SitesIndexPage",
   "SkillDetailDialog",
   "SkillPromptMention",

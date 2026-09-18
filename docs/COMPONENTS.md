@@ -556,6 +556,10 @@ kit never performs filesystem, network, account, or process mutations.
   prompt, frequency/detail fields, facts, saving/updating/running/error/retry
   state, busy action locking, and Create/Save/Edit/Pause/Resume/Run callbacks.
   Persistence, permissions, delivery, and cloud execution belong to the host.
+- `SidebarHelpMenu`: controlled release-note grouping and support/setup menu
+  with host-owned release and navigation intent callbacks, disabled entries,
+  icons, trigger state, and focus restoration. It does not navigate or open
+  external support resources itself.
 - `SitesIndexPage`: controlled site search/index with ready/loading/empty/
   unavailable/error states and Create/Open/Share/Refresh/Overflow callbacks.
   Page-level busy/disabled states lock search and all site actions while retry
