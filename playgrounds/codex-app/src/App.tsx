@@ -3309,6 +3309,7 @@ fatal: could not create leading directories of '.git/worktrees/PROJECT': Not a d
 function initialCurrentWorktreeSetupPhase(
   frame: string | null,
 ): WorktreeSetupPhase {
+  if (frame === "current-worktree-setup-queued") return "queued";
   if (frame === "current-worktree-setup-created") return "created";
   if (frame === "current-worktree-setup-creating") return "creating";
   return "failed";
@@ -6760,20 +6761,33 @@ export function App() {
         ? 2
         : 0;
   const currentWorktreeSetupSteps: readonly WorktreeSetupStep[] =
-    currentWorktreeSetupPhase === "failed"
+    currentWorktreeSetupPhase === "queued"
       ? [
           {
             id: "preparing-workspace",
             label: "Preparing workspace",
-            status: "completed",
+            status: "pending",
           },
           {
             id: "checking-out-files",
             label: "Checking out files",
-            status: "failed",
+            status: "pending",
           },
         ]
-      : currentWorktreeSetupStage === "checkout"
+      : currentWorktreeSetupPhase === "failed"
+        ? [
+            {
+              id: "preparing-workspace",
+              label: "Preparing workspace",
+              status: "completed",
+            },
+            {
+              id: "checking-out-files",
+              label: "Checking out files",
+              status: "failed",
+            },
+          ]
+        : currentWorktreeSetupStage === "checkout"
         ? [
             {
               id: "preparing-workspace",
@@ -18184,7 +18198,8 @@ export function App() {
                     </AgentMessage>
                     <WorktreeSetupStatus
                       cancelAction={
-                        currentWorktreeSetupPhase === "creating"
+                        currentWorktreeSetupPhase === "creating" ||
+                        currentWorktreeSetupPhase === "queued"
                           ? {
                               label: "Cancel",
                               onClick: () => {
@@ -18228,7 +18243,8 @@ export function App() {
                       }
                       steps={currentWorktreeSetupSteps}
                       workLocallyAction={
-                        currentWorktreeSetupPhase === "creating"
+                        currentWorktreeSetupPhase === "creating" ||
+                        currentWorktreeSetupPhase === "queued"
                           ? {
                               label: "Work locally",
                               onClick: () => {

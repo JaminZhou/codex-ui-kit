@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type WorktreeSetupPhase = "created" | "creating" | "failed";
+export type WorktreeSetupPhase = "queued" | "created" | "creating" | "failed";
 
 export type WorktreeSetupStepStatus =
   | "completed"
@@ -49,6 +49,18 @@ const defaultSteps: Record<
   Exclude<WorktreeSetupPhase, "created">,
   readonly WorktreeSetupStep[]
 > = {
+  queued: [
+    {
+      id: "preparing-workspace",
+      label: "Preparing workspace",
+      status: "pending",
+    },
+    {
+      id: "checking-out-files",
+      label: "Checking out files",
+      status: "pending",
+    },
+  ],
   creating: [
     {
       id: "preparing-workspace",
@@ -276,7 +288,9 @@ export function WorktreeSetupStatus({
       ? "Worktree setup failed"
       : phase === "created"
         ? "Worktree created"
-        : "Creating a worktree");
+        : phase === "queued"
+          ? "Worktree setup queued"
+          : "Creating a worktree");
   const resolvedSteps = phase === "created" ? [] : (steps ?? defaultSteps[phase]);
   const hasDetails = details !== undefined && details !== null && details !== false;
   const classes = ["codex-ui-worktree-setup", className]
@@ -307,8 +321,12 @@ export function WorktreeSetupStatus({
 
   return (
     <div
-      aria-busy={phase === "creating" || undefined}
-      aria-live={phase === "creating" ? "polite" : undefined}
+      aria-busy={
+        phase === "creating" || phase === "queued" ? true : undefined
+      }
+      aria-live={
+        phase === "creating" || phase === "queued" ? "polite" : undefined
+      }
       className={classes}
       data-expanded={isExpanded || undefined}
       data-phase={phase}
