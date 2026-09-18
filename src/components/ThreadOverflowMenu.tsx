@@ -20,10 +20,24 @@ export interface ThreadOverflowMenuIcons {
   trigger?: ReactNode;
 }
 
+export type ThreadOverflowMenuAction =
+  | "add-scheduled-task"
+  | "archive"
+  | "new-side-chat"
+  | "open-in-new-window"
+  | "pin"
+  | "rename"
+  | "share";
+
+export type ThreadOverflowMenuDisabledActions = Partial<
+  Record<ThreadOverflowMenuAction, boolean>
+>;
+
 export interface ThreadOverflowMenuProps {
   copySubmenu: ReactNode;
   defaultOpen?: boolean;
   disabled?: boolean;
+  disabledActions?: ThreadOverflowMenuDisabledActions;
   forkSubmenu: ReactNode;
   icons?: ThreadOverflowMenuIcons;
   onAddScheduledTask?: () => void;
@@ -44,6 +58,7 @@ export function ThreadOverflowMenu({
   copySubmenu,
   defaultOpen,
   disabled = false,
+  disabledActions,
   forkSubmenu,
   icons = {},
   onAddScheduledTask,
@@ -83,16 +98,23 @@ export function ThreadOverflowMenu({
       width="menu"
     >
       <MenuItem
+        disabled={disabledActions?.pin}
         onSelect={() => onPinChange?.(!pinned)}
         shortcut="⌥⌘P"
         startIcon={icons.pin}
       >
         {pinned ? "Unpin" : "Pin"}
       </MenuItem>
-      <MenuItem onSelect={onRename} shortcut="⌥⌘R" startIcon={icons.rename}>
+      <MenuItem
+        disabled={disabledActions?.rename}
+        onSelect={onRename}
+        shortcut="⌥⌘R"
+        startIcon={icons.rename}
+      >
         Rename
       </MenuItem>
       <MenuItem
+        disabled={disabledActions?.archive}
         onSelect={onArchive}
         shortcut="⇧⌘A"
         startIcon={icons.archive}
@@ -100,7 +122,11 @@ export function ThreadOverflowMenu({
         Archive
       </MenuItem>
       <MenuSeparator />
-      <MenuItem onSelect={onShare} startIcon={icons.share}>
+      <MenuItem
+        disabled={disabledActions?.share}
+        onSelect={onShare}
+        startIcon={icons.share}
+      >
         Share
       </MenuItem>
       <MenuSubmenu
@@ -113,6 +139,7 @@ export function ThreadOverflowMenu({
       </MenuSubmenu>
       <MenuSeparator />
       <MenuItem
+        disabled={disabledActions?.["new-side-chat"]}
         onSelect={onNewSideChat}
         shortcut="⌥⌘S"
         startIcon={icons.newSideChat}
@@ -128,6 +155,7 @@ export function ThreadOverflowMenu({
         {forkSubmenu}
       </MenuSubmenu>
       <MenuItem
+        disabled={disabledActions?.["add-scheduled-task"]}
         onSelect={onAddScheduledTask}
         startIcon={icons.scheduledTask}
       >
@@ -143,6 +171,7 @@ export function ThreadOverflowMenu({
         {openInSubmenu}
       </MenuSubmenu>
       <MenuItem
+        disabled={disabledActions?.["open-in-new-window"]}
         onSelect={onOpenInNewWindow}
         startIcon={icons.openInNewWindow}
       >
