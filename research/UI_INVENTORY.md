@@ -93,11 +93,13 @@ host-owned and are intentionally not claimed by the playground.
 - A newer isolated shell/sidebar candidate for `26.911.61220` is recorded in
   [`current-baseline-26.911.61220.json`](current-baseline-26.911.61220.json)
   and [`26.911.61220.md`](26.911.61220.md). It repeats the eight renderer
-  states, Projects, Help, responsive, and native-boundary contract. The
-  machine-readable inventory maps the exact CDP observations to the affected
-  shell/sidebar and Projects surfaces, but the candidate remains separate
-  from the promoted `26.903.71938` baseline until those families receive
-  current-build Browser/CDP, Electron, and regional-pixel refreshes.
+  states, Projects, Help, responsive, and native-boundary contract, and records
+  the 712×44px New chat editor anchor at 14px/20px/430. The machine-readable
+  inventory maps the exact CDP observations to the affected shell/sidebar,
+  Projects, thread-shell, and Composer-shell surfaces, but the candidate
+  remains separate from the promoted `26.903.71938` baseline until those
+  families receive current-build Browser/CDP, Electron, and regional-pixel
+  refreshes.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to

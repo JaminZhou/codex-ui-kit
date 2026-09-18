@@ -25,7 +25,9 @@ exit gates; it does not replace the inventory.
   and [`26.911.61220.md`](26.911.61220.md). It is a candidate-only refresh;
   the promoted global baseline remains `26.903.71938` until the affected
   surface families receive their own current-build Browser/CDP, Electron, and
-  regional-pixel evidence.
+  regional-pixel evidence. The capture also records the 26.911 New chat
+  Composer anchor (`712×44px`, 14px/20px/430), but not Composer lifecycle or
+  product-pixel promotion.
 - The installed app now reports `26.908.70816` (`9275`), Chromium
   `152.0.7977.83`, and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
