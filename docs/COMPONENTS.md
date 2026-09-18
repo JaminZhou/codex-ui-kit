@@ -318,8 +318,9 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `GitSettingsPage`: controlled Branch prefix, Merge/Squash, force-push,
   draft-PR, review-delivery, commit-instruction, and pull-request-instruction
   presentation. Saving feedback, retry copy, and busy-state locking are
-  host-controlled; hosts still own persistence, validation, save failures, Git
-  mutation, and dirty-state decisions.
+  host-controlled; a host-wide disabled state locks the same controls without
+  changing their values. Hosts still own persistence, validation, save failures,
+  Git mutation, and dirty-state decisions.
 - `AppearanceSettingsPage`: controlled System/Light/Dark selection, responsive
   previews, Light/Dark theme editors, code-theme menus, contrast ranges, and
   the complete Preferences card. Loading, saving, saved, and error feedback,
@@ -510,8 +511,9 @@ kit never performs filesystem, network, account, or process mutations.
   is an editor contract, not a remote environment client.
 - `HooksSettingsPage`: controlled hook groups, trust/managed/changed states,
   config-open and reload callbacks, refresh busy state, and explicit error
-  recovery with host-configurable copy. Refreshing locks mutable hook actions;
-  it does not read or write hook files.
+  recovery with host-configurable copy. Refreshing or a host-wide disabled state
+  locks reload, trust, config, and toggle actions; it does not read or write hook
+  files.
 - `KeyboardShortcutsPage`: searchable, grouped shortcut catalogue with
   controlled capture/edit/clear/cancel state and `onShortcutChange`.
   Loading, saving, saved, and error feedback, retry copy, and busy-state

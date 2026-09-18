@@ -244,6 +244,7 @@ export type GitSettingsStatus = "error" | "ready" | "saved" | "saving";
 export interface GitSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "onChange"> {
   commitInstructionsDirty?: boolean;
+  disabled?: boolean;
   onChange: (value: GitSettingsValue) => void;
   onRetry?: () => void;
   onSaveCommitInstructions?: () => void;
@@ -357,6 +358,7 @@ function InstructionSection({
   onChange,
   onSave,
   placeholder,
+  saving = false,
   savingLabel = "Saving…",
   value,
 }: {
@@ -367,6 +369,7 @@ function InstructionSection({
   onChange: TextareaHTMLAttributes<HTMLTextAreaElement>["onChange"];
   onSave?: () => void;
   placeholder: string;
+  saving?: boolean;
   savingLabel?: ReactNode;
   value: string;
 }) {
@@ -379,7 +382,7 @@ function InstructionSection({
           <p id={descriptionId}>{description}</p>
         </div>
         <button disabled={disabled || !dirty || !onSave} onClick={onSave} type="button">
-          {disabled ? savingLabel : "Save"}
+          {saving ? savingLabel : "Save"}
         </button>
       </header>
       <textarea
@@ -397,6 +400,7 @@ function InstructionSection({
 export function GitSettingsPage({
   className,
   commitInstructionsDirty = false,
+  disabled = false,
   onChange,
   onRetry,
   onSaveCommitInstructions,
@@ -412,6 +416,7 @@ export function GitSettingsPage({
   const prefixId = useId();
   const statusId = useId();
   const isSaving = status === "saving";
+  const isLocked = disabled || isSaving;
   const showStatus = status !== "ready";
   const resolvedStatusMessage =
     statusMessage ??
@@ -430,9 +435,11 @@ export function GitSettingsPage({
       {...props}
       aria-busy={isSaving || undefined}
       aria-describedby={showStatus ? statusId : undefined}
+      aria-disabled={disabled || undefined}
       className={["codex-ui-git-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <h1>Git</h1>
@@ -445,7 +452,13 @@ export function GitSettingsPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
@@ -462,7 +475,7 @@ export function GitSettingsPage({
           </div>
           <input
             aria-label="Branch prefix"
-            disabled={isSaving}
+            disabled={isLocked}
             id={prefixId}
             onChange={(event) => update("branchPrefix", event.currentTarget.value)}
             placeholder="codex/"
@@ -477,7 +490,7 @@ export function GitSettingsPage({
             <p>Choose how ChatGPT merges pull requests</p>
           </div>
           <SegmentedControl
-            disabled={isSaving}
+            disabled={isLocked}
             label="Pull request merge method"
             onChange={(mergeMethod) => update("mergeMethod", mergeMethod)}
             options={[
@@ -494,7 +507,7 @@ export function GitSettingsPage({
           </div>
           <SettingsSwitch
             checked={value.alwaysForcePush}
-            disabled={isSaving}
+            disabled={isLocked}
             label="Always force push"
             onChange={(alwaysForcePush) =>
               update("alwaysForcePush", alwaysForcePush)
@@ -508,7 +521,7 @@ export function GitSettingsPage({
           </div>
           <SettingsSwitch
             checked={value.createDraftPullRequests}
-            disabled={isSaving}
+            disabled={isLocked}
             label="Create draft pull requests"
             onChange={(createDraftPullRequests) =>
               update("createDraftPullRequests", createDraftPullRequests)
@@ -524,7 +537,7 @@ export function GitSettingsPage({
             </p>
           </div>
           <SegmentedControl
-            disabled={isSaving}
+            disabled={isLocked}
             label="Review delivery"
             onChange={(reviewDelivery) =>
               update("reviewDelivery", reviewDelivery)
@@ -539,7 +552,7 @@ export function GitSettingsPage({
       </section>
       <InstructionSection
         description="Added to commit message generation prompts"
-        disabled={isSaving}
+        disabled={isLocked}
         dirty={commitInstructionsDirty}
         label="Commit instructions"
         onChange={(event) =>
@@ -547,12 +560,13 @@ export function GitSettingsPage({
         }
         onSave={onSaveCommitInstructions}
         placeholder="Add commit message guidance…"
+        saving={isSaving}
         savingLabel={savingLabel}
         value={value.commitInstructions}
       />
       <InstructionSection
         description="Added to PR title/description generation prompts"
-        disabled={isSaving}
+        disabled={isLocked}
         dirty={pullRequestInstructionsDirty}
         label="Pull request instructions"
         onChange={(event) =>
@@ -560,6 +574,7 @@ export function GitSettingsPage({
         }
         onSave={onSavePullRequestInstructions}
         placeholder="Add pull request guidance…"
+        saving={isSaving}
         savingLabel={savingLabel}
         value={value.pullRequestInstructions}
       />
@@ -616,6 +631,7 @@ export interface HookSettingsLoadIssue {
 
 export interface HooksSettingsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  disabled?: boolean;
   errorHeading?: ReactNode;
   errorMessage?: ReactNode;
   entries?: readonly HookSettingsEntry[];
@@ -828,6 +844,7 @@ function HookEntryDetails({
 
 export function HooksSettingsPage({
   className,
+  disabled = false,
   errorHeading = "Could not load hooks",
   errorMessage = "Hooks can run outside of the sandbox so we ask you to review any recently installed or modified hooks",
   entries = [],
@@ -844,6 +861,7 @@ export function HooksSettingsPage({
   status = "ready",
   ...props
 }: HooksSettingsPageProps) {
+  const isLocked = disabled || refreshing || status === "loading";
   const groupedSources = hookSourceOrder.flatMap((source) => {
     const sourceGroups = new Map<string, HookSettingsEntry[]>();
     for (const entry of entries.filter(
@@ -871,9 +889,11 @@ export function HooksSettingsPage({
     <article
       {...props}
       aria-busy={status === "loading" || refreshing || undefined}
+      aria-disabled={disabled || undefined}
       className={["codex-ui-hooks-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-refreshing={refreshing || undefined}
       data-status={status}
     >
@@ -882,7 +902,7 @@ export function HooksSettingsPage({
           <h1>Hooks</h1>
           <p>
             Manage lifecycle hooks from config and enabled plugins.{" "}
-            {learnMoreHref ? (
+            {learnMoreHref && !disabled ? (
               <a href={learnMoreHref} rel="noreferrer" target="_blank">
                 Learn more
               </a>
@@ -894,8 +914,10 @@ export function HooksSettingsPage({
         <button
           aria-label="Reload hooks"
           className="codex-ui-hooks-settings__reload"
-          disabled={!onReload || status === "loading" || refreshing}
-          onClick={onReload}
+          disabled={!onReload || isLocked}
+          onClick={() => {
+            if (!isLocked) onReload?.();
+          }}
           type="button"
         >
           {reloadIcon ?? <span aria-hidden="true">↻</span>}
@@ -910,8 +932,10 @@ export function HooksSettingsPage({
             <span>{errorMessage}</span>
           </div>
           <button
-            disabled={!onReload || refreshing}
-            onClick={onReload}
+            disabled={!onReload || disabled || refreshing}
+            onClick={() => {
+              if (!disabled && !refreshing) onReload?.();
+            }}
             type="button"
           >
             {retryLabel}
@@ -942,7 +966,7 @@ export function HooksSettingsPage({
                       </header>
                       {sourceEntries.map((entry) => (
                         <HookEntryDetails
-                          disabled={refreshing}
+                          disabled={isLocked}
                           entry={entry}
                           key={entry.id}
                           onOpenConfig={onOpenConfig}

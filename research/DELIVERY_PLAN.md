@@ -1430,6 +1430,11 @@ asset manifest to 78 icons; the later completed-thread slice raises it to 90.
 Git preferences, Worktrees, and Hooks now also have explicit wide/720
 light-theme Browser/CDP, Electron, and regional-pixel coverage; these are
 controlled replay evidence and do not claim host persistence or hook mutation.
+The Git and Hooks primitives now also expose a host-wide disabled boundary:
+Git locks its fields, segmented controls, switches, instructions, and retry;
+Hooks locks reload, trust, config, toggle, and external-help actions while
+retaining its visible lifecycle state. This is a renderer contract only;
+Git persistence and hook-file effects remain host-owned.
 Remaining P1 families keep their existing open
 gates, so Stage 4 is still in progress.
 
