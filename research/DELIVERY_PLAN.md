@@ -1481,6 +1481,14 @@ after uninstall, and keeps a retry callback available. This remains renderer
 state evidence; skill installation, execution, and registry persistence stay
 host-owned.
 
+The integration catalog replay now carries a controlled install lifecycle for
+public plugin and recommended skill rows: an action enters a disabled pending
+state, settles to success, and promotes the item into the Installed region.
+Browser/CDP covers both plugin and skill transitions in addition to the static
+wide/compact catalog matrix. This is replay-owned state only; registry writes,
+OAuth, permissions, uninstall, and cross-session persistence remain host-owned
+and are not promoted to product-complete evidence.
+
 The current thread-overflow slice closes the former unsampled P1 root menu.
 `ThreadOverflowMenu` exposes the observed ten actions, three separators, four
 shortcuts, and host-supplied Copy/Fork/Open-in submenus without performing any
