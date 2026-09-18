@@ -1472,7 +1472,11 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+  // macOS normally keeps the app alive after its last window; the headless
+  // Electron harness must exit each scene so the next contract can start.
+  if (process.platform !== "darwin" || process.env.CODEX_DEMO_HEADLESS === "1") {
+    app.quit();
+  }
 });
 
 app.on("before-quit", () => {

@@ -4709,6 +4709,15 @@ export async function launchScene(
     windowSize,
   } = {},
 ) {
+  const progress = process.env.CODEX_UI_KIT_ELECTRON_PROGRESS === "1";
+  const startedAt = Date.now();
+  const report = (phase) => {
+    if (progress) {
+      console.error(
+        `[electron-harness] ${scene.id}: ${phase} (${Date.now() - startedAt}ms)`,
+      );
+    }
+  };
   const resolvedWindowSize = windowSize ?? scene.windowSize;
   const resolvedLayoutMode = layoutMode ?? scene.layoutMode;
   const resolvedTheme = theme ?? scene.theme ?? "dark";
@@ -4748,12 +4757,15 @@ export async function launchScene(
         : {}),
     },
   });
+  report("launched");
   const page = await app.firstWindow();
+  report("first window");
   await page.bringToFront();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.waitForSelector(
     `.demo-root[data-scenario="${scene.scenario}"][data-frame="${scene.frame}"]`,
   );
+  report("scene ready");
   if (scene.frame?.startsWith("workspace-document-preview-current")) {
     try {
       await page.waitForFunction(() => document.querySelectorAll('[data-pdf-page][data-painted="true"]').length === 2);
@@ -4975,5 +4987,6 @@ export async function launchScene(
       if (active instanceof HTMLElement) active.blur();
     });
   }
+  report("prepared");
   return { app, page };
 }
