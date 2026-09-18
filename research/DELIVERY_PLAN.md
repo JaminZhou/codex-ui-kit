@@ -2253,7 +2253,9 @@ without confusing package readiness with full product reconstruction.
     keyboard surface now also exposes host-controlled loading, saving, saved,
     and error states with retry copy and locked search/capture controls. The
     voice surface follows the same lifecycle contract for microphone, voice,
-    hotkey, and dictionary controls. Usage & billing now exposes the same
+    hotkey, and dictionary controls. Both surfaces now also carry page-level
+    disabled semantics and lock their host retry actions without changing
+    current values. Usage & billing now exposes the same
     host-controlled loading, saving, saved, and error boundary while keeping
     account, billing, and checkout effects outside the renderer. Usage
     & billing and its embedded Personal/Business plan surface are now a third

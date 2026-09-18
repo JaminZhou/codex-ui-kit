@@ -165,10 +165,12 @@ export function KeyboardShortcutsPage({
     <article
       {...props}
       aria-busy={status === "loading" || isSaving || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-keyboard-shortcuts", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <h1>Keyboard shortcuts</h1>
@@ -181,7 +183,13 @@ export function KeyboardShortcutsPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
@@ -631,10 +639,12 @@ export function VoiceSettingsPage({
     <article
       {...props}
       aria-busy={status === "loading" || isSaving || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-voice-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <h1>Voice</h1>
@@ -647,7 +657,13 @@ export function VoiceSettingsPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}

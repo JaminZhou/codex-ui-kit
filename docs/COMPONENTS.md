@@ -519,7 +519,8 @@ kit never performs filesystem, network, account, or process mutations.
 - `KeyboardShortcutsPage`: searchable, grouped shortcut catalogue with
   controlled capture/edit/clear/cancel state and `onShortcutChange`.
   Loading, saving, saved, and error feedback, retry copy, and busy-state
-  locking are host-controlled. Native registration and persistence remain
+  locking are host-controlled. A host-wide disabled state also carries page
+  semantics and locks retry. Native registration and persistence remain
   host-owned.
 - `PersonalizationSettingsPage`: controlled custom instructions, Memory
   controls, warning, and Personality choice with save/reset callbacks. Save
@@ -530,7 +531,8 @@ kit never performs filesystem, network, account, or process mutations.
 - `VoiceSettingsPage`: controlled microphone, voice, screen-context,
   dictionary, and recording states with host callbacks. Loading, saving,
   saved, and error feedback, retry copy, and busy-state locking are
-  host-controlled. Audio capture and permissions remain outside the package.
+  host-controlled. A host-wide disabled state also carries page semantics and
+  locks retry. Audio capture and permissions remain outside the package.
 - `WorktreeSettingsPage`: controlled managed-worktree preferences and project
   groups with Refresh/Delete/New-chat callbacks. Loading, saving, saved, and
   error feedback, retry copy, and busy-state locking are host-controlled. It
