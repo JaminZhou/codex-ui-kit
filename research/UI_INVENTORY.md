@@ -370,6 +370,14 @@ Browser/CDP, Electron, and pixel gates. Persistence, cloud execution,
 delivery, real permissions, and installed-product mutation remain host-owned;
 this does not promote replay behavior to a real scheduled-task run.
 
+The installed `26.911.61220` build was re-observed in an isolated native
+viewport. It exposes the current Scheduled tasks title/description, 728×32
+search, four 28px filters, three Pause rows, and the three visible suggestion
+labels with exact icon path hashes; horizontal overflow is zero. The sanitized
+record is `research/current-automations-26.911.61220.json`. This is current
+read-only geometry and icon evidence only; replay/Electron/pixel promotion and
+cloud task mutation remain host-owned and unsampled.
+
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
 workspace selection, PR review, editor diff, terminal, browser and artifact
