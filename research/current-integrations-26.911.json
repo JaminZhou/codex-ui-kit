@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-18",
+  "baseline": {
+    "appAsarBytes": 342674749,
+    "appAsarSha256": "f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f",
+    "appVersion": "26.911.61220",
+    "buildNumber": "9647",
+    "chromiumVersion": "153.0.8010.36",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "mainCodexProcessPreserved": true,
+    "profileKind": "unique-private-tmp-profile",
+    "captureModes": ["native-wide", "emulated-compact"]
+  },
+  "sharedGeometry": {
+    "heading": {
+      "nativeWide": { "left": 1056.9375, "top": 66, "width": 560.421875, "height": 28.796875 },
+      "compact": { "left": 341.875, "top": 66, "width": 358.125, "height": 28.796875 },
+      "fontSize": 24,
+      "fontWeight": 400,
+      "lineHeight": 28.8
+    },
+    "description": {
+      "nativeWide": { "left": 1056.9375, "top": 100.796875, "width": 560.421875, "height": 21 },
+      "compact": { "left": 341.875, "top": 100.796875, "width": 358.125, "height": 21 }
+    },
+    "search": {
+      "nativeWide": { "left": 1600.9375, "top": 153.796875, "width": 224, "height": 32 },
+      "compact": null,
+      "border": "1px solid rgba(255, 255, 255, 0.157)",
+      "borderRadius": 9999,
+      "paddingInline": 10,
+      "compactBehavior": "unmounted-at-720px-emulated-width"
+    },
+    "content": {
+      "nativeWide": { "left": 1056.9375, "top": 153.796875, "width": 768 },
+      "compact": { "left": 341.875, "top": 197.796875, "width": 358.125 }
+    },
+    "horizontalOverflow": { "nativeWide": 0, "compact": 0 }
+  },
+  "plugins": {
+    "routeTitle": "Plugins",
+    "description": "Manage plugins, skills, and MCPs",
+    "tabCount": 13,
+    "nativeWide": {
+      "body": { "left": 1056.9375, "top": 153.796875, "width": 768, "height": 949.625 },
+      "grid": { "left": 1056.9375, "top": 225.796875, "width": 768, "height": 877.625, "columns": "768px" },
+      "visibleItemTitles": ["GitHub", "Watch PR", "AppKit Inspector", "Default templates", "Plugin Management", "Sites", "Documents", "PDF", "Spreadsheets", "Presentations", "Template Creator", "Computer Use", "Visualize"]
+    },
+    "compact": {
+      "body": { "left": 341.875, "top": 197.796875, "width": 358.125, "height": 945.625 },
+      "grid": { "left": 341.875, "top": 265.796875, "width": 358.125, "height": 877.625, "columns": "358.125px" },
+      "visibleItemTitles": ["GitHub", "Watch PR", "AppKit Inspector", "Default templates", "Plugin Management", "Sites"]
+    }
+  },
+  "skills": {
+    "routeTitle": "Plugins",
+    "description": "Manage plugins, skills, and MCPs",
+    "tabCount": 2,
+    "nativeWide": {
+      "body": { "left": 1056.9375, "top": 153.796875, "width": 768, "height": 200.25 },
+      "grid": { "left": 1056.9375, "top": 225.796875, "width": 768, "height": 128.25, "columns": "768px" },
+      "visibleItemTitles": ["ASC Tooling", "RedRocket Market"]
+    },
+    "compact": {
+      "body": { "left": 341.875, "top": 197.796875, "width": 358.125, "height": 196.25 },
+      "grid": { "left": 341.875, "top": 265.796875, "width": 358.125, "height": 128.25, "columns": "358.125px" },
+      "visibleItemTitles": ["ASC Tooling", "RedRocket Market"]
+    }
+  },
+  "boundary": {
+    "readOnly": true,
+    "doesNotClaim": [
+      "plugin installation or uninstallation",
+      "skill enable/disable persistence",
+      "OAuth, permission, registry, network, or execution effects",
+      "third-party artwork provenance or pixel promotion"
+    ],
+    "compactSearch": "The current build unmounts the catalog search field at the emulated compact width; this is recorded as product behavior, not replaced with a synthetic control."
+  }
+}
