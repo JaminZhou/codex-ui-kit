@@ -9896,9 +9896,28 @@ for (const scene of selectedScenes) {
             .querySelector(".demo-current-thread-overflow-anchor")
             ?.getAttribute("data-thread-overflow-action") === "pin",
       );
+      if (
+        (await page
+          .locator(".demo-current-thread-overflow-anchor")
+          .getAttribute("data-thread-overflow-pinned")) !== "true"
+      ) {
+        throw new Error(`${scene.id}: Pin state did not settle.`);
+      }
+      await trigger.click();
+      await page.getByRole("menuitem", { name: /^Unpin\s+⌥⌘P$/ }).click();
+      await page.waitForFunction(
+        () =>
+          document
+            .querySelector(".demo-current-thread-overflow-anchor")
+            ?.getAttribute("data-thread-overflow-action") === "unpin" &&
+          document
+            .querySelector(".demo-current-thread-overflow-anchor")
+            ?.getAttribute("data-thread-overflow-pinned") === "false",
+      );
       overflow.interactions = {
         action: "pin",
         copySubmenu: ["Copy task link", "Copy Markdown"],
+        pinState: ["true", "false"],
         rootEscapeRestoredFocus: true,
         submenuEscapeKeptRootOpen: true,
       };
