@@ -2022,6 +2022,9 @@
         "document-preview-panel",
         "playground:workspace-document-preview-ready-loading-error",
         "playground:workspace-document-preview-format-matrix",
+        "replay:current-26.911-document-media-shell-321.875-wide-compact",
+        "electron:current-26.911-document-media-shell-geometry",
+        "pixel:current-26.911-document-media-shell-zero-drift",
         "browser-cdp:workspace-document-preview-format-matrix",
         "electron:workspace-document-preview-format-matrix",
         "pixel:workspace-document-preview-format-matrix"
@@ -2041,6 +2044,9 @@
         "home-prefill-artifact-preview",
         "document-preview-panel:image",
         "playground:workspace-image-preview-ready-loading-error",
+        "replay:current-26.911-document-media-shell-321.875-wide-compact",
+        "electron:current-26.911-document-media-shell-geometry",
+        "pixel:current-26.911-document-media-shell-zero-drift",
         "browser-cdp:workspace-image-preview-format-lifecycle",
         "electron:workspace-image-preview-format-lifecycle",
         "pixel:workspace-image-preview-wide-compact"

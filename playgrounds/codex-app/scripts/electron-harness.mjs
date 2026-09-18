@@ -559,6 +559,31 @@ export const visualScenes = [
     view: "workspace",
     windowSize: { height: 680, width: 720 },
   },
+  ...[
+    ["doc", "meeting-notes.docx"],
+    ["image", "generated-image.png"],
+  ].flatMap(([kind]) => [
+    {
+      currentSidebar: true,
+      frame: `workspace-current-26-911-${kind}-preview-ready`,
+      id: `workspace-current-26-911-${kind}-preview-ready`,
+      maxPixelRatio: 0.01,
+      scenario: "workspace-workflow",
+      theme: "dark",
+      view: "workspace",
+    },
+    {
+      currentSidebar: true,
+      frame: `workspace-current-26-911-${kind}-preview-ready`,
+      id: `workspace-current-26-911-${kind}-preview-ready-compact`,
+      maxPixelRatio: 0.01,
+      scenario: "workspace-workflow",
+      sidebarState: "hidden",
+      theme: "dark",
+      view: "workspace",
+      windowSize: { height: 680, width: 720 },
+    },
+  ]),
   {
     currentSidebar: true,
     frame: "workspace-document-preview-ready",

@@ -1716,6 +1716,11 @@ public preview shell exposes an explicit `image` kind, while the playground
 uses a checked-in image fixture and states that generation and file decoding
 remain host-owned. Browser/CDP, Electron, and owned-pixel contracts cover the
 route; no product-generation or runtime-decoder claim is made.
+The current 26.911 replay now also routes document and image preview shells
+through the measured `321.875px` expanded rail, with a hidden-rail 720px
+variant, zero overflow, and zero repeated-capture drift. This is a shell and
+ownership regression gate only; it does not promote installed-product
+document decoding, image generation, or product pixels.
 
 The `app.onboarding-login` row now has a controlled `LoginPage` surface based
 on the current package's login-route provider labels and desktop geometry. It

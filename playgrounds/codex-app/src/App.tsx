@@ -837,41 +837,51 @@ function documentPreviewStatusForFrame(
   return "ready";
 }
 
+function normalizedDocumentPreviewFrame(frame: string | null): string | null {
+  const prefix = "workspace-current-26-911-";
+  return frame?.startsWith(prefix)
+    ? `workspace-${frame.slice(prefix.length)}`
+    : frame;
+}
+
 function isDocumentPreviewFrame(frame: string | null): boolean {
+  const normalized = normalizedDocumentPreviewFrame(frame);
   return Boolean(
-    frame &&
-      (frame.startsWith("workspace-document-preview") ||
-        frame.startsWith("workspace-image-preview") ||
-        frame.startsWith("workspace-notebook-preview") ||
-        frame.startsWith("workspace-spreadsheet-preview") ||
-        frame.startsWith("workspace-presentation-preview") ||
-        frame.startsWith("workspace-doc-preview")),
+    normalized &&
+      (normalized.startsWith("workspace-document-preview") ||
+        normalized.startsWith("workspace-image-preview") ||
+        normalized.startsWith("workspace-notebook-preview") ||
+        normalized.startsWith("workspace-spreadsheet-preview") ||
+        normalized.startsWith("workspace-presentation-preview") ||
+        normalized.startsWith("workspace-doc-preview")),
   );
 }
 
 function documentPreviewKindForFrame(
   frame: string | null,
 ): DocumentPreviewKind {
-  if (frame?.startsWith("workspace-image-preview")) return "image";
-  if (frame?.startsWith("workspace-notebook-preview")) return "notebook";
-  if (frame?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
-  if (frame?.startsWith("workspace-presentation-preview")) return "presentation";
-  if (frame?.startsWith("workspace-doc-preview")) return "document";
-  if (frame?.startsWith("workspace-document-preview")) return "pdf";
+  const normalized = normalizedDocumentPreviewFrame(frame);
+  if (normalized?.startsWith("workspace-image-preview")) return "image";
+  if (normalized?.startsWith("workspace-notebook-preview")) return "notebook";
+  if (normalized?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
+  if (normalized?.startsWith("workspace-presentation-preview")) return "presentation";
+  if (normalized?.startsWith("workspace-doc-preview")) return "document";
+  if (normalized?.startsWith("workspace-document-preview")) return "pdf";
   return "pdf";
 }
 
 function documentPreviewTitleForFrame(frame: string | null): string {
-  if (frame?.startsWith("workspace-image-preview")) return "generated-image.png";
-  if (frame?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
-  if (frame?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
-  if (frame?.startsWith("workspace-presentation-preview")) return "roadmap.pptx";
-  if (frame?.startsWith("workspace-doc-preview")) return "meeting-notes.docx";
+  const normalized = normalizedDocumentPreviewFrame(frame);
+  if (normalized?.startsWith("workspace-image-preview")) return "generated-image.png";
+  if (normalized?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
+  if (normalized?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
+  if (normalized?.startsWith("workspace-presentation-preview")) return "roadmap.pptx";
+  if (normalized?.startsWith("workspace-doc-preview")) return "meeting-notes.docx";
   return "design-spec.pdf";
 }
 
 function documentPreviewSubtitleForFrame(frame: string | null): string {
-  if (frame?.startsWith("workspace-image-preview")) {
+  if (normalizedDocumentPreviewFrame(frame)?.startsWith("workspace-image-preview")) {
     return "Generated image · 1.2 MB · workspace artifact";
   }
   return "2 pages · 18 KB · workspace artifact";
