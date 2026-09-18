@@ -1407,7 +1407,8 @@ General now also exposes host-controlled loading, saving, saved, and error
 states with retry copy, status semantics, and a locked control surface while
 the host persists changes. This lifecycle remains presentation-only: hosts
 still own persistence, folder and license actions, global shortcut registration,
-and notification delivery.
+and notification delivery. Its host-wide disabled boundary now also carries
+page semantics and locks retry/elevated-risk help actions.
 
 The Hooks/code-review family is now delivered with its evidence levels kept
 separate. An isolated current `26.803.61601` Renderer reaches the visible
