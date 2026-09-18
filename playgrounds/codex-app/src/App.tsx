@@ -9675,6 +9675,8 @@ export function App() {
           : workspaceEnvironmentId === "worktree"
             ? "workspace-context-current-26-825-new-worktree"
             : "workspace-context-current-26-825-ready"
+      : initialSelection.frame?.startsWith("workspace-current-26-911-")
+        ? initialSelection.frame
       : initialSelection.frame === "workspace-compact-ready"
       ? "workspace-compact-ready"
       : workspaceProjectId === null
@@ -17934,6 +17936,9 @@ export function App() {
             : currentSidebarThreadLifecycle ||
                 currentSidebarWorktreeLifecycle ||
                 currentContext26825Replay ||
+                initialSelection.frame?.startsWith(
+                  "workspace-current-26-911-",
+                ) ||
                 currentTerminal26825Frame(activeFrame) ||
                 view === "automations" ||
                 view === "sites" ||

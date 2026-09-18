@@ -41,6 +41,11 @@ exit gates; it does not replace the inventory.
   the own-fixture screenshot at zero drift. This closes a replay-shell offset
   that could otherwise hide Composer pixel regressions; it does not promote
   installed-product pixels or selection/execution behavior.
+- The same `321.875px` rail is now a dedicated `workspace-current-26-911-ready`
+  wide/compact shell replay. The focused contract locks the `46px` titlebar,
+  `858.125px` wide main track, `736px` Composer, hidden-rail `720px` layout,
+  and zero-overflow/zero-drift repeatability. It is current-build structural
+  replay evidence, not a claim of installed-product pixel promotion.
 - The installed app now reports `26.908.70816` (`9275`), Chromium
   `152.0.7977.83`, and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
