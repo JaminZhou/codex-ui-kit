@@ -939,7 +939,11 @@ The playground now also exposes a deterministic `collection-error` replay with
 the same `role="alert"`, copy, typography, and compact geometry as the shared
 collection state component. This closes the implementation/acceptance gap for
 the failed collection branch without promoting a synthetic failure to current
-installed-product evidence. Remaining Stage 1 work includes re-observing
+installed-product evidence. The shared worktree setup card now also models a
+queued phase with pending steps and the same cancel/work-locally escape hatches
+as the creating phase; this is controlled renderer state until a current
+installed-product queued capture is available. Remaining Stage 1 work includes
+re-observing
 ordinary error and collection loading on the installed build, plus broader
 route lifecycle feedback and installed-product notification reachability. The
 shared ProjectIndex implementation now also exposes host-controlled

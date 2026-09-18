@@ -100,6 +100,36 @@ describe("WorktreeSetupStatus", () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 
+  it("announces a queued setup without starting either step", () => {
+    const onCancel = vi.fn();
+
+    render(
+      <WorktreeSetupStatus
+        cancelAction={{ label: "Cancel", onClick: onCancel }}
+        phase="queued"
+        workLocallyAction={{ label: "Work locally" }}
+      />,
+    );
+
+    const status = screen.getByRole("status");
+    expect(status.getAttribute("data-phase")).toBe("queued");
+    expect(status.getAttribute("aria-busy")).toBe("true");
+    expect(
+      screen.getByRole("heading", { name: "Worktree setup queued" }),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByRole("list")).getAllByRole("listitem")[0]
+        ?.textContent,
+    ).toBe("Pending: Preparing workspace");
+    expect(
+      within(screen.getByRole("list")).getAllByRole("listitem")[1]
+        ?.textContent,
+    ).toBe("Pending: Checking out files");
+
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(onCancel).toHaveBeenCalledOnce();
+  });
+
   it("renders the created handoff without a setup card", () => {
     render(
       <WorktreeSetupStatus
