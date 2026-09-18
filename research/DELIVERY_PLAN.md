@@ -2367,7 +2367,14 @@ without confusing package readiness with full product reconstruction.
     paths. The current manual editor and permission-error detail now
     also have explicit light wide/720 and compact-error Browser/CDP, Electron,
     and regional-pixel coverage; controlled form mutation is covered while
-    cloud persistence and execution remain host-owned. Plugin detail
+    cloud persistence and execution remain host-owned. The installed
+    `26.911.61220` follow-up re-observes the Scheduled tasks index on the
+    current build: title and description, 728×32 search, four filters, three
+    Pause rows, suggestion labels, exact icon path hashes, and zero horizontal
+    overflow. The native-viewport record is retained in
+    [`current-automations-26.911.61220.json`](26.911.61220-automations.md);
+    replay/Electron/pixel promotion and cloud mutation effects remain separate
+    host-owned boundaries. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only

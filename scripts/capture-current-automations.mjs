@@ -1,7 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { realpathSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
-import { currentBaselineFingerprint } from "./current-baseline-contract.mjs";
+import {
+  currentBaselineFingerprint,
+  currentNewestCandidateBaselineFingerprint,
+} from "./current-baseline-contract.mjs";
 
 // Capture-only. This script samples fixed Scheduled-task labels, counts,
 // geometry, and computed styles in an isolated current-build process. It never
@@ -12,6 +15,14 @@ const requestedProfile = process.env.CODEX_CURRENT_AUTOMATIONS_PROFILE;
 const requestedOutput = process.env.CODEX_CURRENT_AUTOMATIONS_OUTPUT;
 const allowCapture =
   process.env.CODEX_CURRENT_AUTOMATIONS_ALLOW_CAPTURE === "1";
+const expectedFingerprint =
+  process.env.CODEX_CURRENT_AUTOMATIONS_FINGERPRINT === "26.911.61220"
+    ? currentNewestCandidateBaselineFingerprint
+    : currentBaselineFingerprint;
+const outputPrefix =
+  process.env.CODEX_CURRENT_AUTOMATIONS_FINGERPRINT === "26.911.61220"
+    ? "current-automations-26-911-"
+    : "current-automations-26-903-";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -38,11 +49,11 @@ if (!profile.startsWith("/private/tmp/codex-ui-kit-")) {
 }
 if (
   dirname(output) !== profile ||
-  !basename(output).startsWith("current-automations-26-903-") ||
+  !basename(output).startsWith(outputPrefix) ||
   !basename(output).endsWith(".json")
 ) {
   throw new Error(
-    "The output must be a current-automations-26-903-*.json direct child of the isolated profile.",
+    `The output must be a ${outputPrefix}*.json direct child of the isolated profile.`,
   );
 }
 
@@ -63,12 +74,12 @@ const fingerprint = {
   chromiumVersion: plistValue("ChromiumBaseVersion"),
 };
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match the requested baseline: ${JSON.stringify(fingerprint)}`,
   );
 }
 
