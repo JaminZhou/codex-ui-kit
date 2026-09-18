@@ -21,6 +21,13 @@ const requestedSceneIds = requestedScenesArgument
 const selectedScenes = requestedSceneIds
   ? visualScenes.filter(({ id }) => requestedSceneIds.has(id))
   : visualScenes;
+const requestedConcurrency = Number.parseInt(
+  process.env.CODEX_UI_KIT_VISUAL_CONCURRENCY ?? "1",
+  10,
+);
+const visualConcurrency = Number.isFinite(requestedConcurrency)
+  ? Math.max(1, requestedConcurrency)
+  : 1;
 if (
   requestedSceneIds &&
   selectedScenes.length !== requestedSceneIds.size
@@ -1826,7 +1833,7 @@ async function compareCurrentBuildWorkspaceFrame({
 
 const regionalFailures = [];
 
-for (const scene of selectedScenes) {
+async function checkScene(scene) {
   const { app, page } = await launchScene(scene);
   const sidebarBaseId = scene.id.replace(/-light(-compact)?$/, "$1");
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
@@ -2758,7 +2765,7 @@ for (const scene of selectedScenes) {
       );
     }
     await writeFile(baselinePath, await readFile(actualPath));
-    continue;
+    return;
   }
 
   const baseline = PNG.sync.read(await readFile(baselinePath));
@@ -3692,7 +3699,7 @@ for (const scene of selectedScenes) {
       })}.`;
     regionalFailures.push(failure);
     console.error(failure);
-    continue;
+    return;
   }
 
   if (
@@ -10186,6 +10193,29 @@ for (const scene of selectedScenes) {
       `${scene.id}: current integration recovery group pixel ratio ${comparison.ratio}`,
     );
   }
+}
+
+let nextSceneIndex = 0;
+let firstSceneError;
+const workerCount = Math.min(
+  visualConcurrency,
+  Math.max(1, selectedScenes.length),
+);
+await Promise.all(
+  Array.from({ length: workerCount }, async () => {
+    while (firstSceneError === undefined) {
+      const scene = selectedScenes[nextSceneIndex++];
+      if (!scene) return;
+      try {
+        await checkScene(scene);
+      } catch (error) {
+        firstSceneError = error;
+      }
+    }
+  }),
+);
+if (firstSceneError !== undefined) {
+  throw firstSceneError;
 }
 
 if (regionalFailures.length > 0) {
