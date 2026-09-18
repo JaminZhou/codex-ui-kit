@@ -99,6 +99,12 @@ exit gates; it does not replace the inventory.
   selection, wide/compact preview and pixels, focus-preserving removal, exact
   completion, and sent-media ownership. Upload failure/progress and plugin
   variants remain open.
+- The installed `26.911.61220` probe now rechecks the `Files and folders`
+  entry at the current shell. It exposes no Renderer-owned file input or
+  intercepted file-chooser event, so the menu-to-native selection boundary is
+  recorded as current runtime evidence without claiming selection, upload,
+  parsing, or preview parity. The existing 26.825 capture and controlled
+  replay remain the evidence for those downstream lifecycles.
 - A current-build `26.903.71938` isolated approval probe now records the real
   external-file denial boundary: the contents-specific `Edit files` card,
   `Deny`/`Allow once` actions, and the exact no-write response after denial.
