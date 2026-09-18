@@ -238,6 +238,27 @@ describe("ScheduledTasks", () => {
     expect(onManualSetup).toHaveBeenCalledOnce();
   });
 
+  it("locks the create split menu while disabled", () => {
+    const onCreateWithCodex = vi.fn();
+    const onManualSetup = vi.fn();
+    render(
+      <ScheduledTaskCreateMenu
+        disabled
+        onCreateWithCodex={onCreateWithCodex}
+        onManualSetup={onManualSetup}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Create" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    expect(
+      screen.getByRole("button", { name: "Create scheduled task options" }),
+    ).toHaveProperty("disabled", true);
+    expect(onCreateWithCodex).not.toHaveBeenCalled();
+    expect(onManualSetup).not.toHaveBeenCalled();
+  });
+
   it("keeps the editor controlled and reports field selection", () => {
     const onCancel = vi.fn();
     const onFieldChange = vi.fn();
