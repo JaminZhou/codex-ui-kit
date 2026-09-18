@@ -2263,7 +2263,9 @@ without confusing package readiness with full product reconstruction.
     annual/monthly selectors, host-owned checkout callbacks, matching
     loading/saving/saved/error boundaries, wide/compact scrolling, CDP,
     Electron, and current-product pixel gates. Real purchase,
-    gifting, and billing-provider flows stay open. The Scheduled tasks slice is
+    gifting, and billing-provider flows stay open. Both surfaces now also carry
+    page-level disabled semantics and lock retry/link/action callbacks without
+    changing the displayed plan or usage values. The Scheduled tasks slice is
     now delivered for wide/compact index layout, status/search empty states,
     suggestions, split Create choices, navigator/manual editor, unavailable
     recovery, Browser/CDP, Electron, and four local-only current-product pixel

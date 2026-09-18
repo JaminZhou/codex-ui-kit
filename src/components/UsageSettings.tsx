@@ -115,10 +115,12 @@ export function UsageSettingsPage({
     <article
       {...props}
       aria-busy={status === "loading" || isSaving || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       className={["codex-ui-usage-settings", className]
         .filter(Boolean)
         .join(" ")}
+      data-disabled={disabled || undefined}
       data-status={status}
     >
       <header className="codex-ui-usage-settings__header">
@@ -126,7 +128,7 @@ export function UsageSettingsPage({
         <p>
           To view invoices, change your payment method, and take other actions,
           visit{" "}
-          {billingSettingsHref ? (
+          {billingSettingsHref && !disabled ? (
             <a href={billingSettingsHref}>settings</a>
           ) : (
             <span>settings</span>
@@ -143,7 +145,13 @@ export function UsageSettingsPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
@@ -452,6 +460,7 @@ export function PlanSelectionPage({
     <article
       {...props}
       aria-busy={status === "loading" || status === "saving" || undefined}
+      aria-disabled={disabled || undefined}
       aria-describedby={showStatus ? statusId : undefined}
       className={[
         "codex-ui-plan-selection",
@@ -461,6 +470,7 @@ export function PlanSelectionPage({
         .filter(Boolean)
         .join(" ")}
       data-status={status}
+      data-disabled={disabled || undefined}
     >
       <header className="codex-ui-plan-selection__topbar">
         <button disabled={isLocked || !onBack} onClick={onBack} type="button">
@@ -477,7 +487,13 @@ export function PlanSelectionPage({
         >
           <span>{resolvedStatusMessage}</span>
           {status === "error" && onRetry ? (
-            <button onClick={onRetry} type="button">
+            <button
+              disabled={disabled}
+              onClick={() => {
+                if (!disabled) onRetry();
+              }}
+              type="button"
+            >
               {retryLabel}
             </button>
           ) : null}
