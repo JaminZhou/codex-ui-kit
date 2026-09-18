@@ -164,6 +164,40 @@ describe("UsageSettingsPage", () => {
     expect(onBuyCredits).toHaveBeenCalledOnce();
     expect(onGiftCredits).toHaveBeenCalledOnce();
   });
+
+  it("locks Usage retry, links, and actions when disabled", () => {
+    const onRetry = vi.fn();
+    const onViewPlans = vi.fn();
+    render(
+      <UsageSettingsPage
+        billingSettingsHref="https://chatgpt.com/settings"
+        credits={{ balance: "$0" }}
+        disabled
+        limitGroups={[]}
+        onRetry={onRetry}
+        onViewPlans={onViewPlans}
+        plan={{ label: "Pro", price: "$100/mo" }}
+        status="error"
+      />,
+    );
+
+    const page = screen
+      .getByRole("heading", { name: "Usage & billing" })
+      .closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.queryByRole("link", { name: "settings" })).toBeNull();
+    expect(screen.getByRole("button", { name: "View plans" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    const retry = screen.getByRole("button", { name: "Retry" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    fireEvent.click(screen.getByRole("button", { name: "View plans" }));
+    expect(onRetry).not.toHaveBeenCalled();
+    expect(onViewPlans).not.toHaveBeenCalled();
+  });
 });
 
 describe("PlanSelectionPage", () => {
@@ -240,5 +274,36 @@ describe("PlanSelectionPage", () => {
     expect(screen.getByText("Business feature")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Choose Business" }));
     expect(onAction).toHaveBeenCalledOnce();
+  });
+
+  it("locks Plan selection retry and page actions when disabled", () => {
+    const onRetry = vi.fn();
+    const props = {
+      audience: "personal" as const,
+      businessCards: [planCard("business", "Business")],
+      disabled: true,
+      onAudienceChange: vi.fn(),
+      onBack: vi.fn(),
+      onCardAction: vi.fn(),
+      onRetry,
+      onSelectorChange: vi.fn(),
+      personalCards: [planCard("go", "Go")],
+      status: "error" as const,
+    };
+    render(<PlanSelectionPage {...props} retryLabel="Try plans again" />);
+
+    const page = screen
+      .getByRole("heading", { name: "Choose your plan" })
+      .closest("article");
+    expect(page?.getAttribute("aria-disabled")).toBe("true");
+    expect(page?.getAttribute("data-disabled")).toBe("true");
+    expect(screen.getByRole("button", { name: "Back to ChatGPT" })).toHaveProperty(
+      "disabled",
+      true,
+    );
+    const retry = screen.getByRole("button", { name: "Try plans again" });
+    expect(retry).toHaveProperty("disabled", true);
+    fireEvent.click(retry);
+    expect(onRetry).not.toHaveBeenCalled();
   });
 });

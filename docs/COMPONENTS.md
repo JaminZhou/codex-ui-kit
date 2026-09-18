@@ -339,14 +339,16 @@ All privileged behavior remains host-owned. The components never auto-approve co
 - `UsageSettingsPage`: controlled plan, credits, usage-limit meters, reset,
   and cancellation presentation with independent host callbacks for View
   plans, Buy credits, and Gift credits. Loading, saving, saved, and error
-  feedback, retry copy, and busy-state locking are host-controlled. Hosts own
-  account data, billing, checkout, gifting, and cancellation effects.
+  feedback, retry copy, and busy-state locking are host-controlled. A
+  host-wide disabled state also locks retry, links, and billing callbacks.
+  Hosts own account data, billing, checkout, gifting, and cancellation effects.
 - `PlanSelectionPage`: full-height Personal/Business plan composition with
   controlled audience, 5x/20x or annual/monthly per-card selectors,
   responsive cards, a host-owned Back transition, supplied pricing/features,
   and host-owned plan actions. Loading, saving, saved, and error feedback,
-  retry copy, and busy-state locking are host-controlled. It does not load an
-  embedded webview or perform a purchase.
+  retry copy, and busy-state locking are host-controlled. A host-wide disabled
+  state also carries page semantics and locks retry and plan actions. It does
+  not load an embedded webview or perform a purchase.
 
 ## Integration catalogs
 
