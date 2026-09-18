@@ -85,6 +85,10 @@ jobs:
     name: Codex app Electron acceptance
     # Native scrollbar rendering is part of the macOS 26 visual baseline.
     runs-on: macos-26
+    timeout-minutes: 120
+    env:
+      CODEX_UI_KIT_ELECTRON_PROGRESS: "1"
+      CODEX_UI_KIT_VISUAL_CONCURRENCY: "2"
     steps:
       - name: Match baseline overlay scrollbar preference
         # Baselines use overlay scrollbars. Runner images may default to Always,
@@ -108,11 +112,15 @@ jobs:
         run: pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground build
       - name: Check native scrollbar pixel parity first
         run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-worktree-setup-failed-compact,current-review-26-825-file-card-compact,integration-skill-detail-current-26-825-try-now-compact
-      - name: Run full acceptance contracts
-        run: |
-          pnpm --filter @codex-ui-kit/codex-app-playground check:cdp
-          pnpm --filter @codex-ui-kit/codex-app-playground check:electron
-          pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+      - name: Run CDP acceptance contracts
+        timeout-minutes: 30
+        run: pnpm --filter @codex-ui-kit/codex-app-playground check:cdp
+      - name: Run native Electron acceptance contracts
+        timeout-minutes: 45
+        run: pnpm --filter @codex-ui-kit/codex-app-playground check:electron
+      - name: Run visual acceptance contracts
+        timeout-minutes: 90
+        run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual
       - name: Upload visual failure evidence
         if: failure()
         uses: actions/upload-artifact@v7
