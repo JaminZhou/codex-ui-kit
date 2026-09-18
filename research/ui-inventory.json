@@ -1049,6 +1049,8 @@
         "replay:current-26.911-public-resource-catalog-and-github-mention",
         "electron:replay-26.911-github-inline-resource-mention-wide-compact",
         "pixel:replay-26.911-github-inline-resource-mention-wide-compact-zero-drift",
+        "electron:replay-26.911-resource-picker-shell-geometry-321.875-wide-compact",
+        "pixel:replay-26.911-resource-picker-own-fixture-zero-drift-wide-compact",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",

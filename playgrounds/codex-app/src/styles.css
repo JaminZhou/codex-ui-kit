@@ -109,6 +109,13 @@ body,
   --codex-ui-workspace-panel-tab-max-width: 9.75rem;
 }
 
+/* The isolated 26.911 capture has a 321.875px expanded left rail. Keep this
+ * current-build Composer replay on that shell geometry instead of inheriting
+ * the older 274px fixture width. */
+.demo-root[data-frame^="workspace-composer-current-26-911"] {
+  --codex-ui-app-sidebar-width: 321.875px;
+}
+
 body {
   background:
     radial-gradient(circle at 65% 0%, rgba(90, 90, 90, 0.1), transparent 30%),
