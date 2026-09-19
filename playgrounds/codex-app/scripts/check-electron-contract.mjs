@@ -21012,6 +21012,69 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
           );
         }
         await currentMcpSettingsPage.keyboard.press("Escape");
+        if (currentMcp26915) {
+          await currentMcpSettingsPage
+            .getByRole("button", { name: "Add", exact: true })
+            .click();
+          await currentMcpSettingsPage
+            .getByRole("menu", { name: "Add integration" })
+            .getByRole("menuitem", { name: "Add MCP server", exact: true })
+            .click();
+          await currentMcpSettingsPage.waitForFunction(
+            (expectedFrame) =>
+              document
+                .querySelector(".demo-root")
+                ?.getAttribute("data-frame") === expectedFrame,
+            `${currentMcpSettingsScene.frame}-stdio-create`,
+          );
+          await currentMcpSettingsPage
+            .getByRole("button", { name: "Back", exact: true })
+            .click();
+          await currentMcpSettingsPage.waitForFunction(
+            (expectedFrame) =>
+              document
+                .querySelector(".demo-root")
+                ?.getAttribute("data-frame") === expectedFrame,
+            currentMcpSettingsScene.frame,
+          );
+          const localBrowserSwitch = currentMcpSettingsPage.getByRole(
+            "switch",
+            { name: "Enable local-browser", exact: true },
+          );
+          await localBrowserSwitch.click();
+          await currentMcpSettingsPage.waitForFunction(() => {
+            const toggle = document.querySelector(
+              '[role="switch"][aria-label="Enable local-browser"]',
+            );
+            return (
+              toggle?.getAttribute("aria-checked") === "true" &&
+              !toggle?.hasAttribute("aria-busy")
+            );
+          });
+          await currentMcpSettingsPage
+            .getByRole("button", { name: "Settings for local-browser", exact: true })
+            .click();
+          await currentMcpSettingsPage.waitForFunction(
+            (expectedFrame) =>
+              document
+                .querySelector(".demo-root")
+                ?.getAttribute("data-frame") === expectedFrame,
+            `${currentMcpSettingsScene.frame}-detail`,
+          );
+          await currentMcpSettingsPage
+            .getByRole("button", { name: "Uninstall", exact: true })
+            .click();
+          await currentMcpSettingsPage.waitForFunction(
+            (expectedFrame) =>
+              document
+                .querySelector(".demo-root")
+                ?.getAttribute("data-frame") === expectedFrame &&
+              !document.querySelector(
+                '[aria-label="Settings for local-browser"]',
+              ),
+            currentMcpSettingsScene.frame,
+          );
+        }
       }
     } else if (create) {
       if (
