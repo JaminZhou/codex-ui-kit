@@ -80,23 +80,18 @@ try {
     processId: started.params.item.processId,
   };
 
-  await page.waitForFunction(
-    async (expectedThreadId) => {
-      const rows = await window.codexDemo.listLiveBackgroundTerminals({
+  const rowsDeadline = Date.now() + 120_000;
+  let rows = [];
+  while (Date.now() < rowsDeadline) {
+    rows = await page.evaluate(async (expectedThreadId) =>
+      window.codexDemo.listLiveBackgroundTerminals({
         projectToken: window.codexDemo.startupWorkspaceProjectToken,
         threadId: expectedThreadId,
-      });
-      return rows.length > 0;
-    },
-    threadId,
-    { timeout: 120_000 },
-  );
-  const rows = await page.evaluate(async (expectedThreadId) =>
-    window.codexDemo.listLiveBackgroundTerminals({
-      projectToken: window.codexDemo.startupWorkspaceProjectToken,
-      threadId: expectedThreadId,
-    }),
-  threadId);
+      }),
+    threadId);
+    if (rows.length === 1 && rows[0]?.itemId === commandId) break;
+    await page.waitForTimeout(250);
+  }
   assert.equal(rows.length, 1, "Exactly one background terminal is expected.");
   assert.equal(rows[0].itemId, commandId);
   result.backgroundTerminal = rows[0];

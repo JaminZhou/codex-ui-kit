@@ -81,6 +81,13 @@ exit gates; it does not replace the inventory.
   Row identities and project actions remain fixture-owned; this promotes the
   current-build Projects geometry/state boundary only, not installed project
   names, chat metadata, or mutation effects.
+- The installed `26.915.31945` global-notification capture is now represented by
+  a current-sidebar replay at wide and 720px widths. It locks the four-mounted/
+  three-visible stack, hover expansion, dismiss-to-three transition, live-region
+  ARIA attributes, 430-weight dark success style, and `0%` own-fixture pixel
+  drift. This is current geometry/state-boundary evidence; it does not claim
+  production toast delivery, provider-specific copy, or installed-product
+  pixels.
 - The 26.911 resource replay now uses the captured `321.875px` expanded left
   rail instead of the older `274px` fixture width. Its focused Electron/CDP
   contract checks the wide editor, Add trigger, and menu origins against the
