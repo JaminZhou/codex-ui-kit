@@ -4716,9 +4716,15 @@ export function App() {
       !current26825LongThreadFrame(initialSelection.frame),
   );
   const [activeFrame, setActiveFrame] = useState(initialSelection.frame);
+  const isCurrentMcp26915Candidate =
+    initialSelection.frame?.startsWith("workspace-mcp-settings-current-26-915") ||
+    activeFrame?.startsWith("workspace-mcp-settings-current-26-915");
   const isCurrentMcp26915SettingsFrame = activeFrame?.startsWith(
     "workspace-mcp-settings-current-26-915",
   );
+  const currentMcpSettingsFramePrefix = isCurrentMcp26915Candidate
+    ? "workspace-mcp-settings-current-26-915"
+    : "workspace-mcp-settings-current-26-825";
   const [markdownRenderRetried, setMarkdownRenderRetried] = useState(false);
   const isCurrentPdfReplay = mode === "replay" && view === "workspace" && Boolean(activeFrame?.startsWith("workspace-document-preview-current"));
   const [pdfOpen, setPdfOpen] = useState(true);
@@ -9653,7 +9659,7 @@ export function App() {
         ? (activeFrame?.startsWith("workspace-mcp-settings-current-26-825") ||
             activeFrame?.startsWith("workspace-mcp-settings-current-26-915"))
           ? activeFrame
-          : "workspace-mcp-settings-current-26-825"
+          : currentMcpSettingsFramePrefix
       : workspacePage === "worktree-settings"
         ? activeFrame?.startsWith("workspace-worktree-settings")
           ? activeFrame
@@ -11654,7 +11660,7 @@ export function App() {
               : itemId === "usage-billing"
                 ? "workspace-usage-settings"
               : itemId === "plugins"
-                ? "workspace-mcp-settings-current-26-825"
+                ? currentMcpSettingsFramePrefix
               : itemId === "voice"
                 ? "workspace-voice-settings"
               : itemId === "hooks"
@@ -11763,7 +11769,7 @@ export function App() {
               setMcpEditorStatusMessage("");
               setMcpEditorMode("create");
               setMcpSettingsAction("");
-              setActiveFrame("workspace-mcp-settings-current-26-825-stdio-create");
+              setActiveFrame(`${currentMcpSettingsFramePrefix}-stdio-create`);
             }}
             onBrowseDirectory={() =>
               setMcpSettingsAction("Browse directory requested")
@@ -11831,7 +11837,7 @@ export function App() {
               setMcpEditorStatusMessage("");
               setMcpEditorMode("update");
               setMcpSettingsAction("");
-              setActiveFrame("workspace-mcp-settings-current-26-825-detail");
+              setActiveFrame(`${currentMcpSettingsFramePrefix}-detail`);
             }}
             disabled={mcpEditorStatus === "saving"}
             pluginServers={currentPluginMcpServers}
@@ -11856,13 +11862,13 @@ export function App() {
                   setMcpEditorStatus("ready");
                   setMcpEditorStatusMessage("");
                   setMcpSettingsAction("");
-                  setActiveFrame("workspace-mcp-settings-current-26-825");
+                  setActiveFrame(currentMcpSettingsFramePrefix);
                 }}
                 onChange={(value) => {
                   setMcpEditorValue(value);
                   if (mcpEditorMode === "create") {
                     setActiveFrame(
-                      `workspace-mcp-settings-current-26-825-${value.type}-create`,
+                      `${currentMcpSettingsFramePrefix}-${value.type}-create`,
                     );
                   }
                 }}
@@ -11931,7 +11937,7 @@ export function App() {
                     setMcpEditorStatus("ready");
                     setMcpEditorMode(null);
                     setMcpEditingServerId(null);
-                    setActiveFrame("workspace-mcp-settings-current-26-825");
+                    setActiveFrame(currentMcpSettingsFramePrefix);
                     setMcpSettingsAction(`Saved ${name}`);
                     mcpMutationTimerRef.current = null;
                   }, 180);
@@ -11954,7 +11960,7 @@ export function App() {
                           setMcpEditorStatus("ready");
                           setMcpEditorMode(null);
                           setMcpEditingServerId(null);
-                          setActiveFrame("workspace-mcp-settings-current-26-825");
+                          setActiveFrame(currentMcpSettingsFramePrefix);
                           setMcpSettingsAction("Uninstalled MCP");
                           mcpMutationTimerRef.current = null;
                         }, 180);
