@@ -575,6 +575,9 @@ kit never performs filesystem, network, account, or process mutations.
   unavailable/error states and Create/Open/Share/Refresh/Overflow callbacks.
   Page-level busy/disabled states lock search and all site actions while retry
   remains explicit. It does not call a Sites service or open external pages.
+- `SitesAccessGate`: controlled current-build terms-to-pricing boundary with
+  terms/pricing modes, explicit Continue/Back/Close callbacks, and no claim of
+  site publication, entitlement, billing, or visitor-data ownership.
 - `SkillDetailDialog` and `SkillPromptMention`: controlled skill detail,
   enabled state, action menu, long instructions, unsent Try-now prompt, and
   updating/error/retry lifecycle. A host-wide disabled lock covers modal
