@@ -1678,6 +1678,15 @@ The current index also exposes host-controlled busy/disabled locking for search,
 refresh, creation, row navigation, sharing, and overflow actions while keeping
 retry explicit. Stage 4 therefore remains in progress.
 
+The current-build boundary now also has a controlled `SitesAccessGate` replay:
+terms mode exposes the observed first-use copy and Continue/Close intents, while
+pricing mode exposes the Back-to-ChatGPT intent and checkout boundary. The
+Browser/Electron targeted gate checks both modes at 1180px and 720px, zero
+overflow, round-trip callbacks, and two own-fixture screenshots with zero pixel
+drift. This makes the current terms-to-pricing observation reusable without
+claiming publication, entitlement, billing, or visitor-data behavior; Stage 4
+remains in progress until those host-owned surfaces are observed and authorized.
+
 The Composer plugin-connect slice makes the legacy-observed `Connect plugins`
 entry explicit without claiming to install or authorize a plugin. The shared
 resource picker now supports a host-owned footer, and an isolated replay frame

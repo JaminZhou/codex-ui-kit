@@ -26200,6 +26200,197 @@ button.codex-ui-generated-image-gallery__image {
   white-space: nowrap;
 }
 
+.codex-ui-sites-access,
+.codex-ui-sites-access * {
+  box-sizing: border-box;
+}
+
+.codex-ui-sites-access {
+  background: var(--codex-ui-surface, rgb(24 24 24));
+  color: var(--codex-ui-text, rgb(255 255 255));
+  font-family: var(--codex-ui-font-sans);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.codex-ui-sites-access--terms {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.codex-ui-sites-access__terms-dialog {
+  background: rgb(45 45 45);
+  border-radius: 1.5625rem;
+  box-shadow:
+    0 0 0 0.5px rgb(255 255 255 / 8.2%),
+    0 4px 8px -2px rgb(0 0 0 / 10%);
+  color: rgb(255 255 255);
+  display: flex;
+  flex-direction: column;
+  min-height: 26.7725rem;
+  max-width: 37.5rem;
+  overflow: hidden;
+  width: min(37.5rem, 100%);
+}
+
+.codex-ui-sites-access__terms-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem 2.5rem 0;
+}
+
+.codex-ui-sites-access__terms-header h1,
+.codex-ui-sites-access__terms-body h2,
+.codex-ui-sites-access__terms-body p,
+.codex-ui-sites-access__terms-body ul {
+  margin: 0;
+}
+
+.codex-ui-sites-access__terms-header h1 {
+  font-size: 1rem;
+  font-weight: 430;
+  line-height: 1.5rem;
+}
+
+.codex-ui-sites-access__terms-header button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 9999px;
+  color: rgb(255 255 255 / 80%);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  height: 1.5rem;
+  justify-content: center;
+  margin-inline-end: -0.5rem;
+  width: 1.5rem;
+}
+
+.codex-ui-sites-access__terms-body {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.5rem 2.5rem 1rem;
+}
+
+.codex-ui-sites-access__terms-body h2 {
+  font-size: 1.125rem;
+  font-weight: 430;
+  line-height: 1.75rem;
+}
+
+.codex-ui-sites-access__terms-body p,
+.codex-ui-sites-access__terms-body li,
+.codex-ui-sites-access__terms-body a {
+  font-size: 0.875rem;
+  font-weight: 430;
+  line-height: 1.3125rem;
+}
+
+.codex-ui-sites-access__terms-body ul {
+  display: grid;
+  gap: 0.25rem;
+  padding-inline-start: 1.25rem;
+}
+
+.codex-ui-sites-access__terms-body a {
+  color: inherit;
+  text-underline-offset: 0.125rem;
+}
+
+.codex-ui-sites-access__terms-footer {
+  margin-top: auto;
+  padding: 0 2.5rem 2.5rem;
+}
+
+.codex-ui-sites-access__terms-footer button {
+  background: rgb(255 255 255);
+  border: 1px solid rgb(255 255 255 / 8.2%);
+  border-radius: 9999px;
+  color: rgb(45 45 45);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 430;
+  height: 2.25rem;
+  line-height: 1.125rem;
+  padding: 0.5rem 1.25rem;
+  width: 100%;
+}
+
+.codex-ui-sites-access button:focus-visible,
+.codex-ui-sites-access a:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 2px;
+}
+
+.codex-ui-sites-access--pricing {
+  display: flex;
+  flex-direction: column;
+}
+
+.codex-ui-sites-access__pricing-header {
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--codex-ui-text) 12%, transparent);
+  display: flex;
+  flex: 0 0 2.875rem;
+  padding-inline: 1rem;
+}
+
+.codex-ui-sites-access__pricing-header button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem;
+  color: color-mix(in srgb, var(--codex-ui-text) 72%, transparent);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0 0.5rem;
+}
+
+.codex-ui-sites-access__pricing-surface {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 0;
+}
+
+.codex-ui-sites-access__pricing-surface span {
+  color: color-mix(in srgb, var(--codex-ui-text) 58%, transparent);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 45rem) {
+  .codex-ui-sites-access--terms {
+    padding: 1rem;
+  }
+
+  .codex-ui-sites-access__terms-dialog {
+    border-radius: 1.25rem;
+  }
+
+  .codex-ui-sites-access__terms-header {
+    padding-inline: 1.5rem;
+  }
+
+  .codex-ui-sites-access__terms-body {
+    padding-inline: 1.5rem;
+  }
+
+  .codex-ui-sites-access__terms-footer {
+    padding-inline: 1.5rem;
+  }
+}
+
 .codex-ui-sites-index button:focus-visible,
 .codex-ui-sites-index input:focus-visible {
   outline: 2px solid var(--codex-ui-focus);

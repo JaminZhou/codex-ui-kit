@@ -2576,3 +2576,13 @@ creation, publishing, visitor-submitted content, pricing or entitlement state,
 third-party site runtime, compact viewport, or native resize behavior. The
 two-row search/create/share/overflow surface remains a separate controlled
 legacy replay, so `app.sites-index` stays `partial`.
+
+### Current Sites access-gate replay
+
+`SitesAccessGate` models the current-build terms-to-pricing boundary as a
+controlled host component. Terms mode keeps the observed first-use copy and
+Continue/Close callbacks; pricing mode keeps the Back-to-ChatGPT callback and
+explicit checkout boundary. The targeted Browser/Electron gate covers 1180px
+and 720px, zero overflow, and zero own-fixture pixel drift on repeated
+screenshots. It intentionally does not claim site publication, entitlement,
+billing, visitor-data, or third-party runtime ownership.

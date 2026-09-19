@@ -101,6 +101,7 @@ import {
   ScheduledTaskNavigator,
   ScheduledTasksPage,
   SidebarHelpMenu,
+  SitesAccessGate,
   SitesIndexPage,
   SourceActivityList,
   SourceSearchActivity,
@@ -3865,6 +3866,12 @@ export function App() {
         : "ready",
   );
   const [sitesAction, setSitesAction] = useState("");
+  const isSitesAccessReplay = initialSelection.frame?.startsWith(
+    "sites-access-26-915",
+  );
+  const [sitesAccessMode, setSitesAccessMode] = useState<"pricing" | "terms">(
+    initialSelection.frame?.includes("pricing") ? "pricing" : "terms",
+  );
   const [mcpServers, setMcpServers] = useState(initialMcpServers);
   const [mcpQuery, setMcpQuery] = useState(
     initialSelection.frame?.endsWith("-empty") ? "no-match-26-825" : "",
@@ -12841,6 +12848,23 @@ export function App() {
     />
   );
 
+  const sitesAccessRoute = isSitesAccessReplay ? (
+    <SitesAccessGate
+      data-action={sitesAction || undefined}
+      data-testid="current-sites-access-route"
+      mode={sitesAccessMode}
+      onBack={() => {
+        setSitesAccessMode("terms");
+        setSitesAction("back");
+      }}
+      onClose={() => setSitesAction("close")}
+      onContinue={() => {
+        setSitesAccessMode("pricing");
+        setSitesAction("continue");
+      }}
+    />
+  ) : null;
+
   const currentPluginDetailTitle = pluginDetailInstalled ? "GitHub" : "Gmail";
   const pluginDetailRoute = (
     <PluginDetailPage
@@ -18153,7 +18177,7 @@ export function App() {
         ) : view === "automations" ? (
           scheduledTasksRoute
         ) : view === "sites" ? (
-          sitesRoute
+          sitesAccessRoute ?? sitesRoute
         ) : view === "plugins" ? (
           pluginDetailOpen ? (
             pluginDetailRoute

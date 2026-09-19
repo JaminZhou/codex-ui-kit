@@ -1636,9 +1636,12 @@
       "packageEvidence": [
         "app-main",
         "sites-index-page",
+        "component:SitesAccessGate",
         "playground:sites-index-controlled-replay",
         "electron:sites-index-search-refresh-create-share-overflow-and-unavailable-retry",
         "pixel:sites-index-own-fixture-1180-720-zero-drift-visible-actions",
+        "electron:sites-access-gate-terms-pricing-1180-720",
+        "pixel:sites-access-gate-own-fixture-zero-drift",
         "replay:current-26.915-sites-terms-pricing-boundary"
       ],
       "runtimeStatus": "runtime_observed",
