@@ -2558,3 +2558,21 @@ evidence are retained in `research/current-mcp-settings-26.915.json` and
 `research/26.915.31945-mcp-settings.md`; server identity and screenshots
 remain local-only. This is current-build read-only evidence; no save, toggle,
 uninstall, OAuth, provider failure, or installed-product pixel claim is made.
+
+## Current 26.915 Sites boundary
+
+The installed `26.915.31945` package was re-observed through the public
+`Add files and more → Sites` entry. At the native 2560×1318 Renderer viewport
+it presents a 600×428.359375px first-use terms dialog with a 25px radius and
+a 520×36px pill-shaped `Continue` action. Continuing returns to the app shell
+with `Back to ChatGPT` and an embedded pricing webview rather than a reachable
+Sites index. The sanitized record is
+[`current-sites-26.915.json`](current-sites-26.915.json), with account and plan
+query values redacted; the capture helper is
+`capture:current-sites-26-915`.
+
+This is read-only current-build boundary evidence. It does not claim site
+creation, publishing, visitor-submitted content, pricing or entitlement state,
+third-party site runtime, compact viewport, or native resize behavior. The
+two-row search/create/share/overflow surface remains a separate controlled
+legacy replay, so `app.sites-index` stays `partial`.

@@ -1653,6 +1653,18 @@ boundaries. Sanitized records are retained in
 current-build read-only evidence: no save, toggle, uninstall, OAuth,
 provider-failure, or installed-product pixel promotion is claimed.
 
+The installed `26.915.31945` Sites entry was also re-observed through the
+current `Add files and more → Sites` route. The native-wide Renderer presents
+a 600×428.359375px first-use terms dialog and a 520×36px pill-shaped
+`Continue` action; continuing reaches an embedded pricing webview rather than
+a Sites index. The sanitized boundary is retained in
+`research/current-sites-26.915.json` and
+`research/26.915.31945-sites.md`. This is read-only current-build evidence:
+creation, publishing, entitlement, billing, visitor-submitted content,
+compact/resize behavior, and third-party site runtime remain unsampled. The
+controlled legacy index replay therefore remains `partial`, and Stage 4 stays
+in progress.
+
 The Sites index slice adds a controlled `SitesIndexPage` for the older
 runtime-observed search, refresh, create, share, and overflow affordances.
 The replay fixture covers two site rows plus loading, empty, unavailable, and
