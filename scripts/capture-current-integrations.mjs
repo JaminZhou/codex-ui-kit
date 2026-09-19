@@ -174,16 +174,22 @@ const call = (method, params = {}) =>
   });
 
 const expectedTitle =
-  expectedFingerprint === currentNewestCandidateBaselineFingerprint ||
-  expectedFingerprint === currentInstalledCandidateBaselineFingerprint
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint
     ? "Plugins"
+    : expectedFingerprint === currentInstalledCandidateBaselineFingerprint
+      ? kind === "plugins"
+        ? "Plugins"
+        : "Skills"
     : kind === "plugins"
       ? "Plugins"
       : "Skills";
 const expectedDescription =
-  expectedFingerprint === currentNewestCandidateBaselineFingerprint ||
-  expectedFingerprint === currentInstalledCandidateBaselineFingerprint
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint
     ? "Manage plugins, skills, and MCPs"
+    : expectedFingerprint === currentInstalledCandidateBaselineFingerprint
+      ? kind === "plugins"
+        ? "Work with Codex across your favorite tools"
+        : "Extend Codex with task-specific skills"
     : kind === "plugins"
       ? "Work with Codex across your favorite tools"
       : "Extend Codex with task-specific skills";
@@ -291,8 +297,7 @@ const capture = response.result?.result?.value;
 if (
   capture?.title !== expectedTitle ||
   capture?.description !== expectedDescription ||
-  ((expectedFingerprint === currentNewestCandidateBaselineFingerprint ||
-    expectedFingerprint === currentInstalledCandidateBaselineFingerprint) &&
+  (expectedFingerprint === currentNewestCandidateBaselineFingerprint &&
     (capture.viewport.width > 720 ? !capture.search : capture.search)) ||
   !capture.installedHeading ||
   Math.abs(capture.horizontalOverflow) > 1

@@ -1532,6 +1532,18 @@ installation, enablement, OAuth, permissions, registry/network effects,
 execution, and third-party artwork remain host-owned. The P1 rows stay
 `partial` until those boundaries have an explicit product contract.
 
+The installed `26.915.31945` package has now been re-observed for the same
+index routes. Unlike 26.911, Plugins is titled `Plugins` with
+`Work with Codex across your favorite tools`, Skills is titled `Skills` with
+`Extend Codex with task-specific skills`, and both keep search mounted at the
+emulated 720px width. Native-wide and compact CDP records capture the
+two-column catalog tracks, 984/679px Plugins roots, 728/679px Skills roots,
+zero horizontal overflow, and current public labels in
+`research/current-integrations-26.915.json`. The capture is read-only and
+does not promote installation, enablement, OAuth, permissions,
+registry/network effects, execution, third-party artwork, or product pixels;
+the P1 rows remain `partial`.
+
 The follow-up Plugin detail slice adds controlled `PluginDetailPage` and
 `PluginDetailBreadcrumb` primitives for installed/discovery identity,
 suggestions, Apps, Information, disclosure, bottom scrolling, and the

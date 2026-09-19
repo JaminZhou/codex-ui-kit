@@ -2438,14 +2438,16 @@
         "browser-cdp:integration-plugin-detail-current-26-825-light-wide-compact",
         "electron:integration-plugin-detail-current-26-825-light-wide-compact",
         "pixel:integration-plugin-detail-current-26-825-light-wide-compact",
-        "capture:current-integrations-26.911-read-only"
+        "capture:current-integrations-26.911-read-only",
+        "capture:current-integrations-26.915-read-only"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:plugins-index-search-categories-actions-and-settings",
         "cdp-26.825.51511:plugins-wide-compact-installed-public-personal-search-actions",
         "cdp-26.825.51511:plugin-detail-installed-discovery-actions-connection-information-wide-compact-bottom",
-        "cdp-26.911.61220:plugins-catalog-native-wide-emulated-compact-search-scope-read-only"
+        "cdp-26.911.61220:plugins-catalog-native-wide-emulated-compact-search-scope-read-only",
+        "cdp-26.915.31945:plugins-catalog-native-wide-emulated-compact-search-scope-read-only"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -2477,14 +2479,16 @@
         "browser-cdp:integration-skill-detail-current-26-825-light-wide-compact",
         "electron:integration-skill-detail-current-26-825-light-wide-compact",
         "pixel:integration-skill-detail-current-26-825-light-wide-compact",
-        "capture:current-integrations-26.911-read-only"
+        "capture:current-integrations-26.911-read-only",
+        "capture:current-integrations-26.915-read-only"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:skills-index-search-actions",
         "cdp-26.825.51511:skills-wide-compact-installed-personal-system-project-recommended",
         "cdp-26.825.51511:skill-detail-dialog-actions-scroll-and-unsent-try-now-prefill",
-        "cdp-26.911.61220:skills-catalog-native-wide-emulated-compact-search-scope-read-only"
+        "cdp-26.911.61220:skills-catalog-native-wide-emulated-compact-search-scope-read-only",
+        "cdp-26.915.31945:skills-catalog-native-wide-emulated-compact-search-scope-read-only"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
