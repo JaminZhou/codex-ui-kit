@@ -14,6 +14,9 @@ describe("current MCP capture policy", () => {
     expect(packageJson.scripts["capture:current-mcp"]).toBe(
       "node scripts/capture-current-mcp.mjs",
     );
+    expect(packageJson.scripts["capture:current-mcp-settings-26-915"]).toBe(
+      "CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT=26.915.31945 node scripts/capture-current-mcp-settings.mjs",
+    );
     expect(captureScript).toContain(
       "Capture-only: this script never submits a prompt.",
     );
