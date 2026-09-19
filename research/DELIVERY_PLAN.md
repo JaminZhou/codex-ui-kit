@@ -1685,6 +1685,14 @@ covered by Electron, CDP, and regional pixels in
 geometry evidence only; native item contents and thread mutation effects stay
 host-owned and the row remains `partial`.
 
+The dedicated 26.915 replay gate now locks this boundary at 1180px and 720px:
+the 28px trigger, 12.5px radius, zero padding, ten root items, three
+separators, Copy/Fork/Open in submenu labels, keyboard submenu Escape, root
+focus restoration, and reversible Pin/Unpin callback state all pass with
+zero-drift own-fixture pixels. It remains a deterministic host-controlled
+parity gate; native menu contents, real Copy/Fork/Open effects, disabled
+variants, and installed-product pixels are not promoted.
+
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
 `McpServerEditor` primitives plus deterministic list, empty, Add-menu,
