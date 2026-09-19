@@ -2542,7 +2542,8 @@
         "browser-cdp:scheduled-current-26-903-detail-error-light-compact",
         "electron:scheduled-current-26-903-detail-error-light-compact",
         "pixel:scheduled-current-26-903-detail-error-light-compact",
-        "capture:current-automations-26.911-read-only"
+        "capture:current-automations-26.911-read-only",
+        "capture:current-automations-26.915-read-only"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2553,6 +2554,7 @@
         "cdp-26.903.71938:scheduled-electron-wide-manual-compact",
         "cdp-26.903.71938:scheduled-pixel-wide-compact-manual-editor",
         "cdp-26.911.61220:scheduled-native-task-count-icon-hashes-and-geometry",
+        "cdp-26.915.31945:scheduled-native-task-count-icon-hashes-geometry-and-empty-suggestions",
         "cdp:scheduled-detail-create-edit-pause-resume-run-retry-wide-compact"
       ],
       "implementationStatus": "partial",

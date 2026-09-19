@@ -2096,6 +2096,22 @@ describe("current baseline capture contract", () => {
     expect(captureSource).not.toContain("document.body.textContent");
   });
 
+  it("keeps current automations refreshes build-scoped and sanitized", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-automations.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(captureSource).toContain(
+      "currentInstalledCandidateBaselineFingerprint",
+    );
+    expect(captureSource).toContain('requestedFingerprint === "26.915.31945"');
+    expect(captureSource).toContain('captureMode: "native-viewport-only"');
+    expect(captureSource).toContain("mutationsSubmitted: false");
+    expect(captureSource).not.toContain("ownerPid: Number(owners[0].pid)");
+    expect(captureSource).not.toContain("document.body.textContent");
+  });
+
   it("rejects stale or unproven current App Server recovery evidence", () => {
     const record = currentAppServerCrashRecoveryRecord();
     expect(() =>

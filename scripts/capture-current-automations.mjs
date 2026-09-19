@@ -1,8 +1,10 @@
+import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { realpathSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import {
   currentBaselineFingerprint,
+  currentInstalledCandidateBaselineFingerprint,
   currentNewestCandidateBaselineFingerprint,
 } from "./current-baseline-contract.mjs";
 
@@ -15,17 +17,24 @@ const requestedProfile = process.env.CODEX_CURRENT_AUTOMATIONS_PROFILE;
 const requestedOutput = process.env.CODEX_CURRENT_AUTOMATIONS_OUTPUT;
 const allowCapture =
   process.env.CODEX_CURRENT_AUTOMATIONS_ALLOW_CAPTURE === "1";
+const requestedFingerprint = process.env.CODEX_CURRENT_AUTOMATIONS_FINGERPRINT;
 const expectedFingerprint =
-  process.env.CODEX_CURRENT_AUTOMATIONS_FINGERPRINT === "26.911.61220"
-    ? currentNewestCandidateBaselineFingerprint
-    : currentBaselineFingerprint;
+  requestedFingerprint === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : requestedFingerprint === "26.911.61220"
+      ? currentNewestCandidateBaselineFingerprint
+      : currentBaselineFingerprint;
 const outputPrefix =
-  process.env.CODEX_CURRENT_AUTOMATIONS_FINGERPRINT === "26.911.61220"
-    ? "current-automations-26-911-"
-    : "current-automations-26-903-";
+  requestedFingerprint === "26.915.31945"
+    ? "current-automations-26-915-"
+    : requestedFingerprint === "26.911.61220"
+      ? "current-automations-26-911-"
+      : "current-automations-26-903-";
+const suggestionsRequired = requestedFingerprint !== "26.915.31945";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error("Set a valid isolated automations CDP port.");
@@ -296,7 +305,7 @@ if (
   capture?.description !==
     "Ask ChatGPT to schedule tasks, set reminders, or monitor for updates" ||
   capture?.filters?.length !== 4 ||
-  capture?.suggestions?.some(({ present }) => !present) ||
+  (suggestionsRequired && capture?.suggestions?.some(({ present }) => !present)) ||
   !capture.search ||
   Math.abs(capture.horizontalOverflow) > 1
 ) {
@@ -314,12 +323,51 @@ writeFileSync(
       baseline: fingerprint,
       isolation: {
         cdpAddress: "127.0.0.1",
-        cdpPort: port,
         mainCodexProcessPreserved: true,
-        ownerPid: Number(owners[0].pid),
+        mutationsSubmitted: false,
+        captureMode: "native-viewport-only",
         profileKind: "unique-private-tmp-profile",
       },
-      scheduled: capture,
+      page: {
+        title: capture.title,
+        description: capture.description,
+        nativeViewport: capture.viewport,
+        heading: { ...capture.heading, ...capture.headingStyle },
+        descriptionRect: capture.descriptionRect,
+        search: {
+          ...capture.search,
+          background: capture.searchStyle.backgroundColor,
+          border: capture.searchStyle.border,
+          borderRadius: capture.searchStyle.borderRadius,
+          fontFamily: capture.searchStyle.fontFamily,
+          fontSize: capture.searchStyle.fontSize,
+          fontWeight: capture.searchStyle.fontWeight,
+          lineHeight: capture.searchStyle.lineHeight,
+          padding: capture.searchStyle.padding,
+        },
+        filters: capture.filters.map(({ label, rect }) => ({ label, ...rect })),
+        taskCount: capture.taskCount,
+        taskStatuses: capture.taskStatuses,
+        suggestions: capture.suggestions
+          .filter(({ present }) => present)
+          .map(({ label }) => label),
+        horizontalOverflow: capture.horizontalOverflow,
+      },
+      visibleIconProvenance: {
+        source: "read-only current-renderer DOM capture",
+        taskActionPathCount: capture.taskActionPathData.length,
+        taskActionPathSha256: sha256(JSON.stringify(capture.taskActionPathData)),
+        suggestionPathSha256: Object.fromEntries(
+          capture.suggestions
+            .filter(({ present, pathData }) => present && pathData.length > 0)
+            .map(({ label, pathData }) => [label, sha256(JSON.stringify(pathData))]),
+        ),
+      },
+      evidenceBoundary: [
+        "This is a current-build native-viewport observation only.",
+        "The 1180x820 and 720x680 Browser/CDP and Electron replay contracts remain tied to older evidence until re-recorded on 26.915.31945.",
+        "No task creation, edit, pause/resume, execution, delivery, or permission mutation was submitted.",
+      ],
     },
     null,
     2,
