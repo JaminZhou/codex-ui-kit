@@ -854,7 +854,10 @@
         "playground:thread-overflow-current-26-915-light-wide-compact",
         "browser-cdp:thread-overflow-current-26-915-light-wide-compact",
         "electron:thread-overflow-current-26-915-light-wide-compact",
-        "pixel:thread-overflow-current-26-915-light-wide-compact"
+        "pixel:thread-overflow-current-26-915-light-wide-compact",
+        "playground:current-26.915-thread-overflow-contract",
+        "electron:current-26.915-thread-overflow-keyboard-pin",
+        "pixel:current-26.915-thread-overflow-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

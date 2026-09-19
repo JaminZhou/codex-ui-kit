@@ -2536,6 +2536,14 @@ replay baselines are checked by Electron, CDP, and regional pixels. Native menu
 item contents and every mutation effect remain host-owned, so the row stays
 `partial`.
 
+The dedicated 26.915 replay gate now locks this boundary at 1180px and 720px:
+the 28px trigger, 12.5px radius, zero padding, ten root items, three
+separators, Copy/Fork/Open in submenu labels, keyboard submenu Escape, root
+focus restoration, and reversible Pin/Unpin callback state all pass with
+zero-drift own-fixture pixels. It remains deterministic host-controlled
+parity evidence; native menu contents, real Copy/Fork/Open effects, disabled
+variants, and installed-product pixels are not promoted.
+
 Cleanup stopped only isolated PID `24607` and its validated profile-owned
 processes, proved loopback port `9931` closed, and moved the exact profile plus
 raw OS evidence recoverably to
