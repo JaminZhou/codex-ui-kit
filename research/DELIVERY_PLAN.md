@@ -1906,14 +1906,17 @@ approval, and retains that project's terminal cwd/environment after returning
 to the other project. It does not approve broader roots or session-wide access.
 Other approval kinds and real PR operations remain outside this sampled path.
 The live subagent follow-up now runs in full playground acceptance and verifies
-one real public-protocol `collabAgentToolCall`, receiver-thread materialization,
-Agent activity geometry, owning-thread Stop, interrupted turn settlement, and
-visible `Stopped` status in the same Electron Live bridge. Its disposable
-workspace is write-disabled, the child prompt forbids shell/network/file
-writes, and the created thread is archived after capture. This closes the
-sampled playground delegation/Stop slice on every complete acceptance pass; it
-does not promote replay fixtures to installed-product evidence or claim
-successful subagent completion.
+one real public-protocol `subAgentActivity`/legacy `collabAgentToolCall`,
+receiver-thread materialization, Agent activity geometry, owning-thread Stop,
+interrupted turn settlement, and visible `Stopped` status in the same Electron
+Live bridge. Its disposable workspace is write-disabled, the child prompt
+forbids shell/network/file writes, and the created thread is archived after
+capture. The acceptance-only harness can request Sol + `ultra` through
+`CODEX_UI_KIT_LIVE_MODEL` and `CODEX_UI_KIT_LIVE_REASONING_EFFORT`; the
+playground's ordinary default remains host-selected Luna and no production
+model is changed. This closes the sampled playground delegation/Stop slice on
+every complete acceptance pass; it does not promote replay fixtures to
+installed-product evidence or claim successful subagent completion.
 The companion opt-in live-stop follow-up now verifies a real pending
 file-approval request, owning-thread Stop, interrupted turn settlement,
 approval resolution, no file write, and a same-thread recovery turn at
