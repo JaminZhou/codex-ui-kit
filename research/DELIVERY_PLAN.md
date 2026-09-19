@@ -53,6 +53,13 @@ exit gates; it does not replace the inventory.
   is `726×28.5625px` with `Create and edit documents`. This extends current
   resource-menu geometry evidence only; selection, upload, authorization,
   execution, Browser/Electron, and product-pixel promotion remain open.
+- The 26.915 candidate now has a dedicated wide/720 replay refresh for the
+  measured shell, document preview, and generated-image routes. CDP and native
+  Electron lock the `321.875px` rail, `46px` titlebar, responsive hidden rail,
+  zero overflow, format identity, and retry/ready ownership; six reviewed
+  visual baselines repeat with zero own-fixture drift. These are current-build
+  structural replay gates only: installed-product document decoding, image
+  generation, and product-region pixels remain unpromoted.
 - The 26.911 resource replay now uses the captured `321.875px` expanded left
   rail instead of the older `274px` fixture width. Its focused Electron/CDP
   contract checks the wide editor, Add trigger, and menu origins against the

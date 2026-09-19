@@ -1142,7 +1142,10 @@
         "pixel:current-sidebar-light-wide-compact",
         "replay:current-26.911-shell-wide-compact-321.875-rail",
         "electron:current-26.911-shell-wide-compact-geometry",
-        "pixel:current-26.911-shell-own-fixture-zero-drift"
+        "pixel:current-26.911-shell-own-fixture-zero-drift",
+        "replay:current-26.915-shell-wide-compact-321.875-rail",
+        "electron:current-26.915-shell-wide-compact-geometry",
+        "pixel:current-26.915-shell-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2028,6 +2031,9 @@
         "replay:current-26.911-document-media-shell-321.875-wide-compact",
         "electron:current-26.911-document-media-shell-geometry",
         "pixel:current-26.911-document-media-shell-zero-drift",
+        "replay:current-26.915-document-media-shell-321.875-wide-compact",
+        "electron:current-26.915-document-media-shell-geometry",
+        "pixel:current-26.915-document-media-shell-zero-drift",
         "browser-cdp:workspace-document-preview-format-matrix",
         "electron:workspace-document-preview-format-matrix",
         "pixel:workspace-document-preview-format-matrix"
@@ -2052,7 +2058,10 @@
         "pixel:current-26.911-document-media-shell-zero-drift",
         "browser-cdp:workspace-image-preview-format-lifecycle",
         "electron:workspace-image-preview-format-lifecycle",
-        "pixel:workspace-image-preview-wide-compact"
+        "pixel:workspace-image-preview-wide-compact",
+        "replay:current-26.915-document-media-shell-321.875-wide-compact",
+        "electron:current-26.915-document-media-shell-geometry",
+        "pixel:current-26.915-document-media-shell-zero-drift"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",

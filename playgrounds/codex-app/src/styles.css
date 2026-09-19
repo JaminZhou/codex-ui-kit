@@ -120,6 +120,11 @@ body,
   --codex-ui-app-sidebar-width: 321.875px;
 }
 
+.demo-root[data-frame^="workspace-composer-current-26-915"],
+.demo-root[data-frame^="workspace-current-26-915"] {
+  --codex-ui-app-sidebar-width: 321.875px;
+}
+
 body {
   background:
     radial-gradient(circle at 65% 0%, rgba(90, 90, 90, 0.1), transparent 30%),

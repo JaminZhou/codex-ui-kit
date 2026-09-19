@@ -838,10 +838,22 @@ function documentPreviewStatusForFrame(
 }
 
 function normalizedDocumentPreviewFrame(frame: string | null): string | null {
-  const prefix = "workspace-current-26-911-";
-  return frame?.startsWith(prefix)
-    ? `workspace-${frame.slice(prefix.length)}`
-    : frame;
+  for (const prefix of [
+    "workspace-current-26-911-",
+    "workspace-current-26-915-",
+  ]) {
+    if (frame?.startsWith(prefix)) {
+      return `workspace-${frame.slice(prefix.length)}`;
+    }
+  }
+  return frame;
+}
+
+function isCurrentShellFrame(frame: string | null): boolean {
+  return (
+    frame?.startsWith("workspace-current-26-911-") === true ||
+    frame?.startsWith("workspace-current-26-915-") === true
+  );
 }
 
 function isDocumentPreviewFrame(frame: string | null): boolean {
@@ -9685,7 +9697,7 @@ export function App() {
           : workspaceEnvironmentId === "worktree"
             ? "workspace-context-current-26-825-new-worktree"
             : "workspace-context-current-26-825-ready"
-      : initialSelection.frame?.startsWith("workspace-current-26-911-")
+      : isCurrentShellFrame(initialSelection.frame)
         ? initialSelection.frame
       : initialSelection.frame === "workspace-compact-ready"
       ? "workspace-compact-ready"
@@ -17946,9 +17958,7 @@ export function App() {
             : currentSidebarThreadLifecycle ||
                 currentSidebarWorktreeLifecycle ||
                 currentContext26825Replay ||
-                initialSelection.frame?.startsWith(
-                  "workspace-current-26-911-",
-                ) ||
+                isCurrentShellFrame(initialSelection.frame) ||
                 currentTerminal26825Frame(activeFrame) ||
                 view === "automations" ||
                 view === "sites" ||
