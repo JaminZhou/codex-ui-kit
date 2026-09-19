@@ -3,6 +3,7 @@ import { realpathSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import {
   currentBaselineFingerprint,
+  currentInstalledCandidateBaselineFingerprint,
   currentNewestCandidateBaselineFingerprint,
 } from "./current-baseline-contract.mjs";
 
@@ -17,13 +18,17 @@ const kind = process.env.CODEX_CURRENT_INTEGRATIONS_KIND;
 const allowCapture =
   process.env.CODEX_CURRENT_INTEGRATIONS_ALLOW_CAPTURE === "1";
 const expectedFingerprint =
-  process.env.CODEX_CURRENT_INTEGRATIONS_FINGERPRINT === "26.911.61220"
-    ? currentNewestCandidateBaselineFingerprint
-    : currentBaselineFingerprint;
+  process.env.CODEX_CURRENT_INTEGRATIONS_FINGERPRINT === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : process.env.CODEX_CURRENT_INTEGRATIONS_FINGERPRINT === "26.911.61220"
+      ? currentNewestCandidateBaselineFingerprint
+      : currentBaselineFingerprint;
 const outputPrefix =
-  expectedFingerprint === currentNewestCandidateBaselineFingerprint
-    ? "current-integrations-26-911-"
-    : "current-integrations-26-825-";
+  expectedFingerprint === currentInstalledCandidateBaselineFingerprint
+    ? "current-integrations-26-915-"
+    : expectedFingerprint === currentNewestCandidateBaselineFingerprint
+      ? "current-integrations-26-911-"
+      : "current-integrations-26-825-";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -169,13 +174,15 @@ const call = (method, params = {}) =>
   });
 
 const expectedTitle =
-  expectedFingerprint === currentNewestCandidateBaselineFingerprint
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint ||
+  expectedFingerprint === currentInstalledCandidateBaselineFingerprint
     ? "Plugins"
     : kind === "plugins"
       ? "Plugins"
       : "Skills";
 const expectedDescription =
-  expectedFingerprint === currentNewestCandidateBaselineFingerprint
+  expectedFingerprint === currentNewestCandidateBaselineFingerprint ||
+  expectedFingerprint === currentInstalledCandidateBaselineFingerprint
     ? "Manage plugins, skills, and MCPs"
     : kind === "plugins"
       ? "Work with Codex across your favorite tools"
@@ -284,10 +291,9 @@ const capture = response.result?.result?.value;
 if (
   capture?.title !== expectedTitle ||
   capture?.description !== expectedDescription ||
-  (expectedFingerprint !== currentNewestCandidateBaselineFingerprint ||
-    capture.viewport.width > 720
-      ? !capture.search
-      : false) ||
+  ((expectedFingerprint === currentNewestCandidateBaselineFingerprint ||
+    expectedFingerprint === currentInstalledCandidateBaselineFingerprint) &&
+    (capture.viewport.width > 720 ? !capture.search : capture.search)) ||
   !capture.installedHeading ||
   Math.abs(capture.horizontalOverflow) > 1
 ) {
