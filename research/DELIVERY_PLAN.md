@@ -1607,6 +1607,15 @@ in submenu triggers without changing the initial geometry; native menu disabled
 styling and the real effects remain open, so `thread.overflow-actions` is still
 `partial` rather than complete.
 
+The installed `26.915.31945` build now refreshes the same root-menu boundary.
+Its current trigger is 28×28px with a 12.5px radius and zero padding at both
+1180×820 and 720×680; the native macOS menu remains outside the Renderer
+DOM before and after opening. Four dark/light wide/compact replay scenes are
+covered by Electron, CDP, and regional pixels in
+`research/current-thread-overflow-26.915.json`. This is current-build
+geometry evidence only; native item contents and thread mutation effects stay
+host-owned and the row remains `partial`.
+
 The current MCP Settings manager slice adds controlled
 `PluginManagerTabs`, `IntegrationAddMenu`, `McpServersPage`, and
 `McpServerEditor` primitives plus deterministic list, empty, Add-menu,

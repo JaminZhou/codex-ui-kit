@@ -2474,6 +2474,16 @@ The `thread.overflow-actions` row is `partial`: native Copy/Fork/Open-in
 submenu contents, real effects, disabled variants, Light appearance, and
 keyboard-only native opening remain open.
 
+The installed `26.915.31945` build was re-observed with the same read-only
+task selector. Its `Chat actions` trigger remains a native-menu boundary, but
+the current Renderer trigger is 28×28px with a 12.5px radius and zero padding
+at both 1180×820 and 720×680. No Renderer menu mounts before or after the
+trigger click. The current record is
+`research/current-thread-overflow-26.915.json`; four dark/light wide/compact
+replay baselines are checked by Electron, CDP, and regional pixels. Native menu
+item contents and every mutation effect remain host-owned, so the row stays
+`partial`.
+
 Cleanup stopped only isolated PID `24607` and its validated profile-owned
 processes, proved loopback port `9931` closed, and moved the exact profile plus
 raw OS evidence recoverably to

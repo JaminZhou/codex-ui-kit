@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-19",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "cdpPort": 9952,
+    "mainCodexProcessPreserved": true,
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "taskSelectorSha256": "4796c01a0757831ff5865176a392211c41a40c9b6257f9a5ab953ffcf49cc54c",
+  "threadOverflow": {
+    "menuLayer": "native-macos-menu",
+    "wide": {
+      "viewport": { "width": 1180, "height": 820 },
+      "trigger": { "left": 962.8125, "top": 9, "width": 28, "height": 28 },
+      "borderRadius": "12.5px",
+      "padding": "0px",
+      "rendererMenuCountBeforeOpen": 0,
+      "rendererMenuCountAfterOpen": 0
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "trigger": { "left": 502.8125, "top": 9, "width": 28, "height": 28 },
+      "borderRadius": "12.5px",
+      "padding": "0px",
+      "rendererMenuCountBeforeOpen": 0,
+      "rendererMenuCountAfterOpen": 0
+    }
+  },
+  "boundary": {
+    "readOnly": true,
+    "doesNotClaim": [
+      "native menu item contents",
+      "copy, fork, archive, share, pin, schedule, or open effects",
+      "keyboard-only native menu invocation",
+      "light-theme product pixels"
+    ]
+  }
+}

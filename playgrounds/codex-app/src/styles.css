@@ -4143,6 +4143,12 @@ textarea {
   color: inherit;
 }
 
+.demo-root[data-frame^="thread-overflow-current-26-915"]
+  .codex-ui-thread-overflow-menu__trigger {
+  border-radius: 12.5px;
+  padding: 0;
+}
+
 .demo-current-basic-26-825-header-actions {
   align-items: center;
   display: flex;
