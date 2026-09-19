@@ -386,6 +386,14 @@ Browser/CDP, Electron, and pixel gates. Persistence, cloud execution,
 delivery, real permissions, and installed-product mutation remain host-owned;
 this does not promote replay behavior to a real scheduled-task run.
 
+The installed `26.915.31945` build is now the newest candidate shell baseline;
+its isolated Renderer capture records the `321.875px` rail, `46px` titlebar,
+responsive hide/show lifecycle, and the same zero-overflow boundary. The
+playground now replays that candidate through wide/720 shell, document, and
+generated-image routes with dedicated CDP, Electron, and zero-drift pixel
+contracts. This extends current-build structural evidence without promoting
+installed-product document decoding, image generation, or product pixels.
+
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32
 search, four 28px filters, three Pause rows, and the three visible suggestion

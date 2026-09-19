@@ -14,11 +14,27 @@ const documentPreviewScenePrefixes = [
   "workspace-doc-preview",
 ];
 
+function normalizeDocumentPreviewFrame(frame) {
+  for (const prefix of [
+    "workspace-current-26-911-",
+    "workspace-current-26-915-",
+  ]) {
+    if (frame?.startsWith(prefix)) {
+      return `workspace-${frame.slice(prefix.length)}`;
+    }
+  }
+  return frame;
+}
+
 function isDocumentPreviewScene(frame) {
-  return documentPreviewScenePrefixes.some((prefix) => frame?.startsWith(prefix));
+  const normalized = normalizeDocumentPreviewFrame(frame);
+  return documentPreviewScenePrefixes.some((prefix) =>
+    normalized?.startsWith(prefix),
+  );
 }
 
 function expectedDocumentPreviewKind(frame) {
+  frame = normalizeDocumentPreviewFrame(frame);
   if (frame?.startsWith("workspace-image-preview")) return "image";
   if (frame?.startsWith("workspace-notebook-preview")) return "notebook";
   if (frame?.startsWith("workspace-spreadsheet-preview")) return "spreadsheet";
@@ -28,6 +44,7 @@ function expectedDocumentPreviewKind(frame) {
 }
 
 function expectedDocumentPreviewTitle(frame) {
+  frame = normalizeDocumentPreviewFrame(frame);
   if (frame?.startsWith("workspace-image-preview")) return "generated-image.png";
   if (frame?.startsWith("workspace-notebook-preview")) return "analysis.ipynb";
   if (frame?.startsWith("workspace-spreadsheet-preview")) return "budget.xlsx";
@@ -6317,7 +6334,7 @@ for (const scene of selectedScenes) {
       );
       const currentShell26_911Expected = scene.frame.startsWith(
         "workspace-current-26-911-",
-      );
+      ) || scene.frame.startsWith("workspace-current-26-915-");
       const currentContextExpected =
         scene.frame.startsWith("workspace-context-current-26-825-") ||
         currentComposerControlsExpected;
