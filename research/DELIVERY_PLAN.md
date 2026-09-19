@@ -60,6 +60,9 @@ exit gates; it does not replace the inventory.
   visual baselines repeat with zero own-fixture drift. These are current-build
   structural replay gates only: installed-product document decoding, image
   generation, and product-region pixels remain unpromoted.
+  The shell and document/media replay checks are now part of the full private
+  acceptance command, so later changes cannot silently bypass these 26.915
+  wide/compact geometry and repeat-capture contracts.
 - The 26.911 resource replay now uses the captured `321.875px` expanded left
   rail instead of the older `274px` fixture width. Its focused Electron/CDP
   contract checks the wide editor, Add trigger, and menu origins against the
