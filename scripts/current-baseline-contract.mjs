@@ -54,6 +54,19 @@ export const currentNewestCandidateBaselineFingerprint = Object.freeze({
   chromiumVersion: "153.0.8010.36",
 });
 
+// The installed app advanced again after the 26.911.61220 candidate. Keep
+// this newest package isolated until its affected surface families are
+// re-observed; a capture may still record it as a candidate without
+// promoting it to the cross-surface baseline.
+export const currentInstalledCandidateBaselineFingerprint = Object.freeze({
+  appAsarBytes: 358_872_526,
+  appAsarSha256:
+    "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  appVersion: "26.915.31945",
+  buildNumber: "9922",
+  chromiumVersion: "153.0.8010.48",
+});
+
 const primaryRoutes = Object.freeze([
   "New chat",
   "Plugins",

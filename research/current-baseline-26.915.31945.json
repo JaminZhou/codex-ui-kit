@@ -1,0 +1,2066 @@
+{
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48",
+    "sampledAt": "2026-09-19"
+  },
+  "captureKind": "renderer_emulation",
+  "composerResourceObservation": {
+    "editor": {
+      "contentEditable": true,
+      "rect": {
+        "height": 44,
+        "left": 395.4375,
+        "top": 720,
+        "width": 712
+      },
+      "style": {
+        "color": "rgb(255, 255, 255)",
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px"
+      }
+    },
+    "horizontalOverflow": 0,
+    "menu": {
+      "backgroundColor": "rgb(45, 45, 45)",
+      "borderRadius": "20px",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "itemHeight": 28.5625,
+      "publicItems": [
+        "Files and folders",
+        "Work in a project",
+        "Goal",
+        "Plan mode",
+        "Record a skill",
+        "Sketch",
+        "GitHub",
+        "Documents",
+        "PDF",
+        "Spreadsheets",
+        "Presentations",
+        "Template Creator",
+        "Browser",
+        "Computer",
+        "Visualize",
+        "Watch PR",
+        "AppKit Inspector",
+        "Plugin Management",
+        "Sites"
+      ],
+      "publicItemDetails": [
+        {
+          "description": null,
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 413.5625,
+            "width": 726
+          },
+          "title": "Files and folders"
+        },
+        {
+          "description": "Choose project for new chats",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 470.6875,
+            "width": 726
+          },
+          "title": "Work in a project"
+        },
+        {
+          "description": "Set a goal to keep pursuing",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 499.25,
+            "width": 726
+          },
+          "title": "Goal"
+        },
+        {
+          "description": "Turn plan mode on",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 527.8125,
+            "width": 726
+          },
+          "title": "Plan mode"
+        },
+        {
+          "description": null,
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 556.375,
+            "width": 726
+          },
+          "title": "Record a skill"
+        },
+        {
+          "description": "Draw a sketch",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 584.9375,
+            "width": 726
+          },
+          "title": "Sketch"
+        },
+        {
+          "description": "Triage PRs, issues, CI, and publish flows",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 644.0625,
+            "width": 726
+          },
+          "title": "GitHub"
+        },
+        {
+          "description": "Create and edit documents",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 672.625,
+            "width": 726
+          },
+          "title": "Documents"
+        },
+        {
+          "description": "Read, create, and verify PDFs",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 701.1875,
+            "width": 726
+          },
+          "title": "PDF"
+        },
+        {
+          "description": "Create and edit spreadsheets",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 729.75,
+            "width": 726
+          },
+          "title": "Spreadsheets"
+        },
+        {
+          "description": "Create and edit presentations",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 758.3125,
+            "width": 726
+          },
+          "title": "Presentations"
+        },
+        {
+          "description": "Create or update reusable templates from reference content",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 786.875,
+            "width": 726
+          },
+          "title": "Template Creator"
+        },
+        {
+          "description": "Control the in-app browser",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 815.4375,
+            "width": 726
+          },
+          "title": "Browser"
+        },
+        {
+          "description": "Control Mac apps from ChatGPT",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 844,
+            "width": 726
+          },
+          "title": "Computer"
+        },
+        {
+          "description": "Create interactive visuals",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 872.5625,
+            "width": 726
+          },
+          "title": "Visualize"
+        },
+        {
+          "description": "Drive GitHub bot review rounds to a clean pass.",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 901.125,
+            "width": 726
+          },
+          "title": "Watch PR"
+        },
+        {
+          "description": "Inspect native macOS views in Codex Browser.",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 929.6875,
+            "width": 726
+          },
+          "title": "AppKit Inspector"
+        },
+        {
+          "description": "Discover and manage plugins",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 958.25,
+            "width": 726
+          },
+          "title": "Plugin Management"
+        },
+        {
+          "description": "Build and deploy websites",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 986.8125,
+            "width": 726
+          },
+          "title": "Sites"
+        }
+      ],
+      "rect": {
+        "height": 320,
+        "left": 383.4375,
+        "top": 382,
+        "width": 736
+      },
+      "scrollOwner": {
+        "clientHeight": 310,
+        "rect": {
+          "height": 310,
+          "left": 388.4375,
+          "top": 387,
+          "width": 726
+        },
+        "scrollHeight": 951,
+        "scrollTop": 0
+      },
+      "visibleItemCount": 25
+    },
+    "trigger": {
+      "ariaExpanded": "true",
+      "dataState": "open",
+      "rect": {
+        "height": 28,
+        "left": 391.4375,
+        "top": 768,
+        "width": 28
+      }
+    },
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 820,
+      "width": 1180
+    }
+  },
+  "runtimeBundleIdentity": {
+    "afterCapture": {
+      "appAsarBytes": 358872526,
+      "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+      "changedAtMs": 1789785704589,
+      "checkedAtMs": 1789789405940,
+      "device": "16777234",
+      "inode": "368005667"
+    },
+    "beforeCapture": {
+      "appAsarBytes": 358872526,
+      "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+      "changedAtMs": 1789785704589,
+      "checkedAtMs": 1789789390741,
+      "device": "16777234",
+      "inode": "368005667"
+    },
+    "ownerPid": 39294,
+    "processStartedAtMs": 1789789313000
+  },
+  "schemaVersion": 1,
+  "projectsIndexObservation": {
+    "collapsed": {
+      "expandedCount": 0,
+      "focusOnToggle": true
+    },
+    "compact": {
+      "header": {
+        "gridTemplateColumns": "415px 128px",
+        "rect": {
+          "height": 40,
+          "left": 21,
+          "top": 179.59,
+          "width": 559
+        }
+      },
+      "horizontalOverflow": 0,
+      "navigationVisible": false,
+      "navigationWidth": null,
+      "routePath": "/projects",
+      "rows": {
+        "count": 15,
+        "firstRect": {
+          "height": 70,
+          "left": 21,
+          "top": 219.59,
+          "width": 559
+        }
+      },
+      "scrollOwners": [
+        {
+          "clientHeight": 554,
+          "overflowY": "auto",
+          "rect": {
+            "height": 554,
+            "left": 1,
+            "top": 46,
+            "width": 599
+          },
+          "scrollHeight": 1259
+        }
+      ],
+      "search": {
+        "count": 1,
+        "placeholder": "Search projects",
+        "rect": {
+          "height": 18,
+          "left": 58,
+          "top": 126.59,
+          "width": 511
+        }
+      },
+      "title": {
+        "count": 1,
+        "rect": {
+          "height": 33.59,
+          "left": 29,
+          "top": 66,
+          "width": 101.08
+        },
+        "style": {
+          "fontSize": "28px",
+          "fontWeight": "500",
+          "lineHeight": "33.6px"
+        }
+      },
+      "updatedDisplay": "none",
+      "viewport": {
+        "height": 600,
+        "width": 600
+      }
+    },
+    "empty": {
+      "emptyMessageCount": 1,
+      "focusOnSearch": true,
+      "rowCount": 0
+    },
+    "expanded": {
+      "collapsedWrapperHeight": 71,
+      "expandedCount": 1,
+      "focusOnToggle": true,
+      "recentGroupCount": 1,
+      "recentGroupHeight": 36,
+      "wrapperHeight": 119
+    },
+    "sort": {
+      "initial": {
+        "name": {
+          "active": false,
+          "descending": false
+        },
+        "updated": {
+          "active": true,
+          "descending": true
+        }
+      },
+      "nameAscending": {
+        "name": {
+          "active": true,
+          "descending": false
+        },
+        "updated": {
+          "active": false,
+          "descending": false
+        }
+      },
+      "nameDescending": {
+        "name": {
+          "active": true,
+          "descending": true
+        },
+        "updated": {
+          "active": false,
+          "descending": false
+        }
+      },
+      "restored": {
+        "name": {
+          "active": false,
+          "descending": false
+        },
+        "updated": {
+          "active": true,
+          "descending": true
+        }
+      }
+    },
+    "wide": {
+      "header": {
+        "gridTemplateColumns": "512px 64px 128px",
+        "rect": {
+          "height": 40,
+          "left": 383.44,
+          "top": 179.59,
+          "width": 736
+        }
+      },
+      "horizontalOverflow": 0,
+      "navigationVisible": true,
+      "navigationWidth": 321.88,
+      "routePath": "/projects",
+      "rows": {
+        "count": 15,
+        "firstRect": {
+          "height": 70,
+          "left": 383.44,
+          "top": 219.59,
+          "width": 736
+        }
+      },
+      "scrollOwners": [
+        {
+          "clientHeight": 774,
+          "overflowY": "auto",
+          "rect": {
+            "height": 774,
+            "left": 322.88,
+            "top": 46,
+            "width": 857.13
+          },
+          "scrollHeight": 1259
+        }
+      ],
+      "search": {
+        "count": 1,
+        "placeholder": "Search projects",
+        "rect": {
+          "height": 18,
+          "left": 420.44,
+          "top": 126.59,
+          "width": 688
+        }
+      },
+      "title": {
+        "count": 1,
+        "rect": {
+          "height": 33.59,
+          "left": 391.44,
+          "top": 66,
+          "width": 101.08
+        },
+        "style": {
+          "fontSize": "28px",
+          "fontWeight": "500",
+          "lineHeight": "33.6px"
+        }
+      },
+      "updatedDisplay": "flex",
+      "viewport": {
+        "height": 820,
+        "width": 1180
+      }
+    }
+  },
+  "sidebarLifecycle": {
+    "baseline": {
+      "expandedProjectGroupCount": 10,
+      "helpControlCount": 1,
+      "horizontalOverflow": 0,
+      "navigationWidth": 321.88,
+      "projectGroupCount": 15,
+      "projectRow": {
+        "rect": {
+          "height": 30,
+          "width": 305.88
+        },
+        "role": "button",
+        "tabIndex": 0,
+        "tag": "div"
+      },
+      "settingsControlCount": 0
+    },
+    "pointerCollapsed": {
+      "expanded": false,
+      "focusOnRow": true
+    },
+    "enterExpanded": {
+      "expanded": true,
+      "focusOnRow": true
+    },
+    "spaceCollapsed": {
+      "expanded": false,
+      "focusOnRow": true
+    },
+    "spaceExpanded": {
+      "expanded": true,
+      "focusOnRow": true
+    },
+    "projectMenu": {
+      "bridge": {
+        "available": true,
+        "frozen": true
+      },
+      "items": null,
+      "observationStatus": "native-items-unavailable",
+      "renderMode": "electron-native-context-menu",
+      "trigger": {
+        "ariaExpanded": "false",
+        "ariaHaspopup": "menu",
+        "rect": {
+          "height": 24,
+          "width": 24
+        },
+        "tag": "button"
+      }
+    },
+    "helpMenu": {
+      "opened": {
+        "focusInside": true,
+        "focusRole": "menu",
+        "hasMarkAllAsRead": false,
+        "menuItemCount": 8,
+        "rect": {
+          "height": 272.06,
+          "width": 320
+        },
+        "visibleMenuCount": 1
+      },
+      "closed": {
+        "focusReturned": true,
+        "visibleMenuCount": 0
+      }
+    },
+    "responsive": {
+      "compactVisibleBeforeCollapse": {
+        "horizontalOverflow": 0,
+        "navigationVisible": true,
+        "navigationWidth": 321.875,
+        "projectExpanded": false,
+        "showSidebarCount": 0
+      },
+      "compactCollapsed": {
+        "horizontalOverflow": 0,
+        "navigationVisible": false,
+        "navigationWidth": null,
+        "projectExpanded": false,
+        "showSidebarCount": 1
+      },
+      "compactPinned": {
+        "horizontalOverflow": 0,
+        "navigationVisible": true,
+        "navigationWidth": 321.875,
+        "projectExpanded": false,
+        "showSidebarCount": 0
+      },
+      "wideRestored": {
+        "horizontalOverflow": 0,
+        "navigationVisible": true,
+        "navigationWidth": 321.875,
+        "projectExpanded": false,
+        "showSidebarCount": 0
+      },
+      "keyboardRestored": {
+        "expanded": true,
+        "focusOnRow": true
+      }
+    }
+  },
+  "states": {
+    "wideNewChat": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 796,
+            "height": 28,
+            "left": 391.44,
+            "right": 419.44,
+            "top": 768,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 796,
+            "height": 28,
+            "left": 1047.44,
+            "right": 1075.44,
+            "top": 768,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 811,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 783,
+            "width": 71.56
+          },
+          {
+            "bottom": 796,
+            "height": 28,
+            "left": 1083.44,
+            "right": 1111.44,
+            "top": 768,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 764,
+          "height": 44,
+          "left": 395.44,
+          "right": 1107.44,
+          "top": 720,
+          "width": 712
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 820,
+          "height": 820,
+          "left": 321.88,
+          "right": 1180,
+          "top": 0,
+          "width": 858.13
+        }
+      ],
+      "navigation": {
+        "bottom": 820,
+        "height": 774,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 658,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 774,
+            "height": 658,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1477
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 820,
+        "width": 1180
+      }
+    },
+    "mediumNewChat": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 732,
+            "right": 760,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 671,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 643,
+            "width": 71.56
+          },
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 768,
+            "right": 796,
+            "top": 628,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 624,
+          "height": 44,
+          "left": 350.88,
+          "right": 792,
+          "top": 580,
+          "width": 441.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 321.88,
+          "right": 820,
+          "top": 0,
+          "width": 498.13
+        }
+      ],
+      "navigation": {
+        "bottom": 680,
+        "height": 634,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 518,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 634,
+            "height": 518,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1438
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 820
+      }
+    },
+    "thresholdNewChat": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 633,
+            "right": 661,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 671,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 643,
+            "width": 71.56
+          },
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 669,
+            "right": 697,
+            "top": 628,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 624,
+          "height": 44,
+          "left": 350.88,
+          "right": 693,
+          "top": 580,
+          "width": 342.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 321.88,
+          "right": 721,
+          "top": 0,
+          "width": 399.13
+        }
+      ],
+      "navigation": {
+        "bottom": 680,
+        "height": 634,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 518,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 634,
+            "height": 518,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1438
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 721
+      }
+    },
+    "compactVisibleBeforeCollapse": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 632,
+            "right": 660,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 671,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 643,
+            "width": 71.56
+          },
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 668,
+            "right": 696,
+            "top": 628,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 624,
+          "height": 44,
+          "left": 350.88,
+          "right": 692,
+          "top": 580,
+          "width": 341.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 321.88,
+          "right": 720,
+          "top": 0,
+          "width": 398.13
+        }
+      ],
+      "navigation": {
+        "bottom": 680,
+        "height": 634,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 518,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 634,
+            "height": 518,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1438
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactCollapsed": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 25,
+            "right": 53,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Back": [],
+        "Dictate": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 632,
+            "right": 660,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Forward": [],
+        "Hide sidebar": [],
+        "Show sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Start new voice chat": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 668,
+            "right": 696,
+            "top": 628,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 624,
+          "height": 44,
+          "left": 29,
+          "right": 692,
+          "top": 580,
+          "width": 663
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 0,
+          "right": 720,
+          "top": 0,
+          "width": 720
+        }
+      ],
+      "navigation": null,
+      "navigationScrollOwners": [],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [],
+        "Plugins": [],
+        "Pull requests": [],
+        "Scheduled": [],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactPinned": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 632,
+            "right": 660,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 671,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 643,
+            "width": 71.56
+          },
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 668,
+            "right": 696,
+            "top": 628,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 624,
+          "height": 44,
+          "left": 350.88,
+          "right": 692,
+          "top": 580,
+          "width": 341.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 321.88,
+          "right": 720,
+          "top": 0,
+          "width": 398.13
+        }
+      ],
+      "navigation": {
+        "bottom": 680,
+        "height": 634,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 518,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 634,
+            "height": 518,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1438
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactPullRequests": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 671,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 643,
+            "width": 71.56
+          }
+        ]
+      },
+      "editor": null,
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 321.88,
+          "right": 720,
+          "top": 0,
+          "width": 398.13
+        }
+      ],
+      "navigation": {
+        "bottom": 680,
+        "height": 634,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 518,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 634,
+            "height": 518,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1438
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 0
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": "page",
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactRestored": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 120,
+            "right": 148,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 632,
+            "right": 660,
+            "top": 628,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 152,
+            "right": 180,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 37,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 9,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 671,
+            "height": 28,
+            "left": 206.31,
+            "right": 277.88,
+            "top": 643,
+            "width": 71.56
+          },
+          {
+            "bottom": 656,
+            "height": 28,
+            "left": 668,
+            "right": 696,
+            "top": 628,
+            "width": 28
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 624,
+          "height": 44,
+          "left": 350.88,
+          "right": 692,
+          "top": 580,
+          "width": 341.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 680,
+          "height": 680,
+          "left": 321.88,
+          "right": 720,
+          "top": 0,
+          "width": 398.13
+        }
+      ],
+      "navigation": {
+        "bottom": 680,
+        "height": 634,
+        "left": 0,
+        "right": 321.88,
+        "top": 46,
+        "width": 321.88
+      },
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 518,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 634,
+            "height": 518,
+            "left": 0,
+            "right": 321.88,
+            "top": 116,
+            "width": 321.88
+          },
+          "scrollHeight": 1438
+        }
+      ],
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 116,
+              "height": 30,
+              "left": 8,
+              "right": 281.88,
+              "top": 86,
+              "width": 273.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 209,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 179,
+              "width": 305.88
+            }
+          }
+        ],
+        "Pull requests": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 147,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 117,
+              "width": 305.88
+            }
+          }
+        ],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 178,
+              "height": 30,
+              "left": 8,
+              "right": 313.88,
+              "top": 148,
+              "width": 305.88
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    }
+  },
+  "targetSelection": {
+    "candidates": [
+      {
+        "area": 2153108,
+        "height": 2789,
+        "index": 0,
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "sidebarTrigger": 0,
+          "textbox": 1
+        },
+        "selected": false,
+        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
+        "visibleControls": 0,
+        "width": 772
+      },
+      {
+        "area": 691200,
+        "height": 720,
+        "index": 1,
+        "landmarks": {
+          "main": 0,
+          "nav": 0,
+          "sidebarTrigger": 0,
+          "textbox": 0
+        },
+        "selected": false,
+        "url": "non-app-page",
+        "visibleControls": 0,
+        "width": 960
+      },
+      {
+        "area": 967600,
+        "height": 820,
+        "index": 2,
+        "landmarks": {
+          "main": 2,
+          "nav": 1,
+          "sidebarTrigger": 2,
+          "textbox": 1
+        },
+        "selected": true,
+        "url": "app://-/index.html",
+        "visibleControls": 51,
+        "width": 1180
+      }
+    ],
+    "selected": {
+      "area": 967600,
+      "landmarks": {
+        "main": 2,
+        "nav": 1,
+        "sidebarTrigger": 2,
+        "textbox": 1
+      },
+      "url": "app://-/index.html",
+      "visibleControls": 51
+    }
+  }
+}

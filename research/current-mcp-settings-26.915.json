@@ -1,0 +1,459 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-19T03:54:22.045Z",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "cdpPort": 9936,
+    "mainCodexProcessPreserved": true,
+    "ownerPid": 42235,
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "mcp": {
+    "addMenu": {
+      "items": [
+        "Create plugin",
+        "Add a marketplace",
+        "Add MCP server",
+        "Record a skill"
+      ],
+      "rect": {
+        "height": 131.25,
+        "left": 975,
+        "top": 142,
+        "width": 159.734375
+      }
+    },
+    "compact": {
+      "fromPlugins": {
+        "card": {
+          "height": 87.125,
+          "left": 21,
+          "top": 589.796875,
+          "width": 679
+        },
+        "heading": {
+          "height": 21,
+          "left": 21,
+          "top": 553.296875,
+          "width": 679
+        },
+        "rowCount": 2,
+        "rows": [
+          {
+            "rect": {
+              "height": 42.5625,
+              "left": 22,
+              "top": 590.796875,
+              "width": 677
+            },
+            "settingsButtonCount": 0,
+            "toggleStates": []
+          },
+          {
+            "rect": {
+              "height": 42.5625,
+              "left": 22,
+              "top": 633.359375,
+              "width": 677
+            },
+            "settingsButtonCount": 0,
+            "toggleStates": []
+          }
+        ]
+      },
+      "heading": {
+        "height": 28.796875,
+        "left": 21,
+        "top": 112,
+        "width": 471.421875
+      },
+      "horizontalOverflow": 0,
+      "search": null,
+      "servers": {
+        "card": {
+          "height": 210,
+          "left": 21,
+          "top": 313.796875,
+          "width": 679
+        },
+        "heading": {
+          "height": 21,
+          "left": 21,
+          "top": 277.296875,
+          "width": 679
+        },
+        "rowCount": 4,
+        "rows": [
+          {
+            "rect": {
+              "height": 52,
+              "left": 22,
+              "top": 314.796875,
+              "width": 677
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "false"
+            ]
+          },
+          {
+            "rect": {
+              "height": 52,
+              "left": 22,
+              "top": 366.796875,
+              "width": 677
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "true"
+            ]
+          },
+          {
+            "rect": {
+              "height": 52,
+              "left": 22,
+              "top": 418.796875,
+              "width": 677
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "true"
+            ]
+          },
+          {
+            "rect": {
+              "height": 52,
+              "left": 22,
+              "top": 470.796875,
+              "width": 677
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "true"
+            ]
+          }
+        ]
+      },
+      "tabs": [
+        {
+          "count": 13,
+          "label": "Plugins",
+          "rect": {
+            "height": 28,
+            "left": 21,
+            "top": 199.796875,
+            "width": 82.65625
+          }
+        },
+        {
+          "count": 6,
+          "label": "Apps",
+          "rect": {
+            "height": 28,
+            "left": 105.65625,
+            "top": 199.796875,
+            "width": 63.625
+          }
+        },
+        {
+          "count": 4,
+          "label": "MCPs",
+          "rect": {
+            "height": 28,
+            "left": 171.28125,
+            "top": 199.796875,
+            "width": 67.78125
+          }
+        },
+        {
+          "count": 2,
+          "label": "Skills",
+          "rect": {
+            "height": 28,
+            "left": 241.0625,
+            "top": 199.796875,
+            "width": 63.65625
+          }
+        },
+        {
+          "count": 2,
+          "label": "Marketplace",
+          "rect": {
+            "height": 28,
+            "left": 306.71875,
+            "top": 199.796875,
+            "width": 107.03125
+          }
+        }
+      ],
+      "viewport": {
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactEditor": {
+      "docsVisible": true,
+      "fields": [
+        "Search",
+        "MCP server name",
+        "https://mcp.example.com/mcp",
+        "MCP_BEARER_TOKEN",
+        "Key",
+        "Value",
+        "Key",
+        "Value"
+      ],
+      "saveDisabled": true,
+      "type": "Streamable HTTP",
+      "viewport": {
+        "height": 680,
+        "width": 720
+      }
+    },
+    "detail": {
+      "fieldLabels": [
+        "URL",
+        "Bearer token env var",
+        "Headers",
+        "Headers from environment variables"
+      ],
+      "form": {
+        "height": 472.5625,
+        "left": 367.4375,
+        "top": 367.796875,
+        "width": 768
+      },
+      "headingMatchesUpdatePattern": true,
+      "saveDisabled": true,
+      "uninstallVisible": true
+    },
+    "empty": {
+      "message": "No MCP servers found",
+      "messageRect": {
+        "height": 18.5625,
+        "left": 384.4375,
+        "top": 330.796875,
+        "width": 710
+      },
+      "searchHasFocus": true
+    },
+    "http": {
+      "docsVisible": true,
+      "fields": [
+        "Search",
+        "Search MCP servers",
+        "MCP server name",
+        "https://mcp.example.com/mcp",
+        "MCP_BEARER_TOKEN",
+        "Key",
+        "Value",
+        "Key",
+        "Value"
+      ],
+      "saveDisabled": true,
+      "type": "Streamable HTTP",
+      "viewport": {
+        "height": 820,
+        "width": 1180
+      }
+    },
+    "stdio": {
+      "docsVisible": true,
+      "fields": [
+        "Search",
+        "Search MCP servers",
+        "MCP server name",
+        "openai-dev-mcp serve-sqlite",
+        "Key",
+        "Value",
+        "~/code"
+      ],
+      "saveDisabled": true,
+      "type": "STDIO",
+      "viewport": {
+        "height": 820,
+        "width": 1180
+      }
+    },
+    "wide": {
+      "fromPlugins": {
+        "card": {
+          "height": 87.125,
+          "left": 367.4375,
+          "top": 593.796875,
+          "width": 768
+        },
+        "heading": {
+          "height": 21,
+          "left": 367.4375,
+          "top": 557.296875,
+          "width": 768
+        },
+        "rowCount": 2,
+        "rows": [
+          {
+            "rect": {
+              "height": 42.5625,
+              "left": 368.4375,
+              "top": 594.796875,
+              "width": 766
+            },
+            "settingsButtonCount": 0,
+            "toggleStates": []
+          },
+          {
+            "rect": {
+              "height": 42.5625,
+              "left": 368.4375,
+              "top": 637.359375,
+              "width": 766
+            },
+            "settingsButtonCount": 0,
+            "toggleStates": []
+          }
+        ]
+      },
+      "heading": {
+        "height": 28.796875,
+        "left": 367.4375,
+        "top": 112,
+        "width": 560.421875
+      },
+      "horizontalOverflow": 0,
+      "search": {
+        "height": 32,
+        "left": 911.4375,
+        "top": 199.796875,
+        "width": 224
+      },
+      "servers": {
+        "card": {
+          "height": 210,
+          "left": 367.4375,
+          "top": 317.796875,
+          "width": 768
+        },
+        "heading": {
+          "height": 21,
+          "left": 367.4375,
+          "top": 281.296875,
+          "width": 768
+        },
+        "rowCount": 4,
+        "rows": [
+          {
+            "rect": {
+              "height": 52,
+              "left": 368.4375,
+              "top": 318.796875,
+              "width": 766
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "false"
+            ]
+          },
+          {
+            "rect": {
+              "height": 52,
+              "left": 368.4375,
+              "top": 370.796875,
+              "width": 766
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "true"
+            ]
+          },
+          {
+            "rect": {
+              "height": 52,
+              "left": 368.4375,
+              "top": 422.796875,
+              "width": 766
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "true"
+            ]
+          },
+          {
+            "rect": {
+              "height": 52,
+              "left": 368.4375,
+              "top": 474.796875,
+              "width": 766
+            },
+            "settingsButtonCount": 1,
+            "toggleStates": [
+              "true"
+            ]
+          }
+        ]
+      },
+      "tabs": [
+        {
+          "count": 13,
+          "label": "Plugins",
+          "rect": {
+            "height": 28,
+            "left": 367.4375,
+            "top": 201.796875,
+            "width": 82.65625
+          }
+        },
+        {
+          "count": 6,
+          "label": "Apps",
+          "rect": {
+            "height": 28,
+            "left": 452.09375,
+            "top": 201.796875,
+            "width": 63.625
+          }
+        },
+        {
+          "count": 4,
+          "label": "MCPs",
+          "rect": {
+            "height": 28,
+            "left": 517.71875,
+            "top": 201.796875,
+            "width": 67.78125
+          }
+        },
+        {
+          "count": 2,
+          "label": "Skills",
+          "rect": {
+            "height": 28,
+            "left": 587.5,
+            "top": 201.796875,
+            "width": 63.65625
+          }
+        },
+        {
+          "count": 2,
+          "label": "Marketplace",
+          "rect": {
+            "height": 28,
+            "left": 653.15625,
+            "top": 201.796875,
+            "width": 107.03125
+          }
+        }
+      ],
+      "viewport": {
+        "height": 820,
+        "width": 1180
+      }
+    }
+  }
+}

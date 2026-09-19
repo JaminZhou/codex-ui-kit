@@ -20,6 +20,7 @@ import {
   assertCurrentSidebarRowsRecord,
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentInstalledCandidateBaselineFingerprint,
   runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
@@ -789,6 +790,38 @@ describe("current baseline capture contract", () => {
       updatedDisplay: "inline-flex",
       viewport: { height: 820, width: 1180 },
     },
+  });
+
+  it("keeps the installed 26.915 candidate record machine-verifiable", () => {
+    const record = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-baseline-26.915.31945.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(() =>
+      assertCurrentBaselineRecord(
+        record,
+        currentInstalledCandidateBaselineFingerprint,
+      ),
+    ).not.toThrow();
+    expect(record.baseline.appVersion).toBe("26.915.31945");
+    expect(record.baseline.buildNumber).toBe("9922");
+    expect(record.targetSelection.selected.url).toBe("app://-/index.html");
+    expect(record.states.wideNewChat.editor.rect).toMatchObject({
+      height: 44,
+      width: 712,
+    });
+    expect(record.composerResourceObservation.menu).toMatchObject({
+      itemHeight: 28.5625,
+      publicItems: expect.arrayContaining(["Documents", "Files and folders"]),
+      rect: { height: 320, width: 736 },
+      scrollOwner: { clientHeight: 310, scrollHeight: 951 },
+    });
   });
 
   it("gates the sanitized current account-menu matrix", () => {

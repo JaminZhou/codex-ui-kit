@@ -5,6 +5,7 @@ import { basename, dirname, resolve } from "node:path";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
   currentBaselineFingerprint,
+  currentInstalledCandidateBaselineFingerprint,
   currentNewestCandidateBaselineFingerprint,
   currentBaselineViewports,
   selectCurrentMainCandidate,
@@ -20,9 +21,11 @@ const requestedOutputDirectory =
 const allowCapture =
   process.env.CODEX_CURRENT_MCP_SETTINGS_ALLOW_CAPTURE === "1";
 const expectedFingerprint =
-  process.env.CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT === "26.911.61220"
-    ? currentNewestCandidateBaselineFingerprint
-    : currentBaselineFingerprint;
+  process.env.CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : process.env.CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT === "26.911.61220"
+      ? currentNewestCandidateBaselineFingerprint
+      : currentBaselineFingerprint;
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -222,11 +225,16 @@ const openPlugins = async () => {
     'h1:has-text("Connect to a custom MCP"), h1:has-text("Update ")',
   );
   if (await visible(nestedEditor)) {
-    const back = page.getByRole("button", { exact: true, name: "Back" });
-    if ((await back.count()) !== 1) {
+    const back = nestedEditor
+      .first()
+      .locator(
+        'xpath=ancestor::div[contains(@class,"flex min-h-0 flex-col")][1]',
+      )
+      .getByRole("button", { exact: true, name: "Back" });
+    if ((await back.count()) < 1) {
       throw new Error("Could not leave the nested MCP editor safely.");
     }
-    await back.click();
+    await back.first().click();
   }
   const mcpTab = page.getByRole("button", { name: /^MCPs\s+\d+$/ });
   if ((await mcpTab.count()) !== 1) {
@@ -393,7 +401,13 @@ const detail = {
   ),
 };
 await page.screenshot({ path: screenshotPath("mcp-detail-wide") });
-await page.getByRole("button", { exact: true, name: "Back" }).click();
+await page
+  .getByRole("heading", { name: /^Update .+ MCP$/ })
+  .locator(
+    'xpath=ancestor::div[contains(@class,"flex min-h-0 flex-col")][1]',
+  )
+  .getByRole("button", { exact: true, name: "Back" })
+  .click();
 
 await page.getByRole("button", { exact: true, name: "Add" }).click();
 await page
@@ -428,7 +442,13 @@ const http = await captureEditor(
   "mcp-editor-http-wide",
   "Streamable HTTP",
 );
-await page.getByRole("button", { exact: true, name: "Back" }).click();
+await page
+  .getByRole("heading", { exact: true, name: "Connect to a custom MCP" })
+  .locator(
+    'xpath=ancestor::div[contains(@class,"flex min-h-0 flex-col")][1]',
+  )
+  .getByRole("button", { exact: true, name: "Back" })
+  .click();
 
 const compact = await captureList(
   "mcp-list-compact",
