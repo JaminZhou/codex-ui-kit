@@ -1547,6 +1547,14 @@ does not promote installation, enablement, OAuth, permissions,
 registry/network effects, execution, third-party artwork, or product pixels;
 the P1 rows remain `partial`.
 
+The matching private playground now exposes separate
+`integration-plugins-current-26-915` and `integration-skills-current-26-915`
+routes. The replay keeps the current public labels/counts and the compact
+search mounted at 720px; its targeted Electron/CDP contract repeats both
+catalogs wide and compact with 0% own-fixture drift. This promotes deterministic
+replay stability only; installation, enablement, permissions, execution, and
+installed-product pixels remain host-owned boundaries.
+
 The follow-up Plugin detail slice adds controlled `PluginDetailPage` and
 `PluginDetailBreadcrumb` primitives for installed/discovery identity,
 suggestions, Apps, Information, disclosure, bottom scrolling, and the

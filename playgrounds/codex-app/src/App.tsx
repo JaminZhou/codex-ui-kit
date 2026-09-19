@@ -3279,6 +3279,45 @@ const currentPersonalPluginSections: readonly IntegrationCatalogSection[] = [
   },
 ];
 
+// 26.915 keeps the catalog search mounted in the compact viewport and exposes
+// a different public catalog than the older 26.825 replay. Keep the observed
+// titles explicit so a package refresh can change this candidate independently
+// of the historical fixture.
+const currentPluginSections26915: readonly IntegrationCatalogSection[] = [
+  {
+    id: "observed-popular",
+    items: [
+      { icon: <CurrentIntegrationFixtureIcon label="G" />, id: "gmail", title: "Gmail" },
+      { icon: <CurrentIntegrationFixtureIcon label="GH" />, id: "github", title: "GitHub" },
+      { icon: <CurrentIntegrationFixtureIcon label="D" tone="pink" />, id: "google-drive", title: "Google Drive" },
+      { icon: <CurrentIntegrationFixtureIcon label="C" tone="blue" />, id: "google-calendar", title: "Google Calendar" },
+      { icon: <CurrentIntegrationFixtureIcon label="N" />, id: "notion", title: "Notion" },
+      { icon: <CurrentIntegrationFixtureIcon label="S" tone="blue" />, id: "slack", title: "Slack" },
+    ],
+  },
+  {
+    id: "observed-data",
+    items: [
+      { icon: <CurrentIntegrationFixtureIcon label="T" />, id: "tableau", title: "Tableau" },
+      { icon: <CurrentIntegrationFixtureIcon label="P" tone="blue" />, id: "power-bi", title: "Microsoft Power BI" },
+      { icon: <CurrentIntegrationFixtureIcon label="AWS" tone="amber" />, id: "aws-data-analytics", title: "AWS Data Analytics" },
+      { icon: <CurrentIntegrationFixtureIcon label="C" tone="blue" />, id: "clickhouse", title: "ClickHouse" },
+      { icon: <CurrentIntegrationFixtureIcon label="F" tone="green" />, id: "firebase", title: "Firebase" },
+      { icon: <CurrentIntegrationFixtureIcon label="D" tone="blue" />, id: "dropbox", title: "Dropbox" },
+    ],
+  },
+  {
+    id: "observed-workflows",
+    items: [
+      { icon: <CurrentIntegrationFixtureIcon label="H" />, id: "hubspot", title: "HubSpot" },
+      { icon: <CurrentIntegrationFixtureIcon label="S" tone="green" />, id: "stripe", title: "Stripe" },
+      { icon: <CurrentIntegrationFixtureIcon label="C" tone="amber" />, id: "canva", title: "Canva" },
+      { icon: <CurrentIntegrationFixtureIcon label="F" tone="violet" />, id: "figma", title: "Figma" },
+      { icon: <CurrentIntegrationFixtureIcon label="S" tone="blue" />, id: "slack-duplicate", title: "Slack" },
+    ],
+  },
+];
+
 const currentSkillInstalledItems: readonly IntegrationCatalogItem[] = [
   { description: "Use App Store Connect release workflows", icon: <CurrentIntegrationFixtureIcon label="A" tone="violet" />, id: "asc-tooling", title: "ASC Tooling" },
   { description: "Generate or edit images for websites", icon: <CurrentIntegrationFixtureIcon label="I" tone="blue" />, id: "image-gen", title: "Image Gen" },
@@ -3324,6 +3363,21 @@ const currentSkillSectionsByScope: Record<string, readonly IntegrationCatalogSec
       ],
     },
   ],
+};
+
+const currentSkillSectionsByScope26915: Record<
+  string,
+  readonly IntegrationCatalogSection[]
+> = {
+  personal: [
+    {
+      id: "observed-personal",
+      items: [currentSkillInstalledItems[0], currentSkillInstalledItems[4]],
+    },
+  ],
+  system: [],
+  trailglass: [],
+  recommended: [],
 };
 
 type IntegrationCatalogItemLifecycle = {
@@ -3612,6 +3666,10 @@ const blankMcpEditorValue: McpServerEditorValue = {
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
+  const currentIntegrationCatalog26915Replay =
+    initialSelection.view === "plugins" &&
+    (initialSelection.frame?.startsWith("integration-plugins-current-26-915") ||
+      initialSelection.frame?.startsWith("integration-skills-current-26-915"));
   const currentComposerControls2691161220Replay =
     initialSelection.view === "workspace" &&
     initialSelection.frame?.startsWith(
@@ -3720,6 +3778,7 @@ export function App() {
     "plugins" | "skills"
   >(
     initialSelection.frame?.startsWith("integration-skills-current-26-825") ||
+      initialSelection.frame?.startsWith("integration-skills-current-26-915") ||
       initialSelection.frame?.startsWith(
         "integration-skill-detail-current-26-825",
       )
@@ -13159,11 +13218,15 @@ export function App() {
       ? pluginCatalogScope
       : skillCatalogScope;
   const integrationCatalogSourceSections =
-    integrationCatalogKind === "plugins"
-      ? pluginCatalogScope === "public"
-        ? currentPluginSections
-        : currentPersonalPluginSections
-      : currentSkillSectionsByScope[skillCatalogScope] ?? [];
+    currentIntegrationCatalog26915Replay
+      ? integrationCatalogKind === "plugins"
+        ? currentPluginSections26915
+        : currentSkillSectionsByScope26915[skillCatalogScope] ?? []
+      : integrationCatalogKind === "plugins"
+        ? pluginCatalogScope === "public"
+          ? currentPluginSections
+          : currentPersonalPluginSections
+        : currentSkillSectionsByScope[skillCatalogScope] ?? [];
   const integrationCatalogView = useMemo(() => {
     const lifecycleFor = (item: IntegrationCatalogItem) =>
       integrationCatalogItemLifecycles[item.id];
@@ -13237,7 +13300,14 @@ export function App() {
   const integrationCatalogRoute = (
     <IntegrationCatalogPage
       activeScope={activeIntegrationScope}
-      className="demo-current-integration-catalog"
+      className={[
+        "demo-current-integration-catalog",
+        currentIntegrationCatalog26915Replay
+          ? "demo-current-integration-catalog--current-26-915"
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       data-action={integrationCatalogAction || undefined}
       data-testid="current-integration-catalog"
       description={
