@@ -27,6 +27,19 @@ async function readRateLimits() {
   }
 }
 
+function hasSubscriptionQuota(rateLimits) {
+  if (!rateLimits) return true;
+  if (rateLimits.rateLimitReachedType) return false;
+  const buckets = [rateLimits.primary, rateLimits.secondary].filter(Boolean);
+  if (buckets.length === 0) return true;
+  return buckets.some(
+    (bucket) =>
+      bucket &&
+      typeof bucket.usedPercent === "number" &&
+      bucket.usedPercent < 100,
+  );
+}
+
 async function runAttempt(attempt) {
   const directory = await realpath(
     await mkdtemp(join(tmpdir(), "ui-kit-live-subagent-recovery-")),
@@ -34,10 +47,15 @@ async function runAttempt(attempt) {
   const registryPath = join(directory, "registry.json");
   const evidence = [];
   const rateLimits = await readRateLimits();
+  // Purchased credits are separate from the subscription windows. A user can
+  // have no extra credits while still having substantial subscription quota;
+  // only shorten the probe when the subscription itself is exhausted.
+  const subscriptionQuotaAvailable = hasSubscriptionQuota(rateLimits);
   const { app, page } = await launchScene(scene, {
     capture: false,
     environment: {
-      CODEX_UI_KIT_LIVE_EPHEMERAL: "0",
+      CODEX_UI_KIT_LIVE_EPHEMERAL:
+        process.env.CODEX_UI_KIT_LIVE_EPHEMERAL ?? "0",
       CODEX_UI_KIT_LIVE_HISTORY_PATH: registryPath,
       CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
       CODEX_UI_KIT_WORKSPACE: directory,
@@ -77,7 +95,7 @@ async function runAttempt(attempt) {
             event.params?.item?.type === "collabAgentToolCall",
         ),
       undefined,
-      { timeout: rateLimits?.credits?.hasCredits === false ? 30_000 : 180_000 },
+      { timeout: subscriptionQuotaAvailable ? 180_000 : 30_000 },
     );
     const beforeStop = await page.evaluate(() => window.__liveSubagentEvidence);
     evidence.push(...beforeStop);
@@ -109,7 +127,7 @@ async function runAttempt(attempt) {
               Object.keys(event.params.item.agentsStates ?? {}).length > 0),
         ),
       callId,
-      { timeout: rateLimits?.credits?.hasCredits === false ? 30_000 : 120_000 },
+      { timeout: subscriptionQuotaAvailable ? 120_000 : 30_000 },
     );
     const collabWithReceiver = await page.evaluate((expectedCallId) => {
       return window.__liveSubagentEvidence.findLast(

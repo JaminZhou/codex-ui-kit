@@ -1273,6 +1273,21 @@ export const visualScenes = [
     view: "workspace",
   },
   {
+    frame: "workspace-mcp-settings-current-26-915",
+    id: "workspace-mcp-settings-current-26-915",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+  },
+  {
+    frame: "workspace-mcp-settings-current-26-915",
+    id: "workspace-mcp-settings-current-26-915-compact",
+    maxPixelRatio: 0.01,
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "workspace-appearance-settings",
     id: "workspace-appearance-settings",
     maxPixelRatio: 0.01,
@@ -4858,7 +4873,10 @@ export async function launchScene(
     },
   });
   report("launched");
-  const page = await app.firstWindow();
+  // Electron can create the BrowserWindow before Playwright subscribes to the
+  // first-window event. Reuse an already attached page to avoid a spurious
+  // 30-second timeout in sequential acceptance runs.
+  const page = app.windows()[0] ?? (await app.firstWindow());
   report("first window");
   await page.bringToFront();
   await page.emulateMedia({ reducedMotion: "reduce" });

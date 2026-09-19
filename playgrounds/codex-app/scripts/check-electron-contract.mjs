@@ -20805,6 +20805,8 @@ const currentMcpSettingsElectronSceneIds = [
   "workspace-mcp-settings-current-26-825-light-compact",
   "workspace-mcp-settings-current-26-825-http-create-compact",
   "workspace-mcp-settings-current-26-825-detail",
+  "workspace-mcp-settings-current-26-915",
+  "workspace-mcp-settings-current-26-915-compact",
 ];
 for (const sceneId of currentMcpSettingsElectronSceneIds) {
   const currentMcpSettingsScene = visualScenes.find(
@@ -20819,6 +20821,10 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
     const compact = sceneId.endsWith("-compact");
     const detail = sceneId.endsWith("-detail");
     const create = sceneId.includes("-create");
+    const currentMcp26915 = sceneId.startsWith(
+      "workspace-mcp-settings-current-26-915",
+    );
+    const currentMcpTopOffset = currentMcp26915 ? 46 : 0;
     const expectedViewport = compact
       ? { height: 680, width: 720 }
       : { height: 820, width: 1180 };
@@ -20827,7 +20833,7 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
     );
     await currentMcpSettingsPage.evaluate(async () => document.fonts.ready);
     await currentMcpSettingsPage.waitForFunction(
-      ({ compact, expectedFrame }) => {
+      ({ compact, currentMcpTopOffset, expectedFrame }) => {
         const root = document.querySelector(".codex-ui-mcp-settings");
         const firstTab = document.querySelector(
           ".codex-ui-plugin-manager-tabs > button",
@@ -20843,10 +20849,17 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
         return (
           frame === expectedFrame &&
           Math.abs(rootRect.width - (compact ? 358.125 : 768)) <= 0.1 &&
-          Math.abs(tabRect.top - (compact ? 197.796875 : 155.796875)) <= 0.1
+          Math.abs(
+            tabRect.top -
+              ((compact ? 197.796875 : 155.796875) + currentMcpTopOffset),
+          ) <= 0.1
         );
       },
-      { compact, expectedFrame: currentMcpSettingsScene.frame },
+      {
+        compact,
+        currentMcpTopOffset,
+        expectedFrame: currentMcpSettingsScene.frame,
+      },
     );
     const contract = await currentMcpSettingsPage.evaluate(() => {
       const rect = (selector) => {
@@ -20911,7 +20924,8 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
     const expectedRoot = compact
       ? { left: 341.875, width: 358.125 }
       : { left: 366.9375, width: 768 };
-    const expectedTabTop = compact ? 197.796875 : 155.796875;
+    const expectedTabTop =
+      (compact ? 197.796875 : 155.796875) + currentMcpTopOffset;
     if (
       nativeBounds?.width !== expectedViewport.width ||
       nativeBounds?.height !== expectedViewport.height ||
@@ -20938,12 +20952,28 @@ for (const sceneId of currentMcpSettingsElectronSceneIds) {
     if (!create && !detail) {
       const expectedCards = compact
         ? [
-            { height: 210, top: 311.796875, width: 358.125 },
-            { height: 87.125, top: 587.796875, width: 358.125 },
+            {
+              height: 210,
+              top: 311.796875 + currentMcpTopOffset,
+              width: 358.125,
+            },
+            {
+              height: 87.125,
+              top: 587.796875 + currentMcpTopOffset,
+              width: 358.125,
+            },
           ]
         : [
-            { height: 210, top: 271.796875, width: 768 },
-            { height: 87.125, top: 547.796875, width: 768 },
+            {
+              height: 210,
+              top: 271.796875 + currentMcpTopOffset,
+              width: 768,
+            },
+            {
+              height: 87.125,
+              top: 547.796875 + currentMcpTopOffset,
+              width: 768,
+            },
           ];
       if (
         JSON.stringify(contract.pluginCards) !== JSON.stringify(expectedCards)
