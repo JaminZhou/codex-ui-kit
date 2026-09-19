@@ -1564,6 +1564,18 @@ settles the installed/discovery identity, closes stale menus on uninstall,
 and exposes an explicit retry boundary. This is renderer/replay evidence,
 not a claim of real plugin registry, OAuth, permission, or connection writes.
 
+The installed `26.915.31945` package has now been re-observed for this detail
+boundary. The isolated native-wide/compact capture retains the 58px artwork
+slot, three suggestions, Apps/Information sections, zero horizontal overflow,
+bottom scroll, and the current Uninstall menu. The connected-account menu now
+includes `Rename account` alongside Reconnect/Disconnect; this build-specific
+difference is preserved in `research/current-plugin-detail-26.915.json`.
+The capture is navigation/read-only only and intentionally makes no current
+product-pixel claim because host artwork and dynamic suggestion content have
+no committed reference asset. Install/uninstall, connection persistence,
+OAuth/permissions, Try-now submission, external links, and failure/retry stay
+open, so Stage 4 remains in progress.
+
 The adjacent Skill detail/entry slice adds controlled `SkillDetailDialog` and
 `SkillPromptMention` primitives for the installed modal, enabled switch,
 three-item actions menu, long instruction scroll, footer actions, two-step

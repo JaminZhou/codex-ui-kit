@@ -2450,7 +2450,8 @@
         "electron:integration-plugin-detail-current-26-825-light-wide-compact",
         "pixel:integration-plugin-detail-current-26-825-light-wide-compact",
         "capture:current-integrations-26.911-read-only",
-        "capture:current-integrations-26.915-read-only"
+        "capture:current-integrations-26.915-read-only",
+        "capture:current-plugin-detail-26.915-read-only"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2458,7 +2459,8 @@
         "cdp-26.825.51511:plugins-wide-compact-installed-public-personal-search-actions",
         "cdp-26.825.51511:plugin-detail-installed-discovery-actions-connection-information-wide-compact-bottom",
         "cdp-26.911.61220:plugins-catalog-native-wide-emulated-compact-search-scope-read-only",
-        "cdp-26.915.31945:plugins-catalog-native-wide-emulated-compact-search-scope-read-only"
+        "cdp-26.915.31945:plugins-catalog-native-wide-emulated-compact-search-scope-read-only",
+        "cdp-26.915.31945:plugin-detail-installed-discovery-wide-compact-bottom-actions-connection-read-only"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
