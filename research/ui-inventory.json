@@ -1130,7 +1130,10 @@
         "playground:current-26.911-resource-catalog-contract",
         "cdp-26.911.61220:read-only-public-plugin-skill-catalog-without-selection",
         "playground:current-26.915-resource-catalog-contract",
-        "cdp-26.915.31945:read-only-public-plugin-skill-catalog-without-selection"
+        "cdp-26.915.31945:read-only-public-plugin-skill-catalog-without-selection",
+        "playground:current-26.915-plugin-mention-contract",
+        "electron:replay-26.915-github-inline-resource-mention-wide-compact",
+        "pixel:replay-26.915-github-inline-resource-mention-wide-compact-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
