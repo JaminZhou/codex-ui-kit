@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-19",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "cdpPort": 9953,
+    "mainCodexProcessPreserved": true,
+    "profileKind": "unique-private-tmp-profile",
+    "captureMode": "native-wide",
+    "viewport": { "width": 2560, "height": 1318 }
+  },
+  "entry": {
+    "action": "Add files and more → Sites",
+    "terms": {
+      "modal": {
+        "rect": { "height": 428.359375, "left": 980, "top": 444.8203125, "width": 600 },
+        "backgroundColor": "rgb(45, 45, 45)",
+        "borderRadius": "25px",
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "16px",
+        "fontWeight": "430",
+        "lineHeight": "24px"
+      },
+      "continue": {
+        "rect": { "height": 36, "left": 1020, "top": 801.1796875, "width": 520 },
+        "backgroundColor": "rgb(255, 255, 255)",
+        "borderRadius": "9999px",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "18px",
+        "padding": "8px 20px"
+      },
+      "publicCopy": [
+        "Sites",
+        "Before you use Sites",
+        "A few additional terms apply when you create and publish a site",
+        "You’re responsible for your site and anything visitors submit",
+        "If your site collects personal data, learn more about your responsibilities",
+        "OpenAI may remove sites that violate our policies",
+        "Read the ChatGPT Sites Terms",
+        "Continue",
+        "Close"
+      ]
+    },
+    "afterContinue": {
+      "backLabel": "Back to ChatGPT",
+      "webviewPresent": true,
+      "webviewSrcPattern": "about:blank?toUrl=/?source=codex-embedded-checkout#pricing&accountId=<redacted>&currentPlan=<redacted>",
+      "route": "embedded pricing"
+    }
+  },
+  "boundary": {
+    "readOnly": true,
+    "observed": "The current build presents Sites terms and then routes to an embedded pricing surface.",
+    "doesNotClaim": [
+      "site creation or publishing",
+      "visitor-submitted content handling",
+      "pricing, entitlement, or billing state",
+      "third-party site runtime behavior",
+      "compact or real native-window resize parity"
+    ]
+  }
+}

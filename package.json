@@ -73,6 +73,7 @@
     "capture:current-attachment-26-825": "node scripts/capture-current-attachment.mjs",
     "capture:current-integrations-26-825": "node scripts/capture-current-integrations.mjs",
     "capture:current-integrations-26-915": "CODEX_CURRENT_INTEGRATIONS_FINGERPRINT=26.915.31945 node scripts/capture-current-integrations.mjs",
+    "capture:current-sites-26-915": "node scripts/capture-current-sites.mjs",
     "capture:current-plugin-detail-26-825": "node scripts/capture-current-plugin-detail.mjs",
     "capture:current-skill-detail-26-825": "node scripts/capture-current-skill-detail.mjs",
     "capture:current-thread-overflow-26-825": "node scripts/capture-current-thread-overflow.mjs",
