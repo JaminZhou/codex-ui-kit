@@ -95,7 +95,7 @@
     "codex-ui-kit": "workspace:*",
     "pdfjs-dist": "6.3.289",
     "react": "19.3.0",
-    "react-dom": "19.2.8"
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@types/node": "24.13.4",
