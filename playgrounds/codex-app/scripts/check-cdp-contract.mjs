@@ -4172,22 +4172,26 @@ for (const scene of selectedScenes) {
           viewport: { height: innerHeight, width: innerWidth },
         };
       });
-      const compact = scene.id === "projects-index-compact";
-      const expanded = scene.id === "projects-index-expanded";
+      const current26915 = scene.id.startsWith(
+        "projects-index-current-26-915-",
+      );
+      const compact = scene.id.endsWith("-compact");
+      const expanded = scene.id.endsWith("-expanded");
+      const expectedProjectCount = current26915 ? 15 : 14;
       if (
         projectIndex.view !== "projects" ||
         projectIndex.layout !== "table" ||
         projectIndex.title.text !== "Projects" ||
         projectIndex.searchPlaceholder !== "Search projects" ||
         projectIndex.horizontalOverflow > 1 ||
-        projectIndex.rows.length !== 14 ||
+        projectIndex.rows.length !== expectedProjectCount ||
         projectIndex.rows.some(({ height }) => height !== 70) ||
-        projectIndex.actions !== 14 ||
+        projectIndex.actions !== expectedProjectCount ||
         projectIndex.actionLabels.some(
           (label) => !label?.startsWith("Project actions for "),
         ) ||
-        new Set(projectIndex.actionLabels).size !== 14 ||
-        projectIndex.toggles !== 14 ||
+        new Set(projectIndex.actionLabels).size !== expectedProjectCount ||
+        projectIndex.toggles !== expectedProjectCount ||
         projectIndex.expandedGroups !== (expanded ? 1 : 0) ||
         projectIndex.firstWrapper?.height !== (expanded ? 119 : 71) ||
         projectIndex.create?.height !== 28 ||
@@ -4203,28 +4207,34 @@ for (const scene of selectedScenes) {
         (compact
           ? projectIndex.viewport.width !== 600 ||
             projectIndex.viewport.height !== 600 ||
-            projectIndex.index?.width !== 600 ||
+            projectIndex.index?.left !== (current26915 ? 1 : 0) ||
+            projectIndex.index?.width !== (current26915 ? 599 : 600) ||
             projectIndex.index?.height !== 554 ||
-            projectIndex.title.bounds?.left !== 28 ||
-            projectIndex.search?.left !== 20 ||
-            projectIndex.search?.width !== 560 ||
-            projectIndex.header?.left !== 20 ||
-            projectIndex.header?.width !== 560 ||
-            projectIndex.columns !== "416px 128px" ||
-            projectIndex.rows[0]?.left !== 20 ||
-            projectIndex.rows[0]?.width !== 560 ||
+            projectIndex.title.bounds?.left !== (current26915 ? 29 : 28) ||
+            projectIndex.search?.left !== (current26915 ? 21 : 20) ||
+            projectIndex.search?.width !== (current26915 ? 559 : 560) ||
+            projectIndex.header?.left !== (current26915 ? 21 : 20) ||
+            projectIndex.header?.width !== (current26915 ? 559 : 560) ||
+            projectIndex.columns !==
+              (current26915 ? "415px 128px" : "416px 128px") ||
+            projectIndex.rows[0]?.left !== (current26915 ? 21 : 20) ||
+            projectIndex.rows[0]?.width !== (current26915 ? 559 : 560) ||
             projectIndex.updatedDisplay !== "none" ||
             projectIndex.updatedHeaderDisplay !== "none"
           : projectIndex.viewport.width !== 1180 ||
             projectIndex.viewport.height !== 820 ||
+            (current26915
+              ? projectIndex.index?.left !== 321.875 ||
+                projectIndex.index?.width !== 858.125
+              : false) ||
             projectIndex.index?.height !== 774 ||
-            projectIndex.title.bounds?.left !== 367 ||
-            projectIndex.search?.left !== 359 ||
+            projectIndex.title.bounds?.left !== (current26915 ? 390.9375 : 367) ||
+            projectIndex.search?.left !== (current26915 ? 382.9375 : 359) ||
             projectIndex.search?.width !== 736 ||
-            projectIndex.header?.left !== 359 ||
+            projectIndex.header?.left !== (current26915 ? 382.9375 : 359) ||
             projectIndex.header?.width !== 736 ||
             projectIndex.columns !== "512px 64px 128px" ||
-            projectIndex.rows[0]?.left !== 359 ||
+            projectIndex.rows[0]?.left !== (current26915 ? 382.9375 : 359) ||
             projectIndex.rows[0]?.width !== 736 ||
             projectIndex.updatedDisplay === "none" ||
             projectIndex.updatedHeaderDisplay === "none")

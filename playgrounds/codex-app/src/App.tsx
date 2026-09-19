@@ -2839,6 +2839,22 @@ const currentProjectIndexItems = workspaceProjects.map((project, index) => ({
   updatedOrder: workspaceProjects.length - index,
 }));
 
+// The installed 26.915 Projects Index reports a content-dependent 15-row
+// list. Keep row identity sanitized and explicit; this replay claims the
+// current geometry/state contract, not installed project names or metadata.
+const currentProjectIndexItems26915 = [
+  ...currentProjectIndexItems,
+  {
+    id: "current-26-915-project",
+    label: "current-project",
+    path: "/workspace/current-project",
+    recentChats: [],
+    status: "available" as const,
+    updated: "Now",
+    updatedOrder: 0,
+  },
+] as const;
+
 const workspaceEnvironmentGroups = [
   {
     description: "Current checkout and linked worktrees",
@@ -3672,6 +3688,9 @@ const blankMcpEditorValue: McpServerEditorValue = {
 
 export function App() {
   const initialSelection = useMemo(querySelection, []);
+  const currentProjectsIndex26915Replay =
+    initialSelection.view === "projects" &&
+    initialSelection.frame?.startsWith("projects-index-current-26-915-");
   const currentIntegrationCatalog26915Replay =
     initialSelection.view === "plugins" &&
     (initialSelection.frame?.startsWith("integration-plugins-current-26-915") ||
@@ -4149,7 +4168,9 @@ export function App() {
   const [expandedProjectIndexIds, setExpandedProjectIndexIds] = useState(
     () =>
       new Set(
-        initialSelection.frame === "projects-index-expanded"
+        (initialSelection.frame === "projects-index-expanded" ||
+          initialSelection.frame ===
+            "projects-index-current-26-915-expanded")
           ? ["codex-ui-kit"]
           : [],
       ),
@@ -12569,7 +12590,9 @@ export function App() {
       updated: "Now",
       updatedOrder: workspaceProjects.length + createdProjects.length - index,
     })),
-    ...currentProjectIndexItems,
+    ...(currentProjectsIndex26915Replay
+      ? currentProjectIndexItems26915
+      : currentProjectIndexItems),
   ];
   const filteredProjectIndexItems = projectIndexSourceItems
     .filter(({ label, path }) => {
@@ -12634,7 +12657,16 @@ export function App() {
       ? ("error" as const)
       : projectIndexStatus;
   const projectsRoute = (
-    <div className="demo-projects-route">
+    <div
+      className={[
+        "demo-projects-route",
+        currentProjectsIndex26915Replay
+          ? "demo-projects-route--current-26-915"
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <ProjectIndex
         emptyState="No projects"
         items={projectIndexItems}
@@ -18168,6 +18200,7 @@ export function App() {
                 currentSidebarWorktreeLifecycle ||
                 currentContext26825Replay ||
                 isCurrentShellFrame(initialSelection.frame) ||
+                currentProjectsIndex26915Replay ||
                 currentTerminal26825Frame(activeFrame) ||
                 view === "automations" ||
                 view === "sites" ||

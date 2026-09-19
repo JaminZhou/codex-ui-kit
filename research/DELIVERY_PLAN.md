@@ -71,6 +71,16 @@ exit gates; it does not replace the inventory.
   with `0%` drift. This is current-build resource-menu evidence only; file
   selection, upload, authorization, plugin execution, and installed-product
   pixels remain host-owned.
+- The 26.915 candidate Projects Index now has a separate replay route:
+  `projects-index-current-26-915-ready`, its 600px compact route, and an
+  expanded-project state. The sanitized fixture holds 15 rows to match the
+  content-dependent current capture; CDP/Electron geometry locks the
+  `321.875px` rail, `736/559px` inner content, `70px` rows, `512/415px`
+  column split, search focus/empty boundary, expanded recent-chat group, zero
+  horizontal overflow, and repeated own-fixture screenshots with `0%` drift.
+  Row identities and project actions remain fixture-owned; this promotes the
+  current-build Projects geometry/state boundary only, not installed project
+  names, chat metadata, or mutation effects.
 - The 26.911 resource replay now uses the captured `321.875px` expanded left
   rail instead of the older `274px` fixture width. Its focused Electron/CDP
   contract checks the wide editor, Add trigger, and menu origins against the

@@ -572,6 +572,15 @@ textarea {
   height: 100%;
 }
 
+/* The 26.915 compact Projects route leaves the measured one-pixel shell
+   inset; keep this candidate geometry isolated from the legacy index replay. */
+@media (max-width: 720px) {
+  .demo-projects-route--current-26-915 > .codex-ui-project-index {
+    margin-left: 1px;
+    width: calc(100% - 1px);
+  }
+}
+
 .demo-root[data-capture][data-view="projects"]
   .codex-ui-project-index {
   scrollbar-width: none;
