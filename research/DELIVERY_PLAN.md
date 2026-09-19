@@ -2510,7 +2510,13 @@ without confusing package readiness with full product reconstruction.
     suggestion templates are absent in this build and are recorded as an
     explicit empty list in [`current-automations-26.915.31945.json`](26.915.31945-automations.md).
     This remains read-only current-build evidence; replay/Electron/pixel
-    promotion and cloud mutation effects stay separately scoped. Plugin detail
+    promotion and cloud mutation effects stay separately scoped. The matching
+    private playground slice now exposes a `scheduled-current-26-915` route
+    with the measured three-row/zero-suggestion state, four filters, and
+    728px/679px search geometry at 1180px/720px. A targeted Electron/CDP gate
+    repeats wide/compact and manual-editor scenes with 0% own-fixture drift;
+    this promotes deterministic replay stability only, not cloud persistence,
+    permission delivery, task execution, or installed-product pixels. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only

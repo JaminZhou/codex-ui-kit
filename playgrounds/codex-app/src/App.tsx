@@ -3494,6 +3494,13 @@ const currentScheduledTasks26903: readonly ScheduledTaskItem[] = [
   },
 ];
 
+// 26.915 reports the same three active rows as the preceding current-build
+// capture. Keep the identity explicit so a future package refresh can change
+// only this candidate without silently inheriting an older route marker.
+const currentScheduledTasks26915: readonly ScheduledTaskItem[] = [
+  ...currentScheduledTasks26903,
+];
+
 const currentScheduledSuggestions: readonly ScheduledTaskSuggestion[] = [
   {
     description:
@@ -3828,13 +3835,19 @@ export function App() {
   const [scheduledEditorOpen, setScheduledEditorOpen] = useState(
     initialSelection.frame?.includes("-manual") ?? false,
   );
+  const currentAutomations26915Replay =
+    initialSelection.frame?.startsWith("scheduled-current-26-915") ?? false;
   const currentAutomations26903Replay =
     initialSelection.frame?.startsWith("scheduled-current-26-903") ?? false;
+  const currentAutomationsCurrentReplay =
+    currentAutomations26915Replay || currentAutomations26903Replay;
   const [scheduledTasks, setScheduledTasks] = useState<readonly ScheduledTaskItem[]>(
     () =>
-      currentAutomations26903Replay
-        ? [...currentScheduledTasks26903]
-        : [...currentScheduledTasks],
+      currentAutomations26915Replay
+        ? [...currentScheduledTasks26915]
+        : currentAutomations26903Replay
+          ? [...currentScheduledTasks26903]
+          : [...currentScheduledTasks],
   );
   const [scheduledAction, setScheduledAction] = useState("");
   const [scheduledName, setScheduledName] = useState("");
@@ -3842,9 +3855,7 @@ export function App() {
   const [scheduledEditingTaskId, setScheduledEditingTaskId] = useState<string | null>(null);
   const [scheduledSelectedTaskId, setScheduledSelectedTaskId] = useState<string | null>(
     initialSelection.frame?.includes("-detail")
-      ? currentAutomations26903Replay
-        ? "workspace-brief"
-        : "workspace-brief"
+      ? "workspace-brief"
       : null,
   );
   const [scheduledDetailStatus, setScheduledDetailStatus] = useState<
@@ -12650,9 +12661,11 @@ export function App() {
   ];
   const scheduledRouteClassName = [
     "demo-current-scheduled-route",
-    currentAutomations26903Replay
-      ? "demo-current-scheduled-route--current-26-903"
-      : null,
+    currentAutomations26915Replay
+      ? "demo-current-scheduled-route--current-26-915"
+      : currentAutomations26903Replay
+        ? "demo-current-scheduled-route--current-26-903"
+        : null,
   ]
     .filter(Boolean)
     .join(" ");
@@ -12845,8 +12858,10 @@ export function App() {
             ? "Check your connection and try again."
             : undefined
       }
-      suggestions={currentScheduledSuggestions}
-        tasks={scheduledTasks}
+      suggestions={
+        currentAutomations26915Replay ? [] : currentScheduledSuggestions
+      }
+      tasks={scheduledTasks}
       />
       {scheduledDetailRoute}
     </>
