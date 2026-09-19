@@ -6,6 +6,7 @@ import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/
 import {
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -20,10 +21,18 @@ const successDuration =
   process.env.CODEX_CURRENT_MCP_SUCCESS_DURATION ?? "Worked for 20s";
 const recoveryDuration =
   process.env.CODEX_CURRENT_MCP_RECOVERY_DURATION ?? "Worked for 10s";
+const requestedFingerprint =
+  process.env.CODEX_CURRENT_MCP_FINGERPRINT?.trim() || "26.903.71938";
 const allowCapture = process.env.CODEX_CURRENT_MCP_ALLOW_CAPTURE === "1";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
+const expectedFingerprint =
+  requestedFingerprint === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : requestedFingerprint === "26.903.71938"
+      ? currentBaselineFingerprint
+      : null;
 
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error("Set a valid isolated MCP CDP port.");
@@ -40,6 +49,11 @@ if (!/^[a-f0-9]{64}$/.test(taskTitleSha256 ?? "")) {
 if (!allowCapture) {
   throw new Error(
     "Set CODEX_CURRENT_MCP_ALLOW_CAPTURE=1 to authorize capture-only navigation and screenshot sampling in the isolated app.",
+  );
+}
+if (!expectedFingerprint) {
+  throw new Error(
+    `Unsupported MCP capture fingerprint ${JSON.stringify(requestedFingerprint)}.`,
   );
 }
 
@@ -90,12 +104,12 @@ const readInstalledSnapshot = async () => {
 };
 const fingerprint = await readInstalledSnapshot();
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match ${requestedFingerprint}: ${JSON.stringify(fingerprint)}`,
   );
 }
 
@@ -503,9 +517,11 @@ try {
     throw new Error("The installed Codex build changed during MCP capture.");
   }
   const record = {
+    schemaVersion: 1,
     capturedAtMs: Date.now(),
     fingerprint,
-    ownerPid: Number(isolatedOwners[0].pid),
+    captureMode: "native-viewport-only",
+    mutationsSubmitted: false,
     recoveryCompact,
     recoveryCompactScreenshot,
     recoveryWide,
