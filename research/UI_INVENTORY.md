@@ -791,6 +791,16 @@ Browser and Electron are therefore current-build verified for the sampled
 success/stack contract while implementation stays partial for other tones and
 triggers.
 
+The installed `26.915.31945` candidate was then re-observed in a new isolated
+Renderer with four disposable no-tool tasks. Reversible Pin → Undo actions
+again produced the four-mounted/three-visible `Chat unpinned` stack at
+1180×820: 170.438/161.916/153.394/144.872px widths, 48/57.05/66.1/75.15px
+tops, and 1/0.95/0.90/0.85 transforms. The candidate's exact notification
+glyph hashes and 430-weight alert style are recorded in
+`research/current-global-notifications-26.915.json`; the two regional PNGs
+remain local-only. This is current-build evidence for the same success/stack
+path, not a promotion of warning/danger tones or other notification triggers.
+
 The earlier current-build probe safely terminated only one isolated process's
 validated App Server child and reached the former 408×400 fatal recovery
 Renderer. The `26.825.51511` refresh supersedes that layout with a full-window

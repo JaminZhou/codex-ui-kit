@@ -54,7 +54,10 @@ export function assertCurrentAccountMenuRecord(record: any): void;
 
 export function assertCurrentSidebarRowsRecord(record: any): void;
 
-export function assertCurrentGlobalNotificationsRecord(record: any): void;
+export function assertCurrentGlobalNotificationsRecord(
+  record: any,
+  expectedFingerprint?: any,
+): void;
 
 export function assertCurrentAppServerCrashRecoveryRecord(record: any): void;
 

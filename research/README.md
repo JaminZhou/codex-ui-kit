@@ -68,6 +68,14 @@ data, process IDs, ports, and profile data remain local-only. This refresh does
 not claim current-product pixel comparison because the instruction content and
 host artwork are dynamic.
 
+`current-global-notifications-26.915.json` is a fingerprinted current-build
+refresh of the reversible four-task Pin/Undo success stack. It retains only
+fixed live-region semantics, notification geometry/styles, icon hashes,
+regional screenshot hashes, and task-title hashes; task titles, account data,
+process IDs, ports, profile data, and raw screenshots remain local-only. The
+26.915 candidate icon paths and 430-weight alert style stay separate from the
+promoted 26.903 baseline.
+
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.

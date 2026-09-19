@@ -2255,9 +2255,14 @@ without confusing package readiness with full product reconstruction.
   sampled success/stack path. A separate four-scene light wide/720 replay
   matrix now locks the same queue/stack counts, success/warning colors,
   zero-overflow shell geometry, and hover/action behavior; it remains
-  controlled replay evidence rather than installed-product reachability. The
-  complete response-stream
+   controlled replay evidence rather than installed-product reachability. The
+   complete response-stream
    retry/failure/follow-up state machine retains its recorded evidence level.
+   The installed `26.915.31945` candidate was then re-observed with four
+   disposable no-tool tasks and the same reversible Pin → Undo sequence. Its
+   current 430-weight alert style and candidate icon paths are retained in a
+   separate sanitized record; this refresh does not promote warning/danger
+   tones or other notification triggers.
 5. **Conversation and Composer lifecycle**: current queue/Stop automatic
    continuation is delivered through real current-build evidence,
    Browser/CDP, Electron, and regional pixels. Current permissions, Add

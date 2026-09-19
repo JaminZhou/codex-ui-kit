@@ -1598,7 +1598,8 @@
         "cdp-26.820.60940:chatgpt-pin-undo-success-notification-top-center",
         "cdp-26.820.60940:four-reversible-pin-undo-success-notifications-three-visible-centered-stack",
         "cdp-26.825.51511:reversible-pin-undo-success-notification-top-center-computed-style-and-regional-pixel",
-        "cdp-26.825.51511:four-reversible-pin-undo-success-notifications-three-visible-centered-stack"
+        "cdp-26.825.51511:four-reversible-pin-undo-success-notifications-three-visible-centered-stack",
+        "cdp-26.915.31945:four-reversible-pin-undo-success-notifications-three-visible-candidate-stack"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

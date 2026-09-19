@@ -1111,6 +1111,10 @@ const currentNotificationIconSha256 = Object.freeze([
   "c9ae9916e10ed453334494746b90c8cf8b2a2303124c2b7d8961f9ca7cb06ceb",
   "2a1c3c07a26d5833ac1225d35ceeedc42105e4124e1b37dfdba34199c8b746f7",
 ]);
+const currentInstalledCandidateNotificationIconSha256 = Object.freeze([
+  "135db8ed90b65550342412e86491c886b36f0f6a8207188c6dcbb001dcd5f75e",
+  "a400a90642de08b4c1d5ffa68d916fdf5706a832594e694f29bc60f3b2230546",
+]);
 
 const currentNotificationAlertStyleMatches = (style) =>
   style?.backgroundColor === "rgb(1, 28, 11)" &&
@@ -1123,6 +1127,9 @@ const currentNotificationAlertStyleMatches = (style) =>
   style?.fontWeight === "400" &&
   style?.lineHeight === "21px" &&
   style?.padding === "8px";
+const currentInstalledCandidateNotificationAlertStyleMatches = (style) =>
+  currentNotificationAlertStyleMatches({ ...style, fontWeight: "400" }) &&
+  style?.fontWeight === "430";
 
 const currentNotificationScreenshotMatches = (screenshot, name) =>
   screenshot?.name === name &&
@@ -1134,8 +1141,11 @@ const currentNotificationScreenshotMatches = (screenshot, name) =>
   screenshot.height <= 256 &&
   /^[a-f0-9]{64}$/.test(screenshot?.sha256 ?? "");
 
-export function assertCurrentGlobalNotificationsRecord(record) {
-  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+export function assertCurrentGlobalNotificationsRecord(
+  record,
+  expectedFingerprint = currentBaselineFingerprint,
+) {
+  const fingerprintMismatch = Object.entries(expectedFingerprint).some(
     ([key, expected]) => record?.fingerprint?.[key] !== expected,
   );
   const titleHashes = record?.taskTitleSha256s;
@@ -1150,30 +1160,52 @@ export function assertCurrentGlobalNotificationsRecord(record) {
     "non-app-page",
   ]);
   const serialized = JSON.stringify(record);
-  if (
-    record?.schemaVersion !== 1 ||
-    record?.captureKind !== "renderer_cdp" ||
-    fingerprintMismatch ||
-    !Number.isSafeInteger(record?.profileOwnerPid) ||
-    record.profileOwnerPid <= 1 ||
-    runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
-    !provesRuntimeBundleIdentity(runtimeIdentity) ||
-    record?.privacyBoundary !==
-      "four-disposable-task-title-hashes-and-notification-geometry-only" ||
-    !Array.isArray(titleHashes) ||
-    titleHashes.length !== 4 ||
-    new Set(titleHashes).size !== 4 ||
-    titleHashes.some((hash) => !/^[a-f0-9]{64}$/.test(hash)) ||
-    /"(?:profilePath|projectName|taskTitle|threadId|title)"\s*:/.test(
+  const isInstalledCandidate =
+    expectedFingerprint?.appVersion ===
+    currentInstalledCandidateBaselineFingerprint.appVersion;
+  const notificationIconSha256 = isInstalledCandidate
+    ? currentInstalledCandidateNotificationIconSha256
+    : currentNotificationIconSha256;
+  const notificationAlertStyleMatches = isInstalledCandidate
+    ? currentInstalledCandidateNotificationAlertStyleMatches
+    : currentNotificationAlertStyleMatches;
+  const initialChecks = {
+    schemaVersion: record?.schemaVersion === 1,
+    captureKind: record?.captureKind === "renderer_cdp",
+    fingerprint: !fingerprintMismatch,
+    profileOwnerPid:
+      Number.isSafeInteger(record?.profileOwnerPid) &&
+      record.profileOwnerPid > 1,
+    runtimeOwnerPid: runtimeIdentity?.ownerPid === record?.profileOwnerPid,
+    runtimeIdentity: provesRuntimeBundleIdentity(
+      runtimeIdentity,
+      expectedFingerprint,
+    ),
+    privacyBoundary:
+      record?.privacyBoundary ===
+      "four-disposable-task-title-hashes-and-notification-geometry-only",
+    titleHashes:
+      Array.isArray(titleHashes) &&
+      titleHashes.length === 4 &&
+      new Set(titleHashes).size === 4 &&
+      titleHashes.every((hash) => /^[a-f0-9]{64}$/.test(hash)),
+    privateFields: !/"(?:profilePath|projectName|taskTitle|threadId|title)"\s*:/.test(
       serialized,
-    ) ||
-    !Array.isArray(candidateUrls) ||
-    candidateUrls.length < 1 ||
-    candidateUrls.some((url) => !allowedCandidateUrls.has(url)) ||
-    record?.targetSelection?.selected?.url !== "app://-/index.html"
-  ) {
+    ),
+    candidateUrls:
+      Array.isArray(candidateUrls) &&
+      candidateUrls.length >= 1 &&
+      candidateUrls.every((url) => allowedCandidateUrls.has(url)),
+    selectedUrl: record?.targetSelection?.selected?.url === "app://-/index.html",
+  };
+  if (Object.values(initialChecks).some((check) => !check)) {
     throw new Error(
-      "Current global-notification record does not prove the isolated current build and privacy boundary.",
+      `Current global-notification record does not prove the isolated current build and privacy boundary: ${Object.entries(
+        initialChecks,
+      )
+        .filter(([, check]) => !check)
+        .map(([name]) => name)
+        .join(",")}`,
     );
   }
 
@@ -1242,9 +1274,9 @@ export function assertCurrentGlobalNotificationsRecord(record) {
         notification?.style?.opacity !== (index < 3 ? "1" : "0") ||
         notification?.style?.pointerEvents !== (index < 3 ? "auto" : "none") ||
         notification?.style?.transform !== expectedTransforms[index] ||
-        !currentNotificationAlertStyleMatches(notification?.alert?.style) ||
+        !notificationAlertStyleMatches(notification?.alert?.style) ||
         JSON.stringify(notification?.iconSha256s) !==
-          JSON.stringify(currentNotificationIconSha256),
+          JSON.stringify(notificationIconSha256),
     )
   ) {
     throw new Error(
@@ -1265,7 +1297,7 @@ export function assertCurrentGlobalNotificationsRecord(record) {
         notification?.expanded !== true ||
         notification?.style?.opacity !== (index < 3 ? "1" : "0") ||
         notification?.style?.pointerEvents !== (index < 3 ? "auto" : "none") ||
-        !currentNotificationAlertStyleMatches(notification?.alert?.style),
+        !notificationAlertStyleMatches(notification?.alert?.style),
     ) ||
     expanded.slice(0, 3).some(
       (notification, index, notifications) =>
