@@ -3815,8 +3815,16 @@ export function App() {
   );
   const isCurrentPluginDetailReplay =
     initialSelection.view === "plugins" &&
-    initialSelection.frame?.startsWith(
+    (initialSelection.frame?.startsWith(
       "integration-plugin-detail-current-26-825",
+    ) ||
+      initialSelection.frame?.startsWith(
+        "integration-plugin-detail-current-26-915",
+      ));
+  const isCurrentPluginDetail26915Replay =
+    initialSelection.view === "plugins" &&
+    initialSelection.frame?.startsWith(
+      "integration-plugin-detail-current-26-915",
     );
   const [pluginDetailOpen, setPluginDetailOpen] = useState(
     isCurrentPluginDetailReplay,
@@ -3834,8 +3842,15 @@ export function App() {
     useState<PluginDetailStatus>("ready");
   const pluginDetailMutationTimerRef = useRef<number | null>(null);
   const isCurrentSkillDetailReplay =
-    initialSelection.frame?.startsWith(
+    (initialSelection.frame?.startsWith(
       "integration-skill-detail-current-26-825",
+    ) ||
+      initialSelection.frame?.startsWith(
+        "integration-skill-detail-current-26-915",
+      )) ?? false;
+  const isCurrentSkillDetail26915Replay =
+    initialSelection.frame?.startsWith(
+      "integration-skill-detail-current-26-915",
     ) ?? false;
   const isCurrentSkillTryNowReplay =
     initialSelection.frame ===
@@ -3845,7 +3860,9 @@ export function App() {
   );
   const [skillDetailActionsOpen, setSkillDetailActionsOpen] = useState(
     initialSelection.frame ===
-      "integration-skill-detail-current-26-825-actions",
+        "integration-skill-detail-current-26-825-actions" ||
+      initialSelection.frame ===
+        "integration-skill-detail-current-26-915-actions",
   );
   const [skillDetailEnabled, setSkillDetailEnabled] = useState(true);
   const [skillDetailAction, setSkillDetailAction] = useState("");
@@ -12987,7 +13004,14 @@ export function App() {
           name={pluginDetailInstalled ? "github" : "gmail"}
         />
       }
-      className="demo-current-plugin-detail"
+      className={[
+        "demo-current-plugin-detail",
+        isCurrentPluginDetail26915Replay
+          ? "demo-current-plugin-detail--current-26-915"
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       connectionMenuOpen={pluginDetailConnectionOpen}
       data-action={pluginDetailAction || undefined}
       data-testid="current-plugin-detail"
@@ -13064,6 +13088,7 @@ export function App() {
         }, 180);
       }}
       onReconnect={() => setPluginDetailAction("reconnect-requested")}
+      onRenameAccount={() => setPluginDetailAction("rename-account-requested")}
       onRetry={() => {
         setPluginDetailStatus("ready");
         setPluginDetailAction("retry-install");
@@ -13101,6 +13126,7 @@ export function App() {
       title={currentPluginDetailTitle}
       status={pluginDetailStatus}
       statusMessage="The plugin installation did not complete."
+      showRenameAccount={isCurrentPluginDetail26915Replay}
     />
   );
 
@@ -13108,7 +13134,14 @@ export function App() {
     <SkillDetailDialog
       actionsMenuOpen={skillDetailActionsOpen}
       artwork={<CurrentIntegrationFixtureIcon label="O" tone="amber" />}
-      className="demo-current-skill-detail"
+      className={[
+        "demo-current-skill-detail",
+        isCurrentSkillDetail26915Replay
+          ? "demo-current-skill-detail--current-26-915"
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       data-action={skillDetailAction || undefined}
       data-testid="current-skill-detail"
       description="OpenAI and Codex docs for models, skills, tasks, and setup"
