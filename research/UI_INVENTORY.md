@@ -2437,6 +2437,20 @@ install/uninstall, reconnect/disconnect persistence, OAuth/permission prompts,
 external information links, and failure/retry effects were deliberately not
 executed by this read-only slice.
 
+An isolated `26.915.31945` Renderer refreshes the same installed/discovery
+detail boundary at native-wide `1180×820` and emulated compact `720×680`.
+The current build retains the 58px artwork slot, 129.59375px header, three
+suggestions, Apps/Information sections, zero horizontal overflow, bottom
+scroll, and the existing Uninstall menu. Its connected-account menu now also
+exposes `Rename account` before Reconnect/Disconnect; that current-build
+difference is retained rather than normalized away. The sanitized geometry and
+local-only screenshot hashes are in
+`research/current-plugin-detail-26.915.json`; no current-product pixel claim
+is made because host artwork and dynamic suggestion content have no committed
+reference asset. Install/uninstall, connection persistence, OAuth, external
+links, Try-now submission, and failure/retry remain outside the read-only
+boundary, so the row remains `partial`.
+
 ## Current Skill detail and Try now entry slice
 
 An isolated same-build `26.825.51511` Renderer reached an installed Skill

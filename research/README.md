@@ -45,6 +45,14 @@ menu labels, scroll extents, screenshot hashes, regional pixel ratios, and the
 read-only mutation boundary; plugin artwork, raw screenshots, account data,
 process IDs, ports, and profile data remain local-only.
 
+`current-plugin-detail-26.915.json` is the newer installed-build refresh for
+the same installed/discovery boundary. It retains fixed geometry, current menu
+labels, scroll extents, screenshot hashes, and the explicit no-mutation
+boundary; host artwork, dynamic content, raw screenshots, account data,
+process IDs, ports, and profile data remain local-only. This refresh does not
+claim current-product pixel comparison because no stable current reference
+asset was committed.
+
 `current-skill-detail-26-825.json` is the sanitized current-build evidence for
 an installed Skill detail modal and the unsent Try now prefill. It retains
 fixed dialog, menu, scroll, composer, and mention geometry plus screenshot

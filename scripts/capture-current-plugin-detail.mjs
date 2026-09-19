@@ -6,6 +6,7 @@ import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/
 import {
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -23,6 +24,15 @@ const discoveryLabel =
   process.env.CODEX_CURRENT_PLUGIN_DETAIL_DISCOVERY_LABEL?.trim();
 const allowCapture =
   process.env.CODEX_CURRENT_PLUGIN_DETAIL_ALLOW_CAPTURE === "1";
+const requestedFingerprint =
+  process.env.CODEX_CURRENT_PLUGIN_DETAIL_FINGERPRINT?.trim() ||
+  "26.825.51511";
+const expectedFingerprint =
+  requestedFingerprint === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : requestedFingerprint === "26.825.51511"
+      ? currentBaselineFingerprint
+      : null;
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -45,6 +55,11 @@ if (installedLabel.length > 120 || discoveryLabel.length > 120) {
 if (!allowCapture) {
   throw new Error(
     "Set CODEX_CURRENT_PLUGIN_DETAIL_ALLOW_CAPTURE=1 to authorize read-only plugin-detail capture.",
+  );
+}
+if (!expectedFingerprint) {
+  throw new Error(
+    `Unsupported plugin-detail fingerprint ${JSON.stringify(requestedFingerprint)}.`,
   );
 }
 
@@ -97,12 +112,12 @@ const readInstalledFingerprint = async () => {
 };
 const fingerprint = await readInstalledFingerprint();
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match ${requestedFingerprint}: ${JSON.stringify(fingerprint)}`,
   );
 }
 
@@ -433,6 +448,9 @@ const captureDetail = async ({ label, name, open, state, viewport }) => {
   await open();
   await setScroll("top");
   await page.evaluate(async () => document.fonts.ready);
+  // Plugin app/skill sections arrive asynchronously after the detail shell;
+  // let the current renderer settle before taking the fixed DOM snapshot.
+  await page.waitForTimeout(600);
   const observation = await inspectDetail(label, state);
   await page.screenshot({ path: screenshotPath(name) });
   return observation;
@@ -457,7 +475,15 @@ const actionsMenu = {
 await page.screenshot({ path: screenshotPath("plugin-actions-wide") });
 await page.keyboard.press("Escape");
 
-await page.getByRole("button", { exact: true, name: "Connected" }).click();
+// The current build exposes account actions as a separate control whose
+// accessible name includes the connected account. Match only the fixed
+// prefix so the private account label never enters the sanitized record.
+const accountActionTrigger = page.getByRole("button", { name: /^Actions for/ });
+if ((await accountActionTrigger.count()) === 1) {
+  await accountActionTrigger.click();
+} else {
+  await page.getByRole("button", { exact: true, name: "Connected" }).click();
+}
 await page.getByRole("menuitem", { exact: true, name: "Reconnect" }).waitFor();
 await page.getByRole("menuitem", { exact: true, name: "Disconnect" }).waitFor();
 const connectionMenu = {
@@ -512,15 +538,18 @@ if (
   installedWide.state !== "installed" ||
   !installedWide.actions.tryNow ||
   installedWide.suggestions.count < 1 ||
-  !installedWide.apps.mounted ||
   !installedWide.information.mounted ||
+  !installedBottom.apps.mounted ||
+  !installedBottom.information.mounted ||
   !actionsMenu.itemLabels.includes("Uninstall") ||
-  connectionMenu.itemLabels.join("|") !== "Reconnect|Disconnect" ||
+  !connectionMenu.itemLabels.includes("Reconnect") ||
+  !connectionMenu.itemLabels.includes("Disconnect") ||
   discoveryWide.state !== "discovery" ||
   !discoveryWide.actions.installPlugin ||
   discoveryWide.suggestions.count < 1 ||
-  !discoveryWide.apps.mounted ||
   !discoveryWide.information.mounted ||
+  !discoveryBottom.apps.mounted ||
+  !discoveryBottom.information.mounted ||
   installedBottomScroll.scrollTop <= 0 ||
   discoveryBottomScroll.scrollTop <= 0 ||
   !installedBottom.privacyDisclosureVisible ||
@@ -547,11 +576,12 @@ await writeFile(
       schemaVersion: 1,
       capturedAt: new Date().toISOString(),
       baseline: fingerprint,
+      captureMode: "native-viewport-only",
+      mutationsSubmitted: false,
       isolation: {
         cdpAddress: "127.0.0.1",
-        cdpPort: port,
         mainCodexProcessPreserved: true,
-        ownerPid: Number(owners[0].pid),
+        mutationBoundary: "navigation-and-read-only-menu-inspection",
         profileKind: "unique-private-tmp-profile",
       },
       pluginDetail: {

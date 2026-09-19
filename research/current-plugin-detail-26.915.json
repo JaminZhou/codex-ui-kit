@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-19T07:18:22.128Z",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48",
+    "theme": "dark"
+  },
+  "captureMode": "native-viewport-only",
+  "mutationsSubmitted": false,
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "navigation-and-read-only-menu-inspection",
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "sharedGeometry": {
+    "wideViewport": { "width": 1180, "height": 820 },
+    "compactViewport": { "width": 720, "height": 680 },
+    "wideScroller": {
+      "left": 322.875,
+      "top": 46,
+      "width": 857.125,
+      "height": 774
+    },
+    "compactScroller": {
+      "left": 0,
+      "top": 46,
+      "width": 720,
+      "height": 634
+    },
+    "wideHeader": {
+      "left": 383.4375,
+      "top": 66,
+      "width": 736,
+      "height": 129.59375
+    },
+    "compactHeader": {
+      "left": 16,
+      "top": 66,
+      "width": 688,
+      "height": 129.59375
+    },
+    "artwork": { "width": 58, "height": 58 },
+    "title": {
+      "top": 142,
+      "height": 26.59375,
+      "fontSize": "20px",
+      "fontWeight": "500",
+      "lineHeight": "26.6px"
+    },
+    "actions": {
+      "height": 28,
+      "copyLinkWidth": 94.234375,
+      "tryNowWidth": 85.921875,
+      "installPluginWidth": 115.09375
+    },
+    "suggestions": {
+      "count": 3,
+      "installedWide": { "left": 505.03125, "width": 492.796875 },
+      "installedCompact": { "left": 125.921875, "width": 468.15625 },
+      "discoveryWide": { "left": 505.03125, "width": 492.796875 },
+      "discoveryCompact": { "left": 125.921875, "width": 468.15625 }
+    },
+    "informationLabels": [
+      "Capabilities",
+      "Developer",
+      "Category",
+      "Version"
+    ],
+    "linkLabels": ["Website", "Privacy Policy", "Terms of Service", "Learn more"],
+    "horizontalOverflow": 0
+  },
+  "installed": {
+    "actions": ["More actions", "Copy link", "Try now"],
+    "appCount": 2,
+    "wideSuggestionHeights": [79, 58, 58],
+    "compactSuggestionHeights": [79, 79, 58],
+    "wideScrollHeight": 1373,
+    "compactScrollHeight": 1437,
+    "wideBottomScrollTop": 599
+  },
+  "discovery": {
+    "actions": ["Copy link", "Install plugin"],
+    "appCount": 1,
+    "wideSuggestionHeights": [79, 79, 79],
+    "compactSuggestionHeights": [79, 79, 79],
+    "wideScrollHeight": 1138,
+    "compactScrollHeight": 1158,
+    "wideBottomScrollTop": 364
+  },
+  "menus": {
+    "actions": {
+      "items": ["Uninstall"],
+      "width": 180,
+      "height": 36.5625
+    },
+    "connection": {
+      "items": ["Rename account", "Reconnect", "Disconnect"],
+      "width": 160,
+      "height": 93.6875
+    }
+  },
+  "localOnlyScreenshots": [
+    { "name": "plugin-installed-wide.png", "sha256": "508ccee15733034eebf51f4846a9feaa685a67ae908b82416abcf5c4b4e472be" },
+    { "name": "plugin-actions-wide.png", "sha256": "36f7209fb8f73d81325a8087506e8d0c96efdc758d75e0f9ad29bb28d098d083" },
+    { "name": "plugin-connection-wide.png", "sha256": "050fcca1b6dbbe975f9df46bf32f9860648399a0f84498221e91055925c9f231" },
+    { "name": "plugin-installed-bottom-wide.png", "sha256": "47b1c31064e6b8a29582a2a1d3511805af5f450249354b93245789eb4a057d89" },
+    { "name": "plugin-installed-compact.png", "sha256": "709b10650f1e23f0b588e5572ddb9b04cb2788435910c981dd2f3f18dd3a5f18" },
+    { "name": "plugin-discovery-wide.png", "sha256": "062af57b31408d762c9a1557f05e68dc91aa8142f834874b2fadebbdf3fafd92" },
+    { "name": "plugin-discovery-bottom-wide.png", "sha256": "d1695e964aa69978e5d4063bccefb252f2d38705bfce92876dc19d26a59041bd" },
+    { "name": "plugin-discovery-compact.png", "sha256": "c54199a9dd330c10d9c8f2f0f25e925dd7c7ee7604c6ba65282ffd820887810f" }
+  ],
+  "pixelEvidence": "not-claimed; dynamic host artwork and content remain local-only",
+  "remainingBoundary": [
+    "copy-link clipboard effect",
+    "Try now navigation and prompt submission",
+    "real install and uninstall",
+    "reconnect and disconnect persistence",
+    "OAuth and permission prompts",
+    "external information-link navigation",
+    "failure and retry effects",
+    "pixel comparison against a committed current-product reference"
+  ]
+}
