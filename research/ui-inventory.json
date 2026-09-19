@@ -2426,7 +2426,10 @@
         "electron:workspace-mcp-settings-current-26-825-light-wide-compact",
         "pixel:workspace-mcp-settings-current-26-825-light-wide-compact",
         "capture:current-mcp-settings-26.911-read-only",
-        "capture:current-mcp-settings-26.915-read-only"
+        "capture:current-mcp-settings-26.915-read-only",
+        "playground:current-26.915-mcp-settings-contract",
+        "electron:current-26.915-mcp-settings-wide-compact-interactions",
+        "pixel:current-26.915-mcp-settings-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

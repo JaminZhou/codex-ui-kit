@@ -2611,6 +2611,14 @@ evidence are retained in `research/current-mcp-settings-26.915.json` and
 remain local-only. This is current-build read-only evidence; no save, toggle,
 uninstall, OAuth, provider failure, or installed-product pixel claim is made.
 
+The dedicated 26.915 replay gate now exercises the same MCP Settings boundary
+at 1180px and 720px: five-tab counts, 4+2 server/plugin rows, the 46px
+titlebar offset, wide/compact cards, compact search behavior, Add menu, Add
+MCP server → Back, and local-browser enable → Settings → Uninstall. CDP and
+own-fixture screenshots remain at zero drift. This is deterministic
+host-controlled parity evidence, not provider save/OAuth behavior or
+installed-product pixels.
+
 ## Current 26.915 Sites boundary
 
 The installed `26.915.31945` package was re-observed through the public
