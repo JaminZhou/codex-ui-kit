@@ -1847,6 +1847,14 @@ the focused Electron contract. This remains controlled replay evidence only;
 installed-plugin authorization, network execution, and product-pixel promotion
 are still excluded.
 
+The follow-up 26.915 replay now carries the same selected public GitHub
+resource as `workspace-composer-current-26-915-github-mentioned`. It uses the
+26.915.31945 catalog marker, preserves the non-editable inline mention rather
+than an attachment card, and repeats Add-menu selection, focus return, zero
+overflow, and 0% own-fixture pixel drift at 1180px/720px. This is a
+current-build vocabulary replay only; plugin authorization, network execution,
+and installed-product pixels remain host-owned and unpromoted.
+
 The isolated 26.911 Documents selection now has the same explicit boundary:
 the installed Composer inserts a non-editable `Documents` plugin mention and
 shows a Templates heading, but does not open a preview route or Renderer file

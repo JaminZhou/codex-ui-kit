@@ -3717,11 +3717,17 @@ export function App() {
     (initialSelection.frame ===
       "workspace-composer-current-26-908-70816-github-mentioned" ||
       initialSelection.frame ===
-        "workspace-composer-current-26-911-github-mentioned");
+        "workspace-composer-current-26-911-github-mentioned" ||
+      initialSelection.frame ===
+        "workspace-composer-current-26-915-github-mentioned");
   const currentComposerResourceMention2691161220Replay =
     initialSelection.view === "workspace" &&
     initialSelection.frame ===
       "workspace-composer-current-26-911-github-mentioned";
+  const currentComposerResourceMention2691531945Replay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame ===
+      "workspace-composer-current-26-915-github-mentioned";
   const currentComposerControls26825Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
@@ -9819,7 +9825,9 @@ export function App() {
       ? activeFrame
       : currentComposerControlsCurrentCatalogReplay
         ? currentComposerResourceMentionReplay
-          ? currentComposerResourceMention2691161220Replay
+          ? currentComposerResourceMention2691531945Replay
+            ? "workspace-composer-current-26-915-github-mentioned"
+            : currentComposerResourceMention2691161220Replay
             ? "workspace-composer-current-26-911-github-mentioned"
             : "workspace-composer-current-26-908-70816-github-mentioned"
           : composerAttachments.length > 0
@@ -11059,18 +11067,24 @@ export function App() {
         <ComposerResourcePicker
           activeId={composerResourceActiveId}
           className={
-            currentComposerResourceMention2691161220Replay
+            currentComposerResourceMention2691531945Replay
+              ? "codex-ui-composer-resource-picker--current-26-915"
+              : currentComposerResourceMention2691161220Replay
               ? "codex-ui-composer-resource-picker--current-26-911"
               : "codex-ui-composer-resource-picker--current-26-908"
           }
           data-current-resource-catalog={
-            currentComposerResourceMention2691161220Replay
+            currentComposerResourceMention2691531945Replay
+              ? "26.915.31945"
+              : currentComposerResourceMention2691161220Replay
               ? "26.911.61220"
               : "26.908.70816"
           }
           descriptionSeparator=""
           groups={
-            currentComposerResourceMention2691161220Replay
+            currentComposerResourceMention2691531945Replay
+              ? currentComposerResourceGroups2691531945
+              : currentComposerResourceMention2691161220Replay
               ? currentComposerResourceGroups2691161220
               : currentComposerResourceGroups2690870816
           }

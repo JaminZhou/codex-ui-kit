@@ -2373,6 +2373,14 @@ return lifecycle. The focused Electron contract records zero overflow and
 for the observed public structure; it does not claim installed-plugin
 authorization, network execution, or product-pixel promotion.
 
+The 26.915.31945 catalog now has the matching
+`workspace-composer-current-26-915-github-mentioned` replay. It preserves the
+public `GitHub` resource as a non-editable inline mention, uses the current
+catalog marker, and repeats Add-menu selection, focus return, zero overflow,
+and 0% own-fixture drift at 1180px/720px. This remains deterministic replay
+evidence only; installed-plugin authorization, network execution, and
+product-pixel promotion stay outside the contract.
+
 The inventory reconciliation that follows the 26.825 App-shell recovery closes
 four stale bookkeeping gaps without inventing new product states. Existing
 current-build Browser/CDP, native Electron, and regional-pixel contracts now
