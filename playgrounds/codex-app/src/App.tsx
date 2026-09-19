@@ -3783,10 +3783,12 @@ export function App() {
     isCurrentSkillTryNowReplay,
   );
   const isCurrentThreadOverflowReplay =
-    initialSelection.frame?.startsWith("thread-overflow-current-26-825") ??
+    initialSelection.frame?.startsWith("thread-overflow-current-26-825") ||
+    initialSelection.frame?.startsWith("thread-overflow-current-26-915") ||
     false;
   const [threadOverflowOpen, setThreadOverflowOpen] = useState(
-    initialSelection.frame === "thread-overflow-current-26-825-open",
+    initialSelection.frame === "thread-overflow-current-26-825-open" ||
+      initialSelection.frame === "thread-overflow-current-26-915-open",
   );
   const [threadOverflowPinned, setThreadOverflowPinned] = useState(false);
   const [threadOverflowAction, setThreadOverflowAction] = useState("");

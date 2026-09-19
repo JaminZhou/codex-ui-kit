@@ -9768,8 +9768,14 @@ for (const scene of selectedScenes) {
       continue;
     }
 
-    if (scene.id.startsWith("thread-overflow-current-26-825-open")) {
+    if (
+      scene.id.startsWith("thread-overflow-current-26-825-open") ||
+      scene.id.startsWith("thread-overflow-current-26-915-open")
+    ) {
       const compact = scene.id.endsWith("-compact");
+      const current26915 = scene.id.startsWith(
+        "thread-overflow-current-26-915-open",
+      );
       const closeTo = (actual, expected, tolerance = 1) =>
         typeof actual === "number" && Math.abs(actual - expected) <= tolerance;
       const trigger = page.getByRole("button", { name: "Chat actions" });
@@ -9855,8 +9861,8 @@ for (const scene of selectedScenes) {
         !closeTo(overflow.trigger.top, 9) ||
         !closeTo(overflow.trigger.width, 28) ||
         !closeTo(overflow.trigger.height, 28) ||
-        overflow.triggerBorderRadius !== "10px" ||
-        overflow.triggerPadding !== "4px" ||
+        overflow.triggerBorderRadius !== (current26915 ? "12.5px" : "10px") ||
+        overflow.triggerPadding !== (current26915 ? "0px" : "4px") ||
         !overflow.triggerBackground?.endsWith("/ 0.08)") ||
         !overflow.menu ||
         !closeTo(overflow.menu.width, 244) ||

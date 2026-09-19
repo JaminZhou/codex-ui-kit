@@ -7,6 +7,8 @@ import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/
 import {
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentInstalledCandidateBaselineFingerprint,
+  currentNewestCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -24,6 +26,12 @@ const requestedTaskTitleSha256 =
   process.env.CODEX_CURRENT_THREAD_OVERFLOW_TASK_TITLE_SHA256?.trim();
 const allowCapture =
   process.env.CODEX_CURRENT_THREAD_OVERFLOW_ALLOW_CAPTURE === "1";
+const expectedFingerprint =
+  process.env.CODEX_CURRENT_THREAD_OVERFLOW_FINGERPRINT === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : process.env.CODEX_CURRENT_THREAD_OVERFLOW_FINGERPRINT === "26.911.61220"
+      ? currentNewestCandidateBaselineFingerprint
+      : currentBaselineFingerprint;
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -93,7 +101,7 @@ const readInstalledFingerprint = async () => {
 };
 const fingerprint = await readInstalledFingerprint();
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {

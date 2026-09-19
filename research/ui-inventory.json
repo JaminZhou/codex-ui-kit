@@ -849,11 +849,17 @@
         "playground:thread-overflow-current-26-825-light-wide-compact",
         "browser-cdp:thread-overflow-current-26-825-light-wide-compact",
         "electron:thread-overflow-current-26-825-light-wide-compact",
-        "pixel:thread-overflow-current-26-825-light-wide-compact"
+        "pixel:thread-overflow-current-26-825-light-wide-compact",
+        "capture:current-thread-overflow-26.915-read-only",
+        "playground:thread-overflow-current-26-915-light-wide-compact",
+        "browser-cdp:thread-overflow-current-26-915-light-wide-compact",
+        "electron:thread-overflow-current-26-915-light-wide-compact",
+        "pixel:thread-overflow-current-26-915-light-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.825.51511:native-macos-chat-actions-menu-wide-and-720-trigger-geometry-ten-actions-three-separators-and-zero-renderer-menu"
+        "cdp-26.825.51511:native-macos-chat-actions-menu-wide-and-720-trigger-geometry-ten-actions-three-separators-and-zero-renderer-menu",
+        "cdp-26.915.31945:native-macos-chat-actions-menu-wide-and-720-trigger-geometry-zero-renderer-menu-12.5-radius"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
