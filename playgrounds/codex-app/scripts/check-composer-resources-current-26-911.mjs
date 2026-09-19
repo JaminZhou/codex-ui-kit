@@ -6,8 +6,13 @@ import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { launchScene } from "./electron-harness.mjs";
 
+const runtimeBaseline =
+  process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_BASELINE ?? "26.911.61220";
+const routeVersion = runtimeBaseline.split(".").slice(0, 2).join("-");
+const routeFrame = `workspace-composer-current-${routeVersion}-resources`;
+
 const directory = await mkdtemp(
-  join(tmpdir(), "ui-kit-composer-resources-26-911-"),
+  join(tmpdir(), `ui-kit-composer-resources-${routeVersion}-`),
 );
 
 const expectedOptions = [
@@ -37,8 +42,8 @@ const expectedOptions = [
 
 function sceneFor(width) {
   return {
-    frame: "workspace-composer-current-26-911-resources",
-    id: `workspace-composer-current-26-911-resources-${width}`,
+    frame: routeFrame,
+    id: `${routeFrame}-${width}`,
     scenario: "workspace-workflow",
     sidebarState: width === 720 ? "hidden" : undefined,
     theme: "dark",
@@ -63,7 +68,7 @@ async function readOptions(picker) {
 }
 
 async function geometry(page) {
-  return page.evaluate(() => {
+  return page.evaluate((runtimeBaseline) => {
     const bounds = (element) => {
       if (!(element instanceof Element)) return null;
       const rect = element.getBoundingClientRect();
@@ -77,7 +82,7 @@ async function geometry(page) {
       };
     };
     const picker = document.querySelector(
-      '[data-current-resource-catalog="26.911.61220"]',
+      `[data-current-resource-catalog="${runtimeBaseline}"]`,
     );
     const aside = document.querySelector(".codex-ui-app-shell__sidebar");
     const editor = document.querySelector(".codex-ui-composer__input");
@@ -104,7 +109,7 @@ async function geometry(page) {
             }
           : null,
     };
-  });
+  }, runtimeBaseline);
 }
 
 async function capture(width, suffix) {
@@ -112,16 +117,16 @@ async function capture(width, suffix) {
   try {
     const root = page.locator(".demo-root");
     const picker = page.locator(
-      '[data-current-resource-catalog="26.911.61220"]',
+      `[data-current-resource-catalog="${runtimeBaseline}"]`,
     );
     await picker.waitFor();
     assert.equal(
-      await root.getAttribute("data-current-composer-controls-26-911"),
+      await root.getAttribute(`data-current-composer-controls-${routeVersion}`),
       "true",
     );
     assert.equal(
       await root.getAttribute("data-frame"),
-      "workspace-composer-current-26-911-resources",
+      routeFrame,
     );
     assert.equal(await root.getAttribute("data-composer-overlay"), "resources");
     assert.deepEqual(await readOptions(picker), expectedOptions);
@@ -156,7 +161,7 @@ async function capture(width, suffix) {
     await picker.waitFor();
     const screenshot = await page.screenshot();
     await writeFile(
-      join(directory, `composer-resources-current-26-911-${width}-${suffix}.png`),
+      join(directory, `composer-resources-current-${routeVersion}-${width}-${suffix}.png`),
       screenshot,
     );
     return { app, page, screenshot };
@@ -186,7 +191,7 @@ for (const width of [1180, 720]) {
         { threshold: 0 },
       ),
       0,
-      `${width}px own-fixture current 26.911 resource menu drifted`,
+      `${width}px own-fixture current ${runtimeBaseline} resource menu drifted`,
     );
   } finally {
     await second.app.close();
@@ -199,7 +204,7 @@ console.log(
     optionCount: expectedOptions.length,
     passed: true,
     pixelGate: "0% own-fixture drift at 1180 and 720",
-    runtimeBaseline: "26.911.61220",
+    runtimeBaseline,
     widths: [1180, 720],
   }),
 );

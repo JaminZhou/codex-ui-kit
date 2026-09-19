@@ -1059,6 +1059,9 @@
         "pixel:replay-26.911-github-inline-resource-mention-wide-compact-zero-drift",
         "electron:replay-26.911-resource-picker-shell-geometry-321.875-wide-compact",
         "pixel:replay-26.911-resource-picker-own-fixture-zero-drift-wide-compact",
+        "playground:current-26.915-resource-catalog-contract",
+        "electron:replay-26.915-resource-picker-shell-geometry-321.875-wide-compact",
+        "pixel:replay-26.915-resource-picker-own-fixture-zero-drift-wide-compact",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",
@@ -1072,7 +1075,8 @@
         "cdp-26.908.40834:read-only-add-files-menu-seven-top-level-actions-and-sampled-scrollable-plugin-skill-catalog",
         "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
-        "cdp-26.911.61220:documents-selection-inline-mention-and-templates"
+        "cdp-26.911.61220:documents-selection-inline-mention-and-templates",
+        "cdp-26.915.31945:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1121,7 +1125,9 @@
         "replay:current-26.908-sampled-plugin-skill-catalog-scroll-keyboard-focus",
         "cdp-26.908.70816:read-only-public-plugin-skill-catalog-without-selection",
         "playground:current-26.911-resource-catalog-contract",
-        "cdp-26.911.61220:read-only-public-plugin-skill-catalog-without-selection"
+        "cdp-26.911.61220:read-only-public-plugin-skill-catalog-without-selection",
+        "playground:current-26.915-resource-catalog-contract",
+        "cdp-26.915.31945:read-only-public-plugin-skill-catalog-without-selection"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

@@ -1185,7 +1185,8 @@ function initialComposerOverlay(frame: string | null): ComposerOverlay {
     frame === "workspace-composer-current-26-825-resources" ||
     frame === "workspace-composer-current-26-908-resources" ||
     frame === "workspace-composer-current-26-908-70816-resources" ||
-    frame === "workspace-composer-current-26-911-resources"
+    frame === "workspace-composer-current-26-911-resources" ||
+    frame === "workspace-composer-current-26-915-resources"
   ) {
     return "resources";
   }
@@ -1834,6 +1835,11 @@ const currentComposerResourceGroups2690870816: readonly ComposerResourceGroup[] 
 // the playground cannot silently substitute the older baseline in its route.
 const currentComposerResourceGroups2691161220 =
   currentComposerResourceGroups2690870816;
+
+// 26.915 keeps the same 19 sanitized public rows as 26.911. Keep the
+// candidate named so a later package refresh cannot silently inherit it.
+const currentComposerResourceGroups2691531945 =
+  currentComposerResourceGroups2691161220;
 
 const composerResourceGroups: readonly ComposerResourceGroup[] = [
   {
@@ -3675,12 +3681,18 @@ export function App() {
     initialSelection.frame?.startsWith(
       "workspace-composer-current-26-911-",
     );
+  const currentComposerControls2691531945Replay =
+    initialSelection.view === "workspace" &&
+    initialSelection.frame?.startsWith(
+      "workspace-composer-current-26-915-",
+    );
   const currentComposerControls2690870816Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
       "workspace-composer-current-26-908-70816-",
     ) ||
-      currentComposerControls2691161220Replay);
+      currentComposerControls2691161220Replay ||
+      currentComposerControls2691531945Replay);
   const currentComposerResourceMentionReplay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame ===
@@ -3699,7 +3711,8 @@ export function App() {
       initialSelection.frame?.startsWith(
         "workspace-composer-current-26-908-",
       ) ||
-      currentComposerControls2691161220Replay);
+      currentComposerControls2691161220Replay ||
+      currentComposerControls2691531945Replay);
   const currentComposerControls26908Replay =
     initialSelection.view === "workspace" &&
     initialSelection.frame?.startsWith(
@@ -3707,7 +3720,8 @@ export function App() {
     );
   const currentComposerControlsCurrentCatalogReplay =
     currentComposerControls26908Replay ||
-    currentComposerControls2691161220Replay;
+    currentComposerControls2691161220Replay ||
+    currentComposerControls2691531945Replay;
   const currentComposerMultiline26825Replay =
     initialSelection.frame ===
       "workspace-composer-current-26-825-multiline-four" ||
@@ -9792,12 +9806,16 @@ export function App() {
             ? "workspace-composer-current-26-908-70816-plugin-selected"
             : "workspace-composer-current-26-908-plugin-selected"
           : composerOverlay === "resources"
-            ? currentComposerControls2691161220Replay
+            ? currentComposerControls2691531945Replay
+              ? "workspace-composer-current-26-915-resources"
+              : currentComposerControls2691161220Replay
               ? "workspace-composer-current-26-911-resources"
               : currentComposerControls2690870816Replay
               ? "workspace-composer-current-26-908-70816-resources"
               : "workspace-composer-current-26-908-resources"
-            : currentComposerControls2691161220Replay
+            : currentComposerControls2691531945Replay
+              ? "workspace-composer-current-26-915-ready"
+              : currentComposerControls2691161220Replay
               ? "workspace-composer-current-26-911-ready"
               : currentComposerControls2690870816Replay
               ? "workspace-composer-current-26-908-70816-ready"
@@ -10929,13 +10947,17 @@ export function App() {
             activeId={composerResourceActiveId}
             className={
               currentComposerControlsCurrentCatalogReplay
-                ? "codex-ui-composer-resource-picker--current-26-908"
+                ? currentComposerControls2691531945Replay
+                  ? "codex-ui-composer-resource-picker--current-26-915"
+                  : "codex-ui-composer-resource-picker--current-26-908"
                 : "codex-ui-composer-resource-picker--current-26-825"
             }
             data-current-resource-catalog={
               currentComposerControlsCurrentCatalogReplay
                 ? currentComposerControls2690870816Replay
-                  ? currentComposerControls2691161220Replay
+                  ? currentComposerControls2691531945Replay
+                    ? "26.915.31945"
+                    : currentComposerControls2691161220Replay
                     ? "26.911.61220"
                     : "26.908.70816"
                   : "26.908.40834"
@@ -10945,7 +10967,9 @@ export function App() {
             groups={
               currentComposerControlsCurrentCatalogReplay
                 ? currentComposerControls2690870816Replay
-                  ? currentComposerControls2691161220Replay
+                  ? currentComposerControls2691531945Replay
+                    ? currentComposerResourceGroups2691531945
+                    : currentComposerControls2691161220Replay
                     ? currentComposerResourceGroups2691161220
                     : currentComposerResourceGroups2690870816
                   : currentComposerResourceGroups26908
@@ -10964,6 +10988,7 @@ export function App() {
               if (
                 currentComposerControls2690870816Replay &&
                 !currentComposerControls2691161220Replay &&
+                !currentComposerControls2691531945Replay &&
                 option.id === "github"
               ) {
                 setComposerAttachments(
@@ -17767,6 +17792,9 @@ export function App() {
       data-current-context-26-911={
         currentComposerControls2691161220Replay || undefined
       }
+      data-current-context-26-915={
+        currentComposerControls2691531945Replay || undefined
+      }
       data-current-composer-controls={
         currentComposerControls26825Replay || undefined
       }
@@ -17781,6 +17809,9 @@ export function App() {
       }
       data-current-composer-controls-26-911={
         currentComposerControls2691161220Replay || undefined
+      }
+      data-current-composer-controls-26-915={
+        currentComposerControls2691531945Replay || undefined
       }
       data-route-history-index={routeHistory.index}
       data-route-history-length={routeHistory.entries.length}
