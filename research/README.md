@@ -60,6 +60,14 @@ hashes and regional pixel ratios; skill instructions, artwork, account and
 project context, raw screenshots, process IDs, ports, and profile data remain
 local-only.
 
+`current-skill-detail-26.915.json` is the newer installed-build refresh for
+the same Skill detail and unsent Try now boundary. It retains fixed dialog,
+scroll, switch, menu, composer, and mention geometry plus screenshot hashes
+and the explicit no-mutation boundary; skill instructions, artwork, account
+data, process IDs, ports, and profile data remain local-only. This refresh does
+not claim current-product pixel comparison because the instruction content and
+host artwork are dynamic.
+
 Raw inspection data belongs in `/private/tmp/codex-ui-kit-research` or a local
 `.research/` directory. Both locations are intentionally outside version
 control.

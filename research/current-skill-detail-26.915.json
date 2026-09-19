@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-19T07:34:13.494Z",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48",
+    "theme": "dark"
+  },
+  "captureMode": "native-viewport-only",
+  "mutationsSubmitted": false,
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "mainCodexProcessPreserved": true,
+    "mutationBoundary": "navigation-and-read-only-dialog-and-draft-inspection",
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "sharedGeometry": {
+    "wideViewport": { "width": 1180, "height": 820 },
+    "compactViewport": { "width": 720, "height": 680 },
+    "wideDialog": { "left": 290, "top": 50, "width": 600, "height": 720 },
+    "compactDialog": { "left": 60, "top": 0, "width": 600, "height": 680 },
+    "wideScroller": {
+      "left": 311,
+      "top": 219,
+      "width": 558,
+      "height": 490,
+      "scrollHeight": 1890
+    },
+    "compactScroller": {
+      "left": 81,
+      "top": 169,
+      "width": 558,
+      "height": 450,
+      "scrollHeight": 1890
+    },
+    "title": {
+      "wide": { "left": 310, "top": 134, "width": 107.40625, "height": 28 },
+      "compact": { "left": 80, "top": 84, "width": 107.40625, "height": 28 }
+    },
+    "horizontalOverflow": 0
+  },
+  "installed": {
+    "switch": { "role": "switch", "checked": "true", "width": 32, "height": 28 },
+    "actions": {
+      "close": { "width": 24, "height": 24 },
+      "more": { "width": 28, "height": 28 },
+      "tryNow": { "width": 85.921875, "height": 28 },
+      "uninstall": { "width": 70.984375, "height": 28 }
+    },
+    "wideBottomScrollTop": 1400
+  },
+  "actionsMenu": {
+    "items": ["Open", "Reveal in Finder", "Copy Markdown"],
+    "width": 122.3125,
+    "height": 93.6875
+  },
+  "tryNowCompact": {
+    "dialogCount": 0,
+    "contentEditable": "true",
+    "textIncludesSkill": true,
+    "sendDisabled": false,
+    "textbox": { "left": 28, "top": 580, "width": 664, "height": 44 },
+    "mention": { "left": 28, "top": 581, "width": 636.203125, "height": 37 },
+    "addFiles": { "left": 24, "top": 628, "width": 28, "height": 28 },
+    "send": { "left": 668, "top": 628, "width": 28, "height": 28 }
+  },
+  "localOnlyScreenshots": [
+    { "name": "skill-installed-wide.png", "sha256": "2296b2876cd105de8397ec5e05b3f7dd292ab02b3287d8a74701514060a20fd4" },
+    { "name": "skill-actions-wide.png", "sha256": "443b9d218ae25bb0510cdc3713c06a24d4ba0d983705b5ec5e4d09e260daae37" },
+    { "name": "skill-bottom-wide.png", "sha256": "fac699c92f4d921879c44714a6665303de4fde5ff739a1c2c902474af9550b43" },
+    { "name": "skill-installed-compact.png", "sha256": "468e1b358c2833f8538a92e2b3fdc704ea382f101a348264e5c6117fca257cd8" },
+    { "name": "skill-try-now-compact.png", "sha256": "3580c95bfadd9b3617715d88bc2d374a520c3522cca170d821b7f678d1bfe88e" }
+  ],
+  "pixelEvidence": "not-claimed; host-owned skill artwork and dynamic instruction content remain local-only",
+  "remainingBoundary": [
+    "enable/disable persistence",
+    "Open/Reveal/Copy effects",
+    "real uninstall",
+    "Try now submission",
+    "successful execution",
+    "failure and retry effects",
+    "pixel comparison against a committed current-product reference"
+  ]
+}
