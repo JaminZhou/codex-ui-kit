@@ -2452,7 +2452,11 @@
         "pixel:integration-plugin-detail-current-26-825-light-wide-compact",
         "capture:current-integrations-26.911-read-only",
         "capture:current-integrations-26.915-read-only",
-        "capture:current-plugin-detail-26.915-read-only"
+        "capture:current-plugin-detail-26.915-read-only",
+        "playground:integration-plugins-current-26-915-wide-compact",
+        "browser-cdp:integration-plugins-current-26-915-wide-compact",
+        "electron:integration-plugins-current-26-915-wide-compact",
+        "pixel:integration-plugins-current-26-915-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2495,7 +2499,11 @@
         "pixel:integration-skill-detail-current-26-825-light-wide-compact",
         "capture:current-integrations-26.911-read-only",
         "capture:current-integrations-26.915-read-only",
-        "capture:current-skill-detail-26.915-read-only"
+        "capture:current-skill-detail-26.915-read-only",
+        "playground:integration-skills-current-26-915-wide-compact",
+        "browser-cdp:integration-skills-current-26-915-wide-compact",
+        "electron:integration-skills-current-26-915-wide-compact",
+        "pixel:integration-skills-current-26-915-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
