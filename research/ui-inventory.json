@@ -2548,7 +2548,11 @@
         "electron:scheduled-current-26-903-detail-error-light-compact",
         "pixel:scheduled-current-26-903-detail-error-light-compact",
         "capture:current-automations-26.911-read-only",
-        "capture:current-automations-26.915-read-only"
+        "capture:current-automations-26.915-read-only",
+        "playground:scheduled-current-26-915-wide-compact-and-manual",
+        "browser-cdp:scheduled-current-26-915-wide-compact-and-manual",
+        "electron:scheduled-current-26-915-wide-compact-and-manual",
+        "pixel:scheduled-current-26-915-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
