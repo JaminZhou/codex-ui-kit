@@ -1676,6 +1676,15 @@ boundaries. Sanitized records are retained in
 current-build read-only evidence: no save, toggle, uninstall, OAuth,
 provider-failure, or installed-product pixel promotion is claimed.
 
+The corresponding 26.915 replay slice now models the measured 46px native
+window-titlebar offset and the current `Plugins13 / Apps6 / MCPs4 / Skills2 /
+Marketplace2` tab counts. Its version prefix is preserved through Add MCP
+server → Back, enable/disable, Settings, and Uninstall transitions; targeted
+CDP, Electron geometry, Electron interaction, and own-fixture pixel contracts
+cover wide and compact frames. This promotes the deterministic replay and
+current-build structural boundary only; installed-product provider effects and
+Live App Server subagent reachability remain separate gates.
+
 The installed `26.915.31945` Sites entry was also re-observed through the
 current `Add files and more → Sites` route. The native-wide Renderer presents
 a 600×428.359375px first-use terms dialog and a 520×36px pill-shaped
