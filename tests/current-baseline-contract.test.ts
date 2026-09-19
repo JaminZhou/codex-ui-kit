@@ -2082,13 +2082,24 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain(
       '"four-disposable-task-title-hashes-and-notification-geometry-only"',
     );
+    expect(captureSource).toContain(
+      "currentInstalledCandidateBaselineFingerprint",
+    );
+    expect(captureSource).toContain(
+      'requestedFingerprint === "26.915.31945"',
+    );
+    expect(captureSource).toContain(
+      "assertCurrentGlobalNotificationsRecord(record, expectedFingerprint)",
+    );
     expect(captureSource).toContain("beforeCapture: beforeCapture.bundle");
     expect(captureSource).toContain("afterCapture: afterCapture.bundle");
     expect(captureSource).toContain('await page.keyboard.press("Meta+z")');
     expect(captureSource).toContain("await setTaskPinned(task, false)");
     expect(captureSource).toContain("clip: {");
     expect(
-      captureSource.indexOf("assertCurrentGlobalNotificationsRecord(record)"),
+      captureSource.indexOf(
+        "assertCurrentGlobalNotificationsRecord(record, expectedFingerprint)",
+      ),
     ).toBeLessThan(
       captureSource.indexOf('join(outputDirectory, "notifications.json")'),
     );

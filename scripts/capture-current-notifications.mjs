@@ -8,6 +8,7 @@ import {
   assertCurrentGlobalNotificationsRecord,
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -21,6 +22,15 @@ const requestedOutputDirectory =
   process.env.CODEX_CURRENT_NOTIFICATIONS_OUTPUT_DIR;
 const allowCapture =
   process.env.CODEX_CURRENT_NOTIFICATIONS_ALLOW_CAPTURE === "1";
+const requestedFingerprint =
+  process.env.CODEX_CURRENT_NOTIFICATIONS_FINGERPRINT?.trim() ||
+  "26.903.71938";
+const expectedFingerprint =
+  requestedFingerprint === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : requestedFingerprint === "26.903.71938"
+      ? currentBaselineFingerprint
+      : null;
 const taskTitleSha256s = (
   process.env.CODEX_CURRENT_NOTIFICATIONS_TASK_TITLE_SHA256S ?? ""
 )
@@ -53,6 +63,11 @@ if (
 if (!allowCapture) {
   throw new Error(
     "Set CODEX_CURRENT_NOTIFICATIONS_ALLOW_CAPTURE=1 to authorize reversible Pin and Undo actions plus regional screenshots in the isolated app.",
+  );
+}
+if (!expectedFingerprint) {
+  throw new Error(
+    `Unsupported notification capture fingerprint ${JSON.stringify(requestedFingerprint)}.`,
   );
 }
 
@@ -114,12 +129,12 @@ const readInstalledSnapshot = async () => {
 const beforeCapture = await readInstalledSnapshot();
 const fingerprint = beforeCapture.fingerprint;
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match ${requestedFingerprint}: ${JSON.stringify(fingerprint)}`,
   );
 }
 
@@ -551,7 +566,7 @@ try {
     taskTitleSha256s,
     viewport: currentBaselineViewports.wide,
   };
-  assertCurrentGlobalNotificationsRecord(record);
+  assertCurrentGlobalNotificationsRecord(record, expectedFingerprint);
   record.sha256 = sha256(JSON.stringify(record));
   await writeFile(
     join(outputDirectory, "notifications.json"),
