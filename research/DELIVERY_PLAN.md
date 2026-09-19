@@ -1722,6 +1722,14 @@ boundaries. Sanitized records are retained in
 current-build read-only evidence: no save, toggle, uninstall, OAuth,
 provider-failure, or installed-product pixel promotion is claimed.
 
+The dedicated 26.915 replay gate now locks this same MCP Settings contract at
+1180px and 720px: the measured five-tab counts, 4+2 server/plugin rows,
+46px titlebar offset, wide/compact cards, compact search behavior, Add menu,
+Add MCP server → Back transition, and local-browser enable → Settings →
+Uninstall path are replayed through CDP with zero-drift own-fixture pixels.
+This is a deterministic host-controlled parity gate, not a claim of provider
+save/OAuth behavior or installed-product pixels.
+
 The corresponding 26.915 replay slice now models the measured 46px native
 window-titlebar offset and the current `Plugins13 / Apps6 / MCPs4 / Skills2 /
 Marketplace2` tab counts. Its version prefix is preserved through Add MCP
