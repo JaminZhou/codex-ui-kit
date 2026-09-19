@@ -402,6 +402,15 @@ record is `research/current-automations-26.911.61220.json`. This is current
 read-only geometry and icon evidence only; replay/Electron/pixel promotion and
 cloud task mutation remain host-owned and unsampled.
 
+The installed `26.915.31945` build was re-observed in the same isolated native
+viewport. It retains the title/description, 728×32 search, four 28px filters,
+three Pause rows, zero horizontal overflow, and the refreshed task-action path
+hash. Its three older suggestion templates are absent in this build; the
+sanitized record `research/current-automations-26.915.31945.json` records that
+absence explicitly. This is still read-only current-build evidence; the
+1180×820/720×680 replay, Electron, pixel, cloud persistence, delivery,
+permissions, and mutation effects remain separately scoped.
+
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and
 workspace selection, PR review, editor diff, terminal, browser and artifact

@@ -2463,7 +2463,14 @@ without confusing package readiness with full product reconstruction.
     overflow. The native-viewport record is retained in
     [`current-automations-26.911.61220.json`](26.911.61220-automations.md);
     replay/Electron/pixel promotion and cloud mutation effects remain separate
-    host-owned boundaries. Plugin detail
+    host-owned boundaries. The installed `26.915.31945` follow-up now
+    re-observes the same index in a native 2560×1318 viewport: title and
+    description, 728×32 search, four 28px filters, three Pause rows, refreshed
+    task-action SVG hash, and zero horizontal overflow. The older three
+    suggestion templates are absent in this build and are recorded as an
+    explicit empty list in [`current-automations-26.915.31945.json`](26.915.31945-automations.md).
+    This remains read-only current-build evidence; replay/Electron/pixel
+    promotion and cloud mutation effects stay separately scoped. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only
