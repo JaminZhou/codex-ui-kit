@@ -1587,6 +1587,16 @@ no committed reference asset. Install/uninstall, connection persistence,
 OAuth/permissions, Try-now submission, external links, and failure/retry stay
 open, so Stage 4 remains in progress.
 
+The private playground now also exposes the current `26.915.31945` detail
+routes for Plugins and Skills. The targeted Electron/CDP gate repeats the
+installed/discovery/action/connection Plugin states and the installed/action
+Skill states at native-wide and 720px sizes, including the measured current
+dialog/scroller geometry, public menu labels, zero overflow, and `0%` drift
+between repeated own-fixture captures. This is deterministic replay evidence
+only: current product artwork, dynamic instructions, install/uninstall,
+connection persistence, OAuth/permissions, Try-now submission, execution, and
+failure/retry remain host-owned and are not promoted to product-pixel parity.
+
 The adjacent Skill detail/entry slice adds controlled `SkillDetailDialog` and
 `SkillPromptMention` primitives for the installed modal, enabled switch,
 three-item actions menu, long instruction scroll, footer actions, two-step

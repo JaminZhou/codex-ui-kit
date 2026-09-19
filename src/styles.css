@@ -13336,6 +13336,20 @@ summary.codex-ui-activity__header::after {
   scrollbar-width: thin;
 }
 
+/* The 26.915 detail surface keeps the same dialog chrome but reserves a
+   slightly taller identity rail before the document scroller. Keep this
+   replay-only calibration scoped to the measured current-build route. */
+.codex-ui-dialog.demo-current-skill-detail--current-26-915
+  .codex-ui-skill-detail__identity {
+  flex-basis: 8.5625rem;
+}
+
+.codex-ui-dialog.demo-current-skill-detail--current-26-915
+  .codex-ui-skill-detail__content {
+  margin-left: 0.0625rem;
+  margin-right: 0.0625rem;
+}
+
 .codex-ui-skill-detail__document {
   background: color-mix(in srgb, var(--codex-ui-background) 40%, transparent);
   border: 1px solid color-mix(in srgb, var(--codex-ui-text) 6%, transparent);

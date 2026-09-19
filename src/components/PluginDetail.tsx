@@ -70,11 +70,13 @@ export interface PluginDetailPageProps
   onInstall?: () => void;
   onRetry?: () => void;
   onReconnect?: () => void;
+  onRenameAccount?: () => void;
   onSuggestionOpen?: (suggestion: PluginDetailSuggestion) => void;
   onTryNow?: () => void;
   onUninstall?: () => void;
   appRetryLabel?: ReactNode;
   retryLabel?: ReactNode;
+  showRenameAccount?: boolean;
   status?: PluginDetailStatus;
   statusMessage?: ReactNode;
   summary?: ReactNode;
@@ -205,10 +207,12 @@ export function PluginDetailPage({
   onRetry,
   onKeyDown,
   onReconnect,
+  onRenameAccount,
   onSuggestionOpen,
   onTryNow,
   onUninstall,
   retryLabel = "Retry",
+  showRenameAccount = false,
   summary,
   suggestions = [],
   status = "ready",
@@ -477,6 +481,16 @@ export function PluginDetailPage({
                         className="codex-ui-plugin-detail__menu codex-ui-plugin-detail__menu--connection"
                         role="menu"
                       >
+                        {showRenameAccount ? (
+                          <button
+                            disabled={isLocked}
+                            onClick={onRenameAccount}
+                            role="menuitem"
+                            type="button"
+                          >
+                            <span>Rename account</span>
+                          </button>
+                        ) : null}
                         <button
                           disabled={isLocked}
                           onClick={onReconnect}
