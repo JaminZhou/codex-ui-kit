@@ -801,6 +801,14 @@ glyph hashes and 430-weight alert style are recorded in
 remain local-only. This is current-build evidence for the same success/stack
 path, not a promotion of warning/danger tones or other notification triggers.
 
+The playground now carries that current build boundary into a dedicated
+current-sidebar replay at 1180px and 720px. Its CDP/Electron gate asserts the
+four-mounted/three-visible stack, hover expansion, dismiss-to-three transition,
+`Notifications alt+T` live-region attributes, and the 430-weight dark success
+style; four replay screenshots repeat at `0%` own-fixture drift. This validates
+the measured geometry and state transitions only, not production toast delivery,
+provider-specific copy, or installed-product pixels.
+
 The earlier current-build probe safely terminated only one isolated process's
 validated App Server child and reached the former 408×400 fatal recovery
 Renderer. The `26.825.51511` refresh supersedes that layout with a full-window

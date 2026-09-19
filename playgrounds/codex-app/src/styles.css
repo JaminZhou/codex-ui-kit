@@ -9310,6 +9310,11 @@ textarea {
 }
 .demo-live-thread-row[aria-pressed="true"] { background: var(--demo-shell-hover); }
 
+html body:has(.demo-root[data-sidebar-current="true"])
+  .codex-ui-app-notification__alert {
+  font-weight: 430;
+}
+
 html body .demo-root[data-scenario="mcp-current-26-903-success"]
   :is(
     .codex-ui-activity-timeline__toggle,

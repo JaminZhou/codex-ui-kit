@@ -1597,7 +1597,10 @@
         "replay:current-shell-notification-light-wide-compact-matrix",
         "browser-cdp:current-shell-notification-light-wide-compact-matrix",
         "electron:current-shell-notification-light-wide-compact-matrix",
-        "pixel:current-shell-notification-light-wide-compact-matrix"
+        "pixel:current-shell-notification-light-wide-compact-matrix",
+        "playground:current-26.915-global-notifications-contract",
+        "electron:current-26.915-global-notifications-wide-compact-dismiss",
+        "pixel:current-26.915-global-notifications-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
