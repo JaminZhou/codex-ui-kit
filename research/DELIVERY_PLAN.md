@@ -1614,6 +1614,17 @@ as read-only current-build evidence in
 toggle, uninstall, OAuth/permission, provider failure, and product-pixel
 effects remain host-owned and unsampled.
 
+The installed `26.915.31945` follow-up re-observes this manager after the
+latest package update. The isolated wide/720 capture retains the 13/6/4/2/2
+tab counts, four 52px server rows, two 42.5625px plugin-provided rows,
+`768px` wide content geometry, `679px` compact cards, compact search unmount,
+the four-item Add menu, and the STDIO/Streamable HTTP plus update-detail field
+boundaries. Sanitized records are retained in
+[`current-mcp-settings-26.915.json`](current-mcp-settings-26.915.json) and
+[`26.915.31945-mcp-settings.md`](26.915.31945-mcp-settings.md). This remains
+current-build read-only evidence: no save, toggle, uninstall, OAuth,
+provider-failure, or installed-product pixel promotion is claimed.
+
 The Sites index slice adds a controlled `SitesIndexPage` for the older
 runtime-observed search, refresh, create, share, and overflow affordances.
 The replay fixture covers two site rows plus loading, empty, unavailable, and

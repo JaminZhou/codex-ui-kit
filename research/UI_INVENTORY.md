@@ -2514,3 +2514,17 @@ evidence are retained in `research/current-mcp-settings-26.911.json`, while
 server identity and screenshots remain local-only. This is current-build
 read-only evidence; no save, toggle, uninstall, OAuth, provider failure, or
 installed-product pixel claim is made.
+
+### Current 26.915 MCP Settings refresh
+
+The installed `26.915.31945` build was re-observed in an isolated process at
+1180×820 and 720×680. It keeps 13 Plugins, 6 Apps, 4 MCPs, 2 Skills, and 2
+Marketplace entries; four 52px server rows, two 42.5625px plugin-provided
+rows, the four-item Add menu, exact empty-search state, STDIO/Streamable HTTP
+editor fields, and the update-detail boundary. The wide content root is
+`768px` at `x=367.4375`; compact cards are `679px` at `x=21`, and the
+compact search field is intentionally unmounted. Sanitized geometry and field
+evidence are retained in `research/current-mcp-settings-26.915.json` and
+`research/26.915.31945-mcp-settings.md`; server identity and screenshots
+remain local-only. This is current-build read-only evidence; no save, toggle,
+uninstall, OAuth, provider failure, or installed-product pixel claim is made.
