@@ -27,11 +27,28 @@ export const currentBaselineFingerprint: Readonly<{
   chromiumVersion: string;
 }>;
 
+export const currentInstalledCandidateBaselineFingerprint: Readonly<{
+  appAsarBytes: number;
+  appAsarSha256: string;
+  appVersion: string;
+  buildNumber: string;
+  chromiumVersion: string;
+}>;
+
 export function selectCurrentMainCandidate<T extends CurrentMainCandidate>(
   candidates: T[],
 ): T;
 
-export function assertCurrentBaselineRecord(record: any): void;
+export function assertCurrentBaselineRecord(
+  record: any,
+  expectedFingerprint?: Readonly<{
+    appAsarBytes: number;
+    appAsarSha256: string;
+    appVersion: string;
+    buildNumber: string;
+    chromiumVersion: string;
+  }>,
+): void;
 
 export function assertCurrentAccountMenuRecord(record: any): void;
 

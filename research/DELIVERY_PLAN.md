@@ -34,6 +34,25 @@ exit gates; it does not replace the inventory.
   rows, and 19 sanitized public resource/skill titles. This is current-build
   structural CDP evidence only; selection, upload, authorization, execution,
   Browser/Electron, and product-pixel promotion remain open.
+- The installed app advanced again to `26.915.31945` (`9922`), Chromium
+  `153.0.8010.48`, and ASAR SHA-256
+  `1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483`.
+  A fresh isolated shell/sidebar capture is recorded in
+  [`current-baseline-26.915.31945.json`](current-baseline-26.915.31945.json)
+  and [`26.915.31945.md`](26.915.31945.md). It repeats the eight renderer
+  states, Projects Index geometry, sidebar focus/collapse/pin lifecycle, Help
+  menu geometry, and the native project-menu boundary; it also rechecks the
+  `712×44px` New chat editor anchor. This is candidate-only structural CDP
+  evidence. The promoted global baseline remains `26.903.71938` until the
+  affected surface families receive current-build Browser/CDP, Electron, and
+  regional-pixel evidence.
+- The same 26.915 capture records the unified Add files-and-more menu inside
+  [`current-baseline-26.915.31945.json`](current-baseline-26.915.31945.json):
+  `736×320px` menu, `726×310px` scroll owner, `951px` content height,
+  `28.5625px` rows, and 19 sanitized public titles. The current Documents row
+  is `726×28.5625px` with `Create and edit documents`. This extends current
+  resource-menu geometry evidence only; selection, upload, authorization,
+  execution, Browser/Electron, and product-pixel promotion remain open.
 - The 26.911 resource replay now uses the captured `321.875px` expanded left
   rail instead of the older `274px` fixture width. Its focused Electron/CDP
   contract checks the wide editor, Add trigger, and menu origins against the

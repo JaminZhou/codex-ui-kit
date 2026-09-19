@@ -108,6 +108,22 @@ host-owned and are intentionally not claimed by the playground.
   and skill titles. Account-, tab-, and history-specific rows are excluded;
   no selection, upload, authorization, execution, or product-pixel promotion
   is inferred.
+- The installed application advanced to `26.915.31945` (`9922`) with Chromium
+  `153.0.8010.48` and ASAR SHA-256
+  `1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483`.
+  A fresh isolated shell/sidebar candidate is recorded in
+  [`current-baseline-26.915.31945.json`](current-baseline-26.915.31945.json)
+  and [`26.915.31945.md`](26.915.31945.md). It repeats the eight renderer
+  states, Projects, Help, responsive, and native-boundary contracts and
+  confirms the current `712×44px` Composer editor anchor. It remains separate
+  from the promoted `26.903.71938` baseline; no current-build Browser/Electron
+  or regional-pixel promotion is inferred for untouched surface families.
+- The same 26.915 candidate record now includes the read-only Add files-and-more
+  menu: `736×320px`, `726×310px` scroll owner, `951px` content height,
+  `28.5625px` rows, and 19 sanitized public titles. Its Documents row is
+  `726×28.5625px` with the description `Create and edit documents`. This is
+  current resource-menu geometry only; file selection, document decoding,
+  authorization, execution, and product-pixel parity remain host-owned.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
