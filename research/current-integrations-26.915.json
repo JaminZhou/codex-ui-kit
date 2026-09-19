@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-19",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48",
+    "theme": "dark"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "cdpPort": 9951,
+    "mainCodexProcessPreserved": true,
+    "profileKind": "unique-private-tmp-profile",
+    "captureModes": ["native-wide", "emulated-compact"]
+  },
+  "plugins": {
+    "routeTitle": "Plugins",
+    "description": "Work with Codex across your favorite tools",
+    "nativeWide": {
+      "viewport": { "width": 2560, "height": 1318 },
+      "heading": { "left": 957.4375, "top": 66, "width": 277.5, "height": 33.59375 },
+      "description": { "left": 957.4375, "top": 107.59375, "width": 277.5, "height": 24 },
+      "search": { "left": 949.4375, "top": 151.59375, "width": 984, "height": 32 },
+      "content": { "left": 949.4375, "top": 211.59375, "width": 984, "height": 5794.375 },
+      "installed": { "left": 949.4375, "top": 211.59375, "width": 984, "height": 93 },
+      "gridColumns": "480px 480px",
+      "visibleItemTitles": ["Gmail", "GitHub", "Google Drive", "Google Calendar", "Notion", "Slack", "Tableau", "Microsoft Power BI", "AWS Data Analytics", "ClickHouse", "Firebase", "Dropbox", "HubSpot", "Stripe", "Canva", "Figma", "Slack"],
+      "horizontalOverflow": 0
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "heading": { "left": 29, "top": 66, "width": 277.5, "height": 33.59375 },
+      "description": { "left": 29, "top": 107.59375, "width": 277.5, "height": 24 },
+      "search": { "left": 21, "top": 151.59375, "width": 679, "height": 32 },
+      "content": { "left": 21, "top": 211.59375, "width": 679, "height": 5794.375 },
+      "installed": { "left": 21, "top": 211.59375, "width": 679, "height": 93 },
+      "gridColumns": "327.5px 327.5px",
+      "visibleItemTitles": ["Gmail", "GitHub", "Google Drive", "Google Calendar", "Notion", "Slack"],
+      "horizontalOverflow": 0
+    }
+  },
+  "skills": {
+    "routeTitle": "Skills",
+    "description": "Extend Codex with task-specific skills",
+    "nativeWide": {
+      "viewport": { "width": 2560, "height": 1318 },
+      "heading": { "left": 1085.4375, "top": 66, "width": 244.921875, "height": 33.59375 },
+      "description": { "left": 1085.4375, "top": 107.59375, "width": 244.921875, "height": 24 },
+      "search": { "left": 1077.4375, "top": 151.59375, "width": 728, "height": 32 },
+      "content": { "left": 1077.4375, "top": 211.59375, "width": 728, "height": 1086.40625 },
+      "installed": { "left": 1077.4375, "top": 211.59375, "width": 728, "height": 296.5 },
+      "gridColumns": ["360px 360px", "356px 356px"],
+      "visibleItemTitles": ["ASC Tooling", "Image Gen", "OpenAI Docs", "Plugin Creator", "RedRocket Market", "Review Agent", "ASC Tooling", "RedRocket Market"],
+      "horizontalOverflow": 0
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "heading": { "left": 29, "top": 66, "width": 244.921875, "height": 33.59375 },
+      "description": { "left": 29, "top": 107.59375, "width": 244.921875, "height": 24 },
+      "search": { "left": 21, "top": 151.59375, "width": 679, "height": 32 },
+      "content": { "left": 21, "top": 211.59375, "width": 679, "height": 468.625 },
+      "installed": { "left": 21, "top": 211.59375, "width": 679, "height": 296.5 },
+      "gridColumns": ["335.5px 335.5px", "331.5px 331.5px"],
+      "visibleItemTitles": ["ASC Tooling", "Image Gen", "OpenAI Docs", "Plugin Creator", "RedRocket Market", "Review Agent", "ASC Tooling", "RedRocket Market"],
+      "horizontalOverflow": 0
+    }
+  },
+  "boundary": {
+    "readOnly": true,
+    "doesNotClaim": [
+      "plugin installation or uninstallation",
+      "skill enable/disable persistence",
+      "OAuth, permission, registry, network, or execution effects",
+      "third-party artwork provenance or pixel promotion"
+    ],
+    "compactSearch": "The 26.915 current build keeps the catalog search field mounted at the emulated 720px width; this differs from the 26.911 candidate and is recorded as observed product behavior."
+  }
+}

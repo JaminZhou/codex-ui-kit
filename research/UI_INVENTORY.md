@@ -2392,6 +2392,18 @@ local-only. This refresh is read-only and does not promote installation,
 enablement, OAuth, permission, registry, network, execution, or
 third-party-artwork behavior.
 
+An isolated `26.915.31945` Renderer refreshes the same settings surface against
+the current installed package. Unlike 26.911, Plugins uses the title
+`Plugins` with `Work with Codex across your favorite tools`, Skills uses the
+title `Skills` with `Extend Codex with task-specific skills`, and both keep
+their search field mounted at the emulated 720×680 compact viewport. The
+sanitized record in `research/current-integrations-26.915.json` captures
+native-wide and compact two-column geometry, 984/679px Plugins roots,
+728/679px Skills roots, public labels, and zero horizontal overflow. The
+capture remains read-only; installation, enablement, OAuth, permissions,
+registry/network effects, execution, third-party artwork, and product pixels
+remain outside the renderer claim, so both rows stay `partial`.
+
 ## Current Plugin detail slice
 
 A second isolated same-build `26.825.51511` Renderer reached one installed and
