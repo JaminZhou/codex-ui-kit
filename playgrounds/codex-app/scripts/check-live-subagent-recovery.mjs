@@ -11,6 +11,25 @@ assert.ok(scene, "The pull-request detail scene is required for Live mode.");
 const prompt =
   "Do not reply with a plan. Immediately invoke the spawnAgent collaboration tool exactly once to spawn one subagent. Ask it to read only this disposable workspace package.json, then wait for the parent to interrupt it; do not send a result before the parent asks. The first and only tool call must be the collaboration spawn. Do not use Sites, MCP, browser, GitHub, connectors, approvals, shell, network, file writes, or any other tools. Keep this turn active while the subagent is waiting.";
 
+function isSubagentStart(event) {
+  const item = event?.params?.item;
+  if (event?.method !== "item/started" || !item) return false;
+  if (
+    item.type === "subAgentActivity" &&
+    item.kind === "started" &&
+    typeof item.agentThreadId === "string"
+  ) {
+    return true;
+  }
+  return (
+    item.type === "collabAgentToolCall" &&
+    item.tool !== "wait" &&
+    (typeof item.tool === "string" ||
+      (Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+      Object.keys(item.agentsStates ?? {}).length > 0)
+  );
+}
+
 async function readRateLimits() {
   const client = new CodexAppServerClient({
     capabilities: { experimentalApi: true },
@@ -27,6 +46,19 @@ async function readRateLimits() {
   }
 }
 
+function hasSubscriptionQuota(rateLimits) {
+  if (!rateLimits) return true;
+  if (rateLimits.rateLimitReachedType) return false;
+  const buckets = [rateLimits.primary, rateLimits.secondary].filter(Boolean);
+  if (buckets.length === 0) return true;
+  return buckets.some(
+    (bucket) =>
+      bucket &&
+      typeof bucket.usedPercent === "number" &&
+      bucket.usedPercent < 100,
+  );
+}
+
 async function runAttempt(attempt) {
   const directory = await realpath(
     await mkdtemp(join(tmpdir(), "ui-kit-live-subagent-recovery-")),
@@ -34,10 +66,19 @@ async function runAttempt(attempt) {
   const registryPath = join(directory, "registry.json");
   const evidence = [];
   const rateLimits = await readRateLimits();
+  // Purchased credits are separate from the subscription windows. A user can
+  // have no extra credits while still having substantial subscription quota;
+  // only shorten the probe when the subscription itself is exhausted.
+  const subscriptionQuotaAvailable = hasSubscriptionQuota(rateLimits);
   const { app, page } = await launchScene(scene, {
     capture: false,
     environment: {
-      CODEX_UI_KIT_LIVE_EPHEMERAL: "0",
+      CODEX_UI_KIT_LIVE_EPHEMERAL:
+        process.env.CODEX_UI_KIT_LIVE_EPHEMERAL ?? "0",
+      CODEX_UI_KIT_LIVE_MODEL:
+        process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-sol",
+      CODEX_UI_KIT_LIVE_REASONING_EFFORT:
+        process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "ultra",
       CODEX_UI_KIT_LIVE_HISTORY_PATH: registryPath,
       CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
       CODEX_UI_KIT_WORKSPACE: directory,
@@ -46,7 +87,7 @@ async function runAttempt(attempt) {
   const result = {
     attempt,
     directory,
-    evidence: "real signed-in App Server collabAgentToolCall plus UI Stop",
+    evidence: "real signed-in App Server subAgentActivity/collabAgentToolCall plus UI Stop",
     modelTurns: 1,
     passed: false,
     workspaceWrite: false,
@@ -72,61 +113,110 @@ async function runAttempt(attempt) {
     await page.waitForFunction(
       () =>
         window.__liveSubagentEvidence?.some(
-          (event) =>
-            event.method === "item/started" &&
-            event.params?.item?.type === "collabAgentToolCall",
+          (event) => {
+            const item = event.params?.item;
+            return (
+              event.method === "item/started" &&
+              item?.type === "subAgentActivity" &&
+              item.kind === "started" &&
+              typeof item.agentThreadId === "string"
+            ) || (
+              event.method === "item/started" &&
+              item?.type === "collabAgentToolCall" &&
+              item.tool !== "wait" &&
+              (typeof item.tool === "string" ||
+                (Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+                Object.keys(item.agentsStates ?? {}).length > 0)
+            );
+          },
         ),
       undefined,
-      { timeout: rateLimits?.credits?.hasCredits === false ? 30_000 : 180_000 },
+      { timeout: subscriptionQuotaAvailable ? 180_000 : 30_000 },
     );
     const beforeStop = await page.evaluate(() => window.__liveSubagentEvidence);
     evidence.push(...beforeStop);
-    const collabStarted = beforeStop.find(
-      (event) =>
-        event.method === "item/started" &&
-        event.params?.item?.type === "collabAgentToolCall",
-    );
-    assert.ok(collabStarted, "A real collabAgentToolCall must be observed.");
-    threadId = collabStarted.params.threadId;
-    assert.equal(typeof threadId, "string");
+    const collabStarted = beforeStop.find(isSubagentStart);
+    assert.ok(collabStarted, "A real subagent activity must be observed.");
+    const parentThreadId = collabStarted.params.threadId;
+    assert.equal(typeof parentThreadId, "string");
     const callId = collabStarted.params.item.id;
+    const childThreadId =
+      collabStarted.params.item.type === "subAgentActivity"
+        ? collabStarted.params.item.agentThreadId
+        : collabStarted.params.item.receiverThreadIds?.[0] ?? null;
+    threadId = childThreadId;
+    assert.equal(typeof threadId, "string");
     result.initialCollab = {
       agentsStates: collabStarted.params.item.agentsStates ?? {},
       receiverThreadIds: collabStarted.params.item.receiverThreadIds ?? [],
       status: collabStarted.params.item.status ?? null,
+      parentThreadId,
+      childThreadId,
+      type: collabStarted.params.item.type,
     };
     assert.equal(typeof callId, "string");
 
+    const usesSubAgentActivity =
+      collabStarted.params.item.type === "subAgentActivity";
     await page.waitForFunction(
-      (expectedCallId) =>
-        window.__liveSubagentEvidence?.some(
-          (event) =>
+      ({ expectedCallId, expectedChildThreadId, usesSubAgentActivity: currentProtocol }) =>
+        window.__liveSubagentEvidence?.some((event) => {
+          const item = event.params?.item;
+          if (
+            currentProtocol &&
+            expectedChildThreadId &&
+            event.method === "thread/status/changed" &&
+            event.params?.threadId === expectedChildThreadId
+          ) {
+            return true;
+          }
+          return !currentProtocol && (
             (event.method === "item/started" || event.method === "item/completed") &&
-            event.params?.item?.type === "collabAgentToolCall" &&
-            event.params.item.id === expectedCallId &&
-            ((Array.isArray(event.params.item.receiverThreadIds) &&
-              event.params.item.receiverThreadIds.length > 0) ||
-              Object.keys(event.params.item.agentsStates ?? {}).length > 0),
-        ),
-      callId,
-      { timeout: rateLimits?.credits?.hasCredits === false ? 30_000 : 120_000 },
+            item?.type === "collabAgentToolCall" &&
+            item.id === expectedCallId &&
+            ((Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+              Object.keys(item.agentsStates ?? {}).length > 0)
+          );
+        }),
+      {
+        expectedCallId: callId,
+        expectedChildThreadId: childThreadId,
+        usesSubAgentActivity,
+      },
+      { timeout: subscriptionQuotaAvailable ? 120_000 : 30_000 },
     );
-    const collabWithReceiver = await page.evaluate((expectedCallId) => {
-      return window.__liveSubagentEvidence.findLast(
-        (event) =>
-          (event.method === "item/started" || event.method === "item/completed") &&
-          event.params?.item?.type === "collabAgentToolCall" &&
-          event.params.item.id === expectedCallId &&
-          ((Array.isArray(event.params.item.receiverThreadIds) &&
-            event.params.item.receiverThreadIds.length > 0) ||
-            Object.keys(event.params.item.agentsStates ?? {}).length > 0),
-      );
-    }, callId);
-    result.receiverCollab = {
-      agentsStates: collabWithReceiver?.params?.item?.agentsStates ?? {},
-      receiverThreadIds: collabWithReceiver?.params?.item?.receiverThreadIds ?? [],
-      status: collabWithReceiver?.params?.item?.status ?? null,
-    };
+    const collabWithReceiver = usesSubAgentActivity
+      ? null
+      : await page.evaluate(
+      ({ expectedCallId, expectedChildThreadId }) => {
+        return window.__liveSubagentEvidence.findLast((event) => {
+          const item = event.params?.item;
+          return (
+            (expectedChildThreadId &&
+              event.method === "thread/started" &&
+              event.params?.thread?.id === expectedChildThreadId) ||
+            ((event.method === "item/started" || event.method === "item/completed") &&
+              item?.type === "collabAgentToolCall" &&
+              item.id === expectedCallId &&
+              ((Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+                Object.keys(item.agentsStates ?? {}).length > 0))
+          );
+        });
+      },
+      { expectedCallId: callId, expectedChildThreadId: childThreadId },
+    );
+    result.receiverCollab =
+      collabStarted.params.item.type === "subAgentActivity"
+        ? {
+            agentsStates: {},
+            receiverThreadIds: [childThreadId],
+            status: "started",
+          }
+        : {
+            agentsStates: collabWithReceiver?.params?.item?.agentsStates ?? {},
+            receiverThreadIds: collabWithReceiver?.params?.item?.receiverThreadIds ?? [],
+            status: collabWithReceiver?.params?.item?.status ?? null,
+          };
     assert.equal(
       result.receiverCollab.receiverThreadIds.length ||
         Object.keys(result.receiverCollab.agentsStates).length,
@@ -166,7 +256,7 @@ async function runAttempt(attempt) {
     const afterStop = await page.evaluate(() => window.__liveSubagentEvidence);
     evidence.push(...afterStop.slice(beforeStop.length));
     const completed = afterStop.findLast((event) => event.method === "turn/completed");
-    assert.equal(completed?.params?.threadId, threadId);
+    assert.equal(completed?.params?.threadId, parentThreadId);
     result.turnStatus = completed?.params?.turn?.status ?? null;
     assert.equal(result.turnStatus, "interrupted");
     const stoppedStatus = page.getByText("Stopped", { exact: true }).first();

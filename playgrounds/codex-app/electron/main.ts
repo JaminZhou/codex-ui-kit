@@ -94,6 +94,8 @@ const workspaceDirectory = resolve(
   process.env.CODEX_UI_KIT_WORKSPACE ?? resolve(currentDirectory, "../../.."),
 );
 const liveWriteOptIn = process.env.CODEX_UI_KIT_LIVE_WORKSPACE_WRITE;
+const requestedLiveModel = process.env.CODEX_UI_KIT_LIVE_MODEL?.trim() || undefined;
+const requestedLiveReasoningEffort = readRequestedLiveReasoningEffort();
 process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH = workspaceDirectory;
 const startupWorkspaceProjectToken = "startup-workspace";
 const trustedProjectDirectories = new Map<string, string>([
@@ -113,6 +115,20 @@ const requestedGitBranchListDelayMs = Number(
 const requestedGitBranchListResponseDelayMs = Number(
   process.env.CODEX_DEMO_GIT_BRANCH_LIST_RESPONSE_DELAY_MS ?? "0",
 );
+
+type LiveReasoningEffort = "none" | "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
+
+function readRequestedLiveReasoningEffort(): LiveReasoningEffort | undefined {
+  const value = process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT?.trim();
+  if (!value) return undefined;
+  const allowed = new Set(["none", "low", "medium", "high", "xhigh", "max", "ultra"]);
+  if (!allowed.has(value)) {
+    throw new TypeError(
+      "CODEX_UI_KIT_LIVE_REASONING_EFFORT must be none, low, medium, high, xhigh, max, or ultra.",
+    );
+  }
+  return value as LiveReasoningEffort;
+}
 
 if (["system", "light", "dark"].includes(requestedNativeThemeSource ?? "")) {
   nativeTheme.themeSource = requestedNativeThemeSource as
@@ -549,6 +565,7 @@ async function startLive(
           ephemeral: process.env.CODEX_UI_KIT_LIVE_EPHEMERAL === "1",
           historyMode: "paginated",
           sandbox: policy.sandbox,
+          ...(requestedLiveModel ? { model: requestedLiveModel } : {}),
         });
         try {
           await registry.remember({ id: response.thread.id, directory, title: prompt.replace(/\s+/g, " ").slice(0, 100), updatedAt: Date.now() });
@@ -580,7 +597,11 @@ async function startLive(
       threadId: thread.id,
     });
     const turn = await thread.startTurn(prompt, {
-      collaborationMode: liveCollaborationMode(collaborationMode, session.settings),
+      collaborationMode: liveCollaborationMode(collaborationMode, {
+        model: requestedLiveModel ?? session.settings.model,
+        reasoningEffort: requestedLiveReasoningEffort ?? session.settings.reasoningEffort,
+      }),
+      ...(requestedLiveReasoningEffort ? { effort: requestedLiveReasoningEffort } : {}),
       approvalPolicy: policy.approvalPolicy,
       cwd: directory,
       sandboxPolicy: policy.sandboxPolicy,

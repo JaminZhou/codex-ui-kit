@@ -1108,7 +1108,17 @@ for (const scene of selectedScenes) {
       );
       continue;
     }
-    if (scene.id.startsWith("workspace-mcp-settings-current-26-825")) {
+    if (
+      scene.id.startsWith("workspace-mcp-settings-current-26-825") ||
+      scene.id.startsWith("workspace-mcp-settings-current-26-915")
+    ) {
+      const currentMcp26915 = scene.id.startsWith(
+        "workspace-mcp-settings-current-26-915",
+      );
+      const currentMcpTopOffset = currentMcp26915 ? 46 : 0;
+      const currentMcpTabLabels = currentMcp26915
+        ? ["Plugins13", "Apps6", "MCPs4", "Skills2", "Marketplace2"]
+        : ["Plugins13", "Apps6", "MCPs6", "Skills2", "Marketplace2"];
       const compact = scene.id.endsWith("-compact");
       const create = scene.id.includes("-create");
       const detail = scene.id.endsWith("-detail");
@@ -1219,37 +1229,39 @@ for (const scene of selectedScenes) {
         mcp.selected !== "Plugins" ||
         !mcp.navigation ||
         Math.abs(mcp.navigation.left) > 0.1 ||
-        Math.abs(mcp.navigation.top - 46) > 0.1 ||
+        Math.abs(mcp.navigation.top - (46 + currentMcpTopOffset)) > 0.1 ||
         Math.abs(mcp.navigation.width - 321.875) > 0.1 ||
-        Math.abs(mcp.navigation.height - (mcp.viewport.height - 46)) > 0.1 ||
+        Math.abs(
+          mcp.navigation.height -
+            (mcp.viewport.height - 46 - currentMcpTopOffset),
+        ) > 0.1 ||
         !mcp.root ||
         Math.abs(mcp.root.left - expectedRoot.left) > 0.1 ||
-        Math.abs(mcp.root.top - 46) > 0.1 ||
+            Math.abs(mcp.root.top - (46 + currentMcpTopOffset)) > 0.1 ||
         Math.abs(mcp.root.width - expectedRoot.width) > 0.1 ||
         !mcp.heading ||
-        Math.abs(mcp.heading.top - 66) > 0.1 ||
+            Math.abs(mcp.heading.top - (66 + currentMcpTopOffset)) > 0.1 ||
         Math.abs(mcp.heading.height - 28.796875) > 0.1 ||
         mcp.tabs.length !== 5 ||
         mcp.tabs.some(
           ({ rect: tab }, index) =>
             !tab ||
-            Math.abs(tab.top - (compact ? 197.796875 : 155.796875)) > 0.1 ||
+            Math.abs(
+              tab.top -
+                ((compact ? 197.796875 : 155.796875) + currentMcpTopOffset),
+            ) > 0.1 ||
             Math.abs(tab.width - expectedTabWidths[index]) > 0.1 ||
             Math.abs(tab.height - 28) > 0.1,
         ) ||
         JSON.stringify(mcp.tabs.map(({ text }) => text)) !==
-          JSON.stringify([
-            "Plugins13",
-            "Apps6",
-            "MCPs6",
-            "Skills2",
-            "Marketplace2",
-          ]) ||
+          JSON.stringify(currentMcpTabLabels) ||
         (compact
           ? mcp.search?.display !== "none"
           : !mcp.search?.rect ||
             Math.abs(mcp.search.rect.left - 910.9375) > 0.1 ||
-            Math.abs(mcp.search.rect.top - 153.796875) > 0.1 ||
+            Math.abs(
+              mcp.search.rect.top - (153.796875 + currentMcpTopOffset),
+            ) > 0.1 ||
             Math.abs(mcp.search.rect.width - 224) > 0.1 ||
             Math.abs(mcp.search.rect.height - 32) > 0.1)
       ) {
@@ -1260,12 +1272,32 @@ for (const scene of selectedScenes) {
       if (!create && !detail) {
         const expectedCards = compact
           ? [
-              { height: 210, left: 341.875, top: 311.796875, width: 358.125 },
-              { height: 87.125, left: 341.875, top: 587.796875, width: 358.125 },
+              {
+                height: 210,
+                left: 341.875,
+                top: 311.796875 + currentMcpTopOffset,
+                width: 358.125,
+              },
+              {
+                height: 87.125,
+                left: 341.875,
+                top: 587.796875 + currentMcpTopOffset,
+                width: 358.125,
+              },
             ]
           : [
-              { height: 210, left: 366.9375, top: 271.796875, width: 768 },
-              { height: 87.125, left: 366.9375, top: 547.796875, width: 768 },
+              {
+                height: 210,
+                left: 366.9375,
+                top: 271.796875 + currentMcpTopOffset,
+                width: 768,
+              },
+              {
+                height: 87.125,
+                left: 366.9375,
+                top: 547.796875 + currentMcpTopOffset,
+                width: 768,
+              },
             ];
         if (
           mcp.pluginCards.length !== 2 ||
