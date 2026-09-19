@@ -1594,6 +1594,17 @@ after uninstall, and keeps a retry callback available. This remains renderer
 state evidence; skill installation, execution, and registry persistence stay
 host-owned.
 
+The installed `26.915.31945` package has now been re-observed for the same
+Skill detail boundary. The current dialog remains 600px wide, while the
+instruction scroller is `558×490` at wide and `558×450` compact with
+`scrollHeight=1890`; the existing Open/Reveal/Copy Markdown menu is unchanged.
+`Try now` still produces an unsent editable draft, but the current inline
+mention occupies a `636.203×37` compact row. The sanitized record is
+`research/current-skill-detail-26.915.json`; this is navigation/read-only
+evidence with no current-product pixel claim because instructions and artwork
+are dynamic. Enablement, uninstall, prompt submission, execution, and
+failure/retry remain open, so Stage 4 remains in progress.
+
 The integration catalog replay now carries a controlled install lifecycle for
 public plugin and recommended skill rows: an action enters a disabled pending
 state, settles to success, and promotes the item into the Installed region.

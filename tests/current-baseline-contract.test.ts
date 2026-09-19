@@ -2153,6 +2153,55 @@ describe("current baseline capture contract", () => {
     expect(record.sharedGeometry.horizontalOverflow).toBe(0);
   });
 
+  it("keeps the current 26.915 skill-detail capture build-scoped and sanitized", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-skill-detail.mjs", import.meta.url),
+      "utf8",
+    );
+    const record = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-skill-detail-26.915.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(captureSource).toContain(
+      "currentInstalledCandidateBaselineFingerprint",
+    );
+    expect(captureSource).toContain('requestedFingerprint === "26.915.31945"');
+    expect(captureSource).toContain('captureMode: "native-viewport-only"');
+    expect(captureSource).toContain("mutationsSubmitted: false");
+    expect(captureSource).not.toContain("ownerPid: Number(owners[0].pid)");
+    expect(captureSource).not.toContain("document.body.textContent");
+    expect(record.baseline).toMatchObject({
+      appVersion: "26.915.31945",
+      buildNumber: "9922",
+      chromiumVersion: "153.0.8010.48",
+    });
+    expect(record.captureMode).toBe("native-viewport-only");
+    expect(record.mutationsSubmitted).toBe(false);
+    expect(record.isolation).not.toHaveProperty("cdpPort");
+    expect(record.isolation).not.toHaveProperty("ownerPid");
+    expect(record.actionsMenu.items).toEqual([
+      "Open",
+      "Reveal in Finder",
+      "Copy Markdown",
+    ]);
+    expect(record.sharedGeometry.wideDialog).toMatchObject({
+      width: 600,
+      height: 720,
+    });
+    expect(record.tryNowCompact).toMatchObject({
+      contentEditable: "true",
+      dialogCount: 0,
+      sendDisabled: false,
+    });
+    expect(record.sharedGeometry.horizontalOverflow).toBe(0);
+  });
+
   it("rejects stale or unproven current App Server recovery evidence", () => {
     const record = currentAppServerCrashRecoveryRecord();
     expect(() =>

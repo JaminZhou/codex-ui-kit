@@ -2473,6 +2473,17 @@ The `integrations.skills` row remains `partial`: persisted enable/disable,
 Open/Reveal/Copy effects, uninstall, prompt submission, successful execution,
 and failure/retry states remain open.
 
+An isolated `26.915.31945` Renderer refreshes the installed Skill detail at
+native-wide `1180×820` and compact `720×680`. The current dialog remains
+600px wide, but its instruction viewport is `558×490` wide and `558×450`
+compact with `scrollHeight=1890`. `Try now` still creates an unsent editable
+draft; the current inline mention occupies the full `636.203×37` compact row.
+The sanitized record is `research/current-skill-detail-26.915.json`; no
+current-product pixel claim is made because instructions and artwork are
+host-owned dynamic content. Enablement, uninstall, prompt submission,
+execution, and failure/retry remain outside the read-only boundary, so the row
+stays `partial`.
+
 ## Current thread overflow actions slice
 
 An isolated same-build `26.825.51511` process reached the completed-thread

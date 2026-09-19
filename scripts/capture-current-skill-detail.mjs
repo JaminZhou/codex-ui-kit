@@ -6,6 +6,7 @@ import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/
 import {
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -21,6 +22,15 @@ const installedLabel =
   process.env.CODEX_CURRENT_SKILL_DETAIL_INSTALLED_LABEL?.trim();
 const allowCapture =
   process.env.CODEX_CURRENT_SKILL_DETAIL_ALLOW_CAPTURE === "1";
+const requestedFingerprint =
+  process.env.CODEX_CURRENT_SKILL_DETAIL_FINGERPRINT?.trim() ||
+  "26.825.51511";
+const expectedFingerprint =
+  requestedFingerprint === "26.915.31945"
+    ? currentInstalledCandidateBaselineFingerprint
+    : requestedFingerprint === "26.825.51511"
+      ? currentBaselineFingerprint
+      : null;
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
@@ -40,6 +50,11 @@ if (!installedLabel || installedLabel.length > 120) {
 if (!allowCapture) {
   throw new Error(
     "Set CODEX_CURRENT_SKILL_DETAIL_ALLOW_CAPTURE=1 to authorize read-only skill-detail capture.",
+  );
+}
+if (!expectedFingerprint) {
+  throw new Error(
+    `Unsupported skill-detail fingerprint ${JSON.stringify(requestedFingerprint)}.`,
   );
 }
 
@@ -90,12 +105,12 @@ const readInstalledFingerprint = async () => {
 };
 const fingerprint = await readInstalledFingerprint();
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match ${requestedFingerprint}: ${JSON.stringify(fingerprint)}`,
   );
 }
 
@@ -231,7 +246,13 @@ const openSkillsIndex = async () => {
       break;
     }
   }
-  if (!sidebarTrigger) throw new Error("The Plugins sidebar route is unavailable.");
+  if (!sidebarTrigger) {
+    const visiblePlugin = plugins.first();
+    if ((await visiblePlugin.count()) === 0 || !(await visiblePlugin.isVisible())) {
+      throw new Error("The Plugins route is unavailable.");
+    }
+    sidebarTrigger = visiblePlugin;
+  }
   await sidebarTrigger.click({ force: true });
   await page.getByRole("heading", { exact: true, name: "Plugins" }).waitFor();
   await page.getByRole("button", { exact: true, name: "Skills" }).click();
@@ -240,7 +261,13 @@ const openSkillsIndex = async () => {
 };
 const openSkill = async () => {
   await openSkillsIndex();
-  const card = page.locator('[role="button"]').filter({ hasText: installedLabel });
+  const installedSection = page
+    .locator("section")
+    .filter({ hasText: /^Installed/ })
+    .first();
+  const card = installedSection
+    .locator('[role="button"]')
+    .filter({ hasText: installedLabel });
   if ((await card.count()) !== 1) {
     throw new Error("The selected installed skill card is ambiguous.");
   }
@@ -251,6 +278,7 @@ const openSkill = async () => {
   await page.getByRole("switch", { name: "Disable skill" }).waitFor();
   await page.getByRole("button", { exact: true, name: "Try now" }).waitFor();
   await page.evaluate(async () => document.fonts.ready);
+  await page.waitForTimeout(600);
   return dialog;
 };
 const inspectSkill = async (state) =>
@@ -469,11 +497,12 @@ await writeFile(
       schemaVersion: 1,
       capturedAt: new Date().toISOString(),
       baseline: fingerprint,
+      captureMode: "native-viewport-only",
+      mutationsSubmitted: false,
       isolation: {
         cdpAddress: "127.0.0.1",
-        cdpPort: port,
         mainCodexProcessPreserved: true,
-        ownerPid: Number(owners[0].pid),
+        mutationBoundary: "navigation-and-read-only-dialog-and-draft-inspection",
         profileKind: "unique-private-tmp-profile",
       },
       skillDetail: {
