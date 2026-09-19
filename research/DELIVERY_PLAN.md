@@ -63,6 +63,14 @@ exit gates; it does not replace the inventory.
   The shell and document/media replay checks are now part of the full private
   acceptance command, so later changes cannot silently bypass these 26.915
   wide/compact geometry and repeat-capture contracts.
+- The same private playground now exposes the 26.915 `Add files and more`
+  resource catalog as `workspace-composer-current-26-915-resources`. Its 19
+  sanitized public rows, `736×320px` wide / `688×320px` compact picker,
+  `726×310px` scroll owner, `321.875px` rail, zero overflow, Escape focus
+  return, and repeated own-fixture captures pass the focused Electron/CDP gate
+  with `0%` drift. This is current-build resource-menu evidence only; file
+  selection, upload, authorization, plugin execution, and installed-product
+  pixels remain host-owned.
 - The 26.911 resource replay now uses the captured `321.875px` expanded left
   rail instead of the older `274px` fixture width. Its focused Electron/CDP
   contract checks the wide editor, Add trigger, and menu origins against the
