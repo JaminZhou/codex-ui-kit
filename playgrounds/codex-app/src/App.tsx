@@ -761,6 +761,7 @@ function querySelection() {
     "collection-long-list",
     "status-lifecycle",
     "thread-lifecycle-current",
+    "thread-lifecycle-current-26-915",
     "worktree-lifecycle-current",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
@@ -7025,7 +7026,10 @@ export function App() {
     initialSelection.frame?.startsWith("sidebar-current") ||
     !initialSelection.capture;
   const currentSidebarThreadLifecycle =
-    initialSelection.sidebarState === "thread-lifecycle-current";
+    initialSelection.sidebarState === "thread-lifecycle-current" ||
+    initialSelection.sidebarState === "thread-lifecycle-current-26-915";
+  const currentSidebarThreadHistory26915Replay =
+    initialSelection.sidebarState === "thread-lifecycle-current-26-915";
   const currentSidebarWorktreeLifecycle =
     initialSelection.sidebarState === "worktree-lifecycle-current";
   const currentWorktreeSetup = currentWorktreeSetupFrame(activeFrame);
@@ -17875,6 +17879,9 @@ export function App() {
       }
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
+      data-current-sidebar-thread-history-26-915={
+        currentSidebarThreadHistory26915Replay || undefined
+      }
       data-sidebar-state={initialSelection.sidebarState ?? undefined}
       data-summary-open={
         isCurrentCitations26825Replay

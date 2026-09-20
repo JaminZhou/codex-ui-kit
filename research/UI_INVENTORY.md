@@ -623,6 +623,17 @@ at 2.9762%, 0.3571%, and 0% promote `app.sidebar-thread-history`,
 sampled lifecycle. Waiting, error, worktree, mutations, and longer history
 remain partial or previous-build evidence.
 
+The 26.915 candidate now has a separately named Sidebar thread-history replay
+route. Dark/light wide and 720px scenes repeat the selected running row,
+background unread row, idle rows, and Pin/Archive hover replacement. Browser/
+CDP computed styles and Electron interaction lock the 321.875px rail,
+305.875×30px rows, 5px 5px 5px 8px padding, 13/18.5714px weight-400 type,
+20px status cells, the theme-specific attention dot, and zero horizontal
+overflow. Repeated own-fixture captures stay at 0% drift. This adds current
+26.915 structural replay evidence for the existing sidebar-thread-history
+surface; row contents, provider state, and installed-product pixels remain
+explicitly unpromoted.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
