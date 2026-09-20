@@ -761,6 +761,7 @@ function querySelection() {
     "collection-long-list",
     "status-lifecycle",
     "status-lifecycle-current-26-915",
+    "item-actions-current-26-915",
     "thread-lifecycle-current",
     "thread-lifecycle-current-26-915",
     "worktree-lifecycle-current",
@@ -7032,6 +7033,8 @@ export function App() {
     initialSelection.sidebarState === "status-lifecycle-current-26-915";
   const currentSidebarStatus26915Replay =
     initialSelection.sidebarState === "status-lifecycle-current-26-915";
+  const currentSidebarItemActions26915Replay =
+    initialSelection.sidebarState === "item-actions-current-26-915";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -17892,6 +17895,9 @@ export function App() {
       data-current-sidebar-status-26-915={
         currentSidebarStatus26915Replay || undefined
       }
+      data-current-sidebar-item-actions-26-915={
+        currentSidebarItemActions26915Replay || undefined
+      }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
@@ -18326,7 +18332,8 @@ export function App() {
         sidebarWidth={
           view === "plugins"
             ? 322.875
-            : currentSidebarStatus26915Replay ||
+            : currentSidebarItemActions26915Replay ||
+                currentSidebarStatus26915Replay ||
                 currentSidebarThreadLifecycle ||
                 currentSidebarWorktreeLifecycle ||
                 currentContext26825Replay ||

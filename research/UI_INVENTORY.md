@@ -657,6 +657,16 @@ replay evidence for `app.sidebar-worktree-status-indicators`; provider-owned
 worktree reachability and installed-product pixels remain explicitly
 unpromoted.
 
+The 26.915 candidate also covers a dedicated Sidebar item-actions matrix in
+dark/light wide and 720px scenes. The current unread project menu retains its
+seven visible items, three separators, 252×212px geometry, and 118×34px
+Section submenu. Escape returns focus to the project trigger, while task-row
+Pin/Archive actions replace the normal row affordance on hover and focus.
+Browser/CDP computed styles and Electron interaction verify the same contract;
+repeated own-fixture captures stay at 0% drift. This is controlled current
+26.915 replay evidence for `app.sidebar-item-actions`; menu mutations and
+provider-owned writes remain explicitly unpromoted.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,

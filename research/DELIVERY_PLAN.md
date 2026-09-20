@@ -299,6 +299,13 @@ exit gates; it does not replace the inventory.
   Browser/CDP computed-style checks, Electron interaction, and repeated
   screenshots pass with 0% own-fixture drift; this remains controlled replay
   evidence and does not promote provider-owned worktree reachability.
+- The 26.915 candidate also has a dedicated Sidebar item-actions matrix.
+  Wide/720 dark/light scenes verify the current project menu's seven-item
+  unread variant, three separators, 252×212px geometry, Section submenu
+  (118×34px), Escape focus return, and task-row Pin/Archive action replacement
+  on hover and focus. Browser/CDP computed-style checks, Electron interaction,
+  and repeated screenshots pass with 0% own-fixture drift. Menu mutations and
+  provider-owned project writes remain explicitly unpromoted.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
