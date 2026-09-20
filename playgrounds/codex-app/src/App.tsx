@@ -752,6 +752,7 @@ function querySelection() {
     "compact-pinned",
     "hidden",
     "account-menu",
+    "account-menu-current-26-915",
     "help-menu",
     "project-collapsed",
     "project-menu",
@@ -5028,7 +5029,10 @@ export function App() {
   const [currentSidebarHelpMenuOpen, setCurrentSidebarHelpMenuOpen] =
     useState(initialSelection.sidebarState === "help-menu");
   const [currentSidebarAccountMenuOpen, setCurrentSidebarAccountMenuOpen] =
-    useState(initialSelection.sidebarState === "account-menu");
+    useState(
+      initialSelection.sidebarState === "account-menu" ||
+        initialSelection.sidebarState === "account-menu-current-26-915",
+    );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
       initialSelection.frame === "mixed-review-open" ||
@@ -7035,6 +7039,8 @@ export function App() {
     initialSelection.sidebarState === "status-lifecycle-current-26-915";
   const currentSidebarItemActions26915Replay =
     initialSelection.sidebarState === "item-actions-current-26-915";
+  const currentSidebarAccount26915Replay =
+    initialSelection.sidebarState === "account-menu-current-26-915";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -17897,6 +17903,9 @@ export function App() {
       }
       data-current-sidebar-item-actions-26-915={
         currentSidebarItemActions26915Replay || undefined
+      }
+      data-current-sidebar-account-26-915={
+        currentSidebarAccount26915Replay || undefined
       }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined

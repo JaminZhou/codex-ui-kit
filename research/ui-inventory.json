@@ -1380,7 +1380,11 @@
         "replay:current-26.915-sidebar-actions-wide-compact-dark-light",
         "browser-cdp:current-26.915-sidebar-actions-wide-compact-dark-light",
         "electron:current-26.915-sidebar-actions-wide-compact-dark-light",
-        "pixel:current-26.915-sidebar-actions-own-fixture-zero-drift"
+        "pixel:current-26.915-sidebar-actions-own-fixture-zero-drift",
+        "replay:current-26.915-sidebar-account-wide-compact-dark-light",
+        "browser-cdp:current-26.915-sidebar-account-wide-compact-dark-light",
+        "electron:current-26.915-sidebar-account-wide-compact-dark-light",
+        "pixel:current-26.915-sidebar-account-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

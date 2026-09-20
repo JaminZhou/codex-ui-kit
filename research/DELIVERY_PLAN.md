@@ -306,6 +306,12 @@ exit gates; it does not replace the inventory.
   on hover and focus. Browser/CDP computed-style checks, Electron interaction,
   and repeated screenshots pass with 0% own-fixture drift. Menu mutations and
   provider-owned project writes remain explicitly unpromoted.
+- The same 26.915 candidate now has a dedicated Sidebar account-menu matrix.
+  Wide/720 dark/light scenes verify the six-item account surface, five exact
+  action icons, identity avatar, 305.875×188.375px geometry, 9px identity
+  divider, Escape focus return, and zero horizontal overflow. Browser/CDP
+  computed-style checks, Electron interaction, and repeated screenshots pass
+  with 0% own-fixture drift; account mutations remain replay-only.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and

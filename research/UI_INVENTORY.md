@@ -667,6 +667,13 @@ repeated own-fixture captures stay at 0% drift. This is controlled current
 26.915 replay evidence for `app.sidebar-item-actions`; menu mutations and
 provider-owned writes remain explicitly unpromoted.
 
+The 26.915 candidate also covers a dedicated Sidebar account-menu matrix in
+dark/light wide and 720px scenes. The six-item account surface keeps five exact
+action icons, one identity avatar, a 305.875×188.375px menu, and a 9px identity
+divider. Browser/CDP computed styles and Electron interaction verify the same
+contract, Escape returns focus to the account trigger, and repeated own-fixture
+captures stay at 0% drift. Account mutations remain replay-only.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
