@@ -1451,7 +1451,9 @@ textarea {
 
 .demo-root:is(
     [data-frame="workspace-composer-current-26-825-multiline-four"],
-    [data-frame="workspace-composer-current-26-825-multiline-long"]
+    [data-frame="workspace-composer-current-26-825-multiline-long"],
+    [data-frame="workspace-composer-current-26-915-multiline-four"],
+    [data-frame="workspace-composer-current-26-915-multiline-long"]
   )
   .demo-workspace-start
   .codex-ui-composer__input {
@@ -1461,20 +1463,29 @@ textarea {
   width: calc(100% - 24px);
 }
 
-.demo-root[data-frame="workspace-composer-current-26-825-multiline-four"]
+.demo-root:is(
+    [data-frame="workspace-composer-current-26-825-multiline-four"],
+    [data-frame="workspace-composer-current-26-915-multiline-four"]
+  )
   .demo-workspace-start
   :is(.codex-ui-composer, .codex-ui-composer__fieldset) {
   height: 134px;
   min-height: 134px;
 }
 
-.demo-root[data-frame="workspace-composer-current-26-825-multiline-four"]
+.demo-root:is(
+    [data-frame="workspace-composer-current-26-825-multiline-four"],
+    [data-frame="workspace-composer-current-26-915-multiline-four"]
+  )
   .demo-workspace-start
   .codex-ui-composer__input {
   height: 80px !important;
 }
 
-.demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+.demo-root:is(
+    [data-frame="workspace-composer-current-26-825-multiline-long"],
+    [data-frame="workspace-composer-current-26-915-multiline-long"]
+  )
   .demo-workspace-start
   :is(.codex-ui-composer, .codex-ui-composer__fieldset) {
   height: 259px;
@@ -1488,14 +1499,20 @@ textarea {
 }
 
 @container codex-ui-app-shell (max-width: 45rem) {
-  .demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+  .demo-root:is(
+      [data-frame="workspace-composer-current-26-825-multiline-long"],
+      [data-frame="workspace-composer-current-26-915-multiline-long"]
+    )
     .demo-workspace-start
     :is(.codex-ui-composer, .codex-ui-composer__fieldset) {
     height: 224px;
     min-height: 224px;
   }
 
-  .demo-root[data-frame="workspace-composer-current-26-825-multiline-long"]
+  .demo-root:is(
+      [data-frame="workspace-composer-current-26-825-multiline-long"],
+      [data-frame="workspace-composer-current-26-915-multiline-long"]
+    )
     .demo-workspace-start
     .codex-ui-composer__input {
     height: 170px !important;

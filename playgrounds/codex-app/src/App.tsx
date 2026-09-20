@@ -1144,7 +1144,10 @@ function initialComposerValue(frame: string | null) {
     return "Reply using three uppercase words describing this test: attachment, lifecycle, complete. Include a final period and no other text.";
   }
   if (frame === "context-compaction-command-menu") return "/compact";
-  if (frame === "workspace-composer-current-26-825-multiline-long") {
+  if (
+    frame === "workspace-composer-current-26-825-multiline-long" ||
+    frame === "workspace-composer-current-26-915-multiline-long"
+  ) {
     return Array.from(
       { length: 20 },
       (_, index) => `Current long Composer line ${index + 1}.`,
@@ -1155,7 +1158,8 @@ function initialComposerValue(frame: string | null) {
     frame === "composer-permissions-menu" ||
     frame === "composer-plugins-menu" ||
     frame === "composer-resources-menu" ||
-    frame === "workspace-composer-current-26-825-multiline-four"
+    frame === "workspace-composer-current-26-825-multiline-four" ||
+    frame === "workspace-composer-current-26-915-multiline-four"
   ) {
     return [
       "First current-build Composer line.",
@@ -1206,8 +1210,12 @@ type CurrentQueue26825Phase =
 function initialCurrentQueue26825Phase(
   frame: string | null,
 ): CurrentQueue26825Phase {
-  const prefix = "workspace-composer-current-26-825-queue-";
-  if (!frame?.startsWith(prefix)) return null;
+  const prefixes = [
+    "workspace-composer-current-26-825-queue-",
+    "workspace-composer-current-26-915-queue-",
+  ];
+  const prefix = prefixes.find((candidate) => frame?.startsWith(candidate));
+  if (!frame || !prefix) return null;
   const phase = frame.slice(prefix.length);
   return [
     "continued",
@@ -3772,16 +3780,26 @@ export function App() {
       "workspace-composer-current-26-908-",
     );
   const currentComposerControlsCurrentCatalogReplay =
-    currentComposerControls26908Replay ||
-    currentComposerControls2691161220Replay ||
-    currentComposerControls2691531945Replay;
+    (currentComposerControls26908Replay ||
+      currentComposerControls2691161220Replay ||
+      currentComposerControls2691531945Replay) &&
+    !initialSelection.frame?.includes("-multiline-") &&
+    !initialSelection.frame?.includes("-queue-");
   const currentComposerMultiline26825Replay =
     initialSelection.frame ===
       "workspace-composer-current-26-825-multiline-four" ||
     initialSelection.frame ===
-      "workspace-composer-current-26-825-multiline-long";
+      "workspace-composer-current-26-825-multiline-long" ||
+    initialSelection.frame ===
+      "workspace-composer-current-26-915-multiline-four" ||
+    initialSelection.frame ===
+      "workspace-composer-current-26-915-multiline-long";
   const currentComposerQueue26825Replay =
     initialCurrentQueue26825Phase(initialSelection.frame) !== null;
+  const currentComposerQueueFramePrefix =
+    initialSelection.frame?.startsWith("workspace-composer-current-26-915-")
+      ? "workspace-composer-current-26-915"
+      : "workspace-composer-current-26-825";
   const currentContext26825Replay =
     initialSelection.view === "workspace" &&
     (initialSelection.frame?.startsWith(
@@ -5213,8 +5231,10 @@ export function App() {
   );
   useLayoutEffect(() => {
     if (
-      initialSelection.frame !==
-      "workspace-composer-current-26-825-multiline-long"
+      ![
+        "workspace-composer-current-26-825-multiline-long",
+        "workspace-composer-current-26-915-multiline-long",
+      ].includes(initialSelection.frame ?? "")
     ) {
       return;
     }
@@ -6728,7 +6748,7 @@ export function App() {
       setCurrentQueue26825Phase("paused");
       setQueueInterrupted(true);
       setReplayComposerStopped(true);
-      setActiveFrame("workspace-composer-current-26-825-queue-paused");
+      setActiveFrame(`${currentComposerQueueFramePrefix}-queue-paused`);
       return;
     }
     if (isCurrentContextCompactionReplay) {
@@ -6774,7 +6794,7 @@ export function App() {
       setQueueInterrupted(false);
       setReplayComposerStopped(true);
       setActiveFrame(
-        "workspace-composer-current-26-825-queue-resume-ready",
+        `${currentComposerQueueFramePrefix}-queue-resume-ready`,
       );
       requestAnimationFrame(() => composerInputRef.current?.focus());
       return;
@@ -6791,15 +6811,15 @@ export function App() {
     setCurrentQueue26825Phase("resumed");
     setQueueInterrupted(false);
     setReplayComposerStopped(false);
-    setActiveFrame("workspace-composer-current-26-825-queue-resumed");
+    setActiveFrame(`${currentComposerQueueFramePrefix}-queue-resumed`);
     replaySubmitTimerRef.current = window.setTimeout(() => {
       setCurrentQueue26825Phase("continued");
       setQueuedPrompts([]);
-      setActiveFrame("workspace-composer-current-26-825-queue-continued");
+      setActiveFrame(`${currentComposerQueueFramePrefix}-queue-continued`);
       replaySubmitTimerRef.current = window.setTimeout(() => {
         replaySubmitTimerRef.current = null;
         setCurrentQueue26825Phase("settled");
-        setActiveFrame("workspace-composer-current-26-825-queue-settled");
+        setActiveFrame(`${currentComposerQueueFramePrefix}-queue-settled`);
         requestAnimationFrame(() => composerInputRef.current?.focus());
       }, 600);
     }, 1_000);
@@ -6813,7 +6833,7 @@ export function App() {
       if (currentComposerQueue26825Replay) {
         setCurrentQueue26825Phase("settled");
         setReplayComposerStopped(true);
-        setActiveFrame("workspace-composer-current-26-825-queue-settled");
+        setActiveFrame(`${currentComposerQueueFramePrefix}-queue-settled`);
       }
     }
   };
@@ -6831,7 +6851,7 @@ export function App() {
       deleteQueuedPrompt(id);
       setCurrentQueue26825Phase("continued");
       setReplayComposerStopped(false);
-      setActiveFrame("workspace-composer-current-26-825-queue-continued");
+      setActiveFrame(`${currentComposerQueueFramePrefix}-queue-continued`);
       return;
     }
     deleteQueuedPrompt(id);
@@ -9894,7 +9914,7 @@ export function App() {
               : "workspace-composer-current-26-908-ready"
       : currentComposerControls26825Replay
         ? currentComposerQueue26825Replay
-          ? `workspace-composer-current-26-825-queue-${currentQueue26825Phase ?? "pending"}`
+          ? `${currentComposerQueueFramePrefix}-queue-${currentQueue26825Phase ?? "pending"}`
           : currentComposerMultiline26825Replay
             ? initialSelection.frame ??
               "workspace-composer-current-26-825-multiline-four"
