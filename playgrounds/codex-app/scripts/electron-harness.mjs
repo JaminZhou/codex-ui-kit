@@ -4903,9 +4903,19 @@ export async function launchScene(
   });
   report("launched");
   // Electron can create the BrowserWindow before Playwright subscribes to the
-  // first-window event. Reuse an already attached page to avoid a spurious
-  // 30-second timeout in sequential acceptance runs.
-  const page = app.windows()[0] ?? (await app.firstWindow());
+  // first-window event. Reuse an already attached page, and briefly poll for
+  // the native window before falling back to the event. This avoids a
+  // spurious 30-second timeout when a headless scene creates its window just
+  // after launch but before Playwright's event subscription is active.
+  let page = app.windows()[0];
+  if (!page) {
+    const deadline = Date.now() + 5_000;
+    while (!page && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      page = app.windows()[0];
+    }
+  }
+  if (!page) page = await app.firstWindow();
   report("first window");
   await page.bringToFront();
   await page.emulateMedia({ reducedMotion: "reduce" });

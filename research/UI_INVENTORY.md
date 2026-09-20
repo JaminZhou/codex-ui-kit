@@ -634,6 +634,17 @@ overflow. Repeated own-fixture captures stay at 0% drift. This adds current
 surface; row contents, provider state, and installed-product pixels remain
 explicitly unpromoted.
 
+The 26.915 candidate separately covers the Sidebar status-indicator matrix in
+dark/light wide and 720px scenes. Active, waiting, error, unread, queued,
+creating, setting-up, and error-plus-unread rows retain the current 321.875px
+rail and 305.875×30px row geometry. Browser/CDP computed styles and Electron
+interaction verify 20px status cells, exact 8px/36px trailing insets,
+theme-specific attention dots, 16px error glyphs, reduced-motion spinner
+paths, shared Pin/Archive hover replacement, and zero horizontal overflow.
+Repeated own-fixture captures stay at 0% drift. This is current 26.915
+structural replay evidence for `app.sidebar-status-indicators`; provider data
+and installed-product pixels remain explicitly unpromoted.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,

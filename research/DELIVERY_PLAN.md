@@ -281,6 +281,16 @@ exit gates; it does not replace the inventory.
   repeated screenshots all pass with 0% own-fixture drift. This is a
   current-build structural replay boundary only; installed-product row data,
   provider state, and product pixels remain unpromoted.
+- The 26.915 candidate now also has a dedicated Sidebar status-indicator
+  matrix. Wide/720 dark/light scenes lock active, waiting, error, unread,
+  queued, creating, setting-up, and error-plus-unread rows against the
+  `321.875px` rail and `305.875×30px` rows, including 20px status cells,
+  exact attention/error/spinner geometry, hover action replacement, and zero
+  horizontal overflow. Browser/CDP computed-style checks, Electron
+  interaction, and repeated screenshots pass with 0% own-fixture drift. A
+  short Electron-window polling fallback also removes the known early-window
+  acceptance race. Product/provider data and installed-product pixels remain
+  explicitly unpromoted.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and

@@ -1405,7 +1405,11 @@
         "playground:current-sidebar-light-status-matrix",
         "browser-cdp:current-sidebar-light-status-matrix",
         "electron:current-sidebar-light-status-matrix",
-        "pixel:current-sidebar-light-status-matrix"
+        "pixel:current-sidebar-light-status-matrix",
+        "replay:current-26.915-sidebar-status-wide-compact-dark-light",
+        "browser-cdp:current-26.915-sidebar-status-wide-compact-dark-light",
+        "electron:current-26.915-sidebar-status-wide-compact-dark-light",
+        "pixel:current-26.915-sidebar-status-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
