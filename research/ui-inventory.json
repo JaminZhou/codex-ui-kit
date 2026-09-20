@@ -2485,7 +2485,8 @@
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp:browser-and-computer-use-settings"
+        "cdp:browser-and-computer-use-settings",
+        "cdp-26.915.31945:settings-browser-computer-use-read-only-geometry"
       ],
       "implementationStatus": "not_started",
       "browserStatus": "not_started",

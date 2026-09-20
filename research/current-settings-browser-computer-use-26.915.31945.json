@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "captureKind": "renderer_settings_read_only_geometry",
+  "appVersion": "26.915.31945",
+  "buildNumber": "9922",
+  "chromiumVersion": "153.0.8010.48",
+  "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  "sampledAt": "2026-09-21",
+  "nativeViewport": { "width": 2560, "height": 1318, "devicePixelRatio": 1 },
+  "navigation": { "left": 0, "top": 46, "width": 321.88, "height": 1272 },
+  "routes": [
+    {
+      "id": "settings.browser-computer-use",
+      "label": "Computer use",
+      "main": { "left": 321.88, "top": 0, "width": 2238.13, "height": 1318 },
+      "heading": { "text": "Computer use", "left": 1057.44, "top": 112, "width": 768, "height": 28.8 },
+      "headingStyle": { "fontFamily": "-apple-system, system-ui, Segoe UI, sans-serif", "fontSize": "24px", "fontWeight": "400", "lineHeight": "28.8px", "color": "rgb(255, 255, 255)" },
+      "controls": { "switches": 4, "radios": 0, "textboxes": 1, "buttons": 44, "sections": 2 },
+      "horizontalOverflow": 0
+    },
+    {
+      "id": "settings.browser-computer-use",
+      "label": "Browser",
+      "main": { "left": 321.88, "top": 0, "width": 2238.13, "height": 1318 },
+      "heading": { "text": "Browser", "left": 1057.44, "top": 112, "width": 768, "height": 28.8 },
+      "headingStyle": { "fontFamily": "-apple-system, system-ui, Segoe UI, sans-serif", "fontSize": "24px", "fontWeight": "400", "lineHeight": "28.8px", "color": "rgb(255, 255, 255)" },
+      "controls": { "switches": 5, "radios": 0, "textboxes": 1, "buttons": 60, "sections": 8 },
+      "horizontalOverflow": 0
+    }
+  ],
+  "observations": {
+    "readOnly": true,
+    "browserConnectionStarted": false,
+    "computerUseStarted": false,
+    "settingsChanged": false,
+    "privateValuesRecorded": false,
+    "productPixelsPromoted": false,
+    "compactNativeViewportProven": false
+  }
+}
