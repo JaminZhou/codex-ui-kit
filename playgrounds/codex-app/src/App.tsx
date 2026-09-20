@@ -759,6 +759,7 @@ function querySelection() {
     "project-navigation-current-26-915",
     "project-group-lifecycle-current-26-915",
     "project-actions-current-26-915",
+    "shell-current-26-915",
     "project-collapsed",
     "project-menu",
     "collection-empty",
@@ -7059,6 +7060,8 @@ export function App() {
     initialSelection.sidebarState === "project-group-lifecycle-current-26-915";
   const currentSidebarProjectActions26915Replay =
     initialSelection.sidebarState === "project-actions-current-26-915";
+  const currentSidebarShell26915Replay =
+    initialSelection.sidebarState === "shell-current-26-915";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -17940,6 +17943,9 @@ export function App() {
       data-current-sidebar-project-actions-26-915={
         currentSidebarProjectActions26915Replay || undefined
       }
+      data-current-sidebar-shell-26-915={
+        currentSidebarShell26915Replay || undefined
+      }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
@@ -18379,6 +18385,7 @@ export function App() {
                 currentSidebarProjectNavigation26915Replay ||
                 currentSidebarProjectGroupLifecycle26915Replay ||
                 currentSidebarProjectActions26915Replay ||
+                currentSidebarShell26915Replay ||
                 currentSidebarItemActions26915Replay ||
                 currentSidebarStatus26915Replay ||
                 currentSidebarThreadLifecycle ||

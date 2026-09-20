@@ -343,6 +343,12 @@ exit gates; it does not replace the inventory.
   submenu, Escape dismissal, trigger-focus return, and zero overflow. Browser/
   CDP computed-style checks, Electron interaction, and repeated screenshots pass
   with 0% own-fixture drift.
+- The same candidate now has a dedicated Sidebar shell matrix. Dark/light
+  1180×820 and 720×680 scenes verify the 321.875px titlebar-inset rail, the
+  70px Header/New chat block, 120px primary stack, 46px Footer, four current
+  sections, footer account plus Voice/Help actions, main-content boundary, and
+  zero horizontal overflow. Browser/CDP computed-style checks, Electron
+  structure, and repeated screenshots pass with 0% own-fixture drift.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
