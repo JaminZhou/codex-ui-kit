@@ -754,6 +754,7 @@ function querySelection() {
     "account-menu",
     "account-menu-current-26-915",
     "help-menu",
+    "help-menu-current-26-915",
     "project-collapsed",
     "project-menu",
     "collection-empty",
@@ -5027,7 +5028,10 @@ export function App() {
         : null,
     );
   const [currentSidebarHelpMenuOpen, setCurrentSidebarHelpMenuOpen] =
-    useState(initialSelection.sidebarState === "help-menu");
+    useState(
+      initialSelection.sidebarState === "help-menu" ||
+        initialSelection.sidebarState === "help-menu-current-26-915",
+    );
   const [currentSidebarAccountMenuOpen, setCurrentSidebarAccountMenuOpen] =
     useState(
       initialSelection.sidebarState === "account-menu" ||
@@ -7041,6 +7045,8 @@ export function App() {
     initialSelection.sidebarState === "item-actions-current-26-915";
   const currentSidebarAccount26915Replay =
     initialSelection.sidebarState === "account-menu-current-26-915";
+  const currentSidebarHelp26915Replay =
+    initialSelection.sidebarState === "help-menu-current-26-915";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -17907,6 +17913,9 @@ export function App() {
       data-current-sidebar-account-26-915={
         currentSidebarAccount26915Replay || undefined
       }
+      data-current-sidebar-help-26-915={
+        currentSidebarHelp26915Replay || undefined
+      }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
@@ -18341,7 +18350,8 @@ export function App() {
         sidebarWidth={
           view === "plugins"
             ? 322.875
-            : currentSidebarItemActions26915Replay ||
+            : currentSidebarHelp26915Replay ||
+                currentSidebarItemActions26915Replay ||
                 currentSidebarStatus26915Replay ||
                 currentSidebarThreadLifecycle ||
                 currentSidebarWorktreeLifecycle ||

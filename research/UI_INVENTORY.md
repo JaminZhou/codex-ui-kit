@@ -674,6 +674,13 @@ divider. Browser/CDP computed styles and Electron interaction verify the same
 contract, Escape returns focus to the account trigger, and repeated own-fixture
 captures stay at 0% drift. Account mutations remain replay-only.
 
+The 26.915 candidate also covers a dedicated Sidebar Help menu matrix in
+dark/light wide and 720px scenes. The eight-item What's new surface keeps one
+separator, nine exact icons, and a 320×272.06px menu. Browser/CDP computed
+styles and Electron interaction verify the same contract, Escape returns focus
+to the Help trigger, and repeated own-fixture captures stay at 0% drift.
+Support and release-note actions remain replay-only.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
