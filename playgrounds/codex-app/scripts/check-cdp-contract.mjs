@@ -156,7 +156,10 @@ for (const scene of selectedScenes) {
   const { app, page } = await launchScene(scene);
   const sidebarBaseId = scene.id.replace(/-light(-compact)?$/, "$1");
   try {
-    if (scene.id.startsWith("scheduled-current-26-903-detail")) {
+    if (
+      scene.id.startsWith("scheduled-current-26-903-detail") ||
+      scene.id.startsWith("scheduled-current-26-915-detail")
+    ) {
       const compact = scene.id.endsWith("-compact");
       const error = scene.id.includes("detail-error");
       const detail = page.getByRole("region", { name: "Scheduled task details" });
