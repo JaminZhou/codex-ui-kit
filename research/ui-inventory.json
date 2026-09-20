@@ -1323,7 +1323,11 @@
         "playground:current-sidebar-light-project-actions",
         "browser-cdp:current-sidebar-light-project-actions",
         "electron:current-sidebar-light-project-actions",
-        "pixel:current-sidebar-light-project-actions"
+        "pixel:current-sidebar-light-project-actions",
+        "playground:current-sidebar-project-actions-26-915",
+        "browser-cdp:current-sidebar-project-actions-26-915",
+        "electron:current-sidebar-project-actions-26-915",
+        "pixel:current-sidebar-project-actions-26-915"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1336,7 +1340,8 @@
         "cdp-26.825.31414:electron-native-project-menu-six-actions-three-separators-and-frozen-provider",
         "cdp-26.825.51511:electron-native-project-menu-section-submenu-provider-and-visible-252x187-plus-118x34-native-windows",
         "cdp-26.903.71938:project-action-trigger-native-boundary-items-unavailable",
-        "cdp-26.911.61220:project-action-trigger-native-boundary-items-unavailable"
+        "cdp-26.911.61220:project-action-trigger-native-boundary-items-unavailable",
+        "cdp-26.915.31945:project-actions-current-build-menu-submenu-icons-focus-dark-light"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

@@ -337,6 +337,12 @@ exit gates; it does not replace the inventory.
   hover actions, and zero horizontal overflow. Browser/CDP computed-style
   checks, Electron interaction, and repeated screenshots pass with 0%
   own-fixture drift.
+- The 26.915 candidate also has a dedicated project-actions matrix. Wide/720
+  dark/light scenes verify seven current-build icon sources, three separators,
+  the 252×212px menu, the conditional unread action, the 118×34px Section
+  submenu, Escape dismissal, trigger-focus return, and zero overflow. Browser/
+  CDP computed-style checks, Electron interaction, and repeated screenshots pass
+  with 0% own-fixture drift.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
