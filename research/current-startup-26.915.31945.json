@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "captureKind": "renderer_startup_poll",
+  "appVersion": "26.915.31945",
+  "buildNumber": "9922",
+  "chromiumVersion": "153.0.8010.48",
+  "appAsarBytes": 358872526,
+  "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  "sampledAt": "2026-09-21",
+  "viewport": {
+    "width": 2560,
+    "height": 1318,
+    "devicePixelRatio": 1
+  },
+  "sampleWindowMs": 15000,
+  "sampleCount": 150,
+  "transitions": [
+    {
+      "elapsedMs": 200,
+      "main": 0,
+      "navigation": 0,
+      "textbox": 0,
+      "status": 0,
+      "alert": 0,
+      "busy": 0,
+      "threadRows": 0,
+      "collectionLoadingSkeleton": 0
+    },
+    {
+      "elapsedMs": 3850,
+      "main": 1,
+      "navigation": 1,
+      "textbox": 1,
+      "status": 5,
+      "alert": 0,
+      "busy": 1,
+      "threadRows": 10,
+      "collectionLoadingSkeleton": 0
+    },
+    {
+      "elapsedMs": 4223,
+      "main": 1,
+      "navigation": 1,
+      "textbox": 1,
+      "status": 5,
+      "alert": 0,
+      "busy": 1,
+      "threadRows": 26,
+      "collectionLoadingSkeleton": 0
+    },
+    {
+      "elapsedMs": 4405,
+      "main": 1,
+      "navigation": 1,
+      "textbox": 1,
+      "status": 5,
+      "alert": 0,
+      "busy": 1,
+      "threadRows": 29,
+      "collectionLoadingSkeleton": 0
+    },
+    {
+      "elapsedMs": 10775,
+      "main": 1,
+      "navigation": 1,
+      "textbox": 1,
+      "status": 4,
+      "alert": 0,
+      "busy": 0,
+      "threadRows": 29,
+      "collectionLoadingSkeleton": 0
+    }
+  ],
+  "observations": {
+    "initialBlankRendererFrame": true,
+    "hydrationBusyBoundary": true,
+    "ordinaryErrorObserved": false,
+    "collectionLoadingSkeletonObserved": false,
+    "productPixelsPromoted": false,
+    "privateTextRecorded": false
+  }
+}
