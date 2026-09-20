@@ -695,6 +695,15 @@ labels, 305.875×30px row geometry, collapse/expand focus behavior, and zero
 horizontal overflow. Browser/CDP computed styles and Electron interaction
 verify the same contract, while repeated own-fixture captures stay at 0% drift.
 
+The same 26.915 candidate now has a dedicated project-group lifecycle matrix in
+dark/light wide and 720px scenes. It verifies the five `aria-expanded` groups,
+the nine depth-one task rows, selected `codex-ui-kit` and unread
+`design-assets` states, 30px row geometry, and `aria-controls` ownership. Space
+collapse/expand preserves group focus, pointer hover reveals the action slot,
+and the sidebar remains contained with zero horizontal overflow. Browser/CDP
+computed styles and Electron interaction repeat the contract; own-fixture
+screenshots remain at 0% drift.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,

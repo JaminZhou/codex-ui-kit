@@ -1290,7 +1290,11 @@
         "playground:current-sidebar-light-project-group-lifecycle",
         "browser-cdp:current-sidebar-light-project-group-lifecycle",
         "electron:current-sidebar-light-project-group-lifecycle",
-        "pixel:current-sidebar-light-project-group-lifecycle"
+        "pixel:current-sidebar-light-project-group-lifecycle",
+        "playground:current-sidebar-project-group-lifecycle-26-915",
+        "browser-cdp:current-sidebar-project-group-lifecycle-26-915",
+        "electron:current-sidebar-project-group-lifecycle-26-915",
+        "pixel:current-sidebar-project-group-lifecycle-26-915"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1302,7 +1306,8 @@
         "cdp-26.825.31414:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration",
         "cdp-26.825.51511:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration",
         "cdp-26.903.71938:project-group-pointer-enter-space-focus-continuity",
-        "cdp-26.911.61220:project-group-pointer-enter-space-focus-continuity"
+        "cdp-26.911.61220:project-group-pointer-enter-space-focus-continuity",
+        "cdp-26.915.31945:project-group-lifecycle-current-build-wide-compact-dark-light"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
