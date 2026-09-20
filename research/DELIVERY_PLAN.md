@@ -2050,6 +2050,13 @@ cover the five lifecycle frames. Credential exchange, browser navigation,
 account discovery, and first-run persistence remain host-owned; this slice is
 not evidence that the installed product's authentication flow was executed.
 
+A 2026-09-21 current-build route probe records the boundary explicitly in
+[`current-onboarding-26.915.31945.json`](current-onboarding-26.915.31945.json):
+`/login` resolves to the authenticated shell, while `/onboarding` exposes only
+a status region and no LoginPage controls. This is negative reachability
+evidence, not an installed LoginPage capture; credential exchange, native auth
+handoff, first-run persistence, and product pixels remain open.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 
