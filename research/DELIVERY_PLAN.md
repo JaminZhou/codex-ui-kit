@@ -330,6 +330,13 @@ exit gates; it does not replace the inventory.
   geometry, collapse/expand focus continuity, and zero horizontal overflow.
   Browser/CDP computed-style checks, Electron interaction, and repeated
   screenshots pass with 0% own-fixture drift.
+- The same 26.915 candidate now has a dedicated project-group lifecycle matrix.
+  Wide/720 dark/light scenes verify five `aria-expanded` groups, selected
+  `codex-ui-kit`, unread `design-assets`, nine depth-one task rows, 30px rows,
+  `aria-controls` ownership, Space collapse/expand focus continuity, pointer
+  hover actions, and zero horizontal overflow. Browser/CDP computed-style
+  checks, Electron interaction, and repeated screenshots pass with 0%
+  own-fixture drift.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
