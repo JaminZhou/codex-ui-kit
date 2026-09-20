@@ -1368,7 +1368,11 @@
         "replay:current-26.915-sidebar-thread-history-wide-compact-dark-light",
         "browser-cdp:current-26.915-sidebar-thread-history-wide-compact-dark-light",
         "electron:current-26.915-sidebar-thread-history-wide-compact-dark-light",
-        "pixel:current-26.915-sidebar-thread-history-own-fixture-zero-drift"
+        "pixel:current-26.915-sidebar-thread-history-own-fixture-zero-drift",
+        "replay:current-26.915-sidebar-collection-loading-error-empty-long-list-wide-compact-dark-light",
+        "browser-cdp:current-26.915-sidebar-collection-loading-error-empty-long-list-wide-compact-dark-light",
+        "electron:current-26.915-sidebar-collection-loading-error-empty-long-list-wide-compact-dark-light",
+        "pixel:current-26.915-sidebar-collection-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

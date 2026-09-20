@@ -767,6 +767,10 @@ function querySelection() {
     "collection-loading",
     "collection-error",
     "collection-long-list",
+    "collection-lifecycle-current-26-915-loading",
+    "collection-lifecycle-current-26-915-error",
+    "collection-lifecycle-current-26-915-empty",
+    "collection-lifecycle-current-26-915-long-list",
     "status-lifecycle",
     "status-lifecycle-current-26-915",
     "item-actions-current-26-915",
@@ -3472,6 +3476,23 @@ function initialCurrentWorktreeSetupPhase(
 
 function currentWorktreeSetupFrame(frame: string | null) {
   return frame?.startsWith("current-worktree-setup-") ?? false;
+}
+
+type CurrentSidebarCollection26915State =
+  | "loading"
+  | "error"
+  | "empty"
+  | "long-list";
+
+function currentSidebarCollection26915State(
+  sidebarState: string | null,
+): CurrentSidebarCollection26915State | null {
+  const prefix = "collection-lifecycle-current-26-915-";
+  if (!sidebarState?.startsWith(prefix)) return null;
+  const state = sidebarState.slice(prefix.length);
+  return ["loading", "error", "empty", "long-list"].includes(state)
+    ? (state as CurrentSidebarCollection26915State)
+    : null;
 }
 
 function currentSidebarTaskStatus(projectId: string, taskIndex: number) {
@@ -7071,6 +7092,8 @@ export function App() {
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
   const currentSidebarThreadHistory26915Replay =
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
+  const currentSidebarCollection26915Replay =
+    currentSidebarCollection26915State(initialSelection.sidebarState);
   const currentSidebarWorktreeLifecycle =
     initialSelection.sidebarState === "worktree-lifecycle-current" ||
     initialSelection.sidebarState === "worktree-lifecycle-current-26-915";
@@ -7142,7 +7165,8 @@ export function App() {
     Object.values(replayScenarios) as ReplayScenario[]
   ).slice(
     0,
-    initialSelection.sidebarState === "collection-long-list"
+    initialSelection.sidebarState === "collection-long-list" ||
+      currentSidebarCollection26915Replay === "long-list"
       ? 12
       : currentSidebarComposition
         ? 6
@@ -7157,7 +7181,8 @@ export function App() {
             tasks: currentSidebarWorktreeTasks,
           },
         ]
-      : initialSelection.sidebarState === "collection-empty"
+      : initialSelection.sidebarState === "collection-empty" ||
+          currentSidebarCollection26915Replay === "empty"
       ? [
           {
             id: "protocol-client",
@@ -7599,15 +7624,25 @@ export function App() {
       }
       titlebarInset
     >
-      {initialSelection.sidebarState === "collection-loading" ? (
+      {initialSelection.sidebarState === "collection-loading" ||
+      currentSidebarCollection26915Replay === "loading" ? (
         <AppSidebarCollection
-          data-sidebar-collection-fixture="loading"
+          data-sidebar-collection-fixture={
+            currentSidebarCollection26915Replay
+              ? "current-26-915-loading"
+              : "loading"
+          }
           isLoading
           loadingLabel="Loading chats"
         />
-      ) : initialSelection.sidebarState === "collection-error" ? (
+      ) : initialSelection.sidebarState === "collection-error" ||
+        currentSidebarCollection26915Replay === "error" ? (
         <AppSidebarCollection
-          data-sidebar-collection-fixture="error"
+          data-sidebar-collection-fixture={
+            currentSidebarCollection26915Replay
+              ? "current-26-915-error"
+              : "error"
+          }
           error="Could not load chats"
         />
       ) : (
@@ -7778,7 +7813,11 @@ export function App() {
             >
               {project.tasks.length === 0 ? (
                 <AppSidebarCollection
-                  data-sidebar-collection-fixture="empty"
+                  data-sidebar-collection-fixture={
+                    currentSidebarCollection26915Replay === "empty"
+                      ? "current-26-915-empty"
+                      : "empty"
+                  }
                   emptyState="No chats"
                 />
               ) : [
@@ -8041,10 +8080,15 @@ export function App() {
           runningIds={Object.entries(liveProjects.threads).filter(([, thread]) => isTurnActive(thread.status)).map(([id]) => id)}
           onSelect={(id) => void openLiveHistory(id)} /> : currentSidebarThreadLifecycle
           ? null
-          : initialSelection.sidebarState === "collection-long-list"
+          : initialSelection.sidebarState === "collection-long-list" ||
+              currentSidebarCollection26915Replay === "long-list"
             ? (
                 <AppSidebarCollection
-                  data-sidebar-collection-fixture="long-list"
+                  data-sidebar-collection-fixture={
+                    currentSidebarCollection26915Replay === "long-list"
+                      ? "current-26-915-long-list"
+                      : "long-list"
+                  }
                   maxItems={5}
                 >
                   {sidebarRecentItems}
@@ -17958,6 +18002,9 @@ export function App() {
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
+      data-current-sidebar-collection-26-915={
+        currentSidebarCollection26915Replay || undefined
+      }
       data-current-sidebar-worktree-26-915={
         currentSidebarWorktree26915Replay || undefined
       }
@@ -18399,6 +18446,7 @@ export function App() {
                 currentSidebarItemActions26915Replay ||
                 currentSidebarStatus26915Replay ||
                 currentSidebarThreadLifecycle ||
+                currentSidebarCollection26915Replay ||
                 currentSidebarWorktreeLifecycle ||
                 currentContext26825Replay ||
                 isCurrentShellFrame(initialSelection.frame) ||

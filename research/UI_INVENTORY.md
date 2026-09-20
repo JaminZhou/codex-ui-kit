@@ -634,6 +634,17 @@ overflow. Repeated own-fixture captures stay at 0% drift. This adds current
 surface; row contents, provider state, and installed-product pixels remain
 explicitly unpromoted.
 
+The same 26.915 candidate now has a dedicated Sidebar collection lifecycle
+replay. Loading skeleton, failed read (`role="alert"`), empty project
+collection, and the one-way long-list `Show more` boundary are exercised at
+1180/720 widths in both themes. The controlled route keeps the current
+`321.875px` rail, zero horizontal overflow, accessible state roles, and the
+five-to-twelve item expansion contract; repeated Electron captures stay at
+0% own-fixture drift. This is current-build structural replay evidence only:
+ordinary collection loading/error still needs a fresh installed-product
+observation before promotion, and provider data and product pixels remain
+unpromoted.
+
 The 26.915 candidate separately covers the Sidebar status-indicator matrix in
 dark/light wide and 720px scenes. Active, waiting, error, unread, queued,
 creating, setting-up, and error-plus-unread rows retain the current 321.875px
