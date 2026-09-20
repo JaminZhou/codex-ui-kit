@@ -154,7 +154,7 @@ export function Example() {
 | [Interactive primitives](docs/COMPONENTS.md#interactive-primitives) | Buttons, dialogs, menus, selects, popovers, tooltips |
 | [Resources and media](docs/COMPONENTS.md#resources-and-media) | Resource cards, document previews, sources, artifacts, generated images |
 | [Navigation and shell](docs/COMPONENTS.md#navigation-and-shell) | Application/sidebar shell, workspace tabs, thread header and overflow actions, thread-summary panel, navigation rail, floating controls |
-| [Settings](docs/COMPONENTS.md#settings) | Full-page Settings shell/search, controlled preferences, Usage & billing, embedded plan selection, and MCP server management |
+| [Settings](docs/COMPONENTS.md#settings) | Full-page Settings shell/search, controlled preferences including Browser and Computer use, Usage & billing, embedded plan selection, and MCP server management |
 | [Workspace and PR workflow](docs/COMPONENTS.md#workspace-and-pull-request-workflow) | Terminal session primitives, project index, new-chat destination/context, local environments, protocol-neutral routing/worktree selectors, PR lists, details, checks, reviewers, and threads |
 
 See the [complete component reference](docs/COMPONENTS.md) for behavior, state, and composition details.

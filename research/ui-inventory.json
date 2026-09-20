@@ -2114,8 +2114,8 @@
         "cdp-26.903.71938:real-two-page-pdf-canvas-preview-pagination-zoom-fit-annotation-mode-wide-and-compact-fourteen-renderer-states"
       ],
       "implementationStatus": "partial",
-      "browserStatus": "verified",
-      "electronStatus": "verified",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p1"
     },
     {
@@ -2481,16 +2481,22 @@
       "packageEvidence": [
         "browser-use-settings",
         "computer-use-settings",
-        "browser-profile-import-dialog"
+        "browser-profile-import-dialog",
+        "component:BrowserComputerUseSettingsPage",
+        "playground:workspace-browser-computer-use-settings-wide-compact",
+        "browser-cdp:workspace-browser-computer-use-settings-wide-compact",
+        "electron:workspace-browser-computer-use-settings-wide-compact",
+        "pixel:workspace-browser-computer-use-settings-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp:browser-and-computer-use-settings",
-        "cdp-26.915.31945:settings-browser-computer-use-read-only-geometry"
+        "cdp-26.915.31945:settings-browser-computer-use-read-only-geometry",
+        "cdp:workspace-browser-computer-use-settings-wide-compact-controlled-switches"
       ],
-      "implementationStatus": "not_started",
-      "browserStatus": "not_started",
-      "electronStatus": "not_started",
+      "implementationStatus": "partial",
+      "browserStatus": "partial_legacy",
+      "electronStatus": "partial_legacy",
       "priority": "p2"
     },
     {

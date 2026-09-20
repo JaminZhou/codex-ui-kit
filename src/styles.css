@@ -163,6 +163,8 @@
 .codex-ui-hooks-settings *,
 .codex-ui-code-review-settings,
 .codex-ui-code-review-settings *,
+.codex-ui-browser-computer-use-settings,
+.codex-ui-browser-computer-use-settings *,
 .codex-ui-appearance-settings,
 .codex-ui-appearance-settings *,
 .codex-ui-personalization-settings,
@@ -476,6 +478,11 @@
   outline-offset: 1px;
 }
 
+.codex-ui-browser-computer-use-settings button:focus-visible {
+  outline: 2px solid var(--codex-ui-focus);
+  outline-offset: 1px;
+}
+
 .codex-ui-git-settings {
   margin: 0 auto;
   max-width: 48rem;
@@ -699,6 +706,151 @@
 
 .codex-ui-git-settings__instructions textarea::placeholder {
   color: var(--codex-ui-text-secondary);
+}
+
+.codex-ui-browser-computer-use-settings {
+  margin: 0 auto;
+  max-width: 48rem;
+  padding: 1.25rem 0 2rem;
+  width: calc(100% - 2.5rem);
+}
+
+.codex-ui-browser-computer-use-settings__header {
+  margin-bottom: 2rem;
+}
+
+.codex-ui-browser-computer-use-settings__header h1 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.8rem;
+  margin: 0;
+}
+
+.codex-ui-browser-computer-use-settings__header p {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin: 0.5rem 0 0;
+}
+
+.codex-ui-browser-computer-use-settings__status {
+  align-items: center;
+  background: rgb(98 159 255 / 10%);
+  border: 1px solid rgb(98 159 255 / 20%);
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin: -1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-browser-computer-use-settings__status[role="alert"] {
+  background: rgb(255 102 102 / 10%);
+  border-color: rgb(255 102 102 / 24%);
+}
+
+.codex-ui-browser-computer-use-settings__status button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+}
+
+.codex-ui-browser-computer-use-settings__sections {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.codex-ui-browser-computer-use-settings__section {
+  background: var(--codex-ui-settings-card-background);
+  border: 1px solid
+    light-dark(var(--codex-ui-border-heavy), rgb(255 255 255 / 0.16));
+  border-radius: 1.0625rem;
+  overflow: hidden;
+}
+
+.codex-ui-browser-computer-use-settings__section > header {
+  padding: 1rem 1rem 0.75rem;
+}
+
+.codex-ui-browser-computer-use-settings__section h2 {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  margin: 0;
+}
+
+.codex-ui-browser-computer-use-settings__section > header p,
+.codex-ui-browser-computer-use-settings__row p {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  margin: 0.125rem 0 0;
+}
+
+.codex-ui-browser-computer-use-settings__row {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  min-height: 3.78515625rem;
+  padding: 0.75rem 1rem;
+}
+
+.codex-ui-browser-computer-use-settings__row +
+  .codex-ui-browser-computer-use-settings__row {
+  border-top: 1px solid
+    light-dark(var(--codex-ui-border), rgb(255 255 255 / 0.11));
+}
+
+.codex-ui-browser-computer-use-settings__row > div:first-child {
+  min-width: 0;
+}
+
+.codex-ui-browser-computer-use-settings__row > div:first-child > span {
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.codex-ui-browser-computer-use-settings__switch {
+  appearance: none;
+  background: light-dark(var(--codex-ui-gray-300), #3a3a3a);
+  border: 0;
+  border-radius: var(--codex-ui-radius-full);
+  cursor: pointer;
+  flex: 0 0 2rem;
+  height: 1.25rem;
+  padding: 0.125rem;
+  transition: background var(--codex-ui-transition);
+  width: 2rem;
+}
+
+.codex-ui-browser-computer-use-settings__switch > span {
+  background: #fff;
+  border-radius: 50%;
+  display: block;
+  height: 1rem;
+  transform: translateX(0);
+  transition: transform var(--codex-ui-transition);
+  width: 1rem;
+}
+
+.codex-ui-browser-computer-use-settings__switch[aria-checked="true"] {
+  background: var(--codex-ui-blue-400);
+}
+
+.codex-ui-browser-computer-use-settings__switch[aria-checked="true"] > span {
+  transform: translateX(0.75rem);
+}
+
+.codex-ui-browser-computer-use-settings[data-disabled="true"] button,
+.codex-ui-browser-computer-use-settings button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .codex-ui-hooks-settings,

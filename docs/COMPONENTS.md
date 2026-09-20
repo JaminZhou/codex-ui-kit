@@ -315,6 +315,11 @@ All privileged behavior remains host-owned. The components never auto-approve co
   and a separately labelled main landmark. Search terms and result descriptions
   remain host data so the component does not own product routes or private
   preferences.
+- `BrowserComputerUseSettingsPage`: controlled Browser or Computer use
+  settings cards with responsive sections, switch semantics, loading/error
+  status, retry, and host-owned persistence. The component models the public
+  route boundary only; provider/device execution and account preferences stay
+  with the host.
 - `GitSettingsPage`: controlled Branch prefix, Merge/Squash, force-push,
   draft-PR, review-delivery, commit-instruction, and pull-request-instruction
   presentation. Saving feedback, retry copy, and busy-state locking are
