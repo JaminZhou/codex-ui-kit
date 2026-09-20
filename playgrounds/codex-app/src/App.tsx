@@ -756,6 +756,7 @@ function querySelection() {
     "help-menu",
     "help-menu-current-26-915",
     "primary-navigation-current-26-915",
+    "project-navigation-current-26-915",
     "project-collapsed",
     "project-menu",
     "collection-empty",
@@ -7050,6 +7051,8 @@ export function App() {
     initialSelection.sidebarState === "help-menu-current-26-915";
   const currentSidebarPrimaryNavigation26915Replay =
     initialSelection.sidebarState === "primary-navigation-current-26-915";
+  const currentSidebarProjectNavigation26915Replay =
+    initialSelection.sidebarState === "project-navigation-current-26-915";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -17922,6 +17925,9 @@ export function App() {
       data-current-sidebar-primary-navigation-26-915={
         currentSidebarPrimaryNavigation26915Replay || undefined
       }
+      data-current-sidebar-project-navigation-26-915={
+        currentSidebarProjectNavigation26915Replay || undefined
+      }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
@@ -18358,6 +18364,7 @@ export function App() {
             ? 322.875
             : currentSidebarHelp26915Replay ||
                 currentSidebarPrimaryNavigation26915Replay ||
+                currentSidebarProjectNavigation26915Replay ||
                 currentSidebarItemActions26915Replay ||
                 currentSidebarStatus26915Replay ||
                 currentSidebarThreadLifecycle ||
