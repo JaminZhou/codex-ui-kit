@@ -1510,7 +1510,11 @@
         "playground:current-sidebar-light-help-menu",
         "browser-cdp:current-sidebar-light-help-menu",
         "electron:current-sidebar-light-help-menu",
-        "pixel:current-sidebar-light-help-menu"
+        "pixel:current-sidebar-light-help-menu",
+        "replay:current-26.915-sidebar-help-wide-compact-dark-light",
+        "browser-cdp:current-26.915-sidebar-help-wide-compact-dark-light",
+        "electron:current-26.915-sidebar-help-wide-compact-dark-light",
+        "pixel:current-26.915-sidebar-help-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

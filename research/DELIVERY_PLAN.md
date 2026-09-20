@@ -312,6 +312,12 @@ exit gates; it does not replace the inventory.
   divider, Escape focus return, and zero horizontal overflow. Browser/CDP
   computed-style checks, Electron interaction, and repeated screenshots pass
   with 0% own-fixture drift; account mutations remain replay-only.
+- The 26.915 candidate also has a dedicated Sidebar Help menu matrix.
+  Wide/720 dark/light scenes verify the eight-item What's new menu, one
+  separator, nine exact icons, 320×272.06px geometry, Escape focus return, and
+  zero horizontal overflow. Browser/CDP computed-style checks, Electron
+  interaction, and repeated screenshots pass with 0% own-fixture drift;
+  support/release-note actions remain replay-only.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
