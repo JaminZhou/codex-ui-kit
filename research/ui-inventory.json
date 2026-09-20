@@ -1476,7 +1476,11 @@
         "replay:current-26.915-sidebar-worktree-wide-compact-dark-light",
         "browser-cdp:current-26.915-sidebar-worktree-wide-compact-dark-light",
         "electron:current-26.915-sidebar-worktree-wide-compact-dark-light",
-        "pixel:current-26.915-sidebar-worktree-own-fixture-zero-drift"
+        "pixel:current-26.915-sidebar-worktree-own-fixture-zero-drift",
+        "replay:current-26.915-worktree-setup-queued-creating-failed-created",
+        "browser-cdp:current-26.915-worktree-setup-queued-creating-failed-created",
+        "electron:current-26.915-worktree-setup-queued-creating-failed-created",
+        "pixel:current-26.915-worktree-setup-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
