@@ -712,6 +712,15 @@ menu and submenu boundaries, keyboard Escape dismissal, trigger-focus return,
 and zero overflow across dark/light wide and 720px scenes. Electron repeats the
 interaction and own-fixture screenshots remain at 0% drift.
 
+The same candidate now has a dedicated Sidebar shell matrix. Across dark/light
+1180×820 and 720×680 scenes, the titlebar-inset rail is 321.875px wide, the
+Header/New chat block is 70px high, the primary stack is 120px, the Footer is
+46px, and the navigation viewport owns the remaining height. The four current
+sections (`Pinned`, `Projects`, `Recents`, and `Connection`), footer account and
+Voice/Help actions, main-content boundary, and zero horizontal overflow are
+verified through Browser/CDP computed styles and Electron. Repeated screenshots
+remain at 0% own-fixture drift.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
