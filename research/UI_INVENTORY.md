@@ -431,7 +431,10 @@ hash. Its three older suggestion templates are absent in this build; the
 sanitized record `research/current-automations-26.915.31945.json` records that
 absence explicitly. This is still read-only current-build evidence; the
 1180×820/720×680 replay, Electron, pixel, cloud persistence, delivery,
-permissions, and mutation effects remain separately scoped.
+permissions, and mutation effects remain separately scoped. The private
+playground now adds current-marked ready and permission-error detail replay
+states with Run/Retry, Pause/Resume, Edit, and Save interactions; the replay
+boundary is documented in `research/26.915.31945-automations-detail-replay.md`.
 
 The current package exposes candidates far beyond the old transcript sample:
 application and thread shells, local/remote conversation routes, projects and

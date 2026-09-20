@@ -48,12 +48,47 @@ const scenes = [
     view: "automations",
     windowSize: { height: 820, width: 720 },
   },
+  {
+    frame: "scheduled-current-26-915-detail",
+    id: "scheduled-current-26-915-detail",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "scheduled-current-26-915-detail",
+    id: "scheduled-current-26-915-detail-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
+  {
+    frame: "scheduled-current-26-915-detail-error",
+    id: "scheduled-current-26-915-detail-error",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "scheduled-current-26-915-detail-error",
+    id: "scheduled-current-26-915-detail-error-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    theme: "dark",
+    view: "automations",
+    windowSize: { height: 820, width: 720 },
+  },
 ];
 
 async function inspect(scene) {
   const { app, page } = await launchScene(scene, { capture: false });
   try {
     const compact = scene.windowSize.width === 720;
+    const detail = scene.frame.includes("detail");
     const manual = scene.frame.endsWith("manual");
     const contract = await page.evaluate((isManual) => {
       const rect = (element) => {
@@ -67,10 +102,9 @@ async function inspect(scene) {
         };
       };
       const root = document.querySelector(
-        isManual
-          ? ".codex-ui-scheduled-task-navigator"
-          : ".codex-ui-scheduled-tasks",
+        isManual ? ".codex-ui-scheduled-task-navigator" : ".codex-ui-scheduled-tasks",
       );
+      const detail = document.querySelector(".codex-ui-scheduled-task-detail");
       const pageRoot = document.querySelector(".demo-current-scheduled-route");
       const navigator = document.querySelector(
         ".codex-ui-scheduled-task-navigator",
@@ -78,6 +112,10 @@ async function inspect(scene) {
       const editor = document.querySelector(".codex-ui-scheduled-task-editor");
       return {
         editor: rect(editor),
+        detail: rect(detail),
+        detailFacts: detail?.querySelectorAll(".codex-ui-scheduled-task-detail__facts > div").length ?? 0,
+        detailStatus: detail?.getAttribute("data-status"),
+        detailTitle: detail?.querySelector("h2")?.textContent?.trim(),
         filters: [...(root?.querySelectorAll(".codex-ui-scheduled-task-filters [role=tab]") ?? [])]
           .map((button) => button.textContent?.trim()),
         frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
@@ -98,7 +136,31 @@ async function inspect(scene) {
     assert.equal(contract.frame, scene.frame);
     assert.equal(contract.horizontalOverflow, 0);
 
-    if (manual) {
+    if (detail) {
+      assert.ok(contract.detail);
+      assert.equal(contract.detailFacts, 4);
+      assert.equal(contract.detailTitle, "Workspace brief");
+      assert.equal(
+        contract.detailStatus,
+        scene.frame.includes("detail-error") ? "error" : "ready",
+      );
+      assert.ok(Math.abs(contract.detail.width - (compact ? 680 : 768)) <= 3);
+      const detailRoot = page.getByRole("region", { name: "Scheduled task details" });
+      if (scene.frame.includes("detail-error")) {
+        await detailRoot.getByRole("button", { name: "Retry" }).click();
+      } else {
+        await detailRoot.getByRole("button", { name: "Run now" }).click();
+      }
+      await page.locator('.codex-ui-scheduled-task-detail[data-status="ready"]').waitFor();
+      await detailRoot.getByRole("button", { name: "Pause" }).click();
+      await detailRoot.getByRole("button", { name: "Resume" }).waitFor();
+      await detailRoot.getByRole("button", { name: "Edit" }).click();
+      const editorRoot = page.getByRole("region", { name: "Scheduled task editor" });
+      await editorRoot.getByRole("textbox", { name: "Name" }).fill("Workspace brief revised");
+      await editorRoot.getByRole("textbox", { name: "Instructions" }).fill("Run workspace brief revised");
+      await editorRoot.getByRole("button", { name: "Save" }).click();
+      await page.getByRole("region", { name: "Scheduled task details" }).waitFor();
+    } else if (manual) {
       assert.ok(contract.navigator && contract.editor);
       assert.ok(
         Math.abs(contract.navigator.width - (compact ? 374 : 437.125)) <= 1.5,

@@ -2733,7 +2733,12 @@ without confusing package readiness with full product reconstruction.
     728px/679px search geometry at 1180px/720px. A targeted Electron/CDP gate
     repeats wide/compact and manual-editor scenes with 0% own-fixture drift;
     this promotes deterministic replay stability only, not cloud persistence,
-    permission delivery, task execution, or installed-product pixels. Plugin detail
+    permission delivery, task execution, or installed-product pixels. The same
+    current-marked replay now adds ready and permission-error detail scenes at
+    wide/720px sizes, exercising Run/Retry, Pause/Resume, Edit, and Save through
+    CDP, Electron, and four zero-drift regional baselines. This remains a
+    host-controlled replay boundary; installed detail reachability, cloud
+    persistence, delivery, permissions, and execution are still open. Plugin detail
     is now separately delivered for installed/discovery identity, suggestions,
     Apps, Information, disclosure, bottom scrolling, controlled uninstall and
     connection menus, wide/720 Browser/CDP, Electron, and eight local-only

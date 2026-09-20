@@ -2670,7 +2670,11 @@
         "playground:scheduled-current-26-915-wide-compact-and-manual",
         "browser-cdp:scheduled-current-26-915-wide-compact-and-manual",
         "electron:scheduled-current-26-915-wide-compact-and-manual",
-        "pixel:scheduled-current-26-915-own-fixture-zero-drift"
+        "pixel:scheduled-current-26-915-own-fixture-zero-drift",
+        "playground:scheduled-current-26-915-detail-ready-error-wide-compact",
+        "browser-cdp:scheduled-current-26-915-detail-ready-error-wide-compact",
+        "electron:scheduled-current-26-915-detail-ready-error-wide-compact",
+        "pixel:scheduled-current-26-915-detail-ready-error-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
