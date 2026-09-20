@@ -2138,7 +2138,8 @@
         "pixel:current-26.915-document-media-shell-zero-drift",
         "browser-cdp:workspace-document-preview-format-matrix",
         "electron:workspace-document-preview-format-matrix",
-        "pixel:workspace-document-preview-format-matrix"
+        "pixel:workspace-document-preview-format-matrix",
+        "cdp-26.915.31945:document-image-artifact-deep-links-generic-status-only-negative"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
@@ -2163,7 +2164,8 @@
         "pixel:workspace-image-preview-wide-compact",
         "replay:current-26.915-document-media-shell-321.875-wide-compact",
         "electron:current-26.915-document-media-shell-geometry",
-        "pixel:current-26.915-document-media-shell-zero-drift"
+        "pixel:current-26.915-document-media-shell-zero-drift",
+        "cdp-26.915.31945:document-image-artifact-deep-links-generic-status-only-negative"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "captureKind": "renderer_route_reachability_probe",
+  "appVersion": "26.915.31945",
+  "buildNumber": "9922",
+  "chromiumVersion": "153.0.8010.48",
+  "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  "sampledAt": "2026-09-21",
+  "nativeViewport": {
+    "width": 2560,
+    "height": 1318,
+    "devicePixelRatio": 1
+  },
+  "sampleWindowMsPerRoute": 15000,
+  "routes": [
+    {
+      "initialRoute": "/workspace-document-preview",
+      "snapshots": [
+        { "elapsedMs": 250, "main": 0, "navigation": 0, "statuses": 0, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 },
+        { "elapsedMs": 3000, "main": 0, "navigation": 0, "statuses": 1, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 },
+        { "elapsedMs": 15000, "main": 1, "navigation": 0, "statuses": 1, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 }
+      ],
+      "result": "generic-status-only-route-no-document-preview"
+    },
+    {
+      "initialRoute": "/workspace-image-preview",
+      "snapshots": [
+        { "elapsedMs": 250, "main": 0, "navigation": 0, "statuses": 0, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 },
+        { "elapsedMs": 3000, "main": 0, "navigation": 0, "statuses": 1, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 },
+        { "elapsedMs": 15000, "main": 1, "navigation": 0, "statuses": 1, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 }
+      ],
+      "result": "generic-status-only-route-no-image-preview"
+    },
+    {
+      "initialRoute": "/artifact",
+      "snapshots": [
+        { "elapsedMs": 250, "main": 0, "navigation": 0, "statuses": 0, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 },
+        { "elapsedMs": 3000, "main": 0, "navigation": 0, "statuses": 1, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 },
+        { "elapsedMs": 15000, "main": 1, "navigation": 0, "statuses": 1, "alerts": 0, "dialogs": 0, "inputs": 0, "buttons": 0, "busy": 0, "dataFrames": 0, "dataTestIds": 0 }
+      ],
+      "result": "generic-status-only-route-no-artifact-preview"
+    }
+  ],
+  "observations": {
+    "credentialsEntered": false,
+    "authenticationClicked": false,
+    "privateTextRecorded": false,
+    "productPixelsPromoted": false,
+    "documentPreviewRuntimeObserved": false,
+    "imagePreviewRuntimeObserved": false,
+    "artifactPreviewRuntimeObserved": false,
+    "compactProductViewportProven": false
+  }
+}

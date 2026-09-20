@@ -394,6 +394,15 @@ generated-image routes with dedicated CDP, Electron, and zero-drift pixel
 contracts. This extends current-build structural evidence without promoting
 installed-product document decoding, image generation, or product pixels.
 
+A 2026-09-21 current-build CDP probe also tested document, image, and artifact
+deep links. All three settled on a generic status-only surface with no
+preview panel or artifact selection controls; the native viewport stayed
+`2560×1318`. The negative record is
+[`current-document-media-26.915.31945.json`](current-document-media-26.915.31945.json).
+It keeps `workspace.document-previews` and `workspace.media-generated-content`
+at `runtimeStatus: not_sampled`: controlled replay is verified, but installed
+decoding, generation, and product pixels are not.
+
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32
 search, four 28px filters, three Pause rows, and the three visible suggestion
