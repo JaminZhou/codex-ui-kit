@@ -674,6 +674,14 @@ divider. Browser/CDP computed styles and Electron interaction verify the same
 contract, Escape returns focus to the account trigger, and repeated own-fixture
 captures stay at 0% drift. Account mutations remain replay-only.
 
+The current Footer/account follow-up now mounts that same menu from the
+`sidebar-current` 321.875px rail rather than the older home-frame shell. It
+locks the 305.875×188.375px portal, 29px account trigger, footer Voice/Help
+actions, five current-build icons, dark/light 1180×820 and 720×680 geometry,
+zero overflow, and Escape/focus return. Browser/CDP and Electron repeat the
+contract; own-fixture screenshots remain at 0% drift. Account and Settings
+mutations remain host-owned.
+
 The 26.915 candidate also covers a dedicated Sidebar Help menu matrix in
 dark/light wide and 720px scenes. The eight-item What's new surface keeps one
 separator, nine exact icons, and a 320×272.06px menu. Browser/CDP computed

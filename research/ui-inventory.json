@@ -1506,7 +1506,11 @@
         "playground:current-sidebar-light-footer-context",
         "browser-cdp:current-sidebar-light-footer-context",
         "electron:current-sidebar-light-footer-context",
-        "pixel:current-sidebar-light-footer-context"
+        "pixel:current-sidebar-light-footer-context",
+        "playground:current-sidebar-footer-account-26-915",
+        "browser-cdp:current-sidebar-footer-account-26-915",
+        "electron:current-sidebar-footer-account-26-915",
+        "pixel:current-sidebar-footer-account-26-915"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1519,7 +1523,8 @@
         "cdp-26.818.41509:fixed-footer-voice-help-and-zero-settings-controls",
         "cdp-26.818.41509:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-zero-role-separators-zero-overflow-and-escape-focus-return",
         "cdp-26.820.60940:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-menu-surface-focus-400-weight-zero-role-separators-zero-overflow-and-escape-focus-return",
-        "cdp-26.825.51511:account-menu-system-restored-dark-light-wide-compact-six-items-305.875x188.375-400-weight-zero-overflow-and-escape-focus-return"
+        "cdp-26.825.51511:account-menu-system-restored-dark-light-wide-compact-six-items-305.875x188.375-400-weight-zero-overflow-and-escape-focus-return",
+        "cdp-26.915.31945:sidebar-footer-account-current-build-menu-wide-compact-dark-light-focus-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
