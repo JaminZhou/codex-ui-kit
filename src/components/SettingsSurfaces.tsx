@@ -2103,6 +2103,8 @@ export interface GeneralSettingsValue {
   ambientSuggestions?: boolean;
   /** @deprecated Not shown by the current General settings surface. */
   autoReview?: boolean;
+  /** Whether the conversation audio visualizer is enabled. */
+  audioVisualizer?: boolean;
   bottomPanel: boolean;
   confettiCannon: boolean;
   defaultFileOpenDestination: string;
@@ -3071,6 +3073,19 @@ export function GeneralSettingsPage({
             label="Confetti cannon"
             onChange={(confettiCannon) =>
               update("confettiCannon", confettiCannon)
+            }
+          />
+        </GeneralSettingsRow>
+        <GeneralSettingsRow
+          description="Animate conversation rails with system audio. Audio is processed on your device, never saved or uploaded."
+          label="Audio visualizer"
+        >
+          <GeneralSwitch
+            checked={value.audioVisualizer ?? false}
+            disabled={isLocked}
+            label="Audio visualizer"
+            onChange={(audioVisualizer) =>
+              update("audioVisualizer", audioVisualizer)
             }
           />
         </GeneralSettingsRow>

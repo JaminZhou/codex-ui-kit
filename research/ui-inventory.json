@@ -2269,6 +2269,7 @@
       "ownership": "app",
       "packageEvidence": [
         "general-settings",
+        "current-general-settings-26.915.31945",
         "browser-cdp:current-general-wide-compact-controls-and-route-persistence",
         "electron:current-general-wide-compact-controls-and-route-persistence",
         "pixel:reviewed-current-general-settings-baselines",
@@ -2284,7 +2285,8 @@
         "cdp-26.803.61601:general-five-menus-language-search-and-hotkey-capture",
         "cdp-26.803.61601:general-wide-compact-bottom-scroll-geometry-and-regional-pixels",
         "cdp-26.803.61601:general-controlled-browser-electron-interactions-and-route-persistence",
-        "cdp-26.825.51511:general-768px-content-permission-composer-panel-notification-controls-and-zero-overflow"
+        "cdp-26.825.51511:general-768px-content-permission-composer-panel-notification-controls-and-zero-overflow",
+        "cdp-26.915.31945:general-native-wide-six-sections-23-rows-audio-visualizer"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

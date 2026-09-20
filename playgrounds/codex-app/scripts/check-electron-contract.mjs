@@ -11243,7 +11243,7 @@ try {
     generalGeometry.heading?.width !== 768 ||
     generalGeometry.cards.length !== 6 ||
     generalGeometry.cards.some(({ width }) => width !== 768) ||
-    generalGeometry.rowCount !== 22 ||
+    generalGeometry.rowCount !== 23 ||
     JSON.stringify(generalGeometry.sectionHeadings) !==
       JSON.stringify([
         "Permissions",
@@ -11253,7 +11253,7 @@ try {
         "Notifications",
         "Toys",
       ]) ||
-    (await generalSettingsMain.getByRole("switch").count()) !== 12 ||
+    (await generalSettingsMain.getByRole("switch").count()) !== 13 ||
     (await generalSettingsMain
       .locator('.codex-ui-general-settings__segmented[role="group"]')
       .count()) !== 2
@@ -11296,6 +11296,10 @@ try {
     name: "Confetti cannon",
   });
   await confettiCannonSwitch.click();
+  const audioVisualizerSwitch = generalSettingsMain.getByRole("switch", {
+    name: "Audio visualizer",
+  });
+  await audioVisualizerSwitch.click();
   await generalSettingsMain
     .getByRole("button", { name: "Default file open destination" })
     .click();
@@ -11530,6 +11534,9 @@ try {
     confettiCannon: main
       .querySelector('[role="switch"][aria-label="Confetti cannon"]')
       ?.getAttribute("aria-checked"),
+    audioVisualizer: main
+      .querySelector('[role="switch"][aria-label="Audio visualizer"]')
+      ?.getAttribute("aria-checked"),
     plainTextComposer: main
       .querySelector('[role="switch"][aria-label="Plain text composer"]')
       ?.getAttribute("aria-checked"),
@@ -11581,6 +11588,7 @@ try {
   });
   if (
     generalInteraction.confettiCannon !== "true" ||
+    generalInteraction.audioVisualizer !== "true" ||
     generalInteraction.plainTextComposer !== "true" ||
     generalInteraction.completionNotifications !== "Always⌄" ||
     generalInteraction.contextUsage !== "true" ||

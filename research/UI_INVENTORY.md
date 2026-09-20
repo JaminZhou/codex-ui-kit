@@ -1149,12 +1149,13 @@ wide, 720px, and bottom-Preferences comparisons differ by 1.2787%, 1.8977%,
 and 3.4665% after ownership masks. General, Hooks, and every other Settings
 page remain independently open.
 
-The next current-build slice reaches General from top to bottom and records 21
-rows across Permissions, General, Composer, Popout Window, and Notifications.
-`GeneralSettingsPage` is controlled and keeps file-opening behavior, license
+The next current-build slice reaches General from top to bottom and records 23
+rows across Permissions, General, Composer, Popout Window, Notifications, and
+Toys, including the observed Audio visualizer row. `GeneralSettingsPage` is
+controlled and keeps file-opening behavior, license
 presentation, shortcut registration, notifications, and persistence
 host-owned. Browser/CDP covers all five menus, the searchable 66-language
-list, twelve switches, both keyboard-operable segmented choices, shortcut
+list, thirteen switches, both keyboard-operable segmented choices, shortcut
 capture/cancel, 1180px and 720px geometry, light paint, and bottom scroll.
 Electron repeats the route and proves General, Git, and Appearance state remain
 independent across navigation. Six reviewed frames bring the matrix to 180,
@@ -1163,6 +1164,15 @@ optional current-product comparisons cover the full wide, compact top-crop,
 shortcut-capture, and bottom frames at 4.6143%, 6.7412%, 4.7654%, and 4.8818%
 without committing raw screenshots. The captured values are observed host
 fixtures rather than product defaults.
+
+The installed `26.915.31945` build is also captured independently at native
+wide size: six sections, 23 rows, `768px` content, and zero overflow. The
+sanitized current-product record is
+`research/current-general-settings-26.915.31945.json`; it is current-build
+structure evidence, not an installed-product pixel claim. The installed Toys
+switches are visually present but unlabeled, while the public Audio visualizer
+control is host-controlled and keeps audio processing outside the renderer
+contract.
 
 The following Hooks/code-review slice preserves a stricter evidence split.
 The current `26.803.61601` Renderer reaches Hooks in the visible Coding group,

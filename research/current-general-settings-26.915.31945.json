@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-20T22:25:31.149Z",
+  "baseline": {
+    "appAsarBytes": 358872526,
+    "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    "appVersion": "26.915.31945",
+    "buildNumber": "9922",
+    "chromiumVersion": "153.0.8010.48"
+  },
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "mainCodexProcessPreserved": true,
+    "mutationsSubmitted": false,
+    "captureMode": "native-viewport-only",
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "page": {
+    "route": "settings/general",
+    "nativeViewport": { "height": 1318, "width": 2560 },
+    "horizontalOverflow": 0,
+    "verticalOverflow": 0,
+    "content": { "height": 1989.171875, "left": 1057.4375, "top": 112, "width": 768 },
+    "heading": { "height": 28.796875, "left": 1057.4375, "top": 112, "width": 768 },
+    "cards": [
+      { "height": 155.125, "left": 1057.4375, "top": 218.796875, "width": 768 },
+      { "height": 623.625, "left": 1057.4375, "top": 459.921875, "width": 768 },
+      { "height": 243.6875, "left": 1057.4375, "top": 1169.546875, "width": 768 },
+      { "height": 123.125, "left": 1057.4375, "top": 1499.234375, "width": 768 },
+      { "height": 183.6875, "left": 1057.4375, "top": 1708.359375, "width": 768 },
+      { "height": 123.125, "left": 1057.4375, "top": 1978.046875, "width": 768 }
+    ],
+    "settingsNavigation": { "count": 26, "width": 305.875 },
+    "sectionHeadings": ["Permissions", "General", "Composer", "Popout Window", "Notifications", "Toys"],
+    "rowCount": 23,
+    "menuCount": 10,
+    "toggleCount": 13,
+    "toggleLabels": [
+      "Default permissions are always shown",
+      "Show Full access in the composer",
+      "Show ChatGPT in the menu bar",
+      "Bottom panel",
+      "Prevent sleep while running",
+      "Toggle plugins",
+      "Plain text composer",
+      "Show context window usage in the composer",
+      "Default Popout Window to standalone chat",
+      "Enable permission notifications",
+      "Enable question notifications",
+      null,
+      null
+    ],
+    "selectedNavigation": "General"
+  },
+  "evidenceBoundary": [
+    "This is a current-build native-viewport observation only.",
+    "It records public labels, counts, geometry, and overflow; no setting value was changed.",
+    "The independent 1180x820 and 720x680 replay remains a renderer contract and does not promote installed-product pixels."
+  ],
+  "captureDigest": "f6ccc7ffe2c7d68b74daa4f9f2b1adbe7640852f15c728b829eef32ae72429b0"
+}

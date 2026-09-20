@@ -4620,6 +4620,7 @@ export function App() {
   const [generalSettings, setGeneralSettings] = useState<GeneralSettingsValue>({
     ambientSuggestions: true,
     autoReview: true,
+    audioVisualizer: false,
     bottomPanel: true,
     confettiCannon: false,
     defaultFileOpenDestination: "vscode",

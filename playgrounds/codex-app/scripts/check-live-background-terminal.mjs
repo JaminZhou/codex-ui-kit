@@ -80,7 +80,10 @@ try {
     processId: started.params.item.processId,
   };
 
-  const rowsDeadline = Date.now() + 120_000;
+  // App Server can publish item/started before the background-terminal index
+  // catches up. Keep the real list assertion strict, but allow the async
+  // registry a little longer than the normal live-turn timeout.
+  const rowsDeadline = Date.now() + 180_000;
   let rows = [];
   while (Date.now() < rowsDeadline) {
     rows = await page.evaluate(async (expectedThreadId) =>

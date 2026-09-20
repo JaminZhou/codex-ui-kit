@@ -2500,6 +2500,7 @@ for (const scene of selectedScenes) {
         ["Enable permission notifications", "true", false],
         ["Enable question notifications", "true", false],
         ["Confetti cannon", "false", false],
+        ["Audio visualizer", "false", false],
       ];
       if (
         general.horizontalOverflow > 1 ||
@@ -2519,7 +2520,7 @@ for (const scene of selectedScenes) {
         Math.abs(general.heading?.width - expectedWidth) > 1 ||
         general.cards.length !== 6 ||
         general.cards.some(({ width }) => Math.abs(width - expectedWidth) > 1) ||
-        general.rowCount !== 22 ||
+        general.rowCount !== 23 ||
         JSON.stringify(general.sectionHeadings) !==
           JSON.stringify([
             "Permissions",
@@ -2610,6 +2611,9 @@ for (const scene of selectedScenes) {
           .click();
         await page
           .getByRole("switch", { name: "Confetti cannon" })
+          .click();
+        await page
+          .getByRole("switch", { name: "Audio visualizer" })
           .click();
         await page
           .getByRole("button", { name: "Default file open destination" })
@@ -2828,6 +2832,9 @@ for (const scene of selectedScenes) {
             confettiCannon: document
               .querySelector('[role="switch"][aria-label="Confetti cannon"]')
               ?.getAttribute("aria-checked"),
+            audioVisualizer: document
+              .querySelector('[role="switch"][aria-label="Audio visualizer"]')
+              ?.getAttribute("aria-checked"),
             completionNotifications: document
               .querySelector('button[aria-label="Turn completion notifications"]')
               ?.textContent?.trim(),
@@ -2920,6 +2927,7 @@ for (const scene of selectedScenes) {
         });
         if (
           interaction.confettiCannon !== "true" ||
+          interaction.audioVisualizer !== "true" ||
           interaction.completionNotifications !== "Always⌄" ||
           interaction.contextUsage !== "true" ||
           interaction.plainTextComposer !== "true" ||

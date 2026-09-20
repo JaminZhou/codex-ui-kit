@@ -148,6 +148,7 @@ function AppearanceFixture({
 const initialGeneralValue: GeneralSettingsValue = {
   ambientSuggestions: true,
   autoReview: true,
+  audioVisualizer: false,
   bottomPanel: true,
   confettiCannon: false,
   defaultFileOpenDestination: "vscode",
@@ -1186,6 +1187,13 @@ describe("settings surfaces", () => {
     });
     fireEvent.click(showContext);
     expect(showContext.getAttribute("aria-checked")).toBe("true");
+
+    const audioVisualizer = screen.getByRole("switch", {
+      name: "Audio visualizer",
+    });
+    expect(audioVisualizer.getAttribute("aria-checked")).toBe("false");
+    fireEvent.click(audioVisualizer);
+    expect(audioVisualizer.getAttribute("aria-checked")).toBe("true");
   });
 
   it("exposes General lifecycle copy and locks controls while saving", () => {
