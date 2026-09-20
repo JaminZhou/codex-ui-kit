@@ -760,6 +760,7 @@ function querySelection() {
     "project-group-lifecycle-current-26-915",
     "project-actions-current-26-915",
     "shell-current-26-915",
+    "footer-account-current-26-915",
     "project-collapsed",
     "project-menu",
     "collection-empty",
@@ -5040,7 +5041,8 @@ export function App() {
   const [currentSidebarAccountMenuOpen, setCurrentSidebarAccountMenuOpen] =
     useState(
       initialSelection.sidebarState === "account-menu" ||
-        initialSelection.sidebarState === "account-menu-current-26-915",
+        initialSelection.sidebarState === "account-menu-current-26-915" ||
+        initialSelection.sidebarState === "footer-account-current-26-915",
     );
   const [reviewOpen, setReviewOpen] = useState(
     initialSelection.frame === "review-open" ||
@@ -7050,6 +7052,8 @@ export function App() {
     initialSelection.sidebarState === "item-actions-current-26-915";
   const currentSidebarAccount26915Replay =
     initialSelection.sidebarState === "account-menu-current-26-915";
+  const currentSidebarFooterAccount26915Replay =
+    initialSelection.sidebarState === "footer-account-current-26-915";
   const currentSidebarHelp26915Replay =
     initialSelection.sidebarState === "help-menu-current-26-915";
   const currentSidebarPrimaryNavigation26915Replay =
@@ -7293,7 +7297,7 @@ export function App() {
               side="top"
               sideOffset={currentHomeFrame ? 7.125 : 7.5}
               style={{
-                width: currentHomeFrame
+                width: currentHomeFrame || currentSidebarFooterAccount26915Replay
                   ? 305.875
                   : "calc(var(--codex-ui-app-sidebar-width) - 1rem)",
               }}
@@ -17928,6 +17932,9 @@ export function App() {
       data-current-sidebar-account-26-915={
         currentSidebarAccount26915Replay || undefined
       }
+      data-current-sidebar-footer-account-26-915={
+        currentSidebarFooterAccount26915Replay || undefined
+      }
       data-current-sidebar-help-26-915={
         currentSidebarHelp26915Replay || undefined
       }
@@ -18386,6 +18393,7 @@ export function App() {
                 currentSidebarProjectGroupLifecycle26915Replay ||
                 currentSidebarProjectActions26915Replay ||
                 currentSidebarShell26915Replay ||
+                currentSidebarFooterAccount26915Replay ||
                 currentSidebarItemActions26915Replay ||
                 currentSidebarStatus26915Replay ||
                 currentSidebarThreadLifecycle ||

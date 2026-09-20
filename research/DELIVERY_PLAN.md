@@ -349,6 +349,11 @@ exit gates; it does not replace the inventory.
   sections, footer account plus Voice/Help actions, main-content boundary, and
   zero horizontal overflow. Browser/CDP computed-style checks, Electron
   structure, and repeated screenshots pass with 0% own-fixture drift.
+- The Footer/account follow-up now mounts the current account menu from that
+  same 321.875px rail. Dark/light 1180×820 and 720×680 scenes verify the
+  305.875×188.375px portal, 29px account trigger, five current-build icons,
+  Voice/Help footer actions, Escape/focus return, and zero overflow through
+  Browser/CDP, Electron, and repeated screenshots with 0% own-fixture drift.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
