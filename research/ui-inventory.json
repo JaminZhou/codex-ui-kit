@@ -1388,7 +1388,8 @@
         "cdp-26.820.60940:live-five-row-show-more-one-way-eleven-row-expansion-no-show-less-and-browser-electron-twelve-row-replay",
         "cdp-26.820.60940:live-no-chats-306.90625-by-29-row-exact-computed-style-and-2.4138-percent-regional-pixel",
         "cdp-26.820.60940:disposable-background-worktree-failed-plus-unread-30px-row-three-track-geometry-and-zero-percent-regional-pixel",
-        "cdp-26.825.51511:isolated-safe-thread-running-completed-background-unread-wide-and-compact-321.875-sidebar-browser-electron-and-reviewed-baselines"
+        "cdp-26.825.51511:isolated-safe-thread-running-completed-background-unread-wide-and-compact-321.875-sidebar-browser-electron-and-reviewed-baselines",
+        "cdp-26.915.31945:startup-hydration-blank-to-busy-10-26-29-rows-negative-loading-error-reachability"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

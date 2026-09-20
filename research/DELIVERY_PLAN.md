@@ -1149,6 +1149,12 @@ installed-product queued capture is available. Remaining Stage 1 work includes
 re-observing
 ordinary error and collection loading on the installed build, plus broader
 route lifecycle feedback and installed-product notification reachability. The
+2026-09-21 `26.915.31945` startup probe adds a current-build negative
+reachability record: a blank Renderer frame transitions through a busy shell
+while 10 → 26 → 29 sidebar rows hydrate, then settles cleanly. No ordinary
+collection skeleton or task error row appeared in the 15-second window, so this
+does not promote the replay states or product pixels and leaves the explicit
+installed-product loading/error follow-up open. The
 shared ProjectIndex implementation now also exposes host-controlled
 loading/error/disabled locks for project sorting, selection, expansion, and
 recent-chat opening; partial-error data remains selectable so hosts can keep
