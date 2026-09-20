@@ -704,6 +704,14 @@ and the sidebar remains contained with zero horizontal overflow. Browser/CDP
 computed styles and Electron interaction repeat the contract; own-fixture
 screenshots remain at 0% drift.
 
+The 26.915 candidate also has a dedicated project-actions matrix. The
+`codex-ui-kit` project menu exposes seven current-build icon sources, three
+separators, a 252×212px surface, and the conditional `Mark all as read` row;
+its Section submenu is 118×34px with `New section…`. Browser/CDP verifies the
+menu and submenu boundaries, keyboard Escape dismissal, trigger-focus return,
+and zero overflow across dark/light wide and 720px scenes. Electron repeats the
+interaction and own-fixture screenshots remain at 0% drift.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
