@@ -281,6 +281,16 @@ exit gates; it does not replace the inventory.
   repeated screenshots all pass with 0% own-fixture drift. This is a
   current-build structural replay boundary only; installed-product row data,
   provider state, and product pixels remain unpromoted.
+- The same 26.915 candidate now has a dedicated Sidebar collection lifecycle
+  replay. Loading skeleton, failed read (`role="alert"`), empty project
+  collection, and the one-way long-list `Show more` boundary are exercised at
+  1180/720 widths in both themes. The controlled route keeps the current
+  `321.875px` rail, zero horizontal overflow, accessible state roles, and the
+  five-to-twelve item expansion contract; repeated Electron captures remain at
+  0% own-fixture drift. This is current-build structural replay evidence only:
+  ordinary collection loading/error still needs a fresh installed-product
+  observation before promotion, and provider data and product pixels remain
+  unpromoted.
 - The 26.915 candidate now also has a dedicated Sidebar status-indicator
   matrix. Wide/720 dark/light scenes lock active, waiting, error, unread,
   queued, creating, setting-up, and error-plus-unread rows against the
