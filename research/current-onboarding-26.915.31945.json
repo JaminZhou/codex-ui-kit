@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "captureKind": "renderer_route_reachability_probe",
+  "appVersion": "26.915.31945",
+  "buildNumber": "9922",
+  "chromiumVersion": "153.0.8010.48",
+  "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  "sampledAt": "2026-09-21",
+  "routes": [
+    {
+      "initialRoute": "/login",
+      "resultUrl": "app://-/index.html?initialRoute=%2Flogin",
+      "viewport": { "width": 2560, "height": 1318, "devicePixelRatio": 1 },
+      "main": 1,
+      "navigation": 1,
+      "dialogs": 0,
+      "alerts": 0,
+      "statuses": 5,
+      "textboxes": 1,
+      "loginOrOnboardingMarkers": 0,
+      "result": "authenticated-shell"
+    },
+    {
+      "initialRoute": "/onboarding",
+      "resultUrl": "app://-/index.html?initialRoute=%2Fonboarding",
+      "viewport": { "width": 2560, "height": 1318, "devicePixelRatio": 1 },
+      "main": 0,
+      "navigation": 0,
+      "dialogs": 0,
+      "alerts": 0,
+      "statuses": 1,
+      "textboxes": 0,
+      "loginOrOnboardingMarkers": 0,
+      "result": "route-not-exposed-in-authenticated-renderer"
+    }
+  ],
+  "compactWindowRequest": {
+    "requested": { "width": 720, "height": 680 },
+    "observed": { "width": 2560, "height": 1318 },
+    "result": "native-window-resize-not-proven-by-renderer-request"
+  },
+  "observations": {
+    "credentialsEntered": false,
+    "authenticationClicked": false,
+    "privateTextRecorded": false,
+    "productPixelsPromoted": false,
+    "loginSurfaceRuntimeObserved": false
+  }
+}

@@ -1785,7 +1785,8 @@
         "playground:onboarding-login-ready-api-key-device-code-error",
         "browser-cdp:onboarding-login-wide-compact-lifecycle",
         "electron:onboarding-login-wide-compact-lifecycle",
-        "pixel:onboarding-login-wide-compact-lifecycle"
+        "pixel:onboarding-login-wide-compact-lifecycle",
+        "cdp-26.915.31945:login-route-authenticated-shell-and-onboarding-route-unexposed-negative"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "partial",
