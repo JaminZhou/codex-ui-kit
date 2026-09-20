@@ -1600,11 +1600,12 @@ the host persists changes. This lifecycle contract remains presentation-only:
 hosts still own persistence, validation, import/copy effects, and Dock assets.
 
 The following General slice is now delivered independently: a controlled
-`GeneralSettingsPage` covers the 21 current rows in Permissions, General,
-Composer, Popout Window, and Notifications. Browser/CDP verifies five
+`GeneralSettingsPage` covers the 23 current rows in Permissions, General,
+Composer, Popout Window, Notifications, and Toys, including the observed
+Audio visualizer row. Browser/CDP verifies five
 single-select menus with current-value descriptions and radio checked states,
 language search with a dialog-plus-listbox hierarchy and native Home/End caret
-editing, twelve switches, two keyboard groups, shortcut capture/
+editing, thirteen switches, two keyboard groups, shortcut capture/
 formatting/clear/cancel,
 1180px/720px layout, light paint, and bottom scroll. Electron repeats the
 route and retains General state while switching through Git and Appearance.
@@ -1616,6 +1617,13 @@ Six reviewed frames extend the matrix to 180, with optional local-only full-
 frame comparisons for wide, compact, shortcut-capture, and bottom states at
 4.6143%, 6.7412%, 4.7654%, and 4.8818%.
 Observed host selections are fixture evidence rather than product defaults.
+
+The installed `26.915.31945` build is also captured independently at native
+wide size: six sections, 23 rows, `768px` content, and zero overflow. The
+sanitized current-product record is retained separately from replay pixels;
+the installed Toys switches have no accessible labels, while the public
+Audio visualizer control is host-controlled and keeps audio processing outside
+the renderer contract.
 
 General now also exposes host-controlled loading, saving, saved, and error
 states with retry copy, status semantics, and a locked control surface while
