@@ -299,6 +299,13 @@ exit gates; it does not replace the inventory.
   Browser/CDP computed-style checks, Electron interaction, and repeated
   screenshots pass with 0% own-fixture drift; this remains controlled replay
   evidence and does not promote provider-owned worktree reachability.
+- The adjacent 26.915 workspace replay now covers the Worktree setup card's
+  queued, creating, failed, and created phases at 1180/720. It locks the
+  `aria-busy` and alert semantics, pending/in-progress step rows, details
+  disclosure, Work locally/Cancel/Edit environment/Retry actions, created
+  handoff, zero overflow, and 0% repeated own-fixture drift. This is bounded
+  renderer-state evidence; provider-owned setup reachability and installed-
+  product pixels remain explicitly unpromoted.
 - The 26.915 candidate also has a dedicated Sidebar item-actions matrix.
   Wide/720 dark/light scenes verify the current project menu's seven-item
   unread variant, three separators, 252×212px geometry, Section submenu

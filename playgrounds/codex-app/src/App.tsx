@@ -9932,6 +9932,8 @@ export function App() {
         ? activeFrame
       : activeFrame?.startsWith("current-home-")
         ? activeFrame
+      : currentWorktreeSetupFrame(activeFrame)
+      ? activeFrame
       : currentWorkspacePersistenceFrame(activeFrame)
       ? activeFrame
       : currentComposerControlsCurrentCatalogReplay

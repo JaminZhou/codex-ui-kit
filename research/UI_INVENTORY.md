@@ -657,6 +657,15 @@ replay evidence for `app.sidebar-worktree-status-indicators`; provider-owned
 worktree reachability and installed-product pixels remain explicitly
 unpromoted.
 
+The same 26.915 playground now covers the bounded Worktree setup card
+lifecycle in queued, creating, failed, and created states at 1180×820 and
+720×680. It verifies the `aria-busy`/alert boundary, pending and in-progress
+step rows, More/Less details, Work locally/Cancel/Edit environment/Retry
+actions, terminal created handoff, zero overflow, and 0% repeated own-fixture
+drift. This is controlled renderer-state evidence for the worktree lifecycle;
+provider-owned setup reachability and installed-product pixels remain
+explicitly unpromoted.
+
 The 26.915 candidate also covers a dedicated Sidebar item-actions matrix in
 dark/light wide and 720px scenes. The current unread project menu retains its
 seven visible items, three separators, 252×212px geometry, and 118×34px
