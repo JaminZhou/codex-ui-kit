@@ -318,6 +318,12 @@ exit gates; it does not replace the inventory.
   zero horizontal overflow. Browser/CDP computed-style checks, Electron
   interaction, and repeated screenshots pass with 0% own-fixture drift;
   support/release-note actions remain replay-only.
+- The 26.915 candidate also has a dedicated Sidebar primary-navigation matrix.
+  Wide/720 dark/light scenes verify the four-item Pull requests/Sites/
+  Scheduled/Plugins stack, exact current-build icon names, 305.875×30px rows,
+  the 321.875px rail, and zero horizontal overflow. Browser/CDP computed-style
+  checks, Electron focus interaction, and repeated screenshots pass with 0%
+  own-fixture drift.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and

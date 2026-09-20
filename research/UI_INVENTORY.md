@@ -681,6 +681,13 @@ styles and Electron interaction verify the same contract, Escape returns focus
 to the Help trigger, and repeated own-fixture captures stay at 0% drift.
 Support and release-note actions remain replay-only.
 
+The 26.915 candidate also covers a dedicated Sidebar primary-navigation matrix
+in dark/light wide and 720px scenes. The current four-item stack keeps the
+Pull requests, Sites, Scheduled, and Plugins labels, exact current-build icon
+names, 305.875×30px rows, and a 321.875px rail with zero horizontal overflow.
+Browser/CDP computed styles and Electron focus interaction verify the same
+contract, while repeated own-fixture captures stay at 0% drift.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,
