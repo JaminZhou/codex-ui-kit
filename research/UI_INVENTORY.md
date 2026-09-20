@@ -688,6 +688,13 @@ names, 305.875×30px rows, and a 321.875px rail with zero horizontal overflow.
 Browser/CDP computed styles and Electron focus interaction verify the same
 contract, while repeated own-fixture captures stay at 0% drift.
 
+The 26.915 candidate also covers a dedicated Sidebar project-navigation matrix
+in dark/light wide and 720px scenes. The five project groups retain their
+expanded state, selected `codex-ui-kit` group, nine depth-one task rows, exact
+labels, 305.875×30px row geometry, collapse/expand focus behavior, and zero
+horizontal overflow. Browser/CDP computed styles and Electron interaction
+verify the same contract, while repeated own-fixture captures stay at 0% drift.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,

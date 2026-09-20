@@ -1210,7 +1210,11 @@
         "playground:current-sidebar-primary-navigation-26-915",
         "browser-cdp:current-sidebar-primary-navigation-26-915",
         "electron:current-sidebar-primary-navigation-26-915",
-        "pixel:current-sidebar-primary-navigation-26-915"
+        "pixel:current-sidebar-primary-navigation-26-915",
+        "playground:current-sidebar-project-navigation-26-915",
+        "browser-cdp:current-sidebar-project-navigation-26-915",
+        "electron:current-sidebar-project-navigation-26-915",
+        "pixel:current-sidebar-project-navigation-26-915"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1232,7 +1236,8 @@
         "cdp-26.903.71938:fixed-route-stack-and-new-chat-restoration",
         "cdp-26.908.70816:fixed-route-stack-and-new-chat-restoration",
         "cdp-26.911.61220:fixed-route-stack-and-new-chat-restoration",
-        "cdp-26.915.31945:primary-navigation-current-build-wide-compact-dark-light"
+        "cdp-26.915.31945:primary-navigation-current-build-wide-compact-dark-light",
+        "cdp-26.915.31945:project-navigation-current-build-wide-compact-dark-light"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
