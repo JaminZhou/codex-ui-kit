@@ -272,6 +272,15 @@ exit gates; it does not replace the inventory.
   route, while repeat screenshots stay at 0% own-fixture drift. This is
   current-build structural replay evidence only, so installed-product pixels
   and host-owned queue/provider behavior remain explicitly unpromoted.
+- The same 26.915 candidate now has a dedicated wide/720 and dark/light
+  replay for Sidebar thread history. A selected running row, a background
+  unread row, idle rows, and the shared Pin/Archive hover replacement lock
+  the `321.875px` rail, `305.875×30px` rows, `5px 5px 5px 8px` padding,
+  13/18.5714px weight-400 type, 20px status cells, and zero horizontal
+  overflow. Browser/CDP computed-style checks, Electron interaction, and
+  repeated screenshots all pass with 0% own-fixture drift. This is a
+  current-build structural replay boundary only; installed-product row data,
+  provider state, and product pixels remain unpromoted.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and

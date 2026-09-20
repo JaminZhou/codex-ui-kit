@@ -1339,7 +1339,11 @@
         "playground:current-sidebar-light-thread-history",
         "browser-cdp:current-sidebar-light-thread-history",
         "electron:current-sidebar-light-thread-history",
-        "pixel:current-sidebar-light-thread-history"
+        "pixel:current-sidebar-light-thread-history",
+        "replay:current-26.915-sidebar-thread-history-wide-compact-dark-light",
+        "browser-cdp:current-26.915-sidebar-thread-history-wide-compact-dark-light",
+        "electron:current-26.915-sidebar-thread-history-wide-compact-dark-light",
+        "pixel:current-26.915-sidebar-thread-history-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
