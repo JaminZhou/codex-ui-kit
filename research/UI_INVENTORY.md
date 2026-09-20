@@ -2289,6 +2289,16 @@ sampled current paths of `composer.queue`, `composer.resources`, and long-input
 `composer.shell`; delete/reorder edge failures, resource-provider errors, and
 other host-owned plugin inventories keep their implementations `partial`.
 
+The current `26.915.31945` candidate now has a bounded Composer lifecycle
+replay for four-line and twenty-line drafts plus a paused queue. The 1180/820
+and 720/680 routes preserve their own versioned frame names, lock the
+`736×134`/`688×134` four-line and `736×259`/`688×224` long-input geometry,
+computed 14px/20px/400 editor styles, local scroll clamp, and the queue
+Resume → continued → settled transition. Browser/CDP and native Electron run
+the same interactions, and repeated screenshots have 0% own-fixture drift.
+This is current-build structural replay evidence only; it does not promote
+installed-product Composer pixels or host-owned queue/provider behavior.
+
 A newer **26.908.40834 (8881)** read-only Composer sample updates the resource
 catalog boundary without promoting an unobserved selection result. The current
 `Add files and more` menu begins with Files and folders, Attach Google Chrome,

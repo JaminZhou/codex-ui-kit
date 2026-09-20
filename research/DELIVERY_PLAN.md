@@ -265,6 +265,13 @@ exit gates; it does not replace the inventory.
   current-product comparisons promote the sampled permission/mode paths while
   leaving custom policy, persistence, unavailable modes, and other host-owned
   variants partial.
+- The 26.915 candidate now has a versioned Composer multiline/queue replay
+  slice. Four-line and twenty-line drafts lock wide/720 geometry, computed
+  editor styles and the local scroll clamp; a paused queue drives Resume,
+  continuation, and settlement. Browser/CDP and Electron exercise the same
+  route, while repeat screenshots stay at 0% own-fixture drift. This is
+  current-build structural replay evidence only, so installed-product pixels
+  and host-owned queue/provider behavior remain explicitly unpromoted.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and

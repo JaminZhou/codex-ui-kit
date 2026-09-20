@@ -888,7 +888,11 @@
         "replay:current-26.825-composer-light-wide-compact-matrix",
         "browser-cdp:current-26.825-composer-light-wide-compact-matrix",
         "electron:current-26.825-composer-light-wide-compact-matrix",
-        "pixel:current-26.825-composer-light-wide-compact-matrix"
+        "pixel:current-26.825-composer-light-wide-compact-matrix",
+        "replay:current-26.915-composer-multiline-and-queue-lifecycle",
+        "browser-cdp:current-26.915-composer-multiline-and-queue-lifecycle",
+        "electron:current-26.915-composer-multiline-and-queue-lifecycle",
+        "pixel:current-26.915-composer-multiline-and-queue-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
