@@ -403,6 +403,15 @@ It keeps `workspace.document-previews` and `workspace.media-generated-content`
 at `runtimeStatus: not_sampled`: controlled replay is verified, but installed
 decoding, generation, and product pixels are not.
 
+The installed `26.915.31945` Settings route was also re-observed read-only:
+`Computer use` and `Browser` are reachable with the current `321.88px` rail,
+`46px` titlebar offset, `768px` centered content column, and zero horizontal
+overflow. The sanitized record is
+[`current-settings-browser-computer-use-26.915.31945.json`](current-settings-browser-computer-use-26.915.31945.json).
+It refreshes current structural runtime evidence for
+`settings.browser-computer-use` only; execution, persistence, Electron, and
+pixels remain open.
+
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32
 search, four 28px filters, three Pause rows, and the three visible suggestion

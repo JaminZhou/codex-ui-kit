@@ -71,6 +71,14 @@ exit gates; it does not replace the inventory.
   with `0%` drift. This is current-build resource-menu evidence only; file
   selection, upload, authorization, plugin execution, and installed-product
   pixels remain host-owned.
+- The installed `26.915.31945` Settings route was re-observed in a read-only
+  isolated Renderer. `Computer use` and `Browser` are both reachable from the
+  current Settings navigation and share a `321.88px` rail, `46px` titlebar
+  offset, `768px` centered content column, and zero horizontal overflow. The
+  sanitized record is
+  [`current-settings-browser-computer-use-26.915.31945.json`](current-settings-browser-computer-use-26.915.31945.json).
+  This promotes current structural reachability only; execution, permissions,
+  provider state, persistence, Electron, and pixels remain unclaimed.
 - The 26.915 candidate Projects Index now has a separate replay route:
   `projects-index-current-26-915-ready`, its 600px compact route, and an
   expanded-project state. The sanitized fixture holds 15 rows to match the
