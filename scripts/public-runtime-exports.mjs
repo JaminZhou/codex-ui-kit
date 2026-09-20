@@ -30,6 +30,7 @@ export const publicRuntimeExports = [
   "AutomaticApprovalReview",
   "BranchCreationDialog",
   "BrowserActivity",
+  "BrowserComputerUseSettingsPage",
   "BrowserWorkspacePanel",
   "Button",
   "CitationMention",

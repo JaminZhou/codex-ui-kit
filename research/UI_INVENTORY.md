@@ -359,7 +359,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 92 surface groups; 18 have current-build runtime evidence, 65 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 1 group and Electron verification covers 1.
+Current inventory: 92 surface groups; 18 have current-build runtime evidence, 65 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -409,8 +409,12 @@ The installed `26.915.31945` Settings route was also re-observed read-only:
 overflow. The sanitized record is
 [`current-settings-browser-computer-use-26.915.31945.json`](current-settings-browser-computer-use-26.915.31945.json).
 It refreshes current structural runtime evidence for
-`settings.browser-computer-use` only; execution, persistence, Electron, and
-pixels remain open.
+`settings.browser-computer-use` only; execution and persistence remain open.
+The public `BrowserComputerUseSettingsPage` now replays the same route family
+at wide and 720px sizes with controlled switches, CDP geometry, Electron
+interaction, and zero-drift own-fixture pixels. Those gates verify the
+component and responsive shell boundary; installed-product pixels and
+provider/device execution are still not promoted.
 
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32

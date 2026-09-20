@@ -44,6 +44,21 @@ describe("settings visual contract", () => {
     expect(styles).toContain("grid-template-columns: var(--codex-ui-settings-sidebar-width) minmax(0, 1fr)");
   });
 
+  it("locks Browser and Computer use settings geometry and switch semantics", () => {
+    expect(styles).toMatch(
+      /\.codex-ui-browser-computer-use-settings \{[\s\S]*?max-width: 48rem;[\s\S]*?padding: 1\.25rem 0 2rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-browser-computer-use-settings__switch \{[\s\S]*?height: 1\.25rem;[\s\S]*?width: 2rem;/,
+    );
+    expect(styles).toMatch(
+      /\.codex-ui-browser-computer-use-settings__section \{[\s\S]*?border-radius: 1\.0625rem;[\s\S]*?overflow: hidden;/,
+    );
+    expect(styles).toContain(
+      ".codex-ui-browser-computer-use-settings[data-disabled=\"true\"] button",
+    );
+  });
+
   it("uses theme-aware paints while preserving the observed dark values", () => {
     expect(styles).toContain("--codex-ui-settings-sidebar-background: light-dark(");
     expect(styles).toContain("--codex-ui-settings-main-background: light-dark(");

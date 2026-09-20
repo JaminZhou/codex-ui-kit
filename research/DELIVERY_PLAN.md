@@ -78,7 +78,12 @@ exit gates; it does not replace the inventory.
   sanitized record is
   [`current-settings-browser-computer-use-26.915.31945.json`](current-settings-browser-computer-use-26.915.31945.json).
   This promotes current structural reachability only; execution, permissions,
-  provider state, persistence, Electron, and pixels remain unclaimed.
+  provider state, and persistence remain unclaimed. The public
+  `BrowserComputerUseSettingsPage` now replays Browser and Computer use at
+  wide and 720px sizes with controlled switches, CDP geometry, Electron
+  interaction, and zero-drift own-fixture pixels. Those gates cover the
+  component and responsive shell boundary without promoting installed-product
+  pixels or provider/device execution.
 - The 26.915 candidate Projects Index now has a separate replay route:
   `projects-index-current-26-915-ready`, its 600px compact route, and an
   expanded-project state. The sanitized fixture holds 15 rows to match the

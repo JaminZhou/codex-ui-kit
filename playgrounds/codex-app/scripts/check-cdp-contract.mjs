@@ -894,6 +894,115 @@ for (const scene of selectedScenes) {
         `${JSON.stringify({ lightShell, promptFocus, selectedPrompt }, null, 2)}\n`,
       );
     }
+    if (
+      scene.id.startsWith("workspace-browser-settings") ||
+      scene.id.startsWith("workspace-computer-use-settings")
+    ) {
+      const compact = scene.id.endsWith("-compact");
+      const expectedKind = scene.id.startsWith("workspace-browser-settings")
+        ? "browser"
+        : "computer-use";
+      const settings = await page.evaluate(() => {
+        const rect = (selector) => {
+          const element = document.querySelector(selector);
+          if (!(element instanceof Element)) return null;
+          const value = element.getBoundingClientRect();
+          return {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          };
+        };
+        return {
+          frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+          horizontalOverflow:
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+          kind: document
+            .querySelector(".codex-ui-browser-computer-use-settings")
+            ?.getAttribute("data-kind"),
+          mainCount: document.querySelectorAll('main, [role="main"]').length,
+          navigation: rect(".codex-ui-settings-shell__navigation"),
+          navigationCount: document.querySelectorAll(
+            'nav[aria-label="Settings"]',
+          ).length,
+          outerRegionCount: document.querySelectorAll(
+            '[role="region"][aria-label="Settings route"]',
+          ).length,
+          root: rect(".codex-ui-browser-computer-use-settings"),
+          heading: rect(".codex-ui-browser-computer-use-settings > header h1"),
+          sections: Array.from(
+            document.querySelectorAll(
+              ".codex-ui-browser-computer-use-settings__section",
+            ),
+            (section) => {
+              const value = section.getBoundingClientRect();
+              return {
+                height: value.height,
+                label: section.querySelector("h2")?.textContent?.trim(),
+                top: value.top,
+                width: value.width,
+              };
+            },
+          ),
+          selected: document
+            .querySelector('.codex-ui-settings-shell__item[aria-current="page"]')
+            ?.getAttribute("aria-label"),
+          switchStates: Array.from(
+            document.querySelectorAll('[role="switch"]'),
+            (control) => ({
+              label: control.getAttribute("aria-label"),
+              value: control.getAttribute("aria-checked"),
+            }),
+          ),
+          viewport: { height: innerHeight, width: innerWidth },
+        };
+      });
+      const expectedSelected = expectedKind === "browser" ? "Browser" : "Computer use";
+      const expectedSections = expectedKind === "browser" ? 8 : 2;
+      const expectedSwitches = expectedKind === "browser" ? 2 : 4;
+      const expectedRootWidth = compact ? 358.125 : 768;
+      if (
+        settings.frame !== scene.frame ||
+        settings.kind !== expectedKind ||
+        settings.horizontalOverflow > 1 ||
+        settings.navigationCount !== 1 ||
+        settings.mainCount !== 1 ||
+        settings.outerRegionCount !== 1 ||
+        settings.selected !== expectedSelected ||
+        settings.viewport.width !== (compact ? 720 : 1180) ||
+        settings.viewport.height !== (compact ? 680 : 820) ||
+        settings.navigation?.left !== 0 ||
+        settings.navigation?.top !== 46 ||
+        settings.navigation?.width !== 321.875 ||
+        settings.navigation?.height !== settings.viewport.height - 46 ||
+        settings.root?.left !== (compact ? 341.875 : 366.9375) ||
+        settings.root?.top !== 46 ||
+        Math.abs((settings.root?.width ?? 0) - expectedRootWidth) > 1 ||
+        settings.heading?.top !== 66 ||
+        settings.heading?.height !== 28.796875 ||
+        settings.sections.length !== expectedSections ||
+        settings.switchStates.length !== expectedSwitches ||
+        settings.switchStates.some(({ value }) => value !== "true" && value !== "false")
+      ) {
+        throw new Error(
+          `${scene.id}: current Browser/Computer use Settings contract failed: ${JSON.stringify(settings)}`,
+        );
+      }
+      const firstSwitch = page.getByRole("switch").first();
+      const before = await firstSwitch.getAttribute("aria-checked");
+      await firstSwitch.click();
+      const after = await firstSwitch.getAttribute("aria-checked");
+      if (before === after) {
+        throw new Error(`${scene.id}: Settings switch did not update controlled state.`);
+      }
+      await writeFile(
+        join(artifactDirectory, `${scene.id}.json`),
+        `${JSON.stringify({ after, before, settings }, null, 2)}\n`,
+      );
+      continue;
+    }
     if (scene.id.startsWith("workspace-git-settings")) {
       const settings = await page.evaluate(() => {
         const rect = (selector) => {

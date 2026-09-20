@@ -22,6 +22,7 @@ import {
   AutomaticApprovalReview,
   BranchCreationDialog,
   BrowserActivity,
+  BrowserComputerUseSettingsPage,
   BrowserWorkspacePanel,
   Button,
   CitationMention,
@@ -147,6 +148,7 @@ import {
   type AppRouteOutletStatus,
   type AppSidebarWorktreeStatus,
   type AppearanceSettingsValue,
+  type BrowserComputerUseSettingsSection,
   type ComposerPermissionOption,
   type ComposerModeKind,
   type ComposerResourceGroup,
@@ -3755,6 +3757,78 @@ const blankMcpEditorValue: McpServerEditorValue = {
   workingDirectory: "",
 };
 
+const currentBrowserComputerUseSections: Record<
+  "browser" | "computer-use",
+  readonly BrowserComputerUseSettingsSection[]
+> = {
+  browser: [
+    {
+      id: "access",
+      label: "Browser access",
+      settings: [
+        {
+          checked: true,
+          description: "Allow browser sessions to be opened from a conversation.",
+          id: "browser-enabled",
+          label: "Allow browser use",
+        },
+      ],
+    },
+    {
+      id: "permissions",
+      label: "Permissions",
+      settings: [
+        {
+          checked: true,
+          id: "browser-confirm-actions",
+          label: "Ask before browser actions",
+        },
+      ],
+    },
+    { id: "profile", label: "Browser profile" },
+    { id: "downloads", label: "Downloads" },
+    { id: "history", label: "History" },
+    { id: "privacy", label: "Privacy" },
+    { id: "shortcuts", label: "Shortcuts" },
+    { id: "advanced", label: "Advanced" },
+  ],
+  "computer-use": [
+    {
+      id: "access",
+      label: "Computer use access",
+      settings: [
+        {
+          checked: true,
+          description: "Allow computer-use tasks to request device interaction.",
+          id: "computer-use-enabled",
+          label: "Allow computer use",
+        },
+      ],
+    },
+    {
+      id: "permissions",
+      label: "Permissions",
+      settings: [
+        {
+          checked: true,
+          id: "computer-use-confirm-actions",
+          label: "Ask before computer actions",
+        },
+        {
+          checked: false,
+          id: "computer-use-show-activity",
+          label: "Show computer-use activity",
+        },
+        {
+          checked: true,
+          id: "computer-use-save-history",
+          label: "Save computer-use history",
+        },
+      ],
+    },
+  ],
+};
+
 export function App() {
   const initialSelection = useMemo(querySelection, []);
   const currentProjectsIndex26915Replay =
@@ -4316,7 +4390,9 @@ export function App() {
   );
   const [workspacePage, setWorkspacePage] = useState<
     | "appearance-settings"
+    | "browser-settings"
     | "code-review-settings"
+    | "computer-use-settings"
     | "connections-settings"
     | "conversation"
     | "document-preview"
@@ -4350,6 +4426,12 @@ export function App() {
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-hooks-settings")
         ? "hooks-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-browser-settings")
+        ? "browser-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-computer-use-settings")
+        ? "computer-use-settings"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-worktree-settings")
         ? "worktree-settings"
@@ -4418,6 +4500,10 @@ export function App() {
       ? "general"
       : initialSelection.frame?.startsWith("workspace-appearance-settings")
         ? "appearance"
+        : initialSelection.frame?.startsWith("workspace-browser-settings")
+          ? "browser"
+        : initialSelection.frame?.startsWith("workspace-computer-use-settings")
+          ? "computer-use"
         : initialSelection.frame?.startsWith("workspace-hooks-settings")
           ? "hooks"
         : initialSelection.frame?.startsWith("workspace-worktree-settings")
@@ -4474,6 +4560,27 @@ export function App() {
     pullRequestInstructions: "",
     reviewDelivery: "inline",
   });
+  const [browserComputerUseValues, setBrowserComputerUseValues] = useState<
+    Record<string, boolean>
+  >({
+    "browser-confirm-actions": true,
+    "browser-enabled": true,
+    "computer-use-confirm-actions": true,
+    "computer-use-enabled": true,
+    "computer-use-save-history": true,
+    "computer-use-show-activity": false,
+  });
+  const browserComputerUseKind =
+    workspacePage === "browser-settings" ? "browser" : "computer-use";
+  const browserComputerUseSections = currentBrowserComputerUseSections[
+    browserComputerUseKind
+  ].map((section) => ({
+    ...section,
+    settings: section.settings?.map((setting) => ({
+      ...setting,
+      checked: browserComputerUseValues[setting.id] ?? setting.checked,
+    })),
+  }));
   const [appearanceSettings, setAppearanceSettings] =
     useState<AppearanceSettingsValue>({
       codeFontSize: 12,
@@ -9938,6 +10045,14 @@ export function App() {
         ? activeFrame?.startsWith("workspace-hooks-settings")
           ? activeFrame
           : "workspace-hooks-settings"
+      : workspacePage === "browser-settings"
+        ? activeFrame?.startsWith("workspace-browser-settings")
+          ? activeFrame
+          : "workspace-browser-settings"
+      : workspacePage === "computer-use-settings"
+        ? activeFrame?.startsWith("workspace-computer-use-settings")
+          ? activeFrame
+          : "workspace-computer-use-settings"
       : workspacePage === "mcp-settings"
         ? (activeFrame?.startsWith("workspace-mcp-settings-current-26-825") ||
             activeFrame?.startsWith("workspace-mcp-settings-current-26-915"))
@@ -10066,7 +10181,9 @@ export function App() {
     if (
       ![
         "appearance-settings",
+        "browser-settings",
         "code-review-settings",
+        "computer-use-settings",
         "general-settings",
         "git-settings",
         "hooks-settings",
@@ -11903,8 +12020,10 @@ export function App() {
       onSelect={(itemId) => {
         if (
           itemId !== "appearance" &&
+          itemId !== "browser" &&
           itemId !== "general" &&
           itemId !== "connections" &&
+          itemId !== "computer-use" &&
           itemId !== "git" &&
           itemId !== "hooks" &&
           itemId !== "keyboard-shortcuts" &&
@@ -11930,8 +12049,12 @@ export function App() {
         setWorkspacePage(
           itemId === "appearance"
             ? "appearance-settings"
+            : itemId === "browser"
+              ? "browser-settings"
             : itemId === "general"
               ? "general-settings"
+              : itemId === "computer-use"
+                ? "computer-use-settings"
               : itemId === "connections"
                 ? "connections-settings"
               : itemId === "personalization"
@@ -11953,8 +12076,12 @@ export function App() {
         setActiveFrame(
           itemId === "appearance"
             ? "workspace-appearance-settings"
+            : itemId === "browser"
+              ? "workspace-browser-settings"
             : itemId === "general"
               ? "workspace-general-settings"
+              : itemId === "computer-use"
+                ? "workspace-computer-use-settings"
               : itemId === "connections"
                 ? "workspace-connections-settings"
               : itemId === "personalization"
@@ -11979,7 +12106,25 @@ export function App() {
       sections={settingsNavigation}
       selectedId={selectedSettingsId}
     >
-      {workspacePage === "connections-settings" ? (
+      {workspacePage === "browser-settings" ||
+      workspacePage === "computer-use-settings" ? (
+        <BrowserComputerUseSettingsPage
+          data-evidence="runtime-observed"
+          kind={browserComputerUseKind}
+          onToggle={(setting, checked) => {
+            setBrowserComputerUseValues((current) => ({
+              ...current,
+              [setting.id]: checked,
+            }));
+            setActiveFrame(
+              browserComputerUseKind === "browser"
+                ? "workspace-browser-settings"
+                : "workspace-computer-use-settings",
+            );
+          }}
+          sections={browserComputerUseSections}
+        />
+      ) : workspacePage === "connections-settings" ? (
         mode === "live" ? (
           <LiveRemoteConnections />
         ) : (
@@ -12714,6 +12859,8 @@ export function App() {
           workspacePage === "code-review-settings" ||
           workspacePage === "connections-settings" ||
           workspacePage === "appearance-settings" ||
+          workspacePage === "browser-settings" ||
+          workspacePage === "computer-use-settings" ||
           workspacePage === "general-settings" ||
           workspacePage === "keyboard-shortcuts-settings" ||
           workspacePage === "mcp-settings" ||
@@ -12729,6 +12876,8 @@ export function App() {
           : workspaceNewConversationRoute;
   const workspaceShowsSettings =
     workspacePage === "appearance-settings" ||
+    workspacePage === "browser-settings" ||
+    workspacePage === "computer-use-settings" ||
     workspacePage === "code-review-settings" ||
     workspacePage === "connections-settings" ||
     workspacePage === "general-settings" ||

@@ -19680,6 +19680,145 @@ for (const settingsLightScene of [
   }
 }
 
+for (const browserComputerUseScene of [
+  {
+    frame: "workspace-browser-settings",
+    heading: "Browser",
+    id: "electron-browser-settings",
+    kind: "browser",
+    root: ".codex-ui-browser-computer-use-settings",
+  },
+  {
+    frame: "workspace-browser-settings",
+    heading: "Browser",
+    id: "electron-browser-settings-compact",
+    kind: "browser",
+    root: ".codex-ui-browser-computer-use-settings",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    frame: "workspace-computer-use-settings",
+    heading: "Computer use",
+    id: "electron-computer-use-settings",
+    kind: "computer-use",
+    root: ".codex-ui-browser-computer-use-settings",
+  },
+  {
+    frame: "workspace-computer-use-settings",
+    heading: "Computer use",
+    id: "electron-computer-use-settings-compact",
+    kind: "computer-use",
+    root: ".codex-ui-browser-computer-use-settings",
+    windowSize: { height: 680, width: 720 },
+  },
+]) {
+  const compact = Boolean(browserComputerUseScene.windowSize);
+  const { app, page } = await launchScene(
+    {
+      frame: browserComputerUseScene.frame,
+      id: browserComputerUseScene.id,
+      scenario: "workspace-workflow",
+      view: "workspace",
+    },
+    { capture: false },
+  );
+  try {
+    const main = page.getByRole("main");
+    await main
+      .getByRole("heading", {
+        level: 1,
+        name: browserComputerUseScene.heading,
+        exact: true,
+      })
+      .waitFor();
+    if (compact) {
+      await app.evaluate(({ BrowserWindow }) => {
+        BrowserWindow.getAllWindows()[0]?.setContentSize(720, 680);
+      });
+      await page.waitForFunction(
+        () => innerWidth === 720 && innerHeight === 680,
+      );
+      await page.waitForFunction((rootSelector) => {
+        const root = document.querySelector(rootSelector);
+        return (
+          root instanceof HTMLElement &&
+          Math.abs(root.getBoundingClientRect().width - 358.125) <= 1
+        );
+      }, browserComputerUseScene.root);
+    }
+    const contract = await page.evaluate((rootSelector) => {
+      const root = document.querySelector(rootSelector);
+      const rootRect = root?.getBoundingClientRect();
+      const navigation = document.querySelector(
+        ".codex-ui-settings-shell__navigation",
+      )?.getBoundingClientRect();
+      return {
+        horizontalOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        navigation: navigation
+          ? {
+              height: navigation.height,
+              left: navigation.left,
+              top: navigation.top,
+              width: navigation.width,
+            }
+          : null,
+        root: rootRect
+          ? {
+              height: rootRect.height,
+              left: rootRect.left,
+              top: rootRect.top,
+              width: rootRect.width,
+            }
+          : null,
+        sectionCount: document.querySelectorAll(
+          `${rootSelector} .codex-ui-browser-computer-use-settings__section`,
+        ).length,
+        switchStates: Array.from(
+          document.querySelectorAll(`${rootSelector} [role="switch"]`),
+          (control) => control.getAttribute("aria-checked"),
+        ),
+        viewport: { height: innerHeight, width: innerWidth },
+      };
+    }, browserComputerUseScene.root);
+    const expectedRootWidth = compact ? 358.125 : 768;
+    const expectedRootLeft = compact ? 341.875 : 366.9375;
+    const expectedSectionCount = browserComputerUseScene.kind === "browser" ? 8 : 2;
+    const expectedSwitchCount = browserComputerUseScene.kind === "browser" ? 2 : 4;
+    if (
+      contract.viewport.width !== (compact ? 720 : 1180) ||
+      contract.viewport.height !== (compact ? 680 : 820) ||
+      contract.horizontalOverflow > 1 ||
+      contract.navigation?.left !== 0 ||
+      contract.navigation?.top !== 46 ||
+      contract.navigation?.width !== 321.875 ||
+      contract.navigation?.height !== contract.viewport.height - 46 ||
+      Math.abs((contract.root?.left ?? Infinity) - expectedRootLeft) > 1 ||
+      contract.root?.top !== 46 ||
+      Math.abs((contract.root?.width ?? Infinity) - expectedRootWidth) > 1 ||
+      contract.sectionCount !== expectedSectionCount ||
+      contract.switchStates.length !== expectedSwitchCount ||
+      contract.switchStates.some((value) => value !== "true" && value !== "false")
+    ) {
+      throw new Error(
+        `${browserComputerUseScene.id}: Electron Browser/Computer use contract failed: ${JSON.stringify(contract)}`,
+      );
+    }
+    const firstSwitch = main.getByRole("switch").first();
+    const before = await firstSwitch.getAttribute("aria-checked");
+    await firstSwitch.click();
+    const after = await firstSwitch.getAttribute("aria-checked");
+    if (before === after) {
+      throw new Error(
+        `${browserComputerUseScene.id}: Electron Settings switch did not update controlled state.`,
+      );
+    }
+  } finally {
+    await app.close();
+  }
+}
+
 const planSettingsScene = {
   frame: "workspace-plan-settings-business",
   id: "electron-plan-settings-business",
