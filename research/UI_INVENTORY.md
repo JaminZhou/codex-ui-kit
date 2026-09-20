@@ -645,6 +645,18 @@ Repeated own-fixture captures stay at 0% drift. This is current 26.915
 structural replay evidence for `app.sidebar-status-indicators`; provider data
 and installed-product pixels remain explicitly unpromoted.
 
+The 26.915 candidate also covers a dedicated Sidebar worktree-status matrix in
+dark/light wide and 720px scenes. Setting-up, failed, restored-plus-unread,
+and restored-idle rows retain the current 321.875px rail, 305.875×30px row,
+14px branch indicator, 20px status rail, and 39px branch/status placement.
+Browser/CDP computed styles and Electron interaction verify the exact branch
+SVG, spinner/error/attention primitives, theme-specific colors, shared
+Pin/Archive hover replacement, and zero horizontal overflow. Repeated
+own-fixture captures stay at 0% drift. This is current 26.915 controlled
+replay evidence for `app.sidebar-worktree-status-indicators`; provider-owned
+worktree reachability and installed-product pixels remain explicitly
+unpromoted.
+
 The first current `26.825.51511` worktree follow-up uses an isolated profile and a
 disposable repository to reach one real setting-up row, a controlled
 initialization failure, successful Retry, a recovered background-unread row,

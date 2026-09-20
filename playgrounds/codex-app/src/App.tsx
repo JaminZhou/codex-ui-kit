@@ -764,6 +764,7 @@ function querySelection() {
     "thread-lifecycle-current",
     "thread-lifecycle-current-26-915",
     "worktree-lifecycle-current",
+    "worktree-lifecycle-current-26-915",
   ].includes(requestedSidebarState ?? "")
     ? requestedSidebarState
     : null;
@@ -7037,7 +7038,10 @@ export function App() {
   const currentSidebarThreadHistory26915Replay =
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
   const currentSidebarWorktreeLifecycle =
-    initialSelection.sidebarState === "worktree-lifecycle-current";
+    initialSelection.sidebarState === "worktree-lifecycle-current" ||
+    initialSelection.sidebarState === "worktree-lifecycle-current-26-915";
+  const currentSidebarWorktree26915Replay =
+    initialSelection.sidebarState === "worktree-lifecycle-current-26-915";
   const currentWorktreeSetup = currentWorktreeSetupFrame(activeFrame);
   const currentWorktreeSetupSelectedSidebarIndex =
     currentWorktreeSetupPhase === "failed"
@@ -17890,6 +17894,9 @@ export function App() {
       }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
+      }
+      data-current-sidebar-worktree-26-915={
+        currentSidebarWorktree26915Replay || undefined
       }
       data-sidebar-state={initialSelection.sidebarState ?? undefined}
       data-summary-open={

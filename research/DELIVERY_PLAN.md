@@ -291,6 +291,14 @@ exit gates; it does not replace the inventory.
   short Electron-window polling fallback also removes the known early-window
   acceptance race. Product/provider data and installed-product pixels remain
   explicitly unpromoted.
+- The same 26.915 candidate now has a dedicated Sidebar worktree-status
+  matrix. Wide/720 dark/light scenes lock setting-up, failed, restored-plus-
+  unread, and restored-idle rows with the 14px branch indicator, 20px status
+  rail, 39px branch/status placement, 30px rows, theme-specific attention and
+  error colors, hover action replacement, and zero horizontal overflow.
+  Browser/CDP computed-style checks, Electron interaction, and repeated
+  screenshots pass with 0% own-fixture drift; this remains controlled replay
+  evidence and does not promote provider-owned worktree reachability.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and
