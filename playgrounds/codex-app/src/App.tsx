@@ -760,6 +760,7 @@ function querySelection() {
     "collection-error",
     "collection-long-list",
     "status-lifecycle",
+    "status-lifecycle-current-26-915",
     "thread-lifecycle-current",
     "thread-lifecycle-current-26-915",
     "worktree-lifecycle-current",
@@ -7025,6 +7026,11 @@ export function App() {
     initialSelection.currentSidebar ||
     initialSelection.frame?.startsWith("sidebar-current") ||
     !initialSelection.capture;
+  const currentSidebarStatusLifecycle =
+    initialSelection.sidebarState === "status-lifecycle" ||
+    initialSelection.sidebarState === "status-lifecycle-current-26-915";
+  const currentSidebarStatus26915Replay =
+    initialSelection.sidebarState === "status-lifecycle-current-26-915";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -7706,7 +7712,7 @@ export function App() {
                 mode === "replay"
               }
               status={
-                initialSelection.sidebarState === "status-lifecycle" ||
+                currentSidebarStatusLifecycle ||
                 currentSidebarThreadLifecycle ||
                 currentSidebarWorktreeLifecycle
                   ? "idle"
@@ -7748,7 +7754,7 @@ export function App() {
                 <AppSidebarItem
                   actions={
                     task === "Verify worktree persistence" ||
-                    (initialSelection.sidebarState === "status-lifecycle" &&
+                    (currentSidebarStatusLifecycle &&
                       project.id === "protocol-client" &&
                       index === 0) ? undefined : (
                       <>
@@ -7783,14 +7789,14 @@ export function App() {
                   data-sidebar-status-fixture={
                     currentSidebarWorktreeLifecycle
                       ? `current-worktree-${currentSidebar26825WorktreeFixture(index)}`
-                      : initialSelection.sidebarState === "status-lifecycle"
+                      : currentSidebarStatusLifecycle
                       ? `${project.id}:${index}`
                       : undefined
                   }
                   data-sidebar-worktree-status-fixture={
                     currentSidebarWorktreeLifecycle
                       ? `current-worktree-${currentSidebar26825WorktreeFixture(index)}`
-                      : initialSelection.sidebarState === "status-lifecycle" &&
+                      : currentSidebarStatusLifecycle &&
                           currentSidebarTaskWorktreeStatus(project.id, index)
                         ? `${project.id}:${index}`
                         : undefined
@@ -7826,7 +7832,7 @@ export function App() {
                       ? "idle"
                       : currentSidebarWorktreeLifecycle
                         ? currentSidebar26825WorktreeItemStatus(index)
-                      : initialSelection.sidebarState === "status-lifecycle"
+                      : currentSidebarStatusLifecycle
                       ? currentSidebarTaskStatus(project.id, index)
                       : "idle"
                   }
@@ -7840,7 +7846,7 @@ export function App() {
                             "Task has an unread update",
                             undefined,
                           ][index]
-                      : initialSelection.sidebarState === "status-lifecycle"
+                      : currentSidebarStatusLifecycle
                       ? currentSidebarTaskStatusLabel(project.id, index)
                       : undefined
                   }
@@ -7849,7 +7855,7 @@ export function App() {
                       ? "restored"
                       : currentSidebarWorktreeLifecycle
                         ? currentSidebar26825WorktreeStatus(index)
-                      : initialSelection.sidebarState === "status-lifecycle"
+                      : currentSidebarStatusLifecycle
                       ? currentSidebarTaskWorktreeStatus(project.id, index)
                       : undefined
                   }
@@ -17879,6 +17885,9 @@ export function App() {
       }
       data-scenario={scenarioId}
       data-sidebar-current={currentSidebarComposition || undefined}
+      data-current-sidebar-status-26-915={
+        currentSidebarStatus26915Replay || undefined
+      }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
@@ -18310,7 +18319,8 @@ export function App() {
         sidebarWidth={
           view === "plugins"
             ? 322.875
-            : currentSidebarThreadLifecycle ||
+            : currentSidebarStatus26915Replay ||
+                currentSidebarThreadLifecycle ||
                 currentSidebarWorktreeLifecycle ||
                 currentContext26825Replay ||
                 isCurrentShellFrame(initialSelection.frame) ||
