@@ -2057,6 +2057,15 @@ a status region and no LoginPage controls. This is negative reachability
 evidence, not an installed LoginPage capture; credential exchange, native auth
 handoff, first-run persistence, and product pixels remain open.
 
+A matching 2026-09-21 current-build probe records the document/media boundary
+in [`current-document-media-26.915.31945.json`](current-document-media-26.915.31945.json):
+`/workspace-document-preview`, `/workspace-image-preview`, and `/artifact`
+all settle on a generic status-only surface without a navigation, dialog,
+input, preview marker, or artifact panel. The native viewport remains
+`2560×1318`; this is not compact-window evidence. Installed-product document
+decoding, image generation/decoding, artifact selection, and product pixels
+remain open even though the controlled replay matrix is fully gated.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 
