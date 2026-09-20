@@ -2317,6 +2317,12 @@ without confusing package readiness with full product reconstruction.
    same-transport disconnect/reconnect with six open-ended network-wait rows;
    retain terminal transport failure and a single real product task spanning
    the full composition as separate unsampled boundaries.
+   The current 26.915 replay now adds an explicit Sources lifecycle contract
+   around the public `SourceList`: loading, empty, unavailable, retry-to-ready,
+   and progressive View-all states are checked at 1180px and 720px with
+   Electron and 0% own-fixture pixel drift. This closes the deterministic
+   renderer-state gap without promoting provider/network retry ownership or
+   claiming that every host failure state is reachable in the installed app.
 4. **App shell continuity — fatal recovery and sampled success notification
    delivered**: window chrome, global feedback, loading/error/offline
    states, route and selection restoration. Current-build evidence covers

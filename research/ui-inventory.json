@@ -816,6 +816,9 @@
         "thread-side-panel-tabs",
         "source-activity-list",
         "source-search-activity",
+        "playground:current-26.915-sources-lifecycle-contract",
+        "electron:current-26.915-sources-lifecycle-wide-compact",
+        "pixel:current-26.915-sources-lifecycle-own-fixture-zero-drift",
         "browser-cdp:current-26.825-summary-and-five-query-sources-workspace-wide-compact",
         "electron:current-26.825-compact-sources-disclosure-close-and-view-all-reopen",
         "pixel:current-26.825-summary-sources-workspace-and-thread-regions"

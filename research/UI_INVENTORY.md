@@ -2662,3 +2662,20 @@ explicit checkout boundary. The targeted Browser/Electron gate covers 1180px
 and 720px, zero overflow, and zero own-fixture pixel drift on repeated
 screenshots. It intentionally does not claim site publication, entitlement,
 billing, visitor-data, or third-party runtime ownership.
+
+### Current 26.915 Sources lifecycle replay
+
+The playground now adds a bounded `SourceList` lifecycle replay alongside the
+runtime-observed Sources/search panel. It covers loading, empty, unavailable,
+retry-to-ready, and two-row-to-four-row expansion states at 1180px and 720px,
+with explicit status semantics, retry ownership, zero horizontal overflow, and
+0% repeated own-fixture pixel drift. The gate is
+`check:current-sources-lifecycle-26-915` and is recorded as
+`playground:current-26.915-sources-lifecycle-contract`,
+`electron:current-26.915-sources-lifecycle-wide-compact`, and
+`pixel:current-26.915-sources-lifecycle-own-fixture-zero-drift`.
+
+This is a controlled public-component replay, not a claim that the installed
+Codex host exposes every failure state or that source-service retry effects are
+renderer-owned. The current-build Sources panel and provider/network behavior
+remain separately bounded and `thread.sources-panel` stays partial.

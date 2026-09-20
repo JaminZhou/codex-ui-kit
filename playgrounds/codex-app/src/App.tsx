@@ -103,6 +103,7 @@ import {
   SidebarHelpMenu,
   SitesAccessGate,
   SitesIndexPage,
+  SourceList,
   SourceActivityList,
   SourceSearchActivity,
   SettingsShell,
@@ -2467,6 +2468,33 @@ const currentCitationQueries = [
   "site:openai.com AGENTS.md Codex",
 ] as const;
 
+const currentSourcesLifecycleItems = [
+  {
+    id: "openai-docs",
+    kind: "web" as const,
+    meta: "Web search · developers.openai.com",
+    title: "OpenAI Codex AGENTS.md guide",
+  },
+  {
+    id: "codex-repository",
+    kind: "file" as const,
+    meta: "Workspace file · AGENTS.md",
+    title: "Repository instructions",
+  },
+  {
+    id: "codex-overview",
+    kind: "external" as const,
+    meta: "OpenAI · Codex overview",
+    title: "Introducing Codex",
+  },
+  {
+    id: "codex-configuration",
+    kind: "tool" as const,
+    meta: "Search result · configuration",
+    title: "Configuration reference",
+  },
+] as const;
+
 function CurrentCitationAnswer() {
   return (
     <div className="demo-current-citations-answer">
@@ -4789,8 +4817,9 @@ export function App() {
         "citations-current-26-825-sources-expanded-compact",
   );
   const [citationSourcesOpen, setCitationSourcesOpen] = useState(
-    initialSelection.frame?.includes("citations-current-26-825-sources") ??
-      false,
+    (initialSelection.frame?.includes("citations-current-26-825-sources") ??
+      false) ||
+      (initialSelection.frame?.startsWith("sources-current-26-915-") ?? false),
   );
   const [citationSearchExpanded, setCitationSearchExpanded] = useState(
     initialSelection.frame?.includes(
@@ -4799,6 +4828,17 @@ export function App() {
   );
   const [citationSourcesWidth, setCitationSourcesWidth] = useState(() =>
     isNarrowDemoWindow() ? 345.671875 : 418.515625,
+  );
+  const [sourceLifecycleStatus, setSourceLifecycleStatus] = useState<
+    "empty" | "error" | "loading" | "ready"
+  >(
+    initialSelection.frame?.endsWith("-empty")
+      ? "empty"
+      : initialSelection.frame?.endsWith("-loading")
+        ? "loading"
+        : initialSelection.frame?.endsWith("-error")
+          ? "error"
+          : "ready",
   );
   const [replayQueuedContinuation, setReplayQueuedContinuation] =
     useState<string | null>(() =>
@@ -5393,6 +5433,9 @@ export function App() {
     mode === "replay" && scenarioId === "current-browser-26-825-failure";
   const isCurrentCitations26825Replay =
     mode === "replay" && scenarioId === "current-citations-26-825";
+  const isCurrentSourcesLifecycleReplay =
+    isCurrentCitations26825Replay &&
+    (activeFrame?.startsWith("sources-current-26-915-") ?? false);
   const isCurrentPullRequestReviewReplay =
     mode === "replay" &&
     activeFrame?.startsWith("pr-detail-current-26-825-");
@@ -13749,6 +13792,39 @@ export function App() {
       </div>
     </BrowserWorkspacePanel>
   ) : null;
+  const citationSourcesContent = isCurrentSourcesLifecycleReplay ? (
+    <div data-testid="current-sources-lifecycle">
+      <SourceList
+        emptyLabel="No citations in this answer"
+        errorLabel="Citations unavailable"
+        items={
+          sourceLifecycleStatus === "ready"
+            ? [...currentSourcesLifecycleItems]
+            : []
+        }
+        loadingLabel="Loading citations…"
+        onRetry={() => {
+          setSourceLifecycleStatus("loading");
+          window.setTimeout(() => setSourceLifecycleStatus("ready"), 160);
+        }}
+        retryLabel="Try again"
+        status={sourceLifecycleStatus}
+        statusMessage="The source service is temporarily unavailable."
+        title="Sources"
+        viewAllLabel="View all sources"
+        visibleLimit={2}
+      />
+    </div>
+  ) : (
+    <SourceActivityList>
+      <SourceSearchActivity
+        expanded={citationSearchExpanded}
+        leading={<SummaryGlyph name="globe" />}
+        onExpandedChange={setCitationSearchExpanded}
+        queries={currentCitationQueries}
+      />
+    </SourceActivityList>
+  );
   const citationSourcesPanel = isCurrentCitations26825Replay ? (
     <WorkspacePanel
       actions={
@@ -13796,16 +13872,7 @@ export function App() {
       tabs={[
         {
           closeLabel: "Close Sources tab",
-          content: (
-            <SourceActivityList>
-              <SourceSearchActivity
-                expanded={citationSearchExpanded}
-                leading={<SummaryGlyph name="globe" />}
-                onExpandedChange={setCitationSearchExpanded}
-                queries={currentCitationQueries}
-              />
-            </SourceActivityList>
-          ),
+          content: citationSourcesContent,
           id: "sources",
           label: (
             <span className="demo-current-citations-sources__tab-label">
@@ -17840,6 +17907,12 @@ export function App() {
       }
       data-current-context-26-915={
         currentComposerControls2691531945Replay || undefined
+      }
+      data-current-sources-lifecycle={
+        isCurrentSourcesLifecycleReplay || undefined
+      }
+      data-current-sources-status={
+        isCurrentSourcesLifecycleReplay ? sourceLifecycleStatus : undefined
       }
       data-current-composer-controls={
         currentComposerControls26825Replay || undefined
