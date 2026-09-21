@@ -19,8 +19,10 @@ const { app, page } = await launchScene(visualScenes.find(scene => scene.id === 
 const result = { passed: false, directory };
 try {
   const visibleTextCount = async (text) =>
-    page.getByText(text, { exact: true }).evaluateAll((elements) =>
+    page.locator("body *").evaluateAll((elements, expected) =>
       elements.filter((element) => {
+        const actual = element.textContent?.trim();
+        if (actual !== expected && actual !== `${expected}.`) return false;
         const style = getComputedStyle(element);
         const rect = element.getBoundingClientRect();
         return (
@@ -30,14 +32,16 @@ try {
           rect.height > 0
         );
       }).length,
+      text,
     );
-  const waitForVisibleText = async (text) =>
+  const waitForVisibleReply = async (text) =>
     page.waitForFunction((expected) =>
       Array.from(document.querySelectorAll("*")).some((element) => {
+        const actual = element.textContent?.trim();
+        if (actual !== expected && actual !== `${expected}.`) return false;
         const style = getComputedStyle(element);
         const rect = element.getBoundingClientRect();
         return (
-          element.textContent?.trim() === expected &&
           style.display !== "none" &&
           style.visibility !== "hidden" &&
           rect.width > 0 &&
@@ -56,7 +60,7 @@ try {
     await composer.fill(`Do not use tools, read or write files, access network, or delegate. Reply exactly ${text}.`);
     await composer.press("Enter");
     await page.waitForFunction(before => window.__projectEvents.filter(event => event.method === "turn/completed").length > before, count, { timeout: 180000 });
-    await page.getByText(text, { exact: true }).waitFor();
+    await waitForVisibleReply(text);
   };
   await submit("PROJECT_A_FIRST");
   await page.getByRole("button", { name: "New project", exact: true }).click();
@@ -68,7 +72,7 @@ try {
   const projects = page.locator('.codex-ui-app-sidebar__section').filter({ has: toggle });
   // The Projects section, not the similarly named current-task row.
   await projects.getByRole("button", { name: "codex-ui-kit", exact: true }).click();
-  await waitForVisibleText("PROJECT_A_FIRST");
+  await waitForVisibleReply("PROJECT_A_FIRST");
   assert.equal(await visibleTextCount("PROJECT_B_ONLY"), 0);
   await submit("PROJECT_A_RETURN");
   const bindings = await page.evaluate(() => window.__projectEvents.filter(event => event.kind === "live-bind"));
@@ -78,8 +82,8 @@ try {
   for (const width of [1180, 720]) {
     await app.evaluate(({ BrowserWindow }, width) => BrowserWindow.getAllWindows()[0].setContentSize(width, 820), width);
     await page.waitForFunction(width => innerWidth === width, width);
-    await waitForVisibleText("PROJECT_A_FIRST");
-    await waitForVisibleText("PROJECT_A_RETURN");
+    await waitForVisibleReply("PROJECT_A_FIRST");
+    await waitForVisibleReply("PROJECT_A_RETURN");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: join(directory, `project-a-restored-${width}.png`) });
   }

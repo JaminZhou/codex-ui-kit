@@ -1885,6 +1885,12 @@ CDP, Electron geometry, Electron interaction, and own-fixture pixel contracts
 cover wide and compact frames. This promotes the deterministic replay and
 current-build structural boundary only; installed-product provider effects and
 Live App Server subagent reachability remain separate gates.
+The same current 26.915 route now also includes provider-error states at wide
+and 720px. Each error scene requires the MCP manager `role=alert` copy,
+preserves the measured route shell, and returns to the server list only through
+the explicit Retry action. This is a controlled renderer failure boundary;
+provider outage reachability, persistence, and installed-product pixels remain
+host-owned.
 
 The installed `26.915.31945` Sites entry was also re-observed through the
 current `Add files and more → Sites` route. The native-wide Renderer presents
