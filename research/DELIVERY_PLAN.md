@@ -1641,6 +1641,15 @@ still own persistence, folder and license actions, global shortcut registration,
 and notification delivery. Its host-wide disabled boundary now also carries
 page semantics and locks retry/elevated-risk help actions.
 
+The current `26.915.31945` replay now carries the Personalization save
+failure/recovery boundary at 1180px and 720px. A host-controlled error is
+announced as an alert, Retry restores the editable instructions, and Save
+settles the saved state while preserving the two memory switches and
+Personality control. Browser/CDP and Electron repeat the error, dirty, and
+saved states with a 0% own-fixture pixel gate. This is controlled renderer
+evidence only; local-memory storage, profile services, and persistence remain
+host-owned.
+
 The Hooks/code-review family is now delivered with its evidence levels kept
 separate. An isolated current `26.803.61601` Renderer reaches the visible
 Hooks route, stable empty state, read-only reload feedback, exact 1180×820 and
