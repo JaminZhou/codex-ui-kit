@@ -52,6 +52,21 @@ const scenes = [
     windowSize: { height: 820, width: 1180 },
   },
   {
+    frame: "integration-plugin-detail-current-26-915-discovery-failure",
+    id: "integration-plugin-detail-current-26-915-discovery-failure",
+    kind: "plugin",
+    installed: false,
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "integration-plugin-detail-current-26-915-discovery-failure",
+    id: "integration-plugin-detail-current-26-915-discovery-failure-compact",
+    kind: "plugin",
+    installed: false,
+    sidebarState: "compact-collapsed",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
     frame: "integration-skill-detail-current-26-915-installed",
     id: "integration-skill-detail-current-26-915-installed",
     kind: "skill",
@@ -69,6 +84,19 @@ const scenes = [
     id: "integration-skill-detail-current-26-915-actions",
     kind: "skill",
     windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "integration-skill-detail-current-26-915-failure",
+    id: "integration-skill-detail-current-26-915-failure",
+    kind: "skill",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "integration-skill-detail-current-26-915-failure",
+    id: "integration-skill-detail-current-26-915-failure-compact",
+    kind: "skill",
+    sidebarState: "compact-collapsed",
+    windowSize: { height: 680, width: 720 },
   },
 ];
 
@@ -93,6 +121,7 @@ async function inspect(scene) {
     { capture: false },
   );
   try {
+    const errorScene = scene.id.includes("-failure");
     const contract = await page.evaluate((kind) => {
       const root = document.querySelector(
         kind === "plugin"
@@ -216,9 +245,13 @@ async function inspect(scene) {
       );
       assert.ok(
         closeTo(contract.scroller.left, compact ? 81 : 311) &&
-          closeTo(contract.scroller.top, compact ? 169 : 219) &&
+          (errorScene
+            ? contract.scroller.top >= 0
+            : closeTo(contract.scroller.top, compact ? 169 : 219)) &&
           closeTo(contract.scroller.width, 558) &&
-          closeTo(contract.scroller.height, compact ? 450 : 490),
+          (errorScene
+            ? contract.scroller.height > 0
+            : closeTo(contract.scroller.height, compact ? 450 : 490)),
         JSON.stringify(contract),
       );
       assert.equal(contract.title, "OpenAI Docs");
@@ -229,6 +262,23 @@ async function inspect(scene) {
           "Copy Markdown",
         ]);
       }
+    }
+
+    if (scene.id.includes("-failure")) {
+      const alert = page.locator(
+        ".codex-ui-plugin-detail [role=\"alert\"], .codex-ui-skill-detail [role=\"alert\"]",
+      );
+      await alert.waitFor();
+      assert.match(
+        await alert.innerText(),
+        /did not complete|Check the connection/,
+      );
+      await page.getByRole("button", { name: "Retry" }).click();
+      await page.waitForFunction(() =>
+        !document.querySelector(
+          '.codex-ui-plugin-detail [role="alert"], .codex-ui-skill-detail [role="alert"]',
+        ),
+      );
     }
 
     await writeFile(

@@ -4031,7 +4031,9 @@ export function App() {
     useState(initialSelection.frame?.endsWith("-connection") ?? false);
   const [pluginDetailAction, setPluginDetailAction] = useState("");
   const [pluginDetailStatus, setPluginDetailStatus] =
-    useState<PluginDetailStatus>("ready");
+    useState<PluginDetailStatus>(
+      initialSelection.frame?.endsWith("-failure") ? "error" : "ready",
+    );
   const pluginDetailMutationTimerRef = useRef<number | null>(null);
   const isCurrentSkillDetailReplay =
     (initialSelection.frame?.startsWith(
@@ -4059,7 +4061,9 @@ export function App() {
   const [skillDetailEnabled, setSkillDetailEnabled] = useState(true);
   const [skillDetailAction, setSkillDetailAction] = useState("");
   const [skillDetailStatus, setSkillDetailStatus] =
-    useState<SkillDetailStatus>("ready");
+    useState<SkillDetailStatus>(
+      initialSelection.frame?.endsWith("-failure") ? "error" : "ready",
+    );
   const [skillDetailUpdatingLabel, setSkillDetailUpdatingLabel] =
     useState("Updating skill…");
   const skillDetailMutationTimerRef = useRef<number | null>(null);
