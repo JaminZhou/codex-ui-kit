@@ -2423,6 +2423,11 @@ error → Retry → edited commit instructions → Save lifecycle at 1180px and
 720px. Browser/CDP and Electron repeat captures hold zero own-fixture pixel
 drift and zero horizontal overflow; the renderer gate does not claim host
 credential, remote, or persistence semantics.
+The current 26.915 Hooks replay now covers a controlled error → Retry →
+refreshing-lock → empty lifecycle at wide and compact widths, plus the initial
+loading state. Browser/CDP and Electron repeat captures keep zero own-fixture
+pixel drift; hook discovery, trust, execution, and config-file ownership remain
+host-owned.
 The shared Settings shell now exposes host-configurable loading copy and marks
 the navigation frame `aria-busy` while its section index is loading; route
 selection and private settings ownership remain with the host.

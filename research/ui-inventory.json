@@ -2480,7 +2480,11 @@
         "playground:workspace-hooks-settings-light-wide-compact",
         "browser-cdp:workspace-hooks-settings-light-wide-compact",
         "electron:workspace-hooks-settings-light-wide-compact",
-        "pixel:workspace-hooks-settings-light-wide-compact"
+        "pixel:workspace-hooks-settings-light-wide-compact",
+        "replay:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
+        "browser-cdp:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
+        "electron:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
+        "pixel:current-26.915-hooks-error-retry-refresh-empty-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
