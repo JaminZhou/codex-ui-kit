@@ -27,6 +27,21 @@ const scenes = [
     view: "workspace",
     windowSize: { height: 680, width: 720 },
   },
+  {
+    frame: "workspace-mcp-settings-current-26-915-error",
+    id: "current-mcp-settings-26-915-error-wide",
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "workspace-mcp-settings-current-26-915-error",
+    id: "current-mcp-settings-26-915-error-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
 ];
 
 function rect(value) {
@@ -60,6 +75,9 @@ async function readContract(page) {
         },
       ),
       frame: document.querySelector(".demo-root")?.getAttribute("data-frame"),
+      status: document
+        .querySelector(".codex-ui-mcp-settings")
+        ?.getAttribute("data-status"),
       pluginRows: Array.from(
         document.querySelectorAll('.codex-ui-mcp-settings__row[data-source="plugin"] .codex-ui-mcp-settings__server-name'),
         (element) => element.textContent?.trim(),
@@ -92,6 +110,7 @@ async function readContract(page) {
 
 function assertContract(contract, scene) {
   const compact = scene.windowSize.width === 720;
+  const errorScene = scene.frame.endsWith("-error");
   const topOffset = 46;
   const expectedRoot = compact
     ? { left: 341.875, width: 358.125 }
@@ -107,6 +126,14 @@ function assertContract(contract, scene) {
       ];
   assert.deepEqual(contract.viewport, scene.windowSize);
   assert.equal(contract.frame, scene.frame);
+  assert.equal(contract.status, errorScene ? "error" : "ready");
+  if (errorScene) {
+    assert.deepEqual(contract.cards, []);
+    assert.deepEqual(contract.serverRows, []);
+    assert.deepEqual(contract.pluginRows, []);
+    assert.equal(contract.root?.width, compact ? 358.125 : 768);
+    return;
+  }
   assert.equal(contract.searchDisplay, compact ? "none" : "flex");
   assert.deepEqual(contract.serverRows, [
     "local-browser",
@@ -146,7 +173,21 @@ async function capture(scene) {
     const initialScreenshot = await page.screenshot();
 
     let addScreenshot = null;
-    if (scene.windowSize.width === 1180) {
+    let retryScreenshot = null;
+    if (scene.frame.endsWith("-error")) {
+      const alert = page.getByRole("alert");
+      await alert.waitFor();
+      assert.match(await alert.innerText(), /Couldn’t load MCP servers/);
+      await page.getByRole("button", { name: "Retry", exact: true }).click();
+      await page.waitForFunction(
+        () =>
+          document.querySelector(".codex-ui-mcp-settings")?.getAttribute("data-status") ===
+          "ready",
+      );
+      await page.getByText("local-browser", { exact: true }).waitFor();
+      retryScreenshot = await page.screenshot();
+    }
+    if (scene.windowSize.width === 1180 && !scene.frame.endsWith("-error")) {
       const search = page.getByPlaceholder("Search MCP servers");
       await search.fill("current-mcp-no-match");
       await page.getByText("No MCP servers found", { exact: true }).waitFor();
@@ -226,7 +267,14 @@ async function capture(scene) {
     if (addScreenshot) {
       await writeFile(join(artifactDirectory, `${prefix}-add.png`), addScreenshot);
     }
-    return { app, screenshots: { add: addScreenshot, initial: initialScreenshot } };
+    return {
+      app,
+      screenshots: {
+        add: addScreenshot,
+        initial: initialScreenshot,
+        retry: retryScreenshot,
+      },
+    };
   } catch (error) {
     await app.close();
     throw error;
@@ -251,6 +299,25 @@ async function assertPixel(name, actual, baselinePath) {
   );
 }
 
+function assertRepeatPixel(name, first, second) {
+  const firstImage = PNG.sync.read(first);
+  const secondImage = PNG.sync.read(second);
+  assert.equal(secondImage.width, firstImage.width);
+  assert.equal(secondImage.height, firstImage.height);
+  assert.equal(
+    pixelmatch(
+      firstImage.data,
+      secondImage.data,
+      null,
+      firstImage.width,
+      firstImage.height,
+      { threshold: 0 },
+    ),
+    0,
+    `${name}: current 26.915 MCP error replay drifted`,
+  );
+}
+
 const results = [];
 for (const scene of scenes) {
   const first = await capture(scene);
@@ -260,11 +327,16 @@ for (const scene of scenes) {
   const prefix = scene.id;
   const initialPath = join(artifactDirectory, `${prefix}-initial.png`);
   await writeFile(initialPath, second.screenshots.initial);
-  await assertPixel(
-    `${prefix} initial`,
-    initialPath,
-    join(baselineDirectory, `${prefix}-initial.png`),
-  );
+  if (scene.frame.endsWith("-error")) {
+    assertRepeatPixel(`${prefix} initial`, first.screenshots.initial, second.screenshots.initial);
+    assertRepeatPixel(`${prefix} retry`, first.screenshots.retry, second.screenshots.retry);
+  } else {
+    await assertPixel(
+      `${prefix} initial`,
+      initialPath,
+      join(baselineDirectory, `${prefix}-initial.png`),
+    );
+  }
   if (second.screenshots.add) {
     const addPath = join(artifactDirectory, `${prefix}-add.png`);
     await writeFile(addPath, second.screenshots.add);

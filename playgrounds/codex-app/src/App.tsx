@@ -4168,9 +4168,11 @@ export function App() {
     initialSelection.frame?.endsWith("-empty") ? "no-match-26-825" : "",
   );
   const [mcpStatus, setMcpStatus] = useState<McpServerPageStatus>(
-    initialSelection.frame?.endsWith("-unavailable")
-      ? "unavailable"
-      : "ready",
+    initialSelection.frame?.endsWith("-error")
+      ? "error"
+      : initialSelection.frame?.endsWith("-unavailable")
+        ? "unavailable"
+        : "ready",
   );
   const [mcpEditorMode, setMcpEditorMode] = useState<
     "create" | "update" | null

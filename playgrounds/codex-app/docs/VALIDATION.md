@@ -838,6 +838,9 @@ acceptance suite. It creates two disposable project directories,
 submits A → B → A through the Electron composer, and verifies the host emits the
 same thread ID for both A turns and a different ID for B. It also verifies
 restored A history excludes B and captures 1180px/720px screenshots.
+The response assertion accepts only the exact requested token or one terminal
+period, keeping the continuity check strict while avoiding a false timeout
+when the model supplies normal sentence punctuation.
 
 The 2026-09-08 run passed in
 `/private/var/folders/0x/qnx4hd7s4_dc0ft9j8cxvyvc0000gn/T/ui-kit-live-projects-0gqSOZ`.
