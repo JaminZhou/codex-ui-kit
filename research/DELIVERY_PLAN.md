@@ -1754,6 +1754,12 @@ between repeated own-fixture captures. This is deterministic replay evidence
 only: current product artwork, dynamic instructions, install/uninstall,
 connection persistence, OAuth/permissions, Try-now submission, execution, and
 failure/retry remain host-owned and are not promoted to product-pixel parity.
+The same 26.915 detail gate now adds explicit Plugin install failure and Skill
+update failure scenes at wide and 720px. Each scene requires role-alert copy,
+keeps the measured container and zero-overflow contract, and recovers only
+through the explicit Retry action. This closes the controlled renderer
+failure/retry gap while leaving provider reachability, registry effects, and
+installed-product pixels host-owned.
 
 The adjacent Skill detail/entry slice adds controlled `SkillDetailDialog` and
 `SkillPromptMention` primitives for the installed modal, enabled switch,

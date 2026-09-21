@@ -2564,7 +2564,8 @@
         "playground:integration-plugin-detail-current-26-915-installed-discovery-actions-connection",
         "browser-cdp:integration-plugin-detail-current-26-915-installed-discovery-actions-connection",
         "electron:integration-plugin-detail-current-26-915-installed-discovery-actions-connection",
-        "pixel:integration-plugin-detail-current-26-915-own-fixture-zero-drift"
+        "pixel:integration-plugin-detail-current-26-915-own-fixture-zero-drift",
+        "replay:current-26.915-plugin-detail-failure-retry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2615,7 +2616,8 @@
         "playground:integration-skill-detail-current-26-915-installed-actions",
         "browser-cdp:integration-skill-detail-current-26-915-installed-actions",
         "electron:integration-skill-detail-current-26-915-installed-actions",
-        "pixel:integration-skill-detail-current-26-915-own-fixture-zero-drift"
+        "pixel:integration-skill-detail-current-26-915-own-fixture-zero-drift",
+        "replay:current-26.915-skill-detail-failure-retry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
