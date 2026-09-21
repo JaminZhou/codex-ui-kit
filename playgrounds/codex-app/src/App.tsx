@@ -4694,6 +4694,12 @@ export function App() {
   );
   const [personalizationSettingsAction, setPersonalizationSettingsAction] =
     useState("");
+  const [personalizationSettingsStatus, setPersonalizationSettingsStatus] =
+    useState<"error" | "ready" | "saved">(
+      initialSelection.frame?.endsWith("-error") ? "error" : "ready",
+    );
+  const [personalizationSettingsMessage, setPersonalizationSettingsMessage] =
+    useState("");
   const [keyboardShortcuts, setKeyboardShortcuts] = useState<
     readonly KeyboardShortcutEntry[]
   >(currentKeyboardShortcuts);
@@ -12660,7 +12666,13 @@ export function App() {
             }
             data-evidence="runtime-observed"
             learnMoreHref="https://help.openai.com/"
-            onChange={setPersonalizationSettings}
+            onChange={(value) => {
+              setPersonalizationSettings(value);
+              if (personalizationSettingsStatus === "saved") {
+                setPersonalizationSettingsStatus("ready");
+                setPersonalizationSettingsMessage("");
+              }
+            }}
             onDeleteLocalMemories={() =>
               setPersonalizationSettingsAction(
                 "Delete local memories requested",
@@ -12672,8 +12684,16 @@ export function App() {
                 personalizationSettings.customInstructions,
               );
               setPersonalizationSettingsAction("Custom instructions saved");
+              setPersonalizationSettingsStatus("saved");
+              setPersonalizationSettingsMessage("Custom instructions saved");
+            }}
+            onRetry={() => {
+              setPersonalizationSettingsStatus("ready");
+              setPersonalizationSettingsMessage("");
             }}
             personalityMenuOpen={personalizationMenuOpen}
+            status={personalizationSettingsStatus}
+            statusMessage={personalizationSettingsMessage || undefined}
             value={personalizationSettings}
           />
           <span aria-live="polite" className="demo-settings-action-status">
