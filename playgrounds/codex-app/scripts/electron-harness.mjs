@@ -1,8 +1,7 @@
-import electronPath from "electron";
 import { randomUUID } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { _electron as electron } from "playwright-core";
+import { launchIsolatedElectron } from "./electron-session.mjs";
 
 // These six dense scenes use the system font to match Codex. Their limits are
 // calibrated from uploaded macOS 15 runner artifacts against macOS 26 baselines;
@@ -4916,7 +4915,7 @@ export async function launchScene(
   {
     capture = true,
     environment = {},
-    executablePath = electronPath,
+    executablePath,
     layoutMode,
     nativeThemeSource,
     theme,
@@ -4935,7 +4934,11 @@ export async function launchScene(
   const resolvedWindowSize = windowSize ?? scene.windowSize;
   const resolvedLayoutMode = layoutMode ?? scene.layoutMode;
   const resolvedTheme = theme ?? scene.theme ?? "dark";
-  const app = await electron.launch({
+  report("launching");
+  // Let Playwright resolve the workspace Electron by default. Supplying its
+  // path explicitly selects the packaged-app path and skips Playwright's loader
+  // (ready-event coordination and Chromium automation/backgrounding switches).
+  return launchIsolatedElectron({
     args: ["."],
     executablePath,
     env: {
@@ -4970,7 +4973,10 @@ export async function launchScene(
           }
         : {}),
     },
-  });
+  }, (app) => prepareScene(app, scene, { capture, report, resolvedLayoutMode }));
+}
+
+async function prepareScene(app, scene, { capture, report, resolvedLayoutMode }) {
   report("launched");
   // Electron can create the BrowserWindow before Playwright subscribes to the
   // first-window event. Reuse an already attached page, and briefly poll for
@@ -4998,7 +5004,6 @@ export async function launchScene(
       await page.waitForFunction(() => document.querySelectorAll('[data-pdf-page][data-painted="true"]').length === 2);
     } catch (error) {
       const detail = await page.locator('[data-testid="current-pdf-preview"]').textContent().catch(() => "PDF panel absent");
-      await app.close();
       throw new Error(`PDF renderer did not become ready: ${detail}`, { cause: error });
     }
     if (scene.frame.endsWith("-page-two")) await page.getByRole("button", { name: "Next page", exact: true }).click();

@@ -86,6 +86,14 @@ import {
   isTrustedRendererUrl,
 } from "./navigation-policy.js";
 
+// Set both paths before creating sessions or loading any persistent registries.
+// The harness creates and removes this directory for each owned test process.
+const testUserDataDirectory = process.env.CODEX_UI_KIT_TEST_USER_DATA_DIR;
+if (testUserDataDirectory) {
+  app.setPath("userData", testUserDataDirectory);
+  app.setPath("sessionData", testUserDataDirectory);
+}
+
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const rendererDirectory = join(currentDirectory, "..", "dist");
 const rendererEntryPath = join(rendererDirectory, "index.html");

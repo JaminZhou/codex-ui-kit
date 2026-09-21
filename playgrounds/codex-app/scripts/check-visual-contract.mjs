@@ -4,23 +4,10 @@ import { join } from "node:path";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
+import { selectVisualScenes } from "./visual-scene-selection.mjs";
 
 const update = process.argv.includes("--update");
-const requestedScenesArgument = process.argv.find((argument) =>
-  argument.startsWith("--scenes="),
-);
-const requestedSceneIds = requestedScenesArgument
-  ? new Set(
-      requestedScenesArgument
-        .slice("--scenes=".length)
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean),
-    )
-  : null;
-const selectedScenes = requestedSceneIds
-  ? visualScenes.filter(({ id }) => requestedSceneIds.has(id))
-  : visualScenes;
+const selectedScenes = selectVisualScenes(visualScenes);
 const requestedConcurrency = Number.parseInt(
   process.env.CODEX_UI_KIT_VISUAL_CONCURRENCY ?? "1",
   10,
@@ -28,14 +15,6 @@ const requestedConcurrency = Number.parseInt(
 const visualConcurrency = Number.isFinite(requestedConcurrency)
   ? Math.max(1, requestedConcurrency)
   : 1;
-if (
-  requestedSceneIds &&
-  selectedScenes.length !== requestedSceneIds.size
-) {
-  const knownIds = new Set(visualScenes.map(({ id }) => id));
-  const unknownIds = [...requestedSceneIds].filter((id) => !knownIds.has(id));
-  throw new Error(`Unknown visual scenes: ${unknownIds.join(", ")}`);
-}
 const root = process.cwd();
 const baselineDirectory = join(root, "tests", "visual", "baselines");
 const artifactDirectory = join(root, "artifacts", "visual");
@@ -1834,6 +1813,12 @@ async function compareCurrentBuildWorkspaceFrame({
 const regionalFailures = [];
 
 async function checkScene(scene) {
+  const startedAt = Date.now();
+  const report = (phase) => {
+    if (process.env.CODEX_UI_KIT_ELECTRON_PROGRESS === "1") {
+      console.error(`[visual-contract] ${scene.id}: ${phase} (${Date.now() - startedAt}ms)`);
+    }
+  };
   const { app, page } = await launchScene(scene);
   const sidebarBaseId = scene.id.replace(/-light(-compact)?$/, "$1");
   const actualPath = join(artifactDirectory, `${scene.id}.png`);
@@ -2650,11 +2635,13 @@ async function checkScene(scene) {
       // Local and hosted captures must allow it to finish after scene setup.
       await page.waitForTimeout(1500);
     }
+    report("capturing");
     await page.screenshot({
       animations: "disabled",
       path: actualPath,
       type: "png",
     });
+    report("captured");
     if (
       scene.id === "current-sidebar-status-lifecycle" &&
       currentBuildSidebarTaskActionsReference
@@ -2756,6 +2743,7 @@ async function checkScene(scene) {
     }
   } finally {
     await app.close();
+    report("closed");
   }
 
   if (update || !existsSync(baselinePath)) {

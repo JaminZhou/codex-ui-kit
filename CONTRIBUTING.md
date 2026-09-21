@@ -51,6 +51,22 @@ The package supports React 18 and React 19. CI installs the packed artifact into
 isolated consumers for both majors and verifies the complete public runtime
 export manifest before server rendering a representative component.
 
+CI runs the CDP, native Electron, and four visual shards in separate macOS jobs.
+Every visual scene runs exactly once across the shards, with the same baselines
+and pixel thresholds as a local full run. To reproduce one shard after building
+the playground, use `pnpm --filter @codex-ui-kit/codex-app-playground check:visual --shard=1/4`.
+`check:harness` verifies concurrent profile/storage isolation and cleanup after
+scene preparation fails. Each scene owns a temporary Electron user/session data
+directory; it must not depend on another scene or a developer's saved profile.
+Use Playwright's default Electron resolution for these source-app tests:
+explicitly passing the installed Electron path skips its startup coordination
+and Chromium automation switches. `check:harness` verifies that loader is active.
+
+The required `check` status aggregates quality, consumer, and all Electron jobs.
+Failed, cancelled, or skipped dependencies fail this gate. A green quality job
+alone is insufficient for merging. Visual progress logs include launch,
+preparation, capture, and close timings so stalls can be attributed to a phase.
+
 ## Research and implementation boundaries
 
 Read [`SOURCES.md`](SOURCES.md) and [`research/README.md`](research/README.md) before contributing parity work.

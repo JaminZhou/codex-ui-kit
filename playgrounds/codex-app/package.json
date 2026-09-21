@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit && tsc -p electron/tsconfig.json --noEmit",
     "test": "vitest run tests",
     "check:protocol": "node scripts/check-protocol-traces.mjs",
+    "check:harness": "node scripts/check-electron-harness.mjs",
     "check:cdp": "node scripts/check-cdp-contract.mjs",
     "check:document-preview-electron": "node scripts/check-document-preview-electron.mjs",
     "check:pdf-product": "node scripts/check-current-pdf-product.mjs",
