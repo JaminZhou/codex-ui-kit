@@ -49,11 +49,66 @@ const scenes = [
     view: "workspace",
     windowSize: { height: 680, width: 720 },
   },
+  {
+    expectedKind: "document",
+    frame: "workspace-current-26-915-doc-preview-error",
+    id: "workspace-current-26-915-doc-preview-error",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "workspace",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    expectedKind: "document",
+    frame: "workspace-current-26-915-doc-preview-error",
+    id: "workspace-current-26-915-doc-preview-error-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "hidden",
+    theme: "dark",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
+  {
+    expectedKind: "image",
+    frame: "workspace-current-26-915-image-preview-error",
+    id: "workspace-current-26-915-image-preview-error",
+    scenario: "workspace-workflow",
+    theme: "dark",
+    view: "workspace",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    expectedKind: "image",
+    frame: "workspace-current-26-915-image-preview-error",
+    id: "workspace-current-26-915-image-preview-error-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "hidden",
+    theme: "dark",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
 ];
 
 async function capture(scene) {
   const { app, page } = await launchScene(scene, { capture: false });
   try {
+    const waitForStablePaint = async () => {
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+        await Promise.all(
+          Array.from(document.images, (image) =>
+            image.complete
+              ? Promise.resolve()
+              : new Promise((resolve) => {
+                  image.addEventListener("load", resolve, { once: true });
+                  image.addEventListener("error", resolve, { once: true });
+                }),
+          ),
+        );
+        await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+        await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+      });
+    };
     const contract = await page.evaluate(() => {
       const bounds = (element) => {
         if (!(element instanceof Element)) return null;
@@ -79,10 +134,14 @@ async function capture(scene) {
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
         panel: bounds(panel),
+        status: panel?.getAttribute("data-status"),
+        alert: panel?.querySelector('[role="alert"]')?.textContent?.trim() ?? null,
       };
     });
     assert.equal(contract.frame, scene.frame);
     assert.equal(contract.kind, scene.expectedKind);
+    const errorScene = scene.frame.endsWith("-error");
+    assert.equal(contract.status, errorScene ? "error" : "ready");
     assert.equal(contract.overflow, 0);
     assert.ok(contract.aside && contract.main && contract.panel);
     if (scene.windowSize.width === 1180) {
@@ -94,11 +153,28 @@ async function capture(scene) {
       assert.equal(contract.main.left, 0);
       assert.ok(contract.panel.width >= 300);
     }
+    await waitForStablePaint();
+    const initialScreenshot = await page.screenshot();
+    let retryScreenshot = null;
+    if (errorScene) {
+      assert.match(contract.alert ?? "", /Preview unavailable/);
+      await page.getByRole("button", { name: "Retry preview", exact: true }).click();
+      await page
+        .locator('[data-testid="document-preview-panel"][data-status="ready"]')
+        .waitFor();
+      await waitForStablePaint();
+      retryScreenshot = await page.screenshot();
+    }
     await writeFile(
       join(artifactDirectory, `${scene.id}.json`),
-      `${JSON.stringify(contract, null, 2)}\n`,
+      `${JSON.stringify({ contract, retried: errorScene }, null, 2)}\n`,
     );
-    return { app, page, screenshot: await page.screenshot() };
+    return {
+      app,
+      page,
+      retryScreenshot,
+      screenshot: initialScreenshot,
+    };
   } catch (error) {
     await app.close();
     throw error;
@@ -126,6 +202,24 @@ for (const scene of scenes) {
       0,
       `${scene.id}: current 26.911 document/media replay drifted`,
     );
+    if (scene.frame.endsWith("-error")) {
+      const firstRetry = PNG.sync.read(first.retryScreenshot);
+      const secondRetry = PNG.sync.read(second.retryScreenshot);
+      assert.equal(firstRetry.width, secondRetry.width);
+      assert.equal(firstRetry.height, secondRetry.height);
+      assert.equal(
+        pixelmatch(
+          firstRetry.data,
+          secondRetry.data,
+          null,
+          firstRetry.width,
+          firstRetry.height,
+          { threshold: 0 },
+        ),
+        0,
+        `${scene.id}: current 26.915 document/media retry drifted`,
+      );
+    }
   } finally {
     await second.app.close();
   }
