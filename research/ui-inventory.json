@@ -2311,7 +2311,11 @@
         "playground:workspace-appearance-settings-light-wide-compact",
         "browser-cdp:workspace-appearance-settings-light-wide-compact",
         "electron:workspace-appearance-settings-light-wide-compact",
-        "pixel:workspace-appearance-settings-light-wide-compact"
+        "pixel:workspace-appearance-settings-light-wide-compact",
+        "replay:current-26.915-appearance-error-retry-saved-wide-compact",
+        "browser-cdp:current-26.915-appearance-error-retry-saved-wide-compact",
+        "electron:current-26.915-appearance-error-retry-saved-wide-compact",
+        "pixel:current-26.915-appearance-error-retry-saved-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
