@@ -4048,7 +4048,15 @@ export function App() {
     ) ?? false;
   const isCurrentSkillTryNowReplay =
     initialSelection.frame ===
-    "integration-skill-detail-current-26-825-try-now-compact";
+      "integration-skill-detail-current-26-825-try-now-compact" ||
+    initialSelection.frame?.startsWith(
+      "integration-skill-detail-current-26-915-try-now",
+    ) ||
+    false;
+  const isCurrentSkillTryNowFailureReplay =
+    initialSelection.frame?.startsWith(
+      "integration-skill-detail-current-26-915-try-now-failure",
+    ) ?? false;
   const [skillDetailOpen, setSkillDetailOpen] = useState(
     isCurrentSkillDetailReplay && !isCurrentSkillTryNowReplay,
   );
@@ -4069,6 +4077,9 @@ export function App() {
   const skillDetailMutationTimerRef = useRef<number | null>(null);
   const [skillTryNowActive, setSkillTryNowActive] = useState(
     isCurrentSkillTryNowReplay,
+  );
+  const [skillTryNowStatus, setSkillTryNowStatus] = useState<"ready" | "error">(
+    "ready",
   );
   const isCurrentThreadOverflowReplay =
     initialSelection.frame?.startsWith("thread-overflow-current-26-825") ||
@@ -9658,9 +9669,16 @@ export function App() {
       aria-label="OpenAI Docs skill draft"
       className="demo-current-skill-try-now"
       data-action={skillDetailAction || undefined}
+      data-status={skillTryNowStatus}
       data-submitted="false"
       data-testid="current-skill-try-now"
-      onSubmit={(event) => event.preventDefault()}
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (isCurrentSkillTryNowFailureReplay && skillTryNowStatus === "ready") {
+          setSkillTryNowStatus("error");
+          setSkillDetailAction("try-now-failed");
+        }
+      }}
     >
       <div
         aria-label="Do anything"
@@ -9685,6 +9703,25 @@ export function App() {
           <CurrentBuildIcon name="composer-send" />
         </button>
       </div>
+      {skillTryNowStatus === "error" ? (
+        <div
+          aria-live="polite"
+          className="demo-current-skill-try-now__status"
+          role="alert"
+        >
+          <strong>Couldn’t run skill</strong>
+          <span>The skill execution did not start.</span>
+          <button
+            onClick={() => {
+              setSkillTryNowStatus("ready");
+              setSkillDetailAction("try-now-retried");
+            }}
+            type="button"
+          >
+            Retry
+          </button>
+        </div>
+      ) : null}
     </form>
   );
   const currentPendingApproval = isCurrentApprovalReplay
