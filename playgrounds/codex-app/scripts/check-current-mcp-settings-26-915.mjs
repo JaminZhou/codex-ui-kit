@@ -42,6 +42,21 @@ const scenes = [
     view: "workspace",
     windowSize: { height: 680, width: 720 },
   },
+  {
+    frame: "workspace-mcp-settings-current-26-915-toggle-failure",
+    id: "current-mcp-settings-26-915-toggle-failure-wide",
+    scenario: "workspace-workflow",
+    view: "workspace",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "workspace-mcp-settings-current-26-915-toggle-failure",
+    id: "current-mcp-settings-26-915-toggle-failure-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    view: "workspace",
+    windowSize: { height: 680, width: 720 },
+  },
 ];
 
 function rect(value) {
@@ -78,6 +93,9 @@ async function readContract(page) {
       status: document
         .querySelector(".codex-ui-mcp-settings")
         ?.getAttribute("data-status"),
+      toggleStatus: document
+        .querySelector('[data-source="server"][data-toggle-status]')
+        ?.getAttribute("data-toggle-status"),
       pluginRows: Array.from(
         document.querySelectorAll('.codex-ui-mcp-settings__row[data-source="plugin"] .codex-ui-mcp-settings__server-name'),
         (element) => element.textContent?.trim(),
@@ -111,6 +129,7 @@ async function readContract(page) {
 function assertContract(contract, scene) {
   const compact = scene.windowSize.width === 720;
   const errorScene = scene.frame.endsWith("-error");
+  const toggleFailureScene = scene.frame.endsWith("-toggle-failure");
   const topOffset = 46;
   const expectedRoot = compact
     ? { left: 341.875, width: 358.125 }
@@ -141,6 +160,7 @@ function assertContract(contract, scene) {
     "workspace-tools",
     "docs-reference",
   ]);
+  assert.equal(contract.toggleStatus, toggleFailureScene ? "error" : "ready");
   assert.deepEqual(contract.pluginRows, ["native_inspector", "connected_apps"]);
   assert.deepEqual(
     contract.tabs.map(({ text, selected, height, top }) => ({ text, selected, height, top })),
@@ -186,8 +206,29 @@ async function capture(scene) {
       );
       await page.getByText("local-browser", { exact: true }).waitFor();
       retryScreenshot = await page.screenshot();
+    } else if (scene.frame.endsWith("-toggle-failure")) {
+      const alert = page.getByRole("alert");
+      await alert.waitFor();
+      assert.match(await alert.innerText(), /MCP server could not be enabled/);
+      const toggle = page.getByRole("switch", {
+        name: "Enable local-browser",
+        exact: true,
+      });
+      assert.equal(await toggle.getAttribute("aria-busy"), null);
+      await page.getByRole("button", { name: "Retry", exact: true }).click();
+      await page.waitForFunction(
+        () =>
+          document.querySelector(
+            '[data-source="server"][data-toggle-status="ready"]',
+          ) !== null && !document.querySelector('[role="alert"]'),
+      );
+      retryScreenshot = await page.screenshot();
     }
-    if (scene.windowSize.width === 1180 && !scene.frame.endsWith("-error")) {
+    if (
+      scene.windowSize.width === 1180 &&
+      !scene.frame.endsWith("-error") &&
+      !scene.frame.endsWith("-toggle-failure")
+    ) {
       const search = page.getByPlaceholder("Search MCP servers");
       await search.fill("current-mcp-no-match");
       await page.getByText("No MCP servers found", { exact: true }).waitFor();
@@ -327,7 +368,10 @@ for (const scene of scenes) {
   const prefix = scene.id;
   const initialPath = join(artifactDirectory, `${prefix}-initial.png`);
   await writeFile(initialPath, second.screenshots.initial);
-  if (scene.frame.endsWith("-error")) {
+  if (
+    scene.frame.endsWith("-error") ||
+    scene.frame.endsWith("-toggle-failure")
+  ) {
     assertRepeatPixel(`${prefix} initial`, first.screenshots.initial, second.screenshots.initial);
     assertRepeatPixel(`${prefix} retry`, first.screenshots.retry, second.screenshots.retry);
   } else {

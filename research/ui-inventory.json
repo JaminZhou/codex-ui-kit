@@ -2518,7 +2518,8 @@
         "playground:current-26.915-mcp-settings-contract",
         "electron:current-26.915-mcp-settings-wide-compact-interactions",
         "pixel:current-26.915-mcp-settings-own-fixture-zero-drift",
-        "replay:current-26.915-mcp-settings-provider-error-retry-wide-compact"
+        "replay:current-26.915-mcp-settings-provider-error-retry-wide-compact",
+        "replay:current-26.915-mcp-settings-toggle-error-retry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
