@@ -204,6 +204,24 @@ describe("interactive controls", () => {
 });
 
 describe("menus and selects", () => {
+  it("does not let delayed initial focus replace an item the user already focused", () => {
+    vi.useFakeTimers();
+    try {
+      render(
+        <Menu defaultOpen trigger={<button type="button">Destination</button>}>
+          <MenuItem>VS Code</MenuItem>
+          <MenuItem>Xcode</MenuItem>
+        </Menu>,
+      );
+      const destination = screen.getByRole("menuitem", { name: "Xcode" });
+      destination.focus();
+      vi.runOnlyPendingTimers();
+      expect(document.activeElement).toBe(destination);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("can focus the menu surface without highlighting an item", async () => {
     render(
       <Menu

@@ -698,6 +698,12 @@ export function Popover({
     const timer = window.setTimeout(() => {
       const content = contentRef.current;
       if (!content) return;
+      // Opening focus can run after the user has already navigated inside the
+      // surface. Do not replace that choice with the default first item.
+      if (content.contains(document.activeElement)) {
+        keyboardOpenTargetRef.current = null;
+        return;
+      }
       const selected = initialFocusSelector
         ? content.querySelector<HTMLElement>(initialFocusSelector)
         : null;

@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  quality:
     # Public pull requests must never execute untrusted code on a personal self-hosted runner.
     runs-on: ubuntu-latest
     steps:
@@ -82,10 +82,26 @@ jobs:
             ${{ matrix.module-resolution }}
 
   codex-app-acceptance:
-    name: Codex app Electron acceptance
+    name: Codex app / ${{ matrix.suite }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: cdp
+            command: check:cdp
+          - suite: electron
+            command: check:electron
+          - suite: visual-1
+            command: check:visual --shard=1/4
+          - suite: visual-2
+            command: check:visual --shard=2/4
+          - suite: visual-3
+            command: check:visual --shard=3/4
+          - suite: visual-4
+            command: check:visual --shard=4/4
     # Native scrollbar rendering is part of the macOS 26 visual baseline.
     runs-on: macos-26
-    timeout-minutes: 120
+    timeout-minutes: 45
     env:
       CODEX_UI_KIT_ELECTRON_PROGRESS: "1"
       CODEX_UI_KIT_VISUAL_CONCURRENCY: "2"
@@ -110,23 +126,36 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build acceptance app
         run: pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground build
-      - name: Check native scrollbar pixel parity first
-        run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual --scenes=current-worktree-setup-failed-compact,current-review-26-825-file-card-compact,integration-skill-detail-current-26-825-try-now-compact
-      - name: Run CDP acceptance contracts
-        timeout-minutes: 30
-        run: pnpm --filter @codex-ui-kit/codex-app-playground check:cdp
-      - name: Run native Electron acceptance contracts
-        timeout-minutes: 45
-        run: pnpm --filter @codex-ui-kit/codex-app-playground check:electron
-      - name: Run visual acceptance contracts
-        timeout-minutes: 90
-        run: pnpm --filter @codex-ui-kit/codex-app-playground check:visual
+      - name: Verify Electron session isolation and cleanup
+        if: matrix.suite == 'cdp'
+        run: pnpm --filter @codex-ui-kit/codex-app-playground check:harness
+      - name: Run acceptance contracts
+        run: pnpm --filter @codex-ui-kit/codex-app-playground ${{ matrix.command }}
       - name: Upload visual failure evidence
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: codex-app-visual-failure-${{ github.run_id }}
+          name: codex-app-failure-${{ matrix.suite }}-${{ github.run_id }}
           path: |
             playgrounds/codex-app/artifacts/visual
             playgrounds/codex-app/artifacts/cdp
           retention-days: 7
+
+  # Keep the existing required check name, but never let a failed, cancelled or
+  # skipped acceptance job be reported as a green merge gate.
+  check:
+    if: always()
+    needs: [quality, consumer, codex-app-acceptance]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every CI job to pass
+        env:
+          CI_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node --input-type=module <<'JS'
+          const results = JSON.parse(process.env.CI_RESULTS);
+          for (const [name, { result }] of Object.entries(results)) {
+            console.log(`${name}: ${result}`);
+            if (result !== "success") process.exitCode = 1;
+          }
+          JS
