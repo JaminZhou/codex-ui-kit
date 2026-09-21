@@ -2449,7 +2449,11 @@
         "playground:workspace-git-settings-light-wide-compact",
         "browser-cdp:workspace-git-settings-light-wide-compact",
         "electron:workspace-git-settings-light-wide-compact",
-        "pixel:workspace-git-settings-light-wide-compact"
+        "pixel:workspace-git-settings-light-wide-compact",
+        "replay:current-26.915-git-error-retry-save-wide-compact",
+        "browser-cdp:current-26.915-git-error-retry-save-wide-compact",
+        "electron:current-26.915-git-error-retry-save-wide-compact",
+        "pixel:current-26.915-git-error-retry-save-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

@@ -4452,6 +4452,7 @@ export function App() {
             "workspace-git-settings-compact",
             "workspace-git-settings-light",
             "workspace-git-settings-light-compact",
+            "workspace-git-settings-current-26-915-error",
           ].includes(
             initialSelection.frame ?? "",
           )
@@ -4803,6 +4804,10 @@ export function App() {
   const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
   const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
     useState("");
+  const [gitSettingsStatus, setGitSettingsStatus] = useState<
+    "error" | "ready" | "saved"
+  >(initialSelection.frame?.endsWith("-error") ? "error" : "ready");
+  const [gitSettingsMessage, setGitSettingsMessage] = useState("");
   const [workspaceWorktreeId, setWorkspaceWorktreeId] = useState(
     initialSelection.view === "workspace" &&
       initialSelection.frame === "workspace-repairing"
@@ -10150,12 +10155,16 @@ export function App() {
           ? activeFrame
           : "workspace-document-preview-ready"
       : workspacePage === "git-settings"
-        ? [
+        ? initialSelection.frame?.startsWith(
+            "workspace-git-settings-current-26-915",
+          )
+          ? initialSelection.frame
+          : [
             "workspace-git-settings-compact",
             "workspace-git-settings-light-compact",
-          ].includes(initialSelection.frame ?? "")
-          ? "workspace-git-settings-compact"
-          : "workspace-git-settings"
+            ].includes(initialSelection.frame ?? "")
+            ? "workspace-git-settings-compact"
+            : "workspace-git-settings"
       : projectIndexChat
       ? "projects-index-chat"
       : activeFrame === "workspace-branch-created"
@@ -12839,16 +12848,32 @@ export function App() {
           commitInstructionsDirty={
             gitSettings.commitInstructions !== savedCommitInstructions
           }
-          onChange={setGitSettings}
-          onSaveCommitInstructions={() =>
-            setSavedCommitInstructions(gitSettings.commitInstructions)
-          }
-          onSavePullRequestInstructions={() =>
-            setSavedPullRequestInstructions(gitSettings.pullRequestInstructions)
-          }
+          onChange={(value) => {
+            setGitSettings(value);
+            if (gitSettingsStatus === "saved") {
+              setGitSettingsStatus("ready");
+              setGitSettingsMessage("");
+            }
+          }}
+          onRetry={() => {
+            setGitSettingsStatus("ready");
+            setGitSettingsMessage("");
+          }}
+          onSaveCommitInstructions={() => {
+            setSavedCommitInstructions(gitSettings.commitInstructions);
+            setGitSettingsStatus("saved");
+            setGitSettingsMessage("Git settings saved");
+          }}
+          onSavePullRequestInstructions={() => {
+            setSavedPullRequestInstructions(gitSettings.pullRequestInstructions);
+            setGitSettingsStatus("saved");
+            setGitSettingsMessage("Git settings saved");
+          }}
           pullRequestInstructionsDirty={
             gitSettings.pullRequestInstructions !== savedPullRequestInstructions
           }
+          status={gitSettingsStatus}
+          statusMessage={gitSettingsMessage || undefined}
           value={gitSettings}
         />
       )}
