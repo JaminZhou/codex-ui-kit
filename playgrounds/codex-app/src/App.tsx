@@ -4786,9 +4786,15 @@ export function App() {
   const [hookSettingsStatus, setHookSettingsStatus] = useState<
     "error" | "loading" | "ready"
   >(() =>
-    initialSelection.frame === "workspace-hooks-settings-loading"
+    (initialSelection.frame === "workspace-hooks-settings-loading" ||
+      initialSelection.frame?.startsWith(
+        "workspace-hooks-settings-current-26-915-loading",
+      ))
       ? "loading"
-      : initialSelection.frame === "workspace-hooks-settings-error"
+      : initialSelection.frame === "workspace-hooks-settings-error" ||
+          initialSelection.frame?.startsWith(
+            "workspace-hooks-settings-current-26-915-error",
+          )
         ? "error"
         : "ready",
   );
