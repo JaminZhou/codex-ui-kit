@@ -2192,7 +2192,11 @@
         "electron:workspace-environments-populated-wide-compact-repair-light",
         "electron:live-environment-repair-wide-compact",
         "pixel:workspace-environment-editor-wide-compact-error",
-        "pixel:workspace-environments-populated-wide-compact-repair-light"
+        "pixel:workspace-environments-populated-wide-compact-repair-light",
+        "replay:current-26.915-environment-editor-error-retry-wide-compact",
+        "browser-cdp:current-26.915-environment-editor-error-retry-wide-compact",
+        "electron:current-26.915-environment-editor-error-retry-wide-compact",
+        "pixel:current-26.915-environment-editor-error-retry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

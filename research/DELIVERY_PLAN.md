@@ -1489,6 +1489,15 @@ New-worktree no-environment menu, and implements the sampled 768px unavailable
 Environments route. Browser/CDP, Electron, and three local-only product gates
 pass without creating an environment. Populated environment repair variants
 and real Remote connection lifecycles remain in this phase.
+The current `26.915.31945` playground now adds a dedicated Environment
+editor failure/recovery replay at 1180px and 720px. The editor preserves its
+Setup/Cleanup/Actions tabs and measured route shell while exposing the
+host-controlled save failure as an alert; Retry restores the editable state,
+and the next Save settles the controlled saved state. Browser/CDP and
+Electron exercise the error, recovered, and saved states, while repeated
+captures pass a 0% own-fixture pixel gate. This is current-build replay
+evidence only: environment provisioning, persistence, credentials, remote
+availability, and installed-product pixels remain host-owned.
 The `26.818.41509` follow-up supersedes the worktree entry vocabulary with
 `New local worktree`, disabled `Cloud`, generic accessible context labels, and
 a 264×91.125 Environment menu containing only `Work without environment` and
