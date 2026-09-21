@@ -2418,6 +2418,11 @@ merge/review preferences, and commit/PR instructions: saving is announced with
 `aria-busy`, mutable controls are locked, and error recovery can use host-owned
 retry copy. Git configuration writes and credential/remote semantics remain
 outside this renderer contract.
+The current 26.915 replay now exercises that Git surface through a controlled
+error → Retry → edited commit instructions → Save lifecycle at 1180px and
+720px. Browser/CDP and Electron repeat captures hold zero own-fixture pixel
+drift and zero horizontal overflow; the renderer gate does not claim host
+credential, remote, or persistence semantics.
 The shared Settings shell now exposes host-configurable loading copy and marks
 the navigation frame `aria-busy` while its section index is loading; route
 selection and private settings ownership remain with the host.
