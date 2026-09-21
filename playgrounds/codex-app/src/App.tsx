@@ -4163,7 +4163,19 @@ export function App() {
   const [sitesAccessMode, setSitesAccessMode] = useState<"pricing" | "terms">(
     initialSelection.frame?.includes("pricing") ? "pricing" : "terms",
   );
-  const [mcpServers, setMcpServers] = useState(initialMcpServers);
+  const [mcpServers, setMcpServers] = useState(() =>
+    initialSelection.frame?.endsWith("-toggle-failure")
+      ? initialMcpServers.map((server) =>
+          server.id === "local-browser"
+            ? {
+                ...server,
+                toggleStatus: "error" as const,
+                toggleStatusMessage: "MCP server could not be enabled.",
+              }
+            : server,
+        )
+      : initialMcpServers,
+  );
   const [mcpQuery, setMcpQuery] = useState(
     initialSelection.frame?.endsWith("-empty") ? "no-match-26-825" : "",
   );

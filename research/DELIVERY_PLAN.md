@@ -1891,6 +1891,11 @@ preserves the measured route shell, and returns to the server list only through
 the explicit Retry action. This is a controlled renderer failure boundary;
 provider outage reachability, persistence, and installed-product pixels remain
 host-owned.
+The same route also covers a failed server-row enablement at wide and 720px:
+the row keeps its measured layout, exposes the provider error as `role=alert`,
+and clears it only through the explicit row Retry action. This is an additional
+controlled toggle boundary, not a claim of a reachable provider or persisted
+enablement effect.
 
 The installed `26.915.31945` Sites entry was also re-observed through the
 current `Add files and more → Sites` route. The native-wide Renderer presents
