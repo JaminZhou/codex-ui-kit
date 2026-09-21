@@ -4650,6 +4650,11 @@ export function App() {
       usePointerCursors: false,
     });
   const [appearanceThemeAction, setAppearanceThemeAction] = useState("");
+  const [appearanceSettingsStatus, setAppearanceSettingsStatus] = useState<
+    "error" | "ready" | "saved"
+  >(initialSelection.frame?.endsWith("-error") ? "error" : "ready");
+  const [appearanceSettingsMessage, setAppearanceSettingsMessage] =
+    useState("");
   const [generalSettings, setGeneralSettings] = useState<GeneralSettingsValue>({
     ambientSuggestions: true,
     autoReview: true,
@@ -12615,13 +12620,23 @@ export function App() {
                 C
               </span>
             }
-            onChange={setAppearanceSettings}
+            onChange={(value) => {
+              setAppearanceSettings(value);
+              setAppearanceSettingsStatus("saved");
+              setAppearanceSettingsMessage("Appearance settings saved");
+            }}
             onCopyTheme={(theme) =>
               setAppearanceThemeAction(`${theme} theme copied`)
             }
             onImportTheme={(theme) =>
               setAppearanceThemeAction(`${theme} theme import requested`)
             }
+            onRetry={() => {
+              setAppearanceSettingsStatus("ready");
+              setAppearanceSettingsMessage("");
+            }}
+            status={appearanceSettingsStatus}
+            statusMessage={appearanceSettingsMessage || undefined}
             value={appearanceSettings}
           />
           <span aria-live="polite" className="demo-settings-action-status">

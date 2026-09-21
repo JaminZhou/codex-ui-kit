@@ -1650,6 +1650,14 @@ saved states with a 0% own-fixture pixel gate. This is controlled renderer
 evidence only; local-memory storage, profile services, and persistence remain
 host-owned.
 
+The same current `26.915.31945` replay now carries the Appearance failure and
+recovery boundary at 1180px and 720px. A host-controlled save error is exposed
+as an alert, Retry restores the editable theme controls, and selecting a theme
+settles the saved state while preserving the Theme and Preferences groups.
+Browser/CDP and Electron repeat the error, ready, and saved states with a 0%
+own-fixture pixel gate. This remains renderer evidence only; preference
+persistence, Dock artwork, and system appearance effects remain host-owned.
+
 The Hooks/code-review family is now delivered with its evidence levels kept
 separate. An isolated current `26.803.61601` Renderer reaches the visible
 Hooks route, stable empty state, read-only reload feedback, exact 1180×820 and
