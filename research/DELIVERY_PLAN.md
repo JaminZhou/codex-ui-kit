@@ -1790,6 +1790,13 @@ evidence with no current-product pixel claim because instructions and artwork
 are dynamic. Enablement, uninstall, prompt submission, execution, and
 failure/retry remain open, so Stage 4 remains in progress.
 
+The current 26.915 playground now adds a controlled Skill `Try now` execution
+failure → Retry route at wide and 720px. The draft remains unsent, the failure
+is exposed as `role=alert`, and Retry restores the editable draft without
+claiming real skill execution or host persistence. Browser/CDP and Electron
+replays compare initial, failed, and recovered captures with 0% own-fixture
+drift.
+
 The integration catalog replay now carries a controlled install lifecycle for
 public plugin and recommended skill rows: an action enters a disabled pending
 state, settles to success, and promotes the item into the Installed region.

@@ -2619,7 +2619,8 @@
         "browser-cdp:integration-skill-detail-current-26-915-installed-actions",
         "electron:integration-skill-detail-current-26-915-installed-actions",
         "pixel:integration-skill-detail-current-26-915-own-fixture-zero-drift",
-        "replay:current-26.915-skill-detail-failure-retry-wide-compact"
+        "replay:current-26.915-skill-detail-failure-retry-wide-compact",
+        "replay:current-26.915-skill-try-now-failure-retry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
