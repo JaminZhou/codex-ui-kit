@@ -2120,6 +2120,14 @@ input, preview marker, or artifact panel. The native viewport remains
 decoding, image generation/decoding, artifact selection, and product pixels
 remain open even though the controlled replay matrix is fully gated.
 
+The current 26.915 document/media replay now also covers the renderer-owned
+failure boundary: both document and generated-image previews enter the
+`Preview unavailable` alert at wide and 720px compact sizes, expose `Retry
+preview`, and return to the ready shell without overflow. Repeated CDP/Electron
+captures are zero-drift within the own fixture. This is still a renderer
+recovery contract; installed-product decoding, generation, artifact selection,
+and host-owned preview pixels remain unsampled.
+
 Exit: each in-scope P1 family has a documented ownership boundary and at least
 one end-to-end vertical slice.
 
