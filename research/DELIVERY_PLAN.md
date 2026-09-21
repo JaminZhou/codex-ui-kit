@@ -1884,6 +1884,15 @@ Uninstall path are replayed through CDP with zero-drift own-fixture pixels.
 This is a deterministic host-controlled parity gate, not a claim of provider
 save/OAuth behavior or installed-product pixels.
 
+The follow-up 26.915 MCP editor gate now exercises the remaining replay-owned
+save transition at both widths: a valid update first enters the explicit
+`Couldn’t save MCP server` alert, Retry restores the editable ready state, and
+the next Save persists the row and returns to the current MCP list. CDP and
+Electron replay the initial, failed, retried, and saved frames with zero drift
+within the own fixture. This closes the local failure/recovery boundary only;
+real host configuration writes, credentials, OAuth/permission, provider
+availability, and installed-product pixels remain host-owned and open.
+
 The corresponding 26.915 replay slice now models the measured 46px native
 window-titlebar offset and the current `Plugins13 / Apps6 / MCPs4 / Skills2 /
 Marketplace2` tab counts. Its version prefix is preserved through Add MCP

@@ -4212,6 +4212,10 @@ export function App() {
   const [mcpEditorStatus, setMcpEditorStatus] =
     useState<McpServerEditorStatus>("ready");
   const [mcpEditorStatusMessage, setMcpEditorStatusMessage] = useState("");
+  const mcpEditorSaveFailureReplay =
+    initialSelection.frame?.includes("-save-failure-") ?? false;
+  const [mcpEditorSaveFailureAttempted, setMcpEditorSaveFailureAttempted] =
+    useState(false);
   const mcpMutationTimerRef = useRef<number | null>(null);
   const [mcpEditorValue, setMcpEditorValue] = useState<McpServerEditorValue>(
     initialSelection.frame?.endsWith("-detail")
@@ -12397,6 +12401,18 @@ export function App() {
                   }
                   if (mcpMutationTimerRef.current !== null) {
                     window.clearTimeout(mcpMutationTimerRef.current);
+                  }
+                  if (
+                    mcpEditorSaveFailureReplay &&
+                    !mcpEditorSaveFailureAttempted
+                  ) {
+                    setMcpEditorSaveFailureAttempted(true);
+                    setMcpEditorStatus("error");
+                    setMcpEditorStatusMessage(
+                      "The MCP configuration service is temporarily unavailable.",
+                    );
+                    setMcpSettingsAction("MCP save failed");
+                    return;
                   }
                   setMcpEditorStatus("saving");
                   setMcpEditorStatusMessage("");
