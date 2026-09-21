@@ -4807,6 +4807,21 @@ export function App() {
       exhaustiveCodeReview: false,
       triggerPolicy: "pr_open",
     });
+  const [codeReviewSettingsStatus, setCodeReviewSettingsStatus] = useState<
+    "error" | "loading" | "ready"
+  >(() =>
+    (initialSelection.frame === "workspace-code-review-settings-loading" ||
+      initialSelection.frame?.startsWith(
+        "workspace-code-review-settings-current-26-915-loading",
+      ))
+      ? "loading"
+      : initialSelection.frame === "workspace-code-review-settings-error" ||
+          initialSelection.frame?.startsWith(
+            "workspace-code-review-settings-current-26-915-error",
+          )
+        ? "error"
+        : "ready",
+  );
   const [savedCommitInstructions, setSavedCommitInstructions] = useState("");
   const [savedPullRequestInstructions, setSavedPullRequestInstructions] =
     useState("");
@@ -12622,8 +12637,9 @@ export function App() {
         <CodeReviewSettingsPage
           data-evidence="package-observed"
           onChange={setCodeReviewSettings}
-          onRetry={() => undefined}
+          onRetry={() => setCodeReviewSettingsStatus("ready")}
           showCreditPreference
+          status={codeReviewSettingsStatus}
           value={codeReviewSettings}
         />
       ) : workspacePage === "appearance-settings" ? (

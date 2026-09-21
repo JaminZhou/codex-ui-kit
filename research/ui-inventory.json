@@ -2484,7 +2484,11 @@
         "replay:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
         "browser-cdp:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
         "electron:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
-        "pixel:current-26.915-hooks-error-retry-refresh-empty-wide-compact"
+        "pixel:current-26.915-hooks-error-retry-refresh-empty-wide-compact",
+        "replay:current-26.915-code-review-loading-error-retry-preferences-wide-compact",
+        "browser-cdp:current-26.915-code-review-loading-error-retry-preferences-wide-compact",
+        "electron:current-26.915-code-review-loading-error-retry-preferences-wide-compact",
+        "pixel:current-26.915-code-review-loading-error-retry-preferences-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
