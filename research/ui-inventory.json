@@ -491,7 +491,8 @@
         "live:2026-09-22-mcp-tool-call-multi-turn-order-wide-compact",
         "electron:live-mcp-multi-tool-disclosure",
         "live:2026-09-22-mcp-tool-call-remote-http-wide-compact",
-        "live:2026-09-22-mcp-tool-call-oauth-dcr-wide-compact"
+        "live:2026-09-22-mcp-tool-call-oauth-dcr-wide-compact",
+        "live:2026-09-22-mcp-elicitation-form-accept-decline-cancel-url-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

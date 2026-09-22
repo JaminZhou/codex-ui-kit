@@ -1509,6 +1509,13 @@ Cancel response. This proves the public URL-mode forwarding boundary only;
 OAuth provider behavior, credential exchange, and external-page rendering stay
 host-owned.
 
+The 2026-09-22 refresh re-runs the form Accept/Decline/Cancel and URL Cancel
+variants on the same disposable signed-in App Server. It records the
+`710×265px` form, `710×206px` URL card, required-field gating, exact result
+tokens, `_blank` authorization link, and compact no-overflow behavior. This
+is current playground protocol/UI evidence, not production provider or
+installed-product pixel parity.
+
 The Composer context family is now independently current on `26.825.51511`.
 Project search and fixed actions, Local/New local worktree selection,
 No environment, starting branch, the current Branches search/roles, Escape
