@@ -1384,6 +1384,13 @@ part of full playground acceptance with disposable workspace evidence. The
 30-turn windowed replay and installed-product eviction heuristics remain
 separate boundaries.
 
+The current 26.915 conversation-shell replay now pairs the basic user/
+assistant turn with the sampled wide and compact Composer/thread geometry.
+Browser/CDP, Electron, and a two-run own-fixture pixel gate cover 1180×820 and
+720×680 without submitting a real prompt. This closes a current-version replay
+slice for `thread.shell` and `thread.messages-basic`; installed-product
+conversation evidence and product-pixel promotion remain separate boundaries.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,

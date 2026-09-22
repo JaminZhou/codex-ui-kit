@@ -134,7 +134,11 @@
         "replay:current-26.825-basic-message-wide-721-open-and-720-collapsed",
         "browser-cdp:current-26.825-header-thread-composer-responsive-boundary-contract",
         "electron:current-26.825-native-window-header-thread-composer-responsive-boundary-contract",
-        "pixel:three-reviewed-current-26.825-basic-thread-baselines-and-nine-local-only-product-regions"
+        "pixel:three-reviewed-current-26.825-basic-thread-baselines-and-nine-local-only-product-regions",
+        "replay:current-26.915-conversation-shell-wide-compact",
+        "browser-cdp:current-26.915-conversation-shell-wide-compact",
+        "electron:current-26.915-conversation-shell-wide-compact",
+        "pixel:current-26.915-conversation-shell-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -165,7 +169,11 @@
         "replay:current-26.825-exact-basic-user-and-assistant-turn",
         "browser-cdp:current-26.825-exact-message-style-and-four-response-actions",
         "electron:current-26.825-native-message-and-keyboard-focus-contract",
-        "pixel:current-26.825-wide-boundary-compact-thread-regions"
+        "pixel:current-26.825-wide-boundary-compact-thread-regions",
+        "replay:current-26.915-basic-message-wide-compact",
+        "browser-cdp:current-26.915-basic-message-wide-compact",
+        "electron:current-26.915-basic-message-wide-compact",
+        "pixel:current-26.915-basic-message-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
