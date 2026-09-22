@@ -1949,7 +1949,11 @@
         "replay:current-26.825-terminal-light-wide-compact-matrix",
         "browser-cdp:current-26.825-terminal-light-wide-compact-matrix",
         "electron:current-26.825-terminal-light-wide-compact-matrix",
-        "pixel:current-26.825-terminal-light-wide-compact-matrix"
+        "pixel:current-26.825-terminal-light-wide-compact-matrix",
+        "replay:current-26.915-terminal-transport-wide-compact",
+        "browser-cdp:current-26.915-terminal-transport-wide-compact",
+        "electron:current-26.915-terminal-transport-wide-compact",
+        "pixel:current-26.915-terminal-transport-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

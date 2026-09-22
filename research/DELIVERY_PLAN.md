@@ -1407,6 +1407,13 @@ two-run own-fixture pixel gate cover both the error and recovered frames at
 1180×820 and 720×680. It remains replay-only evidence and does not promote an
 installed-product provider failure or plugin-generated Markdown variant.
 
+The current 26.915 terminal-transport replay now adds the disconnected terminal
+P0 path: a session-scoped `Reconnect` alert with focus reachability, recovery
+to a fresh prompt, and zero-overflow wide/compact frames. Browser/CDP,
+Electron, and a two-run own-fixture pixel gate cover both failure and recovery
+at 1180×820 and 720×680. It remains replay-only evidence and does not promote
+a real PTY/IPC transport drop from the installed product.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
