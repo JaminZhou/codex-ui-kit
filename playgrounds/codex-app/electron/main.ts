@@ -106,6 +106,9 @@ const workspaceDirectory = resolve(
 );
 const liveWriteOptIn = process.env.CODEX_UI_KIT_LIVE_WORKSPACE_WRITE;
 const requestedLiveModel = process.env.CODEX_UI_KIT_LIVE_MODEL?.trim() || undefined;
+const requestedLiveCodexPath = process.env.CODEX_UI_KIT_LIVE_CODEX_PATH?.trim() || undefined;
+const requestedLiveProtocolValidation =
+  process.env.CODEX_UI_KIT_LIVE_PROTOCOL_VALIDATION === "off" ? "off" : "strict";
 const requestedLiveReasoningEffort = readRequestedLiveReasoningEffort();
 process.env.CODEX_DEMO_WORKSPACE_PROJECT_PATH = workspaceDirectory;
 const startupWorkspaceProjectToken = "startup-workspace";
@@ -529,7 +532,8 @@ async function ensureClient() {
       title: "Codex App Playground",
       version: "0.0.0",
     },
-    protocolValidation: "strict",
+    ...(requestedLiveCodexPath ? { codexPath: requestedLiveCodexPath } : {}),
+    protocolValidation: requestedLiveProtocolValidation,
   });
   unsubscribeNotifications = client.onNotification(broadcastNotification);
   unsubscribeServerRequests = [
