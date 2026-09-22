@@ -4306,6 +4306,12 @@ export function App() {
     return () => window.removeEventListener("focus", refresh);
   }, [mode]);
   useEffect(() => {
+    if (mode !== "live" || !window.codexDemo?.onLiveHistoryChange) return;
+    return window.codexDemo.onLiveHistoryChange(() => {
+      setLiveProjectsRefresh(value => value + 1);
+    });
+  }, [mode]);
+  useEffect(() => {
     if (mode !== "live" || !window.codexDemo) return;
     let active = true;
     setLiveProjectsError(false);

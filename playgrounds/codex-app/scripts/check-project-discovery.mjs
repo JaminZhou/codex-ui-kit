@@ -30,6 +30,10 @@ for (const width of [1180, 720]) {
     await app.evaluate(({ BrowserWindow }, width) => BrowserWindow.getAllWindows()[0].setContentSize(width, 820), width);
     await page.getByRole("button", { name: "Live local", exact: true }).click();
     await page.getByRole("button", { name: "Toggle projects", exact: true }).click();
+    await page.evaluate(() => {
+      window.__projectDiscoveryChanges = 0;
+      window.codexDemo.onLiveHistoryChange(() => { window.__projectDiscoveryChanges += 1; });
+    });
     if (width === 1180) {
       await page.getByText("Couldn’t restore projects.", { exact: true }).waitFor();
       await writeFile(registry, JSON.stringify(records));
@@ -54,7 +58,7 @@ for (const width of [1180, 720]) {
     const refreshed = { ...beforeRefresh, version: 2, projects: beforeRefresh.projects ?? projects.map(({ path, label }) => ({ path, label, updatedAt: 1 })) };
     refreshed.projects = [...refreshed.projects.filter(project => project.path !== external), { path: external, label: `External project ${width}`, updatedAt: 10 }];
     await writeFile(registry, JSON.stringify(refreshed));
-    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await page.waitForFunction(() => window.__projectDiscoveryChanges > 0);
     const externalRow = page.getByRole("button", { name: `External project ${width}`, exact: true });
     await externalRow.waitFor();
     assert.equal(await externalRow.isEnabled(), true);
@@ -69,7 +73,8 @@ for (const width of [1180, 720]) {
     assert.equal(await available.getAttribute("aria-pressed"), "true");
     assert.equal(await composer.inputValue(), `Unsubmitted project draft ${width}`);
     await writeFile(registry, JSON.stringify(refreshed));
-    await page.getByRole("button", { name: "Retry projects", exact: true }).click();
+    // The repaired registry is observed by the same cross-instance watcher;
+    // project discovery should recover without a manual Retry click.
     await page.getByText("Couldn’t restore projects.", { exact: true }).waitFor({ state: "hidden" });
     // Project retry and conversation retry are independent. A fresh focus
     // revalidates both after the shared registry is repaired.
