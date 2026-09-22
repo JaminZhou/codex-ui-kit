@@ -2105,6 +2105,13 @@ overflow, and two-run own-fixture pixels through Browser/CDP and Electron. The
 installed 26.915 inline-mention observation remains separate and is not
 promoted as a plugin attachment card.
 
+The current 26.915 candidate wrapper also adds replay-only attachment upload
+states at 1180×820 and 720×680: five-card containment, accessible 62% progress,
+Upload failed, Retry→ready recovery, submit enablement, focus restoration,
+zero overflow, and repeated zero-drift pixels through Browser/CDP and
+Electron. Native current-build upload progress/error reachability remains
+host-owned and explicitly unpromoted.
+
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests
 only `seq 1 400`. Ask mode classified that exact command as low risk and ran it

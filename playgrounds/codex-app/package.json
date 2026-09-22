@@ -30,6 +30,7 @@
     "check:composer-plugin-connect": "node scripts/check-composer-plugin-connect.mjs",
     "check:composer-plugin-attachment": "node scripts/check-composer-plugin-attachment.mjs",
     "check:current-plugin-attachment-26-915": "node scripts/check-current-plugin-attachment-26-915.mjs",
+    "check:current-attachment-upload-26-915": "node scripts/check-current-attachment-upload-26-915.mjs",
     "check:markdown-error": "node scripts/check-markdown-error.mjs",
     "check:terminal-transport-failure": "node scripts/check-terminal-transport-failure.mjs",
     "check:thread-summary-populated": "node scripts/check-thread-summary-populated.mjs",

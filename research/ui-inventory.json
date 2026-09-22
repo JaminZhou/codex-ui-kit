@@ -1132,7 +1132,10 @@
         "pixel:current-26.825-wide-compact-post-picker-and-preview",
         "replay:current-26.915-plugin-card-attachment-wide-compact",
         "electron:replay-26.915-plugin-card-attachment-wide-compact",
-        "pixel:replay-26.915-plugin-card-attachment-own-fixture-zero-drift"
+        "pixel:replay-26.915-plugin-card-attachment-own-fixture-zero-drift",
+        "replay:current-26.915-attachment-upload-progress-error-retry",
+        "electron:replay-26.915-attachment-upload-progress-error-retry",
+        "pixel:replay-26.915-attachment-upload-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
