@@ -1500,9 +1500,12 @@ runs the same public path with Accept, Decline, and Cancel: Accept completes
 the tool with the deterministic `MCP_ELICITATION_OK` result, while Decline and
 Cancel settle the same tool as failed with their exact response tokens. Each
 action records the 1180/720 form geometry and compact no-overflow contract.
-This promotes the sampled local form-to-tool decision lifecycle, not URL-mode
-elicitation, authentication, permission variants, multi-turn/multi-tool
-behavior, production server reachability, or installed-product pixel parity.
+The URL-mode companion now also runs a real Accept path: the authorization link
+remains an explicit `_blank` affordance without auto-opening a browser, and
+Accept completes the same tool with `MCP_ELICITATION_OK:{}` at wide/compact
+sizes. This promotes the sampled local form/URL-to-tool decision lifecycle,
+not authentication, permission variants, multi-turn/multi-tool behavior,
+production server reachability, or installed-product pixel parity.
 The same live acceptance now adds a URL-mode request with an exact
 authorization link, `_blank` target, no implicit browser navigation, and safe
 Cancel response. This proves the public URL-mode forwarding boundary only;
