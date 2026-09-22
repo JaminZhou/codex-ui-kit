@@ -1436,6 +1436,12 @@ submit transitions, focus restoration, zero overflow, and zero-drift repeated
 pixels through Browser/CDP and Electron. Native 26.915 upload progress/error
 reachability remains host-owned and is not promoted by this replay gate.
 
+The current 26.915 global-notification action replay now wraps the public
+success/warning/info/neutral queue at 1180×820 and 720×680. It covers expansion,
+keyboard focus, `Review → Open → View → Close` settlement, queue counts,
+dismissal, and repeated zero-drift pixels through Browser/CDP and Electron.
+Live App Server notification reachability remains a separate host-owned gate.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
