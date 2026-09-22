@@ -2153,6 +2153,14 @@ host/UI contract only: project selection, browser tabs, plugin authorization,
 network execution, and installed-product pixels remain host-owned and are not
 promoted by this slice.
 
+The same Live picker now routes `Work in a project` through the existing
+host-backed project list rather than recording a dead-end selection. The
+1180px/720px Electron gate opens the project dialog, selects the current
+workspace project, returns to the Live conversation, and verifies the picker
+marker and Composer ownership. The host still owns directory selection,
+project-token persistence, and any remote/project discovery effects; this is
+not a claim of installed-product project pixels.
+
 This extends the earlier 26.908 mention replay rather than replacing it. The
 public `ComposerResourceMention` API marks the token non-editable and replays
 the measured transparent 14px/20px/500 style. Electron coverage checks wide and

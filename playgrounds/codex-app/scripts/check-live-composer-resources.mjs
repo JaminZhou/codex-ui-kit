@@ -84,6 +84,18 @@ for (const width of [1180, 720]) {
       ),
       true,
     );
+
+    await trigger.click();
+    await page.getByRole("listbox", { name: "Composer resources" }).getByRole("option", { name: /Work in a project/ }).click();
+    const projectDialog = page.getByRole("dialog", { name: "Choose a project" });
+    await projectDialog.waitFor();
+    assert.equal(await root.getAttribute("data-live-composer-project-picker"), "true");
+    assert.equal(await projectDialog.getByRole("listbox", { name: "Suggestions" }).count(), 1);
+    await projectDialog.getByRole("option", { name: "Select project codex-ui-kit", exact: true }).click();
+    assert.equal(await root.getAttribute("data-live-composer-project-picker"), null);
+    assert.equal(await root.getAttribute("data-live-composer-resource"), "project");
+    assert.equal(await root.getAttribute("data-composer-plugin-action"), "select:project");
+    await page.locator(".codex-ui-conversation-thread-shell .codex-ui-composer__input").waitFor();
   } finally {
     await app.close();
   }
