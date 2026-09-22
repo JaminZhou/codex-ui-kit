@@ -1138,7 +1138,10 @@
         "pixel:replay-26.915-attachment-upload-own-fixture-zero-drift",
         "replay:current-26.915-global-notification-actions-wide-compact",
         "electron:replay-26.915-global-notification-actions-wide-compact",
-        "pixel:replay-26.915-global-notification-actions-own-fixture-zero-drift"
+        "pixel:replay-26.915-global-notification-actions-own-fixture-zero-drift",
+        "replay:current-26.915-global-notifications-light-wide-compact",
+        "electron:replay-26.915-global-notifications-light-wide-compact",
+        "pixel:replay-26.915-global-notifications-light-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
