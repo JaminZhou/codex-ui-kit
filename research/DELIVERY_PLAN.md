@@ -2599,6 +2599,12 @@ Fine visual tuning comes after structural coverage stabilizes:
 Exit: every in-scope P0 surface and selected P1 integration has current-build
 regional pixel evidence, not only a visually plausible showcase.
 
+The 2026-09-22 replay audit passes all 594 selected lifecycle frames through
+the private Electron visual contract with no geometry, overflow, computed
+style, or regional-pixel regression. It strengthens the maintained replay
+matrix while keeping the locked installed app outside any new product-pixel
+promotion.
+
 ### 7. Prepare public release
 
 - freeze and document the public component/state contracts;
