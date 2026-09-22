@@ -151,6 +151,12 @@ host-owned and are intentionally not claimed by the playground.
   a two-run own-fixture pixel gate cover both error and recovered frames at
   1180×820 and 720×680. It remains replay-only evidence and does not promote
   an installed-product provider failure or plugin-generated Markdown variant.
+- The current 26.915 terminal-transport replay adds the disconnected terminal
+  P0 path: a session-scoped `Reconnect` alert with focus reachability, recovery
+  to a fresh prompt, and zero-overflow wide/compact frames. Browser/CDP,
+  Electron, and a two-run own-fixture pixel gate cover both failure and recovery
+  at 1180×820 and 720×680. It remains replay-only evidence and does not promote
+  a real PTY/IPC transport drop from the installed product.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
