@@ -12,6 +12,9 @@ release change removes `private: true` and selects a version.
   scheduled tasks, sites, login/onboarding, PDF previews, plugin/skill detail,
   workspace recovery, terminal notices, Composer permissions/resources, and
   thread-summary docking.
+- Current 26.915 settings recovery contracts for Personalization, Appearance,
+  Git, Hooks, and Code review, including loading/error/retry and preference
+  transitions at wide and compact widths.
 - Protocol-neutral callback contracts for loading, retry, error, empty,
   running, completed, and unavailable states.
 - React 18/19, SSR/NodeNext, Electron, accessibility, Browser/CDP, and
@@ -34,7 +37,8 @@ import "codex-ui-kit/styles.css";
 
 <RemoteConnectionsPage
   connections={connections}
-  form={draft}
+  formOpen={editorOpen}
+  formValue={draft}
   onChangeForm={setDraft}
   onSave={saveConnection}
   onTest={testConnection}
