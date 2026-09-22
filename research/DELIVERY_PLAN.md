@@ -1421,6 +1421,14 @@ zero overflow, and two-run own-fixture pixels at 1180×820 and 720×680 through
 Browser/CDP and Electron. It remains replay-only evidence and does not promote
 an installed-product populated summary capture.
 
+The current 26.915 plugin-attachment replay now wraps the public 26.908
+GitHub Triage card fixture at 1180×820 and 720×680. It covers the ready card,
+Plugin metadata, disabled submit, focus-preserving removal, resource-picker
+selection, zero overflow, and two-run own-fixture pixels through Browser/CDP
+and Electron. The installed 26.915 product's observed inline mention remains
+the authoritative runtime boundary; this replay does not promote a plugin
+attachment card to installed-product parity.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,

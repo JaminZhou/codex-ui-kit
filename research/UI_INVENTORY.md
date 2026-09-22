@@ -2098,6 +2098,13 @@ the public GitHub resource inserts an inline editor mention rather than a
 ComposerAttachment card; replay-only plugin cards therefore remain explicitly
 separate from current product attachment evidence.
 
+The current 26.915 candidate wrapper now adds a replay-only GitHub Triage
+attachment-card gate at 1180×820 and 720×680. It verifies Plugin metadata,
+disabled submission, focus-preserving removal, resource-picker selection, zero
+overflow, and two-run own-fixture pixels through Browser/CDP and Electron. The
+installed 26.915 inline-mention observation remains separate and is not
+promoted as a plugin attachment card.
+
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests
 only `seq 1 400`. Ask mode classified that exact command as low risk and ran it
