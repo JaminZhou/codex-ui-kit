@@ -1129,7 +1129,10 @@
         "electron:current-26.825-preview-focus-zoom-removal-and-completion",
         "electron:replay-attachment-uploading-progress-1180-and-error-retry-recovery-720",
         "cdp-26.908.70816:github-selection-inline-mention-not-attachment",
-        "pixel:current-26.825-wide-compact-post-picker-and-preview"
+        "pixel:current-26.825-wide-compact-post-picker-and-preview",
+        "replay:current-26.915-plugin-card-attachment-wide-compact",
+        "electron:replay-26.915-plugin-card-attachment-wide-compact",
+        "pixel:replay-26.915-plugin-card-attachment-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1165,7 +1168,8 @@
         "cdp-26.915.31945:read-only-public-plugin-skill-catalog-without-selection",
         "playground:current-26.915-plugin-mention-contract",
         "electron:replay-26.915-github-inline-resource-mention-wide-compact",
-        "pixel:replay-26.915-github-inline-resource-mention-wide-compact-zero-drift"
+        "pixel:replay-26.915-github-inline-resource-mention-wide-compact-zero-drift",
+        "replay:current-26.915-plugin-card-attachment-boundary"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
