@@ -914,7 +914,8 @@
         "cdp-26.825.51511:completed-basic-thread-736-366.125-687-by-98-composer-five-controls-and-44px-editor",
         "cdp-26.825.51511:four-line-736-687x134-and-long-input-736x259-687x224-local-scroll",
         "cdp-26.908.70816:new-chat-composer-wide-medium-721-720-geometry",
-        "cdp-26.911.61220:new-chat-composer-wide-medium-721-720-geometry"
+        "cdp-26.911.61220:new-chat-composer-wide-medium-721-720-geometry",
+        "cdp-26.915.31945:new-chat-composer-editor-and-responsive-sidebar-delta"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1278,7 +1279,8 @@
         "cdp-26.825.51511:content-dependent-project-groups-30px-row-and-owned-scroll-baseline",
         "cdp-26.903.71938:project-group-navigation-and-owned-scroll",
         "cdp-26.908.70816:project-group-navigation-and-owned-scroll",
-        "cdp-26.911.61220:project-group-navigation-and-owned-scroll"
+        "cdp-26.911.61220:project-group-navigation-and-owned-scroll",
+        "cdp-26.915.31945:project-group-navigation-and-owned-scroll-delta"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1425,7 +1427,8 @@
         "cdp-26.810.52044:project-more-new-chat-and-recents-pin-archive-current-icons",
         "cdp-26.818.41509:project-task-and-recents-pin-archive-19x20-gap8-hover-replacement-and-unmasked-action-pixels",
         "cdp-26.820.60940:project-active-and-recents-idle-pin-archive-19x20-gap8-current-icons-browser-electron-and-regional-pixels",
-        "cdp-26.825.51511:thread-pin-chat-archive-chat-19x20-gap8-hover-replaces-status-browser-electron-reviewed-hover-and-2.9762-percent-shape-pixel"
+        "cdp-26.825.51511:thread-pin-chat-archive-chat-19x20-gap8-hover-replaces-status-browser-electron-reviewed-hover-and-2.9762-percent-shape-pixel",
+        "cdp-26.915.31945:project-menu-native-boundary-delta"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1565,7 +1568,8 @@
         "cdp-26.825.31414:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return",
         "cdp-26.825.51511:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return",
         "cdp-26.903.71938:help-menu-eight-items-focus-escape",
-        "cdp-26.911.61220:help-menu-eight-items-focus-escape"
+        "cdp-26.911.61220:help-menu-eight-items-focus-escape",
+        "cdp-26.915.31945:help-menu-content-dependent-nine-item-variant"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1591,7 +1595,8 @@
         "cdp-26.820.60940:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
         "cdp-26.820.60940:projects-back-forward-x88-120-152-opacity-0.4-720-hide-show-and-selected-chat-restoration",
         "cdp-26.825.31414:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
-        "cdp-26.825.51511:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome"
+        "cdp-26.825.51511:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
+        "cdp-26.915.31945:sidebar-back-forward-pull-request-route-and-responsive-delta"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1638,7 +1643,8 @@
         "cdp-26.818.41509:compact-visible-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.820.60940:compact-visible-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.825.31414:compact-visible-pull-requests-to-new-chat-in-session-restoration",
-        "cdp-26.825.51511:compact-visible-pull-requests-to-new-chat-in-session-restoration"
+        "cdp-26.825.51511:compact-visible-pull-requests-to-new-chat-in-session-restoration",
+        "cdp-26.915.31945:compact-pull-requests-to-new-chat-restoration-delta"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
