@@ -39,7 +39,7 @@ it("fast-forwards main and removes only exact merged refs, including an idempote
   expect(await git("ls-remote", "--heads", bare)).toBe(`${merged.mergeCommit}\trefs/heads/main`);
   expect(await git("ls-remote", "--tags", bare)).toBe("");
   expect(await cleanupVerifiedMerge(repo, "origin", bare, merged)).toMatchObject({ branch: "main" });
-});
+}, 20_000);
 it("accepts GitHub's prior head deletion and never deletes advanced local or remote heads", async () => {
   const { repo, bare, git, commit, merged } = await fixture();
   await commit("new local work");

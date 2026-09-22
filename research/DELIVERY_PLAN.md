@@ -2409,6 +2409,11 @@ exists. Registry version 2 preserves these independently of threads and migrates
 version 1 ownership records on write. The Electron gate now selects an empty
 project, restarts and restores its empty history with an enabled Composer, without
 creating a model thread. It does not import a global Codex project index.
+A registry watcher now refreshes the live Projects route when another Electron
+instance atomically adds or changes an owned project, without waiting for window
+focus. The current project, Composer draft, and project token remain stable while
+the new row appears; the Electron project-discovery gate covers that cross-instance
+path at 1180/720px alongside corrupt-registry recovery.
 A separate live project-continuity probe now creates two disposable project
 directories and performs read-only A → B → A model turns, proving distinct B
 thread ownership, same-thread A restoration, and wide/720 captures. Its
@@ -2464,8 +2469,9 @@ stable project tokens and recovery after a corrupt registry. A registry
 directory watcher now broadcasts atomic replacements to other Electron
 instances; `check:live-history-sync` proves external create/rename/archive
 propagation without focus at 1180/720 while preserving the existing draft and
-dialog deferral. Cross-instance project discovery remains a separate host
-boundary.
+dialog deferral. The project-discovery gate now consumes the same broadcast and
+shows an externally added owned project without focus, while preserving the
+active project, token, and Composer draft at 1180/720.
 
 The Live environment-status follow-up adds one deliberately narrow Stage 3
 vertical slice: an owned-project sidebar route accepts a single opaque public
