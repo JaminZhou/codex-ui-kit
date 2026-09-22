@@ -21,17 +21,16 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The authoritative full-surface inventory baseline is the installed
-  `26.903.71938` (`8576`) build. Its 92 surface groups and build-scoped
-  evidence status are tracked in
+- The promoted cross-surface inventory baseline is the installed
+  `26.903.71938` (`8576`) build. The latest installed candidate is
+  `26.915.31945` (`9922`), with scoped shell/sidebar, settings, integrations,
+  Composer, and resource refreshes recorded separately in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md) and the
   [`delivery plan`](research/DELIVERY_PLAN.md). Current-build captures,
   previous-build regression fixtures, and unsampled rows remain explicitly
   separated; a passing replay is not silently promoted to installed-product
-  parity. The 26.903 capture revalidates the shell, responsive sidebar,
-  primary route restoration, project-group lifecycle, Help menu, Projects
-  Index, and the right-hand PDF workspace. This remains a partial UI
-  foundation rather than a global reconstruction claim.
+  parity. This remains a partial UI foundation rather than a global
+  reconstruction claim.
 - The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
