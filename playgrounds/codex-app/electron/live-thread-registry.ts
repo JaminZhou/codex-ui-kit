@@ -213,6 +213,20 @@ export class LiveThreadRegistry {
     });
   }
 
+  /** Permanently remove one already-archived owned thread after remote success. */
+  delete(directory: string, id: string, apply: () => Promise<unknown>): Promise<boolean> {
+    return this.serialize(async () => {
+      const data = await this.read();
+      const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
+      if (!thread) throw new Error("This thread does not belong to the selected playground project.");
+      if (!thread.archived) throw new Error("Only an archived chat can be permanently deleted.");
+      await apply();
+      data.threads = data.threads.filter(entry => entry.id !== id);
+      await this.write(data);
+      return true;
+    });
+  }
+
   observeArchived(id: string, archived: boolean): Promise<boolean> {
     return this.serialize(async () => {
       const data = await this.read();

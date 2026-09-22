@@ -1048,6 +1048,8 @@ restarts Electron, restores A from archived history, verifies the real restore
 notification, loads its prior messages, and continues the exact same ID. The
 public stored name is checked before exact fixture-thread cleanup. This passed
 after fixing an empty-cache entry created by the unarchive metadata event;
-the failed probe receipt remains in its temporary evidence directory. No global
-Codex history or permanent deletion is used. Real multi-descendant archive and
-current-product pixel parity remain separate evidence requirements.
+the failed probe receipt remains in its temporary evidence directory. The
+descendant follow-up separately verifies server-discovered child archive,
+root-only restore, and explicit permanent deletion of both archived child and
+root through the public `thread/delete` contract. No global Codex history or
+current-product pixel parity is claimed.

@@ -28,6 +28,9 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
   const [archiveTarget, setArchiveTarget] = useState<ThreadRow | null>(null);
   const [archiveError, setArchiveError] = useState(false);
   const archiveTrigger = useRef<HTMLButtonElement | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ThreadRow | null>(null);
+  const [deleteError, setDeleteError] = useState(false);
+  const deleteTrigger = useRef<HTMLButtonElement | null>(null);
   const changeArchive = async () => {
     if (!archiveTarget || !projectToken || !window.codexDemo || saving) return;
     const epoch = mutationGeneration.current;
@@ -45,12 +48,30 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
       if (epoch === mutationGeneration.current) setSaving(false);
     }
   };
+  const deleteChat = async () => {
+    if (!deleteTarget || !projectToken || !window.codexDemo || saving) return;
+    const epoch = mutationGeneration.current;
+    setSaving(true);
+    setDeleteError(false);
+    try {
+      await window.codexDemo.deleteLiveThread({ projectToken, threadId: deleteTarget.id });
+      if (epoch !== mutationGeneration.current) return;
+      setDeleteTarget(null);
+      void load();
+    } catch {
+      if (epoch === mutationGeneration.current) setDeleteError(true);
+    } finally {
+      if (epoch === mutationGeneration.current) setSaving(false);
+    }
+  };
   useEffect(() => {
     setEditing(null);
     setSaving(false);
     setRenameError(false);
     setArchiveTarget(null);
     setArchiveError(false);
+    setDeleteTarget(null);
+    setDeleteError(false);
     return () => { mutationGeneration.current += 1; };
   }, [projectToken]);
   const saveName = async () => {
@@ -107,10 +128,10 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
   useEffect(() => {
     // Coalesce focus events; defer refresh until pagination or an open editor
     // settles instead of discarding a user's draft or losing the refresh.
-    if (focusRequest === handledFocus.current || saving || editing || archiveTarget || loading) return;
+    if (focusRequest === handledFocus.current || saving || editing || archiveTarget || deleteTarget || loading) return;
     handledFocus.current = focusRequest;
     void load();
-  }, [focusRequest, saving, editing, archiveTarget, loading]);
+  }, [focusRequest, saving, editing, archiveTarget, deleteTarget, loading]);
   return <div aria-label="Live conversations" aria-busy={loading || busy}>
     {rows.map(row => <AppSidebarItem key={row.id} disabled={busy || showArchived}
       actions={<>{!showArchived && <button type="button" aria-label={`Rename ${row.title || "Untitled chat"}`}
@@ -120,7 +141,11 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
           disabled={busy || loading || saving || runningIds.length > 0}
           onClick={event => { archiveTrigger.current = event.currentTarget; setArchiveTarget(row); setArchiveError(false); }}>
           <CurrentBuildIcon name="sidebar-archive" />
-        </button></>}
+        </button>{showArchived && <button type="button" aria-label={`Delete ${row.title || "Untitled chat"}`}
+          disabled={busy || loading || saving || runningIds.length > 0}
+          onClick={event => { deleteTrigger.current = event.currentTarget; setDeleteTarget(row); setDeleteError(false); }}>
+          <CurrentBuildIcon name="sidebar-project-menu-remove" />
+        </button>}</>}
       status={runningIds.includes(row.id) ? "running" : "idle"}
       statusLabel={runningIds.includes(row.id) ? "Chat is running" : undefined}
       aria-pressed={selectedId === row.id} className="demo-live-thread-row"
@@ -155,6 +180,19 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
       <p>{showArchived ? "Restore this chat only. Archived child chats are not restored automatically."
         : "Archive this chat and its spawned child chats. This does not permanently delete them."}</p>
       {archiveError && <p role="alert">Couldn’t update chat archive. Try again.</p>}
+    </Dialog>
+    <Dialog open={deleteTarget !== null} title="Delete chat permanently" size="compact"
+      returnFocusRef={deleteTrigger} initialFocusSelector="button" closeDisabled={saving} closeOnEscape={!saving} closeOnBackdrop={!saving}
+      footer={<>
+        <Button disabled={saving} onClick={() => setDeleteTarget(null)}>Cancel</Button>
+        <Button tone="primary" disabled={saving} onClick={() => void deleteChat()}>
+          {saving ? "Deleting…" : "Delete permanently"}
+        </Button>
+      </>}
+      onOpenChange={open => { if (!open && !saving) setDeleteTarget(null); }}>
+      <p>{deleteTarget?.title}</p>
+      <p>This permanently deletes this archived chat from the App Server. This cannot be undone.</p>
+      {deleteError && <p role="alert">Couldn’t delete chat. Try again.</p>}
     </Dialog>
   </div>;
 }

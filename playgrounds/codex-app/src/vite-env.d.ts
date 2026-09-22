@@ -69,6 +69,7 @@ interface CodexDemoBridge {
   testRemoteConnection(input: { id: string }): Promise<import("../electron/live-remote-connections").RemoteConnectionTestResult>;
   renameLiveThread(input: { projectToken: string; threadId: string; name: string }): Promise<{ threadId: string; title: string }>;
   setLiveThreadArchived(input: { projectToken: string; threadId: string; archived: boolean }): Promise<{ threadId: string; archived: boolean; changedThreadIds: string[] }>;
+  deleteLiveThread(input: { projectToken: string; threadId: string }): Promise<{ threadId: string; deleted: boolean }>;
   selectProjectDirectory(): Promise<
     | {
         label: string;

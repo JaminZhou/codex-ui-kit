@@ -126,6 +126,19 @@ describe("playground-owned thread registry", () => {
     expect(await registry.observeArchived("a", false)).toBe(true);
     expect((await registry.require("/a", "a")).title).toBe("A");
   });
+  it("permanently deletes only archived owned threads after remote success", async () => {
+    const { path, registry } = await fixture();
+    await registry.remember({ id: "active", directory: "/a", title: "Active", updatedAt: 1 });
+    await registry.remember({ id: "archived", directory: "/a", title: "Archived", updatedAt: 2, archived: true });
+    let remoteCalls = 0;
+    await expect(registry.delete("/a", "active", async () => { remoteCalls++; })).rejects.toThrow("Only an archived chat");
+    await expect(registry.delete("/b", "archived", async () => { remoteCalls++; })).rejects.toThrow("does not belong");
+    await expect(registry.delete("/a", "archived", async () => { remoteCalls++; throw new Error("remote failure"); })).rejects.toThrow("remote failure");
+    expect((await registry.list("/a", "all")).map(row => row.id)).toEqual(["archived", "active"]);
+    expect(await registry.delete("/a", "archived", async () => { remoteCalls++; })).toBe(true);
+    expect((await new LiveThreadRegistry(path).list("/a", "all")).map(row => row.id)).toEqual(["active"]);
+    expect(remoteCalls).toBe(2);
+  });
   it("renames only owned chats after remote success, preserving ordering and project labels", async () => {
     const { path, registry } = await fixture();
     await registry.remember({ id: "a", directory: "/a", title: "Before", updatedAt: 5 });

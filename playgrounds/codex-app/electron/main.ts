@@ -1445,6 +1445,22 @@ ipcMain.handle("demo:live:thread:archive", async (event, raw: unknown) => {
     return { threadId, archived, changedThreadIds: changed };
   });
 });
+ipcMain.handle("demo:live:thread:delete", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { input, directory } = resolveHistoryProject(raw);
+  if (typeof input.threadId !== "string") throw new TypeError("A thread is required.");
+  const threadId = input.threadId;
+  const deleted = await historyRegistry().delete(directory, threadId, async () => {
+    const connectedClient = await ensureClient();
+    const { thread } = await connectedClient.threadRead({ threadId, includeTurns: false });
+    if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed.");
+    if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
+    if (thread.status.type === "active") throw new Error("Wait for this chat to finish before deleting it.");
+    await connectedClient.call("thread/delete", { threadId });
+  });
+  liveSession.removeWhere(session => session.thread.id === threadId);
+  return { threadId, deleted };
+});
 ipcMain.handle("demo:live:stop", handleStopLive);
 ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {
   assertTrustedIpc(event);

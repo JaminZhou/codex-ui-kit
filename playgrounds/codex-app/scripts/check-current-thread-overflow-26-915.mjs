@@ -174,6 +174,12 @@ async function capture(scene) {
         ).length === 0,
     );
     assert.equal((await readState(page)).triggerExpanded, "false");
+    // Make the closed-state capture deterministic: Escape should restore focus
+    // to the trigger, and the focus ring is part of the pixel contract.
+    await trigger.focus();
+    await page.waitForFunction(
+      () => document.activeElement?.getAttribute("aria-label") === "Chat actions",
+    );
     await compareScreenshot(`${scene.id}-closed`, await page.screenshot());
 
     await trigger.press("ArrowDown");

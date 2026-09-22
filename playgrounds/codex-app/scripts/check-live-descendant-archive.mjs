@@ -106,6 +106,42 @@ try {
   assert.ok(activeAfterRestore.threads.some((thread) => thread.id === parentThreadId), "The restored root must return to active history.");
   result.remainingArchivedThreadIds = remainingArchived.threads.map((thread) => thread.id);
   result.activeAfterRestoreThreadIds = activeAfterRestore.threads.map((thread) => thread.id);
+  const childRow = remainingArchived.threads.find((thread) => thread.id === child.id);
+  assert.ok(childRow, "The archived child must remain available for explicit deletion.");
+  await page.getByRole("button", { name: childRow.title, exact: true }).hover();
+  await page.getByRole("button", { name: `Delete ${childRow.title}`, exact: true }).click();
+  await page.getByRole("button", { name: "Delete permanently", exact: true }).click();
+  await page.getByRole("dialog", { name: "Delete chat permanently", exact: true }).waitFor({ state: "hidden" });
+  await page.waitForFunction(
+    (threadId) => window.__descendantArchiveEvents?.some((event) => event.method === "thread/deleted" && event.params?.threadId === threadId),
+    child.id,
+    { timeout: 60_000 },
+  );
+  owned.delete(child.id);
+  const afterChildDelete = await page.evaluate(() => window.codexDemo.listLiveThreads({ projectToken: "startup-workspace", archived: true }));
+  assert.ok(!afterChildDelete.threads.some((thread) => thread.id === child.id), "Explicit deletion must remove the archived child.");
+  await page.getByRole("button", { name: "Show active chats", exact: true }).click();
+  const restoredRoot = activeAfterRestore.threads.find((thread) => thread.id === parentThreadId);
+  assert.ok(restoredRoot, "The restored root must remain available for cleanup.");
+  await page.getByRole("button", { name: restoredRoot.title, exact: true }).hover();
+  await page.getByRole("button", { name: `Archive ${restoredRoot.title}`, exact: true }).click();
+  await page.getByRole("button", { name: "Confirm archive", exact: true }).click();
+  await page.getByRole("dialog", { name: "Archive chat", exact: true }).waitFor({ state: "hidden" });
+  await page.getByRole("button", { name: "Show archived chats", exact: true }).click();
+  await page.getByRole("button", { name: restoredRoot.title, exact: true }).waitFor();
+  await page.getByRole("button", { name: restoredRoot.title, exact: true }).hover();
+  await page.getByRole("button", { name: `Delete ${restoredRoot.title}`, exact: true }).click();
+  await page.getByRole("button", { name: "Delete permanently", exact: true }).click();
+  await page.getByRole("dialog", { name: "Delete chat permanently", exact: true }).waitFor({ state: "hidden" });
+  await page.waitForFunction(
+    (threadId) => window.__descendantArchiveEvents?.some((event) => event.method === "thread/deleted" && event.params?.threadId === threadId),
+    parentThreadId,
+    { timeout: 60_000 },
+  );
+  owned.delete(parentThreadId);
+  const afterRootDelete = await page.evaluate(() => window.codexDemo.listLiveThreads({ projectToken: "startup-workspace", archived: true }));
+  assert.equal(afterRootDelete.threads.length, 0, "Explicit deletion must remove the archived root.");
+  result.deletedThreadIds = [child.id, parentThreadId];
   result.passed = true;
 } catch (error) {
   result.error = String(error);

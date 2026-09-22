@@ -2449,9 +2449,9 @@ or title metadata. Contention times out before remote mutation; failed operation
 release their lock. Crash-orphaned locks deliberately fail closed and require
 explicit recovery with all playground instances closed, rather than age-based
 lock stealing. See the recovery instructions in `VALIDATION.md`.
-Current-product pixels, permanent deletion, automatic orphan-lock recovery and
-continuous cross-instance UI synchronization remain open. A focus-refresh
-follow-up now reloads the selected project's chats
+Current-product pixels, automatic orphan-lock recovery and continuous
+cross-instance UI synchronization remain open. A focus-refresh follow-up now
+reloads the selected project's chats
 when its window regains focus, deferring while a draft/dialog or request is open.
 Same-snapshot complete archived IDs invalidate host and renderer caches without
 mistaking a missing paginated row for an archive. The deterministic Electron
@@ -3205,8 +3205,10 @@ The Live descendant-archive follow-up now closes the previously open
 multi-descendant lifecycle gap for the own-host playground. Its real probe
 recorded one server descendant, archived IDs for both root and child, then
 restored only the root (`remainingArchivedThreadIds` retained the child).
-This is not installed-product pixel evidence and does not claim permanent
-deletion or cross-instance synchronization.
+The same probe now explicitly deletes the archived child and root through the
+public `thread/delete` contract and verifies that the project has no archived
+rows afterward. This is not installed-product pixel evidence and does not
+claim cross-instance synchronization.
 
 Message presentation now follows the same rule: disabled user bubbles no longer
 advertise or activate the built-in edit gesture, while host-provided accessory
