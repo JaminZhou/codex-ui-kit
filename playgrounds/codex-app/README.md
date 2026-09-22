@@ -932,8 +932,11 @@ untracked.
   Detached and unborn HEAD states remain branch-creation-capable instead of
   being collapsed into a repository-unavailable error; unborn symbolic names
   are shown as context, not advertised as selectable refs.
-  Creating blocks every dismissal path until Git settles. Acceptance routes a
-  selected project across two generated disposable Git repositories only,
+  Creating blocks every dismissal path until Git settles. A project-scoped
+  owner-aware lock also serializes create/list/checkout across independent
+  Electron processes, recovering only after the previous process exits.
+  Acceptance routes a selected project across two generated disposable Git
+  repositories only,
   retains modal focus while pending, and discards checkout UI results after
   the user changes projects. The new project's branch control stays disabled
   with an explicit pending notice until the original checkout settles; stale

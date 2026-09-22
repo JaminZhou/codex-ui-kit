@@ -947,9 +947,9 @@ async function handleCreateBranch(
   }
   gitBranchOperationActive = true;
   try {
-    return await gitBranchOperationQueue.run(async () => {
+    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+    return await gitBranchOperationQueue.runForProject(projectDirectory, async () => {
       await delayGitBranchOperationForFixture();
-      const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
       const result = await createAndCheckoutGitBranch(
         projectDirectory,
         rawInput.branchName,
@@ -977,10 +977,11 @@ async function handleListBranches(
   assertTrustedIpc(event);
   assertProjectTokenInput(rawInput);
   try {
-    return await gitBranchOperationQueue.run(async () => {
+    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+    return await gitBranchOperationQueue.runForProject(projectDirectory, async () => {
       await delayGitBranchOperationForFixture(requestedGitBranchListDelayMs);
       const result = await listGitBranches(
-        trustedProjectDirectory(rawInput.projectToken),
+        projectDirectory,
       );
       await delayGitBranchOperationForFixture(
         requestedGitBranchListResponseDelayMs,
@@ -1014,9 +1015,9 @@ async function handleCheckoutBranch(
   }
   gitBranchOperationActive = true;
   try {
-    return await gitBranchOperationQueue.run(async () => {
+    const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
+    return await gitBranchOperationQueue.runForProject(projectDirectory, async () => {
       await delayGitBranchOperationForFixture();
-      const projectDirectory = trustedProjectDirectory(rawInput.projectToken);
       const result = await checkoutGitBranch(
         projectDirectory,
         rawInput.branchName,

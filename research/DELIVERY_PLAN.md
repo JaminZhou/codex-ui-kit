@@ -2802,8 +2802,10 @@ without confusing package readiness with full product reconstruction.
    local worktree state, two-action Environment menu, and non-radio Branches
    menu through CDP, Electron, reviewed baselines, and local-only product
    regions. The own-playground host-backed branch mutation gate now covers
-   create, checkout, and switch-back at 1180/720 without overflow; continue
-   with installed-product environment repair, native directory selection,
+   create, checkout, and switch-back at 1180/720 without overflow. A
+   project-scoped owner-aware lock now serializes create/list/checkout across
+   independent Electron processes and recovers only after a dead owner;
+   continue with installed-product environment repair, native directory selection,
    installed-product branch mutations, and production Remote lifecycles.
 7. **Review content variants — delivered for the sampled current card,
    workspace, and Undo/Reapply family**: `26.820.60940` now covers a real
