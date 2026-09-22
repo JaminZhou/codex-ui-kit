@@ -145,6 +145,12 @@ host-owned and are intentionally not claimed by the playground.
   two-stage return to latest. Browser/CDP, Electron, and a two-run own-fixture
   pixel gate cover 1180×820 and 720×680. It remains replay-only evidence and
   does not promote installed-product 26.915 pixels.
+- The current 26.915 Markdown-error replay adds the renderer-boundary P0 path:
+  a public `Markdown couldn't render` alert, focusable `Try again`, and
+  recovery to the table at wide and compact sizes. Browser/CDP, Electron, and
+  a two-run own-fixture pixel gate cover both error and recovered frames at
+  1180×820 and 720×680. It remains replay-only evidence and does not promote
+  an installed-product provider failure or plugin-generated Markdown variant.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to

@@ -248,7 +248,11 @@
         "pixel:current-26.818-unmasked-wide-and-720px-markdown-root-regions",
         "pixel:two-reviewed-current-26.820-wide-and-720px-markdown-media-replay-baselines",
         "pixel:current-26.825-wide-response-root-at-1.3292-percent-and-two-reviewed-wide-compact-baselines",
-        "pixel:five-reviewed-current-26.825-media-baselines-and-five-local-only-product-comparisons"
+        "pixel:five-reviewed-current-26.825-media-baselines-and-five-local-only-product-comparisons",
+        "replay:current-26.915-markdown-error-wide-compact",
+        "browser-cdp:current-26.915-markdown-error-wide-compact",
+        "electron:current-26.915-markdown-error-wide-compact",
+        "pixel:current-26.915-markdown-error-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
