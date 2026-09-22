@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "captureKind": "renderer_settings_connections_environments_read_only_geometry",
+  "appVersion": "26.915.31945",
+  "buildNumber": "9922",
+  "chromiumVersion": "153.0.8010.48",
+  "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  "sampledAt": "2026-09-23",
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "mainCodexProcessPreserved": true,
+    "mutationsSubmitted": false,
+    "captureMode": "renderer-viewport-only",
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "rendererViewport": { "width": 800, "height": 600, "devicePixelRatio": 1 },
+  "shell": {
+    "navigation": { "left": 0, "top": 0, "width": 321.875, "height": 600 },
+    "main": { "left": 321.875, "top": 0, "width": 478.125, "height": 600 },
+    "horizontalOverflow": 0
+  },
+  "routes": [
+    {
+      "id": "settings.connections",
+      "heading": { "text": "Connections", "left": 342.875, "top": 112, "width": 437.125, "height": 28.796875 },
+      "tabs": [
+        { "label": "Control this Mac", "left": 342.875, "top": 172.796875, "width": 117.984375, "height": 28 },
+        { "label": "Control other devices", "left": 462.859375, "top": 172.796875, "width": 149.109375, "height": 28 },
+        { "label": "SSH", "left": 613.96875, "top": 172.796875, "width": 44.140625, "height": 28 }
+      ],
+      "states": [
+        {
+          "tab": "Control this Mac",
+          "publicText": ["Devices that can control this Mac", "Allow connections", "Other settings"],
+          "controls": {
+            "refresh": { "left": 754, "top": 247.796875, "width": 26, "height": 26 },
+            "allowConnections": { "left": 731, "top": 299.796875, "width": 32, "height": 20 },
+            "keepThisMacAwake": { "left": 731, "top": 510.078125, "width": 32, "height": 20 }
+          }
+        },
+        {
+          "tab": "Control other devices",
+          "publicText": ["Devices you can control from this Mac", "Access and control other devices from this computer"],
+          "controls": { "setUp": { "left": 532.75, "top": 378.359375, "width": 57.375, "height": 24 } }
+        },
+        {
+          "tab": "SSH",
+          "publicText": ["SSH connections from this Mac", "Connect to a remote device through SSH connection"],
+          "controls": { "add": { "left": 540.28125, "top": 378.359375, "width": 42.3125, "height": 24 } }
+        }
+      ],
+      "observations": {
+        "readOnly": true,
+        "connectionChanged": false,
+        "credentialsRecorded": false,
+        "pairingStarted": false,
+        "horizontalOverflow": 0
+      }
+    },
+    {
+      "id": "settings.environments",
+      "heading": { "text": "Environments", "left": 342.875, "top": 112, "width": 437.125, "height": 28.796875 },
+      "controls": {
+        "addProject": { "left": 691.203125, "top": 226.796875, "width": 88.796875, "height": 28 },
+        "sampledAddEnvironmentButton": { "left": 735, "top": 284.078125, "width": 28, "height": 28 }
+      },
+      "publicText": [
+        "Local environments tell ChatGPT how to set up worktrees for a project.",
+        "Learn more.",
+        "Select a project",
+        "Add project",
+        "Add environment"
+      ],
+      "observations": {
+        "readOnly": true,
+        "environmentChanged": false,
+        "privateProjectLabelsRecorded": false,
+        "contentDependentRowsNotPromoted": true,
+        "horizontalOverflow": 0
+      }
+    }
+  ],
+  "nativeDirectoryPickerBoundary": {
+    "invokedFrom": "Create project / Add a folder on this computer",
+    "invocationObserved": true,
+    "nativeWindowPixelsCaptured": false,
+    "selectionCompleted": false,
+    "hostBoundary": "macOS reported the host was locked before the native picker could be inspected"
+  },
+  "evidenceBoundary": [
+    "This is a current-build read-only renderer observation at an 800x600 viewport.",
+    "No connection, credential, environment, project label, or native directory selection was saved.",
+    "The route geometry does not promote compact native pixels, pairing, SSH key exchange, persistence, or production Remote registry semantics."
+  ],
+  "productPixelsPromoted": false
+}
