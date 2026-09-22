@@ -1110,6 +1110,7 @@
         "electron:replay-26.915-resource-picker-shell-geometry-321.875-wide-compact",
         "pixel:replay-26.915-resource-picker-own-fixture-zero-drift-wide-compact",
         "electron:live-composer-resource-picker-plan-plugin-wide-compact-zero-overflow",
+        "electron:live-composer-project-picker-wide-compact-host-routing",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",

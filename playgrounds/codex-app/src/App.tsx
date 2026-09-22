@@ -9636,6 +9636,15 @@ export function App() {
                   void selectFilesAndFolders();
                   return;
                 }
+                if (option.id === "project") {
+                  setComposerPluginAction("select:project");
+                  setComposerOverlay(null);
+                  setWorkspacePage("conversation");
+                  setWorkspaceProjectTriggerId("demo-workspace-project-trigger");
+                  setView("workspace");
+                  setWorkspaceOverlayState("project");
+                  return;
+                }
                 if (option.id === "goal" || option.id === "plan") {
                   setComposerMode(option.id);
                   setComposerValue("");
@@ -11160,6 +11169,7 @@ export function App() {
             label="Suggestions"
             onDismiss={() => {
               setWorkspaceOverlayState(null);
+              if (mode === "live") setView("conversation");
             }}
             onSelect={(projectId) => {
               if (projectId === workspaceNewProjectOptionId) {
@@ -11173,6 +11183,11 @@ export function App() {
                     ? "workspace-context-current-26-825-no-project"
                     : "workspace-no-project",
                 );
+                setWorkspaceProjectQuery("");
+                return;
+              }
+              if (mode === "live") {
+                openWorkspace(projectId);
                 setWorkspaceProjectQuery("");
                 return;
               }
@@ -18319,6 +18334,11 @@ export function App() {
       data-composer-plugin-action={composerPluginAction ?? undefined}
       data-live-composer-resource={
         mode === "live" ? liveComposerResourceId ?? undefined : undefined
+      }
+      data-live-composer-project-picker={
+        mode === "live" && view === "workspace" && workspaceOverlay === "project"
+          ? "true"
+          : undefined
       }
       data-browser-workspace-action={browserWorkspaceAction ?? undefined}
       data-browser-workspace-tab={activeBrowserWorkspaceTab?.id}
