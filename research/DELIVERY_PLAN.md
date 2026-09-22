@@ -1429,6 +1429,13 @@ and Electron. The installed 26.915 product's observed inline mention remains
 the authoritative runtime boundary; this replay does not promote a plugin
 attachment card to installed-product parity.
 
+The current 26.915 attachment-upload replay now wraps the public uploading,
+failed, Retry, and ready states at 1180×820 and 720×680. It locks five-card
+containment, accessible `62%` progress, `Upload failed`, disabled/enabled
+submit transitions, focus restoration, zero overflow, and zero-drift repeated
+pixels through Browser/CDP and Electron. Native 26.915 upload progress/error
+reachability remains host-owned and is not promoted by this replay gate.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
