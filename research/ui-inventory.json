@@ -489,7 +489,9 @@
         "live:2026-09-22-mcp-tool-call-success-wide-compact",
         "electron:live-public-app-server-mcp-tool-card-success",
         "live:2026-09-22-mcp-tool-call-multi-turn-order-wide-compact",
-        "electron:live-mcp-multi-tool-disclosure"
+        "electron:live-mcp-multi-tool-disclosure",
+        "live:2026-09-22-mcp-tool-call-remote-http-wide-compact",
+        "live:2026-09-22-mcp-tool-call-oauth-dcr-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -537,7 +539,9 @@
         "pixel:current-26.903-mcp-recovery-light-wide-compact-sources",
         "live:2026-09-22-mcp-tool-call-retry-recovery-wide-compact",
         "live:2026-09-22-mcp-tool-call-approval-denied-wide-compact",
-        "electron:live-mcp-recovery-card-geometry"
+        "electron:live-mcp-recovery-card-geometry",
+        "live:2026-09-22-mcp-tool-call-timeout-wide-compact",
+        "live:2026-09-22-mcp-tool-call-cancel-interrupted-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
