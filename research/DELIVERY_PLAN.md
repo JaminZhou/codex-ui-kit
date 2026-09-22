@@ -3183,6 +3183,18 @@ The notification and composer-plan progress surfaces now share the same
 disabled boundary: queued notification action/dismiss controls and plan
 hover/focus/disclosure changes are locked without suppressing live status or
 protocol-derived progress content.
+
+## Live archive notification follow-up
+
+The Live playground now forwards the real App Server `thread/archived` and
+`thread/unarchived` events into the shared global notification region. Archive
+and restore therefore produce deduplicated informational/success notices while
+the existing thread registry and sidebar ownership remain unchanged. The real
+history Electron probe asserts both notices at the wide and compact layouts,
+and reducer tests lock their stable IDs and copy. This is host-confirmed Live
+reachability; installed-product notification reachability and provider-specific
+copy remain open.
+
 Message presentation now follows the same rule: disabled user bubbles no longer
 advertise or activate the built-in edit gesture, while host-provided accessory
 content remains outside that component-owned boundary.
