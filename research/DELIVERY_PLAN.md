@@ -1414,6 +1414,13 @@ Electron, and a two-run own-fixture pixel gate cover both failure and recovery
 at 1180×820 and 720×680. It remains replay-only evidence and does not promote
 a real PTY/IPC transport drop from the installed product.
 
+The current 26.915 context-summary replay now adds populated Outputs and
+Sources sections with a `README.md` artifact, `Artifact · 2 pages`, `3 sources`,
+and the `GitHub Triage` source. It locks focusable collapse/reopen behavior,
+zero overflow, and two-run own-fixture pixels at 1180×820 and 720×680 through
+Browser/CDP and Electron. It remains replay-only evidence and does not promote
+an installed-product populated summary capture.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
