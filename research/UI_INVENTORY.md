@@ -138,6 +138,13 @@ host-owned and are intentionally not claimed by the playground.
   controlled replay evidence for `thread.shell` and `thread.messages-basic`,
   not installed-product conversation evidence or a current-product pixel
   promotion.
+- The current 26.915 message-navigation replay extends the same public fixture
+  to the long-thread P0 path: the wide 30-button rail, current marker and
+  36×10 buttons, 12 mounted turns with two virtualized placeholders, plus the
+  compact hidden rail, nine mounted turns, floating return control, and
+  two-stage return to latest. Browser/CDP, Electron, and a two-run own-fixture
+  pixel gate cover 1180×820 and 720×680. It remains replay-only evidence and
+  does not promote installed-product 26.915 pixels.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to

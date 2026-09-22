@@ -138,6 +138,7 @@ async function capture(scene) {
     assert.equal(retry.rowCount, 4);
     assert.equal(retry.switchCount, 3);
     assert.match(retry.trigger ?? "", /On PR open/);
+    await settleFonts(page);
     const retryScreenshot = await page.screenshot();
 
     await settings
@@ -170,6 +171,7 @@ async function capture(scene) {
       credits: "true",
       exhaustive: "true",
     });
+    await settleFonts(page);
     const interactedScreenshot = await page.screenshot();
 
     await writeFile(

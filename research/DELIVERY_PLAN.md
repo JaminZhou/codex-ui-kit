@@ -1391,6 +1391,15 @@ Browser/CDP, Electron, and a two-run own-fixture pixel gate cover 1180×820 and
 slice for `thread.shell` and `thread.messages-basic`; installed-product
 conversation evidence and product-pixel promotion remain separate boundaries.
 
+The current 26.915 message-navigation replay now extends the same controlled
+fixture to the long-thread P0 path. It locks the wide 30-button navigation rail,
+the current marker and 36×10 button geometry, 12 mounted turns with two
+virtualized placeholders, and the compact route's hidden rail, nine mounted
+turns, scroll-away floating return control, and two-stage return to latest.
+Browser/CDP, Electron, and a two-run own-fixture pixel gate cover 1180×820 and
+720×680. The fixture is public replay-only evidence; it does not claim a new
+installed-product 26.915 capture or promote product pixels.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
