@@ -177,6 +177,7 @@ const pendingPermissionRequests = new Map<
 const liveInputGate = new LiveUserInputGate();
 const liveMcpElicitationGate = new LiveMcpElicitationGate();
 let liveThreadRegistry: LiveThreadRegistry | null = null;
+let stopLiveHistoryWatch: (() => void) | null = null;
 let liveEnvironmentRegistry: LiveEnvironmentRegistry | null = null;
 let liveRemoteConnectionRegistry: LiveRemoteConnectionRegistry | null = null;
 function historyRegistry() {
@@ -1535,7 +1536,17 @@ ipcMain.handle("demo:git:create-branch", handleCreateBranch);
 ipcMain.handle("demo:git:checkout-branch", handleCheckoutBranch);
 ipcMain.handle("demo:git:list-branches", handleListBranches);
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  try {
+    stopLiveHistoryWatch = await historyRegistry().watch(() => {
+      const window = mainWindow;
+      if (window && !window.isDestroyed()) {
+        window.webContents.send("demo:live:history-changed");
+      }
+    });
+  } catch (error) {
+    console.error("Could not watch the live history registry.", error);
+  }
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -1551,5 +1562,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", () => {
+  stopLiveHistoryWatch?.();
+  stopLiveHistoryWatch = null;
   void closeLive();
 });

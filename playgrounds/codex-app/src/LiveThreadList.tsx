@@ -126,6 +126,10 @@ export function LiveThreadList({ projectToken, selectedId, refreshKey, busy, run
     return () => window.removeEventListener("focus", refresh);
   }, []);
   useEffect(() => {
+    if (!window.codexDemo) return;
+    return window.codexDemo.onLiveHistoryChange(() => setFocusRequest(value => value + 1));
+  }, []);
+  useEffect(() => {
     // Coalesce focus events; defer refresh until pagination or an open editor
     // settles instead of discarding a user's draft or losing the refresh.
     if (focusRequest === handledFocus.current || saving || editing || archiveTarget || deleteTarget || loading) return;

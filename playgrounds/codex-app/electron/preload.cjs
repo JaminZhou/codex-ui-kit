@@ -63,6 +63,12 @@ contextBridge.exposeInMainWorld("codexDemo", {
     ipcRenderer.on("demo:live:session", listener);
     return () => ipcRenderer.removeListener("demo:live:session", listener);
   },
+  onLiveHistoryChange: (handler) => {
+    if (typeof handler !== "function") throw new TypeError("Live history handler must be a function.");
+    const listener = () => handler();
+    ipcRenderer.on("demo:live:history-changed", listener);
+    return () => ipcRenderer.removeListener("demo:live:history-changed", listener);
+  },
   onNotification: (handler) => {
     if (typeof handler !== "function") {
       throw new TypeError("Notification handler must be a function.");

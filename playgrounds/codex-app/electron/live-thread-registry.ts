@@ -1,4 +1,5 @@
 import { readFile, mkdir, writeFile, rename, rmdir } from "node:fs/promises";
+import { watch as watchDirectory } from "node:fs";
 import { setTimeout as delay } from "node:timers/promises";
 import { basename, dirname, isAbsolute } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -119,6 +120,33 @@ export class LiveThreadRegistry {
   projects(): Promise<OwnedLiveProject[]> {
     return this.serialize(async () => (await this.read()).projects
       .sort((a, b) => b.updatedAt - a.updatedAt || a.path.localeCompare(b.path)));
+  }
+
+  /**
+   * Observe atomic registry replacements made by another playground process.
+   * The callback is debounced because one write can emit both unlink/rename
+   * events on macOS. The watcher never reads or mutates state itself; callers
+   * decide when it is safe to refresh their current project/draft.
+   */
+  async watch(onChange: () => void): Promise<() => void> {
+    if (typeof onChange !== "function") throw new TypeError("A registry change callback is required.");
+    await mkdir(dirname(this.path), { recursive: true });
+    const target = basename(this.path);
+    let timer: NodeJS.Timeout | null = null;
+    const watcher = watchDirectory(dirname(this.path), { persistent: false }, (_event, filename) => {
+      const name = filename?.toString();
+      if (name && name !== target) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        try { onChange(); } catch { /* observers must not tear down the watcher */ }
+      }, 25);
+    });
+    return () => {
+      if (timer) clearTimeout(timer);
+      timer = null;
+      watcher.close();
+    };
   }
 
   rememberProject(project: OwnedLiveProject): Promise<void> {

@@ -2449,18 +2449,21 @@ or title metadata. Contention times out before remote mutation; failed operation
 release their lock. Crash-orphaned locks deliberately fail closed and require
 explicit recovery with all playground instances closed, rather than age-based
 lock stealing. See the recovery instructions in `VALIDATION.md`.
-Current-product pixels, automatic orphan-lock recovery and continuous
-cross-instance UI synchronization remain open. A focus-refresh follow-up now
-reloads the selected project's chats
-when its window regains focus, deferring while a draft/dialog or request is open.
+Current-product pixels and automatic orphan-lock recovery remain open. A
+focus-refresh follow-up now reloads the selected project's chats when its
+window regains focus, deferring while a draft/dialog or request is open.
 Same-snapshot complete archived IDs invalidate host and renderer caches without
 mistaking a missing paginated row for an archive. The deterministic Electron
 gate covers external rename, draft preservation, corrupt-read recovery and
 selected archive beyond the first archived page. Project discovery now also
 revalidates on Live window focus without changing the active project or Composer
 draft. The wide/720 Electron gate covers externally added/renamed owned projects,
-stable project tokens and recovery after a corrupt registry. Continuous
-background synchronization remains separate work.
+stable project tokens and recovery after a corrupt registry. A registry
+directory watcher now broadcasts atomic replacements to other Electron
+instances; `check:live-history-sync` proves external create/rename/archive
+propagation without focus at 1180/720 while preserving the existing draft and
+dialog deferral. Cross-instance project discovery remains a separate host
+boundary.
 
 The Live environment-status follow-up adds one deliberately narrow Stage 3
 vertical slice: an owned-project sidebar route accepts a single opaque public
