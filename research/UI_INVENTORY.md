@@ -131,6 +131,13 @@ host-owned and are intentionally not claimed by the playground.
   and a 26-row Composer resource list without GitHub). The two samples are
   intentionally kept separate so dynamic counts are not mistaken for stable
   product tokens; no installed-product pixel promotion is inferred.
+- The current 26.915 conversation-shell replay now pairs the basic user/
+  assistant turn with the sampled wide and compact Composer/thread geometry.
+  Browser/CDP, Electron, and a two-run own-fixture pixel gate cover the
+  1180×820 and 720×680 routes without submitting a real prompt. This is
+  controlled replay evidence for `thread.shell` and `thread.messages-basic`,
+  not installed-product conversation evidence or a current-product pixel
+  promotion.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to
