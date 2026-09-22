@@ -2543,6 +2543,14 @@ save keeps the editor draft locked behind `aria-busy`, and a failed save
 keeps an explicit retry path. This strengthens the host-backed lifecycle
 without implying production pairing, credentials, or relay ownership.
 
+The 2026-09-22 live MCP success probe now records one real public
+`tools/list` → `tools/call` flow through the temporary loopback server and the
+Electron Live bridge. The `ui_kit_echo` result renders a completed tool card at
+`736×53px` wide and `414×53px` compact, with no production configuration or
+credential mutation. This strengthens the complete-workflow evidence while
+keeping retry, timeout, approval, cancellation, remote HTTP/OAuth, and
+installed-product pixels as independent boundaries.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:
