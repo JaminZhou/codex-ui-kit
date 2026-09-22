@@ -124,6 +124,13 @@ host-owned and are intentionally not claimed by the playground.
   `726×28.5625px` with the description `Create and edit documents`. This is
   current resource-menu geometry only; file selection, document decoding,
   authorization, execution, and product-pixel parity remain host-owned.
+- A dated second 26.915 isolated sample is preserved in
+  [`current-baseline-26.915.31945-2026-09-22.json`](current-baseline-26.915.31945-2026-09-22.json).
+  It confirms the unchanged bundle and shell geometry while exposing
+  content-dependent catalog variation (9 project groups, a 9-item Help menu,
+  and a 26-row Composer resource list without GitHub). The two samples are
+  intentionally kept separate so dynamic counts are not mistaken for stable
+  product tokens; no installed-product pixel promotion is inferred.
 - Fresh current-build Renderer evidence for 26.903 covers the New chat shell,
   1180×820 and 820×680 shell, the exact 721→720 boundary where the sidebar now
   remains visible, explicit Hide/Show, Pull requests selection and return to

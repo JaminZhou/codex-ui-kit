@@ -824,6 +824,35 @@ describe("current baseline capture contract", () => {
     });
   });
 
+  it("keeps the latest 26.915 content-variation delta explicit", () => {
+    const delta = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-baseline-26.915.31945-2026-09-22.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(delta.baseline).toMatchObject({
+      appVersion: "26.915.31945",
+      buildNumber: "9922",
+      appAsarBytes: 358872526,
+      appAsarSha256:
+        "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+    });
+    expect(delta.observations).toMatchObject({
+      sidebar: { projectGroupCount: 9, navigationWidth: 321.88 },
+      helpMenu: { itemCount: 9, rect: { width: 320, height: 300.63 } },
+      composerResourceMenu: {
+        visibleItemCount: 26,
+        scrollOwner: { height: 310, scrollHeight: 1010 },
+        removedFromPreviousSample: ["GitHub"],
+      },
+    });
+  });
+
   it("gates the sanitized current account-menu matrix", () => {
     expect(() => assertCurrentAccountMenuRecord(accountMenuRecord())).not.toThrow();
 
