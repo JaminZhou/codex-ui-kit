@@ -96,6 +96,24 @@ for (const width of [1180, 720]) {
     assert.equal(await root.getAttribute("data-live-composer-resource"), "project");
     assert.equal(await root.getAttribute("data-composer-plugin-action"), "select:project");
     await page.locator(".codex-ui-conversation-thread-shell .codex-ui-composer__input").waitFor();
+
+    await trigger.click();
+    const browserPicker = page.getByRole("listbox", { name: "Composer resources" });
+    await browserPicker.getByRole("option", { name: /Browser.*Control the in-app browser/ }).click();
+    const browserPanel = page.getByTestId("current-browser-workspace");
+    await browserPanel.waitFor();
+    assert.equal(await root.getAttribute("data-live-composer-browser-workspace"), "true");
+    assert.equal(await root.getAttribute("data-live-composer-resource"), "browser");
+    assert.equal(await root.getAttribute("data-composer-plugin-action"), "select:browser");
+    assert.equal(await browserPanel.getByRole("tab").count(), 1);
+    assert.equal(await browserPanel.getByRole("tabpanel").count(), 1);
+    assert.equal(
+      await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+      0,
+    );
+    await browserPanel.locator(".codex-ui-browser-workspace__tab-close").first().click();
+    await browserPanel.waitFor({ state: "hidden" });
+    assert.equal(await root.getAttribute("data-live-composer-browser-workspace"), null);
   } finally {
     await app.close();
   }

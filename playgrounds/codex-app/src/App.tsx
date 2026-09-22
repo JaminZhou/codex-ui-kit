@@ -5255,6 +5255,10 @@ export function App() {
   const [browserPanelOpen, setBrowserPanelOpen] = useState(
     initialSelection.frame === "browser-workspace-legacy-shell",
   );
+  const [liveBrowserWorkspaceOpen, setLiveBrowserWorkspaceOpen] = useState(false);
+  const isLiveBrowserWorkspace = mode === "live" && liveBrowserWorkspaceOpen;
+  const isBrowserWorkspaceSurface =
+    isBrowserWorkspaceControlledReplay || isLiveBrowserWorkspace;
   const [browserPanelWidth, setBrowserPanelWidth] = useState(419.59375);
   const [browserWorkspaceAction, setBrowserWorkspaceAction] = useState<
     string | null
@@ -9634,6 +9638,15 @@ export function App() {
                 setLiveComposerResourceId(option.id);
                 if (option.id === "files") {
                   void selectFilesAndFolders();
+                  return;
+                }
+                if (option.id === "browser") {
+                  setComposerPluginAction("select:browser");
+                  setComposerOverlay(null);
+                  setLiveBrowserWorkspaceOpen(true);
+                  setBrowserWorkspaceAction(null);
+                  setBrowserWorkspaceActiveTabId("codex-page");
+                  setBrowserWorkspaceTabs(initialBrowserWorkspaceReplayTabs());
                   return;
                 }
                 if (option.id === "project") {
@@ -14221,7 +14234,8 @@ export function App() {
     browserWorkspaceTabs.find(
       ({ id }) => id === browserWorkspaceActiveTabId,
     ) ?? browserWorkspaceTabs[0];
-  const browserWorkspacePanel = isBrowserWorkspaceControlledReplay ? (
+  const browserWorkspacePanel =
+    isBrowserWorkspaceControlledReplay || isLiveBrowserWorkspace ? (
     <BrowserWorkspacePanel
       className="demo-current-browser-workspace"
       data-testid="current-browser-workspace"
@@ -14246,7 +14260,11 @@ export function App() {
         setBrowserWorkspaceAction(`close:${tab.id}`);
         setBrowserWorkspaceTabs(remainingTabs);
         if (remainingTabs.length === 0) {
-          setBrowserPanelOpen(false);
+          if (isLiveBrowserWorkspace) {
+            setLiveBrowserWorkspaceOpen(false);
+          } else {
+            setBrowserPanelOpen(false);
+          }
           setBrowserWorkspaceActiveTabId(null);
           return;
         }
@@ -14279,7 +14297,7 @@ export function App() {
         <span>{activeBrowserWorkspaceTab?.url}</span>
       </div>
     </BrowserWorkspacePanel>
-  ) : null;
+    ) : null;
   const citationSourcesContent = isCurrentSourcesLifecycleReplay ? (
     <div data-testid="current-sources-lifecycle">
       <SourceList
@@ -18340,6 +18358,9 @@ export function App() {
           ? "true"
           : undefined
       }
+      data-live-composer-browser-workspace={
+        isLiveBrowserWorkspace ? "true" : undefined
+      }
       data-browser-workspace-action={browserWorkspaceAction ?? undefined}
       data-browser-workspace-tab={activeBrowserWorkspaceTab?.id}
       data-queue-count={
@@ -18669,8 +18690,10 @@ export function App() {
             ? setPullRequestOpen
             : isCurrentCitations26825Replay
               ? setCitationSourcesOpen
-            : isBrowserWorkspaceControlledReplay
-              ? setBrowserPanelOpen
+            : isBrowserWorkspaceSurface
+              ? isLiveBrowserWorkspace
+                ? setLiveBrowserWorkspaceOpen
+                : setBrowserPanelOpen
             : isCurrentBrowser26825Replay
               ? setBrowserPanelOpen
             : backgroundTerminalPanelSelected
@@ -18684,7 +18707,7 @@ export function App() {
             ? setPullRequestWidth
             : isCurrentCitations26825Replay
               ? setCitationSourcesWidth
-            : isBrowserWorkspaceControlledReplay
+            : isBrowserWorkspaceSurface
               ? setBrowserPanelWidth
             : isCurrentBrowser26825Replay
               ? setBrowserPanelWidth
@@ -18697,7 +18720,7 @@ export function App() {
         responsivePanelContinuity={
           !isCurrentPdfReplay && !initialSelection.capture &&
           activeFrame !== "pr-compact-detail" &&
-          !isBrowserWorkspaceControlledReplay
+          !isBrowserWorkspaceSurface
         }
         responsivePanelContinuityKey={`${mode}:${view}:${scenarioId}`}
         responsiveSidebarContinuity={false}
@@ -18712,7 +18735,7 @@ export function App() {
               : pullRequestPanel
             : isCurrentCitations26825Replay
               ? citationSourcesPanel
-            : isBrowserWorkspaceControlledReplay
+            : isBrowserWorkspaceSurface
               ? browserWorkspacePanel
             : isCurrentBrowser26825Replay
               ? null
@@ -18730,7 +18753,7 @@ export function App() {
             ? "Pull request details"
             : isCurrentCitations26825Replay
               ? "Sources"
-            : isBrowserWorkspaceControlledReplay
+            : isBrowserWorkspaceSurface
               ? "Browser"
             : isCurrentBrowser26825Replay
               ? "Browser"
@@ -18747,7 +18770,7 @@ export function App() {
             ? mode === "live" ? 300 : 390
             : isCurrentCitations26825Replay
               ? 374.328125
-            : isBrowserWorkspaceControlledReplay
+            : isBrowserWorkspaceSurface
               ? 405.53125
             : isCurrentBrowser26825Replay
               ? 405.53125
@@ -18764,7 +18787,7 @@ export function App() {
             ? 322
             : isCurrentCitations26825Replay
               ? 320
-            : isBrowserWorkspaceControlledReplay
+            : isBrowserWorkspaceSurface
               ? 320
             : isCurrentBrowser26825Replay
               ? 320
@@ -18779,8 +18802,10 @@ export function App() {
             ? pullRequestOpen
             : isCurrentCitations26825Replay
               ? citationSourcesOpen
-            : isBrowserWorkspaceControlledReplay
-              ? browserPanelOpen
+            : isBrowserWorkspaceSurface
+              ? isLiveBrowserWorkspace
+                ? liveBrowserWorkspaceOpen
+                : browserPanelOpen
             : isCurrentBrowser26825Replay
               ? browserPanelOpen
             : backgroundTerminalPanelSelected
@@ -18797,7 +18822,7 @@ export function App() {
         sidePanelOverlayModal={
           !isCurrentPdfReplay && view !== "pull-request" &&
           !isCurrentCitations26825Replay &&
-          !isBrowserWorkspaceControlledReplay &&
+          !isBrowserWorkspaceSurface &&
           !backgroundTerminalPanelSelected &&
           !subagentPanelSelected
         }
@@ -18807,7 +18832,7 @@ export function App() {
             ? pullRequestWidth
             : isCurrentCitations26825Replay
               ? citationSourcesWidth
-            : isBrowserWorkspaceControlledReplay
+            : isBrowserWorkspaceSurface
               ? browserPanelWidth
             : isCurrentBrowser26825Replay
               ? browserPanelWidth
@@ -18842,7 +18867,7 @@ export function App() {
                 isCurrentRichMarkdownStreamingReplay ||
                 usesCurrent26825ThreadHeader ||
                 isCurrentCitations26825Replay ||
-                isBrowserWorkspaceControlledReplay ||
+                isBrowserWorkspaceSurface ||
                 isCurrentPullRequestRouteReplay
               ? activeFrame === "terminal-current-26-825-compact-sidebar"
                 ? 320.265625

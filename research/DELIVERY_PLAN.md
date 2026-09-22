@@ -2161,6 +2161,13 @@ marker and Composer ownership. The host still owns directory selection,
 project-token persistence, and any remote/project discovery effects; this is
 not a claim of installed-product project pixels.
 
+The same Live picker now routes the observed `Browser` plugin through the
+existing Browser workspace side panel. The 1180px/720px Electron gate opens
+the one-tab shell, verifies its tabpanel and zero-overflow geometry, and closes
+the tab back to the Live conversation. The content pane remains a source-owned
+URL boundary; authentication, downloads, permission prompts, page-owned state,
+and production Browser execution remain host-owned.
+
 This extends the earlier 26.908 mention replay rather than replacing it. The
 public `ComposerResourceMention` API marks the token non-editable and replays
 the measured transparent 14px/20px/500 style. Electron coverage checks wide and
