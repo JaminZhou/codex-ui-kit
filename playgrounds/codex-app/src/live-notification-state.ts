@@ -116,6 +116,19 @@ export function reduceLiveAppNotifications(
     });
   }
 
+  if (method === "thread/archived" || method === "thread/unarchived") {
+    const threadId = String(params.threadId ?? "unknown");
+    const archived = method === "thread/archived";
+    return appendNotification(notifications, {
+      description: archived
+        ? "The chat was moved to Archived chats."
+        : "The chat was restored to your active chats.",
+      heading: archived ? "Chat archived" : "Chat restored",
+      id: `live-thread:${threadId}:${archived ? "archived" : "unarchived"}`,
+      tone: archived ? "info" : "success",
+    });
+  }
+
   if (
     method === "item/commandExecution/requestApproval" ||
     method === "item/fileChange/requestApproval" ||

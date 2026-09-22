@@ -146,6 +146,34 @@ describe("live app notifications", () => {
     ]);
   });
 
+  it("surfaces real archive and restore events", () => {
+    const archived = reduceLiveAppNotifications([], {
+      method: "thread/archived",
+      params: { threadId: "thread-archive" },
+    });
+    expect(archived).toEqual([
+      {
+        description: "The chat was moved to Archived chats.",
+        heading: "Chat archived",
+        id: "live-thread:thread-archive:archived",
+        tone: "info",
+      },
+    ]);
+    const restored = reduceLiveAppNotifications(archived, {
+      method: "thread/unarchived",
+      params: { threadId: "thread-archive" },
+    });
+    expect(restored).toEqual([
+      archived[0],
+      {
+        description: "The chat was restored to your active chats.",
+        heading: "Chat restored",
+        id: "live-thread:thread-archive:unarchived",
+        tone: "success",
+      },
+    ]);
+  });
+
   it("surfaces only confirmed background-terminal stops", () => {
     const stopped = reduceLiveAppNotifications([], {
       command: "npm run dev",

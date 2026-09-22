@@ -63,6 +63,9 @@ try {
   await page.getByRole("dialog", { name: "Archive chat", exact: true }).waitFor({ state: "hidden" });
   await page.getByText("HISTORY_A_ONE", { exact: true }).waitFor({ state: "hidden" });
   await page.waitForFunction(id => window.__historyEvents.some(event => event.method === "thread/archived" && event.params.threadId === id), a);
+  const archiveNotifications = page.getByRole("region", { name: "Notifications alt+T", exact: true });
+  await archiveNotifications.getByText("Chat archived", { exact: true }).waitFor();
+  result.archiveNotification = await archiveNotifications.textContent();
   assert.equal(await page.evaluate(async id => {
     try { await window.codexDemo.readLiveThread({ projectToken: "startup-workspace", threadId: id }); return false; }
     catch { return true; }
@@ -82,6 +85,9 @@ try {
   await page.getByRole("button", { name: "Confirm restore", exact: true }).click();
   await page.getByText("No archived chats in this project.", { exact: true }).waitFor();
   await page.waitForFunction(id => window.__historyEvents.some(event => event.method === "thread/unarchived" && event.params.threadId === id), a);
+  const restoreNotifications = page.getByRole("region", { name: "Notifications alt+T", exact: true });
+  await restoreNotifications.getByText("Chat restored", { exact: true }).waitFor();
+  result.restoreNotification = await restoreNotifications.textContent();
   await page.getByRole("button", { name: "Show active chats", exact: true }).click();
   await page.getByRole("button", { name: "Restored renamed chat A", exact: true }).click();
   await page.getByText("HISTORY_A_ONE", { exact: true }).waitFor();
