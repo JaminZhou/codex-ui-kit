@@ -1483,6 +1483,15 @@ completion or server result at 1180/720. This closes the sampled client
 cancellation lifecycle while leaving provider-specific server cancellation
 and installed-product parity as separate boundaries.
 
+The 2026-09-22 boundary matrix re-runs the timeout, cancellation, loopback
+Streamable HTTP, and OAuth modes against the same signed-in disposable App
+Server. Timeout renders one failed `736×191px`/`688×191px` card without a
+retry; Stop settles an active call as `interrupted` without a completion
+item; remote HTTP and OAuth both render the completed `736×53px`/`414×53px`
+card. The OAuth run proves DCR, authorization-code exchange, and bearer
+transport. These are public playground boundaries, not production provider
+or installed-product parity claims.
+
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from
 inside `tools/call`; the signed-in App Server forwards the form, and the
