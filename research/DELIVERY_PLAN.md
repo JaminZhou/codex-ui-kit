@@ -80,6 +80,14 @@ exit gates; it does not replace the inventory.
   with `0%` drift. This is current-build resource-menu evidence only; file
   selection, upload, authorization, plugin execution, and installed-product
   pixels remain host-owned.
+- A read-only isolated Renderer observation on 2026-09-23 now reaches the
+  installed 26.915 `Edit local environment` route through the real
+  `New local worktree` → `Set up project` path. The sanitized record
+  [`current-environment-editor-26.915.31945.json`](current-environment-editor-26.915.31945.json)
+  locks the 321.875px rail, 768px content column, name field, setup/cleanup
+  editors, platform tabs, Add action, Save control, and zero document
+  overflow. No environment was saved or executed; compact native resize,
+  repair, persistence, Remote authentication, and product pixels remain open.
 - The installed `26.915.31945` Settings route was re-observed in a read-only
   isolated Renderer. `Computer use` and `Browser` are both reachable from the
   current Settings navigation and share a `321.88px` rail, `46px` titlebar
