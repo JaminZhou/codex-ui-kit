@@ -63,4 +63,27 @@ describe("playground-owned environment registry", () => {
     await writeFile(`${path}.lock/owner.json`, JSON.stringify({ pid: 2_147_483_647, startedAt: 1, token: "dead" }));
     await expect(new LiveEnvironmentRegistry(path, 100).upsert(base)).resolves.toMatchObject(base);
   });
+
+  it("notifies a second process after an atomic registry replacement", async () => {
+    const { path, registry } = await fixture();
+    const writer = new LiveEnvironmentRegistry(path);
+    let changed = 0;
+    const stop = await registry.watch(() => { changed += 1; });
+    try {
+      await writer.upsert(base);
+      await new Promise<void>((resolve, reject) => {
+        const deadline = setTimeout(() => reject(new Error("environment registry change was not observed")), 1000);
+        const poll = setInterval(() => {
+          if (changed > 0) {
+            clearTimeout(deadline);
+            clearInterval(poll);
+            resolve();
+          }
+        }, 10);
+      });
+      await expect(registry.list("/project-a")).resolves.toHaveLength(1);
+    } finally {
+      stop();
+    }
+  });
 });
