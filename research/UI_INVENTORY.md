@@ -2112,6 +2112,12 @@ zero overflow, and repeated zero-drift pixels through Browser/CDP and
 Electron. Native current-build upload progress/error reachability remains
 host-owned and explicitly unpromoted.
 
+The current 26.915 candidate wrapper also adds a replay-only global-notification
+action matrix at 1180×820 and 720×680: success/warning/info/neutral tones,
+expansion, keyboard focus, Review→Open→View→Close settlement, queue counts,
+dismissal, and repeated zero-drift pixels through Browser/CDP and Electron.
+Live App Server reachability remains separately scoped.
+
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests
 only `seq 1 400`. Ask mode classified that exact command as low risk and ran it
