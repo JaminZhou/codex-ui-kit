@@ -932,13 +932,16 @@ atomic registry replacement to every Electron renderer; the renderer reuses
 the focus-refresh deferral so drafts and open dialogs are not overwritten.
 
 Contention waits up to five seconds, then reports a retryable busy error before
-calling a remote mutation. Lock age never authorizes stealing a lock from a
-slow live operation. If a process crashes while holding the lock, close **all**
-playground instances, verify that no registry writer is running, then remove
-only the empty `live-threads.json.lock` directory beside the configured registry
-using `rmdir`. Preserve `live-threads.json` and any temporary data files. Do not
-remove the lock while another instance is active. Automatic crash recovery
-remains open.
+calling a remote mutation. Every lock records an owner PID and token. A live
+owner is never stolen, even when a remote operation runs longer than the
+timeout; when the owner process has exited, the next operation removes only
+that exact sibling lock and retries. Locks with incomplete owner metadata are
+left untouched until their conservative grace period expires. The same
+owner-aware recovery is used by the environment and remote-connection
+registries. `check:live-environment-repair` and
+`check:live-remote-connections` seed dead-owner locks, then drive real Electron
+add/save flows at 1180px and 720px and verify the lock is recovered without
+changing the registry payload.
 
 Live conversation lists refresh on registry changes from another Electron
 instance and when the window regains focus. Watcher/focus events coalesce and

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, readFile, writeFile, mkdir, rmdir } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { setTimeout as delay } from "node:timers/promises";
 import ts from "typescript";
@@ -16,7 +16,10 @@ describe("playground-owned thread registry", () => {
   it("retains every write from independent operating-system processes", async () => {
     const { path, registry } = await fixture();
     const source = await readFile(new URL("../electron/live-thread-registry.ts", import.meta.url), "utf8");
-    const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2023, module: ts.ModuleKind.ESNext } }).outputText;
+    const lockSource = await readFile(new URL("../electron/registry-lock.ts", import.meta.url), "utf8");
+    const options = { compilerOptions: { target: ts.ScriptTarget.ES2023, module: ts.ModuleKind.ESNext } };
+    const lockModuleUrl = `data:text/javascript;base64,${Buffer.from(ts.transpileModule(lockSource, options).outputText).toString("base64")}`;
+    const compiled = ts.transpileModule(source.replace('from "./registry-lock.js"', `from ${JSON.stringify(lockModuleUrl)}`), options).outputText;
     const moduleUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
     await Promise.all(Array.from({ length: 4 }, (_, worker) => new Promise<void>((resolve, reject) => {
       const child = spawn(process.execPath, ["--input-type=module", "-e", `
@@ -40,17 +43,26 @@ describe("playground-owned thread registry", () => {
     }
   }, 15000);
 
-  it("does not steal a busy or orphaned lock or call the remote mutation", async () => {
+  it("does not steal a live lock or call the remote mutation", async () => {
     const { path, registry } = await fixture();
     await registry.remember({ id: "a", directory: "/a", title: "A", updatedAt: 1 });
     await mkdir(`${path}.lock`);
+    await writeFile(`${path}.lock/owner.json`, JSON.stringify({ pid: process.pid, startedAt: 1, token: "live" }));
     const impatient = new LiveThreadRegistry(path, 30);
     let called = false;
     await expect(impatient.rename("/a", "a", "Lost", async () => { called = true; })).rejects.toThrow("registry is busy");
     expect(called).toBe(false);
     await expect(mkdir(`${path}.lock`)).rejects.toMatchObject({ code: "EEXIST" });
-    await rmdir(`${path}.lock`);
+    await rm(`${path}.lock`, { recursive: true, force: true });
     expect((await impatient.require("/a", "a")).title).toBe("A");
+  });
+
+  it("recovers a lock whose owner process has exited", async () => {
+    const { path, registry } = await fixture();
+    await mkdir(`${path}.lock`);
+    await writeFile(`${path}.lock/owner.json`, JSON.stringify({ pid: 2_147_483_647, startedAt: 1, token: "dead" }));
+    await expect(new LiveThreadRegistry(path, 100).remember({ id: "recovered", directory: "/a", title: "Recovered", updatedAt: 1 })).resolves.toBeUndefined();
+    expect(await registry.require("/a", "recovered")).toMatchObject({ title: "Recovered" });
   });
 
   it("notifies observers after an independent atomic registry write", async () => {

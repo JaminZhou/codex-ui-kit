@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
-import { setTimeout as delay } from "node:timers/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute } from "node:path";
+import { acquireRegistryLock } from "./registry-lock.js";
 
 export type LiveRemoteConnectionKind = "device" | "ssh";
 export type LiveRemoteConnectionStatus =
@@ -120,23 +120,12 @@ export class LiveRemoteConnectionRegistry {
   private serialize<T>(operation: () => Promise<T>): Promise<T> {
     const locked = async () => {
       await mkdir(dirname(this.path), { recursive: true });
-      const lock = `${this.path}.lock`;
-      const deadline = performance.now() + this.lockTimeoutMs;
-      for (;;) {
-        try {
-          await mkdir(lock, { mode: 0o700 });
-          break;
-        } catch (error) {
-          if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-          if (performance.now() >= deadline) throw new Error("Remote connection registry is busy.");
-          await delay(25);
-        }
-      }
-      try {
-        return await operation();
-      } finally {
-        await rm(lock, { recursive: true, force: true });
-      }
+      const release = await acquireRegistryLock(this.path, {
+        timeoutMs: this.lockTimeoutMs,
+        busyMessage: "Remote connection registry is busy.",
+      });
+      try { return await operation(); }
+      finally { await release(); }
     };
     const next = this.queue.then(locked, locked);
     this.queue = next.catch(() => undefined);

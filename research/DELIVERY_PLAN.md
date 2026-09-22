@@ -2446,10 +2446,12 @@ The cross-process registry follow-up serializes reads, remote acknowledgement,
 and atomic writes with an exclusive sibling lock directory. Four independent
 Node processes concurrently create and rename 40 records without losing project
 or title metadata. Contention times out before remote mutation; failed operations
-release their lock. Crash-orphaned locks deliberately fail closed and require
-explicit recovery with all playground instances closed, rather than age-based
-lock stealing. See the recovery instructions in `VALIDATION.md`.
-Current-product pixels and automatic orphan-lock recovery remain open. A
+release their lock. Registry locks now persist an owner PID/token: live owners
+are never stolen, while a dead owner is recovered on the next operation. The
+same owner-aware helper covers history, environment, and remote-connection
+registries. Real Electron environment and remote-connection gates seed a dead
+owner lock and prove add/save recovery at 1180/720px without changing payloads.
+Current-product pixels remain open. A
 focus-refresh follow-up now reloads the selected project's chats when its
 window regains focus, deferring while a draft/dialog or request is open.
 Same-snapshot complete archived IDs invalidate host and renderer caches without
