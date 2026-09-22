@@ -2560,6 +2560,14 @@ closes two more public-protocol lifecycle branches without claiming timeout,
 cancellation, remote HTTP/OAuth, provider-specific errors, or installed
 product pixels.
 
+The same live gate now covers two sequential MCP tools on one thread. It waits
+for the first turn to settle, submits `ui_kit_upper` as a second turn, then
+opens both activity disclosures before checking the two completed cards. This
+fixes a real acceptance race where the second completed item could be present
+in protocol events but still hidden behind its collapsed turn summary. The
+final run proves `ui_kit_echo` → `ui_kit_upper` ordering at wide and compact
+sizes without changing the public bridge or host configuration.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:
