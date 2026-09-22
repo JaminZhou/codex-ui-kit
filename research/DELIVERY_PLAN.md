@@ -1492,6 +1492,16 @@ card. The OAuth run proves DCR, authorization-code exchange, and bearer
 transport. These are public playground boundaries, not production provider
 or installed-product parity claims.
 
+The Live playground now also has a deterministic public JSON-RPC permissions
+acceptance. A disposable app-server executable sends the real
+`item/permissions/requestApproval` request through the same Electron client,
+renderer approval card, and response bridge; the gate verifies
+`acceptForSession` with the exact file-system profile at wide/720px and a
+declined request with an empty granted profile. This is a protocol and host
+boundary test only: the default path still uses the bundled Codex binary with
+strict validation, while production permission policy, installed-product
+pixels, and provider-specific permission prompts remain separate evidence.
+
 The companion live MCP elicitation probe is now part of full playground
 acceptance. A disposable stdio server sends a real `elicitation/create` from
 inside `tools/call`; the signed-in App Server forwards the form, and the
