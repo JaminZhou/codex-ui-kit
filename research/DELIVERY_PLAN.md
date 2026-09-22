@@ -2551,6 +2551,15 @@ credential mutation. This strengthens the complete-workflow evidence while
 keeping retry, timeout, approval, cancellation, remote HTTP/OAuth, and
 installed-product pixels as independent boundaries.
 
+The companion 2026-09-22 live recovery probes now cover the real retry and
+approval-denied branches. A first `ui_kit_echo` call fails with the deterministic
+retry token and a second call completes; a declined MCP approval produces a
+failed item while the server receives zero `tools/call` requests. Wide and
+720px Electron cards remain bounded and the temporary server is isolated. This
+closes two more public-protocol lifecycle branches without claiming timeout,
+cancellation, remote HTTP/OAuth, provider-specific errors, or installed
+product pixels.
+
 ### 6. Perform global visual convergence
 
 Fine visual tuning comes after structural coverage stabilizes:

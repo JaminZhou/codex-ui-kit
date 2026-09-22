@@ -532,7 +532,10 @@
         "replay:current-26.903-mcp-recovery-light-wide-compact-sources",
         "browser-cdp:current-26.903-mcp-recovery-light-wide-compact-sources",
         "electron:current-26.903-mcp-recovery-light-wide-compact-sources",
-        "pixel:current-26.903-mcp-recovery-light-wide-compact-sources"
+        "pixel:current-26.903-mcp-recovery-light-wide-compact-sources",
+        "live:2026-09-22-mcp-tool-call-retry-recovery-wide-compact",
+        "live:2026-09-22-mcp-tool-call-approval-denied-wide-compact",
+        "electron:live-mcp-recovery-card-geometry"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
