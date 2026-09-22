@@ -1,8 +1,8 @@
-import { readFile, mkdir, writeFile, rename, rmdir } from "node:fs/promises";
+import { readFile, mkdir, writeFile, rename } from "node:fs/promises";
 import { watch as watchDirectory } from "node:fs";
-import { setTimeout as delay } from "node:timers/promises";
 import { basename, dirname, isAbsolute } from "node:path";
 import { randomUUID } from "node:crypto";
+import { acquireRegistryLock } from "./registry-lock.js";
 
 export interface OwnedLiveThread {
   id: string;
@@ -87,20 +87,14 @@ export class LiveThreadRegistry {
   private serialize<T>(operation: () => Promise<T>): Promise<T> {
     const locked = async () => {
       await mkdir(dirname(this.path), { recursive: true });
-      const lock = `${this.path}.lock`;
-      const deadline = performance.now() + this.lockTimeoutMs;
-      for (;;) {
-        try { await mkdir(lock, { mode: 0o700 }); break; }
-        catch (error) {
-          if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-          if (performance.now() >= deadline) throw new Error("Live history registry is busy. Retry after the other playground operation finishes. A lock left by a crashed process requires recovery with all playground instances closed.");
-          await delay(25);
-        }
-      }
-      // Hold across remote acknowledgement and the atomic local write. Never
-      // steal an old lock: a slow remote operation is not proof of a dead owner.
+      const release = await acquireRegistryLock(this.path, {
+        timeoutMs: this.lockTimeoutMs,
+        busyMessage: "Live history registry is busy. Retry after the other playground operation finishes.",
+      });
+      // Hold across remote acknowledgement and the atomic local write. A live
+      // owner is never stolen; dead owners are recovered on the next attempt.
       try { return await operation(); }
-      finally { await rmdir(lock); }
+      finally { await release(); }
     };
     const next = this.queue.then(locked, locked);
     this.queue = next.catch(() => undefined);

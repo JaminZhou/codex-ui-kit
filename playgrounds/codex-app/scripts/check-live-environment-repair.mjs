@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WebSocketServer } from "ws";
@@ -12,6 +12,7 @@ const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-repair-"
 const appServerHome = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-repair-home-"));
 const registryDirectory = await mkdtemp(join(tmpdir(), "ui-kit-live-environment-repair-registry-"));
 const registryPath = join(registryDirectory, "environments.json");
+const orphanLockPath = `${registryPath}.lock`;
 const scene = visualScenes.find(({ id }) => id === "workspace-environments-unavailable");
 assert.ok(scene, "environment route scene is present");
 
@@ -79,6 +80,12 @@ const environmentId = "ui-kit-repair";
 const results = [];
 
 try {
+  await mkdir(orphanLockPath);
+  await writeFile(
+    join(orphanLockPath, "owner.json"),
+    JSON.stringify({ pid: 2_147_483_647, startedAt: 1, token: "orphaned-environment-lock" }),
+  );
+  let orphanLockRecovered = false;
   for (const width of [1180, 720]) {
     const { app, page } = await launchScene(scene, {
       capture: false,
@@ -112,6 +119,8 @@ try {
         await execUrl.fill(execServerUrl);
         await route.getByRole("button", { name: "Add environment", exact: true }).click();
         await route.getByRole("heading", { name: "Environment added", exact: true }).waitFor();
+        await expectNoPath(orphanLockPath);
+        orphanLockRecovered = true;
       } else {
         await saved.getByRole("button", { name: `Use ${environmentId}`, exact: true }).click();
         assert.equal(await input.inputValue(), environmentId);
@@ -141,6 +150,7 @@ try {
   }
   assert.ok(methods.includes("environment/status"));
   assert.ok(methods.filter((method) => method === "environment/status").length >= 4);
+  assert.equal(orphanLockRecovered, true);
   console.log(JSON.stringify({
     passed: true,
     directory,
@@ -149,6 +159,7 @@ try {
     widths: [1180, 720],
     results,
     persistedRegistry: true,
+    orphanLockRecovered,
     disconnectedChecks: 2,
     realAppServer: true,
   }));
@@ -157,4 +168,13 @@ try {
   await rm(appServerHome, { force: true, recursive: true });
   await rm(registryDirectory, { force: true, recursive: true });
   await rm(directory, { force: true, recursive: true });
+}
+
+async function expectNoPath(path) {
+  await access(path).then(
+    () => { throw new Error(`Orphan lock was not recovered: ${path}`); },
+    (error) => {
+      if (error?.code !== "ENOENT") throw error;
+    },
+  );
 }

@@ -56,4 +56,11 @@ describe("playground-owned environment registry", () => {
     await expect(new LiveEnvironmentRegistry(clean.path, 20).upsert(base)).rejects.toThrow(/busy/);
     await rmdir(`${clean.path}.lock`);
   });
+
+  it("recovers a lock whose owner process has exited", async () => {
+    const { path } = await fixture();
+    await mkdir(`${path}.lock`);
+    await writeFile(`${path}.lock/owner.json`, JSON.stringify({ pid: 2_147_483_647, startedAt: 1, token: "dead" }));
+    await expect(new LiveEnvironmentRegistry(path, 100).upsert(base)).resolves.toMatchObject(base);
+  });
 });

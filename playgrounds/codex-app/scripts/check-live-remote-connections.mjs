@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WebSocketServer } from "ws";
@@ -9,6 +9,7 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 // credentials or production Remote registry are involved.
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-remote-connections-"));
 const registryPath = join(directory, "connections.json");
+const orphanLockPath = `${registryPath}.lock`;
 const scene = visualScenes.find(({ id }) => id === "workspace-connections-settings");
 assert.ok(scene, "remote connections route scene is present");
 
@@ -33,6 +34,12 @@ assert.ok(updatedAddress && typeof updatedAddress === "object");
 const updatedEndpoint = `ws://127.0.0.1:${updatedAddress.port}`;
 
 try {
+  await mkdir(orphanLockPath);
+  await writeFile(
+    join(orphanLockPath, "owner.json"),
+    JSON.stringify({ pid: 2_147_483_647, startedAt: 1, token: "orphaned-remote-lock" }),
+  );
+  let orphanLockRecovered = false;
   for (const width of [1180, 720]) {
     const { app, page } = await launchScene(scene, {
       capture: false,
@@ -69,6 +76,8 @@ try {
         await form.getByRole("textbox", { name: "Host or device", exact: true }).fill(initialEndpoint);
         await form.getByRole("button", { name: "Save connection", exact: true }).click();
         await route.getByText("Loopback runner", { exact: true }).waitFor();
+        await expectNoPath(orphanLockPath);
+        orphanLockRecovered = true;
       }
 
       const row = route.locator(".codex-ui-remote-connections__row").filter({ hasText: "Loopback runner" });
@@ -98,6 +107,7 @@ try {
   }
   assert.ok(methods.includes("connection"));
   assert.ok(methods.includes("updated-connection"));
+  assert.equal(orphanLockRecovered, true);
   console.log(JSON.stringify({
     passed: true,
     directory,
@@ -105,6 +115,7 @@ try {
     widths: [1180, 720],
     loopbackTests: methods.filter((method) => method.includes("connection")).length,
     persistedRegistry: true,
+    orphanLockRecovered,
     productionRemoteRegistry: false,
   }));
 } finally {
@@ -113,4 +124,13 @@ try {
     new Promise((resolve) => updatedServer.close(resolve)),
   ]);
   await rm(directory, { recursive: true, force: true });
+}
+
+async function expectNoPath(path) {
+  await access(path).then(
+    () => { throw new Error(`Orphan lock was not recovered: ${path}`); },
+    (error) => {
+      if (error?.code !== "ENOENT") throw error;
+    },
+  );
 }
