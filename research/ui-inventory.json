@@ -198,7 +198,11 @@
       "ownership": "thread",
       "packageEvidence": [
         "thread-virtualizer",
-        "thread-scroll-controller-context-value"
+        "thread-scroll-controller-context-value",
+        "replay:current-26.915-message-navigation-wide-compact",
+        "browser-cdp:current-26.915-message-navigation-wide-compact",
+        "electron:current-26.915-message-navigation-wide-compact",
+        "pixel:current-26.915-message-navigation-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -772,7 +776,11 @@
       "area": "conversation",
       "ownership": "thread",
       "packageEvidence": [
-        "thread-user-message-navigation-rail"
+        "thread-user-message-navigation-rail",
+        "replay:current-26.915-message-navigation-wide-compact",
+        "browser-cdp:current-26.915-message-navigation-wide-compact",
+        "electron:current-26.915-message-navigation-wide-compact",
+        "pixel:current-26.915-message-navigation-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
