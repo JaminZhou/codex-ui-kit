@@ -16,6 +16,15 @@ export interface OwnedLiveProject {
   label: string;
   updatedAt: number;
 }
+
+export interface DiscoveredLiveThread extends OwnedLiveThread {}
+
+type ArchiveMutationResult =
+  | string[]
+  | {
+      changedThreadIds: string[];
+      discoveredThreads?: DiscoveredLiveThread[];
+    };
 interface RegistryData {
   threads: OwnedLiveThread[];
   projects: OwnedLiveProject[];
@@ -170,15 +179,33 @@ export class LiveThreadRegistry {
     });
   }
 
-  /** Returned IDs are actual remote notifications, not guessed descendants.
-   * Only already-owned IDs can be updated; unarchive never implies subtree restore. */
-  setArchived(directory: string, id: string, archived: boolean, apply: () => Promise<string[]>): Promise<string[]> {
+  /**
+   * Archive mutations may include server-discovered descendants. They are
+   * persisted only after the remote mutation succeeds, and only for the
+   * selected project. Unarchive never implies subtree restore.
+   */
+  setArchived(directory: string, id: string, archived: boolean, apply: () => Promise<ArchiveMutationResult>): Promise<string[]> {
     return this.serialize(async () => {
       const data = await this.read();
       const thread = data.threads.find(entry => entry.id === id && entry.directory === directory);
       if (!thread) throw new Error("This thread does not belong to the selected playground project.");
-      const changed = await apply();
-      const targets = new Set(archived ? [id, ...changed] : [id]);
+      const result = await apply();
+      const changed = Array.isArray(result) ? result : result.changedThreadIds;
+      const discovered = archived && !Array.isArray(result) ? result.discoveredThreads ?? [] : [];
+      const targets = new Set(archived ? [id, ...changed, ...discovered.map(entry => entry.id)] : [id]);
+      for (const entry of discovered) {
+        if (!entry.id || !isAbsolute(entry.directory) || entry.directory !== directory || !Number.isFinite(entry.updatedAt)) {
+          throw new TypeError("Invalid discovered live thread metadata.");
+        }
+        const previous = data.threads.find(candidate => candidate.id === entry.id);
+        if (previous && previous.directory !== directory) throw new Error("Cannot move a thread to another project.");
+        if (previous) {
+          previous.title = entry.title;
+          previous.updatedAt = Math.max(previous.updatedAt, entry.updatedAt);
+        } else {
+          data.threads.push({ ...entry, archived: true });
+        }
+      }
       const owned = data.threads.filter(entry => targets.has(entry.id));
       for (const entry of owned) entry.archived = archived;
       await this.write(data);

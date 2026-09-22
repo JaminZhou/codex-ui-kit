@@ -88,6 +88,29 @@ describe("playground-owned thread registry", () => {
     expect((await restarted.require("/a", "parent")).title).toBe("parent");
     expect((await restarted.list("/a", true)).map(row => row.id)).toEqual(["child"]);
   });
+  it("persists server-discovered same-project descendants only after archive succeeds", async () => {
+    const { path, registry } = await fixture();
+    await registry.remember({ id: "parent", directory: "/a", title: "Parent", updatedAt: 1 });
+    const discovered = {
+      id: "child",
+      directory: "/a",
+      title: "Child",
+      updatedAt: 2,
+    };
+    expect(await registry.setArchived("/a", "parent", true, async () => ({
+      changedThreadIds: ["parent"],
+      discoveredThreads: [discovered],
+    }))).toEqual(["parent", "child"]);
+    expect((await new LiveThreadRegistry(path).list("/a", true)).map(row => row.id)).toEqual(["child", "parent"]);
+    await expect(registry.setArchived("/a", "parent", true, async () => ({
+      changedThreadIds: [],
+      discoveredThreads: [{ ...discovered, directory: "/foreign" }],
+    }))).rejects.toThrow("Invalid discovered live thread metadata");
+    await expect(registry.setArchived("/a", "parent", true, async () => {
+      throw new Error("remote failure");
+    })).rejects.toThrow("remote failure");
+    expect((await registry.list("/a", true)).map(row => row.id)).toEqual(["child", "parent"]);
+  });
   it("does not mutate local archive state before remote success or for foreign ownership", async () => {
     const { registry } = await fixture();
     await registry.remember({ id: "a", directory: "/a", title: "A", updatedAt: 1 });

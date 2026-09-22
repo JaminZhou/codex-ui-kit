@@ -2434,8 +2434,14 @@ could mask a later history read. A real three-turn probe now archives its own
 renamed chat, restarts the application, restores it and continues the same ID
 with the original history and name intact at 1180/720px. The two disposable
 threads are archived after verification. Synthetic tests separately cover
-descendant notification bookkeeping and restore-one semantics; an actual
-multi-descendant archive lifecycle is not yet claimed.
+descendant notification bookkeeping and restore-one semantics.
+The descendant follow-up now queries the public App Server's exact
+`ancestorThreadId` + `cwd` set before archiving, persists newly discovered
+same-project descendants only after the remote archive succeeds, and keeps
+restore scoped to the selected root. A signed-in Electron probe creates a real
+parent/subagent pair, archives the root, verifies both archived rows after the
+remote notifications, restores the root, and verifies the child remains
+archived. The probe and the registry metadata test are in full acceptance.
 The cross-process registry follow-up serializes reads, remote acknowledgement,
 and atomic writes with an exclusive sibling lock directory. Four independent
 Node processes concurrently create and rename 40 records without losing project
@@ -2443,9 +2449,9 @@ or title metadata. Contention times out before remote mutation; failed operation
 release their lock. Crash-orphaned locks deliberately fail closed and require
 explicit recovery with all playground instances closed, rather than age-based
 lock stealing. See the recovery instructions in `VALIDATION.md`.
-Current-product pixels, permanent deletion, real descendant-archive coverage,
-automatic orphan-lock recovery and continuous cross-instance UI synchronization
-remain open. A focus-refresh follow-up now reloads the selected project's chats
+Current-product pixels, permanent deletion, automatic orphan-lock recovery and
+continuous cross-instance UI synchronization remain open. A focus-refresh
+follow-up now reloads the selected project's chats
 when its window regains focus, deferring while a draft/dialog or request is open.
 Same-snapshot complete archived IDs invalidate host and renderer caches without
 mistaking a missing paginated row for an archive. The deterministic Electron
@@ -3194,6 +3200,13 @@ history Electron probe asserts both notices at the wide and compact layouts,
 and reducer tests lock their stable IDs and copy. This is host-confirmed Live
 reachability; installed-product notification reachability and provider-specific
 copy remain open.
+
+The Live descendant-archive follow-up now closes the previously open
+multi-descendant lifecycle gap for the own-host playground. Its real probe
+recorded one server descendant, archived IDs for both root and child, then
+restored only the root (`remainingArchivedThreadIds` retained the child).
+This is not installed-product pixel evidence and does not claim permanent
+deletion or cross-instance synchronization.
 
 Message presentation now follows the same rule: disabled user bubbles no longer
 advertise or activate the built-in edit gesture, while host-provided accessory
