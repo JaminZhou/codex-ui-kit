@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "captureKind": "renderer_environment_editor_read_only_geometry",
+  "appVersion": "26.915.31945",
+  "buildNumber": "9922",
+  "chromiumVersion": "153.0.8010.48",
+  "appAsarSha256": "1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483",
+  "sampledAt": "2026-09-23",
+  "nativeViewport": { "width": 2560, "height": 1318, "devicePixelRatio": 1 },
+  "entry": {
+    "route": "project-run-location",
+    "actions": [
+      "open the run-location menu",
+      "choose New local worktree",
+      "open the local-environment picker",
+      "choose Set up project"
+    ],
+    "mutationSubmitted": false
+  },
+  "navigation": { "left": 0, "top": 46, "width": 321.875, "height": 1272 },
+  "main": { "left": 321.875, "top": 0, "width": 2238.125, "height": 1318 },
+  "heading": {
+    "text": "Edit local environment",
+    "left": 1057.4375,
+    "top": 112,
+    "width": 768,
+    "height": 28.796875
+  },
+  "controls": {
+    "textboxes": 3,
+    "buttons": 35,
+    "platformTabs": 8,
+    "actions": 1,
+    "saveButtons": 1,
+    "backLinks": 2
+  },
+  "geometry": {
+    "nameInput": { "left": 1057.4375, "top": 215.359375, "width": 288, "height": 36 },
+    "setupScript": { "left": 1057.4375, "top": 360.234375, "width": 768, "height": 129.375 },
+    "cleanupScript": { "left": 1057.4375, "top": 598.484375, "width": 768, "height": 129.375 },
+    "saveButton": { "left": 1778.125, "top": 904.421875, "width": 47.3125, "height": 28 }
+  },
+  "horizontalOverflow": 0,
+  "observations": {
+    "readOnly": true,
+    "credentialsRecorded": false,
+    "scriptsChanged": false,
+    "saveClicked": false,
+    "environmentCreated": false,
+    "compactNativeViewportProven": false,
+    "productPixelsPromoted": false
+  }
+}
