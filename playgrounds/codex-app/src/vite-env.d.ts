@@ -81,6 +81,8 @@ interface CodexDemoBridge {
   closeLive(): Promise<void>;
   onLiveSession(handler: (event: import("./live-project-state").LiveSessionEvent) => void): () => void;
   onLiveHistoryChange(handler: () => void): () => void;
+  onLiveEnvironmentChange(handler: () => void): () => void;
+  onLiveRemoteConnectionsChange(handler: () => void): () => void;
   startTerminal(input: { sessionId: string; projectToken: string; command: string }): Promise<{ processId: string }>;
   openTerminalShell(input: { sessionId: string; projectToken: string; size: { cols: number; rows: number } }): Promise<{ processId: string }>;
   resizeTerminal(input: { sessionId: string; size: { cols: number; rows: number } }): Promise<void>;

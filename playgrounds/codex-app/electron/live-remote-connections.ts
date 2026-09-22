@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, isAbsolute } from "node:path";
+import { watch as watchDirectory } from "node:fs";
+import { basename, dirname, isAbsolute } from "node:path";
 import { acquireRegistryLock } from "./registry-lock.js";
 
 export type LiveRemoteConnectionKind = "device" | "ssh";
@@ -138,6 +139,30 @@ export class LiveRemoteConnectionRegistry {
         (left, right) => right.updatedAt - left.updatedAt || left.label.localeCompare(right.label),
       ),
     );
+  }
+
+  /** Observe atomic registry replacements made by another playground process. */
+  async watch(onChange: () => void): Promise<() => void> {
+    if (typeof onChange !== "function") {
+      throw new TypeError("A registry change callback is required.");
+    }
+    await mkdir(dirname(this.path), { recursive: true });
+    const target = basename(this.path);
+    let timer: NodeJS.Timeout | null = null;
+    const watcher = watchDirectory(dirname(this.path), { persistent: false }, (_event, filename) => {
+      const name = filename?.toString();
+      if (name && name !== target) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        try { onChange(); } catch { /* observers must not tear down the watcher */ }
+      }, 25);
+    });
+    return () => {
+      if (timer) clearTimeout(timer);
+      timer = null;
+      watcher.close();
+    };
   }
 
   upsert(value: LiveRemoteConnection): Promise<LiveRemoteConnection> {

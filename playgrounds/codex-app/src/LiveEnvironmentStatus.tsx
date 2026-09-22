@@ -66,6 +66,13 @@ export function LiveEnvironmentStatus({ projectToken }: { projectToken?: string 
     return () => { requestEpoch.current++; };
   }, [projectToken, refreshSaved]);
 
+  useEffect(() => {
+    if (!window.codexDemo?.onLiveEnvironmentChange) return;
+    return window.codexDemo.onLiveEnvironmentChange(() => {
+      if (!forgettingEnvironmentId) void refreshSaved();
+    });
+  }, [forgettingEnvironmentId, refreshSaved]);
+
   const read = useCallback(async () => {
     if (!projectToken || !window.codexDemo || state === "loading") return;
     const requestedId = environmentId.trim();

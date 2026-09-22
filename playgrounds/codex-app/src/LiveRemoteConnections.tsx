@@ -67,6 +67,13 @@ export function LiveRemoteConnections() {
     void refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    if (!window.codexDemo?.onLiveRemoteConnectionsChange) return;
+    return window.codexDemo.onLiveRemoteConnectionsChange(() => {
+      if (!operationBusyRef.current) void refresh();
+    });
+  }, [refresh]);
+
   const save = async () => {
     if (
       !window.codexDemo?.saveRemoteConnection ||

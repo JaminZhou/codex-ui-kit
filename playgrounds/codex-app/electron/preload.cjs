@@ -69,6 +69,18 @@ contextBridge.exposeInMainWorld("codexDemo", {
     ipcRenderer.on("demo:live:history-changed", listener);
     return () => ipcRenderer.removeListener("demo:live:history-changed", listener);
   },
+  onLiveEnvironmentChange: (handler) => {
+    if (typeof handler !== "function") throw new TypeError("Live environment handler must be a function.");
+    const listener = () => handler();
+    ipcRenderer.on("demo:live:environment-changed", listener);
+    return () => ipcRenderer.removeListener("demo:live:environment-changed", listener);
+  },
+  onLiveRemoteConnectionsChange: (handler) => {
+    if (typeof handler !== "function") throw new TypeError("Live remote connections handler must be a function.");
+    const listener = () => handler();
+    ipcRenderer.on("demo:live:remote-connections-changed", listener);
+    return () => ipcRenderer.removeListener("demo:live:remote-connections-changed", listener);
+  },
   onNotification: (handler) => {
     if (typeof handler !== "function") {
       throw new TypeError("Notification handler must be a function.");

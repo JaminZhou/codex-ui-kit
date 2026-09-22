@@ -2601,6 +2601,16 @@ save keeps the editor draft locked behind `aria-busy`, and a failed save
 keeps an explicit retry path. This strengthens the host-backed lifecycle
 without implying production pairing, credentials, or relay ownership.
 
+The environment and remote-connection registries now expose the same atomic
+directory watcher contract as Live history. Main-process Electron instances
+broadcast replacement events through preload, and the two settings routes
+refresh their host-owned records without focus or manual Retry. The real
+two-host `check:live-registry-sync` gate proves remote save/Forget propagation
+and environment add/update propagation while keeping the active project and
+credential-free payloads local. This closes playground cross-instance refresh;
+production Remote registry, relay, authentication, and installed-product
+parity remain separate boundaries.
+
 The 2026-09-22 live MCP success probe now records one real public
 `tools/list` → `tools/call` flow through the temporary loopback server and the
 Electron Live bridge. The `ui_kit_echo` result renders a completed tool card at

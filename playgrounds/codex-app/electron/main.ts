@@ -180,6 +180,13 @@ let liveThreadRegistry: LiveThreadRegistry | null = null;
 let stopLiveHistoryWatch: (() => void) | null = null;
 let liveEnvironmentRegistry: LiveEnvironmentRegistry | null = null;
 let liveRemoteConnectionRegistry: LiveRemoteConnectionRegistry | null = null;
+let stopLiveEnvironmentWatch: (() => void) | null = null;
+let stopLiveRemoteConnectionWatch: (() => void) | null = null;
+
+function notifyLiveRegistryChange(channel: "demo:live:history-changed" | "demo:live:environment-changed" | "demo:live:remote-connections-changed") {
+  const window = mainWindow;
+  if (window && !window.isDestroyed()) window.webContents.send(channel);
+}
 function historyRegistry() {
   return liveThreadRegistry ??= new LiveThreadRegistry(
     process.env.CODEX_UI_KIT_LIVE_HISTORY_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-threads.json"),
@@ -1540,13 +1547,24 @@ ipcMain.handle("demo:git:list-branches", handleListBranches);
 app.whenReady().then(async () => {
   try {
     stopLiveHistoryWatch = await historyRegistry().watch(() => {
-      const window = mainWindow;
-      if (window && !window.isDestroyed()) {
-        window.webContents.send("demo:live:history-changed");
-      }
+      notifyLiveRegistryChange("demo:live:history-changed");
     });
   } catch (error) {
     console.error("Could not watch the live history registry.", error);
+  }
+  try {
+    stopLiveEnvironmentWatch = await environmentRegistry().watch(() => {
+      notifyLiveRegistryChange("demo:live:environment-changed");
+    });
+  } catch (error) {
+    console.error("Could not watch the live environment registry.", error);
+  }
+  try {
+    stopLiveRemoteConnectionWatch = await remoteConnectionRegistry().watch(() => {
+      notifyLiveRegistryChange("demo:live:remote-connections-changed");
+    });
+  } catch (error) {
+    console.error("Could not watch the live remote connection registry.", error);
   }
   createWindow();
   app.on("activate", () => {
@@ -1565,5 +1583,9 @@ app.on("window-all-closed", () => {
 app.on("before-quit", () => {
   stopLiveHistoryWatch?.();
   stopLiveHistoryWatch = null;
+  stopLiveEnvironmentWatch?.();
+  stopLiveEnvironmentWatch = null;
+  stopLiveRemoteConnectionWatch?.();
+  stopLiveRemoteConnectionWatch = null;
   void closeLive();
 });
