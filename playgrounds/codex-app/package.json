@@ -32,6 +32,7 @@
     "check:current-plugin-attachment-26-915": "node scripts/check-current-plugin-attachment-26-915.mjs",
     "check:current-attachment-upload-26-915": "node scripts/check-current-attachment-upload-26-915.mjs",
     "check:current-global-notification-actions-26-915": "node scripts/check-current-global-notification-actions-26-915.mjs",
+    "check:current-global-notifications-light-26-915": "node scripts/check-current-global-notifications-light-26-915.mjs",
     "check:markdown-error": "node scripts/check-markdown-error.mjs",
     "check:terminal-transport-failure": "node scripts/check-terminal-transport-failure.mjs",
     "check:thread-summary-populated": "node scripts/check-thread-summary-populated.mjs",

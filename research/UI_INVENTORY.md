@@ -2118,6 +2118,12 @@ expansion, keyboard focus, Review→Open→View→Close settlement, queue counts
 dismissal, and repeated zero-drift pixels through Browser/CDP and Electron.
 Live App Server reachability remains separately scoped.
 
+The current 26.915 candidate wrapper also carries a light wide/compact
+notification matrix: theme-resolved alert colors/fonts, four queue tones,
+expansion, Review focus/settlement, zero overflow, and repeated zero-drift
+pixels through Browser/CDP and Electron. Installed-product light-theme pixels
+remain separate.
+
 The current long-command slice uses a separate disposable task on
 `26.730.61309` and requests
 only `seq 1 400`. Ask mode classified that exact command as low risk and ran it
