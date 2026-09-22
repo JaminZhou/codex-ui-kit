@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mkdtemp, readFile, writeFile, mkdir, rmdir } from "node:fs/promises";
 import { spawn } from "node:child_process";
+import { setTimeout as delay } from "node:timers/promises";
 import ts from "typescript";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -50,6 +51,21 @@ describe("playground-owned thread registry", () => {
     await expect(mkdir(`${path}.lock`)).rejects.toMatchObject({ code: "EEXIST" });
     await rmdir(`${path}.lock`);
     expect((await impatient.require("/a", "a")).title).toBe("A");
+  });
+
+  it("notifies observers after an independent atomic registry write", async () => {
+    const { path, registry } = await fixture();
+    const other = new LiveThreadRegistry(path);
+    let changes = 0;
+    const stop = await registry.watch(() => { changes += 1; });
+    try {
+      await other.remember({ id: "external", directory: "/a", title: "External", updatedAt: 1 });
+      const deadline = Date.now() + 2_000;
+      while (changes === 0 && Date.now() < deadline) await delay(25);
+      expect(changes).toBeGreaterThan(0);
+    } finally {
+      stop();
+    }
   });
 
   it("serializes independent instances across remote acknowledgement and releases failed operations", async () => {

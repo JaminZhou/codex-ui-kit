@@ -927,8 +927,9 @@ directory, with corrupt files preserved and surfaced as errors. The lock spans
 remote acknowledgement and the subsequent atomic write, so another instance
 cannot overwrite that operation using a stale read. Four independent Node
 processes concurrently create and rename 40 owned records in the registry test;
-all projects and titles must survive. This is local registry evidence, not a
-claim that two Electron renderers automatically refresh each other's lists.
+all projects and titles must survive. A directory watcher now broadcasts an
+atomic registry replacement to every Electron renderer; the renderer reuses
+the focus-refresh deferral so drafts and open dialogs are not overwritten.
 
 Contention waits up to five seconds, then reports a retryable busy error before
 calling a remote mutation. Lock age never authorizes stealing a lock from a
@@ -939,15 +940,19 @@ using `rmdir`. Preserve `live-threads.json` and any temporary data files. Do not
 remove the lock while another instance is active. Automatic crash recovery
 remains open.
 
-Live conversation lists refresh when the window regains focus. Focus events
-coalesce and wait for an open rename/archive dialog or page request to settle,
+Live conversation lists refresh on registry changes from another Electron
+instance and when the window regains focus. Watcher/focus events coalesce and
+wait for an open rename/archive/delete dialog or page request to settle,
 preserving drafts. Each host response carries the project's complete archived
 ID set from the same locked snapshot as its paginated rows. Newly observed
 archives invalidate renderer selection/history caches; the host also drops a
 matching cached session. Missing entries on a single page never imply archive.
-Read failures retain the current transcript and offer retry. This is focus-based
-conversation refresh, not continuous multi-window synchronization. Project
-discovery now also refreshes on focus in Live mode, as described below.
+Read failures retain the current transcript and offer retry. The
+`check:live-history-sync` gate runs two real Electron hosts against one
+playground-owned registry, proving external create/rename/archive propagation
+without a focus event at 1180px and 720px. Project discovery now also refreshes
+on focus in Live mode, as described below; cross-instance project-list updates
+remain a separate host boundary.
 
 `check:history` externally edits only its disposable registry, verifies focus
 rename refresh and draft preservation, corrupt-read recovery, and a selected
@@ -1018,7 +1023,8 @@ after another refresh or leaving Live are ignored. Discovery errors retain the
 existing list and provide Retry. The 1180/720 deterministic gate adds an external
 owned project and changes its label, verifies the active project and unsubmitted
 draft survive, and exercises corrupted-registry recovery. It does not access
-global Desktop projects or claim continuous background synchronization.
+global Desktop projects or claim continuous background project discovery
+synchronization.
 
 ## Live conversation rename
 
