@@ -1109,6 +1109,7 @@
         "playground:current-26.915-resource-catalog-contract",
         "electron:replay-26.915-resource-picker-shell-geometry-321.875-wide-compact",
         "pixel:replay-26.915-resource-picker-own-fixture-zero-drift-wide-compact",
+        "electron:live-composer-resource-picker-plan-plugin-wide-compact-zero-overflow",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",
@@ -1190,7 +1191,8 @@
         "playground:current-26.915-plugin-mention-contract",
         "electron:replay-26.915-github-inline-resource-mention-wide-compact",
         "pixel:replay-26.915-github-inline-resource-mention-wide-compact-zero-drift",
-        "replay:current-26.915-plugin-card-attachment-boundary"
+        "replay:current-26.915-plugin-card-attachment-boundary",
+        "electron:live-composer-plugin-selection-wide-compact-host-boundary"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
