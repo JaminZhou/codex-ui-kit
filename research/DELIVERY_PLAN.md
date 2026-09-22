@@ -88,6 +88,16 @@ exit gates; it does not replace the inventory.
   editors, platform tabs, Add action, Save control, and zero document
   overflow. No environment was saved or executed; compact native resize,
   repair, persistence, Remote authentication, and product pixels remain open.
+- A second isolated 26.915 Renderer sample on 2026-09-23 reaches the current
+  Settings `Connections` and `Environments` routes at an 800×600 viewport.
+  [`current-settings-connections-environments-26.915.31945.json`](current-settings-connections-environments-26.915.31945.json)
+  records the three Connections tabs, public control geometry, the
+  Environments add-project/add-environment entry points, and zero horizontal
+  overflow without retaining private project labels. This is current-build
+  structural reachability only; pairing, SSH exchange, environment mutation,
+  persistence, compact native pixels, and production Remote semantics remain
+  open. The real native directory action was invoked but macOS was locked
+  before picker pixels or a selection could be verified.
 - The installed `26.915.31945` Settings route was re-observed in a read-only
   isolated Renderer. `Computer use` and `Browser` are both reachable from the
   current Settings navigation and share a `321.88px` rail, `46px` titlebar
