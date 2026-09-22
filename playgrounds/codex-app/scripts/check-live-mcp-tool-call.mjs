@@ -291,7 +291,7 @@ const result = {
   mode,
   mcpServerStatus: null,
   mcpServer: "ui_kit_echo",
-  modelTurns: 1,
+  modelTurns: mode === "multi" ? 2 : 1,
   passed: false,
   tool: "ui_kit_echo",
   tools: toolDefinitions.map(({ name }) => name),
@@ -392,9 +392,11 @@ try {
     exact: true,
   });
   const expectedCallCount = mode === "multi" || mode === "retry" ? 2 : 1;
+  const multiEchoPrompt = 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK:pixel-check.';
+  const multiUpperPrompt = 'Call the tool named ui_kit_upper on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_UPPER:PIXEL-CHECK.';
   await composer.fill(
     mode === "multi"
-      ? 'Use exactly two MCP tools now, one after the other. First call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Then call the tool named ui_kit_upper on the same MCP server with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving both tool results, reply exactly MCP_TOOL_CALL_OK and MCP_TOOL_CALL_UPPER:PIXEL-CHECK.'
+      ? multiEchoPrompt
       : mode === "retry"
         ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the tool returns MCP_TOOL_CALL_RETRYABLE_ERROR, retry the same tool exactly once with the same argument. Do not use shell, files, network, browser, search, or any other tool. After the retry succeeds, reply exactly MCP_TOOL_CALL_OK:pixel-check.'
       : mode === "timeout"
@@ -424,6 +426,39 @@ try {
       () => (window.__liveMcpEvidence ?? []).some((event) => event.method === "turn/completed"),
       undefined,
       { timeout: 60_000 },
+    );
+  } else if (mode === "multi") {
+    await page.waitForFunction(
+      () =>
+        (window.__liveMcpEvidence ?? []).filter(
+          (event) =>
+            event.method === "item/completed" &&
+            event.params?.item?.type === "mcpToolCall",
+        ).length >= 1,
+      undefined,
+      { timeout: 180_000 },
+    );
+    await page.waitForFunction(
+      () =>
+        (window.__liveMcpEvidence ?? []).some(
+          (event) =>
+            event.method === "turn/completed" &&
+            event.params?.turn?.status === "completed",
+        ),
+      undefined,
+      { timeout: 60_000 },
+    );
+    await composer.fill(multiUpperPrompt);
+    await composer.press("Enter");
+    await page.waitForFunction(
+      (expectedCount) =>
+        (window.__liveMcpEvidence ?? []).filter(
+          (event) =>
+            event.method === "item/completed" &&
+            event.params?.item?.type === "mcpToolCall",
+        ).length >= expectedCount,
+      expectedCallCount,
+      { timeout: 180_000 },
     );
   } else {
     await page.waitForFunction(
@@ -582,15 +617,22 @@ try {
     await page.waitForSelector('.demo-root[data-status="interrupted"]', { state: "attached", timeout: 30_000 });
   } else {
     await page.getByText(/Worked for/).first().waitFor({ state: "visible", timeout: 60_000 });
-    await page.getByText(/Worked for/).first().click();
-    await page
-      .getByText(
-        mode === "timeout" || mode === "approval-denied"
-          ? "ui_kit_echo integration failed"
-          : "Used ui_kit_echo integration",
-        { exact: true },
-      )
-      .click();
+    if (mode === "multi") {
+      await page.getByText(/Worked for/).nth(1).waitFor({ state: "visible", timeout: 60_000 });
+    }
+    const turnSummaries = page.getByText(/Worked for/);
+    for (let index = 0; index < await turnSummaries.count(); index += 1) {
+      await turnSummaries.nth(index).click();
+    }
+    const mcpDisclosures = page.locator(
+      ".codex-ui-mcp-tool-call-group details.codex-ui-activity__disclosure",
+    );
+    for (let index = 0; index < await mcpDisclosures.count(); index += 1) {
+      const disclosure = mcpDisclosures.nth(index);
+      if ((await disclosure.getAttribute("open")) === null) {
+        await disclosure.locator("summary").first().click();
+      }
+    }
   }
   const cards = [];
   for (const { item: completedItem } of displayedItems) {

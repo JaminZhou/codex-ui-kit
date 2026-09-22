@@ -487,7 +487,9 @@
         "electron:current-26.903-mcp-success-light-wide-compact-sources",
         "pixel:current-26.903-mcp-success-light-wide-compact-sources",
         "live:2026-09-22-mcp-tool-call-success-wide-compact",
-        "electron:live-public-app-server-mcp-tool-card-success"
+        "electron:live-public-app-server-mcp-tool-card-success",
+        "live:2026-09-22-mcp-tool-call-multi-turn-order-wide-compact",
+        "electron:live-mcp-multi-tool-disclosure"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
