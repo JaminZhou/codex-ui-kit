@@ -2415,6 +2415,13 @@ and zero-drift 1180px/720px own-fixture captures in Electron. This remains
 replay-only evidence and does not promote a real PTY/IPC transport drop from
 the installed product.
 
+The current 26.915 context-summary replay adds populated Outputs and Sources
+sections with a `README.md` artifact, `Artifact · 2 pages`, `3 sources`, and
+the `GitHub Triage` source. It locks focusable collapse/reopen behavior, zero
+overflow, and two-run own-fixture pixels at 1180×820 and 720×680 through
+Browser/CDP and Electron. It remains replay-only evidence and does not promote
+an installed-product populated summary capture.
+
 The context-summary replay now includes populated Outputs and Sources sections
 with a `README.md` artifact, source count, and `GitHub Triage` plugin source.
 Electron checks collapse/expand, focus, computed typography, responsive
