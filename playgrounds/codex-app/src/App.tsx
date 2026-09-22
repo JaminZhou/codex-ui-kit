@@ -4987,6 +4987,9 @@ export function App() {
   const [composerPluginAction, setComposerPluginAction] = useState<
     string | null
   >(null);
+  const [liveComposerResourceId, setLiveComposerResourceId] = useState<
+    string | null
+  >(null);
   const [composerAttachments, setComposerAttachments] = useState<
     DemoComposerAttachmentItem[]
   >(() => attachmentItemsForFrame(initialSelection.frame));
@@ -6470,6 +6473,7 @@ export function App() {
     setComposerValue("");
     setComposerOverlay(null);
     setComposerPluginAction(null);
+    setLiveComposerResourceId(null);
     setComposerAttachments([]);
     setSubmittedComposerAttachments([]);
     setSubmittedComposerPrompt(null);
@@ -6672,6 +6676,8 @@ export function App() {
     setSubmittedComposerAttachments([]);
     setSubmittedComposerPrompt(null);
     setComposerOverlay(null);
+    setComposerPluginAction(null);
+    setLiveComposerResourceId(null);
     setLiveError(null);
     dismissSidebarAfterNavigation();
   };
@@ -6690,6 +6696,8 @@ export function App() {
       setComposerValue("");
       setComposerAttachments([]);
       setComposerOverlay(null);
+      setComposerPluginAction(null);
+      setLiveComposerResourceId(null);
       dismissSidebarAfterNavigation();
     } catch {
       if (requestId === liveHistoryReadId.current && workspaceProjectIdRef.current === projectId) setLiveError("Couldn’t open this chat. Select it again to retry.");
@@ -9333,6 +9341,28 @@ export function App() {
       actions={
         mode === "live" ? (
           <span className="demo-composer-controls" aria-label="Live workspace permissions">
+            <button
+              aria-expanded={composerOverlay === "resources"}
+              aria-label="Add files and more"
+              onClick={() =>
+                setComposerOverlay((current) =>
+                  current === "resources" ? null : "resources",
+                )
+              }
+              onKeyDown={(event) => {
+                if (
+                  event.key === "Escape" &&
+                  composerOverlay === "resources"
+                ) {
+                  event.preventDefault();
+                  dismissComposerResources();
+                }
+              }}
+              ref={composerResourceTriggerRef}
+              type="button"
+            >
+              <CurrentBuildIcon name="composer-add-files" />
+            </button>
             <span>
               {window.codexDemo?.liveWorkspaceWritable ? "Workspace write" : "Read only"}
               {" · Network off"}
@@ -9563,7 +9593,7 @@ export function App() {
               </span>
             </button>
           </div>
-        ) : (showMeasuredComposer || showLifecycleComposer) &&
+        ) : (mode === "live" || showMeasuredComposer || showLifecycleComposer) &&
           composerOverlay === "resources" ? (
           <ComposerResourcePicker
             activeId={composerResourceActiveId}
@@ -9583,15 +9613,41 @@ export function App() {
               ) : undefined
             }
             groups={
-              composerPluginMenuFrame
+              mode === "live"
+                ? currentComposerResourceGroups2691531945
+                : composerPluginMenuFrame
                 ? composerPluginResourceGroups
                 : composerResourceGroups
             }
-            heading={composerPluginMenuFrame ? "Plugins" : undefined}
+            heading={
+              mode === "live"
+                ? "Add to this chat"
+                : composerPluginMenuFrame
+                ? "Plugins"
+                : undefined
+            }
             onActiveIdChange={setComposerResourceActiveId}
             onDismiss={dismissComposerResources}
             onSelect={(option) => {
               setComposerResourceActiveId(option.id);
+              if (mode === "live") {
+                setLiveComposerResourceId(option.id);
+                if (option.id === "files") {
+                  void selectFilesAndFolders();
+                  return;
+                }
+                if (option.id === "goal" || option.id === "plan") {
+                  setComposerMode(option.id);
+                  setComposerValue("");
+                } else {
+                  // The live host owns project, browser, skill, and plugin
+                  // execution. Record the selection without pretending that
+                  // the picker invoked a local integration.
+                  setComposerPluginAction(`select:${option.id}`);
+                }
+                dismissComposerResources();
+                return;
+              }
               if (composerPluginMenuFrame) {
                 setComposerPluginAction(`select:${option.id}`);
                 dismissComposerResources();
@@ -18246,6 +18302,7 @@ export function App() {
           : undefined
       }
       data-composer-overlay={
+        mode === "live" ||
         isConversationLifecycle ||
         isCurrentAttachmentReplay ||
         currentComposerControls26825Replay
@@ -18253,11 +18310,16 @@ export function App() {
           : undefined
       }
       data-composer-mode={
-        isConversationLifecycle || currentComposerControls26825Replay
+        mode === "live" ||
+        isConversationLifecycle ||
+        currentComposerControls26825Replay
           ? composerMode ?? undefined
           : undefined
       }
       data-composer-plugin-action={composerPluginAction ?? undefined}
+      data-live-composer-resource={
+        mode === "live" ? liveComposerResourceId ?? undefined : undefined
+      }
       data-browser-workspace-action={browserWorkspaceAction ?? undefined}
       data-browser-workspace-tab={activeBrowserWorkspaceTab?.id}
       data-queue-count={

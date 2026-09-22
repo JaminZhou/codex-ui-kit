@@ -2143,6 +2143,16 @@ input. This promotes current resource-selection semantics only; document
 decoding, preview rendering, template execution, and product pixels remain
 host-owned and unsampled.
 
+Live local Composer now exposes the current public resource catalog through a
+real `Add files and more` control instead of leaving the Live surface
+resource-less. The Electron gate opens that picker at 1180px and 720px,
+captures computed geometry and zero overflow, selects Plan mode, and records a
+plugin selection without claiming that a host integration executed. Files
+continue through the existing native attachment boundary. This is a local
+host/UI contract only: project selection, browser tabs, plugin authorization,
+network execution, and installed-product pixels remain host-owned and are not
+promoted by this slice.
+
 This extends the earlier 26.908 mention replay rather than replacing it. The
 public `ComposerResourceMention` API marks the token non-editable and replays
 the measured transparent 14px/20px/500 style. Electron coverage checks wide and
