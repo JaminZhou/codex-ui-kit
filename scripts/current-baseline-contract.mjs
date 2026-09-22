@@ -472,13 +472,22 @@ export function assertCurrentSidebarLifecycle(
       `Current sidebar lifecycle does not prove the project menu boundary: ${JSON.stringify(projectMenu)}`,
     );
   }
+  const helpMenuGeometry = [
+    // The installed 26.915 renderer can expose one additional account-aware
+    // action while the menu keeps the same focus and dismissal contract.
+    { height: 272.06, itemCount: 8 },
+    { height: 300.63, itemCount: 9 },
+  ].find(
+    ({ height, itemCount }) =>
+      helpMenu?.opened?.menuItemCount === itemCount &&
+      withinTolerance(helpMenu?.opened?.rect?.height, height),
+  );
   if (
     helpMenu?.opened?.visibleMenuCount !== 1 ||
-    helpMenu.opened.menuItemCount !== 8 ||
+    !helpMenuGeometry ||
     !helpMenu.opened.focusInside ||
     helpMenu.opened.focusRole !== "menu" ||
     !withinTolerance(helpMenu.opened.rect?.width, 320) ||
-    !withinTolerance(helpMenu.opened.rect?.height, 272.06) ||
     helpMenu.closed?.visibleMenuCount !== 0 ||
     (!allowHelpFocusLoss && helpMenu.closed.focusReturned !== true)
   ) {

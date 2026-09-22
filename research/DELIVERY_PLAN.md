@@ -53,6 +53,15 @@ exit gates; it does not replace the inventory.
   is `726×28.5625px` with `Create and edit documents`. This extends current
   resource-menu geometry evidence only; selection, upload, authorization,
   execution, Browser/Electron, and product-pixel promotion remain open.
+- A second isolated 26.915 sample on 2026-09-22 is recorded in
+  [`current-baseline-26.915.31945-2026-09-22.json`](current-baseline-26.915.31945-2026-09-22.json).
+  It proves the same installed bundle and stable shell geometry while
+  recording content-dependent variation: 9 rather than 15 project groups, a
+  9-item `320×300.63px` Help menu, and a 26-row Composer catalog with the
+  GitHub row absent. The earlier fixture is retained as a dated sample; these
+  counts are not treated as portable product constants. This refresh is still
+  structural CDP evidence only and does not promote the 26.915 candidate to
+  installed-product pixels.
 - The 26.915 candidate now has a dedicated wide/720 replay refresh for the
   measured shell, document preview, and generated-image routes. CDP and native
   Electron lock the `321.875px` rail, `46px` titlebar, responsive hidden rail,
