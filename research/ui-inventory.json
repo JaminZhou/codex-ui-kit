@@ -1111,6 +1111,7 @@
         "pixel:replay-26.915-resource-picker-own-fixture-zero-drift-wide-compact",
         "electron:live-composer-resource-picker-plan-plugin-wide-compact-zero-overflow",
         "electron:live-composer-project-picker-wide-compact-host-routing",
+        "electron:live-composer-browser-workspace-wide-compact-host-routing",
         "replay:current-26.825-resource-picker-light-wide-compact",
         "browser-cdp:current-26.825-resource-picker-light-wide-compact",
         "electron:current-26.825-resource-picker-light-wide-compact",
@@ -2124,12 +2125,14 @@
         "legacy-pixel:26.825.31414-browser-chrome-region",
         "playground:browser-workspace-legacy-controlled-replay",
         "electron:browser-workspace-tabs-toolbar-close-flow",
-        "pixel:browser-workspace-own-fixture-1180-720-zero-drift"
+        "pixel:browser-workspace-own-fixture-1180-720-zero-drift",
+        "electron:live-composer-browser-workspace-wide-compact-host-routing"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.825.31414:real-one-tab-419.59375-browser-workspace-with-46px-tabs-40px-toolbar-and-external-content-boundary",
-        "cdp-26.825.51511:public-browser-activity-succeeded-but-no-current-workspace-browser-route-or-mounted-panel-was-reachable"
+        "cdp-26.825.51511:public-browser-activity-succeeded-but-no-current-workspace-browser-route-or-mounted-panel-was-reachable",
+        "playground:live-composer-browser-resource-route-current-host-ui"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
