@@ -31,6 +31,15 @@ describe("stored live history", () => {
     expect(state.threadId).toBe("thread");
     expect(state.approvals).toEqual([]);
   });
+  it("removes permanently deleted threads without selecting another project", () => {
+    let state = reduceLiveProjectState(initialLiveProjectState, { kind: "live-history", projectToken: "project", threadId: "thread", turns });
+    state = reduceLiveProjectState(state, { kind: "live-history", projectToken: "other", threadId: "other-thread", turns });
+    state = reduceLiveProjectState(state, { method: "thread/deleted", params: { threadId: "thread" } });
+    expect(state.projects.project).toBeUndefined();
+    expect(state.threads.thread).toBeUndefined();
+    expect(state.projects.other).toBe("other-thread");
+    expect(state.currentThread).toBe("other-thread");
+  });
   it("keeps newer streamed state instead of overwriting it with an older read", () => {
     let state = reduceLiveProjectState(initialLiveProjectState, { kind: "live-history", projectToken: "project", threadId: "thread", turns });
     state = reduceLiveProjectState(state, { method: "item/completed", params: { threadId: "thread", turnId: "two", item: { type: "agentMessage", id: "new", text: "New answer" } } });

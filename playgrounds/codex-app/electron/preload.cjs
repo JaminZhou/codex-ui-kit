@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   testRemoteConnection: (input) => ipcRenderer.invoke("demo:remote-connection:test", input),
   renameLiveThread: (input) => ipcRenderer.invoke("demo:live:thread:rename", input),
   setLiveThreadArchived: (input) => ipcRenderer.invoke("demo:live:thread:archive", input),
+  deleteLiveThread: (input) => ipcRenderer.invoke("demo:live:thread:delete", input),
   createAndCheckoutBranch: (input) =>
     ipcRenderer.invoke("demo:git:create-branch", input),
   checkoutBranch: (input) =>
