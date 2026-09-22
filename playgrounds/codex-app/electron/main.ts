@@ -41,7 +41,10 @@ import {
   type LiveMcpElicitationRequest,
 } from "./live-mcp-elicitation.js";
 import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
-import { LiveThreadRegistry } from "./live-thread-registry.js";
+import {
+  LiveThreadRegistry,
+  type DiscoveredLiveThread,
+} from "./live-thread-registry.js";
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
 import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
@@ -1407,13 +1410,36 @@ ipcMain.handle("demo:live:thread:archive", async (event, raw: unknown) => {
       if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session was closed.");
       if (resolve(thread.cwd) !== resolve(directory)) throw new Error("Thread working directory no longer matches the selected project.");
       if (thread.status.type === "active") throw new Error("Wait for this chat to finish before archiving or restoring it.");
+      const discoveredThreads: DiscoveredLiveThread[] = [];
+      if (archived) {
+        let cursor: string | null = null;
+        do {
+          const response = await connectedClient.threadList({
+            ancestorThreadId: threadId,
+            archived: false,
+            cwd: directory,
+            limit: 100,
+            ...(cursor ? { cursor } : {}),
+          });
+          for (const descendant of response.data) {
+            if (descendant.id === threadId || resolve(descendant.cwd) !== resolve(directory)) continue;
+            discoveredThreads.push({
+              id: descendant.id,
+              directory,
+              title: (descendant.name ?? descendant.preview ?? "Untitled chat").replace(/\s+/g, " ").trim().slice(0, 100) || "Untitled chat",
+              updatedAt: Number.isFinite(descendant.updatedAt) ? descendant.updatedAt * 1000 : Date.now(),
+            });
+          }
+          cursor = response.nextCursor;
+        } while (cursor);
+      }
       const observed: string[] = [];
       const stop = connectedClient.onNotification("thread/archived", params => { observed.push(params.threadId); });
       try {
         if (archived) await connectedClient.threadArchive({ threadId });
         else await connectedClient.threadUnarchive({ threadId });
       } finally { stop(); }
-      return observed;
+      return { changedThreadIds: observed, discoveredThreads };
     });
     liveSession.removeWhere(session => changed.includes(session.thread.id));
     return { threadId, archived, changedThreadIds: changed };
