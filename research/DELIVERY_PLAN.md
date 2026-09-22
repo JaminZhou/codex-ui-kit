@@ -1400,6 +1400,13 @@ Browser/CDP, Electron, and a two-run own-fixture pixel gate cover 1180×820 and
 720×680. The fixture is public replay-only evidence; it does not claim a new
 installed-product 26.915 capture or promote product pixels.
 
+The current 26.915 Markdown-error replay now adds the renderer-boundary P0
+path: a public `Markdown couldn't render` alert, focusable `Try again`, and
+recovery to the table at wide and compact sizes. Browser/CDP, Electron, and a
+two-run own-fixture pixel gate cover both the error and recovered frames at
+1180×820 and 720×680. It remains replay-only evidence and does not promote an
+installed-product provider failure or plugin-generated Markdown variant.
+
 The real local MCP tool-call probe is now part of full playground acceptance.
 It starts a disposable stdio server, drives one signed-in App Server/model turn,
 accepts only the MCP tool-call elicitation, and proves the completed tool item,
