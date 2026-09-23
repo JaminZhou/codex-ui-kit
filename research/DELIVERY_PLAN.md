@@ -62,6 +62,12 @@ exit gates; it does not replace the inventory.
   counts are not treated as portable product constants. This refresh is still
   structural CDP evidence only and does not promote the 26.915 candidate to
   installed-product pixels.
+- A read-only installed-process check on 2026-09-23 confirms the running
+  `/Applications/ChatGPT.app` remains `26.915.31945` (`9922`), and its
+  `app.asar` remains 358,872,526 bytes with SHA-256
+  `1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483`.
+  This confirms the 2026-09-22 candidate package has not drifted; it is not a
+  new renderer capture or a promotion of the installed-product pixel baseline.
 - The 26.915 candidate now has a dedicated wide/720 replay refresh for the
   measured shell, document preview, and generated-image routes. CDP and native
   Electron lock the `321.875px` rail, `46px` titlebar, responsive hidden rail,
@@ -1941,7 +1947,23 @@ failure → Retry route at wide and 720px. The draft remains unsent, the failure
 is exposed as `role=alert`, and Retry restores the editable draft without
 claiming real skill execution or host persistence. Browser/CDP and Electron
 replays compare initial, failed, and recovered captures with 0% own-fixture
-drift.
+drift. The installed-detail replay now also clicks the actual `Try now` action
+from the 26.915 route into that prefilled draft at 1180px and 720px, preserving
+the single OpenAI Docs mention and checking zero-drift repeated transition
+captures.
+
+The private playground now has an additional live submission slice: the same
+prefilled draft can enter Live local mode and execute two successful calls
+(`search_openai_docs` then `fetch_openai_doc`) through a real local Codex App
+Server session and a disposable stdio MCP server. The run used `gpt-5.6-luna`
+with `max` reasoning, confirmed both completed tool events and the server-side
+arguments, and captured computed styles/geometry for the shared tool group at
+1180×820 and 720×680. Repeated within-run screenshots of that own-playground
+group differ by 0 pixels at both sizes. The fixture returns deterministic MCP
+documentation metadata; it does not fetch the public page or prove successful
+execution of the installed product's OpenAI Docs skill. Installed-product
+execution, host authorization, and persistent skill state remain open, so the
+P1 integration surface remains partial.
 
 The integration catalog replay now carries a controlled install lifecycle for
 public plugin and recommended skill rows: an action enters a disabled pending
@@ -2398,8 +2420,13 @@ project-owned preload bridge, opens real process output in the side panel, and
 supports individual/all termination. The targeted
 `check:live-background-terminal` probe now proves one real model-created
 background process, list/open/close, and Stop all settlement in a disposable
-workspace. Current-product PTY visual evidence remains open; this does not
-close the complete-workflow exit gate.
+workspace. A 2026-09-23 full-acceptance rerun found that the probe could miss
+the row when it queried before the model turn completed and used a
+continuously-outputting foreground command. It now waits for the completed
+turn around a low-output 600-second process before querying, and terminates the
+exact created process if the assertion fails. The focused probe passes on the
+current local CLI with Luna Max. Current-product PTY visual evidence remains
+open; this does not close the complete-workflow exit gate.
 
 The user-input follow-up registers public `item/tool/requestUserInput` with a
 thread-owned host answer gate and a pending-question form (options, free text,

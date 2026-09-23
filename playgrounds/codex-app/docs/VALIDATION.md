@@ -235,6 +235,15 @@ printed temporary-directory path and are not committed. Current-product PTY
 pixel comparison remains open. Functional local evidence is not full terminal
 parity.
 
+The 2026-09-23 full acceptance run exposed a probe-timing flaw: it queried the
+background registry before the model turn had completed and used a command that
+streamed output every second, so a foreground command could finish without ever
+appearing as a background row. The probe now starts a low-output 600-second
+process, waits for `turn/completed`, then verifies the public list/open/Stop-all
+path; its failure cleanup terminates the exact process ID it created. The
+focused check passed on the current local Codex CLI 0.154.0 using Luna Max. This
+is local App Server behavior and does not promote installed-product PTY pixels.
+
 ### Live global notifications — 2026-09-18
 
 The Live renderer now feeds real App Server approval, user-input, and

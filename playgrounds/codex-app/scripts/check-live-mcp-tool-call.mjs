@@ -1,47 +1,77 @@
 import assert from "node:assert/strict";
-import { access, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
+import { access, lstat, mkdtemp, readFile, symlink, unlink, writeFile } from "node:fs/promises";
 import { constants } from "node:fs";
 import { createServer } from "node:http";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
+import pixelmatch from "pixelmatch";
+import { PNG } from "pngjs";
 import { CodexAppServerClient } from "@jaminzhou/codex-app-server-client";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 assert.ok(
-  ["single", "multi", "retry", "timeout", "approval-denied", "cancel", "remote", "oauth"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, cancel, remote, or oauth.",
+  ["single", "multi", "retry", "timeout", "approval-denied", "cancel", "remote", "oauth", "skill"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, cancel, remote, oauth, or skill.",
 );
-const toolDefinitions = [
-  {
-    description:
-      "Use this tool when the user explicitly asks for the MCP echo. Returns a deterministic validation token.",
-    inputSchema: {
-      properties: {
-        message: { description: "The message to echo", type: "string" },
-      },
-      required: ["message"],
-      type: "object",
-    },
-    name: "ui_kit_echo",
-  },
-  ...(mode === "multi"
-    ? [
-        {
-          description:
-            "Use this tool when the user explicitly asks for the MCP uppercase transform. Returns a deterministic validation token.",
-          inputSchema: {
-            properties: {
-              message: { description: "The message to transform", type: "string" },
-            },
-            required: ["message"],
-            type: "object",
+const mcpServerName = mode === "skill" ? "openaiDeveloperDocs" : "ui_kit_echo";
+const toolDefinitions = mode === "skill"
+  ? [
+      {
+        description:
+          "Search official OpenAI documentation. Use for official documentation lookup and return the best matching page title and URL.",
+        inputSchema: {
+          properties: {
+            query: { description: "The documentation topic to search", type: "string" },
           },
-          name: "ui_kit_upper",
+          required: ["query"],
+          type: "object",
         },
-      ]
-    : []),
-];
+        name: "search_openai_docs",
+      },
+      {
+        description:
+          "Fetch the official OpenAI documentation page at the supplied URL and return its title and content.",
+        inputSchema: {
+          properties: {
+            url: { description: "The official documentation page URL", type: "string" },
+          },
+          required: ["url"],
+          type: "object",
+        },
+        name: "fetch_openai_doc",
+      },
+    ]
+  : [
+      {
+        description:
+          "Use this tool when the user explicitly asks for the MCP echo. Returns a deterministic validation token.",
+        inputSchema: {
+          properties: {
+            message: { description: "The message to echo", type: "string" },
+          },
+          required: ["message"],
+          type: "object",
+        },
+        name: "ui_kit_echo",
+      },
+      ...(mode === "multi"
+        ? [
+            {
+              description:
+                "Use this tool when the user explicitly asks for the MCP uppercase transform. Returns a deterministic validation token.",
+              inputSchema: {
+                properties: {
+                  message: { description: "The message to transform", type: "string" },
+                },
+                required: ["message"],
+                type: "object",
+              },
+              name: "ui_kit_upper",
+            },
+          ]
+        : []),
+    ];
 const toolListSource = JSON.stringify(toolDefinitions);
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-mcp-tool-call-"));
 const serverPath = join(directory, "server.mjs");
@@ -56,6 +86,7 @@ const oauthCode = "ui-kit-oauth-code";
 const sourceCodexHome = process.env.CODEX_HOME ?? join(homedir(), ".codex");
 const sourceAuthPath = join(sourceCodexHome, "auth.json");
 const fallbackAuthPath = join(homedir(), ".codex", "auth.json");
+const ephemeralAuthPath = join(directory, "auth.json");
 let authPath = null;
 for (const candidate of [sourceAuthPath, fallbackAuthPath]) {
   try {
@@ -70,7 +101,7 @@ assert.ok(
   authPath,
   "A signed-in Codex App Server runtime is required for the live MCP tool-call gate (auth.json was not found).",
 );
-await symlink(authPath, join(directory, "auth.json"));
+await symlink(authPath, ephemeralAuthPath);
 
 if (mode === "remote" || mode === "oauth") {
   remoteServer = createServer(async (request, response) => {
@@ -223,14 +254,41 @@ for await (const line of input) {
     reply(message.id, {
       capabilities: { tools: {} },
       protocolVersion: "2024-11-05",
-      serverInfo: { name: "ui-kit-echo", version: "1.0.0" },
+      serverInfo: { name: ${JSON.stringify(mcpServerName)}, version: "1.0.0" },
     });
   } else if (message.method === "tools/list") {
     reply(message.id, { tools: ${toolListSource} });
   } else if (message.method === "tools/call") {
     callCount += 1;
     const tool = String(message.params?.name ?? "");
-    const argument = String(message.params?.arguments?.message ?? "");
+    const argumentsValue = message.params?.arguments ?? {};
+    if (${JSON.stringify(mode === "skill")}) {
+      const result = tool === "search_openai_docs"
+        ? {
+            content: [{ text: "Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features", type: "text" }],
+            isError: false,
+            structuredContent: {
+              results: [{ title: "Model Context Protocol", url: "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features" }],
+            },
+          }
+        : tool === "fetch_openai_doc"
+          ? {
+              content: [{ text: "MCP_SKILL_TOOL_CALL_OK:Model Context Protocol — https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features", type: "text" }],
+              isError: false,
+              structuredContent: {
+                title: "Model Context Protocol",
+                url: "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features",
+              },
+            }
+          : {
+              content: [{ text: "Unsupported OpenAI Docs tool: " + tool, type: "text" }],
+              isError: true,
+            };
+      log("TOOL_ARGUMENTS " + JSON.stringify({ tool, arguments: argumentsValue }));
+      reply(message.id, result);
+      continue;
+    }
+    const argument = String(argumentsValue?.message ?? "");
     if (${JSON.stringify(mode === "timeout")}) {
       await new Promise((resolve) => setTimeout(resolve, 2_500));
     }
@@ -268,19 +326,37 @@ await writeFile(
   join(directory, "config.toml"),
   mode === "remote" || mode === "oauth"
     ? `[mcp_servers.ui_kit_echo]\nurl = "${remoteUrl}"\nstartup_timeout_sec = 10\ntool_timeout_sec = 30\n`
-    : `[mcp_servers.ui_kit_echo]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = ${mode === "timeout" ? 1 : 30}\n`,
+    : `[mcp_servers.${mcpServerName}]\ncommand = "node"\nargs = ["${serverPath}"]\nstartup_timeout_sec = 10\ntool_timeout_sec = ${mode === "timeout" ? 1 : 30}\n`,
 );
 process.env.CODEX_HOME = directory;
 
 const scene = visualScenes.find(({ id }) => id === "pull-request-detail");
-assert.ok(scene, "The pull-request detail scene is required for Live MCP mode.");
-const { app, page } = await launchScene(scene, {
-  capture: false,
-  environment: {
-    CODEX_UI_KIT_LIVE_EPHEMERAL: "1",
-    CODEX_UI_KIT_LIVE_HISTORY_PATH: historyPath,
-    CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
-    CODEX_UI_KIT_WORKSPACE: directory,
+const selectedScene = mode === "skill"
+  ? {
+      frame: "integration-skill-detail-current-26-915-installed",
+      id: "live-openai-docs-skill-try-now",
+      scenario: "workspace-workflow",
+      theme: "dark",
+      view: "plugins",
+      windowSize: { height: 820, width: 1180 },
+    }
+  : scene;
+assert.ok(selectedScene, "A required scene is missing for Live MCP mode.");
+  const { app, page } = await launchScene(selectedScene, {
+    capture: false,
+    environment: {
+      CODEX_UI_KIT_LIVE_EPHEMERAL: "1",
+      CODEX_UI_KIT_LIVE_HISTORY_PATH: historyPath,
+      ...(mode === "skill"
+        ? {
+            CODEX_UI_KIT_LIVE_MODEL:
+              process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna",
+            CODEX_UI_KIT_LIVE_REASONING_EFFORT:
+              process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max",
+          }
+        : {}),
+      CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
+      CODEX_UI_KIT_WORKSPACE: directory,
   },
 });
 
@@ -289,11 +365,13 @@ const result = {
   directory,
   liveAppServer: true,
   mode,
+  model: mode === "skill" ? process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna" : null,
   mcpServerStatus: null,
-  mcpServer: "ui_kit_echo",
+  mcpServer: mcpServerName,
   modelTurns: mode === "multi" ? 2 : 1,
   passed: false,
-  tool: "ui_kit_echo",
+  tool: mode === "skill" ? "search_openai_docs + fetch_openai_doc" : "ui_kit_echo",
+  reasoningEffort: mode === "skill" ? process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max" : null,
   tools: toolDefinitions.map(({ name }) => name),
 };
 let threadId = null;
@@ -309,22 +387,22 @@ try {
       detail: "full",
     });
     let server = statusResponse.data?.find(
-      (candidate) => candidate?.name === "ui_kit_echo",
+      (candidate) => candidate?.name === mcpServerName,
     );
-    assert.ok(server, "The live MCP status list must include ui_kit_echo.");
+    assert.ok(server, `The live MCP status list must include ${mcpServerName}.`);
     if (mode === "oauth") {
       let complete;
       const completion = new Promise((resolve) => {
         complete = resolve;
       });
       const unsubscribeOauth = statusClient.onNotification((event) => {
-        if (event.method === "mcpServer/oauthLogin/completed" && event.params?.name === "ui_kit_echo") {
+        if (event.method === "mcpServer/oauthLogin/completed" && event.params?.name === mcpServerName) {
           complete(event.params);
         }
       });
       const oauthLogin = await statusClient.call("mcpServer/oauth/login", {
         clientRegistration: "dcr",
-        name: "ui_kit_echo",
+        name: mcpServerName,
         scopes: ["mcp:tools"],
         timeoutSecs: 30,
       });
@@ -344,8 +422,8 @@ try {
         success: completed.success,
       };
       statusResponse = await statusClient.call("mcpServerStatus/list", { detail: "full" });
-      server = statusResponse.data?.find((candidate) => candidate?.name === "ui_kit_echo");
-      assert.ok(server, "The OAuth-authenticated MCP status list must include ui_kit_echo.");
+      server = statusResponse.data?.find((candidate) => candidate?.name === mcpServerName);
+      assert.ok(server, `The OAuth-authenticated MCP status list must include ${mcpServerName}.`);
     }
     assert.ok(server.tools, "The live MCP status list must expose configured tools.");
     for (const { name } of toolDefinitions) {
@@ -365,7 +443,33 @@ try {
     await statusClient.close();
   }
 
+  if (mode === "skill") {
+    await page.getByRole("button", { name: "Try now", exact: true }).click();
+    await page.getByTestId("current-skill-try-now").waitFor({ state: "visible" });
+  }
   await page.getByRole("button", { name: "Live local", exact: true }).click();
+  if (mode === "skill") {
+    await page.waitForFunction(
+      () => document.querySelector('[data-testid="current-skill-try-now"]')?.getAttribute("data-submitted") === "false",
+    );
+    const draft = page.getByRole("textbox", { name: "Do anything", exact: true });
+    await draft.evaluate((element) => {
+      element.focus();
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      range.collapse(false);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      document.execCommand(
+        "insertText",
+        false,
+        " Find the official Model Context Protocol documentation: search first, then fetch the matching official page and summarize its title and URL. Use the OpenAI Docs MCP tools only; do not use shell, files, browser, network, or any other tool.",
+      );
+    });
+    assert.match(await draft.innerText(), /OpenAI Docs/);
+    assert.match(await draft.innerText(), /Model Context Protocol documentation/);
+  }
   await page.evaluate((approvalAction) => {
     window.__liveMcpEvidence = [];
     window.codexDemo.onNotification((event) => {
@@ -391,10 +495,10 @@ try {
     name: "Message composer",
     exact: true,
   });
-  const expectedCallCount = mode === "multi" || mode === "retry" ? 2 : 1;
+  const expectedCallCount = mode === "multi" || mode === "retry" || mode === "skill" ? 2 : 1;
   const multiEchoPrompt = 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK:pixel-check.';
   const multiUpperPrompt = 'Call the tool named ui_kit_upper on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_UPPER:PIXEL-CHECK.';
-  await composer.fill(
+  const livePrompt =
     mode === "multi"
       ? multiEchoPrompt
       : mode === "retry"
@@ -405,9 +509,20 @@ try {
           ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". If the MCP approval request is denied, do not retry. After the denial failure, reply exactly MCP_TOOL_CALL_APPROVAL_DENIED. Do not use shell, files, network, browser, search, or any other tool.'
         : mode === "cancel"
           ? 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". The tool call will be cancelled by the user while it is running. Do not retry or use shell, files, network, browser, search, or any other tool.'
-        : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.',
-  );
-  await composer.press("Enter");
+        : 'Use exactly one MCP tool now. Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK.';
+  if (mode === "skill") {
+    await page
+      .getByTestId("current-skill-try-now")
+      .getByRole("button", { name: "Send", exact: true })
+      .click();
+    await page.waitForFunction(
+      () => document.querySelector(".demo-root")?.getAttribute("data-skill-try-now-submitted") === "true",
+    );
+    await page.getByTestId("current-skill-try-now").waitFor({ state: "detached" });
+  } else {
+    await composer.fill(livePrompt);
+    await composer.press("Enter");
+  }
   if (mode === "cancel") {
     await page.waitForFunction(
       () =>
@@ -459,6 +574,27 @@ try {
         ).length >= expectedCount,
       expectedCallCount,
       { timeout: 180_000 },
+    );
+  } else if (mode === "skill") {
+    await page.waitForFunction(
+      (expectedCount) =>
+        (window.__liveMcpEvidence ?? []).filter(
+          (event) =>
+            event.method === "item/completed" &&
+            event.params?.item?.type === "mcpToolCall",
+        ).length >= expectedCount,
+      expectedCallCount,
+      { timeout: 180_000 },
+    );
+    await page.waitForFunction(
+      () =>
+        (window.__liveMcpEvidence ?? []).some(
+          (event) =>
+            event.method === "turn/completed" &&
+            event.params?.turn?.status === "completed",
+        ),
+      undefined,
+      { timeout: 60_000 },
     );
   } else {
     await page.waitForFunction(
@@ -570,6 +706,49 @@ try {
       serverResponded: false,
       turnStatus: completedTurn.params.turn.status,
     };
+  } else if (mode === "skill") {
+    const [searchCall, fetchCall] = completedItems;
+    assert.equal(searchCall.item.tool, "search_openai_docs");
+    assert.equal(searchCall.item.status, "completed");
+    assert.equal(searchCall.item.server, mcpServerName);
+    assert.equal(fetchCall.item.tool, "fetch_openai_doc");
+    assert.equal(fetchCall.item.status, "completed");
+    assert.equal(fetchCall.item.server, mcpServerName);
+    assert.equal(
+      searchCall.item.result?.structuredContent?.results?.[0]?.title,
+      "Model Context Protocol",
+    );
+    assert.equal(
+      fetchCall.item.result?.structuredContent?.url,
+      "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features",
+    );
+    assert.match(
+      fetchCall.item.result?.content?.[0]?.text ?? "",
+      /^MCP_SKILL_TOOL_CALL_OK:Model Context Protocol/,
+    );
+    const serverLog = await readFile(serverLogPath, "utf8");
+    const serverToolCalls = serverLog
+      .split("\n")
+      .filter((line) => line.startsWith("TOOL_ARGUMENTS "))
+      .map((line) => JSON.parse(line.slice("TOOL_ARGUMENTS ".length)));
+    assert.deepEqual(
+      serverToolCalls.map(({ tool }) => tool),
+      ["search_openai_docs", "fetch_openai_doc"],
+      "Try now must execute the OpenAI Docs search then fetch sequence through the local MCP server.",
+    );
+    assert.match(serverToolCalls[0].arguments.query, /Model Context Protocol/i);
+    assert.equal(
+      serverToolCalls[1].arguments.url,
+      "https://learn.chatgpt.com/docs/extend/mcp#supported-mcp-features",
+    );
+    result.skillExecution = {
+      evidenceBoundary:
+        "real local App Server and stdio MCP round-trip; deterministic fixture content, not installed-product skill execution",
+      orderedCalls: serverToolCalls,
+      resultTitle: "Model Context Protocol",
+      resultUrl: serverToolCalls[1].arguments.url,
+      toolStatuses: completedItems.map(({ item }) => item.status),
+    };
   } else if (mode === "remote" || mode === "oauth") {
     assert.ok(remoteMethods.includes("initialize"), "Remote MCP must receive initialize.");
     assert.ok(remoteMethods.includes("tools/list"), "Remote MCP must receive tools/list.");
@@ -654,9 +833,16 @@ try {
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
       return {
+        backgroundColor: style.backgroundColor,
+        borderColor: style.borderColor,
+        borderRadius: style.borderRadius,
+        color: style.color,
         fontFamily: style.fontFamily,
+        fontSize: style.fontSize,
         height: rect.height,
-        text: element.textContent?.replace(/\\s+/g, " ").trim(),
+        lineHeight: style.lineHeight,
+        padding: style.padding,
+        text: element.textContent?.replace(/\s+/g, " ").trim(),
         width: rect.width,
       };
     });
@@ -673,13 +859,73 @@ try {
     }
   }
   result.cards = cards;
+  let compactGroup = null;
+  if (mode === "skill") {
+    const groups = page.locator(".codex-ui-mcp-tool-call-group");
+    assert.equal(
+      await groups.count(),
+      1,
+      "The transcript must render one server activity group containing both search and fetch.",
+    );
+    result.mcpGroups = await groups.evaluateAll((elements) =>
+      elements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          backgroundColor: style.backgroundColor,
+          borderColor: style.borderColor,
+          borderRadius: style.borderRadius,
+          color: style.color,
+          fontFamily: style.fontFamily,
+          fontSize: style.fontSize,
+          height: rect.height,
+          lineHeight: style.lineHeight,
+          width: rect.width,
+        };
+      }),
+    );
+    assert.ok(result.mcpGroups.every(({ height, width }) => width > 0 && height > 0));
+    await page.waitForTimeout(250);
+    const group = groups.first();
+    const firstPixels = await group.screenshot();
+    const repeatedPixels = await group.screenshot();
+    const firstPng = PNG.sync.read(firstPixels);
+    const secondPng = PNG.sync.read(repeatedPixels);
+    assert.equal(firstPng.width, secondPng.width);
+    assert.equal(firstPng.height, secondPng.height);
+    const pixelDiff = pixelmatch(
+      firstPng.data,
+      secondPng.data,
+      null,
+      firstPng.width,
+      firstPng.height,
+      { threshold: 0 },
+    );
+    assert.equal(pixelDiff, 0, "The MCP activity group must be pixel-stable across repeated captures.");
+    result.pixelGate = {
+      comparison: "same rendered MCP group captured twice within one App Server run",
+      diffPixels: pixelDiff,
+      note: "determinism only; not a pixel comparison against the installed Codex product",
+    };
+    result.mcpGroupWideScreenshot = join(directory, "mcp-skill-try-now-group-wide.png");
+    await writeFile(result.mcpGroupWideScreenshot, firstPixels);
+  }
   result.wideScreenshot = join(directory, "mcp-tool-call-wide.png");
   await page.screenshot({ path: result.wideScreenshot });
 
-  await app.evaluate(({ BrowserWindow }) => {
-    BrowserWindow.getAllWindows()[0].setContentSize(720, 820);
-  });
-  await page.waitForFunction(() => innerWidth === 720);
+  if (mode === "skill") {
+    await app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0].setContentSize(720, 680);
+    });
+  } else {
+    await app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows()[0].setContentSize(720, 820);
+    });
+  }
+  await page.waitForFunction(
+    (expectedHeight) => innerWidth === 720 && (!expectedHeight || innerHeight === expectedHeight),
+    mode === "skill" ? 680 : null,
+  );
   assert.equal(
     await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -696,6 +942,43 @@ try {
           const rect = element.getBoundingClientRect();
           return { height: rect.height, width: rect.width };
         });
+  if (mode === "skill") {
+    const compactGroups = page.locator(".codex-ui-mcp-tool-call-group");
+    compactGroup = await compactGroups.first().evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        backgroundColor: style.backgroundColor,
+        borderColor: style.borderColor,
+        borderRadius: style.borderRadius,
+        color: style.color,
+        fontFamily: style.fontFamily,
+        fontSize: style.fontSize,
+        height: rect.height,
+        lineHeight: style.lineHeight,
+        width: rect.width,
+      };
+    });
+    assert.ok(compactGroup.width > 0 && compactGroup.height > 0);
+    await page.waitForTimeout(250);
+    const compactPixels = await compactGroups.first().screenshot();
+    const repeatedCompactPixels = await compactGroups.first().screenshot();
+    const compactPng = PNG.sync.read(compactPixels);
+    const repeatedCompactPng = PNG.sync.read(repeatedCompactPixels);
+    const compactDiff = pixelmatch(
+      compactPng.data,
+      repeatedCompactPng.data,
+      null,
+      compactPng.width,
+      compactPng.height,
+      { threshold: 0 },
+    );
+    assert.equal(compactDiff, 0, "The compact MCP activity group must be pixel-stable.");
+    result.compactMcpGroup = compactGroup;
+    result.pixelGate.compactDiffPixels = compactDiff;
+    result.mcpGroupCompactScreenshot = join(directory, "mcp-skill-try-now-group-compact.png");
+    await writeFile(result.mcpGroupCompactScreenshot, compactPixels);
+  }
   await page.screenshot({ path: result.compactScreenshot });
   result.passed = true;
 } catch (error) {
@@ -728,6 +1011,15 @@ try {
       }
     } finally {
       await client.close();
+    }
+  }
+  try {
+    const authMetadata = await lstat(ephemeralAuthPath);
+    if (authMetadata.isSymbolicLink()) await unlink(ephemeralAuthPath);
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      result.cleanupError = String(error);
+      process.exitCode = 1;
     }
   }
   result.serverLogPath = serverLogPath;

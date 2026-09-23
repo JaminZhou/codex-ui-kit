@@ -4078,9 +4078,11 @@ export function App() {
   const [skillTryNowActive, setSkillTryNowActive] = useState(
     isCurrentSkillTryNowReplay,
   );
-  const [skillTryNowStatus, setSkillTryNowStatus] = useState<"ready" | "error">(
-    "ready",
-  );
+  const [skillTryNowSubmitted, setSkillTryNowSubmitted] = useState(false);
+  const [skillTryNowStatus, setSkillTryNowStatus] = useState<
+    "ready" | "submitting" | "error"
+  >("ready");
+  const skillTryNowTextboxRef = useRef<HTMLDivElement>(null);
   const isCurrentThreadOverflowReplay =
     initialSelection.frame?.startsWith("thread-overflow-current-26-825") ||
     initialSelection.frame?.startsWith("thread-overflow-current-26-915") ||
@@ -6715,16 +6717,16 @@ export function App() {
       if (requestId === liveHistoryReadId.current) setLiveHistoryLoading(false);
     }
   };
-  const submitLive = async (prompt: string) => {
-    if (liveHistoryLoading) return;
+  const submitLive = async (prompt: string): Promise<boolean> => {
+    if (liveHistoryLoading) return false;
     if (!window.codexDemo) {
       setLiveError("Live mode is available in the Electron app.");
-      return;
+      return false;
     }
-    if (liveStartPendingRef.current) return;
+    if (liveStartPendingRef.current) return false;
     if (!workspaceProjectToken) {
       setLiveError("Select a local project before starting a live turn.");
-      return;
+      return false;
     }
     liveStartPendingRef.current = true;
     setLiveStartPending(true);
@@ -6733,8 +6735,10 @@ export function App() {
     try {
       await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken, collaborationMode: composerMode === "plan" ? "plan" : "default", threadId: liveState.threadId ?? null });
       setComposerValue((current) => (current === prompt ? "" : current));
+      return true;
     } catch (error) {
       setLiveError(error instanceof Error ? error.message : String(error));
+      return false;
     } finally {
       liveStartPendingRef.current = false;
       setLiveStartPending(false);
@@ -9795,20 +9799,37 @@ export function App() {
       className="demo-current-skill-try-now"
       data-action={skillDetailAction || undefined}
       data-status={skillTryNowStatus}
-      data-submitted="false"
+      data-submitted={skillTryNowSubmitted ? "true" : "false"}
       data-testid="current-skill-try-now"
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault();
+        if (skillTryNowStatus !== "ready") return;
         if (isCurrentSkillTryNowFailureReplay && skillTryNowStatus === "ready") {
           setSkillTryNowStatus("error");
           setSkillDetailAction("try-now-failed");
+          return;
         }
+        if (mode !== "live") return;
+        const prompt = skillTryNowTextboxRef.current?.innerText?.trim();
+        if (!prompt) return;
+        setSkillTryNowStatus("submitting");
+        setSkillDetailAction("try-now-starting");
+        const started = await submitLive(prompt);
+        if (!started) {
+          setSkillTryNowStatus("error");
+          setSkillDetailAction("try-now-failed");
+          return;
+        }
+        setSkillTryNowSubmitted(true);
+        setSkillTryNowActive(false);
+        setSkillDetailAction("try-now-submitted");
       }}
     >
       <div
         aria-label="Do anything"
         className="demo-current-skill-try-now__textbox"
         contentEditable
+        ref={skillTryNowTextboxRef}
         role="textbox"
         suppressContentEditableWarning
       >
@@ -9824,7 +9845,11 @@ export function App() {
         <button aria-label="Add files and more" type="button">
           <CurrentBuildIcon name="composer-add-files" />
         </button>
-        <button aria-label="Send" type="submit">
+        <button
+          aria-label="Send"
+          disabled={skillTryNowStatus === "submitting"}
+          type="submit"
+        >
           <CurrentBuildIcon name="composer-send" />
         </button>
       </div>
@@ -9839,6 +9864,7 @@ export function App() {
           <button
             onClick={() => {
               setSkillTryNowStatus("ready");
+              setSkillTryNowSubmitted(false);
               setSkillDetailAction("try-now-retried");
             }}
             type="button"
@@ -13798,10 +13824,14 @@ export function App() {
         if (skillDetailStatus === "updating") return;
         setSkillDetailActionsOpen(false);
         setSkillDetailOpen(false);
+        setSkillTryNowSubmitted(false);
+        setSkillTryNowStatus("ready");
         setSkillTryNowActive(true);
         setSkillDetailAction("try-now-prefill");
         setActiveFrame(
-          "integration-skill-detail-current-26-825-try-now-compact",
+          isCurrentSkillDetail26915Replay
+            ? "integration-skill-detail-current-26-915-try-now"
+            : "integration-skill-detail-current-26-825-try-now-compact",
         );
         setView("conversation");
       }}
@@ -18320,6 +18350,7 @@ export function App() {
       data-layout={initialSelection.layoutMode}
       data-last-method={state.lastMethod ?? undefined}
       data-mode={mode}
+      data-skill-try-now-submitted={skillTryNowSubmitted ? "true" : "false"}
       data-composer-phase={
         currentComposerQueue26825Replay
           ? currentQueue26825Phase === "paused"
