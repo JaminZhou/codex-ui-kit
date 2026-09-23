@@ -2611,16 +2611,17 @@
       "area": "settings",
       "ownership": "app",
       "packageEvidence": [
-        "current-settings-connections-tabs",
+        "current-settings-connections-button-toggle",
         "component:ConnectionsSettingsPage",
         "capture:current-settings-connections-environments-26.915-read-only",
-        "playground:current-26.915-settings-connections-three-tab-controlled",
-        "browser-cdp:current-26.915-settings-connections-three-tab-geometry",
-        "electron:current-26.915-settings-connections-three-tab-interactions"
+        "playground:current-26.917-settings-connections-800x600-controlled",
+        "browser-cdp:current-26.917-settings-connections-pressed-geometry-interaction",
+        "electron:current-26.917-settings-connections-pressed-geometry-interaction",
+        "pixel:current-26.915-settings-connections-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
-        "cdp-26.915.31945:settings-connections-environments-read-only-800x600-three-tabs",
+        "cdp-26.915.31945:settings-connections-environments-read-only-800x600-three-selection-controls",
         "cdp-26.917.62051:settings-connections-read-only-three-aria-pressed-buttons-800x600"
       ],
       "implementationStatus": "partial",

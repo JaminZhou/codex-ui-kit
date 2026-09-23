@@ -4491,6 +4491,11 @@ export function App() {
         ? "remote-connections-explorer"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith(
+            "workspace-settings-connections-current-26-917",
+          )
+        ? "connections-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith(
             "workspace-settings-connections-current-26-915",
           )
         ? "connections-settings"
@@ -4564,8 +4569,12 @@ export function App() {
           ? "hooks"
         : initialSelection.frame?.startsWith("workspace-worktree-settings")
           ? "worktrees"
-        : initialSelection.frame?.startsWith("workspace-code-review-settings")
-          ? "code-review"
+      : initialSelection.frame?.startsWith("workspace-code-review-settings")
+        ? "code-review"
+      : initialSelection.frame?.startsWith(
+            "workspace-settings-connections-current-26-917",
+          )
+          ? "connections"
       : initialSelection.frame?.startsWith(
             "workspace-settings-connections-current-26-915",
           )
@@ -8353,12 +8362,12 @@ export function App() {
         {mode === "live" && <AppSidebarItem
           leading={<SidebarGlyph name="plugins" />}
           onClick={() => {
-            setWorkspacePage("connections-settings");
-            setActiveFrame("workspace-connections-settings");
+            setWorkspacePage("remote-connections-explorer");
+            setActiveFrame("workspace-remote-connections-explorer");
             setView("workspace");
             dismissSidebarAfterNavigation({ force: true });
           }}
-          selected={view === "workspace" && workspacePage === "connections-settings"}
+          selected={view === "workspace" && workspacePage === "remote-connections-explorer"}
         >
           Connections
         </AppSidebarItem>}
@@ -10314,7 +10323,12 @@ export function App() {
           ? activeFrame
           : "workspace-code-review-settings"
       : workspacePage === "connections-settings"
-        ? activeFrame?.startsWith("workspace-settings-connections-current-26-915")
+        ? activeFrame?.startsWith(
+            "workspace-settings-connections-current-26-917",
+          ) ||
+          activeFrame?.startsWith(
+            "workspace-settings-connections-current-26-915",
+          )
           ? activeFrame
           : activeFrame?.startsWith("workspace-connections-settings")
           ? activeFrame
@@ -12270,6 +12284,20 @@ export function App() {
     <SettingsShell
       backIcon={<CurrentBuildIcon name="settings-back" />}
       backButtonRef={settingsBackButtonRef}
+      className={
+        activeFrame?.startsWith(
+          "workspace-settings-connections-current-26-917",
+        )
+          ? "demo-current-settings-connections-26-917"
+          : undefined
+      }
+      mainTopInset={
+        activeFrame?.startsWith(
+          "workspace-settings-connections-current-26-917",
+        )
+          ? 0
+          : undefined
+      }
       onBack={() => {
         setSettingsQuery("");
         setWorkspacePage("conversation");
@@ -12401,7 +12429,12 @@ export function App() {
             onActiveTabChange={(tab) => {
               setConnectionsSettingsTab(tab);
               setConnectionsSettingsAction("");
-              setActiveFrame(`workspace-settings-connections-current-26-915-${tab}`);
+              const framePrefix = activeFrame?.startsWith(
+                "workspace-settings-connections-current-26-917",
+              )
+                ? "workspace-settings-connections-current-26-917"
+                : "workspace-settings-connections-current-26-915";
+              setActiveFrame(`${framePrefix}-${tab}`);
             }}
             onAdd={() =>
               setConnectionsSettingsAction(
@@ -19029,7 +19062,13 @@ export function App() {
         }
         sidebarResizable
         windowChrome={
-          view === "projects" ||
+          view === "workspace" &&
+          workspacePage === "connections-settings" &&
+          activeFrame?.startsWith(
+            "workspace-settings-connections-current-26-917",
+          )
+            ? null
+            : view === "projects" ||
           view === "automations" ||
           view === "plugins" ||
           view === "sites" ||

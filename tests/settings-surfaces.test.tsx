@@ -338,6 +338,24 @@ describe("settings surfaces", () => {
     expect(document.activeElement).toBe(searchbox);
   });
 
+  it("lets the host offset Settings content independently of its rail", () => {
+    render(
+      <SettingsShell
+        mainTopInset={0}
+        onBack={() => undefined}
+        onQueryChange={() => undefined}
+        onSelect={() => undefined}
+        query=""
+        sections={sections}
+        selectedId="git"
+      >
+        <h1>Git settings content</h1>
+      </SettingsShell>,
+    );
+
+    expect((screen.getByRole("main") as HTMLElement).style.marginTop).toBe("0px");
+  });
+
   it("announces loading, error, and empty search states", () => {
     const { rerender } = render(
       <SettingsShell

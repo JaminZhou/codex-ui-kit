@@ -450,6 +450,11 @@
   display: none;
 }
 
+.codex-ui-settings-shell.demo-current-settings-connections-26-917
+  > .codex-ui-settings-shell__main {
+  padding-top: 2.875rem;
+}
+
 .codex-ui-settings-shell__visually-hidden {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
@@ -736,8 +741,9 @@
 .codex-ui-connections-settings {
   margin: 0 auto;
   max-width: 48rem;
+  margin-left: max(1.3125rem, calc((100% - 48rem) / 2));
   padding: 1.25rem 0 2rem;
-  width: calc(100% - 2.5rem);
+  width: calc(100% - 2.5625rem);
 }
 
 .codex-ui-connections-settings__header {
@@ -775,15 +781,15 @@
   font: inherit;
   font-size: 0.8125rem;
   height: 1.75rem;
-  padding: 0 0.75rem;
+  padding: 0 0.55rem;
   position: relative;
 }
 
-.codex-ui-connections-settings__tab[aria-selected="true"] {
+.codex-ui-connections-settings__tab[aria-pressed="true"] {
   color: var(--codex-ui-text);
 }
 
-.codex-ui-connections-settings__tab[aria-selected="true"]::after {
+.codex-ui-connections-settings__tab[aria-pressed="true"]::after {
   background: currentColor;
   border-radius: 999px;
   bottom: -1px;

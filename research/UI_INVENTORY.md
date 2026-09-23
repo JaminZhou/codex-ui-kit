@@ -463,14 +463,19 @@ provider/device execution are still not promoted.
 
 The installed 26.915 `Settings → Connections` route was separately sampled at
 800×600. It exposes `Control this Mac`, `Control other devices`, and `SSH`
-tabs, with their visible control descriptions and measured geometry in
+selection controls, with visible descriptions and geometry in
 [`current-settings-connections-environments-26.915.31945.json`](current-settings-connections-environments-26.915.31945.json).
-This is candidate-only structural evidence. The route is tracked as
+This is candidate-only structural evidence. The later 26.917 sample confirms
+the controls are native buttons with `aria-pressed`; the 26.915 record did not
+retain their roles. The route is tracked as
 `settings.connections`; `RemoteConnectionsPage` and its local save/test/forget
 registry are a separate exploratory surface, not a reconstruction of that
-Settings page. The controlled `ConnectionsSettingsPage` now passes local
-Browser/CDP, Electron geometry/interaction, and own-fixture pixel coverage
-(PR #607). That replay coverage does not promote installed-product pixels;
+Settings page. The controlled `ConnectionsSettingsPage` now models the
+installed native button/`aria-pressed` selection semantics rather than ARIA
+tabs. Its replay has local Browser/CDP, Electron geometry/interaction, and
+own-fixture pixel coverage (PR #607). Separate 26.917 Browser/CDP and Electron
+scenes assert current structural geometry and pressed-state interaction; that
+replay coverage does not promote installed-product pixels;
 pairing, SSH exchange, environment mutation, persistence, and production Remote
 semantics remain open. A separate 26.917 sample records the three button
 states, their `aria-pressed` semantics, and 800×600 geometry; it is structural
@@ -540,7 +545,8 @@ transitions must add or split IDs.
   shell/search, Git/review-delivery, and Appearance slices are now
   current-build verified.
 - MCP, plugin detail/install, skill execution, and real automation mutations.
-  Settings Connections has a separate controlled three-tab implementation;
+  Settings Connections has a separate controlled three-button selection
+  implementation using the observed `aria-pressed` state;
   the Add/Edit/Forget/Test registry remains an exploratory local route.
   Account pairing, SSH credentials, persistence, and Remote registry/relay
   semantics stay host-owned until separately observed and validated.
