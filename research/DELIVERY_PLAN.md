@@ -16,8 +16,11 @@ exit gates; it does not replace the inventory.
   The isolated candidate record is
   [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
   summarized in [`26.917.62051.md`](26.917.62051.md). It refreshes structural
-  observations for the shell/sidebar, Projects, Help, and Composer resources;
-  Settings → Connections was not visited. The promoted baseline remains
+  observations for the shell/sidebar, Projects, Help, and Composer resources.
+  A separate read-only 800×600 Settings → Connections observation is recorded
+  in [`current-settings-connections-26.917.62051.json`](current-settings-connections-26.917.62051.json)
+  and [`26.917.62051-settings-connections.md`](26.917.62051-settings-connections.md).
+  The promoted baseline remains
   `26.903.71938`: this candidate has no installed-product pixel evidence, and
   evidence from older builds or controlled replay does not substitute for
   current-build surface-family gates.
@@ -128,6 +131,12 @@ exit gates; it does not replace the inventory.
   checks. These replay gates do not promote installed-product 26.915 or 26.917
   pixels, and pairing, SSH exchange, environment mutation, persistence, and
   production Remote semantics remain open.
+- The separate 26.917 Connections sample confirms the three current-build
+  button states at 800×600 with zero horizontal overflow. Its 321.875px route
+  column and control geometry are recorded without retaining switch values;
+  the tab-like controls are actual buttons using `aria-pressed`, not `role=tab`.
+  This refreshes structural evidence only, not installed-product pixels,
+  pairing, SSH exchange, or persistence.
 - The installed `26.915.31945` Settings route was re-observed in a read-only
   isolated Renderer. `Computer use` and `Browser` are both reachable from the
   current Settings navigation and share a `321.88px` rail, `46px` titlebar
