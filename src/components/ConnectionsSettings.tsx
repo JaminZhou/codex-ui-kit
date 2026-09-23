@@ -1,7 +1,6 @@
 import {
   type HTMLAttributes,
   type ReactNode,
-  useId,
   useState,
 } from "react";
 
@@ -79,12 +78,7 @@ export function ConnectionsSettingsPage({
 }: ConnectionsSettingsPageProps) {
   const [internalActiveTab, setInternalActiveTab] =
     useState<ConnectionsSettingsTabId>("control-this-mac");
-  const instanceId = useId();
   const selectedTab = activeTab ?? internalActiveTab;
-  const tabId = (tab: ConnectionsSettingsTabId) =>
-    `${instanceId}-${tab}-tab`;
-  const panelId = (tab: ConnectionsSettingsTabId) =>
-    `${instanceId}-${tab}-panel`;
   const selectTab = (tab: ConnectionsSettingsTabId) => {
     if (activeTab === undefined) setInternalActiveTab(tab);
     onActiveTabChange?.(tab);
@@ -103,38 +97,14 @@ export function ConnectionsSettingsPage({
         <h1>Connections</h1>
       </header>
       <div
-        aria-label="Connections settings"
         className="codex-ui-connections-settings__tabs"
-        onKeyDown={(event) => {
-          const currentIndex = tabs.findIndex((tab) => tab.id === selectedTab);
-          const nextIndex =
-            event.key === "ArrowRight"
-              ? (currentIndex + 1) % tabs.length
-              : event.key === "ArrowLeft"
-                ? (currentIndex + tabs.length - 1) % tabs.length
-                : event.key === "Home"
-                  ? 0
-                  : event.key === "End"
-                    ? tabs.length - 1
-                    : -1;
-          if (nextIndex >= 0) {
-            event.preventDefault();
-            selectTab(tabs[nextIndex]!.id);
-            document.getElementById(tabId(tabs[nextIndex]!.id))?.focus();
-          }
-        }}
-        role="tablist"
       >
         {tabs.map((tab) => (
           <button
-            aria-controls={panelId(tab.id)}
-            aria-selected={tab.id === selectedTab}
+            aria-pressed={tab.id === selectedTab}
             className="codex-ui-connections-settings__tab"
-            id={tabId(tab.id)}
             key={tab.id}
             onClick={() => selectTab(tab.id)}
-            role="tab"
-            tabIndex={tab.id === selectedTab ? 0 : -1}
             type="button"
           >
             {tab.label}
@@ -143,13 +113,9 @@ export function ConnectionsSettingsPage({
       </div>
       {tabs.map((tab) => (
         <section
-          aria-labelledby={tabId(tab.id)}
           className="codex-ui-connections-settings__panel"
           hidden={tab.id !== selectedTab}
-          id={panelId(tab.id)}
           key={tab.id}
-          role="tabpanel"
-          tabIndex={0}
         >
           {tab.id === "control-this-mac" ? (
             <>

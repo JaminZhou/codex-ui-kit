@@ -15,7 +15,13 @@ const playgroundPackage = JSON.parse(await readFile(new URL("../package.json", i
 const clientPackage = JSON.parse(await readFile(new URL("../package.json", import.meta.resolve("@jaminzhou/codex-app-server-client")), "utf8"));
 const { app, page } = await launchScene(visualScenes.find(scene => scene.id === "pull-request-detail"), {
   capture: false,
-  environment: { CODEX_UI_KIT_WORKSPACE: directory, CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0", CODEX_DEMO_PROJECT_FIXTURE_PATH: secondProject },
+  environment: {
+    CODEX_DEMO_PROJECT_FIXTURE_PATH: secondProject,
+    CODEX_UI_KIT_LIVE_MODEL: "gpt-5.6-luna",
+    CODEX_UI_KIT_LIVE_REASONING_EFFORT: "max",
+    CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
+    CODEX_UI_KIT_WORKSPACE: directory,
+  },
 });
 let result = {
   passed: false, directory,

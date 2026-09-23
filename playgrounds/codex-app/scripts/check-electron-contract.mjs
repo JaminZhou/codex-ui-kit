@@ -1804,14 +1804,21 @@ try {
       heading: heading
         ? { left: heading.left, top: heading.top, width: heading.width }
         : null,
-      tabCount: document.querySelectorAll(
-        ".codex-ui-connections-settings [role=tab]",
+      controlCount: document.querySelectorAll(
+        ".codex-ui-connections-settings__tabs button",
       ).length,
+      pressedControls: Array.from(
+        document.querySelectorAll(
+          ".codex-ui-connections-settings__tabs button",
+        ),
+        (button) => button.getAttribute("aria-pressed"),
+      ),
     };
   });
   if (
     measured.documentOverflows ||
-    measured.tabCount !== 3 ||
+    measured.controlCount !== 3 ||
+    measured.pressedControls.filter((pressed) => pressed === "true").length !== 1 ||
     !measured.heading ||
     Math.abs(measured.heading.left - 342.875) > 8 ||
     Math.abs(measured.heading.top - 112) > 8
@@ -1821,19 +1828,19 @@ try {
     );
   }
   await currentSettingsConnectionsPage
-    .getByRole("tab", { name: "Control other devices", exact: true })
+    .getByRole("button", { name: "Control other devices", exact: true })
     .click();
   await currentSettingsConnectionsPage
     .getByRole("button", { name: "Set up", exact: true })
     .click();
   await currentSettingsConnectionsPage
-    .getByRole("tab", { name: "SSH", exact: true })
+    .getByRole("button", { name: "SSH", exact: true })
     .click();
   await currentSettingsConnectionsPage
     .getByRole("button", { name: "Add", exact: true })
     .click();
   await currentSettingsConnectionsPage
-    .getByRole("tab", { name: "Control this Mac", exact: true })
+    .getByRole("button", { name: "Control this Mac", exact: true })
     .click();
   await currentSettingsConnectionsPage
     .getByRole("switch", { name: "Allow connections", exact: true })
@@ -1843,6 +1850,153 @@ try {
     .waitFor();
 } finally {
   await currentSettingsConnectionsApp.close();
+}
+
+const currentSettingsConnections917Scene = {
+  currentSidebar: true,
+  frame: "workspace-settings-connections-current-26-917",
+  id: "settings-connections-current-26-917-electron-contract",
+  scenario: "workspace-workflow",
+  view: "workspace",
+  windowSize: { height: 600, width: 800 },
+};
+const {
+  app: currentSettingsConnections917App,
+  page: currentSettingsConnections917Page,
+} = await launchScene(currentSettingsConnections917Scene, { capture: false });
+try {
+  await currentSettingsConnections917Page
+    .locator(".codex-ui-connections-settings")
+    .waitFor();
+  const initial = await currentSettingsConnections917Page.evaluate(() => {
+    const rect = (element) => {
+      const value = element?.getBoundingClientRect();
+      return value
+        ? {
+            height: value.height,
+            left: value.left,
+            top: value.top,
+            width: value.width,
+          }
+        : null;
+    };
+    const heading = document.querySelector(
+      ".codex-ui-connections-settings h1",
+    );
+    const appMain = document.querySelector(
+      ".codex-ui-app-shell__main",
+    );
+    const hostChromeInset = Number.parseFloat(
+      getComputedStyle(appMain).paddingBlockStart,
+    );
+    const main = rect(
+      document.querySelector(".codex-ui-settings-shell__main"),
+    );
+    const navigation = rect(
+      document.querySelector(".codex-ui-settings-shell__navigation"),
+    );
+    const controls = Array.from(
+      document.querySelectorAll(
+        ".codex-ui-connections-settings__tabs button",
+      ),
+      (button) => ({
+        label: button.textContent?.trim(),
+        pressed: button.getAttribute("aria-pressed"),
+        rect: rect(button),
+      }),
+    );
+    return {
+      controls,
+      hostChromeInset,
+      heading: rect(heading),
+      main,
+      navigation,
+      normalizedShell: {
+        main: {
+          ...main,
+          height: main?.height + hostChromeInset,
+          top: main?.top - hostChromeInset,
+        },
+        navigation: {
+          ...navigation,
+          height: navigation?.height + hostChromeInset,
+          top: navigation?.top - hostChromeInset,
+        },
+      },
+      tabCount: document.querySelectorAll(
+        ".codex-ui-connections-settings [role=tab]",
+      ).length,
+      viewport: { height: innerHeight, width: innerWidth },
+      horizontalOverflow:
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  const closeEnough = (actual, expected) =>
+    actual !== null && Math.abs(actual - expected) <= 0.5;
+  const expectedControls = [
+    { label: "Control this Mac", left: 341.875, width: 124.3125 },
+    { label: "Control other devices", left: 468.1875, width: 155.546875 },
+    { label: "SSH", left: 625.734375, width: 50.234375 },
+  ];
+  if (
+    initial.viewport.width !== 800 ||
+    initial.viewport.height !== 600 ||
+    initial.horizontalOverflow !== 0 ||
+    initial.tabCount !== 0 ||
+    !initial.heading ||
+    !closeEnough(initial.hostChromeInset, 46) ||
+    !closeEnough(initial.normalizedShell.main?.left, 321.875) ||
+    !closeEnough(initial.normalizedShell.main?.top, 0) ||
+    !closeEnough(initial.normalizedShell.main?.width, 478.125) ||
+    !closeEnough(initial.normalizedShell.main?.height, 600) ||
+    !closeEnough(initial.normalizedShell.navigation?.left, 0) ||
+    !closeEnough(initial.normalizedShell.navigation?.top, 46) ||
+    !closeEnough(initial.normalizedShell.navigation?.width, 321.875) ||
+    !closeEnough(initial.normalizedShell.navigation?.height, 554) ||
+    !closeEnough(initial.heading.left, 341.875) ||
+    !closeEnough(initial.heading.top, 66) ||
+    initial.controls.length !== expectedControls.length ||
+    initial.controls.some((control, index) => {
+      const expected = expectedControls[index];
+      return (
+        control.label !== expected.label ||
+        control.pressed !== (index === 0 ? "true" : "false") ||
+        !closeEnough(control.rect?.left, expected.left) ||
+        !closeEnough(control.rect?.top, 126.796875) ||
+        !closeEnough(control.rect?.width, expected.width) ||
+        !closeEnough(control.rect?.height, 28)
+      );
+    })
+  ) {
+    throw new Error(
+      `Electron current 26.917 Settings Connections geometry failed: ${JSON.stringify(initial)}`,
+    );
+  }
+
+  for (const [label, buttonName] of [
+    ["Control other devices", "Set up"],
+    ["SSH", "Add"],
+    ["Control this Mac", "Refresh devices"],
+  ]) {
+    await currentSettingsConnections917Page
+      .getByRole("button", { name: label, exact: true })
+      .click();
+    if (
+      (await currentSettingsConnections917Page
+        .getByRole("button", { name: label, exact: true })
+        .getAttribute("aria-pressed")) !== "true"
+    ) {
+      throw new Error(`${label} did not expose its pressed state in Electron.`);
+    }
+    if (label !== "Control this Mac") {
+      await currentSettingsConnections917Page
+        .getByRole("button", { name: buttonName, exact: true })
+        .waitFor();
+    }
+  }
+
+} finally {
+  await currentSettingsConnections917App.close();
 }
 
 const sidebarStatusScene = {

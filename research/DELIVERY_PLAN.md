@@ -111,7 +111,7 @@ exit gates; it does not replace the inventory.
 - A second isolated 26.915 Renderer sample on 2026-09-23 reaches the current
   Settings `Connections` and `Environments` routes at an 800×600 viewport.
   [`current-settings-connections-environments-26.915.31945.json`](current-settings-connections-environments-26.915.31945.json)
-  records the three Connections tabs, public control geometry, the
+  records the three Connections selection controls and their geometry, the
   Environments add-project/add-environment entry points, and zero horizontal
   overflow without retaining private project labels. This is current-build
   structural reachability only; pairing, SSH exchange, environment mutation,
@@ -119,18 +119,26 @@ exit gates; it does not replace the inventory.
   open. The real native directory action was invoked but macOS was locked
   before picker pixels or a selection could be verified.
 - The Connections inventory is now split by ownership and actual route. The
-  installed Settings page has three tabs (`Control this Mac`, `Control other
-  devices`, `SSH`) and is tracked separately as `settings.connections`. The
+  installed Settings page has three selection controls (`Control this Mac`,
+  `Control other devices`, `SSH`) and is tracked separately as
+  `settings.connections`. The
   older `RemoteConnectionsPage` plus local registry remains an exploratory
   integration surface (`integrations.remote-connections`); it is not evidence
-  for the current Settings route. `ConnectionsSettingsPage` now provides the
-  observed tab structure and controlled local-replay actions. The current
-  26.915 CDP sample is still candidate-only product evidence. The controlled
-  `ConnectionsSettingsPage` replay now has local Browser/CDP, Electron geometry
-  and interaction, and own-fixture pixel coverage; PR #607 completed those
-  checks. These replay gates do not promote installed-product 26.915 or 26.917
-  pixels, and pairing, SSH exchange, environment mutation, persistence, and
-  production Remote semantics remain open.
+  for the current Settings route. `ConnectionsSettingsPage` provides the
+  observed selection controls and controlled local-replay actions. The 26.917
+  capture confirms they are native buttons with `aria-pressed`, not ARIA tabs;
+  the component and replay contract now use the same button-toggle model.
+  Separate 26.917 Browser/CDP and Electron replay scenes assert the measured
+  shell geometry and pressed-state interactions. The Electron scene records
+  and normalizes its additional 46px local window-chrome inset; its control
+  widths are host-specific structural checks, not product-pixel evidence. This
+  semantics correction does not promote installed-product pixels. The current 26.915
+  CDP sample is still candidate-only product evidence. The controlled
+  `ConnectionsSettingsPage` replay also has own-fixture pixel coverage; PR
+  #607 completed those checks. These replay gates do not promote
+  installed-product 26.915 or 26.917 pixels, and pairing, SSH exchange,
+  environment mutation, persistence, and production Remote semantics remain
+  open.
 - The separate 26.917 Connections sample confirms the three current-build
   button states at 800×600 with zero horizontal overflow. Its 321.875px route
   column and control geometry are recorded without retaining switch values;

@@ -1,4 +1,5 @@
 import {
+  type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
@@ -38,6 +39,7 @@ export interface SettingsShellProps
   emptyLabel?: ReactNode;
   error?: ReactNode;
   loadingLabel?: ReactNode;
+  mainTopInset?: CSSProperties["marginTop"];
   navigationLabel?: string;
   onBack: () => void;
   onQueryChange: (query: string) => void;
@@ -71,6 +73,7 @@ export function SettingsShell({
   emptyLabel = "No settings found",
   error = "Settings could not be loaded.",
   loadingLabel = "Loading settings…",
+  mainTopInset = "2.875rem",
   navigationLabel = "Settings",
   onBack,
   onQueryChange,
@@ -219,7 +222,10 @@ export function SettingsShell({
           )}
         </div>
       </nav>
-      <main className="codex-ui-settings-shell__main">
+      <main
+        className="codex-ui-settings-shell__main"
+        style={{ marginTop: mainTopInset }}
+      >
         {status === "ready" ? children : null}
       </main>
     </div>

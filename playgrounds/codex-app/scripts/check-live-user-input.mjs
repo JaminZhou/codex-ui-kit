@@ -8,7 +8,13 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 const directory = await realpath(await mkdtemp(join(tmpdir(), "ui-kit-live-input-")));
 const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 const { app, page } = await launchScene(visualScenes.find(scene => scene.id === "pull-request-detail"), {
-  capture: false, environment: { CODEX_UI_KIT_WORKSPACE: directory, CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0" },
+  capture: false,
+  environment: {
+    CODEX_UI_KIT_LIVE_MODEL: "gpt-5.6-luna",
+    CODEX_UI_KIT_LIVE_REASONING_EFFORT: "max",
+    CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
+    CODEX_UI_KIT_WORKSPACE: directory,
+  },
 });
 const result = { passed: false, directory, clientDependency: packageJson.dependencies["@jaminzhou/codex-app-server-client"] };
 try {
