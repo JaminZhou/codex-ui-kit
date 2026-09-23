@@ -13,6 +13,7 @@ interface CodexDemoBridge {
   previewPullRequest(input: { projectToken: string; remote: string }): Promise<import("../electron/git-pr-preview").GitPullRequestPreview>;
   createPullRequest(input: { projectToken: string } & import("../electron/git-pr-preview").CreatePullRequestInput): Promise<{ number: number; url: string }>;
   readPullRequest(input: { projectToken: string; remote: string; number: number }): Promise<import("../electron/git-pr-detail").GitPullRequestDetail>;
+  readPullRequestConversation(input: { projectToken: string; remote: string; number: number; head: string }): Promise<import("../electron/git-pr-detail").GitPullRequestConversation>;
   readPullRequestDiff(input: { projectToken: string; remote: string; number: number; head: string }): Promise<import("../electron/git-pr-detail").GitPullRequestDiff>;
   editPullRequest(input: { projectToken: string } & import("../electron/git-pr-detail").EditPullRequestInput): Promise<import("../electron/git-pr-detail").GitPullRequestDetail>;
   mergePullRequest(input: { projectToken: string; adminConfirmed: boolean } & import("../electron/git-pr-merge").PullRequestMergeTarget): Promise<import("../electron/git-pr-merge").PullRequestMergeStatus>;

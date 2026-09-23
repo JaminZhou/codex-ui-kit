@@ -15,6 +15,254 @@ export interface GitPullRequestDetail {
   files: Array<{ path: string; additions: number; deletions: number }>;
 }
 
+export interface GitPullRequestConversationComment {
+  id: string;
+  author: string;
+  body: string;
+  createdAt: string;
+  url: string;
+}
+
+export interface GitPullRequestReviewThread {
+  id: string;
+  path: string;
+  line: number | null;
+  resolved: boolean;
+  outdated: boolean;
+  comments: Array<GitPullRequestConversationComment & {
+    diffHunk: string;
+    line: number | null;
+  }>;
+  totalComments: number;
+  hasMoreComments: boolean;
+}
+
+export interface GitPullRequestReview {
+  id: string;
+  author: string;
+  body: string;
+  submittedAt: string | null;
+  url: string;
+  state: string;
+}
+
+export interface GitPullRequestConversation {
+  number: number;
+  headRefOid: string;
+  baseRefOid: string;
+  comments: GitPullRequestConversationComment[];
+  totalComments: number;
+  hasMoreComments: boolean;
+  reviews: GitPullRequestReview[];
+  totalReviews: number;
+  hasMoreReviews: boolean;
+  reviewThreads: GitPullRequestReviewThread[];
+  totalReviewThreads: number;
+  hasMoreReviewThreads: boolean;
+}
+
+const conversationLimits = Object.freeze({
+  comments: 50,
+  reviews: 50,
+  reviewThreads: 25,
+  threadComments: 5,
+});
+
+const conversationQuery = [
+  "query($owner:String!,$name:String!,$number:Int!){",
+  "repository(owner:$owner,name:$name){",
+  "pullRequest(number:$number){",
+  "number headRefOid baseRefOid",
+  "comments(first:50){totalCount pageInfo{hasNextPage} nodes{id body createdAt url author{login}}}",
+  "reviews(first:50){totalCount pageInfo{hasNextPage} nodes{id body submittedAt url state author{login}}}",
+  "reviewThreads(first:25){totalCount pageInfo{hasNextPage} nodes{id path line isResolved isOutdated comments(first:5){totalCount pageInfo{hasNextPage} nodes{id body createdAt url diffHunk path line author{login}}}}}",
+  "}",
+  "}",
+  "}",
+].join("\n");
+
+function parseConnection<T>(
+  value: unknown,
+  limit: number,
+  label: string,
+  parseNode: (node: unknown) => T,
+): { nodes: T[]; totalCount: number; hasNextPage: boolean } {
+  if (!value || typeof value !== "object") throw new Error(`Invalid ${label} connection.`);
+  const connection = value as Record<string, unknown>;
+  const pageInfo = connection.pageInfo as Record<string, unknown> | null;
+  if (!Array.isArray(connection.nodes) || connection.nodes.length > limit
+    || !Number.isSafeInteger(connection.totalCount) || (connection.totalCount as number) < connection.nodes.length
+    || !pageInfo || typeof pageInfo.hasNextPage !== "boolean") {
+    throw new Error(`Invalid ${label} connection.`);
+  }
+  return {
+    nodes: connection.nodes.map(parseNode),
+    totalCount: connection.totalCount as number,
+    hasNextPage: pageInfo.hasNextPage,
+  };
+}
+
+function parseConversationBase(node: unknown) {
+  if (!node || typeof node !== "object") throw new Error("Invalid PR conversation comment.");
+  const value = node as Record<string, unknown>;
+  const author = value.author as Record<string, unknown> | null;
+  const url = typeof value.url === "string" ? new URL(value.url) : null;
+  if (typeof value.id !== "string" || !value.id || value.id.length > 200
+    || typeof value.body !== "string" || value.body.length > 20_000
+    || !url || url.protocol !== "https:" || url.hostname !== "github.com"
+    || (author !== null && author !== undefined && (typeof author.login !== "string" || author.login.length > 100))) {
+    throw new Error("Invalid PR conversation comment.");
+  }
+  return {
+    id: value.id,
+    author: typeof author?.login === "string" ? author.login : "Deleted user",
+    body: value.body,
+    url: url.toString(),
+  };
+}
+
+function parseConversationComment(node: unknown): GitPullRequestConversationComment {
+  if (!node || typeof node !== "object") throw new Error("Invalid PR conversation comment.");
+  const value = node as Record<string, unknown>;
+  if (typeof value.createdAt !== "string" || !Number.isFinite(Date.parse(value.createdAt))) {
+    throw new Error("Invalid PR conversation comment.");
+  }
+  return { ...parseConversationBase(node), createdAt: value.createdAt };
+}
+
+/** Parse a bounded, read-only snapshot of PR comments, reviews, and inline threads. */
+export function parsePullRequestConversation(
+  raw: string,
+  number: number,
+  expectedHead: string,
+): GitPullRequestConversation {
+  const envelope = JSON.parse(raw) as Record<string, unknown>;
+  if (Array.isArray(envelope.errors) && envelope.errors.length > 0) {
+    throw new Error("GitHub could not read PR conversation data.");
+  }
+  const data = envelope.data as Record<string, unknown> | null;
+  const repository = data?.repository as Record<string, unknown> | null;
+  const pullRequest = repository?.pullRequest as Record<string, unknown> | null;
+  if (!pullRequest || pullRequest.number !== number
+    || pullRequest.headRefOid !== expectedHead
+    || typeof pullRequest.baseRefOid !== "string" || !/^[a-f0-9]{40,64}$/.test(pullRequest.baseRefOid)) {
+    throw new Error("PR head changed or conversation data is unavailable. Refresh details.");
+  }
+  const comments = parseConnection(
+    pullRequest.comments,
+    conversationLimits.comments,
+    "PR comments",
+    parseConversationComment,
+  );
+  const reviews = parseConnection(
+    pullRequest.reviews,
+    conversationLimits.reviews,
+    "PR reviews",
+      (node) => {
+        const review = node as Record<string, unknown> | null;
+      if (!review || typeof review.state !== "string"
+        || !["APPROVED", "CHANGES_REQUESTED", "COMMENTED", "DISMISSED", "PENDING"].includes(review.state)
+        || (review.submittedAt !== null && (typeof review.submittedAt !== "string" || !Number.isFinite(Date.parse(review.submittedAt))))) {
+        throw new Error("Invalid PR review.");
+      }
+      return { ...parseConversationBase(review), submittedAt: review.submittedAt as string | null, state: review.state };
+    },
+  );
+  const reviewThreads = parseConnection(
+    pullRequest.reviewThreads,
+    conversationLimits.reviewThreads,
+    "PR review threads",
+    (node) => {
+      const thread = node as Record<string, unknown> | null;
+      if (!thread || typeof thread.id !== "string" || !thread.id || thread.id.length > 200
+        || typeof thread.path !== "string" || !thread.path || thread.path.length > 4_096
+        || (thread.line !== null && (!Number.isSafeInteger(thread.line) || (thread.line as number) < 1))
+        || typeof thread.isResolved !== "boolean" || typeof thread.isOutdated !== "boolean") {
+        throw new Error("Invalid PR review thread.");
+      }
+      const commentsInThread = parseConnection(
+        thread.comments,
+        conversationLimits.threadComments,
+        "PR review-thread comments",
+        (commentNode) => {
+          const commentValue = commentNode as Record<string, unknown> | null;
+          if (!commentValue || typeof commentValue.diffHunk !== "string"
+            || commentValue.diffHunk.length > 20_000
+            || (commentValue.line !== null && (!Number.isSafeInteger(commentValue.line) || (commentValue.line as number) < 1))) {
+            throw new Error("Invalid PR review-thread comment.");
+          }
+          return {
+            ...parseConversationComment(commentValue),
+            diffHunk: commentValue.diffHunk,
+            line: commentValue.line as number | null,
+          };
+        },
+      );
+      return {
+        id: thread.id,
+        path: thread.path,
+        line: thread.line as number | null,
+        resolved: thread.isResolved,
+        outdated: thread.isOutdated,
+        comments: commentsInThread.nodes,
+        totalComments: commentsInThread.totalCount,
+        hasMoreComments: commentsInThread.hasNextPage,
+      };
+    },
+  );
+  return {
+    number,
+    headRefOid: expectedHead,
+    baseRefOid: pullRequest.baseRefOid,
+    comments: comments.nodes,
+    totalComments: comments.totalCount,
+    hasMoreComments: comments.hasNextPage,
+    reviews: reviews.nodes,
+    totalReviews: reviews.totalCount,
+    hasMoreReviews: reviews.hasNextPage,
+    reviewThreads: reviewThreads.nodes,
+    totalReviewThreads: reviewThreads.totalCount,
+    hasMoreReviewThreads: reviewThreads.hasNextPage,
+  };
+}
+
+/** Read-only GitHub conversation data for the current branch's exact PR head. */
+export async function readGitPullRequestConversation(
+  directory: string,
+  remote: string,
+  number: number,
+  expectedHead: string,
+): Promise<GitPullRequestConversation> {
+  if (!Number.isSafeInteger(number) || number < 1 || !/^[a-f0-9]{40,64}$/.test(expectedHead)) {
+    throw new Error("Select a valid current PR revision.");
+  }
+  const preview = await readGitPullRequestPreview(directory, remote);
+  const selected = preview.pullRequests.find((pr) => pr.number === number);
+  if (!selected || selected.headRefOid !== expectedHead) {
+    throw new Error("Refresh and select the current PR revision.");
+  }
+  const before = await readGitPullRequestDetail(directory, remote, number);
+  if (before.headRefOid !== expectedHead) throw new Error("PR head changed. Refresh details before reading conversation.");
+  const [owner, name] = preview.repository.split("/");
+  const { stdout } = await promisify(execFile)("gh", [
+    "api", "graphql", "-f", `query=${conversationQuery}`,
+    "-F", `owner=${owner}`, "-F", `name=${name}`, "-F", `number=${number}`,
+  ], {
+    cwd: directory,
+    encoding: "utf8",
+    timeout: 30000,
+    maxBuffer: 8 * 1024 * 1024,
+    env: { ...process.env, GH_PROMPT_DISABLED: "1" },
+  });
+  const conversation = parsePullRequestConversation(stdout, number, expectedHead);
+  const after = await readGitPullRequestDetail(directory, remote, number);
+  if (after.headRefOid !== before.headRefOid || after.baseRefOid !== before.baseRefOid
+    || conversation.baseRefOid !== before.baseRefOid) {
+    throw new Error("PR changed while reading conversation. Refresh details again.");
+  }
+  return conversation;
+}
+
 export function parsePullRequestDetail(raw: string, repository: string, number: number): GitPullRequestDetail {
   const value = JSON.parse(raw);
   const count = (n: unknown) => typeof n === "number" && Number.isSafeInteger(n) && n >= 0;

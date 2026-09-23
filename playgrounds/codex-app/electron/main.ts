@@ -48,7 +48,7 @@ import {
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
 import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
-import { editGitPullRequest, readGitPullRequestDetail, readGitPullRequestDiff, type EditPullRequestInput } from "./git-pr-detail.js";
+import { editGitPullRequest, readGitPullRequestConversation, readGitPullRequestDetail, readGitPullRequestDiff, type EditPullRequestInput } from "./git-pr-detail.js";
 import { mergePullRequest, readPullRequestMergeStatus, type PullRequestMergeTarget } from "./git-pr-merge.js";
 import { cleanupMergedPullRequest } from "./git-pr-cleanup.js";
 import { LiveTurnStartGate } from "./live-turn-start-gate.js";
@@ -1289,6 +1289,13 @@ ipcMain.handle("demo:git:pr-detail", async (event, raw: unknown) => {
   const { remote, number } = raw as Record<string, unknown>;
   if (typeof remote !== "string" || typeof number !== "number") throw new TypeError("Select a PR from the current project.");
   return gitBranchOperationQueue.run(() => readGitPullRequestDetail(directory, remote, number));
+});
+ipcMain.handle("demo:git:pr-conversation", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const { remote, number, head } = raw as Record<string, unknown>;
+  if (typeof remote !== "string" || typeof number !== "number" || typeof head !== "string") throw new TypeError("Select a current PR revision.");
+  return gitBranchOperationQueue.run(() => readGitPullRequestConversation(directory, remote, number, head));
 });
 ipcMain.handle("demo:git:pr-diff", async (event, raw: unknown) => {
   assertTrustedIpc(event);
