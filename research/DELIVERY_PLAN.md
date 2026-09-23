@@ -3263,8 +3263,21 @@ route restoration, literal description rendering, retry and panel geometry.
 Below 680px the detail replaces the list and fills the window. The opt-in real
 development-PR script also reads the created PR through this route. These are
 own-playground functional and responsive checks, not current installed-product
-pixel evidence. Project-wide and closed history, comments/reviews and broader
-PR workflows remain incomplete.
+pixel evidence. Project-wide and closed history and broader PR workflows remain
+incomplete.
+
+The current route now adds an on-demand, read-only `Reviews` panel for issue
+comments, submitted review summaries, and inline review threads. The Electron
+host verifies the selected PR still belongs to the pushed current branch,
+binds the snapshot to the selected head, and rechecks head/base revisions after
+the GraphQL read. The first page is deliberately bounded (50 comments, 50
+reviews, 25 threads, and 5 replies per thread); truncation is explicit and
+links to the full GitHub record. Untrusted comment bodies render as text, and
+this slice exposes no comment, reply, resolve, or review mutation. Its synthetic
+Electron gate covers loading, error/retry with stale-data clearing, resolved/
+outdated thread presentation, and 1180/720/600 dark/light containment. This
+closes the first Live comments/reviews renderer path, not full history paging,
+closed/project-wide PR discovery, or current installed-product pixel evidence.
 
 The notification and composer-plan progress surfaces now share the same
 disabled boundary: queued notification action/dismiss controls and plan

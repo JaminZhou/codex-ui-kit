@@ -14,7 +14,8 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
       BrowserWindow.getAllWindows()[0].setContentSize(width, 820);
       globalThis.__routeFails = true; globalThis.__routeDetailFails = false; globalThis.__routeDiffFails = false;
       globalThis.__routeReads = 0; globalThis.__routeEmpty = false;
-      for (const name of ["pr-preview", "pr-detail", "pr-diff"]) ipcMain.removeHandler(`demo:git:${name}`);
+      globalThis.__routeConversationFails = false; globalThis.__routeConversationReads = 0;
+      for (const name of ["pr-preview", "pr-detail", "pr-conversation", "pr-diff"]) ipcMain.removeHandler(`demo:git:${name}`);
       ipcMain.handle("demo:git:pr-preview", () => {
         globalThis.__routeReads++;
         if (globalThis.__routeFails) throw new Error("synthetic provider unavailable");
@@ -23,6 +24,21 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
       ipcMain.handle("demo:git:pr-detail", () => {
         if (globalThis.__routeDetailFails) throw new Error("synthetic detail unavailable");
         return { number: 999, title: "Real-data route fixture", url: "https://github.com/owner/live-project/pull/999", body: "<script>literal summary</script>", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/live.ts", additions: 4, deletions: 1 }] };
+      });
+      ipcMain.handle("demo:git:pr-conversation", (_event, input) => {
+        globalThis.__routeConversationReads++;
+        if (globalThis.__routeConversationFails) throw new Error("synthetic conversation unavailable");
+        if (input.number !== 999 || input.head !== "a".repeat(40)) throw new Error("conversation snapshot was not bound to the current head");
+        return {
+          number: 999, headRefOid: "a".repeat(40), baseRefOid: "b".repeat(40),
+          comments: [{ id: "issue-1", author: "reviewer", body: "<script>literal comment</script>", createdAt: "2026-09-23T10:00:00Z", url: "https://github.com/owner/live-project/pull/999#issuecomment-1" }],
+          totalComments: 51, hasMoreComments: true,
+          reviews: [{ id: "review-1", author: "Codex", body: "One suggested change.", submittedAt: "2026-09-23T10:01:00Z", url: "https://github.com/owner/live-project/pull/999#pullrequestreview-1", state: "CHANGES_REQUESTED" }],
+          totalReviews: 1, hasMoreReviews: false,
+          reviewThreads: [{ id: "thread-1", path: "src/live.ts", line: 42, resolved: false, outdated: true, totalComments: 1, hasMoreComments: false,
+            comments: [{ id: "review-comment-1", author: "Codex", body: "Keep the host boundary explicit.", createdAt: "2026-09-23T10:02:00Z", url: "https://github.com/owner/live-project/pull/999#discussion_r1", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }] }],
+          totalReviewThreads: 26, hasMoreReviewThreads: true,
+        };
       });
       ipcMain.handle("demo:git:pr-diff", () => {
         if (globalThis.__routeDiffFails) throw new Error("synthetic diff unavailable");
@@ -55,6 +71,8 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     assert.equal(await summary.locator("script").count(), 0);
     assert.equal(await page.getByRole("dialog").count(), 0, "Live detail must be a non-modal workspace panel");
     const bounds = await panel.boundingBox();
+    const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    assert.ok(horizontalOverflow <= 1, `Conversation detail must not introduce horizontal overflow: ${horizontalOverflow}px`);
     await page.screenshot({ path: join(directory, `panel-${frameKey}.png`) });
     assert.ok(bounds && bounds.x >= 0 && bounds.x + bounds.width <= width && bounds.y >= 0 && bounds.y + bounds.height <= 820, JSON.stringify({ width, bounds }));
     const listBounds = width >= 680 ? await route.boundingBox() : null;
@@ -65,6 +83,25 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
       assert.ok(bounds.x <= 1 && bounds.width >= width - 2, `Compact detail must fill the window: ${JSON.stringify(bounds)}`);
     }
     await page.screenshot({ path: join(directory, `summary-${frameKey}.png`) });
+    const conversationTab = panel.getByRole("tab", { name: "Comments and review threads", exact: true });
+    await conversationTab.click();
+    const conversation = panel.getByRole("region", { name: "Live PR conversation", exact: true });
+    await conversation.getByText("One suggested change.", { exact: true }).waitFor();
+    assert.ok((await conversation.textContent()).includes("<script>literal comment</script>"));
+    assert.equal(await conversation.locator("script").count(), 0, "GitHub content must remain plain text");
+    assert.equal(await conversation.getByText("Changes requested", { exact: true }).count(), 1);
+    assert.equal(await conversation.locator(".codex-ui-pull-request-review-thread[data-outdated='true']").count(), 1);
+    assert.ok((await conversation.textContent()).includes("first 50 comments, 50 reviews, 25 threads, and 5 replies per thread"));
+    await page.screenshot({ path: join(directory, `conversation-${frameKey}.png`) });
+    await app.evaluate(() => { globalThis.__routeConversationFails = true; });
+    await conversation.getByRole("button", { name: "Refresh conversation", exact: true }).click();
+    await panel.getByText("PR conversation unavailable", { exact: true }).waitFor();
+    assert.equal(await panel.getByText("One suggested change.", { exact: true }).count(), 0, "A failed refresh must not leave stale review content visible");
+    await app.evaluate(() => { globalThis.__routeConversationFails = false; });
+    await panel.getByRole("button", { name: "Retry PR conversation", exact: true }).click();
+    await conversation.getByText("One suggested change.", { exact: true }).waitFor();
+    const conversationReads = await app.evaluate(() => globalThis.__routeConversationReads);
+    assert.ok(conversationReads >= 3, "Conversation load, refresh, and retry should all cross the host bridge");
     await panel.getByRole("tab", { name: "Code", exact: true }).click();
     await panel.getByRole("button", { name: "Read live PR diff", exact: true }).click();
     const diff = panel.getByLabel("Live PR diff", { exact: true });

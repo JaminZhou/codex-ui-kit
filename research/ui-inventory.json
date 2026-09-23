@@ -2072,6 +2072,8 @@
         "pull-request-actions",
         "pull-request-detail-query",
         "pull-request-media",
+        "playground:live-pr-conversation-comments-reviews-inline-threads-bounded-read-only",
+        "electron:live-pr-conversation-current-head-retry-stale-data-and-responsive-containment",
         "replay:current-26.825-pull-request-tabs-search-loading-empty-and-fixed-detail-placeholder",
         "browser-cdp:current-26.825-pull-request-wide-split-list-contract",
         "electron:current-26.825-pull-request-wide-split-list-contract",
