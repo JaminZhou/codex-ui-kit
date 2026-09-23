@@ -2,7 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ exec: vi.fn(), preview: vi.fn() }));
 vi.mock("node:child_process", () => ({ execFile: mocks.exec }));
 vi.mock("../electron/git-pr-preview.js", () => ({ readGitPullRequestPreview: mocks.preview }));
-import { editGitPullRequest, parsePullRequestConversation, parsePullRequestDetail, readGitPullRequestConversation, readGitPullRequestDiff } from "../electron/git-pr-detail";
+import { editGitPullRequest, parsePullRequestConversation, parsePullRequestDetail, readGitPullRequestConversation, readGitPullRequestDiff, readGitPullRequestReviewThreadReplies } from "../electron/git-pr-detail";
 
 const detail = { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Example", body: "Untrusted **body**", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 2, files: [{ path: "a file.ts", additions: 1, deletions: 0 }] };
 beforeEach(() => {
@@ -49,11 +49,11 @@ const comment = { id: "issue-comment-1", body: "Plain comment", createdAt: "2026
 const conversationPayload = {
   data: { repository: { pullRequest: {
     number: 1, headRefOid: detail.headRefOid, baseRefOid: detail.baseRefOid,
-    comments: { totalCount: 1, pageInfo: { hasNextPage: false }, nodes: [comment] },
-    reviews: { totalCount: 1, pageInfo: { hasNextPage: false }, nodes: [{ ...comment, id: "review-1", state: "CHANGES_REQUESTED", submittedAt: comment.createdAt }] },
-    reviewThreads: { totalCount: 1, pageInfo: { hasNextPage: false }, nodes: [{
+    comments: { totalCount: 1, pageInfo: { hasNextPage: false, endCursor: null as string | null }, nodes: [comment] },
+    reviews: { totalCount: 1, pageInfo: { hasNextPage: false, endCursor: null as string | null }, nodes: [{ ...comment, id: "review-1", state: "CHANGES_REQUESTED", submittedAt: comment.createdAt }] },
+    reviewThreads: { totalCount: 1, pageInfo: { hasNextPage: false, endCursor: null as string | null }, nodes: [{
       id: "thread-1", path: "src/example.ts", line: 42, isResolved: false, isOutdated: false,
-      comments: { totalCount: 1, pageInfo: { hasNextPage: false }, nodes: [{ ...comment, id: "review-comment-1", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }] },
+      comments: { totalCount: 1, pageInfo: { hasNextPage: false, endCursor: null as string | null }, nodes: [{ ...comment, id: "review-comment-1", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }] },
     }] },
   } } },
 };
@@ -76,7 +76,7 @@ it("reads bounded comments, reviews and inline threads for the exact current hea
   const [command, args, options] = mocks.exec.mock.calls.find((call) => call[1][1] === "graphql")!;
   expect(command).toBe("gh");
   expect(args.slice(0, 3)).toEqual(["api", "graphql", "-f"]);
-  expect(args[3]).toContain("reviewThreads(first:25)");
+  expect(args[3]).toContain("reviewThreads(first:25,after:$threadsAfter)");
   expect(args).toContain("-F");
   expect(options).toMatchObject({ cwd: "/project", timeout: 30000, maxBuffer: 8 * 1024 * 1024 });
   expect(options.env.GH_PROMPT_DISABLED).toBe("1");
@@ -87,8 +87,10 @@ it("reads bounded comments, reviews and inline threads for the exact current hea
 it("marks bounded pages and rejects stale or malformed conversation snapshots", () => {
   const paged = structuredClone(conversationPayload);
   paged.data.repository.pullRequest.comments.pageInfo.hasNextPage = true;
+  paged.data.repository.pullRequest.comments.pageInfo.endCursor = "issue-cursor";
   paged.data.repository.pullRequest.reviewThreads.nodes[0].comments.pageInfo.hasNextPage = true;
-  expect(parsePullRequestConversation(JSON.stringify(paged), 1, detail.headRefOid)).toMatchObject({ hasMoreComments: true, reviewThreads: [{ hasMoreComments: true }] });
+  paged.data.repository.pullRequest.reviewThreads.nodes[0].comments.pageInfo.endCursor = "reply-cursor";
+  expect(parsePullRequestConversation(JSON.stringify(paged), 1, detail.headRefOid)).toMatchObject({ hasMoreComments: true, nextCommentsCursor: "issue-cursor", reviewThreads: [{ hasMoreComments: true, nextCommentsCursor: "reply-cursor" }] });
   expect(() => parsePullRequestConversation(JSON.stringify({ ...conversationPayload, errors: [{ message: "unauthorized" }] }), 1, detail.headRefOid)).toThrow("could not read");
   const stale = structuredClone(conversationPayload);
   stale.data.repository.pullRequest.headRefOid = "c".repeat(40);
@@ -96,6 +98,47 @@ it("marks bounded pages and rejects stale or malformed conversation snapshots", 
   const malformed = structuredClone(conversationPayload);
   malformed.data.repository.pullRequest.reviewThreads.nodes[0].comments.nodes[0].url = "https://evil.test/comment";
   expect(() => parsePullRequestConversation(JSON.stringify(malformed), 1, detail.headRefOid)).toThrow("Invalid PR conversation comment");
+  const noCursor = structuredClone(conversationPayload);
+  noCursor.data.repository.pullRequest.comments.pageInfo.hasNextPage = true;
+  expect(() => parsePullRequestConversation(JSON.stringify(noCursor), 1, detail.headRefOid)).toThrow("Invalid PR comments connection");
+});
+
+it("passes validated section cursors through the read-only GraphQL query", async () => {
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "graphql") callback(null, { stdout: JSON.stringify(conversationPayload) });
+    else callback(null, { stdout: JSON.stringify(detail) });
+  });
+  await readGitPullRequestConversation("/project", "origin", 1, detail.headRefOid, { commentsAfter: "issue-cursor/+=1" });
+  const [, args] = mocks.exec.mock.calls.find((call) => call[1][1] === "graphql")!;
+  expect(args[3]).toContain("comments(first:50,after:$commentsAfter)");
+  expect(args).toContain("commentsAfter=issue-cursor/+=1");
+  await expect(readGitPullRequestConversation("/project", "origin", 1, detail.headRefOid, { commentsAfter: "bad\nvalue" })).rejects.toThrow("valid PR conversation page cursor");
+});
+
+it("reads another bounded reply page only from the selected current PR thread", async () => {
+  const threadReplies = { data: { node: {
+    id: "thread-node-1",
+    pullRequest: { number: 1, headRefOid: detail.headRefOid, baseRefOid: detail.baseRefOid },
+    comments: { totalCount: 6, pageInfo: { hasNextPage: false, endCursor: null }, nodes: [{ ...comment, id: "reply-2", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }] },
+  } } };
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "graphql") callback(null, { stdout: JSON.stringify(threadReplies) });
+    else callback(null, { stdout: JSON.stringify(detail) });
+  });
+  const result = await readGitPullRequestReviewThreadReplies("/project", "origin", 1, detail.headRefOid, "thread-node-1", "reply-cursor");
+  expect(result).toMatchObject({ threadId: "thread-node-1", headRefOid: detail.headRefOid, totalComments: 6, comments: [{ id: "reply-2", line: 42 }] });
+  const [, args, options] = mocks.exec.mock.calls.find((call) => call[1][1] === "graphql")!;
+  expect(args.some((argument: string) => argument.includes("... on PullRequestReviewThread"))).toBe(true);
+  expect(args).toContain("threadId=thread-node-1");
+  expect(args).toContain("after=reply-cursor");
+  expect(options).toMatchObject({ timeout: 30000, maxBuffer: 2 * 1024 * 1024, env: { GH_PROMPT_DISABLED: "1" } });
+  const wrongParent = structuredClone(threadReplies);
+  wrongParent.data.node.pullRequest.number = 2;
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "graphql") callback(null, { stdout: JSON.stringify(wrongParent) });
+    else callback(null, { stdout: JSON.stringify(detail) });
+  });
+  await expect(readGitPullRequestReviewThreadReplies("/project", "origin", 1, detail.headRefOid, "thread-node-1", "reply-cursor")).rejects.toThrow("does not belong to the selected revision");
 });
 
 const edit = { remote: "origin", number: 1, title: "Updated title", body: "Updated description", expected: detail };

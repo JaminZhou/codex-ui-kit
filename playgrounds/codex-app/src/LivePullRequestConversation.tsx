@@ -21,12 +21,24 @@ const reviewStatus = (state: string) => {
 export function LivePullRequestConversation({
   conversation,
   error,
+  loadingMore,
+  moreError,
+  onLoadMoreComments,
+  onLoadMoreReviews,
+  onLoadMoreReviewThreads,
+  onLoadMoreThreadReplies,
   onRefresh,
   prUrl,
   status,
 }: {
   conversation: GitPullRequestConversation | null;
   error: string | null;
+  loadingMore: boolean;
+  moreError: string | null;
+  onLoadMoreComments: () => void;
+  onLoadMoreReviews: () => void;
+  onLoadMoreReviewThreads: () => void;
+  onLoadMoreThreadReplies: (threadId: string, cursor: string) => void;
   onRefresh: () => void;
   prUrl: string;
   status: ConversationStatus;
@@ -57,7 +69,7 @@ export function LivePullRequestConversation({
       <h2>Conversation</h2>
       <Button onClick={onRefresh}>Refresh conversation</Button>
     </header>
-    <p>Read-only snapshot for head {conversation.headRefOid.slice(0, 12)}. Comments are shown as plain text.</p>
+    <p>Read-only snapshot for head {conversation.headRefOid.slice(0, 12)}. Comments are plain text; each section loads more on demand.</p>
     <PullRequestReviewSummary
       heading={`Reviews (${conversation.totalReviews})`}
       emptyLabel="No submitted reviews."
@@ -68,6 +80,9 @@ export function LivePullRequestConversation({
         summary: review.body || (review.submittedAt ? `Submitted ${review.submittedAt.slice(0, 10)}` : "Pending review"),
       }))}
     />
+    {conversation.hasMoreReviews ? <Button disabled={loadingMore} onClick={onLoadMoreReviews}>
+      {loadingMore ? "Loading more conversation…" : "Load more reviews"}
+    </Button> : null}
     <section aria-label="PR conversation comments" className="demo-live-pr-conversation__section">
       <h3>Comments ({conversation.totalComments})</h3>
       {conversation.comments.length === 0 ? <p>No conversation comments.</p> : conversation.comments.map((comment) =>
@@ -77,6 +92,9 @@ export function LivePullRequestConversation({
           <a href={comment.url} target="_blank" rel="noreferrer">Open comment on GitHub</a>
         </article>
       )}
+      {conversation.hasMoreComments ? <Button disabled={loadingMore} onClick={onLoadMoreComments}>
+        {loadingMore ? "Loading more conversation…" : "Load more comments"}
+      </Button> : null}
     </section>
     <section aria-label="Inline review threads" className="demo-live-pr-conversation__section">
       <h3>Review threads ({conversation.totalReviewThreads})</h3>
@@ -98,13 +116,21 @@ export function LivePullRequestConversation({
               <header><strong>{comment.author}</strong><time dateTime={comment.createdAt}>{comment.createdAt.slice(0, 10)}</time></header>
               <p>{comment.body || "(empty comment)"}</p>
             </article>)}
-            {thread.hasMoreComments ? <p>More replies are available on GitHub.</p> : null}
+            {thread.hasMoreComments && thread.nextCommentsCursor ? <Button
+              aria-label={`Load more replies in ${thread.path}`}
+              disabled={loadingMore}
+              onClick={() => onLoadMoreThreadReplies(thread.id, thread.nextCommentsCursor!)}
+            >{loadingMore ? "Loading more conversation…" : "Load more replies"}</Button> : null}
           </>}
         </PullRequestReviewThread>;
       })}
+      {conversation.hasMoreReviewThreads ? <Button disabled={loadingMore} onClick={onLoadMoreReviewThreads}>
+        {loadingMore ? "Loading more conversation…" : "Load more review threads"}
+      </Button> : null}
     </section>
+    {moreError ? <p role="alert">{moreError}</p> : null}
     {hasTruncatedData ? <p role="note" className="demo-live-pr-conversation__truncated">
-      This view is bounded to the first 50 comments, 50 reviews, 25 threads, and 5 replies per thread. Open GitHub for the complete history: <a href={prUrl} target="_blank" rel="noreferrer">PR #{conversation.number}</a>.
+      More conversation history is available. Load it here or open GitHub: <a href={prUrl} target="_blank" rel="noreferrer">PR #{conversation.number}</a>.
     </p> : null}
   </section>;
 }

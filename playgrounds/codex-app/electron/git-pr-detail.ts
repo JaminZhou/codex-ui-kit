@@ -35,6 +35,7 @@ export interface GitPullRequestReviewThread {
   }>;
   totalComments: number;
   hasMoreComments: boolean;
+  nextCommentsCursor: string | null;
 }
 
 export interface GitPullRequestReview {
@@ -53,12 +54,30 @@ export interface GitPullRequestConversation {
   comments: GitPullRequestConversationComment[];
   totalComments: number;
   hasMoreComments: boolean;
+  nextCommentsCursor: string | null;
   reviews: GitPullRequestReview[];
   totalReviews: number;
   hasMoreReviews: boolean;
+  nextReviewsCursor: string | null;
   reviewThreads: GitPullRequestReviewThread[];
   totalReviewThreads: number;
   hasMoreReviewThreads: boolean;
+  nextReviewThreadsCursor: string | null;
+}
+
+export interface GitPullRequestConversationPageRequest {
+  commentsAfter?: string;
+  reviewsAfter?: string;
+  reviewThreadsAfter?: string;
+}
+
+export interface GitPullRequestReviewThreadReplies {
+  threadId: string;
+  headRefOid: string;
+  comments: GitPullRequestReviewThread["comments"];
+  totalComments: number;
+  hasMoreComments: boolean;
+  nextCommentsCursor: string | null;
 }
 
 const conversationLimits = Object.freeze({
@@ -69,13 +88,24 @@ const conversationLimits = Object.freeze({
 });
 
 const conversationQuery = [
-  "query($owner:String!,$name:String!,$number:Int!){",
+  "query($owner:String!,$name:String!,$number:Int!,$commentsAfter:String,$reviewsAfter:String,$threadsAfter:String){",
   "repository(owner:$owner,name:$name){",
   "pullRequest(number:$number){",
   "number headRefOid baseRefOid",
-  "comments(first:50){totalCount pageInfo{hasNextPage} nodes{id body createdAt url author{login}}}",
-  "reviews(first:50){totalCount pageInfo{hasNextPage} nodes{id body submittedAt url state author{login}}}",
-  "reviewThreads(first:25){totalCount pageInfo{hasNextPage} nodes{id path line isResolved isOutdated comments(first:5){totalCount pageInfo{hasNextPage} nodes{id body createdAt url diffHunk path line author{login}}}}}",
+  "comments(first:50,after:$commentsAfter){totalCount pageInfo{hasNextPage endCursor} nodes{id body createdAt url author{login}}}",
+  "reviews(first:50,after:$reviewsAfter){totalCount pageInfo{hasNextPage endCursor} nodes{id body submittedAt url state author{login}}}",
+  "reviewThreads(first:25,after:$threadsAfter){totalCount pageInfo{hasNextPage endCursor} nodes{id path line isResolved isOutdated comments(first:5){totalCount pageInfo{hasNextPage endCursor} nodes{id body createdAt url diffHunk path line author{login}}}}}",
+  "}",
+  "}",
+  "}",
+].join("\n");
+
+const threadRepliesQuery = [
+  "query($threadId:ID!,$after:String!){",
+  "node(id:$threadId){",
+  "... on PullRequestReviewThread{",
+  "id pullRequest{number headRefOid baseRefOid}",
+  "comments(first:5,after:$after){totalCount pageInfo{hasNextPage endCursor} nodes{id body createdAt url diffHunk path line author{login}}}",
   "}",
   "}",
   "}",
@@ -86,19 +116,23 @@ function parseConnection<T>(
   limit: number,
   label: string,
   parseNode: (node: unknown) => T,
-): { nodes: T[]; totalCount: number; hasNextPage: boolean } {
+): { nodes: T[]; totalCount: number; hasNextPage: boolean; endCursor: string | null } {
   if (!value || typeof value !== "object") throw new Error(`Invalid ${label} connection.`);
   const connection = value as Record<string, unknown>;
   const pageInfo = connection.pageInfo as Record<string, unknown> | null;
+  const endCursor = pageInfo?.endCursor;
   if (!Array.isArray(connection.nodes) || connection.nodes.length > limit
     || !Number.isSafeInteger(connection.totalCount) || (connection.totalCount as number) < connection.nodes.length
-    || !pageInfo || typeof pageInfo.hasNextPage !== "boolean") {
+    || !pageInfo || typeof pageInfo.hasNextPage !== "boolean"
+    || (endCursor !== null && (typeof endCursor !== "string" || endCursor.length === 0 || endCursor.length > 2_048))
+    || (pageInfo.hasNextPage && typeof endCursor !== "string")) {
     throw new Error(`Invalid ${label} connection.`);
   }
   return {
     nodes: connection.nodes.map(parseNode),
     totalCount: connection.totalCount as number,
     hasNextPage: pageInfo.hasNextPage,
+    endCursor: endCursor as string | null,
   };
 }
 
@@ -207,6 +241,7 @@ export function parsePullRequestConversation(
         comments: commentsInThread.nodes,
         totalComments: commentsInThread.totalCount,
         hasMoreComments: commentsInThread.hasNextPage,
+        nextCommentsCursor: commentsInThread.endCursor,
       };
     },
   );
@@ -217,12 +252,15 @@ export function parsePullRequestConversation(
     comments: comments.nodes,
     totalComments: comments.totalCount,
     hasMoreComments: comments.hasNextPage,
+    nextCommentsCursor: comments.endCursor,
     reviews: reviews.nodes,
     totalReviews: reviews.totalCount,
     hasMoreReviews: reviews.hasNextPage,
+    nextReviewsCursor: reviews.endCursor,
     reviewThreads: reviewThreads.nodes,
     totalReviewThreads: reviewThreads.totalCount,
     hasMoreReviewThreads: reviewThreads.hasNextPage,
+    nextReviewThreadsCursor: reviewThreads.endCursor,
   };
 }
 
@@ -232,6 +270,7 @@ export async function readGitPullRequestConversation(
   remote: string,
   number: number,
   expectedHead: string,
+  page: GitPullRequestConversationPageRequest = {},
 ): Promise<GitPullRequestConversation> {
   if (!Number.isSafeInteger(number) || number < 1 || !/^[a-f0-9]{40,64}$/.test(expectedHead)) {
     throw new Error("Select a valid current PR revision.");
@@ -241,13 +280,22 @@ export async function readGitPullRequestConversation(
   if (!selected || selected.headRefOid !== expectedHead) {
     throw new Error("Refresh and select the current PR revision.");
   }
+  for (const cursor of Object.values(page)) {
+    if (cursor !== undefined && (typeof cursor !== "string" || cursor.length === 0 || cursor.length > 2_048 || /[\0\r\n]/.test(cursor))) {
+      throw new Error("Select a valid PR conversation page cursor.");
+    }
+  }
   const before = await readGitPullRequestDetail(directory, remote, number);
   if (before.headRefOid !== expectedHead) throw new Error("PR head changed. Refresh details before reading conversation.");
   const [owner, name] = preview.repository.split("/");
-  const { stdout } = await promisify(execFile)("gh", [
+  const args = [
     "api", "graphql", "-f", `query=${conversationQuery}`,
     "-F", `owner=${owner}`, "-F", `name=${name}`, "-F", `number=${number}`,
-  ], {
+  ];
+  if (page.commentsAfter !== undefined) args.push("-f", `commentsAfter=${page.commentsAfter}`);
+  if (page.reviewsAfter !== undefined) args.push("-f", `reviewsAfter=${page.reviewsAfter}`);
+  if (page.reviewThreadsAfter !== undefined) args.push("-f", `threadsAfter=${page.reviewThreadsAfter}`);
+  const { stdout } = await promisify(execFile)("gh", args, {
     cwd: directory,
     encoding: "utf8",
     timeout: 30000,
@@ -261,6 +309,80 @@ export async function readGitPullRequestConversation(
     throw new Error("PR changed while reading conversation. Refresh details again.");
   }
   return conversation;
+}
+
+/** Read one bounded page of replies after confirming thread ownership and PR head. */
+export async function readGitPullRequestReviewThreadReplies(
+  directory: string,
+  remote: string,
+  number: number,
+  expectedHead: string,
+  threadId: string,
+  after: string,
+): Promise<GitPullRequestReviewThreadReplies> {
+  if (!Number.isSafeInteger(number) || number < 1 || !/^[a-f0-9]{40,64}$/.test(expectedHead)
+    || typeof threadId !== "string" || !threadId || threadId.length > 512
+    || typeof after !== "string" || !after || after.length > 2_048 || /[\0\r\n]/.test(after)) {
+    throw new Error("Select a valid current PR thread page.");
+  }
+  const preview = await readGitPullRequestPreview(directory, remote);
+  const selected = preview.pullRequests.find((pr) => pr.number === number);
+  if (!selected || selected.headRefOid !== expectedHead) {
+    throw new Error("Refresh and select the current PR revision.");
+  }
+  const before = await readGitPullRequestDetail(directory, remote, number);
+  if (before.headRefOid !== expectedHead) throw new Error("PR head changed. Refresh details before reading thread replies.");
+  const { stdout } = await promisify(execFile)("gh", [
+    "api", "graphql", "-f", `query=${threadRepliesQuery}`,
+    "-f", `threadId=${threadId}`, "-f", `after=${after}`,
+  ], {
+    cwd: directory,
+    encoding: "utf8",
+    timeout: 30000,
+    maxBuffer: 2 * 1024 * 1024,
+    env: { ...process.env, GH_PROMPT_DISABLED: "1" },
+  });
+  const envelope = JSON.parse(stdout) as Record<string, unknown>;
+  if (Array.isArray(envelope.errors) && envelope.errors.length > 0) {
+    throw new Error("GitHub could not read PR review-thread replies.");
+  }
+  const data = envelope.data as Record<string, unknown> | null;
+  const node = data?.node as Record<string, unknown> | null;
+  const parent = node?.pullRequest as Record<string, unknown> | null;
+  if (!node || node.id !== threadId || !parent || parent.number !== number
+    || parent.headRefOid !== expectedHead || parent.baseRefOid !== before.baseRefOid) {
+    throw new Error("PR thread changed or does not belong to the selected revision.");
+  }
+  const comments = parseConnection(
+    node.comments,
+    conversationLimits.threadComments,
+    "PR review-thread comments",
+    (commentNode) => {
+      const commentValue = commentNode as Record<string, unknown> | null;
+      if (!commentValue || typeof commentValue.diffHunk !== "string"
+        || commentValue.diffHunk.length > 20_000
+        || (commentValue.line !== null && (!Number.isSafeInteger(commentValue.line) || (commentValue.line as number) < 1))) {
+        throw new Error("Invalid PR review-thread comment.");
+      }
+      return {
+        ...parseConversationComment(commentValue),
+        diffHunk: commentValue.diffHunk,
+        line: commentValue.line as number | null,
+      };
+    },
+  );
+  const afterDetail = await readGitPullRequestDetail(directory, remote, number);
+  if (afterDetail.headRefOid !== before.headRefOid || afterDetail.baseRefOid !== before.baseRefOid) {
+    throw new Error("PR changed while reading thread replies. Refresh again.");
+  }
+  return {
+    threadId,
+    headRefOid: expectedHead,
+    comments: comments.nodes,
+    totalComments: comments.totalCount,
+    hasMoreComments: comments.hasNextPage,
+    nextCommentsCursor: comments.endCursor,
+  };
 }
 
 export function parsePullRequestDetail(raw: string, repository: string, number: number): GitPullRequestDetail {

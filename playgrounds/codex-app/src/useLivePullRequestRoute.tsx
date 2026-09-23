@@ -3,6 +3,7 @@ import { Button, PullRequestList, PullRequestQueryState, WorkspacePanel } from "
 import type { GitPullRequestPreview } from "../electron/git-pr-preview";
 import type { GitPullRequestDetail } from "../electron/git-pr-detail";
 import type { GitPullRequestConversation } from "../electron/git-pr-detail";
+import type { GitPullRequestConversationPageRequest } from "../electron/git-pr-detail";
 import { LivePullRequest } from "./LivePullRequest";
 import { LivePullRequestConversation } from "./LivePullRequestConversation";
 
@@ -29,13 +30,15 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
   const [conversation, setConversation] = useState<GitPullRequestConversation | null>(null);
   const [conversationStatus, setConversationStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [conversationError, setConversationError] = useState<string | null>(null);
+  const [conversationPaging, setConversationPaging] = useState(false);
+  const [conversationPageError, setConversationPageError] = useState<string | null>(null);
   const epoch = useRef(0);
   const detailEpoch = useRef(0);
   const conversationEpoch = useRef(0);
-  const resetDetails = () => { detailEpoch.current++; conversationEpoch.current++; setSelected(null); setDetail(null); setDetailStatus("idle"); setPatch(null); setDiffStatus("idle"); setConversation(null); setConversationStatus("idle"); setConversationError(null); setTab("summary"); };
+  const resetDetails = () => { detailEpoch.current++; conversationEpoch.current++; setSelected(null); setDetail(null); setDetailStatus("idle"); setPatch(null); setDiffStatus("idle"); setConversation(null); setConversationStatus("idle"); setConversationError(null); setConversationPaging(false); setConversationPageError(null); setTab("summary"); };
   useEffect(() => {
     epoch.current++; resetDetails(); setPreview(null); setStatus("idle"); setQuery("");
-    return () => { epoch.current++; detailEpoch.current++; };
+    return () => { epoch.current++; detailEpoch.current++; conversationEpoch.current++; };
   }, [projectToken]);
   const refresh = useCallback(async () => {
     if (!projectToken || !window.codexDemo) return;
@@ -51,7 +54,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
     if (!projectToken || !window.codexDemo) return;
     const request = ++detailEpoch.current;
     conversationEpoch.current++;
-    setConversation(null); setConversationStatus("idle"); setConversationError(null);
+    setConversation(null); setConversationStatus("idle"); setConversationError(null); setConversationPaging(false); setConversationPageError(null);
     setSelected(number); setDetail(null); setDetailStatus("loading"); setPatch(null); setDiffStatus("idle"); setTab("summary"); onOpen();
     try {
       const value = await window.codexDemo.readPullRequest({ projectToken, remote: "origin", number });
@@ -71,7 +74,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
     if (!projectToken || !detail || !window.codexDemo || conversationStatus === "loading") return;
     const request = ++conversationEpoch.current;
     const expectedHead = detail.headRefOid;
-    setConversation(null); setConversationError(null); setConversationStatus("loading");
+    setConversation(null); setConversationError(null); setConversationPaging(false); setConversationPageError(null); setConversationStatus("loading");
     try {
       const value = await window.codexDemo.readPullRequestConversation({
         projectToken,
@@ -90,6 +93,90 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
       }
     }
   }, [projectToken, detail, conversationStatus]);
+  const loadConversationPage = useCallback(async (page: GitPullRequestConversationPageRequest) => {
+    if (!projectToken || !detail || !conversation || !window.codexDemo || conversationPaging) return;
+    const entry = Object.entries(page).find(([, cursor]) => typeof cursor === "string");
+    if (!entry) return;
+    const [key] = entry;
+    const request = conversationEpoch.current;
+    const expectedHead = detail.headRefOid;
+    setConversationPaging(true); setConversationPageError(null);
+    try {
+      const value = await window.codexDemo.readPullRequestConversation({
+        projectToken,
+        remote: "origin",
+        number: detail.number,
+        head: expectedHead,
+        page,
+      });
+      if (request !== conversationEpoch.current) return;
+      if (value.headRefOid !== expectedHead) throw new Error("PR head changed while reading conversation history.");
+      setConversation(current => {
+        if (!current || current.headRefOid !== expectedHead) return current;
+        if (key === "commentsAfter") return {
+          ...current,
+          comments: [...current.comments, ...value.comments.filter(item => !current.comments.some(existing => existing.id === item.id))],
+          totalComments: value.totalComments,
+          hasMoreComments: value.hasMoreComments,
+          nextCommentsCursor: value.nextCommentsCursor,
+        };
+        if (key === "reviewsAfter") return {
+          ...current,
+          reviews: [...current.reviews, ...value.reviews.filter(item => !current.reviews.some(existing => existing.id === item.id))],
+          totalReviews: value.totalReviews,
+          hasMoreReviews: value.hasMoreReviews,
+          nextReviewsCursor: value.nextReviewsCursor,
+        };
+        if (key === "reviewThreadsAfter") return {
+          ...current,
+          reviewThreads: [...current.reviewThreads, ...value.reviewThreads.filter(item => !current.reviewThreads.some(existing => existing.id === item.id))],
+          totalReviewThreads: value.totalReviewThreads,
+          hasMoreReviewThreads: value.hasMoreReviewThreads,
+          nextReviewThreadsCursor: value.nextReviewThreadsCursor,
+        };
+        return current;
+      });
+    } catch {
+      if (request === conversationEpoch.current) setConversationPageError("More PR conversation history could not be loaded. Retry or open the PR on GitHub.");
+    } finally {
+      if (request === conversationEpoch.current) setConversationPaging(false);
+    }
+  }, [projectToken, detail, conversation, conversationPaging]);
+  const loadThreadReplies = useCallback(async (threadId: string, after: string) => {
+    if (!projectToken || !detail || !conversation || !window.codexDemo || conversationPaging) return;
+    const request = conversationEpoch.current;
+    const expectedHead = detail.headRefOid;
+    setConversationPaging(true); setConversationPageError(null);
+    try {
+      const value = await window.codexDemo.readPullRequestReviewThreadReplies({
+        projectToken,
+        remote: "origin",
+        number: detail.number,
+        head: expectedHead,
+        threadId,
+        after,
+      });
+      if (request !== conversationEpoch.current) return;
+      if (value.headRefOid !== expectedHead || value.threadId !== threadId) throw new Error("PR thread changed while reading replies.");
+      setConversation(current => {
+        if (!current || current.headRefOid !== expectedHead) return current;
+        return {
+          ...current,
+          reviewThreads: current.reviewThreads.map(thread => thread.id !== threadId ? thread : {
+            ...thread,
+            comments: [...thread.comments, ...value.comments.filter(item => !thread.comments.some(existing => existing.id === item.id))],
+            totalComments: value.totalComments,
+            hasMoreComments: value.hasMoreComments,
+            nextCommentsCursor: value.nextCommentsCursor,
+          }),
+        };
+      });
+    } catch {
+      if (request === conversationEpoch.current) setConversationPageError("More replies for this review thread could not be loaded. Retry or open the PR on GitHub.");
+    } finally {
+      if (request === conversationEpoch.current) setConversationPaging(false);
+    }
+  }, [projectToken, detail, conversation, conversationPaging]);
   useEffect(() => {
     if (tab === "conversation" && detailStatus === "ready" && conversationStatus === "idle") {
       void readConversation();
@@ -123,6 +210,12 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
   const liveConversation = detailStatus === "ready" && detail ? <LivePullRequestConversation
     conversation={conversation}
     error={conversationError}
+    loadingMore={conversationPaging}
+    moreError={conversationPageError}
+    onLoadMoreComments={() => { if (conversation?.nextCommentsCursor) void loadConversationPage({ commentsAfter: conversation.nextCommentsCursor }); }}
+    onLoadMoreReviews={() => { if (conversation?.nextReviewsCursor) void loadConversationPage({ reviewsAfter: conversation.nextReviewsCursor }); }}
+    onLoadMoreReviewThreads={() => { if (conversation?.nextReviewThreadsCursor) void loadConversationPage({ reviewThreadsAfter: conversation.nextReviewThreadsCursor }); }}
+    onLoadMoreThreadReplies={(threadId, cursor) => void loadThreadReplies(threadId, cursor)}
     onRefresh={() => void readConversation()}
     prUrl={detail.url}
     status={conversationStatus}

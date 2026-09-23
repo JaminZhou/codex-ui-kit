@@ -14,8 +14,9 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
       BrowserWindow.getAllWindows()[0].setContentSize(width, 820);
       globalThis.__routeFails = true; globalThis.__routeDetailFails = false; globalThis.__routeDiffFails = false;
       globalThis.__routeReads = 0; globalThis.__routeEmpty = false;
-      globalThis.__routeConversationFails = false; globalThis.__routeConversationReads = 0;
-      for (const name of ["pr-preview", "pr-detail", "pr-conversation", "pr-diff"]) ipcMain.removeHandler(`demo:git:${name}`);
+      globalThis.__routeConversationFails = false; globalThis.__routeConversationPageFails = false;
+      globalThis.__routeConversationReads = 0; globalThis.__routeThreadReplyReads = 0;
+      for (const name of ["pr-preview", "pr-detail", "pr-conversation", "pr-thread-replies", "pr-diff"]) ipcMain.removeHandler(`demo:git:${name}`);
       ipcMain.handle("demo:git:pr-preview", () => {
         globalThis.__routeReads++;
         if (globalThis.__routeFails) throw new Error("synthetic provider unavailable");
@@ -28,17 +29,39 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
       ipcMain.handle("demo:git:pr-conversation", (_event, input) => {
         globalThis.__routeConversationReads++;
         if (globalThis.__routeConversationFails) throw new Error("synthetic conversation unavailable");
+        if (globalThis.__routeConversationPageFails && input.page) throw new Error("synthetic page unavailable");
         if (input.number !== 999 || input.head !== "a".repeat(40)) throw new Error("conversation snapshot was not bound to the current head");
-        return {
+        const snapshot = {
           number: 999, headRefOid: "a".repeat(40), baseRefOid: "b".repeat(40),
           comments: [{ id: "issue-1", author: "reviewer", body: "<script>literal comment</script>", createdAt: "2026-09-23T10:00:00Z", url: "https://github.com/owner/live-project/pull/999#issuecomment-1" }],
-          totalComments: 51, hasMoreComments: true,
+          totalComments: 51, hasMoreComments: true, nextCommentsCursor: "issue-comments-next",
           reviews: [{ id: "review-1", author: "Codex", body: "One suggested change.", submittedAt: "2026-09-23T10:01:00Z", url: "https://github.com/owner/live-project/pull/999#pullrequestreview-1", state: "CHANGES_REQUESTED" }],
-          totalReviews: 1, hasMoreReviews: false,
-          reviewThreads: [{ id: "thread-1", path: "src/live.ts", line: 42, resolved: false, outdated: true, totalComments: 1, hasMoreComments: false,
+          totalReviews: 51, hasMoreReviews: true, nextReviewsCursor: "reviews-next",
+          reviewThreads: [{ id: "thread-1", path: "src/live.ts", line: 42, resolved: false, outdated: true, totalComments: 6, hasMoreComments: true, nextCommentsCursor: "thread-replies-next",
             comments: [{ id: "review-comment-1", author: "Codex", body: "Keep the host boundary explicit.", createdAt: "2026-09-23T10:02:00Z", url: "https://github.com/owner/live-project/pull/999#discussion_r1", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }] }],
-          totalReviewThreads: 26, hasMoreReviewThreads: true,
+          totalReviewThreads: 26, hasMoreReviewThreads: true, nextReviewThreadsCursor: "review-threads-next",
         };
+        if (input.page?.commentsAfter === snapshot.nextCommentsCursor) return {
+          ...snapshot,
+          comments: [{ id: "issue-2", author: "maintainer", body: "Second issue comment.", createdAt: "2026-09-23T10:03:00Z", url: "https://github.com/owner/live-project/pull/999#issuecomment-2" }],
+          hasMoreComments: false, nextCommentsCursor: null,
+        };
+        if (input.page?.reviewsAfter === snapshot.nextReviewsCursor) return {
+          ...snapshot,
+          reviews: [{ id: "review-2", author: "Reviewer", body: "Second submitted review.", submittedAt: "2026-09-23T10:04:00Z", url: "https://github.com/owner/live-project/pull/999#pullrequestreview-2", state: "COMMENTED" }],
+          hasMoreReviews: false, nextReviewsCursor: null,
+        };
+        if (input.page?.reviewThreadsAfter === snapshot.nextReviewThreadsCursor) return {
+          ...snapshot,
+          reviewThreads: [{ id: "thread-2", path: "src/other.ts", line: 9, resolved: true, outdated: false, totalComments: 1, hasMoreComments: false, nextCommentsCursor: null, comments: [{ id: "review-comment-2", author: "Reviewer", body: "Second thread.", createdAt: "2026-09-23T10:05:00Z", url: "https://github.com/owner/live-project/pull/999#discussion_r2", diffHunk: "@@ -9 +9 @@\n-old\n+new", line: 9 }] }],
+          hasMoreReviewThreads: false, nextReviewThreadsCursor: null,
+        };
+        return snapshot;
+      });
+      ipcMain.handle("demo:git:pr-thread-replies", (_event, input) => {
+        globalThis.__routeThreadReplyReads++;
+        if (input.number !== 999 || input.head !== "a".repeat(40) || input.threadId !== "thread-1" || input.after !== "thread-replies-next") throw new Error("thread reply page was not bound to the current PR thread");
+        return { threadId: "thread-1", headRefOid: "a".repeat(40), comments: [{ id: "review-comment-reply", author: "Maintainer", body: "Additional inline reply.", createdAt: "2026-09-23T10:06:00Z", url: "https://github.com/owner/live-project/pull/999#discussion_r3", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }], totalComments: 6, hasMoreComments: false, nextCommentsCursor: null };
       });
       ipcMain.handle("demo:git:pr-diff", () => {
         if (globalThis.__routeDiffFails) throw new Error("synthetic diff unavailable");
@@ -91,7 +114,24 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     assert.equal(await conversation.locator("script").count(), 0, "GitHub content must remain plain text");
     assert.equal(await conversation.getByText("Changes requested", { exact: true }).count(), 1);
     assert.equal(await conversation.locator(".codex-ui-pull-request-review-thread[data-outdated='true']").count(), 1);
-    assert.ok((await conversation.textContent()).includes("first 50 comments, 50 reviews, 25 threads, and 5 replies per thread"));
+    assert.ok((await conversation.textContent()).includes("More conversation history is available."));
+    await app.evaluate(() => { globalThis.__routeConversationPageFails = true; });
+    await conversation.getByRole("button", { name: "Load more comments", exact: true }).click();
+    await conversation.getByText("More PR conversation history could not be loaded. Retry or open the PR on GitHub.", { exact: true }).waitFor();
+    assert.equal(await conversation.getByText("<script>literal comment</script>", { exact: true }).count(), 1, "A failed page read must preserve the already loaded snapshot");
+    assert.equal(await conversation.getByText("Second issue comment.", { exact: true }).count(), 0);
+    await app.evaluate(() => { globalThis.__routeConversationPageFails = false; });
+    await conversation.getByRole("button", { name: "Load more comments", exact: true }).click();
+    await conversation.getByText("Second issue comment.", { exact: true }).waitFor();
+    assert.equal(await conversation.getByRole("button", { name: "Load more comments", exact: true }).count(), 0);
+    await conversation.getByRole("button", { name: "Load more reviews", exact: true }).click();
+    await conversation.getByText("Second submitted review.", { exact: true }).waitFor();
+    await conversation.getByRole("button", { name: "Load more review threads", exact: true }).click();
+    await conversation.getByText("Second thread.", { exact: true }).waitFor();
+    await conversation.getByRole("button", { name: "Load more replies in src/live.ts", exact: true }).click();
+    await conversation.getByText("Additional inline reply.", { exact: true }).waitFor();
+    const threadReplyReads = await app.evaluate(() => globalThis.__routeThreadReplyReads);
+    assert.equal(threadReplyReads, 1, "Thread replies should cross the dedicated bounded IPC page");
     await page.screenshot({ path: join(directory, `conversation-${frameKey}.png`) });
     await app.evaluate(() => { globalThis.__routeConversationFails = true; });
     await conversation.getByRole("button", { name: "Refresh conversation", exact: true }).click();
@@ -101,7 +141,7 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     await panel.getByRole("button", { name: "Retry PR conversation", exact: true }).click();
     await conversation.getByText("One suggested change.", { exact: true }).waitFor();
     const conversationReads = await app.evaluate(() => globalThis.__routeConversationReads);
-    assert.ok(conversationReads >= 3, "Conversation load, refresh, and retry should all cross the host bridge");
+    assert.ok(conversationReads >= 7, "Conversation first page, paged retry/sections, refresh, and retry should cross the host bridge");
     await panel.getByRole("tab", { name: "Code", exact: true }).click();
     await panel.getByRole("button", { name: "Read live PR diff", exact: true }).click();
     const diff = panel.getByLabel("Live PR diff", { exact: true });
