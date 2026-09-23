@@ -67,6 +67,18 @@ export const currentInstalledCandidateBaselineFingerprint = Object.freeze({
   chromiumVersion: "153.0.8010.48",
 });
 
+// Keep the newest installed build as a candidate until its current surface
+// families are re-observed; do not promote it from package identity alone.
+export const currentLatestInstalledCandidateBaselineFingerprint =
+  Object.freeze({
+    appAsarBytes: 370_175_042,
+    appAsarSha256:
+      "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+    appVersion: "26.917.62051",
+    buildNumber: "10789",
+    chromiumVersion: "153.0.8010.53",
+  });
+
 const primaryRoutes = Object.freeze([
   "New chat",
   "Plugins",

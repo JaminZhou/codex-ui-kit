@@ -21,6 +21,7 @@ import {
   currentBaselineFingerprint,
   currentBaselineViewports,
   currentInstalledCandidateBaselineFingerprint,
+  currentLatestInstalledCandidateBaselineFingerprint,
   runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
@@ -821,6 +822,84 @@ describe("current baseline capture contract", () => {
       publicItems: expect.arrayContaining(["Documents", "Files and folders"]),
       rect: { height: 320, width: 736 },
       scrollOwner: { clientHeight: 310, scrollHeight: 951 },
+    });
+  });
+
+  it("keeps the installed 26.917 fingerprint candidate-only", () => {
+    expect(currentLatestInstalledCandidateBaselineFingerprint).toEqual({
+      appAsarBytes: 370175042,
+      appAsarSha256:
+        "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+      appVersion: "26.917.62051",
+      buildNumber: "10789",
+      chromiumVersion: "153.0.8010.53",
+    });
+
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-baseline.mjs", import.meta.url),
+      "utf8",
+    );
+    expect(captureSource).toContain(
+      'CODEX_CURRENT_BASELINE_FINGERPRINT === "26.917.62051"',
+    );
+  });
+
+  it("keeps the installed 26.917 candidate record machine-verifiable", () => {
+    const record = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-baseline-26.917.62051.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(() =>
+      assertCurrentBaselineRecord(
+        record,
+        currentLatestInstalledCandidateBaselineFingerprint,
+      ),
+    ).not.toThrow();
+    expect(record.baseline).toMatchObject({
+      appVersion: "26.917.62051",
+      buildNumber: "10789",
+      sampledAt: "2026-09-24",
+    });
+    expect(record.targetSelection.selected).toMatchObject({
+      url: "app://-/index.html",
+      landmarks: { main: 1, nav: 1, sidebarTrigger: 2, textbox: 1 },
+    });
+    expect(record.states).toMatchObject({
+      wideNewChat: {
+        editor: { rect: { height: 44, width: 712 } },
+        horizontalOverflow: 0,
+      },
+      thresholdNewChat: {
+        viewport: { height: 680, width: 721 },
+        horizontalOverflow: 0,
+      },
+      compactCollapsed: {
+        viewport: { height: 680, width: 720 },
+        horizontalOverflow: 0,
+      },
+    });
+    expect(record.sidebarLifecycle.helpMenu.opened).toMatchObject({
+      menuItemCount: 9,
+      rect: { height: 300.63, width: 320 },
+    });
+    expect(record.projectsIndexObservation).toMatchObject({
+      compact: { rows: { count: 15, firstRect: { height: 70, width: 559 } } },
+      wide: { rows: { count: 15, firstRect: { height: 70, width: 736 } } },
+    });
+    expect(record.composerResourceObservation).toMatchObject({
+      menu: {
+        itemHeight: 28.5625,
+        publicItems: expect.arrayContaining(["Documents", "Files and folders"]),
+        rect: { height: 320, width: 736 },
+        scrollOwner: { clientHeight: 310, scrollHeight: 951 },
+      },
+      viewport: { devicePixelRatio: 1, height: 820, width: 1180 },
     });
   });
 

@@ -10,7 +10,18 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- Installed-package discovery on 2026-09-12 now resolves to Codex Desktop
+- The installed app advanced to `26.917.62051` (`10789`), Chromium
+  `153.0.8010.53`, with a 370,175,042-byte `app.asar` whose SHA-256 is
+  `c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd`.
+  The isolated candidate record is
+  [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
+  summarized in [`26.917.62051.md`](26.917.62051.md). It refreshes structural
+  observations for the shell/sidebar, Projects, Help, and Composer resources;
+  Settings → Connections was not visited. The promoted baseline remains
+  `26.903.71938`: this candidate has no installed-product pixel evidence, and
+  evidence from older builds or controlled replay does not substitute for
+  current-build surface-family gates.
+- The promoted inventory baseline was sampled on 2026-09-12 from Codex Desktop
   `26.903.71938` (`8576`), Chromium `152.0.7977.83`, and ASAR SHA-256
   `58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0`;
   see [the current baseline](26.903.71938.md). The previous package-only
@@ -111,9 +122,12 @@ exit gates; it does not replace the inventory.
   integration surface (`integrations.remote-connections`); it is not evidence
   for the current Settings route. `ConnectionsSettingsPage` now provides the
   observed tab structure and controlled local-replay actions. The current
-  26.915 CDP sample is still candidate-only: Browser/CDP and Electron
-  interaction contracts, responsive re-observation, and reviewed local pixel
-  regions have not yet been run or promoted.
+  26.915 CDP sample is still candidate-only product evidence. The controlled
+  `ConnectionsSettingsPage` replay now has local Browser/CDP, Electron geometry
+  and interaction, and own-fixture pixel coverage; PR #607 completed those
+  checks. These replay gates do not promote installed-product 26.915 or 26.917
+  pixels, and pairing, SSH exchange, environment mutation, persistence, and
+  production Remote semantics remain open.
 - The installed `26.915.31945` Settings route was re-observed in a read-only
   isolated Renderer. `Computer use` and `Browser` are both reachable from the
   current Settings navigation and share a `321.88px` rail, `46px` titlebar
