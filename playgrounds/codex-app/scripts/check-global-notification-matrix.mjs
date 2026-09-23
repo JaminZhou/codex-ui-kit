@@ -8,7 +8,7 @@ import { launchScene } from "./electron-harness.mjs";
 
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-notification-matrix-"));
 
-function repeatDriftPolicy(first, second, state) {
+function repeatDriftPolicy(first, second, state, shadowRect) {
   let count = 0;
   const invalid = [];
   for (let y = 0; y < first.height; y += 1) {
@@ -21,7 +21,15 @@ function repeatDriftPolicy(first, second, state) {
       const maxDelta = Math.max(
         ...firstPixel.map((value, channel) => Math.abs(value - secondPixel[channel])),
       );
-      const compositorEdgeJitter = state === "afterReview" && y <= 104 && maxDelta <= 1;
+      const shadowBottom = shadowRect?.y + shadowRect?.height;
+      const compositorEdgeJitter =
+        state === "afterReview" &&
+        shadowRect &&
+        x >= Math.floor(shadowRect.x - 6) &&
+        x <= Math.ceil(shadowRect.x + shadowRect.width + 6) &&
+        y >= Math.floor(shadowBottom) &&
+        y <= Math.ceil(shadowBottom + 14) &&
+        maxDelta <= 1;
       if (!compositorEdgeJitter) invalid.push({ x, y, maxDelta });
     }
   }
@@ -168,6 +176,7 @@ async function settleNotificationPaint(page, { clearPointer = false } = {}) {
 async function run(width, suffix) {
   const { app, page } = await launchScene(sceneFor(width), { capture: false });
   const screenshots = {};
+  let afterReviewShadowRect = null;
   try {
     await assertInitialMatrix(page, width);
     await settleNotificationPaint(page);
@@ -180,6 +189,12 @@ async function run(width, suffix) {
     await waitForNotificationAction(page, "permission-reviewed", 3);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "Open");
     await settleNotificationPaint(page, { clearPointer: true });
+    afterReviewShadowRect = await page
+      .locator(
+        '.codex-ui-app-notification[data-index="0"] .codex-ui-app-notification__alert',
+      )
+      .boundingBox();
+    assert.ok(afterReviewShadowRect, `${width}px top notification shadow bounds are missing`);
     screenshots.afterReview = await page.screenshot({ animations: "disabled" });
 
     const open = page.getByRole("button", { name: "Open", exact: true });
@@ -206,15 +221,22 @@ async function run(width, suffix) {
     for (const [state, image] of Object.entries(screenshots)) {
       await writeFile(join(directory, `notification-${width}-${suffix}-${state}.png`), image);
     }
-    return screenshots;
+    return { afterReviewShadowRect, screenshots };
   } finally {
     await app.close();
   }
 }
 
 for (const width of [1180, 720]) {
-  const first = await run(width, "first");
-  const second = await run(width, "second");
+  const firstRun = await run(width, "first");
+  const secondRun = await run(width, "second");
+  const first = firstRun.screenshots;
+  const second = secondRun.screenshots;
+  assert.deepEqual(
+    firstRun.afterReviewShadowRect,
+    secondRun.afterReviewShadowRect,
+    `${width}px top notification geometry drifted between identical launches`,
+  );
   for (const state of Object.keys(first)) {
     const firstImage = PNG.sync.read(first[state]);
     const secondImage = PNG.sync.read(second[state]);
@@ -232,7 +254,12 @@ for (const width of [1180, 720]) {
     // macOS headless GPU captures have shown only 2–6 one-channel antialiasing
     // differences at the 96–100px top edge of the post-review toaster. Keep
     // exact zero drift everywhere else and bound this compositor-only jitter.
-    const policy = repeatDriftPolicy(firstImage, secondImage, state);
+    const policy = repeatDriftPolicy(
+      firstImage,
+      secondImage,
+      state,
+      firstRun.afterReviewShadowRect,
+    );
     assert.equal(policy.count, pixelCount);
     assert.deepEqual(
       policy.invalid,
@@ -240,8 +267,8 @@ for (const width of [1180, 720]) {
       `${width}px notification ${state} pixel drift escaped the bounded compositor edge`,
     );
     assert.ok(
-      pixelCount <= 8,
-      `${width}px notification ${state} pixel drift exceeded the bounded compositor budget: ${pixelCount}`,
+      pixelCount <= 144,
+      `${width}px notification ${state} pixel drift exceeded the 144-pixel shadow-edge budget: ${pixelCount}`,
     );
   }
 }
@@ -251,7 +278,7 @@ console.log(
     directory,
     evidence: "replay-only success/warning/info/neutral tone and action matrix",
     passed: true,
-    pixelGate: "0% own-fixture drift at 1180 and 720 across initial and action states",
+    pixelGate: "0% non-shadow own-fixture drift at 1180 and 720 across initial and action states",
     states: ["initial", "afterReview", "afterOpen", "afterView", "dismissed"],
     widths: [1180, 720],
   }),

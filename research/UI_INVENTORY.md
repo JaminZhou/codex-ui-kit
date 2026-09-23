@@ -2618,6 +2618,17 @@ drift. It remains a deterministic replay of the structural observation; no
 host selection, upload, authorization, execution, or product-pixel approval
 is inferred.
 
+The 26.917.62051 candidate now has its own
+`workspace-composer-current-26-917-resources` replay instead of inheriting the
+26.915 route label. Its 19 sanitized public rows are checked against the
+same-day installed capture, including the 736×320 menu, 726×310 scroll owner,
+28.5625px row height, 20px radius, `rgb(45, 45, 45)` surface, and 13px/430
+weight. The focused Electron contract repeats the wide/compact route, Escape
+focus recovery, and zero-overflow check; the two own-fixture captures have 0%
+drift. This does not add installed-product pixels, promote the sampled icon
+artwork, or infer selection/upload/provider behavior, so the broader
+`composer.resources` row remains partial.
+
 The playground carries a matching `26.908.70816` replay variant with the
 latest public catalog vocabulary (`GitHub`, 19 retained options). Its
 Browser/Electron acceptance path checks listbox semantics, 736/688px wide/

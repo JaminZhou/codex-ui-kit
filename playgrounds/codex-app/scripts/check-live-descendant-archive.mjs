@@ -17,6 +17,10 @@ const environment = {
   CODEX_UI_KIT_LIVE_HISTORY_PATH: registryPath,
   CODEX_UI_KIT_LIVE_EPHEMERAL: "0",
   CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
+  CODEX_UI_KIT_LIVE_MODEL:
+    process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-sol",
+  CODEX_UI_KIT_LIVE_REASONING_EFFORT:
+    process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "ultra",
 };
 const result = { passed: false, directory, evidence: "real signed-in App Server descendant query plus Electron archive/restore UI" };
 const owned = new Set();

@@ -894,6 +894,10 @@ describe("current baseline capture contract", () => {
     });
     expect(record.composerResourceObservation).toMatchObject({
       menu: {
+        backgroundColor: "rgb(45, 45, 45)",
+        borderRadius: "20px",
+        fontSize: "13px",
+        fontWeight: "430",
         itemHeight: 28.5625,
         publicItems: expect.arrayContaining(["Documents", "Files and folders"]),
         rect: { height: 320, width: 736 },

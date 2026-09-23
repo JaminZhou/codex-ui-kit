@@ -8,7 +8,16 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 // Explicit signed-in persistent-history probe; only its own three turns/threads.
 const directory = await realpath(await mkdtemp(join(tmpdir(), "ui-kit-live-history-")));
 const scene = visualScenes.find(scene => scene.id === "pull-request-detail");
-const environment = { CODEX_UI_KIT_WORKSPACE: directory, CODEX_UI_KIT_LIVE_HISTORY_PATH: join(directory, "registry.json"), CODEX_UI_KIT_LIVE_EPHEMERAL: "0", CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0" };
+const environment = {
+  CODEX_UI_KIT_WORKSPACE: directory,
+  CODEX_UI_KIT_LIVE_HISTORY_PATH: join(directory, "registry.json"),
+  CODEX_UI_KIT_LIVE_EPHEMERAL: "0",
+  CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
+  CODEX_UI_KIT_LIVE_MODEL:
+    process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna",
+  CODEX_UI_KIT_LIVE_REASONING_EFFORT:
+    process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max",
+};
 const owned = new Set();
 const evidence = [];
 let app, page;

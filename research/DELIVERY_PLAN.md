@@ -17,6 +17,11 @@ exit gates; it does not replace the inventory.
   [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
   summarized in [`26.917.62051.md`](26.917.62051.md). It refreshes structural
   observations for the shell/sidebar, Projects, Help, and Composer resources.
+  A bounded 26.917 Composer replay now locks the sampled Add-menu surface style,
+  19 sanitized public rows, wide/compact geometry, keyboard dismissal, and
+  repeat-capture stability. This remains a controlled replay rather than
+  installed-product pixel proof; provider selection, upload, and exact current
+  icon artwork remain open.
   A separate read-only 800×600 Settings → Connections observation is recorded
   in [`current-settings-connections-26.917.62051.json`](current-settings-connections-26.917.62051.json)
   and [`26.917.62051-settings-connections.md`](26.917.62051-settings-connections.md).
