@@ -3156,8 +3156,11 @@ The existing synthetic 1180/720 PR gate covers detail success/failure/retry,
 literal HTML-like text, links and expanded-dialog/footer bounds. The separate
 explicit development-PR creation script now also reads that actual PR's detail
 through the UI. Neither test is evidence of installed-Codex pixel parity. Full
-diff support beyond the bounded text patch below, PR edits beyond title/body, merge modes beyond the explicit admin slice below, closed-PR history and provider-specific flows remain
-open; this does not mark the complete PR workflow finished.
+diff support beyond the bounded text patch below, PR edits beyond title/body,
+merge modes beyond the explicit admin slice below, and provider-specific flows
+remain open. Repository-wide and closed-PR discovery is provided by the separate
+read-only history route below; that does not mark the complete PR workflow
+finished.
 
 ## Same-branch PR diff follow-up
 
@@ -3190,8 +3193,10 @@ Backend tests cover successful and stale edits, validation, no-op and uncertain
 responses. The 1180/720 synthetic Electron gate covers explicit confirmation,
 lost-response reconciliation, a subsequent successful edit, cancel and footer
 reachability. The opt-in development-PR script verifies one real description edit
-through Electron. Base/reviewer/label mutations, other merge modes and closed history remain
-open; no installed-product pixel-parity claim is made for this own-host editor.
+through Electron. Base/reviewer/label mutations and other merge modes remain
+open; project-wide and closed PR detail is read-only and does not enable these
+mutations. No installed-product pixel-parity claim is made for this own-host
+editor.
 
 ## Explicit administrator squash-merge follow-up
 
@@ -3217,7 +3222,8 @@ both complete local gates exited zero for that head before clicking the UI merge
 The UI checkbox itself is an acknowledgement, not execution of local validation.
 After a real merge, the agent still synchronizes main and removes only that PR's
 branch. Normal non-admin/queue/rebase merge modes, cleanup beyond the explicit slice below,
-closed-PR history and current installed-product pixels remain open.
+and current installed-product pixels remain open. Closed/project-wide discovery
+is a separate read-only route, not merge authorization.
 
 ## Confirmed post-merge main synchronization and cleanup
 
@@ -3245,14 +3251,14 @@ dirty-file preservation and lost-response recovery, and is part of acceptance.
 The separate real development-PR merge script now also confirms cleanup through
 the UI and independently checks clean main, main/origin-main equality and exact
 local/remote branch absence. It still requires both complete local gates for the
-final head before any real merge. Closed history, other merge modes and current
-installed-product pixel convergence remain incomplete.
+final head before any real merge. Other merge modes and current installed-product
+pixel convergence remain incomplete.
 
 ## Current-branch Live PR workspace route
 
 The sidebar Pull requests entry now preserves Live mode instead of switching to
-replay fixtures. Its own-host route reads open PRs for the current pushed branch
-on origin, retains search state across navigation, and opens non-modal Summary
+replay fixtures. Its own-host route reads PRs for the selected repository on
+origin, retains search state across navigation, and opens non-modal Summary
 and Code panels backed by the existing detail and bounded-diff APIs. Loading,
 empty, provider errors and retries are explicit; failed reads clear stale data.
 Project changes and refreshed requests invalidate older detail responses.
@@ -3263,12 +3269,12 @@ route restoration, literal description rendering, retry and panel geometry.
 Below 680px the detail replaces the list and fills the window. The opt-in real
 development-PR script also reads the created PR through this route. These are
 own-playground functional and responsive checks, not current installed-product
-pixel evidence. Project-wide and closed history and broader PR workflows remain
-incomplete.
+pixel evidence. The separate repository history route below covers project-wide
+and closed/merged discovery; broader PR workflows remain incomplete.
 
 The current route now adds an on-demand, read-only `Reviews` panel for issue
 comments, submitted review summaries, and inline review threads. The Electron
-host verifies the selected PR still belongs to the pushed current branch,
+host verifies the selected PR belongs to the selected project remote,
 binds each snapshot to the selected head, and rechecks head/base revisions after
 every GraphQL page. Comments, reviews, review threads, and per-thread replies
 use separate on-demand cursors (50 comments, 50 reviews, 25 threads, and 5
@@ -3276,8 +3282,27 @@ replies per page). Untrusted comment bodies render as text, and this slice
 exposes no comment, reply, resolve, or review mutation. Its synthetic Electron
 gate covers loading, page append/deduplication, page errors and retry, stale-data
 clearing, resolved/outdated thread presentation, and 1180/720/600 dark/light
-containment. This closes current-branch conversation history paging, not
-closed/project-wide PR discovery or current installed-product pixel evidence.
+containment. This closes bounded conversation history paging, not current
+installed-product pixel evidence.
+
+## Repository-wide and closed PR history
+
+The Live Pull requests route now reads the selected GitHub repository independently
+of the checked-out branch. Open, Closed (including merged), and All filters each
+use a bounded 30-item GraphQL page ordered by most recently updated; search is
+explicitly over loaded pages. Additional pages are on demand and are de-duplicated.
+Page failures preserve the displayed snapshot and can retry the same cursor.
+The host resolves exactly one named GitHub remote before and after each read,
+rejects remote changes, and sends no GitHub mutation or CI request for discovery.
+
+Selecting a repository-wide result opens its summary, bounded diff, and paged
+review conversation using a separate repository read scope; existing title/body,
+merge, and branch-cleanup mutations remain constrained to the current-branch
+workflow. The synthetic Electron gate exercises initial and later-page errors,
+retry, de-duplication, all three state filters, merged and closed detail reads,
+route restoration, and 1180/720/600 dark/light layouts. The 30-item cap and
+opaque cursor bound each response; this own-playground evidence is not current
+installed-product pixel parity or a complete provider-specific PR workflow.
 
 The notification and composer-plan progress surfaces now share the same
 disabled boundary: queued notification action/dismiss controls and plan

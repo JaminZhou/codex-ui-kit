@@ -14,6 +14,21 @@ export function githubRepository(destination: string): string {
   return `${match[1]}/${match[2]}`;
 }
 
+/** Resolve a named remote to one exact GitHub push destination without inspecting branch state. */
+export async function readGitHubRepository(directory: string, remote: string): Promise<{ repository: string; destination: string }> {
+  if (typeof remote !== "string" || !remote || remote.startsWith("-") || /[\0\r\n]/.test(remote)) {
+    throw new Error("Select an existing named remote.");
+  }
+  const options = { cwd: directory, encoding: "utf8" as const, timeout: 10_000, maxBuffer: 65_536, env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GIT_OPTIONAL_LOCKS: "0" } };
+  const { stdout: remoteNames } = await exec("git", ["remote"], options);
+  if (!remoteNames.trim().split(/\r?\n/).includes(remote)) throw new Error("Select an existing named remote.");
+  const { stdout } = await exec("git", ["remote", "get-url", "--push", "--all", remote], options);
+  const destinations = stdout.trim().split(/\r?\n/);
+  if (destinations.length !== 1 || !destinations[0]) throw new Error("Exactly one GitHub remote destination is required.");
+  const destination = destinations[0];
+  return { repository: githubRepository(destination), destination };
+}
+
 export interface GitPullRequestPreview {
   repository: string;
   branch: string;

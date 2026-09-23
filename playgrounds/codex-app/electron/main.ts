@@ -48,6 +48,7 @@ import {
 import { commitGitPreview, readGitCommitPreview } from "./git-commit-preview.js";
 import { pushGitPreview, readGitPushPreview } from "./git-push-preview.js";
 import { createGitPullRequest, readGitPullRequestPreview } from "./git-pr-preview.js";
+import { readGitPullRequestHistory, type PullRequestHistoryFilter } from "./git-pr-history.js";
 import {
   editGitPullRequest,
   readGitPullRequestConversation,
@@ -56,6 +57,7 @@ import {
   readGitPullRequestReviewThreadReplies,
   type EditPullRequestInput,
   type GitPullRequestConversationPageRequest,
+  type PullRequestReadScope,
 } from "./git-pr-detail.js";
 import { mergePullRequest, readPullRequestMergeStatus, type PullRequestMergeTarget } from "./git-pr-merge.js";
 import { cleanupMergedPullRequest } from "./git-pr-cleanup.js";
@@ -1284,6 +1286,14 @@ ipcMain.handle("demo:git:pr-preview", async (event, raw: unknown) => {
   if (typeof remote !== "string") throw new TypeError("A named remote is required.");
   return gitBranchOperationQueue.run(() => readGitPullRequestPreview(directory, remote));
 });
+ipcMain.handle("demo:git:pr-history", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  const { directory } = resolveHistoryProject(raw);
+  const { remote, filter, after } = raw as Record<string, unknown>;
+  if (typeof remote !== "string" || !["open", "closed", "all"].includes(filter as string)
+    || (after !== undefined && typeof after !== "string")) throw new TypeError("Select a valid repository PR history page.");
+  return gitBranchOperationQueue.run(() => readGitPullRequestHistory(directory, remote, filter as PullRequestHistoryFilter, after as string | undefined));
+});
 ipcMain.handle("demo:git:pr-create", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);
@@ -1294,30 +1304,34 @@ ipcMain.handle("demo:git:pr-create", async (event, raw: unknown) => {
 ipcMain.handle("demo:git:pr-detail", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);
-  const { remote, number } = raw as Record<string, unknown>;
+  const { remote, number, scope } = raw as Record<string, unknown>;
   if (typeof remote !== "string" || typeof number !== "number") throw new TypeError("Select a PR from the current project.");
-  return gitBranchOperationQueue.run(() => readGitPullRequestDetail(directory, remote, number));
+  if (scope !== undefined && scope !== "current-branch" && scope !== "repository") throw new TypeError("Select a valid PR read scope.");
+  return gitBranchOperationQueue.run(() => readGitPullRequestDetail(directory, remote, number, (scope ?? "current-branch") as PullRequestReadScope));
 });
 ipcMain.handle("demo:git:pr-conversation", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);
-  const { remote, number, head, page } = raw as Record<string, unknown>;
+  const { remote, number, head, page, scope } = raw as Record<string, unknown>;
   if (typeof remote !== "string" || typeof number !== "number" || typeof head !== "string") throw new TypeError("Select a current PR revision.");
   if (page !== undefined && (!page || typeof page !== "object" || Array.isArray(page))) throw new TypeError("Select a valid PR conversation page.");
+  if (scope !== undefined && scope !== "current-branch" && scope !== "repository") throw new TypeError("Select a valid PR read scope.");
   return gitBranchOperationQueue.run(() => readGitPullRequestConversation(
     directory,
     remote,
     number,
     head,
     (page ?? {}) as GitPullRequestConversationPageRequest,
+    (scope ?? "current-branch") as PullRequestReadScope,
   ));
 });
 ipcMain.handle("demo:git:pr-thread-replies", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);
-  const { remote, number, head, threadId, after } = raw as Record<string, unknown>;
+  const { remote, number, head, threadId, after, scope } = raw as Record<string, unknown>;
   if (typeof remote !== "string" || typeof number !== "number" || typeof head !== "string"
     || typeof threadId !== "string" || typeof after !== "string") throw new TypeError("Select a current PR review-thread page.");
+  if (scope !== undefined && scope !== "current-branch" && scope !== "repository") throw new TypeError("Select a valid PR read scope.");
   return gitBranchOperationQueue.run(() => readGitPullRequestReviewThreadReplies(
     directory,
     remote,
@@ -1325,14 +1339,16 @@ ipcMain.handle("demo:git:pr-thread-replies", async (event, raw: unknown) => {
     head,
     threadId,
     after,
+    (scope ?? "current-branch") as PullRequestReadScope,
   ));
 });
 ipcMain.handle("demo:git:pr-diff", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { directory } = resolveHistoryProject(raw);
-  const { remote, number, head } = raw as Record<string, unknown>;
+  const { remote, number, head, scope } = raw as Record<string, unknown>;
   if (typeof remote !== "string" || typeof number !== "number" || typeof head !== "string") throw new TypeError("Select a current PR detail.");
-  return gitBranchOperationQueue.run(() => readGitPullRequestDiff(directory, remote, number, head));
+  if (scope !== undefined && scope !== "current-branch" && scope !== "repository") throw new TypeError("Select a valid PR read scope.");
+  return gitBranchOperationQueue.run(() => readGitPullRequestDiff(directory, remote, number, head, (scope ?? "current-branch") as PullRequestReadScope));
 });
 ipcMain.handle("demo:git:pr-edit", async (event, raw: unknown) => {
   assertTrustedIpc(event);

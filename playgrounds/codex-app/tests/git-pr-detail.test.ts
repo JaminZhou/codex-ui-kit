@@ -1,13 +1,14 @@
 import { beforeEach, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ exec: vi.fn(), preview: vi.fn() }));
+const mocks = vi.hoisted(() => ({ exec: vi.fn(), preview: vi.fn(), repository: vi.fn() }));
 vi.mock("node:child_process", () => ({ execFile: mocks.exec }));
-vi.mock("../electron/git-pr-preview.js", () => ({ readGitPullRequestPreview: mocks.preview }));
-import { editGitPullRequest, parsePullRequestConversation, parsePullRequestDetail, readGitPullRequestConversation, readGitPullRequestDiff, readGitPullRequestReviewThreadReplies } from "../electron/git-pr-detail";
+vi.mock("../electron/git-pr-preview.js", () => ({ readGitPullRequestPreview: mocks.preview, readGitHubRepository: mocks.repository }));
+import { editGitPullRequest, parsePullRequestConversation, parsePullRequestDetail, readGitPullRequestConversation, readGitPullRequestDetail, readGitPullRequestDiff, readGitPullRequestReviewThreadReplies } from "../electron/git-pr-detail";
 
 const detail = { number: 1, url: "https://github.com/owner/repo/pull/1", title: "Example", body: "Untrusted **body**", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 2, files: [{ path: "a file.ts", additions: 1, deletions: 0 }] };
 beforeEach(() => {
-  mocks.exec.mockReset(); mocks.preview.mockReset();
+  mocks.exec.mockReset(); mocks.preview.mockReset(); mocks.repository.mockReset();
   mocks.preview.mockResolvedValue({ repository: "owner/repo", pullRequests: [detail] });
+  mocks.repository.mockResolvedValue({ repository: "owner/repo", destination: "https://github.com/owner/repo.git" });
 });
 function responses(after = detail, failure = false) {
   let reads = 0;
@@ -38,6 +39,14 @@ it("rejects stale heads, changed bases, unavailable output and unrelated PRs", a
 });
 it("preserves file totals when the provider returns a partial file list", () => {
   expect(parsePullRequestDetail(JSON.stringify(detail), "owner/repo", 1)).toEqual(detail);
+});
+it("reads a closed repository-history PR without requiring it to match the current branch", async () => {
+  const closed = { ...detail, state: "MERGED" };
+  mocks.exec.mockImplementation((_command, args, _options, callback) => callback(null, { stdout: JSON.stringify(closed) }));
+  expect(await readGitPullRequestDetail("/project", "origin", 1, "repository")).toEqual(closed);
+  expect(mocks.preview).not.toHaveBeenCalled();
+  expect(mocks.repository).toHaveBeenCalledTimes(2);
+  expect(mocks.exec.mock.calls[0].slice(0, 2)).toEqual(["gh", ["pr", "view", "1", "--repo", "github.com/owner/repo", "--json", "number,url,title,body,state,baseRefName,baseRefOid,headRefOid,changedFiles,files"]]);
 });
 it("rejects mismatched PRs and malformed file counts", () => {
   for (const value of [{ ...detail, number: 2 }, { ...detail, url: "https://evil.test" }, { ...detail, changedFiles: 0 }, { ...detail, files: [{ path: "x", additions: -1, deletions: 0 }] }, { ...detail, body: null }]) {
@@ -84,6 +93,29 @@ it("reads bounded comments, reviews and inline threads for the exact current hea
   expect(detailReads).toBe(2);
 });
 
+it("reads a merged repository-history conversation without current-branch membership", async () => {
+  const merged = { ...detail, state: "MERGED" };
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "graphql") callback(null, { stdout: JSON.stringify(conversationPayload) });
+    else callback(null, { stdout: JSON.stringify(merged) });
+  });
+  const result = await readGitPullRequestConversation("/project", "origin", 1, detail.headRefOid, {}, "repository");
+  expect(result).toMatchObject({ number: 1, headRefOid: detail.headRefOid, baseRefOid: detail.baseRefOid });
+  expect(mocks.preview).not.toHaveBeenCalled();
+  expect(mocks.repository).toHaveBeenCalledTimes(4);
+});
+
+it("reads a repository-history diff while still rechecking the selected PR revision", async () => {
+  const merged = { ...detail, state: "MERGED" };
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "diff") callback(null, { stdout: "historical diff" });
+    else callback(null, { stdout: JSON.stringify(merged) });
+  });
+  expect(await readGitPullRequestDiff("/project", "origin", 1, detail.headRefOid, "repository")).toEqual({ number: 1, head: detail.headRefOid, patch: "historical diff" });
+  expect(mocks.preview).not.toHaveBeenCalled();
+  expect(mocks.repository).toHaveBeenCalledTimes(4);
+});
+
 it("marks bounded pages and rejects stale or malformed conversation snapshots", () => {
   const paged = structuredClone(conversationPayload);
   paged.data.repository.pullRequest.comments.pageInfo.hasNextPage = true;
@@ -118,7 +150,7 @@ it("passes validated section cursors through the read-only GraphQL query", async
 it("reads another bounded reply page only from the selected current PR thread", async () => {
   const threadReplies = { data: { node: {
     id: "thread-node-1",
-    pullRequest: { number: 1, headRefOid: detail.headRefOid, baseRefOid: detail.baseRefOid },
+    pullRequest: { number: 1, headRefOid: detail.headRefOid, baseRefOid: detail.baseRefOid, repository: { name: "repo", owner: { login: "owner" } } },
     comments: { totalCount: 6, pageInfo: { hasNextPage: false, endCursor: null }, nodes: [{ ...comment, id: "reply-2", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }] },
   } } };
   mocks.exec.mockImplementation((_command, args, _options, callback) => {
@@ -136,6 +168,13 @@ it("reads another bounded reply page only from the selected current PR thread", 
   wrongParent.data.node.pullRequest.number = 2;
   mocks.exec.mockImplementation((_command, args, _options, callback) => {
     if (args[1] === "graphql") callback(null, { stdout: JSON.stringify(wrongParent) });
+    else callback(null, { stdout: JSON.stringify(detail) });
+  });
+  await expect(readGitPullRequestReviewThreadReplies("/project", "origin", 1, detail.headRefOid, "thread-node-1", "reply-cursor")).rejects.toThrow("does not belong to the selected revision");
+  const wrongRepository = structuredClone(threadReplies);
+  wrongRepository.data.node.pullRequest.repository.owner.login = "other";
+  mocks.exec.mockImplementation((_command, args, _options, callback) => {
+    if (args[1] === "graphql") callback(null, { stdout: JSON.stringify(wrongRepository) });
     else callback(null, { stdout: JSON.stringify(detail) });
   });
   await expect(readGitPullRequestReviewThreadReplies("/project", "origin", 1, detail.headRefOid, "thread-node-1", "reply-cursor")).rejects.toThrow("does not belong to the selected revision");

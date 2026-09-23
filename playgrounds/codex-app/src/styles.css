@@ -7265,6 +7265,7 @@ textarea {
   align-items: center;
   flex-wrap: wrap;
 }
+.demo-live-pr-history-filters { display: flex; gap: 8px; flex-wrap: wrap; }
 .demo-live-pr-index h1 { font-size: 20px; margin: 0 auto 0 0; }
 .demo-live-pr-index p { margin: 0; font-size: 13px; line-height: 1.5; }
 .demo-live-pr-index input { min-width: 0; max-width: 100%; box-sizing: border-box; }

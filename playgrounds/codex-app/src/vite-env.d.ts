@@ -11,11 +11,12 @@ interface CodexDemoBridge {
   previewPush(input: { projectToken: string; remote: string; target?: string }): Promise<import("../electron/git-push-preview").GitPushPreview>;
   pushPreview(input: { projectToken: string; remote: string; target: string; fingerprint: string }): Promise<{ head: string; target: string }>;
   previewPullRequest(input: { projectToken: string; remote: string }): Promise<import("../electron/git-pr-preview").GitPullRequestPreview>;
+  listPullRequestHistory(input: { projectToken: string; remote: string; filter: import("../electron/git-pr-history").PullRequestHistoryFilter; after?: string }): Promise<import("../electron/git-pr-history").GitPullRequestHistoryPage>;
   createPullRequest(input: { projectToken: string } & import("../electron/git-pr-preview").CreatePullRequestInput): Promise<{ number: number; url: string }>;
-  readPullRequest(input: { projectToken: string; remote: string; number: number }): Promise<import("../electron/git-pr-detail").GitPullRequestDetail>;
-  readPullRequestConversation(input: { projectToken: string; remote: string; number: number; head: string; page?: import("../electron/git-pr-detail").GitPullRequestConversationPageRequest }): Promise<import("../electron/git-pr-detail").GitPullRequestConversation>;
-  readPullRequestReviewThreadReplies(input: { projectToken: string; remote: string; number: number; head: string; threadId: string; after: string }): Promise<import("../electron/git-pr-detail").GitPullRequestReviewThreadReplies>;
-  readPullRequestDiff(input: { projectToken: string; remote: string; number: number; head: string }): Promise<import("../electron/git-pr-detail").GitPullRequestDiff>;
+  readPullRequest(input: { projectToken: string; remote: string; number: number; scope?: import("../electron/git-pr-detail").PullRequestReadScope }): Promise<import("../electron/git-pr-detail").GitPullRequestDetail>;
+  readPullRequestConversation(input: { projectToken: string; remote: string; number: number; head: string; page?: import("../electron/git-pr-detail").GitPullRequestConversationPageRequest; scope?: import("../electron/git-pr-detail").PullRequestReadScope }): Promise<import("../electron/git-pr-detail").GitPullRequestConversation>;
+  readPullRequestReviewThreadReplies(input: { projectToken: string; remote: string; number: number; head: string; threadId: string; after: string; scope?: import("../electron/git-pr-detail").PullRequestReadScope }): Promise<import("../electron/git-pr-detail").GitPullRequestReviewThreadReplies>;
+  readPullRequestDiff(input: { projectToken: string; remote: string; number: number; head: string; scope?: import("../electron/git-pr-detail").PullRequestReadScope }): Promise<import("../electron/git-pr-detail").GitPullRequestDiff>;
   editPullRequest(input: { projectToken: string } & import("../electron/git-pr-detail").EditPullRequestInput): Promise<import("../electron/git-pr-detail").GitPullRequestDetail>;
   mergePullRequest(input: { projectToken: string; adminConfirmed: boolean } & import("../electron/git-pr-merge").PullRequestMergeTarget): Promise<import("../electron/git-pr-merge").PullRequestMergeStatus>;
   readPullRequestMergeStatus(input: { projectToken: string } & import("../electron/git-pr-merge").PullRequestMergeTarget): Promise<import("../electron/git-pr-merge").PullRequestMergeStatus>;

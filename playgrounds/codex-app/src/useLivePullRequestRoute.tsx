@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, PullRequestList, PullRequestQueryState, WorkspacePanel } from "codex-ui-kit";
-import type { GitPullRequestPreview } from "../electron/git-pr-preview";
 import type { GitPullRequestDetail } from "../electron/git-pr-detail";
 import type { GitPullRequestConversation } from "../electron/git-pr-detail";
 import type { GitPullRequestConversationPageRequest } from "../electron/git-pr-detail";
+import type { GitPullRequestHistoryPage, PullRequestHistoryFilter } from "../electron/git-pr-history";
 import { LivePullRequest } from "./LivePullRequest";
 import { LivePullRequestConversation } from "./LivePullRequestConversation";
 
@@ -12,7 +12,8 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
   projectToken?: string; active: boolean; open: boolean; expanded: boolean; onExpandedChange: (value: boolean) => void;
   onOpen: () => void; onClose: () => void; onSidebar: () => void; onWorkspaceChanged: () => void;
 }) {
-  const [preview, setPreview] = useState<GitPullRequestPreview | null>(null);
+  const [history, setHistory] = useState<GitPullRequestHistoryPage | null>(null);
+  const [historyFilter, setHistoryFilter] = useState<PullRequestHistoryFilter>("open");
   const [compact, setCompact] = useState(() => window.innerWidth < 680);
   useEffect(() => {
     const resize = () => setCompact(window.innerWidth < 680);
@@ -32,24 +33,48 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
   const [conversationError, setConversationError] = useState<string | null>(null);
   const [conversationPaging, setConversationPaging] = useState(false);
   const [conversationPageError, setConversationPageError] = useState<string | null>(null);
+  const [historyPageLoading, setHistoryPageLoading] = useState(false);
+  const [historyPageError, setHistoryPageError] = useState<string | null>(null);
   const epoch = useRef(0);
   const detailEpoch = useRef(0);
   const conversationEpoch = useRef(0);
   const resetDetails = () => { detailEpoch.current++; conversationEpoch.current++; setSelected(null); setDetail(null); setDetailStatus("idle"); setPatch(null); setDiffStatus("idle"); setConversation(null); setConversationStatus("idle"); setConversationError(null); setConversationPaging(false); setConversationPageError(null); setTab("summary"); };
   useEffect(() => {
-    epoch.current++; resetDetails(); setPreview(null); setStatus("idle"); setQuery("");
+    epoch.current++; resetDetails(); setHistory(null); setStatus("idle"); setQuery(""); setHistoryFilter("open"); setHistoryPageLoading(false); setHistoryPageError(null);
     return () => { epoch.current++; detailEpoch.current++; conversationEpoch.current++; };
   }, [projectToken]);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (filter: PullRequestHistoryFilter = historyFilter) => {
     if (!projectToken || !window.codexDemo) return;
     const request = ++epoch.current;
-    resetDetails(); setPreview(null); setStatus("loading");
+    resetDetails(); setHistory(null); setStatus("loading"); setHistoryPageLoading(false); setHistoryPageError(null);
     try {
-      const value = await window.codexDemo.previewPullRequest({ projectToken, remote: "origin" });
-      if (request === epoch.current) { setPreview(value); setStatus("ready"); }
+      const value = await window.codexDemo.listPullRequestHistory({ projectToken, remote: "origin", filter });
+      if (request === epoch.current && value.filter === filter) { setHistory(value); setStatus("ready"); }
+      else if (request === epoch.current) setStatus("error");
     } catch { if (request === epoch.current) setStatus("error"); }
-  }, [projectToken]);
-  useEffect(() => { if (active && status === "idle") void refresh(); }, [active, status, refresh]);
+  }, [projectToken, historyFilter]);
+  const loadMoreHistory = useCallback(async () => {
+    if (!projectToken || !history?.nextCursor || !window.codexDemo || historyPageLoading) return;
+    const request = epoch.current;
+    const cursor = history.nextCursor;
+    const filter = history.filter;
+    setHistoryPageLoading(true); setHistoryPageError(null);
+    try {
+      const value = await window.codexDemo.listPullRequestHistory({ projectToken, remote: "origin", filter, after: cursor });
+      if (request !== epoch.current) return;
+      if (value.filter !== filter || value.repository !== history.repository) throw new Error("Repository PR history changed while paging.");
+      setHistory(current => {
+        if (!current || current.filter !== filter || current.repository !== value.repository) return current;
+        const known = new Set(current.items.map(item => item.number));
+        return { ...value, items: [...current.items, ...value.items.filter(item => !known.has(item.number))] };
+      });
+    } catch {
+      if (request === epoch.current) setHistoryPageError("More pull requests could not be loaded. Retry this page or open the repository on GitHub.");
+    } finally {
+      if (request === epoch.current) setHistoryPageLoading(false);
+    }
+  }, [projectToken, history, historyPageLoading]);
+  useEffect(() => { if (active && status === "idle") void refresh(historyFilter); }, [active, status, historyFilter, refresh]);
   const select = async (number: number) => {
     if (!projectToken || !window.codexDemo) return;
     const request = ++detailEpoch.current;
@@ -57,7 +82,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
     setConversation(null); setConversationStatus("idle"); setConversationError(null); setConversationPaging(false); setConversationPageError(null);
     setSelected(number); setDetail(null); setDetailStatus("loading"); setPatch(null); setDiffStatus("idle"); setTab("summary"); onOpen();
     try {
-      const value = await window.codexDemo.readPullRequest({ projectToken, remote: "origin", number });
+      const value = await window.codexDemo.readPullRequest({ projectToken, remote: "origin", number, scope: "repository" });
       if (request === detailEpoch.current) { setDetail(value); setDetailStatus("ready"); }
     } catch { if (request === detailEpoch.current) setDetailStatus("error"); }
   };
@@ -66,7 +91,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
     const request = ++detailEpoch.current;
     setPatch(null); setDiffStatus("loading");
     try {
-      const value = await window.codexDemo.readPullRequestDiff({ projectToken, remote: "origin", number: detail.number, head: detail.headRefOid });
+      const value = await window.codexDemo.readPullRequestDiff({ projectToken, remote: "origin", number: detail.number, head: detail.headRefOid, scope: "repository" });
       if (request === detailEpoch.current) { setPatch(value.patch); setDiffStatus("ready"); }
     } catch { if (request === detailEpoch.current) setDiffStatus("error"); }
   };
@@ -81,6 +106,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
         remote: "origin",
         number: detail.number,
         head: expectedHead,
+        scope: "repository",
       });
       if (request === conversationEpoch.current && value.headRefOid === expectedHead) {
         setConversation(value); setConversationStatus("ready");
@@ -108,6 +134,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
         number: detail.number,
         head: expectedHead,
         page,
+        scope: "repository",
       });
       if (request !== conversationEpoch.current) return;
       if (value.headRefOid !== expectedHead) throw new Error("PR head changed while reading conversation history.");
@@ -155,6 +182,7 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
         head: expectedHead,
         threadId,
         after,
+        scope: "repository",
       });
       if (request !== conversationEpoch.current) return;
       if (value.headRefOid !== expectedHead || value.threadId !== threadId) throw new Error("PR thread changed while reading replies.");
@@ -182,15 +210,26 @@ export function useLivePullRequestRoute({ projectToken, active, open, expanded, 
       void readConversation();
     }
   }, [tab, detailStatus, conversationStatus, readConversation]);
-  const filtered = preview?.pullRequests.filter(pr => `${pr.number} ${pr.title} ${pr.baseRefName}`.toLowerCase().includes(query.trim().toLowerCase())) ?? [];
+  const filtered = history?.items.filter(pr => `${pr.number} ${pr.title} ${pr.baseRefName} ${pr.author}`.toLowerCase().includes(query.trim().toLowerCase())) ?? [];
+  const changeHistoryFilter = (filter: PullRequestHistoryFilter) => {
+    if (filter === historyFilter) return;
+    setHistoryFilter(filter);
+    void refresh(filter);
+  };
   const index = <section aria-label="Live pull requests" className="demo-live-pr-index" style={compact && open ? { visibility: "hidden" } : undefined}>
     <header><h1>Pull requests</h1><Button onClick={onSidebar}>Toggle sidebar</Button></header>
-    <p>Live GitHub · current project branch · origin</p>
-    <div className="demo-live-pr-actions"><Button disabled={!projectToken || status === "loading"} onClick={() => void refresh()}>Refresh live PRs</Button><LivePullRequest projectToken={projectToken} onWorkspaceChanged={onWorkspaceChanged} /></div>
-    <p>Only open PRs for the current pushed branch are shown. History and other branches are not included; checks are not fetched.</p>
-    <input aria-label="Search live branch PRs" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search loaded pull requests" />
-    {preview && <p>{preview.repository} · {preview.branch}</p>}
-    {!projectToken ? <p>Select a project to read its pull requests.</p> : status === "loading" ? <PullRequestQueryState status="loading" heading="Loading live pull requests" /> : status === "error" ? <PullRequestQueryState status="error" heading="Live pull requests unavailable" description="Check origin, GitHub authentication and that this branch is pushed. No replay data is substituted." action={<Button onClick={() => void refresh()}>Retry live PRs</Button>} /> : status === "ready" ? <PullRequestList label="Live branch pull requests" selectedId={selected === null ? undefined : String(selected)} onSelect={id => void select(Number(id))} emptyLabel={query ? "No loaded PRs match this search." : "No open PR for the current branch."} items={filtered.map(pr => ({ id: String(pr.number), number: pr.number, title: pr.title, repository: preview?.repository, state: "open", meta: `Base: ${pr.baseRefName}`, openLabel: `Open live PR #${pr.number}` }))} /> : null}
+    <p>Live GitHub · repository history · origin · read-only. Checks are not fetched.</p>
+    <div className="demo-live-pr-actions"><Button disabled={!projectToken || status === "loading"} onClick={() => void refresh()}>Refresh PR history</Button><LivePullRequest projectToken={projectToken} onWorkspaceChanged={onWorkspaceChanged} /></div>
+    <div className="demo-live-pr-history-filters" role="group" aria-label="Pull request state filter">
+      {(["open", "closed", "all"] as const).map(filter => <Button key={filter} aria-pressed={historyFilter === filter} disabled={status === "loading"} onClick={() => changeHistoryFilter(filter)}>{filter === "open" ? "Open" : filter === "closed" ? "Closed" : "All"}</Button>)}
+    </div>
+    <input aria-label="Search repository pull requests" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search loaded pull requests" />
+    {history && <p>{history.repository} · {history.totalCount} matching PRs · showing {history.items.length}</p>}
+    {!projectToken ? <p>Select a project to read its pull requests.</p> : status === "loading" ? <PullRequestQueryState status="loading" heading={`Loading ${historyFilter} repository pull requests`} /> : status === "error" ? <PullRequestQueryState status="error" heading="Repository PR history unavailable" description="Check the selected project’s origin remote and GitHub authentication. No branch push is required; no replay data is substituted." action={<Button onClick={() => void refresh()}>Retry PR history</Button>} /> : status === "ready" && history ? <>
+      <PullRequestList label="Repository pull requests" selectedId={selected === null ? undefined : String(selected)} onSelect={id => void select(Number(id))} emptyLabel={query ? "No loaded PRs match this search." : `No ${historyFilter} pull requests in this repository.`} items={filtered.map(pr => ({ id: String(pr.number), number: pr.number, title: pr.title, repository: history.repository, state: pr.state === "OPEN" ? "open" as const : pr.state === "MERGED" ? "merged" as const : "closed" as const, author: pr.author, updatedAt: new Date(pr.updatedAt).toLocaleDateString(), meta: `Base: ${pr.baseRefName}`, openLabel: `Open repository PR #${pr.number}: ${pr.title}` }))} />
+      {historyPageError && <p role="alert">{historyPageError}</p>}
+      {history.hasMore && <Button disabled={historyPageLoading} onClick={() => void loadMoreHistory()}>{historyPageLoading ? "Loading more pull requests…" : historyPageError ? "Retry more pull requests" : `Load more pull requests (${history.items.length} of ${history.totalCount})`}</Button>}
+    </> : null}
   </section>;
   const summary = detail ? <section aria-label="Live PR summary" className="demo-live-pr-content">
     <h2>{detail.title}</h2><p>{detail.state} · Base: {detail.baseRefName}</p><p>Head: {detail.headRefOid}</p>
