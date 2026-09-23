@@ -40,6 +40,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   createPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-create", input),
   readPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-detail", input),
   readPullRequestConversation: (input) => ipcRenderer.invoke("demo:git:pr-conversation", input),
+  readPullRequestReviewThreadReplies: (input) => ipcRenderer.invoke("demo:git:pr-thread-replies", input),
   readPullRequestDiff: (input) => ipcRenderer.invoke("demo:git:pr-diff", input),
   editPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-edit", input),
   mergePullRequest: (input) => ipcRenderer.invoke("demo:git:pr-merge", input),

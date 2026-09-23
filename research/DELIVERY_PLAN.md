@@ -3269,15 +3269,15 @@ incomplete.
 The current route now adds an on-demand, read-only `Reviews` panel for issue
 comments, submitted review summaries, and inline review threads. The Electron
 host verifies the selected PR still belongs to the pushed current branch,
-binds the snapshot to the selected head, and rechecks head/base revisions after
-the GraphQL read. The first page is deliberately bounded (50 comments, 50
-reviews, 25 threads, and 5 replies per thread); truncation is explicit and
-links to the full GitHub record. Untrusted comment bodies render as text, and
-this slice exposes no comment, reply, resolve, or review mutation. Its synthetic
-Electron gate covers loading, error/retry with stale-data clearing, resolved/
-outdated thread presentation, and 1180/720/600 dark/light containment. This
-closes the first Live comments/reviews renderer path, not full history paging,
-closed/project-wide PR discovery, or current installed-product pixel evidence.
+binds each snapshot to the selected head, and rechecks head/base revisions after
+every GraphQL page. Comments, reviews, review threads, and per-thread replies
+use separate on-demand cursors (50 comments, 50 reviews, 25 threads, and 5
+replies per page). Untrusted comment bodies render as text, and this slice
+exposes no comment, reply, resolve, or review mutation. Its synthetic Electron
+gate covers loading, page append/deduplication, page errors and retry, stale-data
+clearing, resolved/outdated thread presentation, and 1180/720/600 dark/light
+containment. This closes current-branch conversation history paging, not
+closed/project-wide PR discovery or current installed-product pixel evidence.
 
 The notification and composer-plan progress surfaces now share the same
 disabled boundary: queued notification action/dismiss controls and plan
