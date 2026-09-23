@@ -12,7 +12,7 @@ A new commit invalidates candidate-specific evidence until it is rechecked.
 Unrun or unavailable checks stay open, not implicitly passed.
 
 The latest private-candidate audit is recorded in
-[`RELEASE_CANDIDATE_2026-09-22.md`](RELEASE_CANDIDATE_2026-09-22.md). It is
+[`RELEASE_CANDIDATE_2026-09-23.md`](RELEASE_CANDIDATE_2026-09-23.md). It is
 evidence for preparation only; the checklist below remains intentionally
 unselected until a named release version and publication decision are
 explicitly approved.
