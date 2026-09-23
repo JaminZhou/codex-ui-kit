@@ -92,10 +92,20 @@ async function geometry(page) {
     const scroller = picker?.querySelector(
       ".codex-ui-composer-resource-picker__scroller",
     );
+    const description = picker?.querySelector(
+      ".codex-ui-composer-resource-picker__description",
+    );
+    const copy = description?.closest(
+      ".codex-ui-composer-resource-picker__copy",
+    );
     return {
       aside: bounds(aside),
       editor: bounds(editor),
       addTrigger: bounds(addTrigger),
+      copyGap: copy instanceof Element ? getComputedStyle(copy).columnGap : null,
+      firstOption: bounds(
+        picker?.querySelector(".codex-ui-composer-resource-picker__option"),
+      ),
       overflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
@@ -130,10 +140,32 @@ async function capture(width, suffix) {
     );
     assert.equal(await root.getAttribute("data-composer-overlay"), "resources");
     assert.deepEqual(await readOptions(picker), expectedOptions);
+    if (runtimeBaseline === "26.917.62051") {
+      const style = await picker.evaluate((element) => {
+        const computed = getComputedStyle(element);
+        return {
+          backgroundColor: computed.backgroundColor,
+          borderRadius: computed.borderRadius,
+          fontSize: computed.fontSize,
+          fontWeight: computed.fontWeight,
+        };
+      });
+      assert.deepEqual(style, {
+        backgroundColor: "rgb(45, 45, 45)",
+        borderRadius: "20px",
+        fontSize: "13px",
+        fontWeight: "430",
+      });
+    }
     const measured = await geometry(page);
     assert.equal(measured.overflow, 0);
     assert.ok(measured.picker && measured.root && measured.scroller);
-    assert.ok(measured.aside && measured.editor && measured.addTrigger);
+    assert.ok(
+      measured.aside &&
+        measured.editor &&
+        measured.addTrigger &&
+        measured.firstOption,
+    );
     if (width === 1180) {
       assert.ok(Math.abs(measured.aside.width - 321.875) <= 1);
       assert.ok(Math.abs(measured.editor.left - 383.4375) <= 1);
@@ -147,6 +179,8 @@ async function capture(width, suffix) {
     }
     assert.equal(measured.picker.width, width === 720 ? 688 : 736);
     assert.equal(measured.picker.height, 320);
+    assert.equal(measured.copyGap, "8px");
+    assert.equal(measured.firstOption.height, 28.5625);
     assert.equal(measured.scroller.clientHeight, 310);
     assert.ok(measured.scroller.scrollHeight > measured.scroller.clientHeight);
 

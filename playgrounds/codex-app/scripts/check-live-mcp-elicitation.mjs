@@ -169,6 +169,10 @@ const { app, page } = await launchScene(scene, {
     CODEX_UI_KIT_LIVE_HISTORY_PATH: historyPath,
     CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
     CODEX_UI_KIT_WORKSPACE: directory,
+    CODEX_UI_KIT_LIVE_MODEL:
+      process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna",
+    CODEX_UI_KIT_LIVE_REASONING_EFFORT:
+      process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max",
   },
 });
 

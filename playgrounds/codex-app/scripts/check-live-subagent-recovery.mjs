@@ -9,7 +9,7 @@ const scene = visualScenes.find((candidate) => candidate.id === "pull-request-de
 assert.ok(scene, "The pull-request detail scene is required for Live mode.");
 
 const prompt =
-  "Do not reply with a plan. Immediately invoke the spawnAgent collaboration tool exactly once to spawn one subagent. Ask it to read only this disposable workspace package.json, then wait for the parent to interrupt it; do not send a result before the parent asks. The first and only tool call must be the collaboration spawn. Do not use Sites, MCP, browser, GitHub, connectors, approvals, shell, network, file writes, or any other tools. Keep this turn active while the subagent is waiting.";
+  "Do not reply with a plan. Immediately use Codex's multi-agent spawn_agent tool exactly once to spawn one subagent. Ask it to read only this disposable workspace package.json, then wait for the parent to interrupt it; do not send a result before the parent asks. The first and only tool call must be the collaboration spawn. Do not use Sites, MCP, browser, GitHub, connectors, approvals, shell, network, file writes, or any other tools. Keep this turn active while the subagent is waiting.";
 
 function isSubagentStart(event) {
   const item = event?.params?.item;
@@ -64,7 +64,6 @@ async function runAttempt(attempt) {
     await mkdtemp(join(tmpdir(), "ui-kit-live-subagent-recovery-")),
   );
   const registryPath = join(directory, "registry.json");
-  const evidence = [];
   const rateLimits = await readRateLimits();
   // Purchased credits are separate from the subscription windows. A user can
   // have no extra credits while still having substantial subscription quota;
@@ -89,6 +88,9 @@ async function runAttempt(attempt) {
     directory,
     evidence: "real signed-in App Server subAgentActivity/collabAgentToolCall plus UI Stop",
     modelTurns: 1,
+    model: process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-sol",
+    reasoningEffort:
+      process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "ultra",
     passed: false,
     workspaceWrite: false,
     rateLimits,
@@ -114,6 +116,7 @@ async function runAttempt(attempt) {
       () =>
         window.__liveSubagentEvidence?.some(
           (event) => {
+            if (event.method === "turn/completed") return true;
             const item = event.params?.item;
             return (
               event.method === "item/started" &&
@@ -134,43 +137,36 @@ async function runAttempt(attempt) {
       { timeout: subscriptionQuotaAvailable ? 180_000 : 30_000 },
     );
     const beforeStop = await page.evaluate(() => window.__liveSubagentEvidence);
-    evidence.push(...beforeStop);
     const collabStarted = beforeStop.find(isSubagentStart);
     assert.ok(collabStarted, "A real subagent activity must be observed.");
     const parentThreadId = collabStarted.params.threadId;
     assert.equal(typeof parentThreadId, "string");
     const callId = collabStarted.params.item.id;
-    const childThreadId =
-      collabStarted.params.item.type === "subAgentActivity"
-        ? collabStarted.params.item.agentThreadId
-        : collabStarted.params.item.receiverThreadIds?.[0] ?? null;
-    threadId = childThreadId;
-    assert.equal(typeof threadId, "string");
-    result.initialCollab = {
-      agentsStates: collabStarted.params.item.agentsStates ?? {},
-      receiverThreadIds: collabStarted.params.item.receiverThreadIds ?? [],
-      status: collabStarted.params.item.status ?? null,
-      parentThreadId,
-      childThreadId,
-      type: collabStarted.params.item.type,
-    };
     assert.equal(typeof callId, "string");
 
     const usesSubAgentActivity =
       collabStarted.params.item.type === "subAgentActivity";
-    await page.waitForFunction(
-      ({ expectedCallId, expectedChildThreadId, usesSubAgentActivity: currentProtocol }) =>
-        window.__liveSubagentEvidence?.some((event) => {
+    let collabWithReceiver = null;
+    if (!usesSubAgentActivity) {
+      await page.waitForFunction(
+        (expectedCallId) =>
+          window.__liveSubagentEvidence?.some((event) => {
+            const item = event.params?.item;
+            return (
+              (event.method === "item/started" || event.method === "item/completed") &&
+              item?.type === "collabAgentToolCall" &&
+              item.id === expectedCallId &&
+              ((Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+                Object.keys(item.agentsStates ?? {}).length > 0)
+            );
+          }),
+        callId,
+        { timeout: subscriptionQuotaAvailable ? 120_000 : 30_000 },
+      );
+      collabWithReceiver = await page.evaluate((expectedCallId) =>
+        window.__liveSubagentEvidence.findLast((event) => {
           const item = event.params?.item;
-          if (
-            currentProtocol &&
-            expectedChildThreadId &&
-            event.method === "thread/status/changed" &&
-            event.params?.threadId === expectedChildThreadId
-          ) {
-            return true;
-          }
-          return !currentProtocol && (
+          return (
             (event.method === "item/started" || event.method === "item/completed") &&
             item?.type === "collabAgentToolCall" &&
             item.id === expectedCallId &&
@@ -178,35 +174,38 @@ async function runAttempt(attempt) {
               Object.keys(item.agentsStates ?? {}).length > 0)
           );
         }),
-      {
-        expectedCallId: callId,
-        expectedChildThreadId: childThreadId,
-        usesSubAgentActivity,
-      },
-      { timeout: subscriptionQuotaAvailable ? 120_000 : 30_000 },
-    );
-    const collabWithReceiver = usesSubAgentActivity
-      ? null
-      : await page.evaluate(
-      ({ expectedCallId, expectedChildThreadId }) => {
-        return window.__liveSubagentEvidence.findLast((event) => {
-          const item = event.params?.item;
-          return (
-            (expectedChildThreadId &&
-              event.method === "thread/started" &&
-              event.params?.thread?.id === expectedChildThreadId) ||
-            ((event.method === "item/started" || event.method === "item/completed") &&
-              item?.type === "collabAgentToolCall" &&
-              item.id === expectedCallId &&
-              ((Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
-                Object.keys(item.agentsStates ?? {}).length > 0))
-          );
-        });
-      },
-      { expectedCallId: callId, expectedChildThreadId: childThreadId },
-    );
+      callId);
+    }
+    const receiverItem = collabWithReceiver?.params?.item ?? collabStarted.params.item;
+    const childThreadId = usesSubAgentActivity
+      ? collabStarted.params.item.agentThreadId
+      : receiverItem.receiverThreadIds?.[0] ??
+        Object.keys(receiverItem.agentsStates ?? {})[0] ??
+        null;
+    threadId = childThreadId;
+    assert.equal(typeof threadId, "string");
+    result.initialCollab = {
+      agentsStates: receiverItem.agentsStates ?? {},
+      receiverThreadIds: receiverItem.receiverThreadIds ?? [],
+      status: receiverItem.status ?? null,
+      parentThreadId,
+      childThreadId,
+      type: collabStarted.params.item.type,
+    };
+    if (usesSubAgentActivity) {
+      await page.waitForFunction(
+        (expectedChildThreadId) =>
+          window.__liveSubagentEvidence?.some(
+            (event) =>
+              event.method === "thread/status/changed" &&
+              event.params?.threadId === expectedChildThreadId,
+          ),
+        childThreadId,
+        { timeout: subscriptionQuotaAvailable ? 120_000 : 30_000 },
+      );
+    }
     result.receiverCollab =
-      collabStarted.params.item.type === "subAgentActivity"
+      usesSubAgentActivity
         ? {
             agentsStates: {},
             receiverThreadIds: [childThreadId],
@@ -254,7 +253,6 @@ async function runAttempt(attempt) {
       { timeout: 180_000 },
     );
     const afterStop = await page.evaluate(() => window.__liveSubagentEvidence);
-    evidence.push(...afterStop.slice(beforeStop.length));
     const completed = afterStop.findLast((event) => event.method === "turn/completed");
     assert.equal(completed?.params?.threadId, parentThreadId);
     result.turnStatus = completed?.params?.turn?.status ?? null;
@@ -278,7 +276,23 @@ async function runAttempt(attempt) {
     result.error = String(error);
     await page.screenshot({ path: join(directory, "failed.png") }).catch(() => undefined);
   } finally {
-    await writeFile(join(directory, "events.json"), JSON.stringify(evidence, null, 2));
+    const eventSummaries = await page.evaluate(() =>
+      (window.__liveSubagentEvidence ?? []).map((event) => {
+        const item = event.params?.item;
+        return {
+          kind: event.kind ?? null,
+          method: event.method ?? null,
+          threadId: event.params?.threadId ?? null,
+          turnStatus: event.params?.turn?.status ?? null,
+          itemType: item?.type ?? null,
+          itemKind: item?.kind ?? null,
+          itemTool: item?.tool ?? null,
+          itemStatus: item?.status ?? null,
+        };
+      }),
+    ).catch(() => []);
+    result.eventSummaries = eventSummaries;
+    await writeFile(join(directory, "events.json"), JSON.stringify(eventSummaries, null, 2));
     await page.evaluate(() => window.codexDemo?.closeLive()).catch(() => undefined);
     await app.close();
     if (threadId) {
@@ -304,8 +318,15 @@ async function runAttempt(attempt) {
 }
 
 const attempts = [];
+const maxAttempts = Number(
+  process.env.CODEX_UI_KIT_LIVE_SUBAGENT_RECOVERY_ATTEMPTS ?? 2,
+);
+assert.ok(
+  Number.isInteger(maxAttempts) && maxAttempts >= 1 && maxAttempts <= 2,
+  "Subagent recovery attempts must be 1 or 2.",
+);
 let result;
-for (let attempt = 1; attempt <= 2; attempt += 1) {
+for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
   result = await runAttempt(attempt);
   attempts.push({
     attempt,

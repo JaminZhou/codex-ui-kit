@@ -88,6 +88,9 @@ describe("composer visual contract", () => {
       /\.codex-ui-composer-resource-picker \{[\s\S]*?height: 20rem;[\s\S]*?padding: 0\.25rem;[\s\S]*?width: 100%;/,
     );
     expect(styles).toMatch(
+      /\.codex-ui-composer-resource-picker--current-26-917 \{[\s\S]*?font-weight: 430;/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-composer-mode \{[\s\S]*?border-radius: 9999px;[\s\S]*?height: var\(--codex-ui-size-button-composer\);[\s\S]*?padding: 0 0\.5rem;/,
     );
     expect(styles).toMatch(

@@ -17354,7 +17354,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 
 :is(
   .codex-ui-composer-resource-picker--current-26-825,
-  .codex-ui-composer-resource-picker--current-26-908
+  .codex-ui-composer-resource-picker--current-26-908,
+  .codex-ui-composer-resource-picker--current-26-917
 ) {
   backdrop-filter: blur(8px);
   background: rgb(45, 45, 45);
@@ -17367,7 +17368,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 
 :is(
   .codex-ui-composer-resource-picker--current-26-825,
-  .codex-ui-composer-resource-picker--current-26-908
+  .codex-ui-composer-resource-picker--current-26-908,
+  .codex-ui-composer-resource-picker--current-26-917
 )
   :is(
     .codex-ui-composer-resource-picker__heading,
@@ -17379,7 +17381,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 
 :is(
   .codex-ui-composer-resource-picker--current-26-825,
-  .codex-ui-composer-resource-picker--current-26-908
+  .codex-ui-composer-resource-picker--current-26-908,
+  .codex-ui-composer-resource-picker--current-26-917
 )
   .codex-ui-composer-resource-picker__option {
   border-radius: 0.9375rem;
@@ -17393,7 +17396,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 
 :is(
   .codex-ui-composer-resource-picker--current-26-825,
-  .codex-ui-composer-resource-picker--current-26-908
+  .codex-ui-composer-resource-picker--current-26-908,
+  .codex-ui-composer-resource-picker--current-26-917
 )
   .codex-ui-composer-resource-picker__icon {
   height: 1.25rem;
@@ -17402,7 +17406,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 
 :is(
   .codex-ui-composer-resource-picker--current-26-825,
-  .codex-ui-composer-resource-picker--current-26-908
+  .codex-ui-composer-resource-picker--current-26-908,
+  .codex-ui-composer-resource-picker--current-26-917
 )
   .codex-ui-composer-resource-picker__icon
   > svg {
@@ -17413,10 +17418,17 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 
 :is(
   .codex-ui-composer-resource-picker--current-26-825,
-  .codex-ui-composer-resource-picker--current-26-908
+  .codex-ui-composer-resource-picker--current-26-908,
+  .codex-ui-composer-resource-picker--current-26-911,
+  .codex-ui-composer-resource-picker--current-26-915,
+  .codex-ui-composer-resource-picker--current-26-917
 )
   .codex-ui-composer-resource-picker__copy {
   gap: 0.5rem;
+}
+
+.codex-ui-composer-resource-picker--current-26-917 {
+  font-weight: 430;
 }
 
 .codex-ui-composer {
