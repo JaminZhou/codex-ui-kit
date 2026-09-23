@@ -138,8 +138,11 @@ host-owned and are intentionally not claimed by the playground.
   [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
   with method and limits in [`26.917.62051.md`](26.917.62051.md). It refreshes
   structural shell/sidebar, Projects, Help, and Composer-resource observations
-  only. The promoted baseline remains `26.903.71938`; no Settings Connections
-  route or installed-product pixel was sampled on 26.917.
+  only. A separate read-only 800×600 Settings Connections sample is in
+  [`current-settings-connections-26.917.62051.json`](current-settings-connections-26.917.62051.json)
+  and [`26.917.62051-settings-connections.md`](26.917.62051-settings-connections.md).
+  The promoted baseline remains `26.903.71938`; no installed-product pixel
+  was sampled or promoted on 26.917.
 - The current 26.915 conversation-shell replay now pairs the basic user/
   assistant turn with the sampled wide and compact Composer/thread geometry.
   Browser/CDP, Electron, and a two-run own-fixture pixel gate cover the
@@ -469,7 +472,9 @@ Settings page. The controlled `ConnectionsSettingsPage` now passes local
 Browser/CDP, Electron geometry/interaction, and own-fixture pixel coverage
 (PR #607). That replay coverage does not promote installed-product pixels;
 pairing, SSH exchange, environment mutation, persistence, and production Remote
-semantics remain open. The newer 26.917 candidate did not revisit this route.
+semantics remain open. A separate 26.917 sample records the three button
+states, their `aria-pressed` semantics, and 800×600 geometry; it is structural
+product evidence only and does not promote product pixels.
 
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32

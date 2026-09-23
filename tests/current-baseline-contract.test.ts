@@ -903,6 +903,91 @@ describe("current baseline capture contract", () => {
     });
   });
 
+  it("keeps the 26.917 Settings Connections candidate structural-only", () => {
+    const record = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-settings-connections-26.917.62051.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(record.baseline).toMatchObject({
+      appVersion: "26.917.62051",
+      buildNumber: "10789",
+      appAsarBytes: 370175042,
+      appAsarSha256:
+        "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+    });
+    expect(record).toMatchObject({
+      captureKind: "renderer_emulation",
+      productPixelsPromoted: false,
+      rendererViewport: { devicePixelRatio: 1, height: 600, width: 800 },
+      targetSelection: {
+        selected: {
+          url: "app://-/index.html",
+          landmarks: { main: 2, nav: 1, sidebarTrigger: 2 },
+        },
+      },
+      shell: {
+        main: { left: 321.875, top: 0, width: 478.125, height: 600 },
+        navigation: { left: 0, top: 46, width: 321.875, height: 554 },
+      },
+    });
+    expect(record.routes).toHaveLength(1);
+    expect(record.routes[0]).toMatchObject({
+      id: "settings.connections",
+      observations: {
+        readOnly: true,
+        connectionChanged: false,
+        credentialsRecorded: false,
+        pairingStarted: false,
+        horizontalOverflow: 0,
+      },
+    });
+    const states = record.routes[0].states;
+    expect(states.map((state: { activeTab: string }) => state.activeTab)).toEqual([
+      "Control this Mac",
+      "Control other devices",
+      "SSH",
+    ]);
+    for (const [index, state] of states.entries()) {
+      expect(state.tabs).toHaveLength(3);
+      expect(state.tabs[index]).toMatchObject({
+        label: state.activeTab,
+        pressed: "true",
+        role: "button",
+        selected: true,
+      });
+      expect(state.tabs.every((tab: { role: string }) => tab.role === "button")).toBe(
+        true,
+      );
+      expect(state.horizontalOverflow).toBe(0);
+    }
+    expect(states[0].switches).toHaveLength(2);
+    expect(states[0].switches).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Allow connections",
+          rect: expect.objectContaining({ height: 20, width: 32 }),
+        }),
+        expect.objectContaining({
+          label: "Keep this Mac awake",
+          rect: expect.objectContaining({ height: 20, width: 32 }),
+        }),
+      ]),
+    );
+    expect(states[0].switches.every((control: object) => !("checked" in control))).toBe(
+      true,
+    );
+    expect(states[1].controls).toHaveProperty("Set up");
+    expect(states[2].controls).toHaveProperty("Add");
+    expect(record.captureDigest).toMatch(/^[a-f0-9]{64}$/);
+    expect(JSON.stringify(record)).not.toMatch(/projectName|threadId|accountName/i);
+  });
+
   it("keeps the latest 26.915 content-variation delta explicit", () => {
     const delta = JSON.parse(
       readFileSync(

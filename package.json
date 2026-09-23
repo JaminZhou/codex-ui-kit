@@ -64,6 +64,7 @@
     "check:visual:review": "pnpm build:demo && node scripts/check-visual-scenarios.mjs --scenes=current-review-file-card,current-review-file-card-compact,current-review-workspace,current-review-workspace-compact",
     "check:research": "node scripts/check-research-inventory.mjs && node scripts/check-current-pdf-preview.mjs && node scripts/check-visual-assets.mjs && node scripts/update-current-thread-visual-assets.mjs",
     "capture:current-baseline": "node scripts/capture-current-baseline.mjs",
+    "capture:current-settings-connections-26-917": "CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.62051 node scripts/capture-current-settings-connections.mjs",
     "capture:current-account-menu": "node scripts/capture-current-account-menu.mjs",
     "capture:current-long-thread": "node scripts/capture-current-long-thread.mjs",
     "capture:current-mcp": "node scripts/capture-current-mcp.mjs",

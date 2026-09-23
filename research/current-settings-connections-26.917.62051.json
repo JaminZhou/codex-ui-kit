@@ -1,0 +1,347 @@
+{
+  "baseline": {
+    "appAsarBytes": 370175042,
+    "appAsarSha256": "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+    "appVersion": "26.917.62051",
+    "buildNumber": "10789",
+    "chromiumVersion": "153.0.8010.53",
+    "sampledAt": "2026-09-24"
+  },
+  "capturedAt": "2026-09-23T17:22:23.334Z",
+  "captureKind": "renderer_emulation",
+  "evidenceBoundary": [
+    "This is a read-only current-build Renderer observation at an emulated 800x600 viewport.",
+    "Only public tab labels, approved public copy, controls, geometry, and overflow are retained.",
+    "No switch was toggled; no pairing, SSH key exchange, credential entry, or connection mutation was started.",
+    "No product screenshot or installed-product pixel comparison is included."
+  ],
+  "isolation": {
+    "cdpAddress": "127.0.0.1",
+    "cdpPort": 9941,
+    "mainCodexProcessPreserved": true,
+    "ownerPid": 64789,
+    "profileKind": "unique-private-tmp-profile"
+  },
+  "productPixelsPromoted": false,
+  "rendererViewport": {
+    "devicePixelRatio": 1,
+    "height": 600,
+    "width": 800
+  },
+  "runtimeBundleIdentity": {
+    "afterCapture": {
+      "appAsarBytes": 370175042,
+      "appAsarSha256": "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+      "changedAtMs": 1790179691782,
+      "checkedAtMs": 1790184143334,
+      "device": "16777234",
+      "inode": "379605357"
+    },
+    "beforeCapture": {
+      "appAsarBytes": 370175042,
+      "appAsarSha256": "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+      "changedAtMs": 1790179691782,
+      "checkedAtMs": 1790184141093,
+      "device": "16777234",
+      "inode": "379605357"
+    },
+    "ownerPid": 64789,
+    "processStartedAtMs": 1790183811000
+  },
+  "routes": [
+    {
+      "id": "settings.connections",
+      "observations": {
+        "connectionChanged": false,
+        "credentialsRecorded": false,
+        "horizontalOverflow": 0,
+        "pairingStarted": false,
+        "readOnly": true
+      },
+      "states": [
+        {
+          "activeTab": "Control this Mac",
+          "heading": {
+            "height": 28.796875,
+            "left": 342.875,
+            "top": 66,
+            "width": 437.125
+          },
+          "horizontalOverflow": 0,
+          "publicText": [
+            "Control this Mac",
+            "Control other devices",
+            "SSH",
+            "Devices that can control this Mac",
+            "Allow connections",
+            "Other settings",
+            "Keep this Mac awake"
+          ],
+          "shell": {
+            "main": {
+              "height": 600,
+              "left": 321.875,
+              "top": 0,
+              "width": 478.125
+            },
+            "navigation": {
+              "height": 554,
+              "left": 0,
+              "top": 46,
+              "width": 321.875
+            }
+          },
+          "switches": [
+            {
+              "label": "Allow connections",
+              "rect": {
+                "height": 20,
+                "left": 731,
+                "top": 253.796875,
+                "width": 32
+              }
+            },
+            {
+              "label": "Keep this Mac awake",
+              "rect": {
+                "height": 20,
+                "left": 731,
+                "top": 410.078125,
+                "width": 32
+              }
+            }
+          ],
+          "tabs": [
+            {
+              "label": "Control this Mac",
+              "pressed": "true",
+              "rect": {
+                "height": 28,
+                "left": 342.875,
+                "top": 126.796875,
+                "width": 117.984375
+              },
+              "role": "button",
+              "selected": true
+            },
+            {
+              "label": "Control other devices",
+              "pressed": "false",
+              "rect": {
+                "height": 28,
+                "left": 462.859375,
+                "top": 126.796875,
+                "width": 149.109375
+              },
+              "role": "button",
+              "selected": false
+            },
+            {
+              "label": "SSH",
+              "pressed": "false",
+              "rect": {
+                "height": 28,
+                "left": 613.96875,
+                "top": 126.796875,
+                "width": 44.140625
+              },
+              "role": "button",
+              "selected": false
+            }
+          ],
+          "controls": {}
+        },
+        {
+          "activeTab": "Control other devices",
+          "heading": {
+            "height": 28.796875,
+            "left": 342.875,
+            "top": 66,
+            "width": 437.125
+          },
+          "horizontalOverflow": 0,
+          "publicText": [
+            "Control this Mac",
+            "Control other devices",
+            "SSH",
+            "Devices you can control from this Mac",
+            "Access and control other devices from this computer"
+          ],
+          "shell": {
+            "main": {
+              "height": 600,
+              "left": 321.875,
+              "top": 0,
+              "width": 478.125
+            },
+            "navigation": {
+              "height": 554,
+              "left": 0,
+              "top": 46,
+              "width": 321.875
+            }
+          },
+          "switches": [],
+          "tabs": [
+            {
+              "label": "Control this Mac",
+              "pressed": "false",
+              "rect": {
+                "height": 28,
+                "left": 342.875,
+                "top": 126.796875,
+                "width": 117.984375
+              },
+              "role": "button",
+              "selected": false
+            },
+            {
+              "label": "Control other devices",
+              "pressed": "true",
+              "rect": {
+                "height": 28,
+                "left": 462.859375,
+                "top": 126.796875,
+                "width": 149.109375
+              },
+              "role": "button",
+              "selected": true
+            },
+            {
+              "label": "SSH",
+              "pressed": "false",
+              "rect": {
+                "height": 28,
+                "left": 613.96875,
+                "top": 126.796875,
+                "width": 44.140625
+              },
+              "role": "button",
+              "selected": false
+            }
+          ],
+          "controls": {
+            "Set up": {
+              "height": 24,
+              "left": 532.75,
+              "top": 332.359375,
+              "width": 57.375
+            }
+          }
+        },
+        {
+          "activeTab": "SSH",
+          "heading": {
+            "height": 28.796875,
+            "left": 342.875,
+            "top": 66,
+            "width": 437.125
+          },
+          "horizontalOverflow": 0,
+          "publicText": [
+            "Control this Mac",
+            "Control other devices",
+            "SSH",
+            "SSH connections from this Mac",
+            "Connect to a remote device through SSH connection"
+          ],
+          "shell": {
+            "main": {
+              "height": 600,
+              "left": 321.875,
+              "top": 0,
+              "width": 478.125
+            },
+            "navigation": {
+              "height": 554,
+              "left": 0,
+              "top": 46,
+              "width": 321.875
+            }
+          },
+          "switches": [],
+          "tabs": [
+            {
+              "label": "Control this Mac",
+              "pressed": "false",
+              "rect": {
+                "height": 28,
+                "left": 342.875,
+                "top": 126.796875,
+                "width": 117.984375
+              },
+              "role": "button",
+              "selected": false
+            },
+            {
+              "label": "Control other devices",
+              "pressed": "false",
+              "rect": {
+                "height": 28,
+                "left": 462.859375,
+                "top": 126.796875,
+                "width": 149.109375
+              },
+              "role": "button",
+              "selected": false
+            },
+            {
+              "label": "SSH",
+              "pressed": "true",
+              "rect": {
+                "height": 28,
+                "left": 613.96875,
+                "top": 126.796875,
+                "width": 44.140625
+              },
+              "role": "button",
+              "selected": true
+            }
+          ],
+          "controls": {
+            "Add": {
+              "height": 24,
+              "left": 540.28125,
+              "top": 332.359375,
+              "width": 42.3125
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 1,
+  "targetSelection": {
+    "selected": {
+      "area": 480000,
+      "landmarks": {
+        "main": 2,
+        "nav": 1,
+        "sidebarTrigger": 2,
+        "textbox": 0
+      },
+      "url": "app://-/index.html",
+      "visibleControls": 33
+    }
+  },
+  "viewport": {
+    "devicePixelRatio": 1,
+    "height": 600,
+    "width": 800
+  },
+  "shell": {
+    "main": {
+      "height": 600,
+      "left": 321.875,
+      "top": 0,
+      "width": 478.125
+    },
+    "navigation": {
+      "height": 554,
+      "left": 0,
+      "top": 46,
+      "width": 321.875
+    }
+  },
+  "captureDigest": "054354d1dfa3908a0d41df33d994749e7ef3baf33d2cd21e802e584f5da3b4bc"
+}
