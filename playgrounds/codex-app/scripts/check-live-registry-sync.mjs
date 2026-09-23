@@ -37,8 +37,14 @@ try {
   }
 
   await Promise.all([openLiveRoute(first, "Connections"), openLiveRoute(second, "Connections")]);
-  const firstRemote = first.page.getByRole("region", { name: "Connections", exact: true });
-  const secondRemote = second.page.getByRole("region", { name: "Connections", exact: true });
+  const firstRemote = first.page.getByRole("region", {
+    name: "Remote connection registry",
+    exact: true,
+  });
+  const secondRemote = second.page.getByRole("region", {
+    name: "Remote connection registry",
+    exact: true,
+  });
   await firstRemote.getByRole("button", { name: "Add connection", exact: true }).click();
   const form = firstRemote.getByRole("form", { name: "Connection editor", exact: true });
   await form.getByRole("textbox", { name: "Connection name", exact: true }).fill("Cross-instance runner");
@@ -101,7 +107,10 @@ async function openLiveRoute(app, routeName) {
     if (await showSidebar.count()) await showSidebar.click();
   }
   await navigation.click({ force: true });
-  await app.page.getByRole("region", { name: routeName === "Connections" ? "Connections" : "Environments", exact: true }).waitFor();
+  await app.page.getByRole("region", {
+    name: routeName === "Connections" ? "Remote connection registry" : "Environments",
+    exact: true,
+  }).waitFor();
 }
 
 async function writeRegistry(path, value) {

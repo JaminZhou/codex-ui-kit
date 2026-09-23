@@ -1778,6 +1778,73 @@ for (const remoteConnectionsScene of visualScenes.filter((candidate) =>
   }
 }
 
+const currentSettingsConnectionsScene = {
+  currentSidebar: true,
+  frame: "workspace-settings-connections-current-26-915",
+  id: "settings-connections-current-26-915-electron-contract",
+  scenario: "workspace-workflow",
+  view: "workspace",
+  windowSize: { height: 600, width: 800 },
+};
+const {
+  app: currentSettingsConnectionsApp,
+  page: currentSettingsConnectionsPage,
+} = await launchScene(currentSettingsConnectionsScene, { capture: false });
+try {
+  const settingsConnections = currentSettingsConnectionsPage.locator(
+    ".codex-ui-connections-settings",
+  );
+  await settingsConnections.waitFor();
+  const measured = await currentSettingsConnectionsPage.evaluate(() => {
+    const heading = document
+      .querySelector(".codex-ui-connections-settings h1")
+      ?.getBoundingClientRect();
+    return {
+      documentOverflows: document.documentElement.scrollWidth > innerWidth,
+      heading: heading
+        ? { left: heading.left, top: heading.top, width: heading.width }
+        : null,
+      tabCount: document.querySelectorAll(
+        ".codex-ui-connections-settings [role=tab]",
+      ).length,
+    };
+  });
+  if (
+    measured.documentOverflows ||
+    measured.tabCount !== 3 ||
+    !measured.heading ||
+    Math.abs(measured.heading.left - 342.875) > 8 ||
+    Math.abs(measured.heading.top - 112) > 8
+  ) {
+    throw new Error(
+      `Electron current Connections settings geometry failed: ${JSON.stringify(measured)}`,
+    );
+  }
+  await currentSettingsConnectionsPage
+    .getByRole("tab", { name: "Control other devices", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("button", { name: "Set up", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("tab", { name: "SSH", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("button", { name: "Add", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("tab", { name: "Control this Mac", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("switch", { name: "Allow connections", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .locator('.codex-ui-connections-settings__switch[aria-checked="true"]')
+    .waitFor();
+} finally {
+  await currentSettingsConnectionsApp.close();
+}
+
 const sidebarStatusScene = {
   currentSidebar: true,
   frame: "sidebar-current",

@@ -104,6 +104,16 @@ exit gates; it does not replace the inventory.
   persistence, compact native pixels, and production Remote semantics remain
   open. The real native directory action was invoked but macOS was locked
   before picker pixels or a selection could be verified.
+- The Connections inventory is now split by ownership and actual route. The
+  installed Settings page has three tabs (`Control this Mac`, `Control other
+  devices`, `SSH`) and is tracked separately as `settings.connections`. The
+  older `RemoteConnectionsPage` plus local registry remains an exploratory
+  integration surface (`integrations.remote-connections`); it is not evidence
+  for the current Settings route. `ConnectionsSettingsPage` now provides the
+  observed tab structure and controlled local-replay actions. The current
+  26.915 CDP sample is still candidate-only: Browser/CDP and Electron
+  interaction contracts, responsive re-observation, and reviewed local pixel
+  regions have not yet been run or promoted.
 - The installed `26.915.31945` Settings route was re-observed in a read-only
   isolated Renderer. `Computer use` and `Browser` are both reachable from the
   current Settings navigation and share a `321.88px` rail, `46px` titlebar
@@ -188,8 +198,8 @@ exit gates; it does not replace the inventory.
   unavailable because the new Renderer no longer exposes the old Fiber provider
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
-- The inventory contains 92 surface groups: 59 P0, 22 P1, and 11 P2.
-- 18 groups have current-build runtime evidence, 65 have previous-build-only
+- The inventory contains 93 surface groups: 59 P0, 23 P1, and 11 P2.
+- 18 groups have current-build runtime evidence, 66 have previous-build-only
   runtime evidence, and 9 have not been sampled. Browser/Electron verified
   statuses remain intentionally scoped: the current 26.903 PDF slice is
   promoted, while older and broader families stay regression fixtures until

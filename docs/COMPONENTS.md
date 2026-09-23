@@ -320,6 +320,12 @@ All privileged behavior remains host-owned. The components never auto-approve co
   status, retry, and host-owned persistence. The component models the public
   route boundary only; provider/device execution and account preferences stay
   with the host.
+- `ConnectionsSettingsPage`: controlled `Control this Mac`,
+  `Control other devices`, and `SSH` tabs with keyboard-operable tab semantics,
+  host-owned switch values, and Refresh/Set up/Add callbacks. The component
+  presents the Settings route only; device pairing, SSH credentials, connection
+  persistence, and platform effects remain host-owned. It is distinct from
+  `RemoteConnectionsPage`, which models an exploratory connection registry.
 - `GitSettingsPage`: controlled Branch prefix, Merge/Squash, force-push,
   draft-PR, review-delivery, commit-instruction, and pull-request-instruction
   presentation. Saving feedback, retry copy, and busy-state locking are

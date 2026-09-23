@@ -22,7 +22,7 @@ function toUiConnection(connection: LiveRemoteConnection): RemoteConnection {
   };
 }
 
-/** Host-backed settings route. The renderer receives labels/status, never credentials. */
+/** Host-backed exploratory registry; it is not the installed Connections settings route. */
 export function LiveRemoteConnections() {
   const [connections, setConnections] = useState<RemoteConnection[]>([]);
   const [status, setStatus] = useState<"error" | "loading" | "ready">("loading");
@@ -153,7 +153,9 @@ export function LiveRemoteConnections() {
     <>
       <RemoteConnectionsPage
         connections={connections}
+        data-surface-kind="exploratory-registry"
         disabled={operationBusy}
+        description="Exploratory local registry, separate from Settings → Connections. The renderer receives labels and status, never credentials."
         errorMessage={action || "Connections could not be loaded."}
         formOpen={formOpen}
         formValue={formValue}
@@ -188,7 +190,7 @@ export function LiveRemoteConnections() {
         onTest={(connection) => void test(connection)}
         status={status}
         statusMessage={action || undefined}
-        title="Connections"
+        title="Remote connection registry"
       />
       <span aria-live="polite" className="demo-settings-action-status">{action}</span>
     </>

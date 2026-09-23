@@ -6029,6 +6029,17 @@ for (const scene of selectedScenes) {
         const remoteConnections = document.querySelector(
           ".codex-ui-remote-connections",
         );
+        const connectionsSettings = document.querySelector(
+          ".codex-ui-connections-settings",
+        );
+        const connectionsSettingsTabs = Array.from(
+          connectionsSettings?.querySelectorAll('[role="tab"]') ?? [],
+          (tab) => ({
+            active: tab.getAttribute("aria-selected"),
+            label: tab.textContent?.trim() ?? null,
+            rect: rect(tab),
+          }),
+        );
         const style = (element) => {
           if (!element) return null;
           const computed = getComputedStyle(element);
@@ -6211,6 +6222,20 @@ for (const scene of selectedScenes) {
                 ).length,
                 status: remoteConnections.getAttribute("data-status"),
                 title: remoteConnections.querySelector("h1")?.textContent?.trim(),
+              }
+            : null,
+          connectionsSettings: connectionsSettings
+            ? {
+                heading: connectionsSettings.querySelector("h1")
+                  ?.textContent?.trim(),
+                panel: rect(
+                  connectionsSettings.querySelector('[role="tabpanel"]'),
+                ),
+                rect: rect(connectionsSettings),
+                tabs: connectionsSettingsTabs,
+                selectedTab: connectionsSettings.querySelector(
+                  '[role="tab"][aria-selected="true"]',
+                )?.textContent?.trim(),
               }
             : null,
           environment: environmentMenu
@@ -6458,7 +6483,7 @@ for (const scene of selectedScenes) {
         );
         continue;
       }
-      if (scene.frame.startsWith("workspace-connections-settings")) {
+      if (scene.frame.startsWith("workspace-remote-connections-explorer")) {
         const connections = contract.remoteConnections;
         const expectedStatus = scene.frame.endsWith("-error") ? "error" : "ready";
         if (
@@ -25230,6 +25255,92 @@ try {
   }
 } finally {
   await contextSummaryCompactApp.close();
+}
+
+const currentSettingsConnectionsScene = {
+  currentSidebar: true,
+  frame: "workspace-settings-connections-current-26-915",
+  id: "settings-connections-current-26-915-cdp-contract",
+  scenario: "workspace-workflow",
+  view: "workspace",
+  windowSize: { height: 600, width: 800 },
+};
+const {
+  app: currentSettingsConnectionsApp,
+  page: currentSettingsConnectionsPage,
+} = await launchScene(currentSettingsConnectionsScene, { capture: false });
+try {
+  const settingsConnections = currentSettingsConnectionsPage.locator(
+    ".codex-ui-connections-settings",
+  );
+  await settingsConnections.waitFor();
+  const initial = await currentSettingsConnectionsPage.evaluate(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const { left, top, width, height } = element.getBoundingClientRect();
+      return { height, left, top, width };
+    };
+    return {
+      documentOverflows: document.documentElement.scrollWidth > innerWidth,
+      heading: rect(".codex-ui-connections-settings h1"),
+      main: rect(".codex-ui-settings-shell__main"),
+      rail: rect(".codex-ui-settings-shell__navigation"),
+      tabs: Array.from(
+        document.querySelectorAll(".codex-ui-connections-settings [role=tab]"),
+        (tab) => {
+          const { left, top, width, height } = tab.getBoundingClientRect();
+          return { height, label: tab.textContent?.trim(), left, top, width };
+        },
+      ),
+      viewport: { height: innerHeight, width: innerWidth },
+    };
+  });
+  if (
+    initial.documentOverflows ||
+    initial.viewport.width !== 800 ||
+    initial.viewport.height !== 600 ||
+    initial.tabs.length !== 3 ||
+    !initial.heading ||
+    Math.abs(initial.heading.left - 342.875) > 8 ||
+    Math.abs(initial.heading.top - 112) > 8
+  ) {
+    throw new Error(
+      `Current Settings Connections geometry failed: ${JSON.stringify(initial)}`,
+    );
+  }
+  await currentSettingsConnectionsPage
+    .getByRole("tab", { name: "Control other devices", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("heading", {
+      name: "Devices you can control from this Mac",
+      exact: true,
+    })
+    .waitFor();
+  await currentSettingsConnectionsPage
+    .getByRole("tab", { name: "SSH", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("heading", { name: "SSH connections from this Mac", exact: true })
+    .waitFor();
+  await currentSettingsConnectionsPage
+    .getByRole("tab", { name: "Control this Mac", exact: true })
+    .click();
+  await currentSettingsConnectionsPage
+    .getByRole("switch", { name: "Allow connections", exact: true })
+    .click();
+  await writeFile(
+    join(artifactDirectory, "current-settings-connections-26-915.json"),
+    `${JSON.stringify({
+      baselineEvidence: "current-settings-connections-environments-26.915.31945.json",
+      initial,
+      interactions: ["control-other-devices", "ssh", "allow-connections"],
+      productPixelsPromoted: false,
+    }, null, 2)}\n`,
+  );
+} finally {
+  await currentSettingsConnectionsApp.close();
 }
 
 await writeFile(

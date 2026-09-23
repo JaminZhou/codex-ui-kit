@@ -27,6 +27,7 @@ import {
   Button,
   CitationMention,
   CodeReviewSettingsPage,
+  ConnectionsSettingsPage,
   CommandExecution,
   CommandOutput,
   ComposerAttachment,
@@ -92,6 +93,8 @@ import {
   RemoteConnectionsPage,
   type RemoteConnection,
   type RemoteConnectionFormValue,
+  type ConnectionsSettingsTabId,
+  type ConnectionsSettingsToggleId,
   QueuedPromptList,
   ProjectIndex,
   SearchActivity,
@@ -4435,6 +4438,7 @@ export function App() {
     | "code-review-settings"
     | "computer-use-settings"
     | "connections-settings"
+    | "remote-connections-explorer"
     | "conversation"
     | "document-preview"
     | "environments"
@@ -4481,8 +4485,18 @@ export function App() {
           initialSelection.frame?.startsWith("workspace-code-review-settings")
         ? "code-review-settings"
       : initialSelection.view === "workspace" &&
-          initialSelection.frame?.startsWith("workspace-connections-settings")
+          initialSelection.frame?.startsWith(
+            "workspace-remote-connections-explorer",
+          )
+        ? "remote-connections-explorer"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith(
+            "workspace-settings-connections-current-26-915",
+          )
         ? "connections-settings"
+      : initialSelection.view === "workspace" &&
+          initialSelection.frame?.startsWith("workspace-connections-settings")
+        ? "remote-connections-explorer"
       : initialSelection.view === "workspace" &&
           initialSelection.frame?.startsWith("workspace-general-settings")
         ? "general-settings"
@@ -4552,6 +4566,14 @@ export function App() {
           ? "worktrees"
         : initialSelection.frame?.startsWith("workspace-code-review-settings")
           ? "code-review"
+      : initialSelection.frame?.startsWith(
+            "workspace-settings-connections-current-26-915",
+          )
+          ? "connections"
+        : initialSelection.frame?.startsWith(
+              "workspace-remote-connections-explorer",
+            )
+          ? "connections"
         : initialSelection.frame?.startsWith("workspace-connections-settings")
           ? "connections"
         : "git",
@@ -4592,6 +4614,22 @@ export function App() {
     kind: "ssh",
     label: "",
   });
+  const [connectionsSettingsTab, setConnectionsSettingsTab] =
+    useState<ConnectionsSettingsTabId>(
+      initialSelection.frame?.endsWith("-control-other-devices")
+        ? "control-other-devices"
+        : initialSelection.frame?.endsWith("-ssh")
+          ? "ssh"
+          : "control-this-mac",
+    );
+  const [connectionsSettingsValues, setConnectionsSettingsValues] = useState<
+    Record<ConnectionsSettingsToggleId, boolean>
+  >({
+    "allow-connections": false,
+    "keep-this-mac-awake": false,
+  });
+  const [connectionsSettingsAction, setConnectionsSettingsAction] =
+    useState("");
   const settingsBackButtonRef = useRef<HTMLButtonElement>(null);
   const [gitSettings, setGitSettings] = useState<GitSettingsValue>({
     alwaysForcePush: false,
@@ -6114,10 +6152,12 @@ export function App() {
     setReplayCount(nextCount);
   };
 
-  const dismissSidebarAfterNavigation = () => {
+  const dismissSidebarAfterNavigation = (
+    { force = false }: { force?: boolean } = {},
+  ) => {
     if (!isNarrowDemoWindow()) return;
     const shell = document.querySelector(".codex-ui-app-shell");
-    if (!shell?.hasAttribute("data-sidebar-pinned")) {
+    if (force || !shell?.hasAttribute("data-sidebar-pinned")) {
       setSidebarOpen(false);
     }
   };
@@ -8304,7 +8344,7 @@ export function App() {
             setWorkspacePage("environments");
             setActiveFrame("workspace-environments-live-status");
             setView("workspace");
-            dismissSidebarAfterNavigation();
+            dismissSidebarAfterNavigation({ force: true });
           }}
           selected={view === "workspace" && workspacePage === "environments"}
         >
@@ -8316,7 +8356,7 @@ export function App() {
             setWorkspacePage("connections-settings");
             setActiveFrame("workspace-connections-settings");
             setView("workspace");
-            dismissSidebarAfterNavigation();
+            dismissSidebarAfterNavigation({ force: true });
           }}
           selected={view === "workspace" && workspacePage === "connections-settings"}
         >
@@ -10274,9 +10314,15 @@ export function App() {
           ? activeFrame
           : "workspace-code-review-settings"
       : workspacePage === "connections-settings"
-        ? activeFrame?.startsWith("workspace-connections-settings")
+        ? activeFrame?.startsWith("workspace-settings-connections-current-26-915")
+          ? activeFrame
+          : activeFrame?.startsWith("workspace-connections-settings")
           ? activeFrame
           : "workspace-connections-settings"
+      : workspacePage === "remote-connections-explorer"
+        ? activeFrame?.startsWith("workspace-remote-connections-explorer")
+          ? activeFrame
+          : "workspace-remote-connections-explorer"
       : workspacePage === "appearance-settings"
         ? initialSelection.frame?.startsWith("workspace-appearance-settings")
           ? initialSelection.frame
@@ -12346,19 +12392,67 @@ export function App() {
           <LiveRemoteConnections />
         ) : (
         <>
+          <ConnectionsSettingsPage
+            activeTab={connectionsSettingsTab}
+            allowConnections={connectionsSettingsValues["allow-connections"]}
+            data-evidence="runtime-observed"
+            data-host-semantics="local-replay-only"
+            keepThisMacAwake={connectionsSettingsValues["keep-this-mac-awake"]}
+            onActiveTabChange={(tab) => {
+              setConnectionsSettingsTab(tab);
+              setConnectionsSettingsAction("");
+              setActiveFrame(`workspace-settings-connections-current-26-915-${tab}`);
+            }}
+            onAdd={() =>
+              setConnectionsSettingsAction(
+                "SSH key exchange remains host-owned in this local replay.",
+              )
+            }
+            onRefresh={() =>
+              setConnectionsSettingsAction(
+                "Device refresh remains host-owned in this local replay.",
+              )
+            }
+            onSetUp={() =>
+              setConnectionsSettingsAction(
+                "Device pairing remains host-owned in this local replay.",
+              )
+            }
+            onToggle={(setting, checked) => {
+              setConnectionsSettingsValues((current) => ({
+                ...current,
+                [setting]: checked,
+              }));
+              setConnectionsSettingsAction(
+                "Setting changes are local to this replay and are not persisted.",
+              );
+            }}
+            refreshIcon={<CurrentIntegrationHeaderGlyph name="refresh" />}
+          />
+          <span aria-live="polite" className="demo-settings-action-status">
+            {connectionsSettingsAction}
+          </span>
+        </>
+        )
+      ) : workspacePage === "remote-connections-explorer" ? (
+        mode === "live" ? (
+          <LiveRemoteConnections />
+        ) : (
+        <>
           <RemoteConnectionsPage
             connections={remoteConnections}
+            data-surface-kind="exploratory-registry"
             formOpen={remoteConnectionFormOpen}
             formValue={remoteConnectionForm}
             onAdd={() => {
               setRemoteConnectionFormOpen(true);
               setRemoteConnectionsAction("");
-              setActiveFrame("workspace-connections-settings-form");
+              setActiveFrame("workspace-remote-connections-explorer-form");
             }}
             onCancelForm={() => {
               setRemoteConnectionFormOpen(false);
               setRemoteConnectionsAction("Form cancelled");
-              setActiveFrame("workspace-connections-settings");
+              setActiveFrame("workspace-remote-connections-explorer");
             }}
             onChangeForm={setRemoteConnectionForm}
             onEdit={(connection) => {
@@ -12369,7 +12463,7 @@ export function App() {
                 label: connection.label,
               });
               setRemoteConnectionsAction(`Editing ${connection.label}`);
-              setActiveFrame("workspace-connections-settings-form");
+              setActiveFrame("workspace-remote-connections-explorer-form");
             }}
             onForget={(connection) => {
               setRemoteConnections((current) =>
@@ -12395,7 +12489,7 @@ export function App() {
               ]);
               setRemoteConnectionFormOpen(false);
               setRemoteConnectionsAction("Connection saved");
-              setActiveFrame("workspace-connections-settings");
+              setActiveFrame("workspace-remote-connections-explorer");
             }}
             onTest={(connection) => {
               setRemoteConnections((current) =>
@@ -13128,6 +13222,7 @@ export function App() {
           workspacePage === "hooks-settings" ||
           workspacePage === "code-review-settings" ||
           workspacePage === "connections-settings" ||
+          workspacePage === "remote-connections-explorer" ||
           workspacePage === "appearance-settings" ||
           workspacePage === "browser-settings" ||
           workspacePage === "computer-use-settings" ||
@@ -13150,6 +13245,7 @@ export function App() {
     workspacePage === "computer-use-settings" ||
     workspacePage === "code-review-settings" ||
     workspacePage === "connections-settings" ||
+    workspacePage === "remote-connections-explorer" ||
     workspacePage === "general-settings" ||
     workspacePage === "keyboard-shortcuts-settings" ||
     workspacePage === "mcp-settings" ||
@@ -18879,7 +18975,11 @@ export function App() {
               ? subagentPanelWidth
               : reviewPanelWidth
         }
-        sidebar={view === "onboarding" ? null : sidebar}
+        sidebar={
+          view === "onboarding" || workspacePage === "connections-settings"
+            ? null
+            : sidebar
+        }
         sidebarWidth={
           view === "plugins"
             ? 322.875
@@ -18920,7 +19020,13 @@ export function App() {
               ? 240
               : undefined
         }
-        sidebarOpen={view === "onboarding" ? false : isCurrentPdfReplay ? false : sidebarOpen}
+        sidebarOpen={
+          view === "onboarding" ||
+          isCurrentPdfReplay ||
+          workspacePage === "connections-settings"
+            ? false
+            : sidebarOpen
+        }
         sidebarResizable
         windowChrome={
           view === "projects" ||
@@ -18931,6 +19037,7 @@ export function App() {
           view === "workspace" ? (
             view === "workspace" &&
             workspaceShowsSettings &&
+            workspacePage !== "connections-settings" &&
             !isCurrentMcp26915SettingsFrame ? null : (
             <AppWindowChrome
               className={
@@ -19044,12 +19151,16 @@ export function App() {
                     }
                   : undefined
               }
-              sidebarAction={{
-                "aria-expanded": sidebarOpen,
-                icon: <CurrentBuildIcon name="window-chrome-sidebar" />,
-                label: sidebarOpen ? "Hide sidebar" : "Show sidebar",
-                onClick: () => setSidebarOpen((open) => !open),
-              }}
+              sidebarAction={
+                workspaceShowsSettings
+                  ? undefined
+                  : {
+                      "aria-expanded": sidebarOpen,
+                      icon: <CurrentBuildIcon name="window-chrome-sidebar" />,
+                      label: sidebarOpen ? "Hide sidebar" : "Show sidebar",
+                      onClick: () => setSidebarOpen((open) => !open),
+                    }
+              }
               startActions={
                 view === "plugins" && pluginDetailOpen ? (
                   <PluginDetailBreadcrumb

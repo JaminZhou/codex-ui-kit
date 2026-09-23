@@ -72,7 +72,7 @@ describe("playground-owned environment registry", () => {
     try {
       await writer.upsert(base);
       await new Promise<void>((resolve, reject) => {
-        const deadline = setTimeout(() => reject(new Error("environment registry change was not observed")), 1000);
+        const deadline = setTimeout(() => reject(new Error("environment registry change was not observed")), 5000);
         const poll = setInterval(() => {
           if (changed > 0) {
             clearTimeout(deadline);

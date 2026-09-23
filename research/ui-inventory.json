@@ -2600,6 +2600,27 @@
       "priority": "p2"
     },
     {
+      "id": "settings.connections",
+      "area": "settings",
+      "ownership": "app",
+      "packageEvidence": [
+        "current-settings-connections-tabs",
+        "component:ConnectionsSettingsPage",
+        "capture:current-settings-connections-environments-26.915-read-only",
+        "playground:current-26.915-settings-connections-three-tab-controlled",
+        "browser-cdp:current-26.915-settings-connections-three-tab-geometry",
+        "electron:current-26.915-settings-connections-three-tab-interactions"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.915.31945:settings-connections-environments-read-only-800x600-three-tabs"
+      ],
+      "implementationStatus": "partial",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
       "id": "integrations.mcp",
       "area": "integrations",
       "ownership": "app",
@@ -2806,21 +2827,13 @@
       "area": "integrations",
       "ownership": "app",
       "packageEvidence": [
+        "scope:exploratory-local-registry-not-current-settings-route",
         "remote-connections-page",
-        "remote-connections-settings",
         "component:RemoteConnectionsPage",
-        "playground:workspace-connections-settings-wide-compact-error-form",
-        "playground:workspace-connections-settings-light",
-        "playground:workspace-connections-settings-light-compact",
-        "browser-cdp:workspace-connections-settings-wide-compact-error-form",
-        "browser-cdp:workspace-connections-settings-light",
-        "browser-cdp:workspace-connections-settings-light-compact",
-        "electron:workspace-connections-settings-wide-compact-error-form",
-        "electron:workspace-connections-settings-light",
-        "electron:workspace-connections-settings-light-compact",
-        "pixel:workspace-connections-settings-wide-compact-error-form",
-        "pixel:workspace-connections-settings-light",
-        "pixel:workspace-connections-settings-light-compact",
+        "playground:remote-connections-registry-explorer-wide-compact-error-form",
+        "browser-cdp:remote-connections-registry-explorer-wide-compact-error-form",
+        "electron:remote-connections-registry-explorer-wide-compact-error-form",
+        "pixel:remote-connections-registry-explorer-wide-compact-error-form",
         "electron:live-remote-connections-registry-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",

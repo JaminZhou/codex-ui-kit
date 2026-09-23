@@ -392,7 +392,7 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 92 surface groups; 18 have current-build runtime evidence, 65 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
+Current inventory: 93 surface groups; 18 have current-build runtime evidence, 66 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -448,6 +448,18 @@ at wide and 720px sizes with controlled switches, CDP geometry, Electron
 interaction, and zero-drift own-fixture pixels. Those gates verify the
 component and responsive shell boundary; installed-product pixels and
 provider/device execution are still not promoted.
+
+The installed 26.915 `Settings → Connections` route was separately sampled at
+800×600. It exposes `Control this Mac`, `Control other devices`, and `SSH`
+tabs, with their visible control descriptions and measured geometry in
+[`current-settings-connections-environments-26.915.31945.json`](current-settings-connections-environments-26.915.31945.json).
+This is candidate-only structural evidence. The route is tracked as
+`settings.connections`; `RemoteConnectionsPage` and its local save/test/forget
+registry are a separate exploratory surface, not a reconstruction of that
+Settings page. The new controlled `ConnectionsSettingsPage` is implemented,
+but Browser/CDP and Electron interaction gates, responsive re-observation,
+and reviewed local pixel regions remain pending; installed-product pixels are
+not promoted.
 
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32
@@ -513,9 +525,10 @@ transitions must add or split IDs.
   shell/search, Git/review-delivery, and Appearance slices are now
   current-build verified.
 - MCP, plugin detail/install, skill execution, and real automation mutations.
-  Settings Connections now has a controlled device/SSH directory and
-  Add/Edit/Forget/Test lifecycle with wide/720/error/form evidence; account
-  pairing, SSH credentials, and Remote registry/relay writes stay host-owned.
+  Settings Connections has a separate controlled three-tab implementation;
+  the Add/Edit/Forget/Test registry remains an exploratory local route.
+  Account pairing, SSH credentials, persistence, and Remote registry/relay
+  semantics stay host-owned until separately observed and validated.
 
 ### P2: confirm scope before implementing
 
