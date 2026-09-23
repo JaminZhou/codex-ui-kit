@@ -13,21 +13,35 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     await app.evaluate(({ BrowserWindow, ipcMain }, width) => {
       BrowserWindow.getAllWindows()[0].setContentSize(width, 820);
       globalThis.__routeFails = true; globalThis.__routeDetailFails = false; globalThis.__routeDiffFails = false;
-      globalThis.__routeReads = 0; globalThis.__routeEmpty = false;
+      globalThis.__routeReads = 0; globalThis.__routeEmpty = false; globalThis.__historyPageFails = false;
+      globalThis.__historyPageReads = 0; globalThis.__historyStates = [];
       globalThis.__routeConversationFails = false; globalThis.__routeConversationPageFails = false;
       globalThis.__routeConversationReads = 0; globalThis.__routeThreadReplyReads = 0;
-      for (const name of ["pr-preview", "pr-detail", "pr-conversation", "pr-thread-replies", "pr-diff"]) ipcMain.removeHandler(`demo:git:${name}`);
-      ipcMain.handle("demo:git:pr-preview", () => {
+      for (const name of ["pr-preview", "pr-history", "pr-detail", "pr-conversation", "pr-thread-replies", "pr-diff"]) ipcMain.removeHandler(`demo:git:${name}`);
+      const historyItem = (number, state, title) => ({ number, state, title, url: `https://github.com/owner/live-project/pull/${number}`, headRefOid: "a".repeat(40), baseRefName: "main", updatedAt: "2026-09-23T10:00:00Z", author: "jamin" });
+      ipcMain.handle("demo:git:pr-history", (_event, input) => {
         globalThis.__routeReads++;
+        globalThis.__historyStates.push(input.filter);
         if (globalThis.__routeFails) throw new Error("synthetic provider unavailable");
-        return { repository: "owner/live-project", branch: "feat/live-route", head: "a".repeat(40), fingerprint: "fresh", pullRequests: globalThis.__routeEmpty ? [] : [{ number: 999, title: "Real-data route fixture", url: "https://github.com/owner/live-project/pull/999", baseRefName: "main", headRefOid: "a".repeat(40) }] };
+        if (input.filter === "open" && input.after === "open-next") {
+          globalThis.__historyPageReads++;
+          if (globalThis.__historyPageFails) throw new Error("synthetic later page unavailable");
+          return { repository: "owner/live-project", filter: "open", items: [historyItem(999, "OPEN", "Real-data route fixture"), historyItem(1000, "OPEN", "Next page fixture")], totalCount: 31, hasMore: false, nextCursor: null };
+        }
+        if (input.filter === "open") return { repository: "owner/live-project", filter: "open", items: globalThis.__routeEmpty ? [] : [historyItem(999, "OPEN", "Real-data route fixture")], totalCount: globalThis.__routeEmpty ? 0 : 31, hasMore: !globalThis.__routeEmpty, nextCursor: globalThis.__routeEmpty ? null : "open-next" };
+        if (input.filter === "closed") return { repository: "owner/live-project", filter: "closed", items: [historyItem(998, "CLOSED", "Closed history fixture"), historyItem(997, "MERGED", "Merged history fixture")], totalCount: 2, hasMore: false, nextCursor: null };
+        return { repository: "owner/live-project", filter: "all", items: [historyItem(999, "OPEN", "Real-data route fixture"), historyItem(998, "CLOSED", "Closed history fixture"), historyItem(997, "MERGED", "Merged history fixture")], totalCount: 3, hasMore: false, nextCursor: null };
       });
-      ipcMain.handle("demo:git:pr-detail", () => {
+      ipcMain.handle("demo:git:pr-detail", (_event, input) => {
+        if (input.scope !== "repository") throw new Error("Repository-history detail scope was not sent through the host bridge");
         if (globalThis.__routeDetailFails) throw new Error("synthetic detail unavailable");
-        return { number: 999, title: "Real-data route fixture", url: "https://github.com/owner/live-project/pull/999", body: "<script>literal summary</script>", state: "OPEN", baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/live.ts", additions: 4, deletions: 1 }] };
+        const number = input.number;
+        const state = number === 998 ? "CLOSED" : number === 997 ? "MERGED" : "OPEN";
+        return { number, title: number === 999 ? "Real-data route fixture" : number === 998 ? "Closed history fixture" : "Merged history fixture", url: `https://github.com/owner/live-project/pull/${number}`, body: "<script>literal summary</script>", state, baseRefName: "main", baseRefOid: "b".repeat(40), headRefOid: "a".repeat(40), changedFiles: 3, files: [{ path: "src/live.ts", additions: 4, deletions: 1 }] };
       });
       ipcMain.handle("demo:git:pr-conversation", (_event, input) => {
         globalThis.__routeConversationReads++;
+        if (input.scope !== "repository") throw new Error("Repository-history conversation scope was not sent through the host bridge");
         if (globalThis.__routeConversationFails) throw new Error("synthetic conversation unavailable");
         if (globalThis.__routeConversationPageFails && input.page) throw new Error("synthetic page unavailable");
         if (input.number !== 999 || input.head !== "a".repeat(40)) throw new Error("conversation snapshot was not bound to the current head");
@@ -60,10 +74,12 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
       });
       ipcMain.handle("demo:git:pr-thread-replies", (_event, input) => {
         globalThis.__routeThreadReplyReads++;
+        if (input.scope !== "repository") throw new Error("Repository-history thread scope was not sent through the host bridge");
         if (input.number !== 999 || input.head !== "a".repeat(40) || input.threadId !== "thread-1" || input.after !== "thread-replies-next") throw new Error("thread reply page was not bound to the current PR thread");
         return { threadId: "thread-1", headRefOid: "a".repeat(40), comments: [{ id: "review-comment-reply", author: "Maintainer", body: "Additional inline reply.", createdAt: "2026-09-23T10:06:00Z", url: "https://github.com/owner/live-project/pull/999#discussion_r3", diffHunk: "@@ -1 +1 @@\n-old\n+new", line: 42 }], totalComments: 6, hasMoreComments: false, nextCommentsCursor: null };
       });
-      ipcMain.handle("demo:git:pr-diff", () => {
+      ipcMain.handle("demo:git:pr-diff", (_event, input) => {
+        if (input.scope !== "repository") throw new Error("Repository-history diff scope was not sent through the host bridge");
         if (globalThis.__routeDiffFails) throw new Error("synthetic diff unavailable");
         return { number: 999, head: "a".repeat(40), patch: "diff --git a/src/live.ts b/src/live.ts\n+LIVE_ROUTE_PATCH\n".repeat(30) };
       });
@@ -76,16 +92,39 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     if (!(await prNavigation.isVisible())) await page.getByRole("button", { name: "Show sidebar", exact: true }).first().click();
     await prNavigation.click();
     const route = page.getByRole("region", { name: "Live pull requests", exact: true });
-    await route.getByText("Live pull requests unavailable", { exact: true }).waitFor();
+    await route.getByText("Repository PR history unavailable", { exact: true }).waitFor();
     assert.equal(await page.locator("[data-mode]").getAttribute("data-mode"), "live");
     assert.equal(await page.getByRole("button", { name: "Open pull request 80: feat: add terminal session lifecycle", exact: true }).count(), 0);
     await app.evaluate(() => { globalThis.__routeFails = false; });
-    await route.getByRole("button", { name: "Retry live PRs", exact: true }).click();
-    const row = route.getByRole("button", { name: "Open live PR #999", exact: true });
+    await route.getByRole("button", { name: "Retry PR history", exact: true }).click();
+    const row = route.getByRole("button", { name: "Open repository PR #999: Real-data route fixture", exact: true });
     await row.waitFor();
-    await route.getByLabel("Search live branch PRs", { exact: true }).fill("not found");
+    assert.equal(await route.getByRole("button", { name: "Open", exact: true }).getAttribute("aria-pressed"), "true");
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("not found");
     await route.getByText("No loaded PRs match this search.", { exact: true }).waitFor();
-    await route.getByLabel("Search live branch PRs", { exact: true }).fill("999");
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("999");
+    await app.evaluate(() => { globalThis.__historyPageFails = true; });
+    await route.getByRole("button", { name: /Load more pull requests/ }).click();
+    await route.getByText("More pull requests could not be loaded. Retry this page or open the repository on GitHub.", { exact: true }).waitFor();
+    assert.equal(await row.count(), 1, "A failed history page must preserve the current repository snapshot");
+    assert.equal(await route.getByRole("button", { name: /Next page fixture/ }).count(), 0);
+    await app.evaluate(() => { globalThis.__historyPageFails = false; });
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("");
+    await route.getByRole("button", { name: "Retry more pull requests", exact: true }).click();
+    const nextRow = route.getByRole("button", { name: "Open repository PR #1000: Next page fixture", exact: true });
+    await nextRow.waitFor();
+    assert.equal(await row.count(), 1, "Overlapping history pages must de-duplicate existing PRs");
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("");
+    await route.getByRole("button", { name: "Closed", exact: true }).click();
+    const closedRow = route.getByRole("button", { name: "Open repository PR #998: Closed history fixture", exact: true });
+    await closedRow.waitFor();
+    await route.getByRole("button", { name: "All", exact: true }).click();
+    await route.getByRole("button", { name: "Open repository PR #997: Merged history fixture", exact: true }).waitFor();
+    assert.ok((await app.evaluate(() => globalThis.__historyStates)).includes("closed"));
+    assert.ok((await app.evaluate(() => globalThis.__historyStates)).includes("all"));
+    await route.getByRole("button", { name: "Open", exact: true }).click();
+    await row.waitFor();
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("999");
     await row.click();
     const panel = page.getByRole("region", { name: "Live pull request", exact: true });
     const summary = panel.getByRole("region", { name: "Live PR summary", exact: true });
@@ -160,6 +199,17 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     await app.evaluate(() => { globalThis.__routeDetailFails = false; });
     await panel.getByRole("button", { name: "Retry live detail", exact: true }).click(); await summary.waitFor();
     await panel.getByRole("button", { name: "Close live PR detail", exact: true }).click();
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("");
+    await route.getByRole("button", { name: "Closed", exact: true }).click();
+    await closedRow.waitFor();
+    await closedRow.click();
+    await panel.getByText("CLOSED · Base: main", { exact: true }).waitFor();
+    await panel.getByRole("button", { name: "Close live PR detail", exact: true }).click();
+    await route.getByRole("button", { name: "All", exact: true }).click();
+    await route.getByRole("button", { name: "Open repository PR #997: Merged history fixture", exact: true }).waitFor();
+    await route.getByRole("button", { name: "Open", exact: true }).click();
+    await row.waitFor();
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("999");
     const reads = await app.evaluate(() => globalThis.__routeReads);
     await route.getByRole("button", { name: "Toggle sidebar", exact: true }).click();
     const newChat = page.getByRole("button", { name: "New chat", exact: true });
@@ -168,12 +218,12 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     const navigation = page.getByRole("button", { name: "Pull requests", exact: true });
     if (!(await navigation.isVisible())) await page.getByRole("button", { name: "Show sidebar", exact: true }).first().click();
     await navigation.click(); await route.waitFor();
-    assert.equal(await route.getByLabel("Search live branch PRs", { exact: true }).inputValue(), "999");
+    assert.equal(await route.getByLabel("Search repository pull requests", { exact: true }).inputValue(), "999");
     assert.equal(await app.evaluate(() => globalThis.__routeReads), reads, "Route restoration retains loaded state");
     await app.evaluate(() => { globalThis.__routeEmpty = true; });
-    await route.getByRole("button", { name: "Refresh live PRs", exact: true }).click();
-    await route.getByLabel("Search live branch PRs", { exact: true }).fill("");
-    await route.getByText("No open PR for the current branch.", { exact: true }).waitFor();
+    await route.getByRole("button", { name: "Refresh PR history", exact: true }).click();
+    await route.getByLabel("Search repository pull requests", { exact: true }).fill("");
+    await route.getByText("No open pull requests in this repository.", { exact: true }).waitFor();
     assert.equal(await page.locator("[data-mode]").getAttribute("data-mode"), "live");
   } finally { await app.close(); }
 }

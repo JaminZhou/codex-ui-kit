@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { readGitPullRequestPreview } from "./git-pr-preview.js";
+import { readGitHubRepository, readGitPullRequestPreview } from "./git-pr-preview.js";
 
 export interface GitPullRequestDetail {
   number: number;
@@ -80,6 +80,13 @@ export interface GitPullRequestReviewThreadReplies {
   nextCommentsCursor: string | null;
 }
 
+export type PullRequestReadScope = "current-branch" | "repository";
+
+function validateReadScope(scope: PullRequestReadScope): PullRequestReadScope {
+  if (scope !== "current-branch" && scope !== "repository") throw new Error("Select a valid PR read scope.");
+  return scope;
+}
+
 const conversationLimits = Object.freeze({
   comments: 50,
   reviews: 50,
@@ -104,7 +111,7 @@ const threadRepliesQuery = [
   "query($threadId:ID!,$after:String!){",
   "node(id:$threadId){",
   "... on PullRequestReviewThread{",
-  "id pullRequest{number headRefOid baseRefOid}",
+  "id pullRequest{number headRefOid baseRefOid repository{name owner{login}}}",
   "comments(first:5,after:$after){totalCount pageInfo{hasNextPage endCursor} nodes{id body createdAt url diffHunk path line author{login}}}",
   "}",
   "}",
@@ -271,23 +278,20 @@ export async function readGitPullRequestConversation(
   number: number,
   expectedHead: string,
   page: GitPullRequestConversationPageRequest = {},
+  scope: PullRequestReadScope = "current-branch",
 ): Promise<GitPullRequestConversation> {
+  validateReadScope(scope);
   if (!Number.isSafeInteger(number) || number < 1 || !/^[a-f0-9]{40,64}$/.test(expectedHead)) {
     throw new Error("Select a valid current PR revision.");
-  }
-  const preview = await readGitPullRequestPreview(directory, remote);
-  const selected = preview.pullRequests.find((pr) => pr.number === number);
-  if (!selected || selected.headRefOid !== expectedHead) {
-    throw new Error("Refresh and select the current PR revision.");
   }
   for (const cursor of Object.values(page)) {
     if (cursor !== undefined && (typeof cursor !== "string" || cursor.length === 0 || cursor.length > 2_048 || /[\0\r\n]/.test(cursor))) {
       throw new Error("Select a valid PR conversation page cursor.");
     }
   }
-  const before = await readGitPullRequestDetail(directory, remote, number);
+  const before = await readGitPullRequestDetail(directory, remote, number, scope);
   if (before.headRefOid !== expectedHead) throw new Error("PR head changed. Refresh details before reading conversation.");
-  const [owner, name] = preview.repository.split("/");
+  const [owner, name] = new URL(before.url).pathname.split("/").filter(Boolean);
   const args = [
     "api", "graphql", "-f", `query=${conversationQuery}`,
     "-F", `owner=${owner}`, "-F", `name=${name}`, "-F", `number=${number}`,
@@ -303,7 +307,7 @@ export async function readGitPullRequestConversation(
     env: { ...process.env, GH_PROMPT_DISABLED: "1" },
   });
   const conversation = parsePullRequestConversation(stdout, number, expectedHead);
-  const after = await readGitPullRequestDetail(directory, remote, number);
+  const after = await readGitPullRequestDetail(directory, remote, number, scope);
   if (after.headRefOid !== before.headRefOid || after.baseRefOid !== before.baseRefOid
     || conversation.baseRefOid !== before.baseRefOid) {
     throw new Error("PR changed while reading conversation. Refresh details again.");
@@ -319,18 +323,15 @@ export async function readGitPullRequestReviewThreadReplies(
   expectedHead: string,
   threadId: string,
   after: string,
+  scope: PullRequestReadScope = "current-branch",
 ): Promise<GitPullRequestReviewThreadReplies> {
+  validateReadScope(scope);
   if (!Number.isSafeInteger(number) || number < 1 || !/^[a-f0-9]{40,64}$/.test(expectedHead)
     || typeof threadId !== "string" || !threadId || threadId.length > 512
     || typeof after !== "string" || !after || after.length > 2_048 || /[\0\r\n]/.test(after)) {
     throw new Error("Select a valid current PR thread page.");
   }
-  const preview = await readGitPullRequestPreview(directory, remote);
-  const selected = preview.pullRequests.find((pr) => pr.number === number);
-  if (!selected || selected.headRefOid !== expectedHead) {
-    throw new Error("Refresh and select the current PR revision.");
-  }
-  const before = await readGitPullRequestDetail(directory, remote, number);
+  const before = await readGitPullRequestDetail(directory, remote, number, scope);
   if (before.headRefOid !== expectedHead) throw new Error("PR head changed. Refresh details before reading thread replies.");
   const { stdout } = await promisify(execFile)("gh", [
     "api", "graphql", "-f", `query=${threadRepliesQuery}`,
@@ -349,8 +350,12 @@ export async function readGitPullRequestReviewThreadReplies(
   const data = envelope.data as Record<string, unknown> | null;
   const node = data?.node as Record<string, unknown> | null;
   const parent = node?.pullRequest as Record<string, unknown> | null;
+  const parentRepository = parent?.repository as Record<string, unknown> | null;
+  const parentOwner = parentRepository?.owner as Record<string, unknown> | null;
+  const [expectedOwner, expectedRepository] = new URL(before.url).pathname.split("/").filter(Boolean);
   if (!node || node.id !== threadId || !parent || parent.number !== number
-    || parent.headRefOid !== expectedHead || parent.baseRefOid !== before.baseRefOid) {
+    || parent.headRefOid !== expectedHead || parent.baseRefOid !== before.baseRefOid
+    || parentRepository?.name !== expectedRepository || parentOwner?.login !== expectedOwner) {
     throw new Error("PR thread changed or does not belong to the selected revision.");
   }
   const comments = parseConnection(
@@ -371,7 +376,7 @@ export async function readGitPullRequestReviewThreadReplies(
       };
     },
   );
-  const afterDetail = await readGitPullRequestDetail(directory, remote, number);
+  const afterDetail = await readGitPullRequestDetail(directory, remote, number, scope);
   if (afterDetail.headRefOid !== before.headRefOid || afterDetail.baseRefOid !== before.baseRefOid) {
     throw new Error("PR changed while reading thread replies. Refresh again.");
   }
@@ -400,17 +405,30 @@ export function parsePullRequestDetail(raw: string, repository: string, number: 
     baseRefOid: value.baseRefOid, headRefOid: value.headRefOid, changedFiles: value.changedFiles, files: value.files.map((file: GitPullRequestDetail["files"][number]) => ({ path: file.path, additions: file.additions, deletions: file.deletions })) };
 }
 
-/** Read only a PR discovered for this trusted project's same-repository branch. */
-export async function readGitPullRequestDetail(directory: string, remote: string, number: number): Promise<GitPullRequestDetail> {
+/** Read a same-branch PR by default; repository scope is read-only and still bound to this exact remote. */
+export async function readGitPullRequestDetail(
+  directory: string,
+  remote: string,
+  number: number,
+  scope: PullRequestReadScope = "current-branch",
+): Promise<GitPullRequestDetail> {
+  validateReadScope(scope);
   if (!Number.isSafeInteger(number) || number < 1) throw new Error("Select a valid PR.");
-  const preview = await readGitPullRequestPreview(directory, remote);
-  const selected = preview.pullRequests.find(pr => pr.number === number);
-  if (!selected) throw new Error("Refresh and select a PR belonging to the current branch.");
-  const { stdout } = await promisify(execFile)("gh", ["pr", "view", String(number), "--repo", `github.com/${preview.repository}`, "--json", "number,url,title,body,state,baseRefName,baseRefOid,headRefOid,changedFiles,files"], {
+  const preview = scope === "current-branch" ? await readGitPullRequestPreview(directory, remote) : null;
+  const selected = preview?.pullRequests.find(pr => pr.number === number);
+  if (scope === "current-branch" && !selected) throw new Error("Refresh and select a PR belonging to the current branch.");
+  const resolved = scope === "repository"
+    ? await readGitHubRepository(directory, remote)
+    : { repository: preview!.repository, destination: "" };
+  const { stdout } = await promisify(execFile)("gh", ["pr", "view", String(number), "--repo", `github.com/${resolved.repository}`, "--json", "number,url,title,body,state,baseRefName,baseRefOid,headRefOid,changedFiles,files"], {
     cwd: directory, encoding: "utf8", timeout: 30000, maxBuffer: 4 * 1024 * 1024, env: { ...process.env, GH_PROMPT_DISABLED: "1" },
   });
-  const detail = parsePullRequestDetail(stdout, preview.repository, number);
-  if (detail.headRefOid !== selected.headRefOid) throw new Error("PR changed while reading details. Refresh again.");
+  const detail = parsePullRequestDetail(stdout, resolved.repository, number);
+  if (selected && detail.headRefOid !== selected.headRefOid) throw new Error("PR changed while reading details. Refresh again.");
+  if (scope === "repository") {
+    const verified = await readGitHubRepository(directory, remote);
+    if (verified.repository !== resolved.repository || verified.destination !== resolved.destination) throw new Error("Project GitHub remote changed while reading PR details. Refresh again.");
+  }
   return detail;
 }
 
@@ -444,14 +462,21 @@ export async function editGitPullRequest(directory: string, input: EditPullReque
 }
 
 /** Read GitHub's patch without checking out or modifying the working tree. */
-export async function readGitPullRequestDiff(directory: string, remote: string, number: number, expectedHead: string): Promise<GitPullRequestDiff> {
-  const before = await readGitPullRequestDetail(directory, remote, number);
+export async function readGitPullRequestDiff(
+  directory: string,
+  remote: string,
+  number: number,
+  expectedHead: string,
+  scope: PullRequestReadScope = "current-branch",
+): Promise<GitPullRequestDiff> {
+  validateReadScope(scope);
+  const before = await readGitPullRequestDetail(directory, remote, number, scope);
   if (before.headRefOid !== expectedHead) throw new Error("PR head changed. Refresh details before reading the diff.");
   const repository = before.url.split("/").slice(3, 5).join("/");
   const { stdout } = await promisify(execFile)("gh", ["pr", "diff", String(number), "--repo", `github.com/${repository}`, "--color", "never"], {
     cwd: directory, encoding: "utf8", timeout: 60000, maxBuffer: 8 * 1024 * 1024, env: { ...process.env, GH_PROMPT_DISABLED: "1" },
   });
-  const after = await readGitPullRequestDetail(directory, remote, number);
+  const after = await readGitPullRequestDetail(directory, remote, number, scope);
   if (after.headRefOid !== before.headRefOid || after.baseRefName !== before.baseRefName || after.baseRefOid !== before.baseRefOid) throw new Error("PR changed while reading the diff. Refresh again.");
   return { number, head: after.headRefOid, patch: stdout };
 }

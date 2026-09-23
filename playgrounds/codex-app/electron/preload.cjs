@@ -37,6 +37,7 @@ contextBridge.exposeInMainWorld("codexDemo", {
   previewPush: (input) => ipcRenderer.invoke("demo:git:push-preview", input),
   pushPreview: (input) => ipcRenderer.invoke("demo:git:push", input),
   previewPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-preview", input),
+  listPullRequestHistory: (input) => ipcRenderer.invoke("demo:git:pr-history", input),
   createPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-create", input),
   readPullRequest: (input) => ipcRenderer.invoke("demo:git:pr-detail", input),
   readPullRequestConversation: (input) => ipcRenderer.invoke("demo:git:pr-conversation", input),
