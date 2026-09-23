@@ -6,8 +6,8 @@ changing registry credentials.
 
 ## Candidate identity
 
-- Audit target: `main` at `93ccc2db0f57fb5b4e53b23baa2bfa8cf6862724`
-- Candidate commit: `docs: record current settings connections evidence (#600)`
+- Audit target: `main` at `2fe4f131a4ee774bbf900883866401e2b328a3cc`
+- Candidate commit: `docs: refresh release candidate audit (#601)`
 - Package: `codex-ui-kit@0.1.0`
 - Package privacy: `private: true`
 - Node: `v22.22.2`
