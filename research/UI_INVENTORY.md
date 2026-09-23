@@ -50,7 +50,7 @@ surface; Browser/CDP, Electron, and wide/720 replay pixels cover the five
 states. Authentication, browser navigation, and first-run persistence remain
 host-owned and are intentionally not claimed by the playground.
 
-## Current baseline
+## Promoted baseline and latest candidate
 
 - Codex Desktop `26.903.71938` (`8576`)
 - Package and scoped shell lifecycle sampled on 2026-09-12
@@ -131,6 +131,15 @@ host-owned and are intentionally not claimed by the playground.
   and a 26-row Composer resource list without GitHub). The two samples are
   intentionally kept separate so dynamic counts are not mistaken for stable
   product tokens; no installed-product pixel promotion is inferred.
+- The newest installed package is now `26.917.62051` (`10789`), Chromium
+  `153.0.8010.53`, with `app.asar` SHA-256
+  `c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd`.
+  Its isolated candidate record is
+  [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
+  with method and limits in [`26.917.62051.md`](26.917.62051.md). It refreshes
+  structural shell/sidebar, Projects, Help, and Composer-resource observations
+  only. The promoted baseline remains `26.903.71938`; no Settings Connections
+  route or installed-product pixel was sampled on 26.917.
 - The current 26.915 conversation-shell replay now pairs the basic user/
   assistant turn with the sampled wide and compact Composer/thread geometry.
   Browser/CDP, Electron, and a two-run own-fixture pixel gate cover the
@@ -419,7 +428,7 @@ Browser/CDP, Electron, and pixel gates. Persistence, cloud execution,
 delivery, real permissions, and installed-product mutation remain host-owned;
 this does not promote replay behavior to a real scheduled-task run.
 
-The installed `26.915.31945` build is now the newest candidate shell baseline;
+The installed `26.915.31945` build remains a historical candidate shell baseline;
 its isolated Renderer capture records the `321.875px` rail, `46px` titlebar,
 responsive hide/show lifecycle, and the same zero-overflow boundary. The
 playground now replays that candidate through wide/720 shell, document, and
@@ -456,10 +465,11 @@ tabs, with their visible control descriptions and measured geometry in
 This is candidate-only structural evidence. The route is tracked as
 `settings.connections`; `RemoteConnectionsPage` and its local save/test/forget
 registry are a separate exploratory surface, not a reconstruction of that
-Settings page. The new controlled `ConnectionsSettingsPage` is implemented,
-but Browser/CDP and Electron interaction gates, responsive re-observation,
-and reviewed local pixel regions remain pending; installed-product pixels are
-not promoted.
+Settings page. The controlled `ConnectionsSettingsPage` now passes local
+Browser/CDP, Electron geometry/interaction, and own-fixture pixel coverage
+(PR #607). That replay coverage does not promote installed-product pixels;
+pairing, SSH exchange, environment mutation, persistence, and production Remote
+semantics remain open. The newer 26.917 candidate did not revisit this route.
 
 The installed `26.911.61220` build was re-observed in an isolated native
 viewport. It exposes the current Scheduled tasks title/description, 728×32

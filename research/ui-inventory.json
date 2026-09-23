@@ -26,6 +26,7 @@
       "cdp-26.908.70816": "26.908.70816",
       "cdp-26.911.61220": "26.911.61220",
       "cdp-26.915.31945": "26.915.31945",
+      "cdp-26.917.62051": "26.917.62051",
       "playground": "playground-owned"
     }
   },
@@ -154,7 +155,8 @@
         "cdp-26.820.60940:thirty-turn-wide-and-720x680-shell-header-timeline-composer-geometry-zero-overflow",
         "cdp-26.825.51511:completed-basic-message-wide-721-open-720-collapsed-header-thread-composer-geometry-zero-overflow",
         "cdp-26.908.70816:new-chat-shell-wide-medium-721-720-zero-overflow",
-        "cdp-26.911.61220:new-chat-shell-wide-medium-721-720-zero-overflow"
+        "cdp-26.911.61220:new-chat-shell-wide-medium-721-720-zero-overflow",
+        "cdp-26.917.62051:new-chat-shell-wide-820-721-720-responsive-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -956,7 +958,8 @@
         "cdp-26.825.51511:four-line-736-687x134-and-long-input-736x259-687x224-local-scroll",
         "cdp-26.908.70816:new-chat-composer-wide-medium-721-720-geometry",
         "cdp-26.911.61220:new-chat-composer-wide-medium-721-720-geometry",
-        "cdp-26.915.31945:new-chat-composer-editor-and-responsive-sidebar-delta"
+        "cdp-26.915.31945:new-chat-composer-editor-and-responsive-sidebar-delta",
+        "cdp-26.917.62051:new-chat-editor-wide-medium-threshold-and-compact-geometry"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1131,7 +1134,8 @@
         "cdp-26.908.70816:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "cdp-26.911.61220:documents-selection-inline-mention-and-templates",
-        "cdp-26.915.31945:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller"
+        "cdp-26.915.31945:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
+        "cdp-26.917.62051:unified-add-menu-public-catalog-736x320-726x310-scroller"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1627,7 +1631,8 @@
         "cdp-26.825.51511:help-menu-eight-items-320x272.06-dom-menu-and-escape-focus-return",
         "cdp-26.903.71938:help-menu-eight-items-focus-escape",
         "cdp-26.911.61220:help-menu-eight-items-focus-escape",
-        "cdp-26.915.31945:help-menu-content-dependent-nine-item-variant"
+        "cdp-26.915.31945:help-menu-content-dependent-nine-item-variant",
+        "cdp-26.917.62051:help-menu-content-dependent-nine-item-320x300.63-focus-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1654,7 +1659,8 @@
         "cdp-26.820.60940:projects-back-forward-x88-120-152-opacity-0.4-720-hide-show-and-selected-chat-restoration",
         "cdp-26.825.31414:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
         "cdp-26.825.51511:visible-sidebar-back-forward-28px-controls-and-collapsed-show-only-chrome",
-        "cdp-26.915.31945:sidebar-back-forward-pull-request-route-and-responsive-delta"
+        "cdp-26.915.31945:sidebar-back-forward-pull-request-route-and-responsive-delta",
+        "cdp-26.917.62051:titlebar-sidebar-navigation-and-responsive-collapse-restore"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1776,7 +1782,8 @@
         "cdp-26.825.51511:projects-index-content-dependent-rows-wide-sort-empty-focus-and-559px-explicitly-collapsed-compact",
         "cdp-26.903.71938:projects-index-wide-compact-sort-empty-and-owned-scroll",
         "cdp-26.911.61220:projects-index-wide-compact-sort-empty-and-owned-scroll",
-        "cdp-26.915.31945:projects-index-15-row-wide-compact-scroll-and-sidebar-lifecycle"
+        "cdp-26.915.31945:projects-index-15-row-wide-compact-scroll-and-sidebar-lifecycle",
+        "cdp-26.917.62051:projects-index-15-content-dependent-rows-wide-compact-sort-empty-focus-owned-scroll"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
