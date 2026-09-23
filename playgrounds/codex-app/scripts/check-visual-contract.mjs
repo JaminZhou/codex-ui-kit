@@ -2638,6 +2638,7 @@ async function checkScene(scene) {
     report("capturing");
     await page.screenshot({
       animations: "disabled",
+      scale: "css",
       path: actualPath,
       type: "png",
     });
@@ -2670,6 +2671,7 @@ async function checkScene(scene) {
           y: bounds.y,
         },
         path: sidebarTaskActionsActualPath,
+        scale: "css",
         type: "png",
       });
     }
@@ -2705,6 +2707,7 @@ async function checkScene(scene) {
           y: bounds.y,
         },
         path: sidebarTaskActionsActualPath,
+        scale: "css",
         type: "png",
       });
     }
@@ -2738,6 +2741,7 @@ async function checkScene(scene) {
           y: bounds.y,
         },
         path: sidebarRecentsActionsActualPath,
+        scale: "css",
         type: "png",
       });
     }

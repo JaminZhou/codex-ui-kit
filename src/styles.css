@@ -733,6 +733,205 @@
   margin: 0.5rem 0 0;
 }
 
+.codex-ui-connections-settings {
+  margin: 0 auto;
+  max-width: 48rem;
+  padding: 1.25rem 0 2rem;
+  width: calc(100% - 2.5rem);
+}
+
+.codex-ui-connections-settings__header {
+  margin-bottom: 2rem;
+}
+
+.codex-ui-connections-settings__header h1 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.8rem;
+  margin: 0;
+}
+
+.codex-ui-connections-settings__tabs {
+  align-items: center;
+  border-bottom: 1px solid var(--codex-ui-border);
+  display: flex;
+  gap: 0.125rem;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.codex-ui-connections-settings__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.codex-ui-connections-settings__tab {
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem 0.5rem 0 0;
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.8125rem;
+  height: 1.75rem;
+  padding: 0 0.75rem;
+  position: relative;
+}
+
+.codex-ui-connections-settings__tab[aria-selected="true"] {
+  color: var(--codex-ui-text);
+}
+
+.codex-ui-connections-settings__tab[aria-selected="true"]::after {
+  background: currentColor;
+  border-radius: 999px;
+  bottom: -1px;
+  content: "";
+  height: 2px;
+  left: 0.5rem;
+  position: absolute;
+  right: 0.5rem;
+}
+
+.codex-ui-connections-settings__panel {
+  min-width: 0;
+  outline: none;
+  padding-top: 2.875rem;
+}
+
+.codex-ui-connections-settings__section-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-height: 1.625rem;
+}
+
+.codex-ui-connections-settings__section-heading h2,
+.codex-ui-connections-settings__other-settings h2,
+.codex-ui-connections-settings__empty-state h2 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  margin: 0;
+}
+
+.codex-ui-connections-settings__icon-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 0.5rem;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  display: inline-flex;
+  height: 1.625rem;
+  justify-content: center;
+  padding: 0;
+  width: 1.625rem;
+}
+
+.codex-ui-connections-settings__icon-button svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.codex-ui-connections-settings__setting-row {
+  align-items: center;
+  display: flex;
+  font-size: 0.8125rem;
+  justify-content: space-between;
+  line-height: 1.25rem;
+  min-height: 3rem;
+}
+
+.codex-ui-connections-settings__other-settings {
+  margin-top: 10.5rem;
+}
+
+.codex-ui-connections-settings__other-settings h2 {
+  margin-bottom: 0.5rem;
+}
+
+.codex-ui-connections-settings__switch {
+  background: var(--codex-ui-border-heavy);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  flex: 0 0 auto;
+  height: 1.25rem;
+  padding: 2px;
+  transition: background-color 120ms ease;
+  width: 2rem;
+}
+
+.codex-ui-connections-settings__switch[aria-checked="true"] {
+  background: var(--codex-ui-text-accent);
+}
+
+.codex-ui-connections-settings__switch span {
+  background: #fff;
+  border-radius: 50%;
+  display: block;
+  height: 1rem;
+  transform: translateX(0);
+  transition: transform 120ms ease;
+  width: 1rem;
+}
+
+.codex-ui-connections-settings__switch[aria-checked="true"] span {
+  transform: translateX(0.75rem);
+}
+
+.codex-ui-connections-settings__empty-state {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 22.5rem;
+  text-align: center;
+}
+
+.codex-ui-connections-settings__empty-state p {
+  color: var(--codex-ui-text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.codex-ui-connections-settings__primary {
+  background: var(--codex-ui-background-button-secondary);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 0.5rem;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8125rem;
+  height: 1.5rem;
+  padding: 0 0.625rem;
+}
+
+.codex-ui-connections-settings__tab:focus-visible,
+.codex-ui-connections-settings__icon-button:focus-visible,
+.codex-ui-connections-settings__switch:focus-visible,
+.codex-ui-connections-settings__primary:focus-visible {
+  outline: 2px solid var(--codex-ui-border-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 42rem) {
+  .codex-ui-connections-settings {
+    width: calc(100% - 2rem);
+  }
+
+  .codex-ui-connections-settings__tab {
+    padding-inline: 0.625rem;
+  }
+
+  .codex-ui-connections-settings__other-settings {
+    margin-top: 7rem;
+  }
+}
+
 .codex-ui-browser-computer-use-settings__status {
   align-items: center;
   background: rgb(98 159 255 / 10%);

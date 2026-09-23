@@ -1196,7 +1196,7 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
-    frame: "workspace-connections-settings",
+    frame: "workspace-remote-connections-explorer",
     id: "workspace-connections-settings",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
@@ -1204,7 +1204,7 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
-    frame: "workspace-connections-settings-compact",
+    frame: "workspace-remote-connections-explorer-compact",
     id: "workspace-connections-settings-compact",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
@@ -1214,7 +1214,7 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
-    frame: "workspace-connections-settings-error",
+    frame: "workspace-remote-connections-explorer-error",
     id: "workspace-connections-settings-error",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
@@ -1222,7 +1222,7 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
-    frame: "workspace-connections-settings-form",
+    frame: "workspace-remote-connections-explorer-form",
     id: "workspace-connections-settings-form",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
@@ -1230,7 +1230,7 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
-    frame: "workspace-connections-settings",
+    frame: "workspace-remote-connections-explorer",
     id: "workspace-connections-settings-light",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
@@ -1239,7 +1239,7 @@ export const visualScenes = [
   },
   {
     currentSidebar: true,
-    frame: "workspace-connections-settings",
+    frame: "workspace-remote-connections-explorer-compact",
     id: "workspace-connections-settings-light-compact",
     maxPixelRatio: 0.01,
     scenario: "workspace-workflow",
@@ -4939,7 +4939,7 @@ export async function launchScene(
   // path explicitly selects the packaged-app path and skips Playwright's loader
   // (ready-event coordination and Chromium automation/backgrounding switches).
   return launchIsolatedElectron({
-    args: ["."],
+    args: ["--force-color-profile=srgb", "."],
     executablePath,
     env: {
       ...process.env,

@@ -26,6 +26,7 @@ export interface RemoteConnectionFormValue {
 export interface RemoteConnectionsPageProps
   extends Omit<HTMLAttributes<HTMLElement>, "children" | "title"> {
   connections?: readonly RemoteConnection[];
+  description?: ReactNode;
   disabled?: boolean;
   emptyMessage?: ReactNode;
   errorMessage?: ReactNode;
@@ -52,6 +53,7 @@ export interface RemoteConnectionsPageProps
 export function RemoteConnectionsPage({
   className,
   connections = [],
+  description = "Allow ChatGPT apps signed into your account to use this device.",
   disabled = false,
   emptyMessage = "No remote connections yet.",
   errorMessage = "Connections could not be loaded.",
@@ -111,7 +113,7 @@ export function RemoteConnectionsPage({
         <div>
           <p className="codex-ui-remote-connections__eyebrow">Coding</p>
           <h1 id={titleId}>{title}</h1>
-          <p>Allow ChatGPT apps signed into your account to use this device.</p>
+          <p>{description}</p>
         </div>
         {onAdd ? (
           <button className="codex-ui-remote-connections__primary" disabled={pageLocked} onClick={onAdd} type="button">

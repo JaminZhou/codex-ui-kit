@@ -10,8 +10,14 @@ import { launchScene, visualScenes } from "./electron-harness.mjs";
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-live-remote-connections-"));
 const registryPath = join(directory, "connections.json");
 const orphanLockPath = `${registryPath}.lock`;
-const scene = visualScenes.find(({ id }) => id === "workspace-connections-settings");
-assert.ok(scene, "remote connections route scene is present");
+const wideScene = visualScenes.find(
+  ({ id }) => id === "workspace-connections-settings",
+);
+const compactScene = visualScenes.find(
+  ({ id }) => id === "workspace-connections-settings-compact",
+);
+assert.ok(wideScene, "wide remote connections route scene is present");
+assert.ok(compactScene, "compact remote connections route scene is present");
 
 const methods = [];
 const server = new WebSocketServer({ host: "127.0.0.1", port: 0 });
@@ -41,6 +47,7 @@ try {
   );
   let orphanLockRecovered = false;
   for (const width of [1180, 720]) {
+    const scene = width === 720 ? compactScene : wideScene;
     const { app, page } = await launchScene(scene, {
       capture: false,
       environment: { CODEX_UI_KIT_LIVE_REMOTE_CONNECTIONS_PATH: registryPath },
@@ -64,7 +71,10 @@ try {
         if (await showSidebar.count()) await showSidebar.click();
       }
       await navigation.click({ force: true });
-      const route = page.getByRole("region", { name: "Connections", exact: true });
+      const route = page.getByRole("region", {
+        name: "Remote connection registry",
+        exact: true,
+      });
       await route.waitFor();
       await route.getByText("Available connections", { exact: true }).waitFor();
 
@@ -94,7 +104,51 @@ try {
       }
       await row.getByRole("button", { name: "Test", exact: true }).click();
       await row.getByText("Connected", { exact: true }).waitFor();
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      const layout = await page.evaluate(() => {
+        const shell = document.querySelector(".codex-ui-app-shell");
+        const route = document
+          .querySelector(".codex-ui-remote-connections")
+          ?.closest(".codex-ui-settings-shell");
+        const content = route?.querySelector(".codex-ui-settings-shell__main");
+        const buttons = [
+          ...(route?.querySelectorAll(
+            ".codex-ui-remote-connections__row button",
+          ) ?? []),
+        ];
+        const rect = (element) => {
+          const { left, right, width } = element.getBoundingClientRect();
+          return { left, right, width };
+        };
+        return {
+          documentOverflows: document.documentElement.scrollWidth > innerWidth,
+          sidebarPinned: shell?.hasAttribute("data-sidebar-pinned") ?? false,
+          sidebarOpen: shell?.hasAttribute("data-sidebar-open") ?? false,
+          route: route ? rect(route) : null,
+          content: content ? rect(content) : null,
+          actions: buttons.map((button) => ({
+            label: button.textContent?.trim(),
+            ...rect(button),
+          })),
+        };
+      });
+      assert.equal(layout.documentOverflows, false, `document overflows at ${width}px`);
+      assert.ok(layout.route, `settings route is missing at ${width}px`);
+      assert.ok(layout.content?.width > 0, `settings content is collapsed at ${width}px`);
+      assert.ok(layout.actions.length > 0, `connection actions are missing at ${width}px`);
+      for (const action of layout.actions) {
+        assert.ok(
+          action.left >= layout.content.left,
+          `${action.label} overlaps the settings navigation at ${width}px`,
+        );
+        assert.ok(
+          action.right <= layout.content.right + 1,
+          `${action.label} is clipped at ${width}px`,
+        );
+      }
+      if (width === 720) {
+        assert.equal(layout.sidebarPinned, false, "primary sidebar should collapse on compact settings routes");
+        assert.equal(layout.sidebarOpen, false, "primary sidebar should close after compact settings navigation");
+      }
       await page.screenshot({ path: join(directory, `remote-connections-${width}.png`) });
 
       if (width === 720) {
