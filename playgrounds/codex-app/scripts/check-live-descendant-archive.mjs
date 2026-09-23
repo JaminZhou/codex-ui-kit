@@ -9,7 +9,7 @@ const scene = visualScenes.find((candidate) => candidate.id === "pull-request-de
 assert.ok(scene, "The pull-request detail scene is required for Live mode.");
 
 const prompt =
-  "Immediately invoke the spawnAgent collaboration tool exactly once. Ask one subagent to reply with exactly CHILD_DONE and then wait for it to finish. After it finishes, reply with exactly PARENT_DONE. Do not use shell, MCP, browser, network, file writes, or any other tools.";
+  "Do not reply with a plan. Immediately invoke the spawnAgent collaboration tool exactly once to spawn one subagent. Ask it to reply with exactly CHILD_DONE, then wait for it to finish. After it finishes, reply with exactly PARENT_DONE. The first and only tool call must be the collaboration spawn. Do not use Sites, MCP, browser, GitHub, connectors, approvals, shell, network, file writes, or any other tools.";
 const directory = await realpath(await mkdtemp(join(tmpdir(), "ui-kit-live-descendant-archive-")));
 const registryPath = join(directory, "registry.json");
 const environment = {
@@ -22,6 +22,25 @@ const result = { passed: false, directory, evidence: "real signed-in App Server 
 const owned = new Set();
 let app;
 let page;
+
+function isSubagentStart(event) {
+  const item = event?.params?.item;
+  if (event?.method !== "item/started" || !item) return false;
+  if (
+    item.type === "subAgentActivity" &&
+    item.kind === "started" &&
+    typeof item.agentThreadId === "string"
+  ) {
+    return true;
+  }
+  return (
+    item.type === "collabAgentToolCall" &&
+    item.tool !== "wait" &&
+    (typeof item.tool === "string" ||
+      (Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+      Object.keys(item.agentsStates ?? {}).length > 0)
+  );
+}
 
 async function listServerDescendants(threadId) {
   const client = new CodexAppServerClient({ capabilities: { experimentalApi: true }, protocolValidation: "strict" });
@@ -46,24 +65,96 @@ try {
   await composer.fill(prompt);
   await composer.press("Enter");
   await page.waitForFunction(
-    () => window.__descendantArchiveEvents?.some((event) => event.kind === "live-bind"),
+    () => window.__descendantArchiveEvents?.some((event) => {
+      const item = event?.params?.item;
+      if (event?.method !== "item/started" || !item) return false;
+      if (
+        item.type === "subAgentActivity" &&
+        item.kind === "started" &&
+        typeof item.agentThreadId === "string"
+      ) {
+        return true;
+      }
+      return (
+        item.type === "collabAgentToolCall" &&
+        item.tool !== "wait" &&
+        (typeof item.tool === "string" ||
+          (Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+          Object.keys(item.agentsStates ?? {}).length > 0)
+      );
+    }),
     undefined,
     { timeout: 180_000 },
   );
-  const bound = await page.evaluate(() => window.__descendantArchiveEvents.find((event) => event.kind === "live-bind"));
-  const parentThreadId = bound?.threadId;
+  const events = await page.evaluate(() => window.__descendantArchiveEvents);
+  const collabStarted = events.find(isSubagentStart);
+  const parentThreadId = collabStarted?.params?.threadId;
   assert.equal(typeof parentThreadId, "string");
   owned.add(parentThreadId);
+
+  const callId = collabStarted.params.item.id;
+  assert.equal(typeof callId, "string");
+  const usesSubAgentActivity = collabStarted.params.item.type === "subAgentActivity";
+  const initialChildThreadId = usesSubAgentActivity
+    ? collabStarted.params.item.agentThreadId
+    : null;
   await page.waitForFunction(
-    () => window.__descendantArchiveEvents?.some((event) => event.method === "turn/completed" && event.params?.turn?.status === "completed"),
-    undefined,
+    ({ expectedCallId, expectedChildThreadId, usesSubAgentActivity: currentProtocol }) =>
+      window.__descendantArchiveEvents?.some((event) => {
+        const item = event.params?.item;
+        if (
+          currentProtocol &&
+          expectedChildThreadId &&
+          event.method === "thread/status/changed" &&
+          event.params?.threadId === expectedChildThreadId
+        ) {
+          return true;
+        }
+        return !currentProtocol && (
+          (event.method === "item/started" || event.method === "item/completed") &&
+          item?.type === "collabAgentToolCall" &&
+          item.id === expectedCallId &&
+          ((Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+            Object.keys(item.agentsStates ?? {}).length > 0)
+        );
+      }),
+    {
+      expectedCallId: callId,
+      expectedChildThreadId: initialChildThreadId,
+      usesSubAgentActivity,
+    },
+    { timeout: 120_000 },
+  );
+  const receiverEvents = await page.evaluate(() => window.__descendantArchiveEvents);
+  const receiverEvent = usesSubAgentActivity
+    ? null
+    : receiverEvents.findLast((event) => {
+        const item = event.params?.item;
+        return (
+          (event.method === "item/started" || event.method === "item/completed") &&
+          item?.type === "collabAgentToolCall" &&
+          item.id === callId &&
+          ((Array.isArray(item.receiverThreadIds) && item.receiverThreadIds.length > 0) ||
+            Object.keys(item.agentsStates ?? {}).length > 0)
+        );
+      });
+  const childThreadId = usesSubAgentActivity
+    ? initialChildThreadId
+    : receiverEvent?.params?.item?.receiverThreadIds?.[0] ?? null;
+  assert.equal(typeof childThreadId, "string");
+  owned.add(childThreadId);
+  await page.waitForFunction(
+    (threadId) => window.__descendantArchiveEvents?.some(
+      (event) => event.method === "turn/completed" && event.params?.threadId === threadId && event.params?.turn?.status === "completed",
+    ),
+    parentThreadId,
     { timeout: 240_000 },
   );
   await page.getByText("PARENT_DONE", { exact: true }).waitFor({ timeout: 60_000 });
 
   const descendants = await listServerDescendants(parentThreadId);
   assert.ok(descendants.length >= 1, "The completed parent must expose at least one server descendant.");
-  const child = descendants.find((thread) => thread.parentThreadId === parentThreadId) ?? descendants[0];
+  const child = descendants.find((thread) => thread.id === childThreadId) ?? descendants.find((thread) => thread.parentThreadId === parentThreadId) ?? descendants[0];
   assert.ok(child, "A direct descendant must be discoverable from the server.");
   owned.add(child.id);
   result.parentThreadId = parentThreadId;

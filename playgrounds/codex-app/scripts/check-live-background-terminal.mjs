@@ -11,9 +11,9 @@ const directory = await realpath(
   await mkdtemp(join(tmpdir(), "ui-kit-live-background-terminal-")),
 );
 const prompt = [
-  "In this disposable workspace, use the terminal tool to run exactly this command as a background process and leave it running after your response:",
-  "for i in $(seq 1 120); do printf 'live-background-handle-%03d\\n' \"$i\"; sleep 1; done",
-  "Do not run any other command or tool, do not stop the process, and reply exactly LIVE_BACKGROUND_OK once it is started.",
+  "In this disposable workspace, use the terminal tool to start exactly this command as a detached background terminal and leave it running after your response:",
+  "printf 'live-background-handle ready\\n'; sleep 600",
+  "Return as soon as the process has started; do not wait for command completion, poll it, run any other command or tool, or stop it. Reply exactly LIVE_BACKGROUND_OK once it is running.",
 ].join(" ");
 const evidence = [];
 const { app, page } = await launchScene(scene, {
@@ -21,6 +21,8 @@ const { app, page } = await launchScene(scene, {
   environment: {
     CODEX_UI_KIT_LIVE_EPHEMERAL: "1",
     CODEX_UI_KIT_LIVE_HISTORY_PATH: join(directory, "history.json"),
+    CODEX_UI_KIT_LIVE_MODEL: "gpt-5.6-luna",
+    CODEX_UI_KIT_LIVE_REASONING_EFFORT: "max",
     CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "1",
     CODEX_UI_KIT_WORKSPACE: directory,
   },
@@ -32,6 +34,8 @@ const result = {
   modelTurns: 1,
   passed: false,
 };
+let threadId = null;
+let processId = null;
 
 try {
   await page.getByRole("button", { name: "Live local", exact: true }).click();
@@ -68,22 +72,35 @@ try {
     ),
   );
   assert.ok(started, "A real background commandExecution must be observed.");
-  const threadId = started.params.threadId;
+  threadId = started.params.threadId;
   const commandId = started.params.item.id;
+  processId = started.params.item.processId;
   assert.equal(typeof threadId, "string");
   assert.equal(typeof commandId, "string");
-  assert.match(String(started.params.item.command ?? ""), /seq 1 120/);
+  assert.match(String(started.params.item.command ?? ""), /sleep 600/);
   result.startedItem = {
     command: started.params.item.command,
     cwd: started.params.item.cwd,
     id: commandId,
-    processId: started.params.item.processId,
+    processId,
   };
+
+  await page.waitForFunction(
+    () =>
+      window.__liveBackgroundEvidence?.some(
+        (event) =>
+          event.method === "turn/completed" &&
+          event.params?.turn?.status === "completed",
+      ),
+    undefined,
+    { timeout: 120_000 },
+  );
+  result.turnCompletedWhileProcessExpectedToRemain = true;
 
   // App Server can publish item/started before the background-terminal index
   // catches up. Keep the real list assertion strict, but allow the async
   // registry a little longer than the normal live-turn timeout.
-  const rowsDeadline = Date.now() + 180_000;
+  const rowsDeadline = Date.now() + 60_000;
   let rows = [];
   while (Date.now() < rowsDeadline) {
     rows = await page.evaluate(async (expectedThreadId) =>
@@ -95,6 +112,18 @@ try {
     if (rows.length === 1 && rows[0]?.itemId === commandId) break;
     await page.waitForTimeout(250);
   }
+  result.rowsAtDiscovery = rows;
+  result.eventTimeline = await page.evaluate(() =>
+    (window.__liveBackgroundEvidence ?? []).flatMap((event) => {
+      if (event.method === "turn/completed") {
+        return [{ method: event.method, status: event.params?.turn?.status }];
+      }
+      if (event.method === "item/started" || event.method === "item/completed") {
+        return [{ method: event.method, type: event.params?.item?.type }];
+      }
+      return [];
+    }),
+  );
   assert.equal(rows.length, 1, "Exactly one background terminal is expected.");
   assert.equal(rows[0].itemId, commandId);
   result.backgroundTerminal = rows[0];
@@ -139,7 +168,26 @@ try {
   result.stopNotification = await notifications.textContent();
   await processList.waitFor({ state: "detached", timeout: 30_000 });
   result.passed = true;
+} catch (error) {
+  result.error = String(error);
+  process.exitCode = 1;
 } finally {
+  if (!result.passed && threadId && processId) {
+    try {
+      await page.evaluate(
+        ({ processId: targetProcessId, targetThreadId }) =>
+          window.codexDemo.terminateLiveBackgroundTerminal({
+            processId: targetProcessId,
+            projectToken: window.codexDemo.startupWorkspaceProjectToken,
+            threadId: targetThreadId,
+          }),
+        { processId, targetThreadId: threadId },
+      );
+      result.failureCleanupTerminatedProcess = true;
+    } catch (error) {
+      result.cleanupError = String(error);
+    }
+  }
   await app.close();
 }
 

@@ -27,6 +27,23 @@ const scenes = [
     windowSize: { height: 680, width: 720 },
   },
 ];
+const routeScenes = [
+  {
+    frame: "integration-skill-detail-current-26-915-installed",
+    id: "current-skill-try-now-26-915-route-wide",
+    scenario: "workspace-workflow",
+    view: "plugins",
+    windowSize: { height: 820, width: 1180 },
+  },
+  {
+    frame: "integration-skill-detail-current-26-915-installed",
+    id: "current-skill-try-now-26-915-route-compact",
+    scenario: "workspace-workflow",
+    sidebarState: "compact-collapsed",
+    view: "plugins",
+    windowSize: { height: 680, width: 720 },
+  },
+];
 
 async function readContract(page) {
   return page.evaluate(() => {
@@ -112,6 +129,33 @@ async function capture(scene) {
   }
 }
 
+async function captureRouteTransition(scene) {
+  const { app, page } = await launchScene(scene, { capture: false });
+  try {
+    await page.getByTestId("current-skill-detail").waitFor({ state: "visible" });
+    await page.getByRole("button", { name: "Try now", exact: true }).click();
+    await page.getByTestId("current-skill-try-now").waitFor({ state: "visible" });
+    await page.waitForFunction(
+      () => document.querySelector('[data-testid="current-skill-try-now"]')?.getAttribute("data-action") === "try-now-prefill",
+    );
+    const contract = await readContract(page);
+    assertContract(contract, scene);
+    const draftText = await page.getByRole("textbox", { name: "Do anything", exact: true }).innerText();
+    assert.match(draftText, /OpenAI Docs/);
+    assert.equal(await page.locator(".codex-ui-skill-prompt-mention").count(), 1);
+    await page.waitForTimeout(350);
+    const screenshot = await page.screenshot();
+    await writeFile(
+      join(artifactDirectory, `${scene.id}.json`),
+      `${JSON.stringify({ contract, draftText, transition: "skill detail Try now -> conversation draft" }, null, 2)}\n`,
+    );
+    return { app, screenshot };
+  } catch (error) {
+    await app.close();
+    throw error;
+  }
+}
+
 function assertRepeatPixel(name, first, second) {
   const firstImage = PNG.sync.read(first);
   const secondImage = PNG.sync.read(second);
@@ -146,13 +190,25 @@ for (const scene of scenes) {
   }
   results.push(scene.id);
 }
+for (const scene of routeScenes) {
+  const first = await captureRouteTransition(scene);
+  await first.app.close();
+  const second = await captureRouteTransition(scene);
+  await second.app.close();
+  assertRepeatPixel(
+    `${scene.id} detail-to-draft transition`,
+    first.screenshot,
+    second.screenshot,
+  );
+  results.push(scene.id);
+}
 
 console.log(
   JSON.stringify({
     artifactDirectory,
     passed: true,
     pixelGate: "0% own-fixture drift at 1180 and 720",
-    replayEvidence: "current 26.915 controlled Skill Try now failure → Retry",
+    replayEvidence: "current 26.915 detail → Try now draft and controlled failure → Retry",
     scenes: results,
   }),
 );

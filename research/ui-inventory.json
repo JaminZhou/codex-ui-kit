@@ -327,7 +327,8 @@
         "replay:current-26.825-uuidgen-command-completion",
         "browser-cdp:current-26.825-worked-for-expanded-ran-row-wide-and-compact",
         "electron:current-26.825-native-command-row-and-composer-recovery",
-        "pixel:current-26.825-wide-compact-activity-header-and-composer-regions"
+        "pixel:current-26.825-wide-compact-activity-header-and-composer-regions",
+        "live:2026-09-23-background-terminal-list-open-stop-all-local-app-server"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -493,7 +494,10 @@
         "electron:live-mcp-multi-tool-disclosure",
         "live:2026-09-22-mcp-tool-call-remote-http-wide-compact",
         "live:2026-09-22-mcp-tool-call-oauth-dcr-wide-compact",
-        "live:2026-09-22-mcp-elicitation-form-accept-decline-cancel-url-wide-compact"
+        "live:2026-09-22-mcp-elicitation-form-accept-decline-cancel-url-wide-compact",
+        "live:2026-09-23-openai-docs-try-now-search-fetch-local-stdio",
+        "cdp:2026-09-23-openai-docs-try-now-group-style-geometry-wide-compact",
+        "pixel:2026-09-23-openai-docs-try-now-group-repeatability-zero-diff-wide-compact"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2713,7 +2717,9 @@
         "electron:integration-skill-detail-current-26-915-installed-actions",
         "pixel:integration-skill-detail-current-26-915-own-fixture-zero-drift",
         "replay:current-26.915-skill-detail-failure-retry-wide-compact",
-        "replay:current-26.915-skill-try-now-failure-retry-wide-compact"
+        "replay:current-26.915-skill-try-now-failure-retry-wide-compact",
+        "electron:current-26.915-skill-detail-to-try-now-prefilled-draft-wide-compact",
+        "live:2026-09-23-openai-docs-try-now-app-server-mcp-search-fetch"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
