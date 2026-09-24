@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import {
   mkdir,
@@ -10,8 +9,9 @@ import { basename, dirname, resolve } from "node:path";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
   assertCurrentAccountMenuRecord,
-  currentBaselineFingerprint,
+  currentAccountMenuCandidateFingerprints,
   currentBaselineViewports,
+  sanitizeCurrentAccountMenuRecord,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -19,6 +19,16 @@ const port = Number(process.env.CODEX_CURRENT_ACCOUNT_MENU_CDP_PORT);
 const profilePath = process.env.CODEX_CURRENT_ACCOUNT_MENU_PROFILE;
 const requestedOutputDirectory =
   process.env.CODEX_CURRENT_ACCOUNT_MENU_OUTPUT_DIR;
+const requestedFingerprint =
+  process.env.CODEX_CURRENT_ACCOUNT_MENU_FINGERPRINT ?? "promoted";
+const expectedFingerprint = Object.hasOwn(
+  currentAccountMenuCandidateFingerprints,
+  requestedFingerprint,
+)
+  ? currentAccountMenuCandidateFingerprints[requestedFingerprint]
+  : null;
+const candidateObservationOnly =
+  process.env.CODEX_CURRENT_ACCOUNT_MENU_OBSERVATION_ONLY === "1";
 const allowPreferences =
   process.env.CODEX_CURRENT_ACCOUNT_MENU_ALLOW_PREFERENCES === "1";
 const appBundle = "/Applications/ChatGPT.app";
@@ -33,6 +43,16 @@ if (!profilePath?.startsWith("/") || /\s/.test(profilePath)) {
 }
 if (!requestedOutputDirectory?.startsWith("/")) {
   throw new Error("Set an absolute account-menu output directory.");
+}
+if (!expectedFingerprint) {
+  throw new Error(
+    `Select a supported account-menu fingerprint: ${Object.keys(currentAccountMenuCandidateFingerprints).join(", ")}`,
+  );
+}
+if (candidateObservationOnly && requestedFingerprint === "promoted") {
+  throw new Error(
+    "Observation-only capture is reserved for an explicit non-promoted candidate.",
+  );
 }
 if (!allowPreferences) {
   throw new Error(
@@ -98,12 +118,12 @@ const readInstalledSnapshot = async () => {
 const beforeCapture = await readInstalledSnapshot();
 const fingerprint = beforeCapture.fingerprint;
 if (
-  Object.entries(currentBaselineFingerprint).some(
+  Object.entries(expectedFingerprint).some(
     ([key, expected]) => fingerprint[key] !== expected,
   )
 ) {
   throw new Error(
-    `The installed fingerprint does not match the promoted baseline: ${JSON.stringify(fingerprint)}`,
+    `The installed fingerprint does not match the selected account-menu baseline: ${JSON.stringify(fingerprint)}`,
   );
 }
 
@@ -534,7 +554,22 @@ try {
       };
     }, { compact, theme });
     const stem = `${theme.toLowerCase()}-${compact ? "compact" : "wide"}`;
-    await page.screenshot({ path: `${outputDirectory}/${stem}.png` });
+    const menuBounds = await menu.boundingBox();
+    if (!menuBounds) throw new Error("The account menu has no visible bounds.");
+    await page.screenshot({
+      clip: {
+        height: menuBounds.height,
+        width: menuBounds.width,
+        x: menuBounds.x,
+        y: menuBounds.y,
+      },
+      mask: [
+        menu.getByRole("menuitem").nth(0),
+        menu.getByRole("menuitem").nth(1),
+      ],
+      maskColor: "#555555",
+      path: `${outputDirectory}/${stem}.png`,
+    });
     await page.keyboard.press("Escape");
     await menu.waitFor({ state: "hidden" });
     state.focusReturned = await trigger.evaluate(
@@ -563,6 +598,9 @@ try {
   }
 
   const record = {
+    captureStatus: candidateObservationOnly
+      ? "candidate-observation-only"
+      : "contract-verified",
     fingerprint,
     profileOwnerPid: Number(isolatedOwnerPid),
     restoredPreference: "System",
@@ -574,28 +612,28 @@ try {
     },
     states,
   };
-  assertCurrentAccountMenuRecord(record);
+  assertCurrentAccountMenuRecord(record, expectedFingerprint, {
+    candidateObservationOnly,
+  });
+  const sanitizedRecord = sanitizeCurrentAccountMenuRecord(record);
   for (const [key, state] of Object.entries(states)) {
     const stem = `${state.theme.toLowerCase()}-${key.endsWith("Compact") ? "compact" : "wide"}`;
     await writeFile(
       `${outputDirectory}/${stem}.json`,
-      `${JSON.stringify(state, null, 2)}\n`,
+      `${JSON.stringify(sanitizedRecord.states[key], null, 2)}\n`,
       { encoding: "utf8", mode: 0o600 },
     );
   }
-  record.sha256 = createHash("sha256")
-    .update(JSON.stringify(record))
-    .digest("hex");
   await writeFile(
     `${outputDirectory}/account-menu.json`,
-    `${JSON.stringify(record, null, 2)}\n`,
+    `${JSON.stringify(sanitizedRecord, null, 2)}\n`,
     { encoding: "utf8", mode: 0o600 },
   );
   successSummary = {
     fingerprint,
     outputDirectory,
     restoredPreference: record.restoredPreference,
-    sha256: record.sha256,
+    sha256: sanitizedRecord.sha256,
     states: Object.fromEntries(
       Object.entries(states).map(([key, state]) => [
         key,

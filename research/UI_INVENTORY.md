@@ -800,6 +800,15 @@ zero overflow, and Escape/focus return. Browser/CDP and Electron repeat the
 contract; own-fixture screenshots remain at 0% drift. Account and Settings
 mutations remain host-owned.
 
+The installed 26.917.71314 candidate now has a separate isolated CDP capture
+for the same four theme/viewport states. It records the updated
+305.875×202.375px menu, 42.563px identity row, 430-weight text, and the
+`Show pet` ⌥Space hint; focus return and zero horizontal overflow hold in all
+four states. The evidence is candidate-only, redacts identity/usage content,
+and does not claim an installed-product pixel diff or promote the global
+baseline. See
+[`current-account-menu-26.917.71314.json`](current-account-menu-26.917.71314.json).
+
 The 26.915 candidate also covers a dedicated Sidebar Help menu matrix in
 dark/light wide and 720px scenes. The eight-item What's new surface keeps one
 separator, nine exact icons, and a 320×272.06px menu. Browser/CDP computed

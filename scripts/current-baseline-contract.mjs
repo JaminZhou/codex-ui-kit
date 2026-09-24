@@ -91,6 +91,11 @@ export const currentLatestInstalledCandidateBaselineFingerprint =
     chromiumVersion: "153.0.8010.53",
   });
 
+export const currentAccountMenuCandidateFingerprints = Object.freeze({
+  promoted: currentBaselineFingerprint,
+  "26.917.71314": currentLatestInstalledCandidateBaselineFingerprint,
+});
+
 const primaryRoutes = Object.freeze([
   "New chat",
   "Plugins",
@@ -622,23 +627,32 @@ export async function runBestEffortCurrentBaselineCleanup(steps) {
   return failures;
 }
 
-export function assertCurrentAccountMenuRecord(record) {
+export function assertCurrentAccountMenuRecord(
+  record,
+  expectedFingerprint = currentBaselineFingerprint,
+  { candidateObservationOnly = false } = {},
+) {
   const expectedStateKeys = [
     "darkCompact",
     "darkWide",
     "lightCompact",
     "lightWide",
   ];
-  const fingerprintMismatch = Object.entries(currentBaselineFingerprint).some(
+  const fingerprintMismatch = Object.entries(expectedFingerprint).some(
     ([key, expected]) => record?.fingerprint?.[key] !== expected,
   );
   const runtimeIdentity = record?.runtimeBundleIdentity;
+  const expectedCaptureStatus = candidateObservationOnly
+    ? "candidate-observation-only"
+    : "contract-verified";
   if (
     fingerprintMismatch ||
     !Number.isSafeInteger(record?.profileOwnerPid) ||
     record.profileOwnerPid <= 1 ||
     runtimeIdentity?.ownerPid !== record.profileOwnerPid ||
-    !provesRuntimeBundleIdentity(runtimeIdentity) ||
+    !provesRuntimeBundleIdentity(runtimeIdentity, expectedFingerprint) ||
+    (record?.captureStatus !== undefined &&
+      record.captureStatus !== expectedCaptureStatus) ||
     record?.restoredPreference !== "System" ||
     JSON.stringify(Object.keys(record?.states ?? {}).sort()) !==
       JSON.stringify(expectedStateKeys)
@@ -648,15 +662,82 @@ export function assertCurrentAccountMenuRecord(record) {
     );
   }
 
-  const expectedLabels = [
-    "<account>",
-    "Usage <dynamic>",
-    "Show pet",
-    "Invite a friend",
-    "Settings⌘,",
-    "Log out",
-  ];
-  const expectedSvgGeometry = [
+  if (candidateObservationOnly) {
+    for (const [key, state] of Object.entries(record.states)) {
+      const compact = key.endsWith("Compact");
+      const theme = key.startsWith("light") ? "light" : "dark";
+      const viewport = compact
+        ? currentBaselineViewports.compact
+        : currentBaselineViewports.wide;
+      if (
+        state?.theme?.toLowerCase() !== theme ||
+        state.colorScheme !== theme ||
+        state.compact !== compact ||
+        state.viewport?.width !== viewport.width ||
+        state.viewport?.height !== viewport.height ||
+        state.focusRole !== "menu" ||
+        state.focusReturned !== true ||
+        !Number.isFinite(state.horizontalOverflow) ||
+        Math.abs(state.horizontalOverflow) > 1 ||
+        state.imageCount !== 1 ||
+        state.itemCount !== 6 ||
+        state.separatorCount !== 0 ||
+        state.labels?.[0] !== "<account>" ||
+        state.labels?.[1] !== "Usage <dynamic>" ||
+        state.labels?.length !== 6 ||
+        state.labels.slice(2).some((label) => typeof label !== "string") ||
+        state.itemRects?.length !== 6 ||
+        state.itemRects.some(
+          (rect) =>
+            !Number.isFinite(rect?.left) ||
+            !Number.isFinite(rect?.top) ||
+            !Number.isFinite(rect?.width) ||
+            !Number.isFinite(rect?.height) ||
+            rect.width <= 0 ||
+            rect.height <= 0,
+        ) ||
+        !Number.isFinite(state.menuRect?.left) ||
+        !Number.isFinite(state.menuRect?.top) ||
+        !Number.isFinite(state.menuRect?.width) ||
+        !Number.isFinite(state.menuRect?.height) ||
+        state.menuRect.width <= 0 ||
+        state.menuRect.height <= 0 ||
+        !Number.isFinite(state.sidebarRect?.width) ||
+        !Number.isFinite(state.sidebarRect?.height) ||
+        !Number.isFinite(state.triggerRect?.width) ||
+        !Number.isFinite(state.triggerRect?.height) ||
+        !Number.isSafeInteger(state.triggerTextLength) ||
+        state.triggerTextLength < 1
+      ) {
+        throw new Error(
+          `Current account-menu ${key} candidate observation is incomplete or unsafe.`,
+        );
+      }
+    }
+    return;
+  }
+
+  const latestCandidate =
+    expectedFingerprint.appVersion ===
+    currentLatestInstalledCandidateBaselineFingerprint.appVersion;
+  const expectedLabels = latestCandidate
+    ? [
+        "<account>",
+        "Usage <dynamic>",
+        "Show pet⌥Space",
+        "Invite a friend",
+        "Settings⌘,",
+        "Log out",
+      ]
+    : [
+        "<account>",
+        "Usage <dynamic>",
+        "Show pet",
+        "Invite a friend",
+        "Settings⌘,",
+        "Log out",
+      ];
+  const promotedSvgGeometry = [
     [],
     [
       {
@@ -694,21 +775,77 @@ export function assertCurrentAccountMenuRecord(record) {
       },
     ],
   ];
+  const latestCandidateSvgGeometry = [
+    [],
+    [
+      {
+        shapeSha256:
+          "8d1383dcf2b7620ba5a184355db564a11d662b39ba88d1aeab45e0942fdaef36",
+        viewBox: "0 0 16 16",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "3a9aa7c85b5da0d67faae27b4dd3a402c4a0647d0edbb4251f385a1f7868306f",
+        viewBox: "0 0 16 16",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "4926a51ab5b3089bc5f2c81bb8a71f351075b5af10e29abcd7872cd7eb9e5e74",
+        viewBox: "0 0 16 16",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "d99a35f037e22df3415231782c9de283ed95d9075034db6c0000e6308b1a4f6e",
+        viewBox: "0 0 16 16",
+      },
+    ],
+    [
+      {
+        shapeSha256:
+          "e856f1fbfba58c13204d79b6f0d034111dbcd66f4475d60a3fa090ed0cc807e0",
+        viewBox: "0 0 16 16",
+      },
+    ],
+  ];
+  const expectedSvgGeometry = latestCandidate
+    ? latestCandidateSvgGeometry
+    : promotedSvgGeometry;
   for (const [key, state] of Object.entries(record.states)) {
     const compact = key.endsWith("Compact");
     const theme = key.startsWith("light") ? "light" : "dark";
     const viewport = compact
       ? currentBaselineViewports.compact
       : currentBaselineViewports.wide;
-    const expectedTop = compact ? 447 : 587;
-    const expectedItemTops = [
-      expectedTop + 4,
-      expectedTop + 41.5625,
-      expectedTop + 70.125,
-      expectedTop + 98.6875,
-      expectedTop + 127.25,
-      expectedTop + 155.8125,
-    ];
+    const expectedTop = latestCandidate
+      ? compact
+        ? 432
+        : 572
+      : compact
+        ? 447
+        : 587;
+    const expectedItemOffsets = latestCandidate
+      ? [4, 55.5625, 84.125, 112.6875, 141.25, 169.8125]
+      : [4, 41.5625, 70.125, 98.6875, 127.25, 155.8125];
+    const expectedItemTops = expectedItemOffsets.map(
+      (offset) => expectedTop + offset,
+    );
+    const expectedMenuHeight = latestCandidate ? 202.375 : 188.375;
+    const expectedFirstItemHeight = latestCandidate ? 42.5625 : 28.5625;
+    const expectedTriggerTop = latestCandidate
+      ? compact
+        ? 641
+        : 781
+      : compact
+        ? 642.5
+        : 782.5;
+    const expectedTriggerHeight = latestCandidate ? 32 : 29;
+    const expectedFontWeight = latestCandidate ? "430" : "400";
     const expectedBackground =
       theme === "light"
         ? "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)"
@@ -717,7 +854,8 @@ export function assertCurrentAccountMenuRecord(record) {
       theme === "light" ? "rgb(26, 28, 31)" : "rgb(255, 255, 255)";
     const svgGeometry = state?.svgGeometry?.map((icons) =>
       icons.map((icon) => ({
-        shapeSha256: sanitizedShapeSha256(icon?.shapes),
+        shapeSha256:
+          icon?.shapeSha256 ?? sanitizedShapeSha256(icon?.shapes),
         viewBox: icon?.viewBox,
       })),
     );
@@ -741,10 +879,10 @@ export function assertCurrentAccountMenuRecord(record) {
       !withinTolerance(state.menuRect?.left, 9) ||
       !withinTolerance(state.menuRect?.top, expectedTop) ||
       !withinTolerance(state.menuRect?.width, 305.875) ||
-      !withinTolerance(state.menuRect?.height, 188.375) ||
+      !withinTolerance(state.menuRect?.height, expectedMenuHeight) ||
       !withinTolerance(state.triggerRect?.left, 8) ||
-      !withinTolerance(state.triggerRect?.top, compact ? 642.5 : 782.5) ||
-      !withinTolerance(state.triggerRect?.height, 29) ||
+      !withinTolerance(state.triggerRect?.top, expectedTriggerTop) ||
+      !withinTolerance(state.triggerRect?.height, expectedTriggerHeight) ||
       !Number.isFinite(state.triggerRect?.width) ||
       state.triggerRect.width < 150 ||
       state.triggerRect.left + state.triggerRect.width >
@@ -765,7 +903,10 @@ export function assertCurrentAccountMenuRecord(record) {
           !withinTolerance(rect?.left, 13) ||
           !withinTolerance(rect?.top, expectedItemTops[index]) ||
           !withinTolerance(rect?.width, 297.875) ||
-          !withinTolerance(rect?.height, 28.5625),
+          !withinTolerance(
+            rect?.height,
+            index === 0 ? expectedFirstItemHeight : 28.5625,
+          ),
       ) ||
       state.itemStyles?.length !== 6 ||
       state.itemStyles.some(
@@ -775,17 +916,47 @@ export function assertCurrentAccountMenuRecord(record) {
           style.fontFamily !==
             '-apple-system, "system-ui", "Segoe UI", sans-serif' ||
           style.fontSize !== "13px" ||
-          style.fontWeight !== "400" ||
+          style.fontWeight !== expectedFontWeight ||
           style.lineHeight !== "18.5714px" ||
           style.padding !== "5px 8px",
       ) ||
       JSON.stringify(svgGeometry) !== JSON.stringify(expectedSvgGeometry)
     ) {
       throw new Error(
-        `Current account-menu ${key} observation does not match the current contract: ${JSON.stringify(state)}`,
+        `Current account-menu ${key} observation does not match the current contract: ${JSON.stringify(sanitizeCurrentAccountMenuRecord({ ...record, states: { [key]: state } }).states[key])}`,
       );
     }
   }
+}
+
+export function sanitizeCurrentAccountMenuRecord(record) {
+  const states = Object.fromEntries(
+    Object.entries(record?.states ?? {}).map(([key, state]) => [
+      key,
+      {
+        ...state,
+        svgGeometry: state.svgGeometry.map((icons) =>
+          icons.map(({ shapeSha256: existingHash, shapes, viewBox }) => {
+            const shapeSha256 =
+              /^[a-f0-9]{64}$/.test(existingHash ?? "")
+                ? existingHash
+                : sanitizedShapeSha256(shapes);
+            if (!shapeSha256) {
+              throw new Error(
+                `Current account-menu ${key} contains invalid SVG geometry.`,
+              );
+            }
+            return { shapeSha256, viewBox };
+          }),
+        ),
+      },
+    ]),
+  );
+  const sanitizedRecord = { ...record, states };
+  sanitizedRecord.sha256 = createHash("sha256")
+    .update(JSON.stringify(sanitizedRecord))
+    .digest("hex");
+  return sanitizedRecord;
 }
 
 const currentSidebarActionIconHashes = Object.freeze({

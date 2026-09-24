@@ -1,0 +1,96 @@
+{
+  "captureDate": "2026-09-24",
+  "captureStatus": "contract-verified-candidate",
+  "sanitizedCaptureSha256": "6e676a0eee98b071a852f7a24310dd28b8b66ecb8d03ba3d4b267ab09638559d",
+  "fingerprint": {
+    "appAsarBytes": 370175042,
+    "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
+    "appVersion": "26.917.71314",
+    "buildNumber": "10954",
+    "chromiumVersion": "153.0.8010.53"
+  },
+  "candidateOnly": true,
+  "captureMethod": "isolated-loopback-CDP",
+  "privacy": "Account and Usage labels are redacted in the JSON; menu-only screenshots mask those first two rows and were transient local references, not committed. Raw SVG paths and process/profile identifiers are not included in this summary.",
+  "scope": "Structural and computed-style evidence; no installed-product pixel-diff or baseline promotion is claimed.",
+  "restoredPreference": "System",
+  "states": {
+    "darkWide": {
+      "colorScheme": "dark",
+      "viewport": { "width": 1180, "height": 820 },
+      "sidebarRect": { "left": 0, "top": 46, "width": 321.875, "height": 774 },
+      "menuRect": { "left": 9, "top": 572, "width": 305.875, "height": 202.375 },
+      "triggerRect": { "left": 8, "top": 781, "width": 186.531, "height": 32 },
+      "focusRole": "menu",
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    "lightWide": {
+      "colorScheme": "light",
+      "viewport": { "width": 1180, "height": 820 },
+      "sidebarRect": { "left": 0, "top": 46, "width": 321.875, "height": 774 },
+      "menuRect": { "left": 9, "top": 572, "width": 305.875, "height": 202.375 },
+      "triggerRect": { "left": 8, "top": 781, "width": 186.531, "height": 32 },
+      "focusRole": "menu",
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    "darkCompact": {
+      "colorScheme": "dark",
+      "viewport": { "width": 720, "height": 680 },
+      "sidebarRect": { "left": 0, "top": 46, "width": 321.875, "height": 634 },
+      "menuRect": { "left": 9, "top": 432, "width": 305.875, "height": 202.375 },
+      "triggerRect": { "left": 8, "top": 641, "width": 186.531, "height": 32 },
+      "focusRole": "menu",
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    "lightCompact": {
+      "colorScheme": "light",
+      "viewport": { "width": 720, "height": 680 },
+      "sidebarRect": { "left": 0, "top": 46, "width": 321.875, "height": 634 },
+      "menuRect": { "left": 9, "top": 432, "width": 305.875, "height": 202.375 },
+      "triggerRect": { "left": 8, "top": 641, "width": 186.531, "height": 32 },
+      "focusRole": "menu",
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    }
+  },
+  "menu": {
+    "itemCount": 6,
+    "imageCount": 1,
+    "separatorCount": 0,
+    "labels": ["<account>", "Usage <dynamic>", "Show pet⌥Space", "Invite a friend", "Settings⌘,", "Log out"],
+    "itemGeometry": {
+      "left": 13,
+      "width": 297.875,
+      "firstIdentityRowHeight": 42.563,
+      "remainingRowHeight": 28.563,
+      "rowTopsWide": [576, 627.563, 656.125, 684.688, 713.25, 741.813],
+      "rowTopsCompact": [436, 487.563, 516.125, 544.688, 573.25, 601.813]
+    },
+    "computedItemStyle": {
+      "backgroundColor": "rgba(0, 0, 0, 0)",
+      "borderRadius": "15px",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "lineHeight": "18.5714px",
+      "padding": "5px 8px"
+    },
+    "surface": {
+      "borderRadius": "20px",
+      "lightBackground": "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)",
+      "lightColor": "rgb(26, 28, 31)",
+      "darkBackground": "oklab(0.297161 0.0000135154 0.00000594556 / 0.9)",
+      "darkColor": "rgb(255, 255, 255)"
+    },
+    "iconGeometry": [
+      { "label": "Usage <dynamic>", "shapeSha256": "8d1383dcf2b7620ba5a184355db564a11d662b39ba88d1aeab45e0942fdaef36", "viewBox": "0 0 16 16" },
+      { "label": "Show pet", "shapeSha256": "3a9aa7c85b5da0d67faae27b4dd3a402c4a0647d0edbb4251f385a1f7868306f", "viewBox": "0 0 16 16" },
+      { "label": "Invite a friend", "shapeSha256": "4926a51ab5b3089bc5f2c81bb8a71f351075b5af10e29abcd7872cd7eb9e5e74", "viewBox": "0 0 16 16" },
+      { "label": "Settings", "shapeSha256": "d99a35f037e22df3415231782c9de283ed95d9075034db6c0000e6308b1a4f6e", "viewBox": "0 0 16 16" },
+      { "label": "Log out", "shapeSha256": "e856f1fbfba58c13204d79b6f0d034111dbcd66f4475d60a3fa090ed0cc807e0", "viewBox": "0 0 16 16" }
+    ]
+  }
+}

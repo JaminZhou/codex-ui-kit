@@ -20,10 +20,12 @@ import {
   assertCurrentSidebarRowsRecord,
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentAccountMenuCandidateFingerprints,
   currentInstalledCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
   currentPreviousInstalledCandidateBaselineFingerprint,
   runBestEffortCurrentBaselineCleanup,
+  sanitizeCurrentAccountMenuRecord,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
 } from "../scripts/current-baseline-contract.mjs";
@@ -72,6 +74,44 @@ const accountMenuSvgGeometry = [
     ];
   }),
 ];
+const latestAccountMenuSvgGeometry = [
+  [],
+  [
+    {
+      shapeSha256:
+        "8d1383dcf2b7620ba5a184355db564a11d662b39ba88d1aeab45e0942fdaef36",
+      viewBox: "0 0 16 16",
+    },
+  ],
+  [
+    {
+      shapeSha256:
+        "3a9aa7c85b5da0d67faae27b4dd3a402c4a0647d0edbb4251f385a1f7868306f",
+      viewBox: "0 0 16 16",
+    },
+  ],
+  [
+    {
+      shapeSha256:
+        "4926a51ab5b3089bc5f2c81bb8a71f351075b5af10e29abcd7872cd7eb9e5e74",
+      viewBox: "0 0 16 16",
+    },
+  ],
+  [
+    {
+      shapeSha256:
+        "d99a35f037e22df3415231782c9de283ed95d9075034db6c0000e6308b1a4f6e",
+      viewBox: "0 0 16 16",
+    },
+  ],
+  [
+    {
+      shapeSha256:
+        "e856f1fbfba58c13204d79b6f0d034111dbcd66f4475d60a3fa090ed0cc807e0",
+      viewBox: "0 0 16 16",
+    },
+  ],
+];
 
 const candidate = (overrides: Record<string, unknown> = {}) => ({
   area: 1180 * 820,
@@ -82,22 +122,29 @@ const candidate = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
-const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
-  const menuTop = compact ? 447 : 587;
-  const itemTops = [
-    menuTop + 4,
-    menuTop + 41.5625,
-    menuTop + 70.125,
-    menuTop + 98.6875,
-    menuTop + 127.25,
-    menuTop + 155.8125,
-  ];
+const accountMenuState = (
+  theme: "dark" | "light",
+  compact: boolean,
+  appVersion = currentBaselineFingerprint.appVersion,
+) => {
+  const latestCandidate = appVersion === "26.917.71314";
+  const menuTop = latestCandidate
+    ? compact
+      ? 432
+      : 572
+    : compact
+      ? 447
+      : 587;
+  const itemOffsets = latestCandidate
+    ? [4, 55.5625, 84.125, 112.6875, 141.25, 169.8125]
+    : [4, 41.5625, 70.125, 98.6875, 127.25, 155.8125];
+  const itemTops = itemOffsets.map((offset) => menuTop + offset);
   const itemStyle = {
     backgroundColor: "rgba(0, 0, 0, 0)",
     borderRadius: "15px",
     fontFamily: '-apple-system, "system-ui", "Segoe UI", sans-serif',
     fontSize: "13px",
-    fontWeight: "400",
+    fontWeight: latestCandidate ? "430" : "400",
     lineHeight: "18.5714px",
     padding: "5px 8px",
   };
@@ -109,8 +156,8 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
     horizontalOverflow: 0,
     imageCount: 1,
     itemCount: 6,
-    itemRects: itemTops.map((top) => ({
-      height: 28.5625,
+    itemRects: itemTops.map((top, index) => ({
+      height: latestCandidate && index === 0 ? 42.5625 : 28.5625,
       left: 13,
       top,
       width: 297.875,
@@ -119,13 +166,13 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
     labels: [
       "<account>",
       "Usage <dynamic>",
-      "Show pet",
+      latestCandidate ? "Show pet⌥Space" : "Show pet",
       "Invite a friend",
       "Settings⌘,",
       "Log out",
     ],
     menuRect: {
-      height: 188.375,
+      height: latestCandidate ? 202.375 : 188.375,
       left: 9,
       top: menuTop,
       width: 305.875,
@@ -149,17 +196,27 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
       top: 46,
       width: 321.875,
     },
-    svgGeometry: accountMenuSvgGeometry.map((icons) =>
-      icons.map((icon) => ({
-        ...icon,
-        shapes: icon.shapes.map((shape) => ({ ...shape })),
-      })),
-    ),
+    svgGeometry: latestCandidate
+      ? latestAccountMenuSvgGeometry.map((icons) =>
+          icons.map((icon) => ({ ...icon })),
+        )
+      : accountMenuSvgGeometry.map((icons) =>
+          icons.map((icon) => ({
+            ...icon,
+            shapes: icon.shapes.map((shape) => ({ ...shape })),
+          })),
+        ),
     theme: theme === "light" ? "Light" : "Dark",
     triggerRect: {
-      height: 29,
+      height: latestCandidate ? 32 : 29,
       left: 8,
-      top: compact ? 642.5 : 782.5,
+      top: latestCandidate
+        ? compact
+          ? 641
+          : 781
+        : compact
+          ? 642.5
+          : 782.5,
       width: 186.53125,
     },
     triggerTextLength: 9,
@@ -169,22 +226,22 @@ const accountMenuState = (theme: "dark" | "light", compact: boolean) => {
   };
 };
 
-const accountMenuRecord = () => ({
-  fingerprint: currentBaselineFingerprint,
+const accountMenuRecord = (expectedFingerprint = currentBaselineFingerprint) => ({
+  fingerprint: expectedFingerprint,
   profileOwnerPid: 12_345,
   restoredPreference: "System",
   runtimeBundleIdentity: {
     afterCapture: {
-      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
-      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      appAsarBytes: expectedFingerprint.appAsarBytes,
+      appAsarSha256: expectedFingerprint.appAsarSha256,
       changedAtMs: 1_786_150_111_000,
       checkedAtMs: 1_786_351_000_000,
       device: "16777231",
       inode: "346397970",
     },
     beforeCapture: {
-      appAsarBytes: currentBaselineFingerprint.appAsarBytes,
-      appAsarSha256: currentBaselineFingerprint.appAsarSha256,
+      appAsarBytes: expectedFingerprint.appAsarBytes,
+      appAsarSha256: expectedFingerprint.appAsarSha256,
       changedAtMs: 1_786_150_111_000,
       checkedAtMs: 1_786_350_900_000,
       device: "16777231",
@@ -194,10 +251,10 @@ const accountMenuRecord = () => ({
     processStartedAtMs: 1_786_350_800_000,
   },
   states: {
-    darkCompact: accountMenuState("dark", true),
-    darkWide: accountMenuState("dark", false),
-    lightCompact: accountMenuState("light", true),
-    lightWide: accountMenuState("light", false),
+    darkCompact: accountMenuState("dark", true, expectedFingerprint.appVersion),
+    darkWide: accountMenuState("dark", false, expectedFingerprint.appVersion),
+    lightCompact: accountMenuState("light", true, expectedFingerprint.appVersion),
+    lightWide: accountMenuState("light", false, expectedFingerprint.appVersion),
   },
 });
 
@@ -1217,7 +1274,11 @@ describe("current baseline capture contract", () => {
     );
 
     const staleIcon = accountMenuRecord();
-    staleIcon.states.darkWide.svgGeometry[1][0].shapes[0].d = "M0 0Z";
+    const staleUsageIcon = staleIcon.states.darkWide.svgGeometry[1][0];
+    if (!("shapes" in staleUsageIcon)) {
+      throw new Error("The promoted account-menu fixture must retain raw paths.");
+    }
+    staleUsageIcon.shapes[0].d = "M0 0Z";
     expect(() => assertCurrentAccountMenuRecord(staleIcon)).toThrow(
       "darkWide observation",
     );
@@ -1234,6 +1295,58 @@ describe("current baseline capture contract", () => {
     expect(() => assertCurrentAccountMenuRecord(staleRenderer)).toThrow(
       "isolated current build",
     );
+  });
+
+  it("gates the latest installed account-menu candidate independently", () => {
+    const candidateRecord = {
+      ...accountMenuRecord(currentLatestInstalledCandidateBaselineFingerprint),
+      captureStatus: "candidate-observation-only",
+    };
+    expect(currentAccountMenuCandidateFingerprints["26.917.71314"]).toEqual(
+      currentLatestInstalledCandidateBaselineFingerprint,
+    );
+    expect(() =>
+      assertCurrentAccountMenuRecord(
+        candidateRecord,
+        currentLatestInstalledCandidateBaselineFingerprint,
+      ),
+    ).toThrow("isolated current build");
+    expect(() =>
+      assertCurrentAccountMenuRecord(
+        candidateRecord,
+        currentLatestInstalledCandidateBaselineFingerprint,
+        { candidateObservationOnly: true },
+      ),
+    ).not.toThrow();
+    expect(() => assertCurrentAccountMenuRecord(candidateRecord)).toThrow(
+      "isolated current build",
+    );
+
+    const sanitized = sanitizeCurrentAccountMenuRecord(candidateRecord);
+    const serialized = JSON.stringify(sanitized);
+    expect(serialized).not.toContain('"shapes"');
+    expect(serialized).not.toContain('"d":');
+    expect(sanitized.states.darkWide.svgGeometry[1][0]).toMatchObject({
+      shapeSha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+      viewBox: "0 0 16 16",
+    });
+    expect(sanitized.sha256).toMatch(/^[a-f0-9]{64}$/);
+
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-account-menu.mjs", import.meta.url),
+      "utf8",
+    );
+    expect(captureSource).toContain(
+      "Object.hasOwn(\n  currentAccountMenuCandidateFingerprints",
+    );
+    expect(captureSource).toContain(
+      "CODEX_CURRENT_ACCOUNT_MENU_OBSERVATION_ONLY === \"1\"",
+    );
+    expect(captureSource).toContain('"candidate-observation-only"');
+    expect(captureSource).toContain("maskColor: \"#555555\"");
+    expect(captureSource).toContain("sanitizeCurrentAccountMenuRecord(record)");
+    expect(captureSource).toContain(
+      "JSON.stringify(sanitizedRecord.states[key]");
   });
 
   it("gates sanitized current sidebar rows, actions, and status rails", () => {

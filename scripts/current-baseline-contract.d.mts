@@ -43,6 +43,11 @@ export const currentLatestInstalledCandidateBaselineFingerprint: Readonly<{
   chromiumVersion: string;
 }>;
 
+export const currentAccountMenuCandidateFingerprints: Readonly<{
+  promoted: typeof currentBaselineFingerprint;
+  "26.917.71314": typeof currentLatestInstalledCandidateBaselineFingerprint;
+}>;
+
 export const currentPreviousInstalledCandidateBaselineFingerprint: Readonly<{
   appAsarBytes: number;
   appAsarSha256: string;
@@ -66,7 +71,13 @@ export function assertCurrentBaselineRecord(
   }>,
 ): void;
 
-export function assertCurrentAccountMenuRecord(record: any): void;
+export function assertCurrentAccountMenuRecord(
+  record: any,
+  expectedFingerprint?: any,
+  options?: { candidateObservationOnly?: boolean },
+): void;
+
+export function sanitizeCurrentAccountMenuRecord(record: any): any;
 
 export function assertCurrentSidebarRowsRecord(record: any): void;
 
