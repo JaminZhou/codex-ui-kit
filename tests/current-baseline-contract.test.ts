@@ -1074,6 +1074,98 @@ describe("current baseline capture contract", () => {
     expect(JSON.stringify(record)).not.toMatch(/projectName|threadId|accountName/i);
   });
 
+  it("keeps the latest 26.917 Settings Connections sample read-only and structural", () => {
+    const record = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-settings-connections-26.917.71314.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(record.baseline).toMatchObject({
+      appVersion: "26.917.71314",
+      buildNumber: "10954",
+      appAsarBytes: 370175042,
+      appAsarSha256:
+        "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
+    });
+    expect(record).toMatchObject({
+      captureKind: "renderer_emulation",
+      productPixelsPromoted: false,
+      rendererViewport: { devicePixelRatio: 1, height: 600, width: 800 },
+      targetSelection: {
+        selected: {
+          url: "app://-/index.html",
+          landmarks: { main: 2, nav: 1, sidebarTrigger: 2 },
+        },
+      },
+      shell: {
+        main: { left: 321.875, top: 0, width: 478.125, height: 600 },
+        navigation: { left: 0, top: 46, width: 321.875, height: 554 },
+      },
+    });
+    expect(record.routes).toHaveLength(1);
+    expect(record.routes[0]).toMatchObject({
+      id: "settings.connections",
+      observations: {
+        readOnly: true,
+        connectionChanged: false,
+        credentialsRecorded: false,
+        pairingStarted: false,
+        horizontalOverflow: 0,
+      },
+    });
+    const states = record.routes[0].states;
+    expect(states.map((state: { activeTab: string }) => state.activeTab)).toEqual([
+      "Control this Mac",
+      "Control other devices",
+      "SSH",
+    ]);
+    for (const [index, state] of states.entries()) {
+      expect(state.tabs).toHaveLength(3);
+      expect(state.tabs[index]).toMatchObject({
+        label: state.activeTab,
+        pressed: "true",
+        role: "button",
+        selected: true,
+      });
+      expect(state.tabs.every((tab: { role: string }) => tab.role === "button")).toBe(
+        true,
+      );
+      expect(state.horizontalOverflow).toBe(0);
+    }
+    expect(states[0].switches).toHaveLength(2);
+    expect(states[0].switches.every((control: object) => !("checked" in control))).toBe(
+      true,
+    );
+    expect(states[1].controls).toHaveProperty("Set up");
+    expect(states[2].controls).toHaveProperty("Add");
+    expect(record.captureDigest).toMatch(/^[a-f0-9]{64}$/);
+    expect(JSON.stringify(record)).not.toMatch(/projectName|threadId|accountName/i);
+  });
+
+  it("pins Settings Connections captures to the exact supported 26.917 builds", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-settings-connections.mjs", import.meta.url),
+      "utf8",
+    );
+    const packageManifest = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    );
+
+    expect(captureSource).toContain("currentLatestInstalledCandidateBaselineFingerprint");
+    expect(captureSource).toContain("currentPreviousInstalledCandidateBaselineFingerprint");
+    expect(packageManifest.scripts[
+      "capture:current-settings-connections-26-917-71314"
+    ]).toContain("CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.71314");
+    expect(packageManifest.scripts[
+      "capture:current-settings-connections-26-917-62051"
+    ]).toContain("CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.62051");
+  });
+
   it("keeps the latest 26.915 content-variation delta explicit", () => {
     const delta = JSON.parse(
       readFileSync(
