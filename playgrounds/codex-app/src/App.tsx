@@ -765,6 +765,7 @@ function querySelection() {
     "project-group-lifecycle-current-26-915",
     "project-actions-current-26-915",
     "shell-current-26-915",
+    "shell-current-26-917",
     "footer-account-current-26-915",
     "project-collapsed",
     "project-menu",
@@ -3137,6 +3138,27 @@ const currentSidebarProjects = [
   },
 ];
 
+const currentSidebarShell26917Projects = Array.from(
+  { length: 15 },
+  (_, index) => {
+    const projectNumber = String(index + 1).padStart(2, "0");
+    return {
+      id: `sample-project-${projectNumber}`,
+      label: `Sample project ${projectNumber}`,
+      selected: false,
+      status: undefined,
+      tasks:
+        index < 9
+          ? [
+              `Sample task ${projectNumber}-A`,
+              `Sample task ${projectNumber}-B`,
+              `Sample task ${projectNumber}-C`,
+            ]
+          : [],
+    };
+  },
+);
+
 const currentSidebarWorktreeTasks = [
   "Run worktree activity check",
   "Worktree init failed",
@@ -5293,16 +5315,22 @@ export function App() {
         initialSelection.sidebarState !== "compact-collapsed") ||
         !isNarrowDemoWindow()),
   );
+  const initialSidebarProjects =
+    initialSelection.sidebarState === "shell-current-26-917"
+      ? currentSidebarShell26917Projects
+      : currentSidebarProjects;
   const [currentSidebarExpandedProjectIds, setCurrentSidebarExpandedProjectIds] =
     useState<Set<string>>(
       () =>
         new Set(
-          currentSidebarProjects
+          initialSidebarProjects
             .filter(
               (_project, index) =>
-                initialSelection.view !== "projects" &&
-                (initialSelection.sidebarState !== "project-collapsed" ||
-                  index !== 0),
+                initialSelection.sidebarState === "shell-current-26-917"
+                  ? index < 9
+                  : initialSelection.view !== "projects" &&
+                    (initialSelection.sidebarState !== "project-collapsed" ||
+                      index !== 0),
             )
             .map((project) => project.id),
         ),
@@ -7359,6 +7387,8 @@ export function App() {
     initialSelection.sidebarState === "project-actions-current-26-915";
   const currentSidebarShell26915Replay =
     initialSelection.sidebarState === "shell-current-26-915";
+  const currentSidebarShell26917Replay =
+    initialSelection.sidebarState === "shell-current-26-917";
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -7445,7 +7475,9 @@ export function App() {
         : undefined,
   );
   const currentSidebarVisibleProjects =
-    currentSidebarWorktreeLifecycle
+    currentSidebarShell26917Replay
+      ? currentSidebarShell26917Projects
+      : currentSidebarWorktreeLifecycle
       ? [
           {
             id: "codex-ui-kit",
@@ -7863,16 +7895,18 @@ export function App() {
           >
             Pull requests
           </AppSidebarItem>
-          <AppSidebarItem
-            leading={<SidebarGlyph name="sites" />}
-            onClick={() => {
-              setView("sites");
-              dismissSidebarAfterNavigation();
-            }}
-            selected={view === "sites"}
-          >
-            Sites
-          </AppSidebarItem>
+          {currentSidebarShell26917Replay ? null : (
+            <AppSidebarItem
+              leading={<SidebarGlyph name="sites" />}
+              onClick={() => {
+                setView("sites");
+                dismissSidebarAfterNavigation();
+              }}
+              selected={view === "sites"}
+            >
+              Sites
+            </AppSidebarItem>
+          )}
           <AppSidebarItem
             leading={<SidebarGlyph name="automation" />}
             onClick={() => {
@@ -8984,6 +9018,7 @@ export function App() {
         )
       }
       navigation={
+        currentSidebarShell26917Replay ? undefined :
         isCurrentMcp26825Replay ||
         isCurrentMcp26903Replay ||
         isCurrentApproval26825FileReplay ||
@@ -18616,6 +18651,9 @@ export function App() {
       data-current-sidebar-shell-26-915={
         currentSidebarShell26915Replay || undefined
       }
+      data-current-sidebar-shell-26-917={
+        currentSidebarShell26917Replay || undefined
+      }
       data-current-sidebar-thread-history-26-915={
         currentSidebarThreadHistory26915Replay || undefined
       }
@@ -19070,6 +19108,7 @@ export function App() {
                 currentSidebarProjectGroupLifecycle26915Replay ||
                 currentSidebarProjectActions26915Replay ||
                 currentSidebarShell26915Replay ||
+                currentSidebarShell26917Replay ||
                 currentSidebarFooterAccount26915Replay ||
                 currentSidebarItemActions26915Replay ||
                 currentSidebarStatus26915Replay ||
@@ -19111,7 +19150,15 @@ export function App() {
         }
         sidebarResizable
         windowChrome={
-          view === "workspace" &&
+          currentSidebarShell26917Replay ? (
+            <AppWindowChrome
+              sidebarAction={{
+                "aria-expanded": sidebarOpen,
+                label: sidebarOpen ? "Hide sidebar" : "Show sidebar",
+                onClick: () => setSidebarOpen((open) => !open),
+              }}
+            />
+          ) : view === "workspace" &&
           workspacePage === "connections-settings" &&
           activeFrame?.startsWith(
             "workspace-settings-connections-current-26-917",

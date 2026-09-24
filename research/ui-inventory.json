@@ -1240,7 +1240,11 @@
         "playground:current-sidebar-shell-26-915",
         "browser-cdp:current-sidebar-shell-26-915",
         "electron:current-sidebar-shell-26-915",
-        "pixel:current-sidebar-shell-26-915"
+        "pixel:current-sidebar-shell-26-915",
+        "playground:current-sidebar-shell-26-917",
+        "browser-cdp:current-sidebar-shell-26-917",
+        "electron:current-sidebar-shell-26-917",
+        "pixel:current-sidebar-shell-26-917-own-fixture-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1261,7 +1265,8 @@
         "cdp-26.903.71938:shell-wide-medium-721-720-hide-show-zero-overflow",
         "cdp-26.908.70816:shell-wide-medium-721-720-hide-show-zero-overflow",
         "cdp-26.911.61220:shell-wide-medium-721-720-hide-show-zero-overflow",
-        "cdp-26.915.31945:sidebar-shell-current-build-header-navigation-sections-footer-wide-compact-dark-light"
+        "cdp-26.915.31945:sidebar-shell-current-build-header-navigation-sections-footer-wide-compact-dark-light",
+        "cdp-26.917.62051:shell-wide-medium-721-720-visible-before-explicit-hide-show-pinned-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

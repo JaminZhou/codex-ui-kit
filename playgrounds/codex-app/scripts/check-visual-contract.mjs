@@ -2635,6 +2635,28 @@ async function checkScene(scene) {
       // Local and hosted captures must allow it to finish after scene setup.
       await page.waitForTimeout(1500);
     }
+    if (scene.id === "composer-plan-compact") {
+      await page.waitForFunction(
+        () => {
+          const viewport = document.querySelector(
+            ".codex-ui-thread-viewport",
+          );
+          return Boolean(
+            viewport &&
+              viewport.scrollTop >=
+                viewport.scrollHeight - viewport.clientHeight - 1,
+          );
+        },
+        null,
+        { timeout: 5_000 },
+      );
+      await page.evaluate(
+        () =>
+          new Promise((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+          }),
+      );
+    }
     report("capturing");
     await page.screenshot({
       animations: "disabled",
