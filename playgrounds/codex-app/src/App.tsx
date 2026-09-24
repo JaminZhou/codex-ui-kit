@@ -2918,6 +2918,10 @@ const currentProjectIndexItems26915 = [
   },
 ] as const;
 
+// The 26.917 sample also contains 15 content-dependent rows. Reuse the
+// sanitized fixture shape without carrying installed project identities.
+const currentProjectIndexItems26917 = currentProjectIndexItems26915;
+
 const workspaceEnvironmentGroups = [
   {
     description: "Current checkout and linked worktrees",
@@ -3843,6 +3847,9 @@ export function App() {
   const currentProjectsIndex26915Replay =
     initialSelection.view === "projects" &&
     initialSelection.frame?.startsWith("projects-index-current-26-915-");
+  const currentProjectsIndex26917Replay =
+    initialSelection.view === "projects" &&
+    initialSelection.frame?.startsWith("projects-index-current-26-917-");
   const currentIntegrationCatalog26915Replay =
     initialSelection.view === "plugins" &&
     (initialSelection.frame?.startsWith("integration-plugins-current-26-915") ||
@@ -4387,7 +4394,9 @@ export function App() {
       new Set(
         (initialSelection.frame === "projects-index-expanded" ||
           initialSelection.frame ===
-            "projects-index-current-26-915-expanded")
+            "projects-index-current-26-915-expanded" ||
+          initialSelection.frame ===
+            "projects-index-current-26-917-expanded")
           ? ["codex-ui-kit"]
           : [],
       ),
@@ -13334,9 +13343,11 @@ export function App() {
       updated: "Now",
       updatedOrder: workspaceProjects.length + createdProjects.length - index,
     })),
-    ...(currentProjectsIndex26915Replay
-      ? currentProjectIndexItems26915
-      : currentProjectIndexItems),
+    ...(currentProjectsIndex26917Replay
+      ? currentProjectIndexItems26917
+      : currentProjectsIndex26915Replay
+        ? currentProjectIndexItems26915
+        : currentProjectIndexItems),
   ];
   const filteredProjectIndexItems = projectIndexSourceItems
     .filter(({ label, path }) => {
@@ -13404,12 +13415,21 @@ export function App() {
     <div
       className={[
         "demo-projects-route",
-        currentProjectsIndex26915Replay
-          ? "demo-projects-route--current-26-915"
-          : null,
+        currentProjectsIndex26917Replay
+          ? "demo-projects-route--current-26-917"
+          : currentProjectsIndex26915Replay
+            ? "demo-projects-route--current-26-915"
+            : null,
       ]
         .filter(Boolean)
         .join(" ")}
+      data-current-project-index-baseline={
+        currentProjectsIndex26917Replay
+          ? "26.917.62051"
+          : currentProjectsIndex26915Replay
+            ? "26.915.31945"
+            : undefined
+      }
     >
       <ProjectIndex
         emptyState="No projects"
@@ -19059,6 +19079,7 @@ export function App() {
                 currentContext26825Replay ||
                 isCurrentShellFrame(initialSelection.frame) ||
                 currentProjectsIndex26915Replay ||
+                currentProjectsIndex26917Replay ||
                 currentTerminal26825Frame(activeFrame) ||
                 view === "automations" ||
                 view === "sites" ||

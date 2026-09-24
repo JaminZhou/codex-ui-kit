@@ -2629,6 +2629,15 @@ drift. This does not add installed-product pixels, promote the sampled icon
 artwork, or infer selection/upload/provider behavior, so the broader
 `composer.resources` row remains partial.
 
+The 26.917.62051 Projects Index now also has a version-labelled replay for the
+same-day 15-row sample. The contract checks the 1180×820 and 600×600 route
+geometry, 321.875px rail, 70px rows, owned scroll surface, search/title
+semantics, the measured 28px/500/33.6px title, and expanded recent-chat group.
+Electron/CDP repeats the three states, while a crop of the ProjectIndex-owned
+region has 0% repeated-fixture drift. This refreshes controlled replay evidence
+only; the product capture is structural and does not establish installed-
+product pixel parity or stable project identities.
+
 The playground carries a matching `26.908.70816` replay variant with the
 latest public catalog vocabulary (`GitHub`, 19 retained options). Its
 Browser/Electron acceptance path checks listbox semantics, 736/688px wide/
