@@ -67,15 +67,27 @@ export const currentInstalledCandidateBaselineFingerprint = Object.freeze({
   chromiumVersion: "153.0.8010.48",
 });
 
-// Keep the newest installed build as a candidate until its current surface
-// families are re-observed; do not promote it from package identity alone.
-export const currentLatestInstalledCandidateBaselineFingerprint =
+// Preserve the previous 26.917 candidate so its structural captures remain
+// reproducible after the installed package advances.
+export const currentPreviousInstalledCandidateBaselineFingerprint =
   Object.freeze({
     appAsarBytes: 370_175_042,
     appAsarSha256:
       "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
     appVersion: "26.917.62051",
     buildNumber: "10789",
+    chromiumVersion: "153.0.8010.53",
+  });
+
+// The installed app advanced again after 26.917.62051. Keep this package
+// candidate-only until its current surface families are re-observed.
+export const currentLatestInstalledCandidateBaselineFingerprint =
+  Object.freeze({
+    appAsarBytes: 370_175_042,
+    appAsarSha256:
+      "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
+    appVersion: "26.917.71314",
+    buildNumber: "10954",
     chromiumVersion: "153.0.8010.53",
   });
 

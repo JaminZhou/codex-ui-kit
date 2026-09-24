@@ -14,24 +14,25 @@ import {
   currentNewestCandidateBaselineFingerprint,
   currentInstalledCandidateBaselineFingerprint,
   currentBaselineFingerprint,
+  currentPreviousInstalledCandidateBaselineFingerprint,
   resolveCurrentBaselineOutputPath,
   runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
 } from "./current-baseline-contract.mjs";
 
+const candidateFingerprintsByVersion = new Map([
+  ["26.917.71314", currentLatestInstalledCandidateBaselineFingerprint],
+  ["26.917.62051", currentPreviousInstalledCandidateBaselineFingerprint],
+  ["26.915.31945", currentInstalledCandidateBaselineFingerprint],
+  ["26.911.61220", currentNewestCandidateBaselineFingerprint],
+  ["26.908.70816", currentLatestCandidateBaselineFingerprint],
+  ["26.908.40834", currentCandidateBaselineFingerprint],
+]);
 const expectedFingerprint =
-  process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.917.62051"
-    ? currentLatestInstalledCandidateBaselineFingerprint
-    : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.915.31945"
-      ? currentInstalledCandidateBaselineFingerprint
-      : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.911.61220"
-        ? currentNewestCandidateBaselineFingerprint
-        : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.70816"
-          ? currentLatestCandidateBaselineFingerprint
-          : process.env.CODEX_CURRENT_BASELINE_FINGERPRINT === "26.908.40834"
-            ? currentCandidateBaselineFingerprint
-            : currentBaselineFingerprint;
+  candidateFingerprintsByVersion.get(
+    process.env.CODEX_CURRENT_BASELINE_FINGERPRINT,
+  ) ?? currentBaselineFingerprint;
 
 const port = Number(process.env.CODEX_CURRENT_BASELINE_CDP_PORT);
 const expectedProfile = process.env.CODEX_CURRENT_BASELINE_PROFILE;

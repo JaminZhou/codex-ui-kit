@@ -43,6 +43,14 @@ export const currentLatestInstalledCandidateBaselineFingerprint: Readonly<{
   chromiumVersion: string;
 }>;
 
+export const currentPreviousInstalledCandidateBaselineFingerprint: Readonly<{
+  appAsarBytes: number;
+  appAsarSha256: string;
+  appVersion: string;
+  buildNumber: string;
+  chromiumVersion: string;
+}>;
+
 export function selectCurrentMainCandidate<T extends CurrentMainCandidate>(
   candidates: T[],
 ): T;

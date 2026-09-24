@@ -22,6 +22,7 @@ import {
   currentBaselineViewports,
   currentInstalledCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
+  currentPreviousInstalledCandidateBaselineFingerprint,
   runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
@@ -829,10 +830,14 @@ describe("current baseline capture contract", () => {
     expect(currentLatestInstalledCandidateBaselineFingerprint).toEqual({
       appAsarBytes: 370175042,
       appAsarSha256:
-        "c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd",
+        "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
+      appVersion: "26.917.71314",
+      buildNumber: "10954",
+      chromiumVersion: "153.0.8010.53",
+    });
+    expect(currentPreviousInstalledCandidateBaselineFingerprint).toMatchObject({
       appVersion: "26.917.62051",
       buildNumber: "10789",
-      chromiumVersion: "153.0.8010.53",
     });
 
     const captureSource = readFileSync(
@@ -840,8 +845,59 @@ describe("current baseline capture contract", () => {
       "utf8",
     );
     expect(captureSource).toContain(
-      'CODEX_CURRENT_BASELINE_FINGERPRINT === "26.917.62051"',
+      '["26.917.71314", currentLatestInstalledCandidateBaselineFingerprint]',
     );
+    expect(captureSource).toContain(
+      '["26.917.62051", currentPreviousInstalledCandidateBaselineFingerprint]',
+    );
+  });
+
+  it("keeps the latest 26.917 structural capture machine-verifiable", () => {
+    const record = JSON.parse(
+      readFileSync(
+        new URL(
+          "../research/current-baseline-26.917.71314.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+
+    expect(() =>
+      assertCurrentBaselineRecord(
+        record,
+        currentLatestInstalledCandidateBaselineFingerprint,
+      ),
+    ).not.toThrow();
+    expect(record.baseline).toMatchObject({
+      appVersion: "26.917.71314",
+      buildNumber: "10954",
+      sampledAt: "2026-09-24",
+    });
+    expect(record.targetSelection.selected).toMatchObject({
+      url: "app://-/index.html",
+      landmarks: { main: 2, nav: 1, sidebarTrigger: 2, textbox: 1 },
+    });
+    expect(record.states).toMatchObject({
+      wideNewChat: {
+        viewport: { width: 1180, height: 820 },
+        navigation: { width: 321.88 },
+        horizontalOverflow: 0,
+      },
+      thresholdNewChat: {
+        viewport: { width: 721, height: 680 },
+        horizontalOverflow: 0,
+      },
+      compactCollapsed: {
+        viewport: { width: 720, height: 680 },
+        horizontalOverflow: 0,
+      },
+    });
+    expect(record.projectsIndexObservation.wide.rows).toMatchObject({
+      count: 15,
+      firstRect: { height: 70, width: 736 },
+    });
+    expect(record.composerResourceObservation).toBeUndefined();
   });
 
   it("keeps the installed 26.917 candidate record machine-verifiable", () => {
@@ -858,7 +914,7 @@ describe("current baseline capture contract", () => {
     expect(() =>
       assertCurrentBaselineRecord(
         record,
-        currentLatestInstalledCandidateBaselineFingerprint,
+        currentPreviousInstalledCandidateBaselineFingerprint,
       ),
     ).not.toThrow();
     expect(record.baseline).toMatchObject({

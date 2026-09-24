@@ -10,29 +10,19 @@ exit gates; it does not replace the inventory.
 
 ## Current position
 
-- The installed app advanced to `26.917.62051` (`10789`), Chromium
+- The installed app now reports `26.917.71314` (`10954`), Chromium
   `153.0.8010.53`, with a 370,175,042-byte `app.asar` whose SHA-256 is
-  `c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd`.
-  The isolated candidate record is
-  [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
-  summarized in [`26.917.62051.md`](26.917.62051.md). It refreshes structural
-  observations for the shell/sidebar, Projects, Help, and Composer resources.
-  A bounded 26.917 Composer replay now locks the sampled Add-menu surface style,
-  19 sanitized public rows, wide/compact geometry, keyboard dismissal, and
-  repeat-capture stability. This remains a controlled replay rather than
-  installed-product pixel proof; provider selection, upload, and exact current
-  icon artwork remain open.
-  The same candidate's Projects Index now has a version-labelled wide/compact
-  replay with an expanded recent-chat group and an owned-region pixel repeat
-  gate. It preserves the 15-row count as content-dependent sample data and does
-  not promote project identities or installed-product pixels.
-  A separate read-only 800×600 Settings → Connections observation is recorded
-  in [`current-settings-connections-26.917.62051.json`](current-settings-connections-26.917.62051.json)
-  and [`26.917.62051-settings-connections.md`](26.917.62051-settings-connections.md).
-  The promoted baseline remains
-  `26.903.71938`: this candidate has no installed-product pixel evidence, and
-  evidence from older builds or controlled replay does not substitute for
-  current-build surface-family gates.
+  `03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804`.
+  Its isolated candidate record is
+  [`current-baseline-26.917.71314.json`](current-baseline-26.917.71314.json),
+  summarized in [`26.917.71314.md`](26.917.71314.md). It refreshes structural
+  evidence for the shell/sidebar, Projects, Help, and Pull Requests route. The
+  sample does not capture Composer resources, Settings Connections, or
+  installed-product pixels. The previous `26.917.62051` record and its bounded
+  Composer/Projects replays and read-only Connections observation remain
+  useful previous-build evidence, not proof for the latest package. The
+  promoted baseline remains `26.903.71938`; controlled replay and older-build
+  evidence do not substitute for current-build surface-family and pixel gates.
 - The promoted inventory baseline was sampled on 2026-09-12 from Codex Desktop
   `26.903.71938` (`8576`), Chromium `152.0.7977.83`, and ASAR SHA-256
   `58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0`;
@@ -40,7 +30,7 @@ exit gates; it does not replace the inventory.
   `26.901.51231` note is superseded. Existing surface evidence remains tied to
   its recorded build until each affected surface is re-observed; old fixtures
   remain regression evidence rather than current-product proof.
-- The installed app now reports `26.911.61220` (`9647`), Chromium
+- The earlier `26.911.61220` (`9647`) candidate used Chromium
   `153.0.8010.36`, and ASAR SHA-256
   `f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f`.
   A fresh isolated shell/sidebar capture is recorded in
@@ -57,7 +47,7 @@ exit gates; it does not replace the inventory.
   rows, and 19 sanitized public resource/skill titles. This is current-build
   structural CDP evidence only; selection, upload, authorization, execution,
   Browser/Electron, and product-pixel promotion remain open.
-- The installed app advanced again to `26.915.31945` (`9922`), Chromium
+- The earlier `26.915.31945` (`9922`) candidate used Chromium
   `153.0.8010.48`, and ASAR SHA-256
   `1f7939c1c781887c167043c4d1d307af3400d324685cfc315dfe2f80e634f483`.
   A fresh isolated shell/sidebar capture is recorded in
@@ -134,10 +124,11 @@ exit gates; it does not replace the inventory.
   older `RemoteConnectionsPage` plus local registry remains an exploratory
   integration surface (`integrations.remote-connections`); it is not evidence
   for the current Settings route. `ConnectionsSettingsPage` provides the
-  observed selection controls and controlled local-replay actions. The 26.917
-  capture confirms they are native buttons with `aria-pressed`, not ARIA tabs;
+  observed selection controls and controlled local-replay actions. The
+  26.917.62051 capture confirms they are native buttons with `aria-pressed`,
+  not ARIA tabs;
   the component and replay contract now use the same button-toggle model.
-  Separate 26.917 Browser/CDP and Electron replay scenes assert the measured
+  Separate 26.917.62051 Browser/CDP and Electron replay scenes assert the measured
   shell geometry and pressed-state interactions. The Electron scene records
   and normalizes its additional 46px local window-chrome inset; its control
   widths are host-specific structural checks, not product-pixel evidence. This
@@ -148,7 +139,7 @@ exit gates; it does not replace the inventory.
   installed-product 26.915 or 26.917 pixels, and pairing, SSH exchange,
   environment mutation, persistence, and production Remote semantics remain
   open.
-- The separate 26.917 Connections sample confirms the three current-build
+- The separate 26.917.62051 Connections sample confirms the three candidate-build
   button states at 800×600 with zero horizontal overflow. Its 321.875px route
   column and control geometry are recorded without retaining switch values;
   the tab-like controls are actual buttons using `aria-pressed`, not `role=tab`.
@@ -196,7 +187,7 @@ exit gates; it does not replace the inventory.
   `858.125px` wide main track, `736px` Composer, hidden-rail `720px` layout,
   and zero-overflow/zero-drift repeatability. It is current-build structural
   replay evidence, not a claim of installed-product pixel promotion.
-- The installed app now reports `26.908.70816` (`9275`), Chromium
+- The earlier `26.908.70816` (`9275`) candidate used Chromium
   `152.0.7977.83`, and ASAR SHA-256
   `100b3a06768326eec58ae32e54fa7b85368fef8d4ead5a5866ecb0e8751bdeaa`.
   The earlier `26.908.40834` (`8881`) package remains recorded as a prior
@@ -239,11 +230,13 @@ exit gates; it does not replace the inventory.
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
 - The inventory contains 93 surface groups: 59 P0, 23 P1, and 11 P2.
-- 18 groups have current-build runtime evidence, 66 have previous-build-only
-  runtime evidence, and 9 have not been sampled. Browser/Electron verified
-  statuses remain intentionally scoped: the current 26.903 PDF slice is
-  promoted, while older and broader families stay regression fixtures until
-  their affected slices are re-observed.
+- At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 66
+  have previous-build-only runtime evidence, and 9 have not been sampled. The
+  `26.917.71314` candidate adds structural observations to six shell,
+  navigation, composer-anchor, and Projects groups, but does not change
+  promotion or Browser/Electron verification status. The 26.903 PDF slice is
+  still the only promoted current-build pixel slice; broader families remain
+  regression fixtures until their current-build gates are met.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
   selection, wide/compact preview and pixels, focus-preserving removal, exact
@@ -1166,6 +1159,12 @@ new parity claims:
 Exit: the current build has a reproducible CDP capture recipe and no
 `verified` status relies solely on a previous build.
 
+The `26.917.71314` package identity and shell/sidebar/Projects/Help/Pull
+Requests structure are now captured in a candidate record. Stage 0 remains
+open: conversation, Composer resources, Review, Terminal, Markdown, MCP, other
+P0 route families, and installed-product pixel regions still need their own
+current-build evidence.
+
 ### 1. Complete the application shell and left sidebar
 
 The left sidebar is a P0 application-owned system, not one generic navigation
@@ -1352,8 +1351,8 @@ feature:
 - portal layering and focus return across sidebar, workspace panels, dialogs,
   menus, and notifications.
 
-The 26.917.62051 refresh now also has an isolated Shell replay covering the
-observed wide/medium/721px/720px widths, 321.875px rail, route list, navigation
+The previous 26.917.62051 candidate also has an isolated Shell replay covering
+the observed wide/medium/721px/720px widths, 321.875px rail, route list, navigation
 scroll ownership, and compact Hide/Show restoration. It adds Browser/CDP,
 Electron, and own-fixture regional pixel evidence only; the locked installed
 app prevented a product-pixel comparison, so `app.sidebar-shell` and Stage 1
