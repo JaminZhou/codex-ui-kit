@@ -1597,7 +1597,9 @@
         "playground:current-sidebar-footer-account-26-915",
         "browser-cdp:current-sidebar-footer-account-26-915",
         "electron:current-sidebar-footer-account-26-915",
-        "pixel:current-sidebar-footer-account-26-915"
+        "pixel:current-sidebar-footer-account-26-915",
+        "browser-cdp:current-account-menu-26-917-71314-dark-light-wide-compact",
+        "replay:current-account-menu-26-917-71314-candidate-only"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1611,7 +1613,8 @@
         "cdp-26.818.41509:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-zero-role-separators-zero-overflow-and-escape-focus-return",
         "cdp-26.820.60940:account-menu-dark-light-wide-compact-six-items-306.90625x188.375-five-exact-icons-one-avatar-menu-surface-focus-400-weight-zero-role-separators-zero-overflow-and-escape-focus-return",
         "cdp-26.825.51511:account-menu-system-restored-dark-light-wide-compact-six-items-305.875x188.375-400-weight-zero-overflow-and-escape-focus-return",
-        "cdp-26.915.31945:sidebar-footer-account-current-build-menu-wide-compact-dark-light-focus-return"
+        "cdp-26.915.31945:sidebar-footer-account-current-build-menu-wide-compact-dark-light-focus-return",
+        "cdp-26.917.71314:account-menu-six-items-305.875x202.375-42.563px-identity-row-430-weight-show-pet-shortcut-dark-light-wide-compact-focus-return-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

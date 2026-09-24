@@ -18,8 +18,15 @@ exit gates; it does not replace the inventory.
   summarized in [`26.917.71314.md`](26.917.71314.md). It refreshes structural
   evidence for the shell/sidebar, Projects, Help, Pull Requests route, and the
   Composer resource menu and read-only Settings Connections states. It does
-  not capture resource selection/execution, connection mutations/pairing/SSH,
-  or installed-product pixels. The previous
+  not capture resource selection/execution or connection mutations/pairing/SSH.
+  The isolated 26.917 account-menu matrix in
+  [`current-account-menu-26.917.71314.json`](current-account-menu-26.917.71314.json)
+  now records all four dark/light × wide/compact states: a `305.875×202.375px`
+  menu, a `42.563px` identity row, 430-weight labels, and the `Show pet`
+  shortcut. The capture contract is strict and version-specific; account and
+  usage labels are redacted, vector data is represented by hashes, and the
+  screenshots are masked temporary references only. This is structural/current-
+  style evidence, not a product-pixel diff or baseline promotion. The previous
   `26.917.62051` record and its bounded
   Composer/Projects replays and read-only Connections observation remain
   useful previous-build evidence, not proof for the latest package. The
