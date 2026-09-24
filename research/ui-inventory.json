@@ -1772,7 +1772,11 @@
         "projects-index-page",
         "playground:current-26.915-projects-index-contract",
         "electron:current-26.915-projects-index-wide-compact-expanded",
-        "pixel:current-26.915-projects-index-own-fixture-zero-drift"
+        "pixel:current-26.915-projects-index-own-fixture-zero-drift",
+        "playground:current-26.917-projects-index-contract",
+        "cdp:current-26.917-projects-index-wide-compact-expanded",
+        "electron:current-26.917-projects-index-wide-compact-expanded",
+        "pixel:current-26.917-project-index-owned-region-zero-drift"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [

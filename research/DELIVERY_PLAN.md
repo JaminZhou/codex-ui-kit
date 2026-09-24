@@ -22,6 +22,10 @@ exit gates; it does not replace the inventory.
   repeat-capture stability. This remains a controlled replay rather than
   installed-product pixel proof; provider selection, upload, and exact current
   icon artwork remain open.
+  The same candidate's Projects Index now has a version-labelled wide/compact
+  replay with an expanded recent-chat group and an owned-region pixel repeat
+  gate. It preserves the 15-row count as content-dependent sample data and does
+  not promote project identities or installed-product pixels.
   A separate read-only 800×600 Settings → Connections observation is recorded
   in [`current-settings-connections-26.917.62051.json`](current-settings-connections-26.917.62051.json)
   and [`26.917.62051-settings-connections.md`](26.917.62051-settings-connections.md).

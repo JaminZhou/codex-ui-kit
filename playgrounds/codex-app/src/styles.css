@@ -576,13 +576,23 @@ textarea {
   height: 100%;
 }
 
-/* The 26.915 compact Projects route leaves the measured one-pixel shell
-   inset; keep this candidate geometry isolated from the legacy index replay. */
+/* The 26.915 and 26.917 compact Projects routes share the measured one-pixel
+   shell inset; keep these candidate geometries isolated from legacy replay. */
 @media (max-width: 720px) {
-  .demo-projects-route--current-26-915 > .codex-ui-project-index {
+  :is(
+    .demo-projects-route--current-26-915,
+    .demo-projects-route--current-26-917
+  ) > .codex-ui-project-index {
     margin-left: 1px;
     width: calc(100% - 1px);
   }
+}
+
+.demo-projects-route--current-26-917
+  .codex-ui-project-index[data-layout="table"]
+  .codex-ui-project-index__header
+  h3 {
+  font-weight: 500;
 }
 
 .demo-root[data-capture][data-view="projects"]
