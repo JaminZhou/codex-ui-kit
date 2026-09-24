@@ -137,9 +137,10 @@ host-owned and are intentionally not claimed by the playground.
   Its isolated candidate record is
   [`current-baseline-26.917.71314.json`](current-baseline-26.917.71314.json),
   with method and limits in [`26.917.71314.md`](26.917.71314.md). It refreshes
-  structural shell/sidebar, Projects, Help, and Pull Requests route observations
-  only. Composer resources, Settings Connections, and installed-product pixels
-  were not sampled on this build. The earlier `26.917.62051` records remain
+  structural shell/sidebar, Projects, Help, and Pull Requests observations and
+  samples the Composer resource menu without selecting a resource. Settings
+  Connections, resource execution, and installed-product pixels were not
+  sampled on this build. The earlier `26.917.62051` records remain
   previous-build evidence. The promoted baseline remains `26.903.71938`.
 - The current 26.915 conversation-shell replay now pairs the basic user/
   assistant turn with the sampled wide and compact Composer/thread geometry.
@@ -406,8 +407,8 @@ Current inventory: 93 surface groups; at the promoted `26.903.71938` baseline,
 18 have runtime evidence, 66 have previous-build-only runtime evidence, and 9
 remain `not_sampled` (0 are `blocked_by_policy`). Current-build Browser
 verification covers 0 groups and Electron verification covers 0. The
-candidate `26.917.71314` adds structural runtime observations but does not
-change promoted status.
+candidate `26.917.71314` adds structural runtime observations to seven groups
+but does not change promoted status.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

@@ -1141,7 +1141,8 @@
         "cdp-26.911.61220:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
         "cdp-26.911.61220:documents-selection-inline-mention-and-templates",
         "cdp-26.915.31945:read-only-unified-add-files-menu-public-resource-catalog-736x320-726x310-scroller",
-        "cdp-26.917.62051:unified-add-menu-public-catalog-736x320-726x310-scroller"
+        "cdp-26.917.62051:unified-add-menu-public-catalog-736x320-726x310-scroller",
+        "cdp-26.917.71314:unified-add-menu-736x320-726x310-scroller-19-allowlisted-public-titles"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

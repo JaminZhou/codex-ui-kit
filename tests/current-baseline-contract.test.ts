@@ -897,7 +897,33 @@ describe("current baseline capture contract", () => {
       count: 15,
       firstRect: { height: 70, width: 736 },
     });
-    expect(record.composerResourceObservation).toBeUndefined();
+    expect(record.composerResourceObservation).toMatchObject({
+      editor: {
+        contentEditable: true,
+        rect: { height: 44, width: 712 },
+        style: { fontSize: "14px", lineHeight: "20px" },
+      },
+      horizontalOverflow: 0,
+      menu: {
+        backgroundColor: "rgb(45, 45, 45)",
+        borderRadius: "20px",
+        fontSize: "13px",
+        fontWeight: "430",
+        itemHeight: 28.5625,
+        publicItems: expect.arrayContaining([
+          "Files and folders",
+          "Documents",
+          "GitHub",
+          "Browser",
+        ]),
+        rect: { height: 320, width: 736 },
+        scrollOwner: { clientHeight: 310, scrollHeight: 834 },
+        visibleItemCount: 22,
+      },
+      trigger: { ariaExpanded: "true", dataState: "open" },
+      viewport: { devicePixelRatio: 1, height: 820, width: 1180 },
+    });
+    expect(record.composerResourceObservation.menu.publicItems).toHaveLength(19);
   });
 
   it("keeps the installed 26.917 candidate record machine-verifiable", () => {
