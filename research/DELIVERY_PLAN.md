@@ -16,9 +16,10 @@ exit gates; it does not replace the inventory.
   Its isolated candidate record is
   [`current-baseline-26.917.71314.json`](current-baseline-26.917.71314.json),
   summarized in [`26.917.71314.md`](26.917.71314.md). It refreshes structural
-  evidence for the shell/sidebar, Projects, Help, and Pull Requests route. The
-  sample does not capture Composer resources, Settings Connections, or
-  installed-product pixels. The previous `26.917.62051` record and its bounded
+  evidence for the shell/sidebar, Projects, Help, Pull Requests route, and the
+  Composer resource menu. It does not capture resource selection/execution,
+  Settings Connections, or installed-product pixels. The previous
+  `26.917.62051` record and its bounded
   Composer/Projects replays and read-only Connections observation remain
   useful previous-build evidence, not proof for the latest package. The
   promoted baseline remains `26.903.71938`; controlled replay and older-build
@@ -232,8 +233,8 @@ exit gates; it does not replace the inventory.
 - The inventory contains 93 surface groups: 59 P0, 23 P1, and 11 P2.
 - At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 66
   have previous-build-only runtime evidence, and 9 have not been sampled. The
-  `26.917.71314` candidate adds structural observations to six shell,
-  navigation, composer-anchor, and Projects groups, but does not change
+  `26.917.71314` candidate adds structural observations to seven shell,
+  navigation, Composer, and Projects groups, but does not change
   promotion or Browser/Electron verification status. The 26.903 PDF slice is
   still the only promoted current-build pixel slice; broader families remain
   regression fixtures until their current-build gates are met.
@@ -1160,10 +1161,10 @@ Exit: the current build has a reproducible CDP capture recipe and no
 `verified` status relies solely on a previous build.
 
 The `26.917.71314` package identity and shell/sidebar/Projects/Help/Pull
-Requests structure are now captured in a candidate record. Stage 0 remains
-open: conversation, Composer resources, Review, Terminal, Markdown, MCP, other
-P0 route families, and installed-product pixel regions still need their own
-current-build evidence.
+Requests plus Composer resource-menu structure are now captured in a candidate
+record. Stage 0 remains open: conversation, resource selection/execution,
+Review, Terminal, Markdown, MCP, other P0 route families, and installed-product
+pixel regions still need their own current-build evidence.
 
 ### 1. Complete the application shell and left sidebar
 

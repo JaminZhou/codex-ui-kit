@@ -8,12 +8,285 @@
     "sampledAt": "2026-09-24"
   },
   "captureKind": "renderer_emulation",
+  "composerResourceObservation": {
+    "editor": {
+      "contentEditable": true,
+      "rect": {
+        "height": 44,
+        "left": 395.4375,
+        "top": 720,
+        "width": 712
+      },
+      "style": {
+        "color": "rgb(255, 255, 255)",
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px"
+      }
+    },
+    "horizontalOverflow": 0,
+    "menu": {
+      "backgroundColor": "rgb(45, 45, 45)",
+      "borderRadius": "20px",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "itemHeight": 28.5625,
+      "publicItems": [
+        "Files and folders",
+        "Work in a project",
+        "Goal",
+        "Plan mode",
+        "Record a skill",
+        "Sketch",
+        "GitHub",
+        "Documents",
+        "PDF",
+        "Spreadsheets",
+        "Presentations",
+        "Template Creator",
+        "Browser",
+        "Computer",
+        "Visualize",
+        "Watch PR",
+        "AppKit Inspector",
+        "Plugin Management",
+        "Sites"
+      ],
+      "publicItemDetails": [
+        {
+          "description": null,
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 413.5625,
+            "width": 726
+          },
+          "title": "Files and folders"
+        },
+        {
+          "description": "Choose project for new chats",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 470.6875,
+            "width": 726
+          },
+          "title": "Work in a project"
+        },
+        {
+          "description": "Set a goal to keep pursuing",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 499.25,
+            "width": 726
+          },
+          "title": "Goal"
+        },
+        {
+          "description": "Turn plan mode on",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 527.8125,
+            "width": 726
+          },
+          "title": "Plan mode"
+        },
+        {
+          "description": null,
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 556.375,
+            "width": 726
+          },
+          "title": "Record a skill"
+        },
+        {
+          "description": "Draw a sketch",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 584.9375,
+            "width": 726
+          },
+          "title": "Sketch"
+        },
+        {
+          "description": "Triage PRs, issues, CI, and publish flows",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 644.0625,
+            "width": 726
+          },
+          "title": "GitHub"
+        },
+        {
+          "description": "Create and edit documents",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 672.625,
+            "width": 726
+          },
+          "title": "Documents"
+        },
+        {
+          "description": "Read, create, and verify PDFs",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 701.1875,
+            "width": 726
+          },
+          "title": "PDF"
+        },
+        {
+          "description": "Create and edit spreadsheets",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 729.75,
+            "width": 726
+          },
+          "title": "Spreadsheets"
+        },
+        {
+          "description": "Create and edit presentations",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 758.3125,
+            "width": 726
+          },
+          "title": "Presentations"
+        },
+        {
+          "description": "Create or update reusable templates from reference content",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 786.875,
+            "width": 726
+          },
+          "title": "Template Creator"
+        },
+        {
+          "description": "Control the in-app browser",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 815.4375,
+            "width": 726
+          },
+          "title": "Browser"
+        },
+        {
+          "description": "Control Mac apps from ChatGPT",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 844,
+            "width": 726
+          },
+          "title": "Computer"
+        },
+        {
+          "description": "Create interactive visuals",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 872.5625,
+            "width": 726
+          },
+          "title": "Visualize"
+        },
+        {
+          "description": "Drive GitHub bot review rounds to a clean pass.",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 901.125,
+            "width": 726
+          },
+          "title": "Watch PR"
+        },
+        {
+          "description": "Inspect native macOS views in Codex Browser.",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 929.6875,
+            "width": 726
+          },
+          "title": "AppKit Inspector"
+        },
+        {
+          "description": "Discover and manage plugins",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 958.25,
+            "width": 726
+          },
+          "title": "Plugin Management"
+        },
+        {
+          "description": "Build and deploy websites",
+          "rect": {
+            "height": 28.5625,
+            "left": 388.4375,
+            "top": 986.8125,
+            "width": 726
+          },
+          "title": "Sites"
+        }
+      ],
+      "rect": {
+        "height": 320,
+        "left": 383.4375,
+        "top": 382,
+        "width": 736
+      },
+      "scrollOwner": {
+        "clientHeight": 310,
+        "rect": {
+          "height": 310,
+          "left": 388.4375,
+          "top": 387,
+          "width": 726
+        },
+        "scrollHeight": 834,
+        "scrollTop": 0
+      },
+      "visibleItemCount": 22
+    },
+    "trigger": {
+      "ariaExpanded": "true",
+      "dataState": "open",
+      "rect": {
+        "height": 28,
+        "left": 391.4375,
+        "top": 768,
+        "width": 28
+      }
+    },
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 820,
+      "width": 1180
+    }
+  },
   "runtimeBundleIdentity": {
     "afterCapture": {
       "appAsarBytes": 370175042,
       "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
       "changedAtMs": 1790255716779,
-      "checkedAtMs": 1790256480818,
+      "checkedAtMs": 1790260542076,
       "device": "16777234",
       "inode": "381336117"
     },
@@ -21,12 +294,12 @@
       "appAsarBytes": 370175042,
       "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
       "changedAtMs": 1790255716779,
-      "checkedAtMs": 1790256469926,
+      "checkedAtMs": 1790260529039,
       "device": "16777234",
       "inode": "381336117"
     },
-    "ownerPid": 71530,
-    "processStartedAtMs": 1790256377000
+    "ownerPid": 36103,
+    "processStartedAtMs": 1790260508000
   },
   "schemaVersion": 1,
   "projectsIndexObservation": {
@@ -1733,39 +2006,9 @@
   "targetSelection": {
     "candidates": [
       {
-        "area": 3145992,
-        "height": 2789,
-        "index": 0,
-        "landmarks": {
-          "main": 1,
-          "nav": 0,
-          "sidebarTrigger": 0,
-          "textbox": 1
-        },
-        "selected": false,
-        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
-        "visibleControls": 0,
-        "width": 1128
-      },
-      {
-        "area": 967600,
-        "height": 820,
-        "index": 1,
-        "landmarks": {
-          "main": 2,
-          "nav": 1,
-          "sidebarTrigger": 2,
-          "textbox": 1
-        },
-        "selected": true,
-        "url": "app://-/index.html",
-        "visibleControls": 51,
-        "width": 1180
-      },
-      {
         "area": 691200,
         "height": 720,
-        "index": 2,
+        "index": 0,
         "landmarks": {
           "main": 0,
           "nav": 0,
@@ -1776,6 +2019,36 @@
         "url": "non-app-page",
         "visibleControls": 0,
         "width": 960
+      },
+      {
+        "area": 113920,
+        "height": 320,
+        "index": 1,
+        "landmarks": {
+          "main": 0,
+          "nav": 0,
+          "sidebarTrigger": 0,
+          "textbox": 0
+        },
+        "selected": false,
+        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
+        "visibleControls": 0,
+        "width": 356
+      },
+      {
+        "area": 967600,
+        "height": 820,
+        "index": 2,
+        "landmarks": {
+          "main": 2,
+          "nav": 1,
+          "sidebarTrigger": 2,
+          "textbox": 1
+        },
+        "selected": true,
+        "url": "app://-/index.html",
+        "visibleControls": 51,
+        "width": 1180
       }
     ],
     "selected": {
