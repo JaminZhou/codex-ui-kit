@@ -2642,7 +2642,8 @@
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
         "cdp-26.915.31945:settings-connections-environments-read-only-800x600-three-selection-controls",
-        "cdp-26.917.62051:settings-connections-read-only-three-aria-pressed-buttons-800x600"
+        "cdp-26.917.62051:settings-connections-read-only-three-aria-pressed-buttons-800x600",
+        "cdp-26.917.71314:settings-connections-read-only-three-aria-pressed-buttons-800x600-zero-overflow"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

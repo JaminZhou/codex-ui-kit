@@ -17,8 +17,9 @@ exit gates; it does not replace the inventory.
   [`current-baseline-26.917.71314.json`](current-baseline-26.917.71314.json),
   summarized in [`26.917.71314.md`](26.917.71314.md). It refreshes structural
   evidence for the shell/sidebar, Projects, Help, Pull Requests route, and the
-  Composer resource menu. It does not capture resource selection/execution,
-  Settings Connections, or installed-product pixels. The previous
+  Composer resource menu and read-only Settings Connections states. It does
+  not capture resource selection/execution, connection mutations/pairing/SSH,
+  or installed-product pixels. The previous
   `26.917.62051` record and its bounded
   Composer/Projects replays and read-only Connections observation remain
   useful previous-build evidence, not proof for the latest package. The
@@ -146,6 +147,11 @@ exit gates; it does not replace the inventory.
   the tab-like controls are actual buttons using `aria-pressed`, not `role=tab`.
   This refreshes structural evidence only, not installed-product pixels,
   pairing, SSH exchange, or persistence.
+- The current 26.917.71314 Settings Connections record is
+  [`current-settings-connections-26.917.71314.json`](current-settings-connections-26.917.71314.json).
+  At 800×600 it confirms the three `aria-pressed` button views, the 321.875px
+  rail, 478.125px route main, and zero overflow. No switches were toggled and
+  no pairing, SSH, or connection mutation was started; pixels remain unproven.
 - The installed `26.915.31945` Settings route was re-observed in a read-only
   isolated Renderer. `Computer use` and `Browser` are both reachable from the
   current Settings navigation and share a `321.88px` rail, `46px` titlebar
@@ -1161,10 +1167,11 @@ Exit: the current build has a reproducible CDP capture recipe and no
 `verified` status relies solely on a previous build.
 
 The `26.917.71314` package identity and shell/sidebar/Projects/Help/Pull
-Requests plus Composer resource-menu structure are now captured in a candidate
-record. Stage 0 remains open: conversation, resource selection/execution,
-Review, Terminal, Markdown, MCP, other P0 route families, and installed-product
-pixel regions still need their own current-build evidence.
+Requests, Composer resource-menu, and Settings Connections structures are now
+captured in candidate records. Stage 0 remains open: conversation, resource
+selection/execution, connection mutation/pairing/SSH, Review, Terminal,
+Markdown, MCP, other P0 route families, and installed-product pixel regions
+still need their own current-build evidence.
 
 ### 1. Complete the application shell and left sidebar
 

@@ -66,6 +66,7 @@
     "capture:current-baseline": "node scripts/capture-current-baseline.mjs",
     "capture:current-baseline-26-917": "CODEX_CURRENT_BASELINE_FINGERPRINT=26.917.71314 node scripts/capture-current-baseline.mjs",
     "capture:current-settings-connections-26-917-62051": "CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.62051 node scripts/capture-current-settings-connections.mjs",
+    "capture:current-settings-connections-26-917-71314": "CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.71314 node scripts/capture-current-settings-connections.mjs",
     "capture:current-account-menu": "node scripts/capture-current-account-menu.mjs",
     "capture:current-long-thread": "node scripts/capture-current-long-thread.mjs",
     "capture:current-mcp": "node scripts/capture-current-mcp.mjs",

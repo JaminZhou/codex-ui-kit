@@ -5,6 +5,7 @@ import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
+  currentLatestInstalledCandidateBaselineFingerprint,
   currentPreviousInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
@@ -18,7 +19,17 @@ const allowCapture =
   process.env.CODEX_CURRENT_SETTINGS_CONNECTIONS_ALLOW_CAPTURE === "1";
 const requestedFingerprint =
   process.env.CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT;
-const expectedFingerprint = currentPreviousInstalledCandidateBaselineFingerprint;
+const supportedFingerprints = new Map([
+  [
+    currentLatestInstalledCandidateBaselineFingerprint.appVersion,
+    currentLatestInstalledCandidateBaselineFingerprint,
+  ],
+  [
+    currentPreviousInstalledCandidateBaselineFingerprint.appVersion,
+    currentPreviousInstalledCandidateBaselineFingerprint,
+  ],
+]);
+const expectedFingerprint = supportedFingerprints.get(requestedFingerprint);
 const appBundle = "/Applications/ChatGPT.app";
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
@@ -41,8 +52,10 @@ if (!allowCapture) {
     "Set CODEX_CURRENT_SETTINGS_CONNECTIONS_ALLOW_CAPTURE=1 to authorize read-only Settings navigation.",
   );
 }
-if (requestedFingerprint !== expectedFingerprint.appVersion) {
-  throw new Error("This capture is pinned to the 26.917.62051 candidate.");
+if (!expectedFingerprint) {
+  throw new Error(
+    "Set the Settings Connections capture fingerprint to a supported 26.917 candidate.",
+  );
 }
 
 const profile = realpathSync(requestedProfile);
@@ -101,7 +114,7 @@ if (
   )
 ) {
   throw new Error(
-    `Installed fingerprint does not match 26.917.62051: ${JSON.stringify(baseline)}`,
+    `Installed fingerprint does not match ${expectedFingerprint.appVersion}: ${JSON.stringify(baseline)}`,
   );
 }
 
