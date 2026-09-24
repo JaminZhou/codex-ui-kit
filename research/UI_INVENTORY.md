@@ -131,18 +131,16 @@ host-owned and are intentionally not claimed by the playground.
   and a 26-row Composer resource list without GitHub). The two samples are
   intentionally kept separate so dynamic counts are not mistaken for stable
   product tokens; no installed-product pixel promotion is inferred.
-- The newest installed package is now `26.917.62051` (`10789`), Chromium
+- The newest installed package is now `26.917.71314` (`10954`), Chromium
   `153.0.8010.53`, with `app.asar` SHA-256
-  `c41157d36d701d3228c82e56852f49da2381941a7e5ccfac2d58b7e10e31aefd`.
+  `03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804`.
   Its isolated candidate record is
-  [`current-baseline-26.917.62051.json`](current-baseline-26.917.62051.json),
-  with method and limits in [`26.917.62051.md`](26.917.62051.md). It refreshes
-  structural shell/sidebar, Projects, Help, and Composer-resource observations
-  only. A separate read-only 800×600 Settings Connections sample is in
-  [`current-settings-connections-26.917.62051.json`](current-settings-connections-26.917.62051.json)
-  and [`26.917.62051-settings-connections.md`](26.917.62051-settings-connections.md).
-  The promoted baseline remains `26.903.71938`; no installed-product pixel
-  was sampled or promoted on 26.917.
+  [`current-baseline-26.917.71314.json`](current-baseline-26.917.71314.json),
+  with method and limits in [`26.917.71314.md`](26.917.71314.md). It refreshes
+  structural shell/sidebar, Projects, Help, and Pull Requests route observations
+  only. Composer resources, Settings Connections, and installed-product pixels
+  were not sampled on this build. The earlier `26.917.62051` records remain
+  previous-build evidence. The promoted baseline remains `26.903.71938`.
 - The current 26.915 conversation-shell replay now pairs the basic user/
   assistant turn with the sampled wide and compact Composer/thread geometry.
   Browser/CDP, Electron, and a two-run own-fixture pixel gate cover the
@@ -404,7 +402,12 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 93 surface groups; 18 have current-build runtime evidence, 66 have previous-build-only runtime evidence, 9 remain `not_sampled`, and 0 are `blocked_by_policy`. Current-build Browser verification covers 0 groups and Electron verification covers 0.
+Current inventory: 93 surface groups; at the promoted `26.903.71938` baseline,
+18 have runtime evidence, 66 have previous-build-only runtime evidence, and 9
+remain `not_sampled` (0 are `blocked_by_policy`). Current-build Browser
+verification covers 0 groups and Electron verification covers 0. The
+candidate `26.917.71314` adds structural runtime observations but does not
+change promoted status.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 
@@ -465,19 +468,19 @@ The installed 26.915 `Settings → Connections` route was separately sampled at
 800×600. It exposes `Control this Mac`, `Control other devices`, and `SSH`
 selection controls, with visible descriptions and geometry in
 [`current-settings-connections-environments-26.915.31945.json`](current-settings-connections-environments-26.915.31945.json).
-This is candidate-only structural evidence. The later 26.917 sample confirms
-the controls are native buttons with `aria-pressed`; the 26.915 record did not
-retain their roles. The route is tracked as
+This is candidate-only structural evidence. The earlier 26.917.62051 sample
+confirms the controls are native buttons with `aria-pressed`; the 26.915 record
+did not retain their roles. The route is tracked as
 `settings.connections`; `RemoteConnectionsPage` and its local save/test/forget
 registry are a separate exploratory surface, not a reconstruction of that
 Settings page. The controlled `ConnectionsSettingsPage` now models the
 installed native button/`aria-pressed` selection semantics rather than ARIA
 tabs. Its replay has local Browser/CDP, Electron geometry/interaction, and
-own-fixture pixel coverage (PR #607). Separate 26.917 Browser/CDP and Electron
-scenes assert current structural geometry and pressed-state interaction; that
-replay coverage does not promote installed-product pixels;
+own-fixture pixel coverage (PR #607). Separate 26.917.62051 Browser/CDP and
+Electron scenes assert current structural geometry and pressed-state
+interaction; that replay coverage does not promote installed-product pixels;
 pairing, SSH exchange, environment mutation, persistence, and production Remote
-semantics remain open. A separate 26.917 sample records the three button
+semantics remain open. A separate 26.917.62051 sample records the three button
 states, their `aria-pressed` semantics, and 800×600 geometry; it is structural
 product evidence only and does not promote product pixels.
 

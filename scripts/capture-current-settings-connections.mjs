@@ -5,7 +5,7 @@ import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
-  currentLatestInstalledCandidateBaselineFingerprint,
+  currentPreviousInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -18,7 +18,7 @@ const allowCapture =
   process.env.CODEX_CURRENT_SETTINGS_CONNECTIONS_ALLOW_CAPTURE === "1";
 const requestedFingerprint =
   process.env.CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT;
-const expectedFingerprint = currentLatestInstalledCandidateBaselineFingerprint;
+const expectedFingerprint = currentPreviousInstalledCandidateBaselineFingerprint;
 const appBundle = "/Applications/ChatGPT.app";
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
