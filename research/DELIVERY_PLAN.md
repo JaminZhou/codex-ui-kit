@@ -1352,6 +1352,13 @@ feature:
 - portal layering and focus return across sidebar, workspace panels, dialogs,
   menus, and notifications.
 
+The 26.917.62051 refresh now also has an isolated Shell replay covering the
+observed wide/medium/721px/720px widths, 321.875px rail, route list, navigation
+scroll ownership, and compact Hide/Show restoration. It adds Browser/CDP,
+Electron, and own-fixture regional pixel evidence only; the locked installed
+app prevented a product-pixel comparison, so `app.sidebar-shell` and Stage 1
+remain partial.
+
 Acceptance matrix:
 
 | Axis | Required states |

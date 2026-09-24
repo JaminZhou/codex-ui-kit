@@ -91,7 +91,8 @@ try {
       }
 
       const row = route.locator(".codex-ui-remote-connections__row").filter({ hasText: "Loopback runner" });
-      await row.getByRole("button", { name: "Test", exact: true }).click();
+      const firstTestButton = row.getByRole("button", { name: "Test", exact: true });
+      await clickWithFailureContext(firstTestButton, row, page, width, "initial test");
       await row.getByText("Connected", { exact: true }).waitFor();
       await page.getByText("Loopback device connection is ready.", { exact: true }).waitFor();
 
@@ -102,7 +103,13 @@ try {
         await form.getByRole("button", { name: "Save connection", exact: true }).click();
         await route.getByText("Loopback runner", { exact: true }).waitFor();
       }
-      await row.getByRole("button", { name: "Test", exact: true }).click();
+      await clickWithFailureContext(
+        row.getByRole("button", { name: "Test", exact: true }),
+        row,
+        page,
+        width,
+        width === 1180 ? "updated-endpoint test" : "compact repeat test",
+      );
       await row.getByText("Connected", { exact: true }).waitFor();
       const layout = await page.evaluate(() => {
         const shell = document.querySelector(".codex-ui-app-shell");
@@ -187,4 +194,30 @@ async function expectNoPath(path) {
       if (error?.code !== "ENOENT") throw error;
     },
   );
+}
+
+async function clickWithFailureContext(button, row, page, width, action) {
+  try {
+    await button.click({ timeout: 10000 });
+  } catch (error) {
+    const state = await row.evaluate((element) => {
+      const target = element.querySelector("button");
+      const bounds = target?.getBoundingClientRect();
+      const hitTarget = bounds
+        ? document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
+        : null;
+      return {
+        registryStatus: element.closest(".codex-ui-remote-connections")?.getAttribute("data-status"),
+        rowStatus: element.getAttribute("data-status"),
+        buttons: [...element.querySelectorAll("button")].map((candidate) => ({
+          label: candidate.textContent?.trim(),
+          disabled: candidate.disabled,
+        })),
+        hitTarget: hitTarget?.outerHTML.slice(0, 300) ?? null,
+        html: element.outerHTML,
+      };
+    }).catch((diagnosticError) => ({ diagnosticError: String(diagnosticError) }));
+    console.error(JSON.stringify({ width, action, state }));
+    throw error;
+  }
 }

@@ -2638,6 +2638,16 @@ region has 0% repeated-fixture drift. This refreshes controlled replay evidence
 only; the product capture is structural and does not establish installed-
 product pixel parity or stable project identities.
 
+The same 26.917.62051 candidate now has a separate left-sidebar Shell replay.
+Its Browser/CDP and Electron gate checks the sampled 1180/820/721/720 widths,
+321.875px rail, titlebar/header/navigation/footer geometry, 15 sanitized
+project groups with a 9-expanded fixture, the observed Pull requests/Scheduled/
+Plugins primary routes (without Sites), navigation-owned scrolling, and
+720px explicit Hide/Show with pinned restoration and focus continuity. Repeated
+sidebar-region captures have 0% own-fixture drift. This is controlled replay
+evidence only: the source capture is structural, no installed-product pixels
+are compared, and `app.sidebar-shell` remains partial.
+
 The playground carries a matching `26.908.70816` replay variant with the
 latest public catalog vocabulary (`GitHub`, 19 retained options). Its
 Browser/Electron acceptance path checks listbox semantics, 736/688px wide/
