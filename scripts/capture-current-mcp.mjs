@@ -7,6 +7,7 @@ import {
   currentBaselineFingerprint,
   currentBaselineViewports,
   currentInstalledCandidateBaselineFingerprint,
+  currentLatestInstalledCandidateBaselineFingerprint,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -27,12 +28,16 @@ const allowCapture = process.env.CODEX_CURRENT_MCP_ALLOW_CAPTURE === "1";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
+const expectedFingerprintByVersion = new Map([
+  ["26.903.71938", currentBaselineFingerprint],
+  ["26.915.31945", currentInstalledCandidateBaselineFingerprint],
+  [
+    "26.917.71314",
+    currentLatestInstalledCandidateBaselineFingerprint,
+  ],
+]);
 const expectedFingerprint =
-  requestedFingerprint === "26.915.31945"
-    ? currentInstalledCandidateBaselineFingerprint
-    : requestedFingerprint === "26.903.71938"
-      ? currentBaselineFingerprint
-      : null;
+  expectedFingerprintByVersion.get(requestedFingerprint) ?? null;
 
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error("Set a valid isolated MCP CDP port.");
