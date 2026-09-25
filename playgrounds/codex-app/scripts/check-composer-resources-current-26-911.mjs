@@ -104,11 +104,39 @@ async function geometry(page) {
     )?.closest("[role='option']");
     const publicRows = [...(picker?.querySelectorAll('[role="option"]') ?? [])]
       .flatMap((option) => {
-        const label = option
-          .querySelector(".codex-ui-composer-resource-picker__label")
-          ?.textContent?.trim();
+        const labelElement = option.querySelector(
+          ".codex-ui-composer-resource-picker__label",
+        );
+        const label = labelElement?.textContent?.trim();
+        const descriptionElement = option.querySelector(
+          ".codex-ui-composer-resource-picker__description",
+        );
+        const icon = option.querySelector(
+          ".codex-ui-composer-resource-picker__icon > svg",
+        );
+        const iconStyle = icon instanceof SVGElement
+          ? getComputedStyle(icon)
+          : null;
         return label && publicLabels.includes(label)
-          ? [{ label, ...bounds(option) }]
+          ? [
+              {
+                icon: {
+                  ...bounds(icon),
+                  computedHeight: iconStyle?.height ?? null,
+                  computedWidth: iconStyle?.width ?? null,
+                  inlineHeight: icon instanceof SVGElement ? icon.style.height : null,
+                  inlineWidth: icon instanceof SVGElement ? icon.style.width : null,
+                },
+                label,
+                labelBounds: bounds(labelElement),
+                descriptionBounds: bounds(descriptionElement),
+                descriptionColor:
+                  descriptionElement instanceof Element
+                    ? getComputedStyle(descriptionElement).color
+                    : null,
+                ...bounds(option),
+              },
+            ]
           : [];
       });
     const description = picker?.querySelector(
@@ -230,6 +258,33 @@ async function capture(width, suffix) {
           `${label} row offset drifted: ${row.top - menuTop}px`,
         );
       }
+      const filesRow = measured.publicRows.find(
+        (item) => item.label === "Files and folders",
+      );
+      assert.ok(filesRow?.icon && filesRow.labelBounds);
+      assert.equal(filesRow.icon.width, 16, JSON.stringify(filesRow.icon));
+      assert.equal(filesRow.icon.height, 16, JSON.stringify(filesRow.icon));
+      assert.equal(
+        Math.round((filesRow.labelBounds.left - measured.picker.left) * 100) /
+          100,
+        35,
+      );
+      const projectRow = measured.publicRows.find(
+        (item) => item.label === "Work in a project",
+      );
+      assert.ok(projectRow?.labelBounds && projectRow.descriptionBounds);
+      assert.equal(
+        projectRow?.descriptionColor,
+        "rgba(255, 255, 255, 0.498)",
+      );
+      assert.ok(
+        Math.abs(projectRow.labelBounds.width - 103.0469) <= 0.01,
+      );
+      assert.ok(
+        Math.abs(projectRow.descriptionBounds.left - measured.picker.left - 146.0469) <=
+          0.01,
+      );
+      assert.equal(measured.picker.top, width === 720 ? 242 : 382);
     }
     if (width === 1180) {
       assert.ok(Math.abs(measured.aside.width - 321.875) <= 1);

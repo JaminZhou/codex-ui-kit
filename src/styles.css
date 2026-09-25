@@ -17431,6 +17431,24 @@ button.codex-ui-file-revert-error-dialog__file:hover {
   font-weight: 430;
 }
 
+.codex-ui-composer-resource-picker--current-26-917[data-current-resource-catalog="26.917.71314"]
+  .codex-ui-composer-resource-picker__icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+.codex-ui-composer-resource-picker--current-26-917[data-current-resource-catalog="26.917.71314"]
+  .codex-ui-composer-resource-picker__icon
+  > svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.codex-ui-composer-resource-picker--current-26-917[data-current-resource-catalog="26.917.71314"]
+  .codex-ui-composer-resource-picker__description {
+  color: rgba(255, 255, 255, 0.498);
+}
+
 .codex-ui-composer-resource-picker--current-26-917[data-current-resource-catalog="26.917.71314"] {
   transform: translateX(0.5px);
 }

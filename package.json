@@ -75,6 +75,7 @@
     "capture:current-mcp": "node scripts/capture-current-mcp.mjs",
     "capture:current-mcp-26-915": "CODEX_CURRENT_MCP_FINGERPRINT=26.915.31945 node scripts/capture-current-mcp.mjs",
     "capture:current-mcp-26-917-71314": "CODEX_CURRENT_MCP_FINGERPRINT=26.917.71314 node scripts/capture-current-mcp.mjs",
+    "capture:current-composer-menu-26-917-71314": "node scripts/capture-current-composer-menu.mjs",
     "capture:current-command": "node scripts/capture-current-command.mjs",
     "capture:current-command-26-825": "node scripts/capture-current-command-anchor.mjs",
     "capture:current-browser-success-26-825": "node scripts/capture-current-browser-success.mjs",
