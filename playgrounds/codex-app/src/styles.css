@@ -2181,6 +2181,19 @@ textarea {
   transform: translateY(1px);
 }
 
+.demo-root[data-current-sidebar-account-26-917]
+  .codex-ui-app-sidebar-footer__account-control {
+  flex: 0 0 186.53125px;
+  transform: translateY(-0.5px);
+  width: 186.53125px;
+}
+
+.demo-root[data-current-sidebar-account-26-917]
+  .codex-ui-app-sidebar-footer__account {
+  height: 32px;
+  min-height: 32px;
+}
+
 .demo-current-sidebar-account-menu {
   border-radius: 20px;
   gap: 0;
@@ -2216,6 +2229,21 @@ textarea {
 
 .demo-current-sidebar-account-menu .codex-ui-menu-item__icon {
   color: inherit;
+}
+
+.demo-current-sidebar-account-menu--26-917 .codex-ui-menu-item {
+  font-weight: 430;
+}
+
+.demo-current-sidebar-account-menu--26-917:focus-visible {
+  outline: 0;
+}
+
+.demo-current-sidebar-account-menu--26-917
+  .demo-current-sidebar-account-menu__identity {
+  box-sizing: border-box;
+  height: 42.5625px;
+  margin-bottom: 9px;
 }
 
 .demo-current-sidebar-help-menu {

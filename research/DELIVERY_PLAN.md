@@ -26,7 +26,13 @@ exit gates; it does not replace the inventory.
   shortcut. The capture contract is strict and version-specific; account and
   usage labels are redacted, vector data is represented by hashes, and the
   screenshots are masked temporary references only. This is structural/current-
-  style evidence, not a product-pixel diff or baseline promotion. The previous
+  style evidence, not a baseline promotion. A 2026-09-25 masked regional
+  comparison and 26.917-specific CDP/Electron replay are now recorded in
+  [`current-account-menu-pixel-comparison-26.917.71314.json`](current-account-menu-pixel-comparison-26.917.71314.json).
+  Own-fixture repeated captures have 0% drift, but the local installed-product
+  comparison remains 4.83%-4.93%, above the existing 0.8% regional limit;
+  the action glyphs/menu edge still differ and the candidate is not promoted.
+  The previous
   `26.917.62051` record and its bounded
   Composer/Projects replays and read-only Connections observation remain
   useful previous-build evidence, not proof for the latest package. The
@@ -474,6 +480,16 @@ exit gates; it does not replace the inventory.
   305.875×188.375px portal, 29px account trigger, five current-build icons,
   Voice/Help footer actions, Escape/focus return, and zero overflow through
   Browser/CDP, Electron, and repeated screenshots with 0% own-fixture drift.
+- The 26.917.71314 follow-up now uses the five exact user-approved sidebar
+  account-menu vectors, attributed to the current app/build/ASAR fingerprint;
+  screenshots and user-specific data remain local-only. Browser/CDP and
+  Electron reproduce all four dark/light × wide/compact states. After replacing
+  a stale fixed privacy-mask height with measured row bounds, the masked product
+  region is 0.46%-0.77% different (<=0.8%) and repeated fixtures remain 0%.
+  This is a scoped menu result, not full-window parity; account mutations remain
+  host-owned. The final local `pnpm check` and complete `check:acceptance:full`
+  both passed on 2026-09-25; the four-state installed-product menu pixel gate
+  also passed with all ratios below the 0.8% threshold.
 - The scoped `26.825.51511` refresh revalidates the global shell, responsive
   Composer, primary navigation, project-group lifecycle, project-menu
   provider plus rendered Section submenu, Help menu, route restoration, and

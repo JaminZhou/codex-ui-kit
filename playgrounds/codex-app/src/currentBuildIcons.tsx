@@ -2,6 +2,7 @@ import type { ComponentProps } from "react";
 import visualAssets from "../../../research/visual-assets.json";
 import currentHomeAssets from "../../../research/current-home-assets.json";
 import currentProjectMenuAssets from "../../../research/current-project-menu-assets.json";
+import currentAccountMenuAssets from "../../../research/current-account-menu-26.917.71314-icons.json";
 import {
   VisualAssetIcon,
   type VisualAssetIconData,
@@ -51,10 +52,15 @@ export type CurrentBuildIconName =
   | "sidebar-activity-attention"
   | "sidebar-explore"
   | "sidebar-account-menu-invite"
+  | "sidebar-account-menu-invite-26-917-71314"
   | "sidebar-account-menu-logout"
+  | "sidebar-account-menu-logout-26-917-71314"
   | "sidebar-account-menu-pet"
+  | "sidebar-account-menu-pet-26-917-71314"
   | "sidebar-account-menu-settings"
+  | "sidebar-account-menu-settings-26-917-71314"
   | "sidebar-account-menu-usage"
+  | "sidebar-account-menu-usage-26-917-71314"
   | "sidebar-archive"
   | "sidebar-folder"
   | "sidebar-help"
@@ -144,6 +150,7 @@ interface CurrentBuildIconProps
 
 export function CurrentBuildIcon({ name, ...props }: CurrentBuildIconProps) {
   const icon =
+    currentAccountMenuAssets.icons.find((candidate) => candidate.id === name) ??
     currentHomeAssets.icons.find((candidate) => candidate.id === name) ??
     currentProjectMenuAssets.icons.find((candidate) => candidate.id === name) ??
     visualAssets.icons.find((candidate) => candidate.id === name);

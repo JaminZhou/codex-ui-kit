@@ -758,6 +758,7 @@ function querySelection() {
     "hidden",
     "account-menu",
     "account-menu-current-26-915",
+    "account-menu-current-26-917",
     "help-menu",
     "help-menu-current-26-915",
     "primary-navigation-current-26-915",
@@ -5350,6 +5351,7 @@ export function App() {
     useState(
       initialSelection.sidebarState === "account-menu" ||
         initialSelection.sidebarState === "account-menu-current-26-915" ||
+        initialSelection.sidebarState === "account-menu-current-26-917" ||
         initialSelection.sidebarState === "footer-account-current-26-915",
     );
   const [reviewOpen, setReviewOpen] = useState(
@@ -7373,6 +7375,8 @@ export function App() {
     initialSelection.sidebarState === "item-actions-current-26-915";
   const currentSidebarAccount26915Replay =
     initialSelection.sidebarState === "account-menu-current-26-915";
+  const currentSidebarAccount26917Replay =
+    initialSelection.sidebarState === "account-menu-current-26-917";
   const currentSidebarFooterAccount26915Replay =
     initialSelection.sidebarState === "footer-account-current-26-915";
   const currentSidebarHelp26915Replay =
@@ -7388,7 +7392,8 @@ export function App() {
   const currentSidebarShell26915Replay =
     initialSelection.sidebarState === "shell-current-26-915";
   const currentSidebarShell26917Replay =
-    initialSelection.sidebarState === "shell-current-26-917";
+    initialSelection.sidebarState === "shell-current-26-917" ||
+    currentSidebarAccount26917Replay;
   const currentSidebarThreadLifecycle =
     initialSelection.sidebarState === "thread-lifecycle-current" ||
     initialSelection.sidebarState === "thread-lifecycle-current-26-915";
@@ -7615,7 +7620,11 @@ export function App() {
           renderAccountTrigger={(trigger) => (
             <Menu
               align="start"
-              className="demo-current-sidebar-menu demo-current-sidebar-account-menu"
+              className={`demo-current-sidebar-menu demo-current-sidebar-account-menu${
+                currentSidebarAccount26917Replay
+                  ? " demo-current-sidebar-account-menu--26-917"
+                  : ""
+              }`}
               initialFocus="content"
               label="Account menu"
               onOpenChange={(open) => {
@@ -7624,7 +7633,13 @@ export function App() {
               }}
               open={currentSidebarAccountMenuOpen}
               side="top"
-              sideOffset={currentHomeFrame ? 7.125 : 7.5}
+              sideOffset={
+                currentSidebarAccount26917Replay
+                  ? 6.625
+                  : currentHomeFrame
+                    ? 7.125
+                    : 7.5
+              }
               style={{
                 width: currentHomeFrame || currentSidebarFooterAccount26915Replay
                   ? 305.875
@@ -7645,30 +7660,53 @@ export function App() {
               >
                 Demo account
               </MenuItem>
-              <div
-                aria-hidden="true"
-                className="demo-current-sidebar-account-menu__divider"
-              >
-                <span />
-              </div>
+              {currentSidebarAccount26917Replay ? null : (
+                <div
+                  aria-hidden="true"
+                  className="demo-current-sidebar-account-menu__divider"
+                >
+                  <span />
+                </div>
+              )}
               <MenuItem
-                shortcut="94% left"
+                shortcut={
+                  currentSidebarAccount26917Replay ? "80% left" : "94% left"
+                }
                 startIcon={
-                  <CurrentBuildIcon name="sidebar-account-menu-usage" />
+                  <CurrentBuildIcon
+                    name={
+                      currentSidebarAccount26917Replay
+                        ? "sidebar-account-menu-usage-26-917-71314"
+                        : "sidebar-account-menu-usage"
+                    }
+                  />
                 }
               >
                 Usage
               </MenuItem>
               <MenuItem
+                shortcut={currentSidebarAccount26917Replay ? "⌥Space" : undefined}
                 startIcon={
-                  <CurrentBuildIcon name="sidebar-account-menu-pet" />
+                  <CurrentBuildIcon
+                    name={
+                      currentSidebarAccount26917Replay
+                        ? "sidebar-account-menu-pet-26-917-71314"
+                        : "sidebar-account-menu-pet"
+                    }
+                  />
                 }
               >
                 Show pet
               </MenuItem>
               <MenuItem
                 startIcon={
-                  <CurrentBuildIcon name="sidebar-account-menu-invite" />
+                  <CurrentBuildIcon
+                    name={
+                      currentSidebarAccount26917Replay
+                        ? "sidebar-account-menu-invite-26-917-71314"
+                        : "sidebar-account-menu-invite"
+                    }
+                  />
                 }
               >
                 Invite a friend
@@ -7676,14 +7714,26 @@ export function App() {
               <MenuItem
                 shortcut="⌘,"
                 startIcon={
-                  <CurrentBuildIcon name="sidebar-account-menu-settings" />
+                  <CurrentBuildIcon
+                    name={
+                      currentSidebarAccount26917Replay
+                        ? "sidebar-account-menu-settings-26-917-71314"
+                        : "sidebar-account-menu-settings"
+                    }
+                  />
                 }
               >
                 Settings
               </MenuItem>
               <MenuItem
                 startIcon={
-                  <CurrentBuildIcon name="sidebar-account-menu-logout" />
+                  <CurrentBuildIcon
+                    name={
+                      currentSidebarAccount26917Replay
+                        ? "sidebar-account-menu-logout-26-917-71314"
+                        : "sidebar-account-menu-logout"
+                    }
+                  />
                 }
               >
                 Log out
@@ -18629,6 +18679,9 @@ export function App() {
       }
       data-current-sidebar-account-26-915={
         currentSidebarAccount26915Replay || undefined
+      }
+      data-current-sidebar-account-26-917={
+        currentSidebarAccount26917Replay || undefined
       }
       data-current-sidebar-footer-account-26-915={
         currentSidebarFooterAccount26915Replay || undefined

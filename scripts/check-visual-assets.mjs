@@ -304,9 +304,13 @@ for (const icon of manifest.icons ?? []) {
     (candidate) =>
       candidate.id === icon.id && candidate.renderStatus === "provider_only",
   );
+  const renderedByConditionalAccountMenu =
+    appSource.includes(`? "${icon.id}"`) ||
+    appSource.includes(`: "${icon.id}"`);
   if (
     !providerOnly &&
     !appSource.includes(`name="${icon.id}"`) &&
+    !renderedByConditionalAccountMenu &&
     !demoSource.includes(`name="${icon.id}"`) &&
     !renderedBySettingsNavigation
   ) {

@@ -804,10 +804,23 @@ The installed 26.917.71314 candidate now has a separate isolated CDP capture
 for the same four theme/viewport states. It records the updated
 305.875×202.375px menu, 42.563px identity row, 430-weight text, and the
 `Show pet` ⌥Space hint; focus return and zero horizontal overflow hold in all
-four states. The evidence is candidate-only, redacts identity/usage content,
-and does not claim an installed-product pixel diff or promote the global
-baseline. See
-[`current-account-menu-26.917.71314.json`](current-account-menu-26.917.71314.json).
+four states. A focused local CDP/Electron replay reproduces its measured
+geometry and computed style with 0% own-fixture drift. The five action SVGs are
+now reproduced from the exact observed vectors, with their 26.917.71314 build
+and ASAR fingerprint, attribution, and geometry hashes recorded in
+[`current-account-menu-26.917.71314-icons.json`](current-account-menu-26.917.71314-icons.json).
+This is the user-approved, exploratory exception for these five scoped icons;
+no bundled source, stylesheets, fonts, account identity, or dynamic usage data
+were added, and the reference screenshots remain local-only. The first pixel
+comparison used a stale fixed 82px mask that left two rows of dynamic identity/
+Usage content in the scored region. The comparator now derives that mask and
+action-text masks from observed menu-item bounds. The corrected four-state
+product-region diff is 0.46%-0.77% (<=0.8%), with 0% repeated-fixture drift.
+This closes only the masked account-menu region; full-window and global UI
+pixel parity remain partial, and account mutations remain host-owned. See
+[`current-account-menu-26.917.71314.json`](current-account-menu-26.917.71314.json)
+and
+[`current-account-menu-pixel-comparison-26.917.71314.json`](current-account-menu-pixel-comparison-26.917.71314.json).
 
 The 26.915 candidate also covers a dedicated Sidebar Help menu matrix in
 dark/light wide and 720px scenes. The eight-item What's new surface keeps one
