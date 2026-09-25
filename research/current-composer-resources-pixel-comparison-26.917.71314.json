@@ -1,0 +1,77 @@
+{
+  "captureDate": "2026-09-25",
+  "candidateBuild": {
+    "appVersion": "26.917.71314",
+    "buildNumber": "10954",
+    "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804"
+  },
+  "comparison": {
+    "scope": "dark Add-resource menu region only",
+    "pixelmatch": {
+      "version": "7.2.0",
+      "threshold": 0.1
+    },
+    "privacyMask": {
+      "product": "One account/context-dependent row was replaced by a flat #3a3a3a region; its title and icon were not retained.",
+      "fixture": "The corresponding inert disabled placeholder was masked to the same #3a3a3a color.",
+      "productScreenshotsCommitted": false
+    },
+    "results": {
+      "darkWide": {
+        "viewport": [1180, 820],
+        "crop": [736, 320],
+        "differentPixels": 6455,
+        "ratio": 0.027407,
+        "productCropSha256": "08a1cb7dc620bc13999fb957f76f386b302b792fb37020027270ccfb52096455",
+        "fixtureCropSha256": "de1b7ef8668e0d65a166147895c04069900a48cabf682033a0da99d42bcede0a"
+      },
+      "darkCompact": {
+        "viewport": [720, 680],
+        "crop": [687, 320],
+        "differentPixels": 6274,
+        "ratio": 0.028539,
+        "productCropSha256": "4097fcc1d4584d115e010fd86c75329c4daa2326e77244e4d7eae1c43d19fd0b",
+        "fixtureCropSha256": "f0a10e2391f62647ca6870f0832961332ae20f48e398a75d65f46dd0bf8462da"
+      }
+    }
+  },
+  "geometry": {
+    "darkWide": {
+      "productMenu": [383.4375, 382, 736, 320],
+      "fixtureMenu": [383.4375, 382, 736, 320],
+      "heading": { "text": "Add", "height": 26.5625 },
+      "rowHeight": 28.5625,
+      "redactedContextRow": "between Files and folders and Work in a project"
+    },
+    "darkCompact": {
+      "productMenu": [17, 242, 687, 320],
+      "fixtureMenu": [17, 242, 687, 320],
+      "heading": { "text": "Add", "height": 26.5625 },
+      "rowHeight": 28.5625,
+      "redactedContextRow": "between Files and folders and Work in a project"
+    }
+  },
+  "sameBundleDynamicStateCheck": {
+    "captureKind": "read-only CDP",
+    "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
+    "viewport": [720, 680],
+    "menuRect": [17, 242, 687, 320],
+    "headingRect": [22, 247, 677, 26.5625],
+    "scrollOwner": { "clientHeight": 310, "scrollHeight": 463 },
+    "allowlistedRowsObservedInViewport": [
+      "Files and folders",
+      "Work in a project",
+      "Goal",
+      "Plan mode",
+      "Record a skill",
+      "Sketch"
+    ],
+    "note": "A second live state from the same installed bundle exposed fewer allowlisted rows than the earlier 30-row structural sample. Non-allowlisted content was not retained; resource availability is context-dependent. The pixel comparison above applies only to the earlier masked 30-row sample."
+  },
+  "status": "partial-product-region-comparison",
+  "remaining": [
+    "The measured full-menu sample still differs by 2.7407% wide and 2.8539% compact after geometry alignment.",
+    "Service/resource glyphs and the full account-dependent catalog are not yet pixel-matched.",
+    "These menu crops do not establish full-window parity or promote the installed-product baseline."
+  ]
+}

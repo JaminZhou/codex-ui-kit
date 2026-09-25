@@ -1882,8 +1882,33 @@ const currentComposerResourceGroups2691762051 =
 
 // The 26.917.71314 capture independently confirms the same 19 public rows.
 // Keep its app/build candidate identity distinct from 26.917.62051.
+// The current product capture had one account/context row between Files and
+// Project. Preserve its geometry with an inert, visibly redacted local slot;
+// never copy or infer the account-specific label, icon, or action.
 const currentComposerResourceGroups2691771314 =
-  currentComposerResourceGroups2691762051;
+  currentComposerResourceGroups2691762051.map((group) =>
+    group.id === "add"
+      ? {
+          ...group,
+          options: group.options.flatMap((option) =>
+            option.id === "files"
+              ? [
+                  option,
+                  {
+                    disabled: true,
+                    id: "current-context-redacted",
+                    label: (
+                      <span data-current-context-redacted>
+                        Context item (redacted)
+                      </span>
+                    ),
+                  },
+                ]
+              : [option],
+          ),
+        }
+      : group,
+  );
 
 const composerResourceGroups: readonly ComposerResourceGroup[] = [
   {
@@ -11700,7 +11725,11 @@ export function App() {
                 : currentComposerResourceGroups
             }
             heading={
-              currentComposerControlsCurrentCatalogReplay ? null : undefined
+              currentComposerControls2691771314Replay
+                ? "Add"
+                : currentComposerControlsCurrentCatalogReplay
+                  ? null
+                  : undefined
             }
             onActiveIdChange={setComposerResourceActiveId}
             onDismiss={() => {

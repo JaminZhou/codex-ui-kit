@@ -57,8 +57,9 @@ function sceneFor(width) {
 
 async function readOptions(picker) {
   return picker.evaluate((element) =>
-    [...element.querySelectorAll(".codex-ui-composer-resource-picker__option")].map(
-      (option) => [
+    [...element.querySelectorAll(".codex-ui-composer-resource-picker__option")]
+      .filter((option) => !option.querySelector("[data-current-context-redacted]"))
+      .map((option) => [
         option
           .querySelector(".codex-ui-composer-resource-picker__label")
           ?.textContent?.trim() ?? null,
@@ -71,7 +72,7 @@ async function readOptions(picker) {
 }
 
 async function geometry(page) {
-  return page.evaluate((runtimeBaseline) => {
+  return page.evaluate(({ runtimeBaseline, publicLabels }) => {
     const bounds = (element) => {
       if (!(element instanceof Element)) return null;
       const rect = element.getBoundingClientRect();
@@ -95,6 +96,21 @@ async function geometry(page) {
     const scroller = picker?.querySelector(
       ".codex-ui-composer-resource-picker__scroller",
     );
+    const heading = picker?.querySelector(
+      ".codex-ui-composer-resource-picker__heading",
+    );
+    const redactedContext = picker?.querySelector(
+      "[data-current-context-redacted]",
+    )?.closest("[role='option']");
+    const publicRows = [...(picker?.querySelectorAll('[role="option"]') ?? [])]
+      .flatMap((option) => {
+        const label = option
+          .querySelector(".codex-ui-composer-resource-picker__label")
+          ?.textContent?.trim();
+        return label && publicLabels.includes(label)
+          ? [{ label, ...bounds(option) }]
+          : [];
+      });
     const description = picker?.querySelector(
       ".codex-ui-composer-resource-picker__description",
     );
@@ -109,10 +125,17 @@ async function geometry(page) {
       firstOption: bounds(
         picker?.querySelector(".codex-ui-composer-resource-picker__option"),
       ),
+      heading: heading instanceof HTMLElement
+        ? { text: heading.textContent?.trim(), ...bounds(heading) }
+        : null,
       overflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
       picker: bounds(picker),
+      pickerTransform:
+        picker instanceof Element ? getComputedStyle(picker).transform : null,
+      publicRows,
+      redactedContext: bounds(redactedContext),
       root: bounds(document.querySelector(".demo-root")),
       scroller:
         scroller instanceof HTMLElement
@@ -122,7 +145,10 @@ async function geometry(page) {
             }
           : null,
     };
-  }, runtimeBaseline);
+  }, {
+    runtimeBaseline,
+    publicLabels: expectedOptions.map(([label]) => label),
+  });
 }
 
 async function capture(width, suffix) {
@@ -149,6 +175,13 @@ async function capture(width, suffix) {
     );
     assert.equal(await root.getAttribute("data-composer-overlay"), "resources");
     assert.deepEqual(await readOptions(picker), expectedOptions);
+    if (runtimeBaseline === "26.917.71314") {
+      const redactedContext = picker.locator(
+        '[role="option"]:has([data-current-context-redacted])',
+      );
+      assert.equal(await redactedContext.count(), 1);
+      assert.equal(await redactedContext.isDisabled(), true);
+    }
     if (runtimeBaseline.startsWith("26.917.")) {
       const style = await picker.evaluate((element) => {
         const computed = getComputedStyle(element);
@@ -175,18 +208,57 @@ async function capture(width, suffix) {
         measured.addTrigger &&
         measured.firstOption,
     );
+    if (runtimeBaseline === "26.917.71314") {
+      assert.equal(measured.heading?.text, "Add");
+      assert.equal(measured.heading?.height, 26.5625);
+      assert.equal(measured.redactedContext?.height, 28.5625);
+      assert.equal(
+        measured.redactedContext?.top,
+        measured.firstOption.bottom,
+      );
+      const menuTop = measured.picker.top;
+      for (const [label, relativeTop] of [
+        ["Files and folders", 31.5625],
+        ["Work in a project", 88.6875],
+        ["GitHub", 262.0625],
+        ["Documents", 290.625],
+      ]) {
+        const row = measured.publicRows.find((item) => item.label === label);
+        assert.ok(row, `missing safe public resource row: ${label}`);
+        assert.ok(
+          Math.abs(row.top - menuTop - relativeTop) <= 0.01,
+          `${label} row offset drifted: ${row.top - menuTop}px`,
+        );
+      }
+    }
     if (width === 1180) {
       assert.ok(Math.abs(measured.aside.width - 321.875) <= 1);
       assert.ok(Math.abs(measured.editor.left - 383.4375) <= 1);
       assert.ok(Math.abs(measured.addTrigger.left - 391.4375) <= 1);
-      assert.ok(Math.abs(measured.picker.left - 383.4375) <= 1);
+      const hasExactProductGeometry =
+        runtimeBaseline === "26.911.61220" ||
+        runtimeBaseline === "26.917.71314";
+      assert.ok(
+        Math.abs(measured.picker.left - 383.4375) <=
+          (hasExactProductGeometry ? 0.1 : 1),
+        `wide menu left edge drifted: ${measured.picker.left}px (${measured.pickerTransform})`,
+      );
     } else {
       assert.ok(measured.aside.left <= -320);
       assert.ok(Math.abs(measured.editor.left - 16) <= 1);
       assert.ok(Math.abs(measured.addTrigger.left - 24) <= 1);
-      assert.ok(Math.abs(measured.picker.left - 16) <= 1);
+      const expectedPickerLeft =
+        runtimeBaseline === "26.917.71314" ? 17 : 16;
+      assert.ok(Math.abs(measured.picker.left - expectedPickerLeft) <= 0.1);
     }
-    assert.equal(measured.picker.width, width === 720 ? 688 : 736);
+    assert.equal(
+      measured.picker.width,
+      width === 720
+        ? runtimeBaseline === "26.917.71314"
+          ? 687
+          : 688
+        : 736,
+    );
     assert.equal(measured.picker.height, 320);
     assert.equal(measured.copyGap, "8px");
     assert.equal(measured.firstOption.height, 28.5625);
@@ -202,7 +274,13 @@ async function capture(width, suffix) {
 
     await page.getByRole("button", { name: "Add files and more" }).click();
     await picker.waitFor();
-    const screenshot = await page.screenshot();
+    const redactedContext = picker.locator(
+      '[role="option"]:has([data-current-context-redacted])',
+    );
+    const screenshot = await page.screenshot({
+      mask: runtimeBaseline === "26.917.71314" ? [redactedContext] : [],
+      maskColor: "#3a3a3a",
+    });
     await writeFile(
       join(directory, `composer-resources-current-${routeVersion}-${width}-${suffix}.png`),
       screenshot,
@@ -245,6 +323,7 @@ console.log(
   JSON.stringify({
     directory,
     optionCount: expectedOptions.length,
+    redactedContextSlotCount: runtimeBaseline === "26.917.71314" ? 1 : 0,
     passed: true,
     pixelGate: "0% own-fixture drift at 1180 and 720",
     runtimeBaseline,
