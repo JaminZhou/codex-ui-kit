@@ -165,7 +165,14 @@ try {
   }));
 } finally {
   await new Promise((resolve) => server.close(resolve));
-  await rm(appServerHome, { force: true, recursive: true });
+  // App Server may finish its disposable plugin Git clone immediately after
+  // Electron closes. Retry transient ENOTEMPTY errors while removing the home.
+  await rm(appServerHome, {
+    force: true,
+    recursive: true,
+    maxRetries: 8,
+    retryDelay: 250,
+  });
   await rm(registryDirectory, { force: true, recursive: true });
   await rm(directory, { force: true, recursive: true });
 }
