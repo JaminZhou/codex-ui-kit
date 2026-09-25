@@ -31,9 +31,18 @@ exit gates; it does not replace the inventory.
   style evidence, not a baseline promotion. A 2026-09-25 masked regional
   comparison and 26.917-specific CDP/Electron replay are now recorded in
   [`current-account-menu-pixel-comparison-26.917.71314.json`](current-account-menu-pixel-comparison-26.917.71314.json).
-  Own-fixture repeated captures have 0% drift, but the local installed-product
-  comparison remains 4.83%-4.93%, above the existing 0.8% regional limit;
-  the action glyphs/menu edge still differ and the candidate is not promoted.
+  Own-fixture repeated captures have 0% drift. The four masked local
+  installed-product comparisons are 0.4582%-0.7684%, all within the existing
+  0.8% regional limit; this passes only the scoped account-menu pixel gate and
+  does not promote a full-window or global UI baseline.
+  The Composer Add menu now has a separate measured product-region comparison
+  in [`current-composer-resources-pixel-comparison-26.917.71314.json`](current-composer-resources-pixel-comparison-26.917.71314.json).
+  After matching its measured header, one redacted context-row slot, row
+  positions, and wide/compact bounds, the earlier 30-row sample still differs
+  by 2.7407% wide and 2.8539% compact. A same-bundle read-only sample later
+  exposed only six allowlisted core rows in the viewport, confirming that menu
+  membership is context-dependent. Product-region assets remain local-only;
+  the comparison is partial and does not promote the global baseline.
   The previous
   `26.917.62051` record and its bounded
   Composer/Projects replays and read-only Connections observation remain
