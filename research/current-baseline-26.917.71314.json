@@ -5,7 +5,7 @@
     "appVersion": "26.917.71314",
     "buildNumber": "10954",
     "chromiumVersion": "153.0.8010.53",
-    "sampledAt": "2026-09-24"
+    "sampledAt": "2026-09-25"
   },
   "captureKind": "renderer_emulation",
   "composerResourceObservation": {
@@ -286,7 +286,7 @@
       "appAsarBytes": 370175042,
       "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
       "changedAtMs": 1790255716779,
-      "checkedAtMs": 1790260542076,
+      "checkedAtMs": 1790304006289,
       "device": "16777234",
       "inode": "381336117"
     },
@@ -294,12 +294,12 @@
       "appAsarBytes": 370175042,
       "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
       "changedAtMs": 1790255716779,
-      "checkedAtMs": 1790260529039,
+      "checkedAtMs": 1790303994911,
       "device": "16777234",
       "inode": "381336117"
     },
-    "ownerPid": 36103,
-    "processStartedAtMs": 1790260508000
+    "ownerPid": 60863,
+    "processStartedAtMs": 1790303971000
   },
   "schemaVersion": 1,
   "projectsIndexObservation": {
@@ -497,11 +497,11 @@
   },
   "sidebarLifecycle": {
     "baseline": {
-      "expandedProjectGroupCount": 9,
+      "expandedProjectGroupCount": 8,
       "helpControlCount": 1,
       "horizontalOverflow": 0,
       "navigationWidth": 321.88,
-      "projectGroupCount": 15,
+      "projectGroupCount": 8,
       "projectRow": {
         "rect": {
           "height": 30,
@@ -722,7 +722,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1478
+          "scrollHeight": 1250
         }
       ],
       "routeMarkers": {
@@ -731,7 +731,7 @@
       "routes": {
         "New chat": [
           {
-            "ariaCurrent": null,
+            "ariaCurrent": "page",
             "ariaSelected": null,
             "rect": {
               "bottom": 116,
@@ -915,7 +915,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1439
+          "scrollHeight": 1211
         }
       ],
       "routeMarkers": {
@@ -924,7 +924,7 @@
       "routes": {
         "New chat": [
           {
-            "ariaCurrent": null,
+            "ariaCurrent": "page",
             "ariaSelected": null,
             "rect": {
               "bottom": 116,
@@ -1108,7 +1108,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1439
+          "scrollHeight": 1211
         }
       ],
       "routeMarkers": {
@@ -1117,7 +1117,7 @@
       "routes": {
         "New chat": [
           {
-            "ariaCurrent": null,
+            "ariaCurrent": "page",
             "ariaSelected": null,
             "rect": {
               "bottom": 116,
@@ -1301,7 +1301,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1439
+          "scrollHeight": 1211
         }
       ],
       "routeMarkers": {
@@ -1310,7 +1310,7 @@
       "routes": {
         "New chat": [
           {
-            "ariaCurrent": null,
+            "ariaCurrent": "page",
             "ariaSelected": null,
             "rect": {
               "bottom": 116,
@@ -1588,7 +1588,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1439
+          "scrollHeight": 1211
         }
       ],
       "routeMarkers": {
@@ -1597,7 +1597,7 @@
       "routes": {
         "New chat": [
           {
-            "ariaCurrent": null,
+            "ariaCurrent": "page",
             "ariaSelected": null,
             "rect": {
               "bottom": 116,
@@ -1738,7 +1738,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1439
+          "scrollHeight": 1211
         }
       ],
       "routeMarkers": {
@@ -1931,7 +1931,7 @@
             "top": 116,
             "width": 321.88
           },
-          "scrollHeight": 1439
+          "scrollHeight": 1211
         }
       ],
       "routeMarkers": {
@@ -1940,7 +1940,7 @@
       "routes": {
         "New chat": [
           {
-            "ariaCurrent": null,
+            "ariaCurrent": "page",
             "ariaSelected": null,
             "rect": {
               "bottom": 116,
@@ -2006,9 +2006,24 @@
   "targetSelection": {
     "candidates": [
       {
+        "area": 3145992,
+        "height": 2789,
+        "index": 0,
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "sidebarTrigger": 0,
+          "textbox": 1
+        },
+        "selected": false,
+        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
+        "visibleControls": 0,
+        "width": 1128
+      },
+      {
         "area": 691200,
         "height": 720,
-        "index": 0,
+        "index": 1,
         "landmarks": {
           "main": 0,
           "nav": 0,
@@ -2019,21 +2034,6 @@
         "url": "non-app-page",
         "visibleControls": 0,
         "width": 960
-      },
-      {
-        "area": 113920,
-        "height": 320,
-        "index": 1,
-        "landmarks": {
-          "main": 0,
-          "nav": 0,
-          "sidebarTrigger": 0,
-          "textbox": 0
-        },
-        "selected": false,
-        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
-        "visibleControls": 0,
-        "width": 356
       },
       {
         "area": 967600,
@@ -2047,7 +2047,7 @@
         },
         "selected": true,
         "url": "app://-/index.html",
-        "visibleControls": 51,
+        "visibleControls": 48,
         "width": 1180
       }
     ],
@@ -2060,7 +2060,7 @@
         "textbox": 1
       },
       "url": "app://-/index.html",
-      "visibleControls": 51
+      "visibleControls": 48
     }
   }
 }

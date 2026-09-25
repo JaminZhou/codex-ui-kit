@@ -929,7 +929,7 @@ describe("current baseline capture contract", () => {
     expect(record.baseline).toMatchObject({
       appVersion: "26.917.71314",
       buildNumber: "10954",
-      sampledAt: "2026-09-24",
+      sampledAt: "2026-09-25",
     });
     expect(record.targetSelection.selected).toMatchObject({
       url: "app://-/index.html",

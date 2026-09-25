@@ -9,7 +9,10 @@ import { launchScene } from "./electron-harness.mjs";
 const runtimeBaseline =
   process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_BASELINE ?? "26.911.61220";
 const routeVersion = runtimeBaseline.split(".").slice(0, 2).join("-");
-const routeFrame = `workspace-composer-current-${routeVersion}-resources`;
+const routeFrame =
+  runtimeBaseline === "26.917.71314"
+    ? "workspace-composer-current-26-917-71314-resources"
+    : `workspace-composer-current-${routeVersion}-resources`;
 
 const directory = await mkdtemp(
   join(tmpdir(), `ui-kit-composer-resources-${routeVersion}-`),
@@ -134,13 +137,19 @@ async function capture(width, suffix) {
       await root.getAttribute(`data-current-composer-controls-${routeVersion}`),
       "true",
     );
+    if (runtimeBaseline === "26.917.71314") {
+      assert.equal(
+        await root.getAttribute("data-current-composer-controls-26-917-71314"),
+        "true",
+      );
+    }
     assert.equal(
       await root.getAttribute("data-frame"),
       routeFrame,
     );
     assert.equal(await root.getAttribute("data-composer-overlay"), "resources");
     assert.deepEqual(await readOptions(picker), expectedOptions);
-    if (runtimeBaseline === "26.917.62051") {
+    if (runtimeBaseline.startsWith("26.917.")) {
       const style = await picker.evaluate((element) => {
         const computed = getComputedStyle(element);
         return {

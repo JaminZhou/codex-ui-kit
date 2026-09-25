@@ -102,7 +102,7 @@
     "update:visual-assets:review": "node scripts/update-current-visual-assets.mjs --review-only --write",
     "update:current-thread-visual-assets": "node scripts/update-current-thread-visual-assets.mjs --write",
     "check:codex-app": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check",
-    "check:codex-app:acceptance": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check:acceptance:full && pnpm --filter @codex-ui-kit/codex-app-playground check:current-sidebar-account-26-917",
+    "check:codex-app:acceptance": "pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground check:acceptance:full && pnpm --filter @codex-ui-kit/codex-app-playground check:current-sidebar-account-26-917 && pnpm --filter @codex-ui-kit/codex-app-playground check:composer-resources-current-26-917-71314",
     "prepack": "node scripts/prepack.mjs",
     "test": "vitest run tests",
     "typecheck": "tsc --noEmit",
