@@ -1933,10 +1933,11 @@ try {
   });
   const closeEnough = (actual, expected) =>
     actual !== null && Math.abs(actual - expected) <= 0.5;
+  // The 26.917 Renderer capture has no host-chrome inset at this route.
   const expectedControls = [
-    { label: "Control this Mac", left: 341.875, width: 124.3125 },
-    { label: "Control other devices", left: 468.1875, width: 155.546875 },
-    { label: "SSH", left: 625.734375, width: 50.234375 },
+    { label: "Control this Mac", left: 342.875, width: 117.984375 },
+    { label: "Control other devices", left: 462.859375, width: 149.109375 },
+    { label: "SSH", left: 613.96875, width: 44.140625 },
   ];
   if (
     initial.viewport.width !== 800 ||
@@ -1944,7 +1945,7 @@ try {
     initial.horizontalOverflow !== 0 ||
     initial.tabCount !== 0 ||
     !initial.heading ||
-    !closeEnough(initial.hostChromeInset, 46) ||
+    !closeEnough(initial.hostChromeInset, 0) ||
     !closeEnough(initial.normalizedShell.main?.left, 321.875) ||
     !closeEnough(initial.normalizedShell.main?.top, 0) ||
     !closeEnough(initial.normalizedShell.main?.width, 478.125) ||
@@ -1953,7 +1954,7 @@ try {
     !closeEnough(initial.normalizedShell.navigation?.top, 46) ||
     !closeEnough(initial.normalizedShell.navigation?.width, 321.875) ||
     !closeEnough(initial.normalizedShell.navigation?.height, 554) ||
-    !closeEnough(initial.heading.left, 341.875) ||
+    !closeEnough(initial.heading.left, 342.875) ||
     !closeEnough(initial.heading.top, 66) ||
     initial.controls.length !== expectedControls.length ||
     initial.controls.some((control, index) => {

@@ -2657,6 +2657,25 @@ async function checkScene(scene) {
           }),
       );
     }
+    if (scene.scenario === "markdown-current-26-825-media") {
+      const loadedImage = page.locator(
+        '[data-item-id="assistant-markdown-current-26-825-media-loaded"] [data-markdown-image-preview-trigger] img',
+      );
+      await loadedImage.evaluate((image) => image.decode());
+      await page.waitForFunction(
+        () => {
+          const image = document.querySelector(
+            '[data-item-id="assistant-markdown-current-26-825-media-loaded"] [data-markdown-image-preview-trigger] img',
+          );
+          return image?.complete &&
+            image.naturalWidth === 48 &&
+            image.naturalHeight === 48 &&
+            image.closest("button")?.getBoundingClientRect().height === 74;
+        },
+        null,
+        { timeout: 10_000 },
+      );
+    }
     report("capturing");
     await page.screenshot({
       animations: "disabled",
