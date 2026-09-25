@@ -1212,6 +1212,12 @@ revalidated on 2026-09-25 with the isolated baseline recipe; the sanitized
 record now carries that second run and keeps profile-dependent row/scroll counts
 explicitly sample-scoped.
 
+A disposable 2026-09-25 probe on this build reached a populated assistant turn,
+but only observed an assistant-text claim of documentation search: the product
+Renderer exposed no MCP activity group/card or Search/Fetch call rows. This is
+not evidence of a successful visible MCP interaction; the MCP implementation
+and current-build acceptance remain open.
+
 ### 1. Complete the application shell and left sidebar
 
 The left sidebar is a P0 application-owned system, not one generic navigation

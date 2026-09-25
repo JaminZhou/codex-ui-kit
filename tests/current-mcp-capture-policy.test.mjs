@@ -17,6 +17,9 @@ describe("current MCP capture policy", () => {
     expect(packageJson.scripts["capture:current-mcp-26-915"]).toBe(
       "CODEX_CURRENT_MCP_FINGERPRINT=26.915.31945 node scripts/capture-current-mcp.mjs",
     );
+    expect(packageJson.scripts["capture:current-mcp-26-917-71314"]).toBe(
+      "CODEX_CURRENT_MCP_FINGERPRINT=26.917.71314 node scripts/capture-current-mcp.mjs",
+    );
     expect(packageJson.scripts["capture:current-mcp-settings-26-915"]).toBe(
       "CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT=26.915.31945 node scripts/capture-current-mcp-settings.mjs",
     );
@@ -27,6 +30,7 @@ describe("current MCP capture policy", () => {
       "Capture-only: this script never submits a prompt.",
     );
     expect(captureScript).toContain("currentInstalledCandidateBaselineFingerprint");
+    expect(captureScript).toContain("currentLatestInstalledCandidateBaselineFingerprint");
     expect(captureScript).toContain('captureMode: "native-viewport-only"');
     expect(captureScript).toContain("mutationsSubmitted: false");
     expect(captureScript).toContain("Unsupported MCP capture fingerprint");

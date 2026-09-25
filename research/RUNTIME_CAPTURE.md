@@ -2627,6 +2627,18 @@ exact profile plus raw OS evidence recoverably to
 and its `-evidence` sibling. Primary user-owned Codex PID `13503` remained
 alive.
 
+## 2026-09-25 current MCP UI reachability probe
+
+On installed build `26.917.71314`, one explicitly authorized disposable task
+produced an assistant reply that textually claimed a documentation search.
+Inspection of the selected main Renderer found no visible MCP activity
+group/card and no Search/Fetch call rows. Treat this as a bounded negative
+reachability observation only: it does not prove that MCP is absent from other
+routes or states, and the assistant's text is not proof that a tool ran. No
+current-build MCP success or pixel-parity evidence was promoted. The disposable
+task was archived, the exact isolated process/profile were cleaned up
+recoverably, and the user-owned Codex process was left running.
+
 ## Promotion rule
 
 After a capture:
