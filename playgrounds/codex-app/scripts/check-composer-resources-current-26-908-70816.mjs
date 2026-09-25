@@ -122,7 +122,8 @@ async function capture(width, suffix) {
     assert.equal(measured.picker.height, 320);
     assert.equal(measured.scroller.clientHeight, 310);
     assert.ok(measured.scroller.scrollHeight > measured.scroller.clientHeight);
-    const screenshot = await page.screenshot();
+    // Keep the pixel fixture scoped to the picker, excluding unrelated composer controls.
+    const screenshot = await picker.screenshot({ animations: "disabled" });
     await writeFile(
       join(directory, `composer-resources-current-26-908-70816-${width}-${suffix}.png`),
       screenshot,

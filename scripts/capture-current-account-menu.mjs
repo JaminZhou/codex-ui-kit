@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   mkdir,
   realpath,
@@ -29,11 +30,34 @@ const expectedFingerprint = Object.hasOwn(
   : null;
 const candidateObservationOnly =
   process.env.CODEX_CURRENT_ACCOUNT_MENU_OBSERVATION_ONLY === "1";
+const includeIconPaths =
+  process.env.CODEX_CURRENT_ACCOUNT_MENU_INCLUDE_ICON_PATHS === "1";
 const allowPreferences =
   process.env.CODEX_CURRENT_ACCOUNT_MENU_ALLOW_PREFERENCES === "1";
 const appBundle = "/Applications/ChatGPT.app";
 const appInfoPlist = `${appBundle}/Contents/Info.plist`;
 const appAsar = `${appBundle}/Contents/Resources/app.asar`;
+const exactIconIds = [
+  "sidebar-account-menu-usage-26-917-71314",
+  "sidebar-account-menu-pet-26-917-71314",
+  "sidebar-account-menu-invite-26-917-71314",
+  "sidebar-account-menu-settings-26-917-71314",
+  "sidebar-account-menu-logout-26-917-71314",
+];
+const exactIconLabels = [
+  "Usage",
+  "Show pet",
+  "Invite a friend",
+  "Settings",
+  "Log out",
+];
+const expectedIconGeometrySha256 = [
+  "8d1383dcf2b7620ba5a184355db564a11d662b39ba88d1aeab45e0942fdaef36",
+  "3a9aa7c85b5da0d67faae27b4dd3a402c4a0647d0edbb4251f385a1f7868306f",
+  "4926a51ab5b3089bc5f2c81bb8a71f351075b5af10e29abcd7872cd7eb9e5e74",
+  "d99a35f037e22df3415231782c9de283ed95d9075034db6c0000e6308b1a4f6e",
+  "e856f1fbfba58c13204d79b6f0d034111dbcd66f4475d60a3fa090ed0cc807e0",
+];
 
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error("Set a valid isolated account-menu CDP port.");
@@ -52,6 +76,14 @@ if (!expectedFingerprint) {
 if (candidateObservationOnly && requestedFingerprint === "promoted") {
   throw new Error(
     "Observation-only capture is reserved for an explicit non-promoted candidate.",
+  );
+}
+if (
+  includeIconPaths &&
+  (!candidateObservationOnly || requestedFingerprint !== "26.917.71314")
+) {
+  throw new Error(
+    "Exact icon-path capture is restricted to the explicit 26.917.71314 candidate.",
   );
 }
 if (!allowPreferences) {
@@ -251,6 +283,7 @@ for (const listener of listeners) {
 }
 
 await mkdir(outputDirectory, { mode: 0o700 });
+const exactIconCaptures = {};
 
 const inspectCandidate = async (page, index) => {
   const structure = await page.evaluate(() => {
@@ -494,6 +527,190 @@ try {
           : null;
       };
       const items = [...element.querySelectorAll('[role="menuitem"]')];
+      const allowedTags = new Set([
+        "circle",
+        "clippath",
+        "defs",
+        "ellipse",
+        "g",
+        "line",
+        "lineargradient",
+        "mask",
+        "path",
+        "polygon",
+        "polyline",
+        "radialgradient",
+        "rect",
+        "stop",
+        "use",
+      ]);
+      const allowedAttributes = new Set([
+        "clip-path",
+        "clip-rule",
+        "color",
+        "cx",
+        "cy",
+        "d",
+        "fill",
+        "fill-opacity",
+        "fill-rule",
+        "filter",
+        "gradienttransform",
+        "gradientunits",
+        "height",
+        "href",
+        "id",
+        "mask",
+        "offset",
+        "opacity",
+        "points",
+        "preserveaspectratio",
+        "r",
+        "rx",
+        "ry",
+        "stop-color",
+        "stop-opacity",
+        "stroke",
+        "stroke-dasharray",
+        "stroke-dashoffset",
+        "stroke-linecap",
+        "stroke-linejoin",
+        "stroke-miterlimit",
+        "stroke-opacity",
+        "stroke-width",
+        "transform",
+        "vector-effect",
+        "width",
+        "x",
+        "x1",
+        "x2",
+        "xlink:href",
+        "y",
+        "y1",
+        "y2",
+      ]);
+      const ignoredAttributes = new Set([
+        "aria-hidden",
+        "focusable",
+        "role",
+        "tabindex",
+        "version",
+        "viewbox",
+        "xmlns",
+        "xmlns:xlink",
+      ]);
+      const captureAttributes = (target) => {
+        if (target.hasAttribute("style")) {
+          throw new Error(
+            `Inline SVG style attributes are unsupported: ${target.tagName.toLowerCase()}`,
+          );
+        }
+        const attributes = [...target.attributes];
+        const unsupported = attributes
+          .map((attribute) => attribute.name.toLowerCase())
+          .filter(
+            (name) =>
+              !allowedAttributes.has(name) &&
+              !ignoredAttributes.has(name) &&
+              name !== "class" &&
+              !name.startsWith("aria-") &&
+              !name.startsWith("data-"),
+          );
+        if (unsupported.length > 0) {
+          throw new Error(
+            `Unsupported account-menu SVG attributes: ${unsupported.join(", ")}`,
+          );
+        }
+        return Object.fromEntries(
+          attributes
+            .filter((attribute) =>
+              allowedAttributes.has(attribute.name.toLowerCase()),
+            )
+            .map((attribute) => [
+              attribute.name.toLowerCase(),
+              attribute.value,
+            ])
+            .sort(([left], [right]) => left.localeCompare(right)),
+        );
+      };
+      const capturedStyleProperties = new Set([
+        "clip-path",
+        "display",
+        "fill-opacity",
+        "filter",
+        "height",
+        "mask",
+        "opacity",
+        "overflow",
+        "paint-order",
+        "shape-rendering",
+        "stroke-dasharray",
+        "stroke-dashoffset",
+        "stroke-linecap",
+        "stroke-linejoin",
+        "stroke-miterlimit",
+        "stroke-opacity",
+        "stroke-width",
+        "vector-effect",
+        "visibility",
+        "width",
+      ]);
+      const captureComputedStyle = (target) => {
+        const style = getComputedStyle(target);
+        return Object.fromEntries(
+          [...style]
+            .filter((property) => capturedStyleProperties.has(property))
+            .map((property) => [property, style.getPropertyValue(property)])
+            .sort(([left], [right]) => left.localeCompare(right)),
+        );
+      };
+      const serializePrimitive = (target) => {
+        const tag = target.tagName.toLowerCase();
+        if (!allowedTags.has(tag)) {
+          throw new Error(`Unsupported account-menu SVG element: ${tag}`);
+        }
+        const children = [...target.children]
+          .filter((child) => !["title", "desc"].includes(child.tagName.toLowerCase()))
+          .map(serializePrimitive);
+        return {
+          attributes: captureAttributes(target),
+          ...(children.length > 0 ? { children } : {}),
+          computedStyle: captureComputedStyle(target),
+          tag,
+        };
+      };
+      const serializeExactIcon = (item, iconIndex) => {
+        const roots = [...item.querySelectorAll("svg")];
+        if (roots.length !== 1) {
+          throw new Error(
+            `Expected one SVG for account menu item ${iconIndex + 1}; found ${roots.length}.`,
+          );
+        }
+        const root = roots[0];
+        const bounds = root.getBoundingClientRect();
+        const viewBox = root.getAttribute("viewBox");
+        if (!viewBox || bounds.width <= 0 || bounds.height <= 0) {
+          throw new Error(`Account menu icon ${iconIndex + 1} has no visible viewBox.`);
+        }
+        return {
+          id: context.iconIds[iconIndex],
+          label: context.iconLabels[iconIndex],
+          primitives: [...root.children]
+            .filter((child) => !["title", "desc"].includes(child.tagName.toLowerCase()))
+            .map(serializePrimitive),
+          renderSize: {
+            height: round(bounds.height),
+            width: round(bounds.width),
+          },
+          rootAttributes: captureAttributes(root),
+          rootComputedStyle: captureComputedStyle(root),
+          sourceSize: {
+            height: Number(root.getAttribute("height")) || round(bounds.height),
+            width: Number(root.getAttribute("width")) || round(bounds.width),
+          },
+          viewBox,
+        };
+      };
       const menuStyle = getComputedStyle(element);
       const trigger = document.querySelector(
         'button[aria-haspopup="menu"]:has(img)',
@@ -547,12 +764,46 @@ try {
             viewBox: svg.getAttribute("viewBox"),
           })),
         ),
+        ...(context.includeIconPaths
+          ? {
+              exactIconAssets: items.slice(1, 6).map((item, index) =>
+                serializeExactIcon(item, index),
+              ),
+            }
+          : {}),
         theme: context.theme,
         triggerRect: rect(trigger),
         triggerTextLength: trigger?.textContent?.trim().length ?? 0,
         viewport: { height: innerHeight, width: innerWidth },
       };
-    }, { compact, theme });
+    }, {
+      compact,
+      includeIconPaths,
+      iconIds: exactIconIds,
+      iconLabels: exactIconLabels,
+      theme,
+    });
+    if (includeIconPaths) {
+      exactIconCaptures[`${theme.toLowerCase()}${compact ? "Compact" : "Wide"}`] =
+        state.exactIconAssets;
+      delete state.exactIconAssets;
+      for (const [index, icon] of exactIconCaptures[
+        `${theme.toLowerCase()}${compact ? "Compact" : "Wide"}`
+      ].entries()) {
+        const shapeValues = state.svgGeometry[index + 1]?.[0]?.shapes;
+        if (!shapeValues) {
+          throw new Error(`Installed icon geometry is missing for ${icon.id}.`);
+        }
+        const shapeSha256 = createHash("sha256")
+          .update(JSON.stringify(shapeValues))
+          .digest("hex");
+        if (shapeSha256 !== expectedIconGeometrySha256[index]) {
+          throw new Error(
+            `Installed icon geometry changed for ${icon.id}: ${shapeSha256}`,
+          );
+        }
+      }
+    }
     const stem = `${theme.toLowerCase()}-${compact ? "compact" : "wide"}`;
     const menuBounds = await menu.boundingBox();
     if (!menuBounds) throw new Error("The account menu has no visible bounds.");
@@ -616,6 +867,41 @@ try {
     candidateObservationOnly,
   });
   const sanitizedRecord = sanitizeCurrentAccountMenuRecord(record);
+  if (includeIconPaths) {
+    const captures = Object.values(exactIconCaptures);
+    if (captures.length !== 4 || captures.some((icons) => icons?.length !== 5)) {
+      throw new Error("Exact account-menu vector capture is incomplete.");
+    }
+    const icons = captures[0];
+    const canonicalIcons = (value) => JSON.stringify(value);
+    if (captures.some((capture) => canonicalIcons(capture) !== canonicalIcons(icons))) {
+      throw new Error(
+        "Exact account-menu vector structure or non-color styles differ across theme/viewport states.",
+      );
+    }
+    const exactIconRecord = {
+      schemaVersion: 1,
+      baseline: {
+        appAsarBytes: fingerprint.appAsarBytes,
+        appAsarSha256: fingerprint.appAsarSha256,
+        appVersion: fingerprint.appVersion,
+        buildNumber: fingerprint.buildNumber,
+        capturedAt: new Date().toISOString().slice(0, 10),
+        chromiumVersion: fingerprint.chromiumVersion,
+        source: "five visible sidebar account-menu SVGs observed through isolated loopback-only CDP",
+        sourceBoundary: "exact vector paths only; no bundled application code, stylesheets, fonts, account identity, or dynamic usage data",
+      },
+      icons: icons.map((icon, index) => ({
+        ...icon,
+        geometrySha256: expectedIconGeometrySha256[index],
+      })),
+    };
+    await writeFile(
+      `${outputDirectory}/current-account-menu-26.917.71314-icons.json`,
+      `${JSON.stringify(exactIconRecord, null, 2)}\n`,
+      { encoding: "utf8", mode: 0o600 },
+    );
+  }
   for (const [key, state] of Object.entries(states)) {
     const stem = `${state.theme.toLowerCase()}-${key.endsWith("Compact") ? "compact" : "wide"}`;
     await writeFile(

@@ -62,6 +62,7 @@
     "check:current-sidebar-status-26-915": "node scripts/check-current-sidebar-status-26-915.mjs",
     "check:current-sidebar-actions-26-915": "node scripts/check-current-sidebar-actions-26-915.mjs",
     "check:current-sidebar-account-26-915": "node scripts/check-current-sidebar-account-26-915.mjs",
+    "check:current-sidebar-account-26-917": "node scripts/check-current-sidebar-account-26-917.mjs",
     "check:current-sidebar-help-26-915": "node scripts/check-current-sidebar-help-26-915.mjs",
     "check:current-sidebar-primary-navigation-26-915": "node scripts/check-current-sidebar-primary-navigation-26-915.mjs",
     "check:current-sidebar-project-navigation-26-915": "node scripts/check-current-sidebar-project-navigation-26-915.mjs",
