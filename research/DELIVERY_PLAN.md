@@ -1194,7 +1194,10 @@ Requests, Composer resource-menu, and Settings Connections structures are now
 captured in candidate records. Stage 0 remains open: conversation, resource
 selection/execution, connection mutation/pairing/SSH, Review, Terminal,
 Markdown, MCP, other P0 route families, and installed-product pixel regions
-still need their own current-build evidence.
+still need their own current-build evidence. The exact same installed ASAR was
+revalidated on 2026-09-25 with the isolated baseline recipe; the sanitized
+record now carries that second run and keeps profile-dependent row/scroll counts
+explicitly sample-scoped.
 
 ### 1. Complete the application shell and left sidebar
 
