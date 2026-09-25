@@ -16,9 +16,11 @@ exit gates; it does not replace the inventory.
   Its isolated candidate record is
   [`current-baseline-26.917.71314.json`](current-baseline-26.917.71314.json),
   summarized in [`26.917.71314.md`](26.917.71314.md). It refreshes structural
-  evidence for the shell/sidebar, Projects, Help, Pull Requests route, and the
-  Composer resource menu and read-only Settings Connections states. It does
-  not capture resource selection/execution or connection mutations/pairing/SSH.
+  evidence for the shell/sidebar, New chat destination and route restoration,
+  Projects, Help, Pull Requests route, Composer resource menu, and read-only
+  Settings Connections states. The New chat evidence covers only the empty
+  destination/editor shell, not a populated message thread. It does not capture
+  resource selection/execution or connection mutations/pairing/SSH.
   The isolated 26.917 account-menu matrix in
   [`current-account-menu-26.917.71314.json`](current-account-menu-26.917.71314.json)
   now records all four dark/light × wide/compact states: a `305.875×202.375px`
@@ -252,11 +254,12 @@ exit gates; it does not replace the inventory.
 - The inventory contains 93 surface groups: 59 P0, 23 P1, and 11 P2.
 - At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 66
   have previous-build-only runtime evidence, and 9 have not been sampled. The
-  `26.917.71314` candidate adds structural observations to seven shell,
-  navigation, Composer, and Projects groups, but does not change
-  promotion or Browser/Electron verification status. The 26.903 PDF slice is
-  still the only promoted current-build pixel slice; broader families remain
-  regression fixtures until their current-build gates are met.
+  `26.917.71314` candidate now maps structural observations to twelve P0
+  conversation-destination, shell/navigation, Composer, and Projects groups,
+  but does not change promotion or Browser/Electron verification status. The
+  New chat observation does not cover populated thread messages. The 26.903
+  PDF slice is still the only promoted current-build pixel slice; broader
+  families remain regression fixtures until their current-build gates are met.
 - The current mixed-attachment refresh promotes `composer.attachments` to
   `26.825.51511` Browser/Electron verification with trusted-CDP image/file
   selection, wide/compact preview and pixels, focus-preserving removal, exact
@@ -1189,12 +1192,13 @@ new parity claims:
 Exit: the current build has a reproducible CDP capture recipe and no
 `verified` status relies solely on a previous build.
 
-The `26.917.71314` package identity and shell/sidebar/Projects/Help/Pull
-Requests, Composer resource-menu, and Settings Connections structures are now
-captured in candidate records. Stage 0 remains open: conversation, resource
-selection/execution, connection mutation/pairing/SSH, Review, Terminal,
-Markdown, MCP, other P0 route families, and installed-product pixel regions
-still need their own current-build evidence. The exact same installed ASAR was
+The `26.917.71314` package identity and shell/sidebar, empty New chat
+destination/route restoration, Projects/Help/Pull Requests, Composer
+resource-menu, and Settings Connections structures are now captured in
+candidate records. Stage 0 remains open: populated conversation/thread states,
+resource selection/execution, connection mutation/pairing/SSH, Review,
+Terminal, Markdown, MCP, other P0 route families, and installed-product pixel
+regions still need their own current-build evidence. The exact same installed ASAR was
 revalidated on 2026-09-25 with the isolated baseline recipe; the sanitized
 record now carries that second run and keeps profile-dependent row/scroll counts
 explicitly sample-scoped.

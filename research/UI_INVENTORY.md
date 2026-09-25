@@ -407,8 +407,10 @@ Current inventory: 93 surface groups; at the promoted `26.903.71938` baseline,
 18 have runtime evidence, 66 have previous-build-only runtime evidence, and 9
 remain `not_sampled` (0 are `blocked_by_policy`). Current-build Browser
 verification covers 0 groups and Electron verification covers 0. The
-candidate `26.917.71314` adds structural runtime observations to seven groups
-but does not change promoted status.
+candidate `26.917.71314` maps structural runtime observations to twelve P0
+groups, including the empty New chat destination, navigation, and route
+restoration; it does not observe populated thread messages or change promoted
+status.
 Prior acceptance outside those sampled current-build groups remains
 recorded as `partial_legacy` until current-build re-observation.
 

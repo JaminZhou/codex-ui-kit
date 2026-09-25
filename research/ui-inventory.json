@@ -53,7 +53,8 @@
         "cdp-26.825.31414:new-chat-wide-medium-721-720-current-route-marker-and-responsive-destination",
         "cdp-26.825.51511:new-chat-wide-medium-721-720-current-route-marker-and-responsive-destination",
         "cdp-26.903.71938:new-chat-shell-route-restoration",
-        "cdp-26.911.61220:new-chat-shell-route-restoration"
+        "cdp-26.911.61220:new-chat-shell-route-restoration",
+        "cdp-26.917.71314:new-chat-current-route-marker-wide-medium-721-720-and-compact-restore"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1318,7 +1319,8 @@
         "cdp-26.908.70816:fixed-route-stack-and-new-chat-restoration",
         "cdp-26.911.61220:fixed-route-stack-and-new-chat-restoration",
         "cdp-26.915.31945:primary-navigation-current-build-wide-compact-dark-light",
-        "cdp-26.915.31945:project-navigation-current-build-wide-compact-dark-light"
+        "cdp-26.915.31945:project-navigation-current-build-wide-compact-dark-light",
+        "cdp-26.917.71314:new-chat-and-fixed-primary-route-current-state-wide-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1355,7 +1357,8 @@
         "cdp-26.903.71938:project-group-navigation-and-owned-scroll",
         "cdp-26.908.70816:project-group-navigation-and-owned-scroll",
         "cdp-26.911.61220:project-group-navigation-and-owned-scroll",
-        "cdp-26.915.31945:project-group-navigation-and-owned-scroll-delta"
+        "cdp-26.915.31945:project-group-navigation-and-owned-scroll-delta",
+        "cdp-26.917.71314:projects-index-sort-search-empty-group-expansion-and-owned-scroll-sampled-content"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1389,7 +1392,8 @@
         "cdp-26.825.51511:30px-project-row-pointer-enter-space-focus-and-720-hide-show-restoration",
         "cdp-26.903.71938:project-group-pointer-enter-space-focus-continuity",
         "cdp-26.911.61220:project-group-pointer-enter-space-focus-continuity",
-        "cdp-26.915.31945:project-group-lifecycle-current-build-wide-compact-dark-light"
+        "cdp-26.915.31945:project-group-lifecycle-current-build-wide-compact-dark-light",
+        "cdp-26.917.71314:project-group-pointer-collapse-keyboard-enter-space-focus"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1726,7 +1730,8 @@
         "cdp-26.820.60940:compact-visible-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.825.31414:compact-visible-pull-requests-to-new-chat-in-session-restoration",
         "cdp-26.825.51511:compact-visible-pull-requests-to-new-chat-in-session-restoration",
-        "cdp-26.915.31945:compact-pull-requests-to-new-chat-restoration-delta"
+        "cdp-26.915.31945:compact-pull-requests-to-new-chat-restoration-delta",
+        "cdp-26.917.71314:compact-pull-requests-to-new-chat-collapse-and-restore-route-state"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
