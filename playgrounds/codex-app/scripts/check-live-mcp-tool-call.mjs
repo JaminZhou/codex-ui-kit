@@ -383,13 +383,41 @@ try {
   });
   try {
     await statusClient.connect();
-    let statusResponse = await statusClient.call("mcpServerStatus/list", {
-      detail: "full",
+    const readServerStatus = async ({ requireTools = false } = {}) => {
+      const deadline = Date.now() + 15_000;
+      let response;
+      let configuredServer;
+      do {
+        response = await statusClient.call("mcpServerStatus/list", {
+          detail: "full",
+        });
+        configuredServer = response.data?.find(
+          (candidate) => candidate?.name === mcpServerName,
+        );
+        if (configuredServer && (!requireTools || configuredServer.tools)) {
+          return { response, server: configuredServer };
+        }
+        if (Date.now() >= deadline) break;
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      } while (true);
+
+      const availableNames = (response?.data ?? [])
+        .map((candidate) => candidate?.name)
+        .filter((name) => typeof name === "string");
+      assert.ok(
+        configuredServer,
+        `The live MCP status list must include ${mcpServerName}; returned: ${availableNames.join(", ") || "(empty)"}.`,
+      );
+      assert.ok(
+        configuredServer.tools,
+        `The live MCP status list must expose tools for ${mcpServerName}; runtime status: ${configuredServer.runtimeStatus ?? "unknown"}.`,
+      );
+      return { response, server: configuredServer };
+    };
+
+    let { response: statusResponse, server } = await readServerStatus({
+      requireTools: mode !== "oauth",
     });
-    let server = statusResponse.data?.find(
-      (candidate) => candidate?.name === mcpServerName,
-    );
-    assert.ok(server, `The live MCP status list must include ${mcpServerName}.`);
     if (mode === "oauth") {
       let complete;
       const completion = new Promise((resolve) => {
@@ -421,9 +449,9 @@ try {
         initialAuthStatus: server.authStatus ?? null,
         success: completed.success,
       };
-      statusResponse = await statusClient.call("mcpServerStatus/list", { detail: "full" });
-      server = statusResponse.data?.find((candidate) => candidate?.name === mcpServerName);
-      assert.ok(server, `The OAuth-authenticated MCP status list must include ${mcpServerName}.`);
+      ({ response: statusResponse, server } = await readServerStatus({
+        requireTools: true,
+      }));
     }
     assert.ok(server.tools, "The live MCP status list must expose configured tools.");
     for (const { name } of toolDefinitions) {
