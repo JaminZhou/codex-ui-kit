@@ -15,8 +15,10 @@ function assert(condition, message) {
 }
 
 assert(packageJson.name === "codex-ui-kit", "unexpected package name");
-assert(packageJson.private === true, "release audit must not publish a private package");
+assert(packageJson.private !== true, "release archive must be publishable");
 assert(packageJson.publishConfig?.access === "public", "package access must remain public");
+assert(packageJson.publishConfig?.tag === "latest", "unexpected publication tag");
+assert(packageJson.publishConfig?.registry === "https://registry.npmjs.org/", "unexpected registry");
 assert(packageJson.version === "0.1.0", "unexpected foundation version");
 
 const runtimeModule = await import(new URL("dist/index.js", root));
@@ -39,8 +41,8 @@ assert(
 const releaseNotes = await readFile(new URL("docs/RELEASE_NOTES.md", root), "utf8");
 assert(
   releaseNotes.includes("# Release notes") &&
-    releaseNotes.includes("private: true"),
-  "release notes must document the unpublished private-candidate boundary",
+    releaseNotes.includes("unpublished"),
+  "release notes must document the unpublished candidate boundary",
 );
 
 const npmExecutable = process.platform === "win32" ? "npm.cmd" : "npm";
@@ -81,6 +83,7 @@ try {
   for (const required of [
     "LICENSE",
     "README.md",
+    "THIRD_PARTY_NOTICES.md",
     "package.json",
     "dist/index.js",
     "dist/index.d.ts",
@@ -107,7 +110,7 @@ try {
       passed: true,
       package: report.name,
       version: report.version,
-      private: packageJson.private,
+      publishable: packageJson.private !== true,
       entryCount: files.length,
       tarballBytes: tarball.byteLength,
       sha256,

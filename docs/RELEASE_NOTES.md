@@ -1,8 +1,8 @@
 # Release notes
 
-This file records the public-package changes that must accompany the first
-registry release. It is documentation only until a separately approved
-release change removes `private: true` and selects a version.
+This file records the public-package changes that accompany the first registry
+release. The reviewed source is publishable; registry publication is a separate
+step from building or merging this source.
 
 ## 0.1.0 foundation candidate (unpublished)
 
@@ -52,8 +52,8 @@ OAuth, SSH, Noise relay, GitHub, billing, or file-decoding clients.
 
 ### Known limitations
 
-- The package is unpublished and still has `private: true`; no registry
-  version, tag, or dist-integrity claim is made by this note.
+- Until registry read-back succeeds, this source makes no npm version, tag, or
+  dist-integrity claim. Verify `codex-ui-kit@0.1.0` directly in npm.
 - Codex Desktop reconstruction evidence is build-scoped and separated from
   public package readiness. Replay and playground evidence is not a claim of
   installed-product parity or provider authentication.

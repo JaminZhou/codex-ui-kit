@@ -31,7 +31,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   separated; a passing replay is not silently promoted to installed-product
   parity. This remains a partial UI foundation rather than a global
   reconstruction claim.
-- The repository is public and the package baseline is `0.1.0`, but the npm package has **not** been published.
+- The repository is public and `0.1.0` is prepared for its first npm release.
+  Check `npm view codex-ui-kit@0.1.0 version` before attempting to install it;
+  a source version number alone does not establish registry availability.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
 
@@ -100,10 +102,11 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-After the first registry release, installation will be:
+After `npm view codex-ui-kit@0.1.0 version` confirms the first release, install
+the exact version:
 
 ```bash
-pnpm add codex-ui-kit
+pnpm add --save-exact codex-ui-kit@0.1.0
 ```
 
 ```tsx
@@ -279,9 +282,9 @@ CODEX_UI_KIT_APPROVAL_DENIED_REFERENCE=/absolute/path/to/denied.png \
   -- --scenes=approval-current-pending,approval-current-denied
 ```
 
-`npm pack` and a future `npm publish` run the library build first so the ignored
-`dist/` directory is always generated from the checked-out source. The package
-remains marked private until the first registry release is approved explicitly.
+`npm pack` runs the library build first so the ignored `dist/` directory is
+generated from the checked-out source. Registry publication uses one reviewed,
+immutable archive through the [npm release workflow](docs/NPM_PUBLISHING.md).
 
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) covers development and visual-acceptance expectations.
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) defines community expectations.
@@ -293,4 +296,5 @@ remains marked private until the first registry release is approved explicitly.
 
 ## License
 
-MIT
+MIT. The packed KaTeX stylesheet and fonts retain the attribution in
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
