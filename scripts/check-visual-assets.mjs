@@ -223,8 +223,9 @@ if (
 }
 if (
   !Array.isArray(packageJson.files) ||
-  packageJson.files.length !== 1 ||
-  packageJson.files[0] !== "dist"
+  packageJson.files.length !== 2 ||
+  packageJson.files[0] !== "dist" ||
+  packageJson.files[1] !== "THIRD_PARTY_NOTICES.md"
 ) {
   throw new Error("exact reference visuals must remain outside the npm package");
 }
