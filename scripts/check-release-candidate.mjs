@@ -19,7 +19,7 @@ assert(packageJson.private !== true, "release archive must be publishable");
 assert(packageJson.publishConfig?.access === "public", "package access must remain public");
 assert(packageJson.publishConfig?.tag === "latest", "unexpected publication tag");
 assert(packageJson.publishConfig?.registry === "https://registry.npmjs.org/", "unexpected registry");
-assert(packageJson.version === "0.1.0", "unexpected foundation version");
+assert(/^0\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(packageJson.version), "expected an exact pre-1.0 version");
 
 const runtimeModule = await import(new URL("dist/index.js", root));
 const runtimeExports = Object.keys(runtimeModule).sort();
