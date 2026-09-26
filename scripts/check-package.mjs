@@ -14,10 +14,12 @@ function assert(condition, message) {
 assert(packageJson.name === "codex-ui-kit", "unexpected package name");
 assert(packageJson.version === "0.1.0", "expected the 0.1.0 foundation version");
 assert(
-  packageJson.private === true,
-  "package must remain private until the first registry release",
+  packageJson.private !== true,
+  "release package must be publishable; workflow gates control publication",
 );
 assert(packageJson.publishConfig?.access === "public", "package access must be public");
+assert(packageJson.publishConfig?.tag === "latest", "unexpected publication tag");
+assert(packageJson.publishConfig?.registry === "https://registry.npmjs.org/", "unexpected registry");
 assert(
   packageJson.scripts?.prepack === "node scripts/prepack.mjs",
   "npm pack and publish must build ignored package output first",
@@ -97,6 +99,7 @@ const packedPaths = new Set(report.files.map((file) => file.path));
 for (const requiredPath of [
   "LICENSE",
   "README.md",
+  "THIRD_PARTY_NOTICES.md",
   "package.json",
   "dist/index.js",
   "dist/index.d.ts",

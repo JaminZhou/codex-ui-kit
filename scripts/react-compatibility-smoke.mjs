@@ -6,7 +6,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { publicRuntimeExports } from "./public-runtime-exports.mjs";
 
@@ -16,6 +16,8 @@ const [
   reactTypesVersion,
   reactDomTypesVersion,
   moduleResolution = "Bundler",
+  archiveOption,
+  archiveArgument,
 ] = process.argv.slice(2);
 
 if (
@@ -31,6 +33,9 @@ if (
 
 if (moduleResolution !== "Bundler" && moduleResolution !== "NodeNext") {
   throw new Error(`unsupported module resolution: ${moduleResolution}`);
+}
+if (archiveOption !== undefined && (!["--tarball", "--registry-version"].includes(archiveOption) || !archiveArgument)) {
+  throw new Error("optional package argument must be --tarball <path> or --registry-version <version>");
 }
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -52,36 +57,37 @@ function run(command, args, cwd) {
 }
 
 try {
-  const packOutput = run(
-    npmExecutable,
-    ["pack", "--json", "--pack-destination", temporaryRoot],
-    root,
-  );
-  const [packReport] = JSON.parse(packOutput);
-  const tarballPath = join(temporaryRoot, packReport.filename);
+  const packageTarget = archiveOption === "--registry-version"
+    ? `codex-ui-kit@${archiveArgument}`
+    : archiveArgument
+    ? resolve(archiveArgument)
+    : join(
+        temporaryRoot,
+        JSON.parse(
+          run(npmExecutable, ["pack", "--json", "--pack-destination", temporaryRoot], root),
+        )[0].filename,
+      );
 
   writeFileSync(
     join(temporaryRoot, "package.json"),
     `${JSON.stringify({ private: true }, null, 2)}\n`,
   );
 
-  run(
-    npmExecutable,
-    [
-      "install",
-      "--ignore-scripts",
-      "--no-audit",
-      "--no-fund",
-      "--package-lock=false",
+  const dependencies = [
       `react@${reactVersion}`,
       `react-dom@${reactDomVersion}`,
       `@types/react@${reactTypesVersion}`,
       `@types/react-dom@${reactDomTypesVersion}`,
       "typescript@5.9.3",
-      tarballPath,
-    ],
-    temporaryRoot,
-  );
+      packageTarget,
+  ];
+  if (process.env.RELEASE_CONSUMER_INSTALLER === "pnpm") {
+    run("pnpm", ["add", "--ignore-scripts", "--save-exact", ...dependencies], temporaryRoot);
+  } else {
+    run(npmExecutable, ["install", "--ignore-scripts", "--no-audit", "--no-fund",
+      ...(archiveOption === "--registry-version" ? [] : ["--package-lock=false"]),
+      ...dependencies], temporaryRoot);
+  }
 
   writeFileSync(
     join(temporaryRoot, "tsconfig.json"),
@@ -177,6 +183,25 @@ if (inertAttributes.length !== 3) {
       "utf8",
     ),
   );
+  if (archiveOption === "--registry-version") {
+    if (installedPackage.name !== "codex-ui-kit" || installedPackage.version !== archiveArgument) {
+      throw new Error("Installed registry version differs from the requested exact version");
+    }
+    const integrity = process.env.RELEASE_INTEGRITY;
+    if (!integrity?.startsWith("sha512-")) throw new Error("RELEASE_INTEGRITY is required for registry smoke");
+    const installer = process.env.RELEASE_CONSUMER_INSTALLER;
+    const lock = readFileSync(join(temporaryRoot, installer === "pnpm" ? "pnpm-lock.yaml" : "package-lock.json"), "utf8");
+    if (installer === "pnpm") {
+      if (!lock.includes(`codex-ui-kit@${archiveArgument}`) || !lock.includes(integrity)) {
+        throw new Error("pnpm consumer lock does not pin the approved archive integrity");
+      }
+    } else {
+      const packages = JSON.parse(lock).packages;
+      if (packages?.["node_modules/codex-ui-kit"]?.integrity !== integrity) {
+        throw new Error("npm consumer lock does not pin the approved archive integrity");
+      }
+    }
+  }
   console.log(
     `React ${reactVersion} / ${moduleResolution} compatibility ok: ${installedPackage.name}@${installedPackage.version}`,
   );

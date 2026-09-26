@@ -1,7 +1,6 @@
 {
   "name": "codex-ui-kit",
   "version": "0.1.0",
-  "private": true,
   "description": "Independently designed React components for Codex-style coding-agent interfaces.",
   "keywords": [
     "agent-ui",
@@ -23,7 +22,8 @@
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -113,7 +113,9 @@
     "check": "pnpm check:research && pnpm typecheck && pnpm test && pnpm build && pnpm check:package && pnpm build:demo && node scripts/check-current-streaming-browser.mjs && node scripts/check-current-command-browser.mjs && pnpm check:a11y && pnpm --filter @codex-ui-kit/electron-playground check && pnpm --filter @codex-ui-kit/codex-app-playground check"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "latest",
+    "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
     "react": ">=18",

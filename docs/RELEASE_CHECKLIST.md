@@ -1,7 +1,8 @@
 # First public package release checklist
 
-Status: preparation only. `package.json` remains `private: true`; this checklist
-does not authorize an npm publication, tag, credential change, or account setup.
+Status: `0.1.0` release in progress. The source package is publishable, while
+registry publication requires the exact candidate gates and npm account setup
+in [`NPM_PUBLISHING.md`](NPM_PUBLISHING.md).
 Package readiness and complete Codex product reconstruction are separate claims.
 
 ## Candidate record
@@ -11,17 +12,16 @@ versions, packed artifact digest, and links to that candidate's validation.
 A new commit invalidates candidate-specific evidence until it is rechecked.
 Unrun or unavailable checks stay open, not implicitly passed.
 
-The latest private-candidate audit is recorded in
+The last historical private-candidate audit is recorded in
 [`RELEASE_CANDIDATE_2026-09-23.md`](RELEASE_CANDIDATE_2026-09-23.md). It is
-evidence for preparation only; the checklist below remains intentionally
-unselected until a named release version and publication decision are
-explicitly approved.
+evidence for preparation only. It does not cover the current publishable source.
+Re-run the checks on the final merged `main` commit before publishing.
 
 The repository provides `pnpm check:release:candidate` for this audit. It
-packs the current private candidate into a temporary tarball, checks the
+packs the current source into a temporary tarball, checks the
 public runtime export list and required package files from that tarball,
 rejects development-only paths, and prints the artifact byte count and
-SHA-256. It never publishes, changes `private`, or leaves a tarball in the
+SHA-256. It never publishes or leaves a tarball in the
 repository.
 
 - [ ] Freeze root runtime exports against `scripts/public-runtime-exports.mjs`.
@@ -63,14 +63,13 @@ repository.
 
 ## Separate publication decision
 
-- [ ] Obtain explicit approval for the named version and candidate artifact.
-- [ ] In a reviewed release change, remove `private: true` and update the
-  foundation-only version/privacy assertions in `scripts/check-package.mjs`
-  consistently. Do not simply disable package validation.
+- [x] Select `codex-ui-kit@0.1.0` as the first public release scope.
+- [ ] Review and merge the change removing `private: true`, with package
+  privacy assertions updated rather than disabled.
 - [ ] Re-run the candidate checks and inspect the final tarball after that
   change; earlier artifact digests no longer identify the release candidate.
-- [ ] Verify registry destination, package ownership, tag, and release notes
-  before the separately authorized publish action.
+- [ ] Verify registry destination, package ownership, `latest` tag, and release
+  notes before publishing the selected candidate.
 - [ ] Verify registry version, integrity, exports, CSS, and clean consumer install
   after publication. Record how consumers can pin the previous version if a
   regression is discovered; do not rely on deletion as a rollback strategy.
