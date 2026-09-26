@@ -31,9 +31,9 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
   separated; a passing replay is not silently promoted to installed-product
   parity. This remains a partial UI foundation rather than a global
   reconstruction claim.
-- The repository is public and `0.1.0` is prepared for its first npm release.
-  Check `npm view codex-ui-kit@0.1.0 version` before attempting to install it;
-  a source version number alone does not establish registry availability.
+- [`codex-ui-kit@0.1.0`](https://www.npmjs.com/package/codex-ui-kit) is published
+  on npm. The package was verified against fresh npm and pnpm consumers using
+  React 18 and React 19.
 - The API remains pre-1.0 and may change while public documentation and consumer feedback mature.
 - Extracted application files, private IPC, bundled fonts, and OpenAI brand assets are not included.
 
@@ -92,7 +92,13 @@ review the [coverage policy](research/PARITY.md), or follow the
 
 ## Quick start
 
-The package is not yet available from npm. To explore the current public source:
+Install the published version:
+
+```bash
+pnpm add --save-exact codex-ui-kit@0.1.0
+```
+
+To explore the current public source and component showcase:
 
 ```bash
 git clone https://github.com/JaminZhou/codex-ui-kit.git
@@ -100,13 +106,6 @@ cd codex-ui-kit
 corepack enable
 pnpm install --frozen-lockfile
 pnpm dev
-```
-
-After `npm view codex-ui-kit@0.1.0 version` confirms the first release, install
-the exact version:
-
-```bash
-pnpm add --save-exact codex-ui-kit@0.1.0
 ```
 
 ```tsx
