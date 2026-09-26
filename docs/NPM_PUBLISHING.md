@@ -1,7 +1,7 @@
 # npm and GitHub release flow
 
-The package name is `codex-ui-kit`; the first authorized release target is
-`0.1.0` on npm's public `latest` tag. This is an independently written partial
+The package name is `codex-ui-kit`; `0.1.0` was the first release on npm's
+public `latest` tag. This is an independently written partial
 React UI foundation, not a complete Codex Desktop reconstruction. Publishing
 is manual. Pushes, PRs, tags, Pages deployment and CI cannot publish.
 
@@ -11,7 +11,7 @@ Merge a reviewed release change to protected `main`, then wait for the exact
 commit's required CI, including all macOS acceptance shards, to pass. Dispatch:
 
 ```bash
-gh workflow run npm-release-candidate.yml --ref main -f version=0.1.0
+gh workflow run npm-release-candidate.yml --ref main -f version=0.1.1
 ```
 
 The candidate workflow verifies the current `main` and CI, checks npm version

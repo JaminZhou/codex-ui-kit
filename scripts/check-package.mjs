@@ -12,7 +12,7 @@ function assert(condition, message) {
 }
 
 assert(packageJson.name === "codex-ui-kit", "unexpected package name");
-assert(packageJson.version === "0.1.0", "expected the 0.1.0 foundation version");
+assert(/^0\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(packageJson.version), "expected an exact pre-1.0 version");
 assert(
   packageJson.private !== true,
   "release package must be publishable; workflow gates control publication",

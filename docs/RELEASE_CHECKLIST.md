@@ -1,8 +1,8 @@
 # First public package release checklist
 
-Status: `0.1.0` release in progress. The source package is publishable, while
-registry publication requires the exact candidate gates and npm account setup
-in [`NPM_PUBLISHING.md`](NPM_PUBLISHING.md).
+Historical checklist for the first `0.1.0` release, published on 2026-09-26.
+For later releases, use the exact candidate and OIDC gates in
+[`NPM_PUBLISHING.md`](NPM_PUBLISHING.md).
 Package readiness and complete Codex product reconstruction are separate claims.
 
 ## Candidate record
