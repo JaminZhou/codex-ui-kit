@@ -469,7 +469,6 @@ try {
       .filter(
         (element) =>
           visible(element) &&
-          element.textContent?.includes("Environment") &&
           element.textContent?.includes("Sources") &&
           element.textContent?.includes("openai-docs-mcp") &&
           Math.abs(element.getBoundingClientRect().width - 300) < 1,

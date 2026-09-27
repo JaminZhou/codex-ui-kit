@@ -1,0 +1,70 @@
+{
+  "captureDate": "2026-09-27",
+  "captureStatus": "contract-verified-candidate",
+  "candidateOnly": true,
+  "captureMethod": "isolated-loopback-CDP",
+  "captureMode": "native-viewport-only",
+  "mutationsSubmitted": false,
+  "fingerprint": {
+    "appVersion": "26.917.71314",
+    "buildNumber": "10954",
+    "chromiumVersion": "153.0.8010.53",
+    "appAsarBytes": 370175042,
+    "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804"
+  },
+  "taskTitleSha256": "9ac70abd204f854ea6ca826f5c9bf8e01f45b70d68bed1e14cf2554fb77d4059",
+  "scope": "Current-build MCP activity and Sources geometry/computed typography in a read-only real integration task. No installed-product pixel comparison or baseline promotion is claimed.",
+  "privacy": "Only sanitized geometry, styles, labels, and installed-build fingerprint are retained. Screenshots are transient local references in the isolated temporary profile and are not committed.",
+  "success": {
+    "durationLabel": "Worked for 1m 5s",
+    "viewport": { "width": 1180, "height": 820 },
+    "horizontalOverflow": 0,
+    "activity": {
+      "rect": { "left": 222.5, "top": 306.063, "width": 133.906, "height": 21 },
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "14px",
+      "fontWeight": "430",
+      "lineHeight": "21px"
+    },
+    "integrationGroup": {
+      "rect": { "left": 222.5, "top": 348.063, "width": 306.391, "height": 21 },
+      "label": "Used OpenAI Developer Docs integration"
+    },
+    "callRows": [
+      { "label": "Search OpenAI docs", "top": 373.063, "left": 244.5, "width": 132.531, "height": 21, "fontSize": "14px", "fontWeight": "430", "lineHeight": "21px" },
+      { "label": "Fetch OpenAI doc", "top": 398.063, "left": 244.5, "width": 116.578, "height": 21, "fontSize": "14px", "fontWeight": "430", "lineHeight": "21px" }
+    ]
+  },
+  "recoveryProbe": {
+    "durationLabel": "Worked for 26s",
+    "promptedInvalidDocumentationURL": true,
+    "assistantClaim": "MCP_RECOVERY_PROBE_OK",
+    "visibleCallSequence": ["Fetch OpenAI doc", "Search OpenAI docs", "Fetch OpenAI doc"],
+    "failureResultIndependentlyVerified": false,
+    "wide": {
+      "viewport": { "width": 1180, "height": 820 },
+      "horizontalOverflow": 0,
+      "activityRect": { "left": 222.5, "top": 459.313, "width": 118.047, "height": 21 },
+      "integrationGroupRect": { "left": 222.5, "top": 501.313, "width": 306.391, "height": 21 },
+      "callRowTops": [526.313, 551.313, 576.313]
+    },
+    "compact": {
+      "viewport": { "width": 720, "height": 680 },
+      "horizontalOverflow": 0,
+      "activityRect": { "left": 16, "top": 296.063, "width": 118.047, "height": 21 },
+      "integrationGroupRect": { "left": 16, "top": 338.063, "width": 306.391, "height": 21 },
+      "callRowTops": [363.063, 388.063, 413.063]
+    }
+  },
+  "sourcesPanel": {
+    "rect": { "left": 864, "top": 59, "width": 300, "height": 212 },
+    "visibleLabels": ["Sources", "openai-docs-mcp", "View all"],
+    "observedProbeLink": "https://learn.chatgpt.com/docs/codex-ui-kit-recovery-probe-404",
+    "canonicalDocumentationURLFromAnswer": "https://learn.chatgpt.com/docs/extend/mcp"
+  },
+  "knownLimitations": [
+    "The renderer showed the MCP activity group and exact call labels, but not the per-call result transcript; the assistant response alone does not prove that the invalid URL produced a tool error.",
+    "The Sources panel retained the deliberate probe URL while the final answer linked the canonical documentation page; source ownership and error semantics need a separate focused verification.",
+    "This is structural/current-style evidence only. Installed-product regional pixel diffs, failure/cancellation/unavailable states, and baseline promotion remain open."
+  ]
+}

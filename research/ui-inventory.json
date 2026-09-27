@@ -522,7 +522,8 @@
         "cdp-26.825.51511:real-openai-developer-docs-search-fetch-success-and-same-thread-recovery-expanded-1180x820-and-720x680",
         "cdp-26.825.51511:current-mcp-computed-styles-noninteractive-call-rows-and-regional-pixel-gates",
         "cdp-26.903.71938:real-openai-developer-docs-search-three-calls-fetch-success-expanded-1180x820-and-720x680",
-        "cdp-26.903.71938:current-mcp-success-computed-styles-and-regional-pixel-gates"
+        "cdp-26.903.71938:current-mcp-success-computed-styles-and-regional-pixel-gates",
+        "cdp-26.917.71314:real-mcp-search-fetch-and-three-call-activity-wide-compact-geometry"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
