@@ -1944,7 +1944,7 @@ textarea {
   > .codex-ui-app-sidebar__item-row
   > .codex-ui-app-sidebar__item-actions {
   gap: 6px;
-  margin-inline-end: 2px;
+  margin-inline-end: 6px;
 }
 
 .demo-root[data-sidebar-current]
