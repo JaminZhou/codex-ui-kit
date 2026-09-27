@@ -37,12 +37,15 @@ exit gates; it does not replace the inventory.
   does not promote a full-window or global UI baseline.
   The Composer Add menu now has a separate measured product-region comparison
   in [`current-composer-resources-pixel-comparison-26.917.71314.json`](current-composer-resources-pixel-comparison-26.917.71314.json).
-  After matching its measured header, one redacted context-row slot, row
-  positions, and wide/compact bounds, the earlier 30-row sample still differs
-  by 2.7407% wide and 2.8539% compact. A same-bundle read-only sample later
-  exposed only six allowlisted core rows in the viewport, confirming that menu
-  membership is context-dependent. Product-region assets remain local-only;
-  the comparison is partial and does not promote the global baseline.
+  The earlier masked 30-row sample differs by 2.7407% wide and 2.8539% compact.
+  A separate 2026-09-27 read-only sample from the same ASAR records a dynamic
+  plugin-group row, different redacted slots, a 1010px scroll extent, and the
+  exact `rgba(255,255,255,.082)` border with no shadow. Aligning those outer
+  styles and masking the matching context-dependent plugin row lowers that
+  distinct regional diff to 1.2483% wide and 1.3551% compact—still above the
+  0.8% target. Its CSS width is 736px while the fractional-origin screenshot
+  crop rasterizes to 737px. The samples remain context-specific, assets stay
+  local-only, and neither comparison promotes the global baseline.
   The previous
   `26.917.62051` record and its bounded
   Composer/Projects replays and read-only Connections observation remain

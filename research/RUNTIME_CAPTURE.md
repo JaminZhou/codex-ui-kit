@@ -2654,3 +2654,32 @@ After a capture:
 No aggregate area becomes complete merely because each known row has a status.
 The inventory remains open to newly discovered routes, states, and
 compositions.
+
+## 2026-09-27 current Composer menu visual follow-up
+
+On the isolated installed build `26.917.71314` (`10954`, ASAR SHA-256
+`03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804`), a
+read-only New chat Add-menu sample measured a `736×320px` wide menu at
+`383.4375,382` and a `687×320px` compact menu at `17,242`. Both had `28.5625px`
+rows, a `1010px` scroll extent, `13px`/`18.5714px`/`430` text, `rgb(45,45,45)`
+background, `blur(8px)`, a `20px` radius, an
+`rgba(255,255,255,.082)` border, and no shadow. The fractional wide origin
+produces a `737×320px` screenshot crop.
+
+The observed ordering begins with Files, one redacted context row, Work in a
+project, Goal, Plan mode, Record a skill, and Sketch; a `Plugins` group follows
+with a context-dependent redacted row before Documents. Additional redacted
+rows occur later in the scroll extent. Wide and compact states exposed seven
+and eight redacted slots respectively, so the sample is not a portable plugin
+catalog. No private row titles or icons were retained; screenshots remain
+local-only.
+
+The reusable Electron comparison path accepts local product references through
+`CODEX_UI_KIT_COMPOSER_RESOURCES_PRODUCT_WIDE` and
+`CODEX_UI_KIT_COMPOSER_RESOURCES_PRODUCT_COMPACT`. When supplied for this build,
+it masks the fixture's matching GitHub row as well as the context row, compares
+the product crop with Pixelmatch threshold `0.1`, and reports metrics without
+claiming a passing regional gate. After aligning border and shadow, this sample
+measured `1.2483%` wide and `1.3551%` compact; both remain above the `0.8%`
+target. The earlier 30-row product sample remains separately recorded and is
+not overwritten by this context-specific observation.

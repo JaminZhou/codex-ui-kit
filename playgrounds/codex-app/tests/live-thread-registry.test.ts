@@ -17,9 +17,14 @@ describe("playground-owned thread registry", () => {
     const { path, registry } = await fixture();
     const source = await readFile(new URL("../electron/live-thread-registry.ts", import.meta.url), "utf8");
     const lockSource = await readFile(new URL("../electron/registry-lock.ts", import.meta.url), "utf8");
+    const watchSource = await readFile(new URL("../electron/registry-watch.ts", import.meta.url), "utf8");
     const options = { compilerOptions: { target: ts.ScriptTarget.ES2023, module: ts.ModuleKind.ESNext } };
     const lockModuleUrl = `data:text/javascript;base64,${Buffer.from(ts.transpileModule(lockSource, options).outputText).toString("base64")}`;
-    const compiled = ts.transpileModule(source.replace('from "./registry-lock.js"', `from ${JSON.stringify(lockModuleUrl)}`), options).outputText;
+    const watchModuleUrl = `data:text/javascript;base64,${Buffer.from(ts.transpileModule(watchSource, options).outputText).toString("base64")}`;
+    const rewrittenSource = source
+      .replace('from "./registry-lock.js"', `from ${JSON.stringify(lockModuleUrl)}`)
+      .replace('from "./registry-watch.js"', `from ${JSON.stringify(watchModuleUrl)}`);
+    const compiled = ts.transpileModule(rewrittenSource, options).outputText;
     const moduleUrl = `data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`;
     await Promise.all(Array.from({ length: 4 }, (_, worker) => new Promise<void>((resolve, reject) => {
       const child = spawn(process.execPath, ["--input-type=module", "-e", `

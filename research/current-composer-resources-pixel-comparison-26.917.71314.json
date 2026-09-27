@@ -68,9 +68,79 @@
     ],
     "note": "A second live state from the same installed bundle exposed fewer allowlisted rows than the earlier 30-row structural sample. Non-allowlisted content was not retained; resource availability is context-dependent. The pixel comparison above applies only to the earlier masked 30-row sample."
   },
+  "followUpReadOnlySample": {
+    "capturedAt": "2026-09-27",
+    "captureKind": "read-only CDP menu capture with non-allowlisted rows masked",
+    "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804",
+    "menuStyle": {
+      "backgroundColor": "rgb(45, 45, 45)",
+      "backdropFilter": "blur(8px)",
+      "borderColor": "rgba(255, 255, 255, 0.082)",
+      "borderRadius": "20px",
+      "boxShadow": "none",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "lineHeight": "18.5714px",
+      "rowHeight": 28.5625,
+      "scrollHeight": 1010
+    },
+    "menuBounds": {
+      "darkWide": [383.4375, 382, 736, 320],
+      "darkCompact": [17, 242, 687, 320]
+    },
+    "sampledRowOrder": [
+      "files",
+      "redacted",
+      "project",
+      "goal",
+      "plan",
+      "record-skill",
+      "sketch",
+      "plugins-group",
+      "redacted",
+      "documents",
+      "pdf",
+      "spreadsheets",
+      "presentations",
+      "template-creator",
+      "browser",
+      "computer",
+      "visualize",
+      "watch-pr",
+      "appkit-inspector",
+      "plugin-management",
+      "sites",
+      "redacted-tail"
+    ],
+    "redactedSlotCounts": {
+      "darkWide": 7,
+      "darkCompact": 8
+    },
+    "pixelComparison": {
+      "fixture": "Electron 26.917.71314 resource replay, masking the same first context row and context-dependent plugin slot",
+      "productScreenshotsCommitted": false,
+      "pixelmatchThreshold": 0.1,
+      "rasterCrop": {
+        "darkWide": [737, 320],
+        "darkCompact": [687, 320]
+      },
+      "results": {
+        "darkWide": {
+          "differentPixels": 2944,
+          "ratio": 0.012483
+        },
+        "darkCompact": {
+          "differentPixels": 2979,
+          "ratio": 0.013551
+        }
+      },
+      "note": "The fractional wide CSS left edge rasterizes to a 737px screenshot crop although the measured CSS width is 736px. This distinct context sample remains above the 0.8% regional target."
+    },
+    "status": "partial-product-region-comparison"
+  },
   "status": "partial-product-region-comparison",
   "remaining": [
-    "The measured full-menu sample still differs by 2.7407% wide and 2.8539% compact after geometry alignment.",
+    "The earlier masked sample differs by 2.7407% wide and 2.8539% compact; the separate 2026-09-27 context sample differs by 1.2483% wide and 1.3551% compact after matching its two visible redacted slots.",
     "Service/resource glyphs and the full account-dependent catalog are not yet pixel-matched.",
     "These menu crops do not establish full-window parity or promote the installed-product baseline."
   ]

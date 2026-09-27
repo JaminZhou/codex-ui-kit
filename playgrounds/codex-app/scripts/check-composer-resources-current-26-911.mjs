@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import pixelmatch from "pixelmatch";
@@ -8,6 +8,10 @@ import { launchScene } from "./electron-harness.mjs";
 
 const runtimeBaseline =
   process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_BASELINE ?? "26.911.61220";
+const productReferences = {
+  compact: process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_PRODUCT_COMPACT,
+  wide: process.env.CODEX_UI_KIT_COMPOSER_RESOURCES_PRODUCT_WIDE,
+};
 const routeVersion = runtimeBaseline.split(".").slice(0, 2).join("-");
 const routeFrame =
   runtimeBaseline === "26.917.71314"
@@ -215,17 +219,39 @@ async function capture(width, suffix) {
         const computed = getComputedStyle(element);
         return {
           backgroundColor: computed.backgroundColor,
+          borderColor: computed.borderColor,
           borderRadius: computed.borderRadius,
+          boxShadow: computed.boxShadow,
           fontSize: computed.fontSize,
           fontWeight: computed.fontWeight,
         };
       });
-      assert.deepEqual(style, {
-        backgroundColor: "rgb(45, 45, 45)",
-        borderRadius: "20px",
-        fontSize: "13px",
-        fontWeight: "430",
-      });
+      assert.deepEqual(
+        {
+          backgroundColor: style.backgroundColor,
+          borderRadius: style.borderRadius,
+          fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
+        },
+        {
+          backgroundColor: "rgb(45, 45, 45)",
+          borderRadius: "20px",
+          fontSize: "13px",
+          fontWeight: "430",
+        },
+      );
+      if (runtimeBaseline === "26.917.71314") {
+        assert.deepEqual(
+          {
+            borderColor: style.borderColor,
+            boxShadow: style.boxShadow,
+          },
+          {
+            borderColor: "rgba(255, 255, 255, 0.082)",
+            boxShadow: "none",
+          },
+        );
+      }
     }
     const measured = await geometry(page);
     assert.equal(measured.overflow, 0);
@@ -332,23 +358,76 @@ async function capture(width, suffix) {
     const redactedContext = picker.locator(
       '[role="option"]:has([data-current-context-redacted])',
     );
+    const productReference =
+      width === 720 ? productReferences.compact : productReferences.wide;
+    const screenshotMasks = [redactedContext];
+    if (productReference && runtimeBaseline === "26.917.71314") {
+      const contextDependentPlugin = picker
+        .locator('[role="option"][id$="-resource-github"]');
+      assert.equal(await contextDependentPlugin.count(), 1);
+      screenshotMasks.push(contextDependentPlugin);
+    }
     const screenshot = await page.screenshot({
-      mask: runtimeBaseline === "26.917.71314" ? [redactedContext] : [],
+      mask: runtimeBaseline === "26.917.71314" ? screenshotMasks : [],
       maskColor: "#3a3a3a",
     });
     await writeFile(
       join(directory, `composer-resources-current-${routeVersion}-${width}-${suffix}.png`),
       screenshot,
     );
-    return { app, page, screenshot };
+    let productPixelComparison;
+    if (productReference) {
+      const reference = PNG.sync.read(await readFile(productReference));
+      const fixture = PNG.sync.read(screenshot);
+      const crop = new PNG({
+        width: Math.ceil(measured.picker.right) -
+          Math.floor(measured.picker.left),
+        height: Math.ceil(measured.picker.bottom) -
+          Math.floor(measured.picker.top),
+      });
+      PNG.bitblt(
+        fixture,
+        crop,
+        Math.floor(measured.picker.left),
+        Math.floor(measured.picker.top),
+        crop.width,
+        crop.height,
+        0,
+        0,
+      );
+      assert.equal(reference.width, crop.width);
+      assert.equal(reference.height, crop.height);
+      const differentPixels = pixelmatch(
+        reference.data,
+        crop.data,
+        null,
+        crop.width,
+        crop.height,
+        { threshold: 0.1 },
+      );
+      productPixelComparison = {
+        differentPixels,
+        height: crop.height,
+        ratio: differentPixels / (crop.width * crop.height),
+        width: crop.width,
+      };
+    }
+    return { app, page, productPixelComparison, screenshot };
   } catch (error) {
     await app.close();
     throw error;
   }
 }
 
+const productPixelComparisons = [];
 for (const width of [1180, 720]) {
   const first = await capture(width, "first");
+  if (first.productPixelComparison) {
+    productPixelComparisons.push({
+      viewportWidth: width,
+      ...first.productPixelComparison,
+    });
+  }
   await first.app.close();
 
   const second = await capture(width, "second");
@@ -381,6 +460,7 @@ console.log(
     redactedContextSlotCount: runtimeBaseline === "26.917.71314" ? 1 : 0,
     passed: true,
     pixelGate: "0% own-fixture drift at 1180 and 720",
+    productPixelComparisons,
     runtimeBaseline,
     widths: [1180, 720],
   }),
