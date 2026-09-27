@@ -190,8 +190,8 @@ try {
       JSON.stringify(["sidebar-more", "sidebar-new-chat"]) ||
     JSON.stringify(projectActionContract.rects) !==
       JSON.stringify([
-        { height: 24, rightInset: 32, width: 24 },
-        { height: 24, rightInset: 2, width: 24 },
+        { height: 24, rightInset: 36, width: 24 },
+        { height: 24, rightInset: 6, width: 24 },
       ]) ||
     taskActionContract.opacity !== "1" ||
     taskActionContract.gap !== 8 ||
