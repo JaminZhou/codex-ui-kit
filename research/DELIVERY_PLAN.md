@@ -1316,8 +1316,13 @@ row hover the visible action shifted inboard and its center hit resolved inside
 the button. A prior sample did not capture visibility and remains unconfirmed.
 Keep the state transition as an open measurement, not a confirmed user-visible
 defect; compare the hovered geometry against the shared project-row component
-before changing generic resize behavior. The current controlled replay now
-covers 1180/720 dark/light keyboard Tab → project action → menu → Escape focus
+before changing generic resize behavior. Comparing the measured 26.917 hover
+button (`24×24px`, 6px from the separator) with the shared project-group row
+showed its former 8px trailing inset was 2px too large. The project-group-only
+inset is now 6px; the controlled replay locks the 14px button-to-sidebar-edge
+gap and center hit across wide/compact and dark/light scenes. This is a scoped
+geometry correction, not evidence for the compact installed product. The
+current controlled replay now covers 1180/720 dark/light keyboard Tab → project action → menu → Escape focus
 return and confirms the focused action's center hit target. This proves the
 shared component path only; compact/keyboard reachability in the installed
 product remains unsampled. The
@@ -2520,16 +2525,20 @@ approval resolution, no file write, and a same-thread recovery turn at
 1180/720px. It uses the pinned public client and a write-disabled disposable
 workspace; protocol logs and screenshots remain local-only. Other approval
 kinds and installed-product visual parity remain open.
-The running-command cancellation follow-up now asks the public App Server to
-execute a real disposable `sleep 30` command, waits for the
-`commandExecution` item to enter `inProgress`, and drives the owning Composer
-Stop control. It requires the same turn to settle as `interrupted` without a
-successful command completion, reads the public item's `processId`, and
-requires that process to exit after Stop. It captures the running/stopped
-states at 1180/720px. This closes the sampled local App Server
-process-termination lifecycle; provider-specific external process-group
-behavior, broader command-policy variants, and installed-product visual parity
-remain separate boundaries.
+The running-command Stop follow-up asks the public App Server to execute a real
+disposable command, waits for its `commandExecution` item to enter `inProgress`,
+and drives the owning Composer Stop control. The public `turn/interrupt`
+contract verifies that the turn settles as `interrupted`; it does not promise
+termination of an arbitrary foreground `commandExecution`. A pinned
+`@openai/codex` 0.153.4 probe observed the command item later finish as
+`completed` and write its harmless marker after the turn was interrupted. The
+item's `processId` is an App Server identifier, not a safe OS PID; a
+best-effort lookup/termination through the separate background-terminal API
+still left this foreground item running. The earlier process-exit assertion
+was therefore invalid. Command-process cancellation remains an
+explicit gap to compare against the installed product and a supported App
+Server contract; this probe does not claim the command was stopped. The
+running/stopped UI states remain captured at 1180/720px.
 The companion opt-in command-approval follow-up now verifies one real
 `touch command-approval-proof.txt` request, the Terminal card's `Allow once`
 action, completed command/turn settlement, and wide/compact no-overflow
@@ -3112,10 +3121,10 @@ without confusing package readiness with full product reconstruction.
     termination responses stay silent. This is host-confirmed lifecycle
     feedback, not a claim that every provider background-process completion
     emits a product toast.
-    real active `commandExecution` Stop follow-up now also settles an in-flight
-    `sleep 30` command as an interrupted turn without a successful completion;
-    provider-specific process-group behavior and installed-product evidence
-    remain open. The bounded terminal transport-failure replay is delivered
+    real active `commandExecution` Stop follow-up verifies that the turn settles
+    as interrupted. On App Server 0.153.4, the foreground command subsequently
+    completed and wrote a marker after turn interruption; process cancellation
+    remains unresolved and is not represented as passed. The bounded terminal transport-failure replay is delivered
     separately; current
     real transport recovery is delivered
     through an isolated proxy plus CDP/Electron/pixel gates. The independent

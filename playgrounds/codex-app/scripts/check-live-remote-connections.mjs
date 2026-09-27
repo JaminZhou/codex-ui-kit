@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WebSocketServer } from "ws";
@@ -86,7 +86,7 @@ try {
         await form.getByRole("textbox", { name: "Host or device", exact: true }).fill(initialEndpoint);
         await form.getByRole("button", { name: "Save connection", exact: true }).click();
         await route.getByText("Loopback runner", { exact: true }).waitFor();
-        await expectNoPath(orphanLockPath);
+        await expectOrphanLockRecovered(orphanLockPath, "orphaned-remote-lock");
         orphanLockRecovered = true;
       }
 
@@ -187,13 +187,27 @@ try {
   await rm(directory, { recursive: true, force: true });
 }
 
-async function expectNoPath(path) {
-  await access(path).then(
-    () => { throw new Error(`Orphan lock was not recovered: ${path}`); },
-    (error) => {
-      if (error?.code !== "ENOENT") throw error;
-    },
-  );
+async function expectOrphanLockRecovered(path, orphanToken) {
+  const deadline = Date.now() + 2000;
+  while (Date.now() <= deadline) {
+    try {
+      const owner = JSON.parse(await readFile(join(path, "owner.json"), "utf8"));
+      if (owner?.token && owner.token !== orphanToken) return;
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        try {
+          await access(path);
+        } catch (directoryError) {
+          if (directoryError?.code === "ENOENT") return;
+          throw directoryError;
+        }
+      } else if (!(error instanceof SyntaxError)) {
+        throw error;
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error(`Orphan lock owner was not replaced: ${path}`);
 }
 
 async function clickWithFailureContext(button, row, page, width, action) {

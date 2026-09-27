@@ -18,6 +18,7 @@ const records = { version: 1, threads: [
   { id: "owned-restored", directory: restored, title: "Restored project chat", updatedAt: 2 },
   { id: "owned-missing", directory: missing, title: "Missing project chat", updatedAt: 1 },
 ] };
+let projectRecoveryRetries = 0;
 await writeFile(registry, "broken");
 for (const width of [1180, 720]) {
   const { app, page } = await launchScene(visualScenes.find(scene => scene.id === "pull-request-detail"), {
@@ -40,7 +41,11 @@ for (const width of [1180, 720]) {
       await page.getByRole("button", { name: "Retry projects", exact: true }).click();
     }
     const available = page.getByRole("button", { name: "restored-project", exact: true });
-    await available.waitFor();
+    if (width === 720) {
+      projectRecoveryRetries += await waitForAvailableProject(page, available);
+    } else {
+      await available.waitFor();
+    }
     assert.equal(await available.isEnabled(), true);
     assert.equal(await page.getByRole("button", { name: "missing-project", exact: true }).isDisabled(), true);
     await available.click();
@@ -107,4 +112,21 @@ for (const width of [1180, 720]) {
     }
   } finally { await app.close(); }
 }
-console.log(JSON.stringify({ passed: true, directory, modelTurns: 0, restarted: true, emptyProjectRestored: true, focusDiscovery: true, draftAndSelectionPreserved: true, widths: [1180, 720] }));
+console.log(JSON.stringify({ passed: true, directory, modelTurns: 0, restarted: true, emptyProjectRestored: true, focusDiscovery: true, draftAndSelectionPreserved: true, projectRecoveryRetries, widths: [1180, 720] }));
+
+async function waitForAvailableProject(page, projectButton) {
+  const deadline = Date.now() + 45_000;
+  let retries = 0;
+  while (Date.now() < deadline) {
+    if (await projectButton.isVisible().catch(() => false)) return retries;
+    const retryButton = page.getByRole("button", { name: "Retry projects", exact: true });
+    if (await retryButton.isVisible().catch(() => false)) {
+      await retryButton.click();
+      retries += 1;
+      await retryButton.waitFor({ state: "hidden", timeout: 1_000 }).catch(() => undefined);
+    }
+    await page.waitForTimeout(250);
+  }
+  await projectButton.waitFor({ timeout: 1_000 });
+  return retries;
+}

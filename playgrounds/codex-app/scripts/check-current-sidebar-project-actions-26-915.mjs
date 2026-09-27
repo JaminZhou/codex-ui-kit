@@ -77,6 +77,36 @@ async function capture(scene) {
       sidebar: { height: scene.windowSize.height, width: 321.875 },
     });
 
+    const newChatAction = page.getByRole("button", {
+      exact: true,
+      name: "Start new chat in codex-ui-kit",
+    });
+    await newChatAction.hover();
+    assert.deepEqual(
+      await newChatAction.evaluate((button) => {
+        const bounds = button.getBoundingClientRect();
+        const sidebar = document.querySelector(".codex-ui-app-sidebar");
+        const sidebarBounds = sidebar?.getBoundingClientRect();
+        const centerHit = document.elementFromPoint(
+          bounds.left + bounds.width / 2,
+          bounds.top + bounds.height / 2,
+        );
+        return {
+          buttonHeight: bounds.height,
+          buttonWidth: bounds.width,
+          centerHit: centerHit?.closest("button") === button,
+          sidebarRightGap: sidebarBounds
+            ? Number((sidebarBounds.right - bounds.right).toFixed(3))
+            : null,
+        };
+      }),
+      {
+        buttonHeight: 24,
+        buttonWidth: 24,
+        centerHit: true,
+        sidebarRightGap: 14,
+      },
+    );
     const trigger = page.getByRole("button", {
       exact: true,
       name: "Project actions for codex-ui-kit",
