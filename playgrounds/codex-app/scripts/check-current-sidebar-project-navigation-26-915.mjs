@@ -210,6 +210,56 @@ async function capture(scene) {
       true,
     );
     await page.evaluate(() => document.activeElement?.blur());
+    const currentProjectGroup = page
+      .locator(".codex-ui-app-sidebar__project-group")
+      .nth(2);
+    const currentProjectRow = currentProjectGroup.locator(
+      ":scope > .codex-ui-app-sidebar__item-row",
+    );
+    await currentProjectRow.hover();
+    const currentProjectActions = await currentProjectRow.evaluate((row) => {
+      const toolbar = row.querySelector(
+        ":scope > .codex-ui-app-sidebar__item-actions",
+      );
+      const rowRect = row.getBoundingClientRect();
+      const buttons = Array.from(toolbar?.querySelectorAll("button") ?? []);
+      return {
+        buttons: buttons.map((button) => {
+          const rect = button.getBoundingClientRect();
+          const target = document.elementFromPoint(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+          );
+          return {
+            height: rect.height,
+            hitTargetIsButton: Boolean(target && button.contains(target)),
+            rightInset: Math.round((rowRect.right - rect.right) * 1000) / 1000,
+            topOffset: Math.round((rect.top - rowRect.top) * 1000) / 1000,
+            width: rect.width,
+          };
+        }),
+        opacity: toolbar ? getComputedStyle(toolbar).opacity : null,
+      };
+    });
+    assert.deepEqual(currentProjectActions, {
+      buttons: [
+        {
+          height: 24,
+          hitTargetIsButton: true,
+          rightInset: 36,
+          topOffset: 3,
+          width: 24,
+        },
+        {
+          height: 24,
+          hitTargetIsButton: true,
+          rightInset: 6,
+          topOffset: 3,
+          width: 24,
+        },
+      ],
+      opacity: "1",
+    });
     await page.mouse.move(640, 100);
     await writeFile(
       join(artifactDirectory, `${scene.id}.json`),

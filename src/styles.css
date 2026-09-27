@@ -6572,6 +6572,12 @@ button.codex-ui-login-page__mark {
   z-index: 1;
 }
 
+.codex-ui-app-sidebar__project-group
+  > .codex-ui-app-sidebar__item-row
+  > .codex-ui-app-sidebar__item-actions {
+  margin-inline-end: calc(var(--codex-ui-spacing) * 2);
+}
+
 .codex-ui-app-sidebar__item-row:hover
   .codex-ui-app-sidebar__item-actions,
 .codex-ui-app-sidebar__item-row:focus-within

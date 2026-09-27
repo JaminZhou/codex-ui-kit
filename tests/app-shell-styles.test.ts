@@ -142,6 +142,9 @@ describe("application shell visual contract", () => {
       /\.codex-ui-app-sidebar__item-actions \{[\s\S]*?grid-column: 2;[\s\S]*?position: relative;/,
     );
     expect(styles).toMatch(
+      /\.codex-ui-app-sidebar__project-group\s*> \.codex-ui-app-sidebar__item-row\s*> \.codex-ui-app-sidebar__item-actions \{\s*margin-inline-end: calc\(var\(--codex-ui-spacing\) \* 2\);/,
+    );
+    expect(styles).toMatch(
       /\.codex-ui-app-sidebar__project-children[\s\S]*?> \.codex-ui-app-sidebar__item-row[\s\S]*?> \.codex-ui-app-sidebar__item-actions,[\s\S]*?gap: calc\(var\(--codex-ui-spacing\) \* 2\);[\s\S]*?margin-inline-end: calc\(var\(--codex-ui-spacing\) \* 2\);/,
     );
     expect(styles).toMatch(

@@ -145,7 +145,10 @@ function assertState(state, scene) {
 }
 
 async function capture(scene) {
-  const { app, page } = await launchScene(scene, { capture: false });
+  const { app, page } = await launchScene(scene, {
+    capture: false,
+    deviceScaleFactor: 1,
+  });
   const prefix = scene.id;
   try {
     await page.waitForSelector(".codex-ui-app-notification[data-index=\"0\"]");
@@ -155,7 +158,7 @@ async function capture(scene) {
       join(artifactDirectory, `${prefix}.initial.json`),
       `${JSON.stringify(initial, null, 2)}\n`,
     );
-    const initialScreenshot = await page.screenshot();
+    const initialScreenshot = await page.screenshot({ scale: "css" });
 
     await page
       .locator('.codex-ui-app-notification[data-index="0"]')
@@ -184,7 +187,7 @@ async function capture(scene) {
       join(artifactDirectory, `${prefix}.expanded.json`),
       `${JSON.stringify(expanded, null, 2)}\n`,
     );
-    const expandedScreenshot = await page.screenshot();
+    const expandedScreenshot = await page.screenshot({ scale: "css" });
 
     await page
       .locator('.codex-ui-app-notification[data-index="0"] .codex-ui-app-notification__dismiss')

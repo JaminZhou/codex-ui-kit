@@ -248,7 +248,7 @@ for (const width of [1180, 720]) {
       null,
       firstImage.width,
       firstImage.height,
-      { threshold: 0 },
+      { includeAA: true, threshold: 0 },
     );
     if (pixelCount === 0) continue;
     // macOS headless GPU captures have shown only 2–6 one-channel antialiasing
