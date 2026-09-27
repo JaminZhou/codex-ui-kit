@@ -153,7 +153,10 @@ async function compareScreenshot(name, screenshot) {
 }
 
 async function capture(scene) {
-  const { app, page } = await launchScene(scene, { capture: false });
+  const { app, page } = await launchScene(scene, {
+    capture: false,
+    deviceScaleFactor: 1,
+  });
   try {
     const trigger = page.getByRole("button", { name: "Chat actions" });
     const rootMenu = page.getByRole("menu", { name: "Chat actions" });
@@ -164,7 +167,10 @@ async function capture(scene) {
       join(artifactDirectory, `${scene.id}.open.json`),
       `${JSON.stringify(open, null, 2)}\n`,
     );
-    await compareScreenshot(`${scene.id}-open`, await page.screenshot());
+    await compareScreenshot(
+      `${scene.id}-open`,
+      await page.screenshot({ scale: "css" }),
+    );
 
     await rootMenu.press("Escape");
     await page.waitForFunction(
@@ -180,7 +186,10 @@ async function capture(scene) {
     await page.waitForFunction(
       () => document.activeElement?.getAttribute("aria-label") === "Chat actions",
     );
-    await compareScreenshot(`${scene.id}-closed`, await page.screenshot());
+    await compareScreenshot(
+      `${scene.id}-closed`,
+      await page.screenshot({ scale: "css" }),
+    );
 
     await trigger.press("ArrowDown");
     const pin = page.getByRole("menuitem", { name: /^Pin\s+⌥⌘P$/ });
