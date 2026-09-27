@@ -1316,8 +1316,11 @@ row hover the visible action shifted inboard and its center hit resolved inside
 the button. A prior sample did not capture visibility and remains unconfirmed.
 Keep the state transition as an open measurement, not a confirmed user-visible
 defect; compare the hovered geometry against the shared project-row component
-before changing generic resize behavior. Compact-width and keyboard behavior
-remain untested. The
+before changing generic resize behavior. The current controlled replay now
+covers 1180/720 dark/light keyboard Tab → project action → menu → Escape focus
+return and confirms the focused action's center hit target. This proves the
+shared component path only; compact/keyboard reachability in the installed
+product remains unsampled. The
 2026-09-21 `26.915.31945` startup probe adds a current-build negative
 reachability record: a blank Renderer frame transitions through a busy shell
 while 10 → 26 → 29 sidebar rows hydrate, then settles cleanly. No ordinary
