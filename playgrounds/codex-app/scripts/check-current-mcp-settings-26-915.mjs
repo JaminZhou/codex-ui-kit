@@ -184,13 +184,16 @@ function assertContract(contract, scene) {
 }
 
 async function capture(scene) {
-  const { app, page } = await launchScene(scene, { capture: false });
+  const { app, page } = await launchScene(scene, {
+    capture: false,
+    deviceScaleFactor: 1,
+  });
   try {
     await page.waitForSelector(".codex-ui-mcp-settings");
     const initial = await readContract(page);
     assertContract(initial, scene);
     await page.waitForFunction(() => document.fonts.status === "loaded");
-    const initialScreenshot = await page.screenshot();
+    const initialScreenshot = await page.screenshot({ scale: "css" });
 
     let addScreenshot = null;
     let retryScreenshot = null;
@@ -205,7 +208,7 @@ async function capture(scene) {
           "ready",
       );
       await page.getByText("local-browser", { exact: true }).waitFor();
-      retryScreenshot = await page.screenshot();
+      retryScreenshot = await page.screenshot({ scale: "css" });
     } else if (scene.frame.endsWith("-toggle-failure")) {
       const alert = page.getByRole("alert");
       await alert.waitFor();
@@ -222,7 +225,7 @@ async function capture(scene) {
             '[data-source="server"][data-toggle-status="ready"]',
           ) !== null && !document.querySelector('[role="alert"]'),
       );
-      retryScreenshot = await page.screenshot();
+      retryScreenshot = await page.screenshot({ scale: "css" });
     }
     if (
       scene.windowSize.width === 1180 &&
@@ -244,7 +247,7 @@ async function capture(scene) {
         "Add MCP server",
         "Record a skill",
       ]);
-      addScreenshot = await page.screenshot();
+      addScreenshot = await page.screenshot({ scale: "css" });
       await page.keyboard.press("Escape");
 
       await page.getByRole("button", { name: "Add", exact: true }).click();

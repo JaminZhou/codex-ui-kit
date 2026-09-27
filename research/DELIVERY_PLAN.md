@@ -1309,7 +1309,15 @@ as the creating phase; this is controlled renderer state until a current
 installed-product queued capture is available. Remaining Stage 1 work includes
 re-observing
 ordinary error and collection loading on the installed build, plus broader
-route lifecycle feedback and installed-product notification reachability. The
+route lifecycle feedback and installed-product notification reachability. A
+2026-09-27 current-build sidebar hit-test found a pre-hover project-action DOM
+rectangle behind the resize separator while its parent was `opacity: 0`; after
+row hover the visible action shifted inboard and its center hit resolved inside
+the button. A prior sample did not capture visibility and remains unconfirmed.
+Keep the state transition as an open measurement, not a confirmed user-visible
+defect; compare the hovered geometry against the shared project-row component
+before changing generic resize behavior. Compact-width and keyboard behavior
+remain untested. The
 2026-09-21 `26.915.31945` startup probe adds a current-build negative
 reachability record: a blank Renderer frame transitions through a busy shell
 while 10 → 26 → 29 sidebar rows hydrate, then settles cleanly. No ordinary
