@@ -6575,7 +6575,7 @@ button.codex-ui-login-page__mark {
 .codex-ui-app-sidebar__project-group
   > .codex-ui-app-sidebar__item-row
   > .codex-ui-app-sidebar__item-actions {
-  margin-inline-end: calc(var(--codex-ui-spacing) * 2);
+  margin-inline-end: 6px;
 }
 
 .codex-ui-app-sidebar__item-row:hover

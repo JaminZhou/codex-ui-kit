@@ -13262,7 +13262,28 @@ try {
       "Electron host mode exposed a replay-only linked worktree fixture.",
     );
   }
-  await linkedWorktreePage.waitForTimeout(1_000);
+  await linkedWorktreePage.waitForFunction(
+    () => {
+      const dialog = Array.from(
+        document.querySelectorAll('[role="dialog"]'),
+      ).find((element) =>
+        element.querySelector("h2")?.textContent?.includes(
+          "Select local environment",
+        ),
+      );
+      const items = dialog?.querySelectorAll("li");
+      const currentCheckout = Array.from(
+        dialog?.querySelectorAll("button") ?? [],
+      ).find(
+        (button) =>
+          button.getAttribute("aria-label") ===
+          "Use local environment Main",
+      );
+      return items?.length === 1 && currentCheckout && !currentCheckout.disabled;
+    },
+    null,
+    { timeout: 10_000 },
+  );
   const hostCurrentCheckout = hostLocalEnvironmentDialog.getByRole("button", {
     name: "Use local environment Main",
   });
