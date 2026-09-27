@@ -612,6 +612,9 @@ try {
   await accountMenuTrigger.click();
   const accountMenu = page.getByRole("menu", { name: "Account menu" });
   await accountMenu.waitFor({ state: "visible" });
+  await page.waitForFunction(
+    () => document.activeElement?.getAttribute("role") === "menu",
+  );
   const accountMenuContract = await accountMenu.evaluate((menu) => {
     const bounds = menu.getBoundingClientRect();
     return {
