@@ -1206,8 +1206,10 @@ destination/route restoration, Projects/Help/Pull Requests, Composer
 resource-menu, and Settings Connections structures are now captured in
 candidate records. Stage 0 remains open: populated conversation/thread states,
 resource selection/execution, connection mutation/pairing/SSH, Review,
-Terminal, Markdown, MCP, other P0 route families, and installed-product pixel
-regions still need their own current-build evidence. The exact same installed ASAR was
+Terminal, Markdown failure states, other P0 route families, and installed-product
+pixel regions still need their own current-build evidence. MCP's current-build
+success and multi-call activity anchor is recorded separately below; its
+failure semantics and pixel evidence remain open. The exact same installed ASAR was
 revalidated on 2026-09-25 with the isolated baseline recipe; the sanitized
 record now carries that second run and keeps profile-dependent row/scroll counts
 explicitly sample-scoped.
@@ -1215,8 +1217,19 @@ explicitly sample-scoped.
 A disposable 2026-09-25 probe on this build reached a populated assistant turn,
 but only observed an assistant-text claim of documentation search: the product
 Renderer exposed no MCP activity group/card or Search/Fetch call rows. This is
-not evidence of a successful visible MCP interaction; the MCP implementation
-and current-build acceptance remain open.
+not evidence of a successful visible MCP interaction; that observation is kept
+as a dated negative sample.
+
+A fresh 2026-09-27 read-only task on the same installed build exposed the
+expanded `Used OpenAI Developer Docs integration` group after successful real
+Search → Fetch calls. A second turn exposed Fetch → Search → Fetch at both
+1180×820 and 720×680 with zero horizontal overflow. The sanitized structural
+record is [`current-mcp-26.917.71314.json`](current-mcp-26.917.71314.json).
+The final answer claimed recovery, but the Renderer did not expose per-call
+result text, and the Sources panel retained the deliberate probe URL; therefore
+the invalid-URL failure and recovery semantics are not independently proven.
+This closes only current-build activity reachability/geometry, not product
+pixels, failure semantics, or global baseline promotion.
 
 ### 1. Complete the application shell and left sidebar
 
@@ -1445,6 +1458,14 @@ itself reconnected. The current-style mixed multi-turn replay now composes searc
 Browser, MCP, command, approval, file Review, and subagent events under one
 public reducer and one Browser/Electron/pixel matrix. It is composition
 evidence, not a synthetic promotion of whole-thread current-product reachability.
+
+On `26.917.71314`, a real read-only MCP Search → Fetch turn and a three-call
+probe turn now confirm the current Renderer activity group, call ordering,
+Sources panel bounds, 14px/430-weight rows, and wide/720 compact containment.
+The capture selector was updated because the current Sources panel no longer
+contains the older `Environment` label. The probe did not expose tool-result
+transcripts, so error/retry semantics and product-region pixel comparison stay
+open; see the sanitized candidate record for exact measurements and limits.
 
 The Markdown composition is now refreshed on `26.825.51511` with a real rich
 stream. Six replay checkpoints independently lock link-only output, an open
