@@ -12,52 +12,81 @@
     "appAsarBytes": 370175042,
     "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804"
   },
-  "scope": "Read-only pointer hit-test of one visible project-level New chat action and the sidebar resize separator. No prompt was submitted, and the project action was not activated.",
-  "privacy": "Project and task labels, account data, and screenshots are not retained. Only geometry, semantic role, and the hit-test result are recorded.",
+  "scope": "Read-only pre-hover and project-row-hover hit-test of project-level New chat actions and the sidebar resize separator. No prompt was submitted, and no project action was activated.",
+  "privacy": "Project and task labels and account data are not retained. The cropped screenshot is local-only and contains no row label.",
   "viewport": {
     "width": 1728,
-    "height": 1001
+    "height": 1003,
+    "devicePixelRatio": 2
   },
-  "projectNewChatAction": {
-    "role": "button",
-    "label": "Start new chat in [redacted]",
-    "rect": {
-      "left": 313.8828,
-      "top": 166,
-      "width": 24,
-      "height": 24
+  "preHover": {
+    "projectAction": {
+      "role": "button",
+      "label": "Start new chat in [redacted]",
+      "rect": {
+        "left": 317.8828,
+        "top": 288,
+        "width": 24,
+        "height": 24
+      },
+      "buttonOpacity": 1,
+      "parentOpacity": 0
     },
-    "visible": true
+    "separator": {
+      "role": "separator",
+      "rect": {
+        "left": 313.8828,
+        "top": -46,
+        "width": 16,
+        "height": 1049
+      }
+    },
+    "hitTests": [
+      {
+        "point": { "x": 321.8828, "y": 300 },
+        "topmostElement": { "tagName": "DIV", "role": "separator" },
+        "isButton": false
+      },
+      {
+        "point": { "x": 329.8828, "y": 300 },
+        "topmostElement": { "tagName": "DIV", "role": "main" },
+        "isButton": false
+      }
+    ]
   },
-  "sidebarResizeSeparator": {
-    "role": "separator",
-    "rect": {
-      "left": 313.8828,
-      "top": -46,
-      "width": 16,
-      "height": 1047
-    }
+  "rowHover": {
+    "pointerMovedTo": { "x": 100, "y": 300 },
+    "projectAction": {
+      "rect": {
+        "left": 283.8828,
+        "top": 288,
+        "width": 24,
+        "height": 24
+      },
+      "parentOpacity": 1,
+      "centerHit": { "tagName": "SVG", "isButton": true }
+    },
+    "separatorLeft": 313.8828,
+    "gapFromButtonRight": 6
   },
-  "hitTest": {
-    "point": {
-      "x": 325.8828,
-      "y": 178
-    },
-    "overlapRect": {
-      "left": 313.8828,
-      "top": 166,
-      "width": 16,
-      "height": 24
-    },
-    "overlapAreaCssPixels": 384,
-    "topmostElement": {
-      "tagName": "DIV",
-      "role": "separator"
-    },
-    "pointerOutcome": "click-intercepted-by-sidebar-resizer"
+  "priorUnconfirmedSample": {
+    "viewport": { "width": 1728, "height": 1001 },
+    "buttonRect": { "left": 313.8828, "top": 166, "width": 24, "height": 24 },
+    "separatorRect": { "left": 313.8828, "top": -46, "width": 16, "height": 1047 },
+    "centerHitRole": "separator",
+    "visibilityStateMeasured": false,
+    "interpretation": "Geometry alone did not prove that the project action was visibly presented in this transient state."
   },
+  "localEvidence": {
+    "screenshotPath": "/private/tmp/codex-ui-kit-sidebar-action-26.917.71314-1728x1003-hover.png",
+    "distribution": "local-only",
+    "imagePixels": { "width": 96, "height": 80 },
+    "description": "Small crop of the hovered action and resize boundary; project text is outside the crop."
+  },
+  "interpretation": "The pre-hover action parent is opacity 0 and the initial DOM rectangle overlaps the separator; after row hover the visible action shifts 34px inboard, clears the separator by 6px, and its center hit resolves inside the button. Current evidence does not establish that a visibly presented action is blocked.",
   "knownLimitations": [
-    "This is one 1728×1001 dark-theme layout sample; compact widths, other themes, keyboard activation, and resizing while focused remain untested.",
-    "The record proves hit-target overlap and pointer interception, not installed-product pixel parity or a general failure across all projects."
+    "This is one 1728×1003 dark-theme sample of a single hovered project row; compact widths, other themes, keyboard activation, and resize while focused remain untested.",
+    "The prior 1728×1001 sample did not record visibility or parent opacity, so its center-hit result remains unconfirmed as a user-visible reachability defect.",
+    "The screenshot is structural/local-only evidence, not an installed-product pixel comparison or global baseline promotion."
   ]
 }
