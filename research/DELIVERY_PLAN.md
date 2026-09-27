@@ -1466,6 +1466,9 @@ The capture selector was updated because the current Sources panel no longer
 contains the older `Environment` label. The probe did not expose tool-result
 transcripts, so error/retry semantics and product-region pixel comparison stay
 open; see the sanitized candidate record for exact measurements and limits.
+The successful activity observation is indexed on `thread.mcp-tool-events`;
+`thread.mcp-tool-failure-retry` remains on prior-build evidence until a visible
+failure result is independently observed.
 
 The Markdown composition is now refreshed on `26.825.51511` with a real rich
 stream. Six replay checkpoints independently lock link-only output, an open
