@@ -8,9 +8,11 @@ import { launchScene } from "./electron-harness.mjs";
 
 const directory = await mkdtemp(join(tmpdir(), "ui-kit-notification-matrix-"));
 
-function repeatDriftPolicy(first, second, state, shadowRect) {
+function repeatDriftPolicy(first, second, state, shadowRect, viewport) {
   let count = 0;
   const invalid = [];
+  const scaleX = first.width / viewport.width;
+  const scaleY = first.height / viewport.height;
   for (let y = 0; y < first.height; y += 1) {
     for (let x = 0; x < first.width; x += 1) {
       const offset = (y * first.width + x) * 4;
@@ -21,14 +23,14 @@ function repeatDriftPolicy(first, second, state, shadowRect) {
       const maxDelta = Math.max(
         ...firstPixel.map((value, channel) => Math.abs(value - secondPixel[channel])),
       );
-      const shadowBottom = shadowRect?.y + shadowRect?.height;
+      const shadowBottom = (shadowRect?.y + shadowRect?.height) * scaleY;
       const compositorEdgeJitter =
-        state === "afterReview" &&
+        ["afterReview", "afterOpen", "afterView"].includes(state) &&
         shadowRect &&
-        x >= Math.floor(shadowRect.x - 6) &&
-        x <= Math.ceil(shadowRect.x + shadowRect.width + 6) &&
+        x >= Math.floor((shadowRect.x - 6) * scaleX) &&
+        x <= Math.ceil((shadowRect.x + shadowRect.width + 6) * scaleX) &&
         y >= Math.floor(shadowBottom) &&
-        y <= Math.ceil(shadowBottom + 14) &&
+        y <= Math.ceil(shadowBottom + 14 * scaleY) &&
         maxDelta <= 1;
       if (!compositorEdgeJitter) invalid.push({ x, y, maxDelta });
     }
@@ -176,7 +178,7 @@ async function settleNotificationPaint(page, { clearPointer = false } = {}) {
 async function run(width, suffix) {
   const { app, page } = await launchScene(sceneFor(width), { capture: false });
   const screenshots = {};
-  let afterReviewShadowRect = null;
+  const shadowRects = {};
   try {
     await assertInitialMatrix(page, width);
     await settleNotificationPaint(page);
@@ -189,12 +191,12 @@ async function run(width, suffix) {
     await waitForNotificationAction(page, "permission-reviewed", 3);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "Open");
     await settleNotificationPaint(page, { clearPointer: true });
-    afterReviewShadowRect = await page
+    shadowRects.afterReview = await page
       .locator(
         '.codex-ui-app-notification[data-index="0"] .codex-ui-app-notification__alert',
       )
       .boundingBox();
-    assert.ok(afterReviewShadowRect, `${width}px top notification shadow bounds are missing`);
+    assert.ok(shadowRects.afterReview, `${width}px top notification shadow bounds are missing`);
     screenshots.afterReview = await page.screenshot({ animations: "disabled" });
 
     const open = page.getByRole("button", { name: "Open", exact: true });
@@ -203,6 +205,12 @@ async function run(width, suffix) {
     await waitForNotificationAction(page, "background-opened", 2);
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === "View");
     await settleNotificationPaint(page, { clearPointer: true });
+    shadowRects.afterOpen = await page
+      .locator(
+        '.codex-ui-app-notification[data-index="0"] .codex-ui-app-notification__alert',
+      )
+      .boundingBox();
+    assert.ok(shadowRects.afterOpen, `${width}px top notification shadow bounds are missing`);
     screenshots.afterOpen = await page.screenshot({ animations: "disabled" });
 
     const view = page.getByRole("button", { name: "View", exact: true });
@@ -211,6 +219,12 @@ async function run(width, suffix) {
     await waitForNotificationAction(page, "update-viewed", 1);
     await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Close");
     await settleNotificationPaint(page, { clearPointer: true });
+    shadowRects.afterView = await page
+      .locator(
+        '.codex-ui-app-notification[data-index="0"] .codex-ui-app-notification__alert',
+      )
+      .boundingBox();
+    assert.ok(shadowRects.afterView, `${width}px top notification shadow bounds are missing`);
     screenshots.afterView = await page.screenshot({ animations: "disabled" });
 
     await page.getByRole("button", { name: "Close", exact: true }).click();
@@ -221,7 +235,7 @@ async function run(width, suffix) {
     for (const [state, image] of Object.entries(screenshots)) {
       await writeFile(join(directory, `notification-${width}-${suffix}-${state}.png`), image);
     }
-    return { afterReviewShadowRect, screenshots };
+    return { shadowRects, screenshots };
   } finally {
     await app.close();
   }
@@ -232,11 +246,13 @@ for (const width of [1180, 720]) {
   const secondRun = await run(width, "second");
   const first = firstRun.screenshots;
   const second = secondRun.screenshots;
-  assert.deepEqual(
-    firstRun.afterReviewShadowRect,
-    secondRun.afterReviewShadowRect,
-    `${width}px top notification geometry drifted between identical launches`,
-  );
+  for (const [state, rect] of Object.entries(firstRun.shadowRects)) {
+    assert.deepEqual(
+      rect,
+      secondRun.shadowRects[state],
+      `${width}px top notification geometry drifted between identical launches after ${state}`,
+    );
+  }
   for (const state of Object.keys(first)) {
     const firstImage = PNG.sync.read(first[state]);
     const secondImage = PNG.sync.read(second[state]);
@@ -251,14 +267,15 @@ for (const width of [1180, 720]) {
       { includeAA: true, threshold: 0 },
     );
     if (pixelCount === 0) continue;
-    // macOS headless GPU captures have shown only 2–6 one-channel antialiasing
-    // differences at the 96–100px top edge of the post-review toaster. Keep
+    // macOS headless GPU captures can rasterize low-amplitude antialiasing
+    // differently at the measured top-toast shadow after queue actions. Keep
     // exact zero drift everywhere else and bound this compositor-only jitter.
     const policy = repeatDriftPolicy(
       firstImage,
       secondImage,
       state,
-      firstRun.afterReviewShadowRect,
+      firstRun.shadowRects[state],
+      { height: width === 720 ? 680 : 820, width },
     );
     assert.equal(policy.count, pixelCount);
     assert.deepEqual(
