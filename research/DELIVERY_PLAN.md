@@ -1309,7 +1309,13 @@ as the creating phase; this is controlled renderer state until a current
 installed-product queued capture is available. Remaining Stage 1 work includes
 re-observing
 ordinary error and collection loading on the installed build, plus broader
-route lifecycle feedback and installed-product notification reachability. The
+route lifecycle feedback and installed-product notification reachability. A
+2026-09-27 current-build sidebar hit-test also found one visible project New
+chat action overlapped by the resize separator at 1728×1001; its center pointer
+hit resolves to the separator. Track this as a sampled project-action
+reachability defect, and reproduce it against the shared project-row component
+before changing generic resize behavior. Compact-width and keyboard behavior
+remain untested. The
 2026-09-21 `26.915.31945` startup probe adds a current-build negative
 reachability record: a blank Renderer frame transitions through a busy shell
 while 10 → 26 → 29 sidebar rows hydrate, then settles cleanly. No ordinary

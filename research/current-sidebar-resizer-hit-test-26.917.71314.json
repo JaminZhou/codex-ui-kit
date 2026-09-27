@@ -1,0 +1,63 @@
+{
+  "captureDate": "2026-09-27",
+  "captureStatus": "candidate-only",
+  "candidateOnly": true,
+  "captureMethod": "isolated-loopback-CDP",
+  "captureMode": "native-viewport-only",
+  "mutationsSubmitted": false,
+  "fingerprint": {
+    "appVersion": "26.917.71314",
+    "buildNumber": "10954",
+    "chromiumVersion": "153.0.8010.53",
+    "appAsarBytes": 370175042,
+    "appAsarSha256": "03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804"
+  },
+  "scope": "Read-only pointer hit-test of one visible project-level New chat action and the sidebar resize separator. No prompt was submitted, and the project action was not activated.",
+  "privacy": "Project and task labels, account data, and screenshots are not retained. Only geometry, semantic role, and the hit-test result are recorded.",
+  "viewport": {
+    "width": 1728,
+    "height": 1001
+  },
+  "projectNewChatAction": {
+    "role": "button",
+    "label": "Start new chat in [redacted]",
+    "rect": {
+      "left": 313.8828,
+      "top": 166,
+      "width": 24,
+      "height": 24
+    },
+    "visible": true
+  },
+  "sidebarResizeSeparator": {
+    "role": "separator",
+    "rect": {
+      "left": 313.8828,
+      "top": -46,
+      "width": 16,
+      "height": 1047
+    }
+  },
+  "hitTest": {
+    "point": {
+      "x": 325.8828,
+      "y": 178
+    },
+    "overlapRect": {
+      "left": 313.8828,
+      "top": 166,
+      "width": 16,
+      "height": 24
+    },
+    "overlapAreaCssPixels": 384,
+    "topmostElement": {
+      "tagName": "DIV",
+      "role": "separator"
+    },
+    "pointerOutcome": "click-intercepted-by-sidebar-resizer"
+  },
+  "knownLimitations": [
+    "This is one 1728×1001 dark-theme layout sample; compact widths, other themes, keyboard activation, and resizing while focused remain untested.",
+    "The record proves hit-target overlap and pointer interception, not installed-product pixel parity or a general failure across all projects."
+  ]
+}
