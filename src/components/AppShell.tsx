@@ -1805,10 +1805,14 @@ export function AppShell({
       <div className="codex-ui-app-shell__layout">
         {navigationRailIsVisible ? (
           <aside
+            aria-hidden={responsiveModalOpen || undefined}
             aria-label={navigationRailLabel}
             className="codex-ui-app-shell__navigation-rail"
+            inert={inertWhen(responsiveModalOpen)}
           >
-            {navigationRail}
+            <SurfaceBlockedContext.Provider value={responsiveModalOpen}>
+              {navigationRail}
+            </SurfaceBlockedContext.Provider>
           </aside>
         ) : null}
         <aside

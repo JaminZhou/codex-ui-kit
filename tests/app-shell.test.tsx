@@ -77,6 +77,72 @@ describe("application shell", () => {
     ).toBe("269.875px");
   });
 
+  it("blocks the primary rail behind the narrow modal sidebar", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+    function ResponsiveRailFixture() {
+      const [sidebarOpen, setSidebarOpen] = useState(true);
+      return (
+        <AppShell
+          navigationRail={
+            <AppPrimaryNavigationRail>
+              <button type="button">Home</button>
+            </AppPrimaryNavigationRail>
+          }
+          narrowSidebarBehavior="modal"
+          onSidebarOpenChange={setSidebarOpen}
+          sidebar={<button type="button">Projects</button>}
+          sidebarOpen={sidebarOpen}
+        >
+          <button type="button">Composer</button>
+        </AppShell>
+      );
+    }
+
+    const { container } = render(<ResponsiveRailFixture />);
+    const rail = container.querySelector<HTMLElement>(
+      ".codex-ui-app-shell__navigation-rail",
+    )!;
+    expect(rail.hasAttribute("inert")).toBe(false);
+
+    act(() => resize?.(720));
+
+    expect(rail.hasAttribute("inert")).toBe(true);
+    expect(rail.getAttribute("aria-hidden")).toBe("true");
+    expect(
+      screen.getByRole("button", { name: "Projects" }),
+    ).toBeTruthy();
+
+    act(() => resize?.(1_180));
+
+    expect(rail.hasAttribute("inert")).toBe(false);
+    expect(rail.hasAttribute("aria-hidden")).toBe(false);
+  });
+
   it("keeps the measured dual-navigation split pinned at 720px", () => {
     let resize: ((width: number) => void) | undefined;
     class ResizeObserverMock {

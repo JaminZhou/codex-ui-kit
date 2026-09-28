@@ -990,6 +990,18 @@ describe("current baseline capture contract", () => {
     expect(() =>
       assertCurrentBaselineObservationRecord({
         ...record,
+        baselineStatus: undefined,
+      }),
+    ).toThrow("marked candidate-only");
+    expect(() =>
+      assertCurrentBaselineObservationRecord({
+        ...record,
+        baselineStatus: "contract-verified",
+      }),
+    ).toThrow("marked candidate-only");
+    expect(() =>
+      assertCurrentBaselineObservationRecord({
+        ...record,
         baseline: { ...record.baseline, appVersion: "26.917.71314" },
       }),
     ).toThrow("candidate package fingerprint");

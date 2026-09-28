@@ -66,7 +66,7 @@
     "report:current-build-audit": "node scripts/report-current-build-audit.mjs",
     "scan:current-package-candidates": "node scripts/scan-current-package-candidates.mjs",
     "capture:current-baseline": "node scripts/capture-current-baseline.mjs",
-    "capture:current-baseline-26-924": "CODEX_CURRENT_BASELINE_FINGERPRINT=26.924.22138 CODEX_CURRENT_BASELINE_OBSERVATION_ONLY=1 CODEX_CURRENT_BASELINE_WRITE_RESEARCH_CANDIDATE=1 CODEX_CURRENT_BASELINE_OUTPUT=research/current-baseline-26.924.22138-candidate.json node scripts/capture-current-baseline.mjs",
+    "capture:current-baseline-26-924": "CODEX_CURRENT_BASELINE_FINGERPRINT=26.924.22138 CODEX_CURRENT_BASELINE_OBSERVATION_ONLY=1 node scripts/capture-current-baseline.mjs",
     "capture:current-baseline-26-917": "CODEX_CURRENT_BASELINE_FINGERPRINT=26.917.71314 node scripts/capture-current-baseline.mjs",
     "capture:current-settings-connections-26-917-62051": "CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.62051 node scripts/capture-current-settings-connections.mjs",
     "capture:current-settings-connections-26-917-71314": "CODEX_CURRENT_SETTINGS_CONNECTIONS_FINGERPRINT=26.917.71314 node scripts/capture-current-settings-connections.mjs",

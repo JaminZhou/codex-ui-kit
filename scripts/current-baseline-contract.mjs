@@ -2170,6 +2170,11 @@ export function assertCurrentBaselineObservationRecord(
   if (record?.schemaVersion !== 1) {
     throw new Error("Current baseline observation must use schema version 1.");
   }
+  if (record?.baselineStatus !== "candidate-only-observation") {
+    throw new Error(
+      "Current baseline observation must be marked candidate-only.",
+    );
+  }
   if (
     Object.entries(expectedFingerprint).some(
       ([key, expected]) => record.baseline?.[key] !== expected,
