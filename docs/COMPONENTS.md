@@ -213,6 +213,14 @@ All privileged behavior remains host-owned. The components never auto-approve co
   recomputed when the visible notification set changes, including one-for-one
   replacement. A disabled lock keeps queued action and dismissal callbacks
   host-controlled while preserving the live region.
+- `AppPrimaryNavigationRail`: the optional first navigation column inside an
+  `AppShell`, with separate main-item and footer slots. It establishes the
+  measured 52px rail, 36px icon-button targets, 20px icons, and 8px item gap;
+  hosts provide their own routes and icon content. When present, `AppShell`
+  accounts for the rail in sidebar/workspace resizing and keeps the sidebar
+  pinned in a narrow container only while its configured minimum main width
+  still fits. The default 269.875px sidebar width is used only with this new
+  rail; the legacy single-sidebar default remains unchanged.
 - `AppShell`: the application-level grid for a persistent navigation sidebar,
   conversation main region, right workspace panel, and bottom panel. Wide mode
   reserves measured tracks; medium and narrow containers switch side surfaces

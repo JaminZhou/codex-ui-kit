@@ -8,9 +8,175 @@ The machine-readable surface denominator remains
 [`ui-inventory.json`](ui-inventory.json). This plan defines delivery order and
 exit gates; it does not replace the inventory.
 
+## Major-build UI re-audit rule
+
+When a Codex build changes shared navigation, route ownership, shell geometry,
+or Composer structure, re-audit the entire current inventory for presence,
+entry point, owner, lifecycle, and affected states. Treat every older-build
+capture as regression evidence only until that surface is checked against the
+new build. Re-capture the shared shell across supported widths and themes
+first, then prioritize P0/P1 families whose anchors, bounds, visibility,
+ownership, or lifecycle changed. Do not mechanically rebuild every component:
+implement only observed gaps, but do not carry a surface forward as current
+merely because one internal dimension or screenshot looks unchanged. Promote
+visual parity only with the surface's current-build Browser/CDP, Electron, and
+regional-pixel evidence; record policy-blocked or unobservable boundaries
+explicitly rather than inferring them.
+
+### Reported major UI change: version alignment gate
+
+On 2026-09-29, Jamin reported that the Codex UI now looks substantially
+different and may invalidate the earlier surface work. The local
+`/Applications/ChatGPT.app` metadata still identifies Codex Desktop
+`26.924.22138` / build `11645` (Chromium `154.0.8037.57`); no newer desktop
+package is currently evidenced by this checkout's host inspection. The
+reported screen has not yet been tied to that exact package, so do not treat
+the 26.924 candidate as proof of the UI Jamin is seeing, and do not extend its
+replay fixtures as if they were new-build observations.
+
+OpenAI's [Codex changelog](https://learn.chatgpt.com/docs/changelog) records
+Codex joining the ChatGPT desktop app in 26.707, including in-app editing and
+PR Chat, and later changes to plugin/settings and task-activity surfaces. Its
+September 2026 notes add GPT-6 Sol and GPT-6 Luna to the Codex model picker.
+They also describe shared desktop-app Quick Chat/Pets and Appshots, plus
+Computer History and browser site tools in recent updates. These release notes
+identify audit leads, but do not prove that a capability is enabled for this
+local account/build or specify desktop geometry and state-by-state behavior.
+
+Add these leads to the version-alignment pass, without counting them as
+observed inventory surfaces until the exact local Codex route or control is
+reached:
+
+- Inspect the model picker for GPT-6 Sol/Luna availability, selected and
+  unavailable states, and any workspace/rollout-specific variants.
+- Check whether the desktop Quick Chat/Pets controls are exposed in Codex;
+  if present, follow the quick composer, `@` context and `$` skill pickers,
+  send/follow-progress/reopen-thread flow, Settings > Pets/shortcut controls,
+  and the macOS Appshot destination path.
+- Check Computer History opt-in, source selection, pause, review/delete, and
+  how any captured activity is surfaced to Codex; treat these as distinct
+  privacy and lifecycle states.
+- Check Browser site-tool/WebMCP discovery, approval, execution, and resulting
+  thread activity where available.
+
+Record absent, unavailable, rollout-gated, or policy-blocked states explicitly;
+do not infer them from public release notes or from a different account/build.
+
+A read-only string-presence scan of the installed `26.924.22138` package found
+candidate labels for GPT-6 Sol/Luna, Quick Chat, Show pet, Appshot destination,
+Computer History, and WebMCP/site tools. The inventory records these as package
+evidence only; two not-sampled P2 cross-layer rows now track Appshot capture
+routing and Computer History. The version-filtered audit reports these package
+fragments separately from the 33 runtime-observation surfaces. They do not
+increase runtime-observation counts or establish that a feature is reachable
+or enabled for this account. Reproduce the bounded marker scan with:
+
+```sh
+pnpm scan:current-package-candidates -- --app /Applications/ChatGPT.app --expected-version 26.924.22138 --expected-build 11645
+```
+
+It emits build identity, ASAR hash, and booleans only, never source excerpts.
+
+For immediate progress, use the installed `26.924.22138` package as the
+working audit candidate. Continue its version-scoped structural replays where
+existing evidence supports them, but label them only as 26.924 fixtures. If
+Jamin's screen is a later staged rollout, capture its exact About/build
+identity before promoting any 26.924 result to that UI.
+
+The next gate is to align the exact app build with the reported UI, then audit
+all 99 inventory surfaces for presence, entry point, ownership, lifecycle,
+state variants, viewport, and theme. Preserve old implementations and captures
+as regression material; only rewrite or extend a component where the aligned
+build's evidence shows a delta. Prioritize the shared shell/navigation and
+Composer first, then conversation/workspace, Settings/integrations, and
+cross-layer surfaces. Until version alignment and evidence collection are
+resolved, product Browser, Electron, and regional-pixel claims remain
+unverified.
+
+For the `26.924.22138` candidate, the full-denominator report currently finds
+candidate runtime fragments on 33/99 surfaces (P0 16/59, P1 14/27, P2 3/13).
+By area: app shell 12/23, Composer 4/8, conversation 3/28, cross-layer 0/5,
+integrations 2/6, scope candidates 0/2, Settings 10/12, and workspace 2/15.
+These counts are reconnaissance coverage, not acceptance; target-build Browser,
+Electron, and regional-pixel coverage are all still zero. Audit in this order:
+shared rail/sidebar and route-dependent shell; Composer/context/destination;
+populated thread and workspace/review/tool states; then integrations,
+settings, and cross-layer windows. Within each family, compare route entry,
+state owner, lifecycle, visibility, responsive/theme variants, measured anchors,
+and accessible names against the new build before deciding whether an older
+component remains reusable.
+
+On 2026-09-29, mapping the already-recorded project-dialog open/dismiss sample
+and the Environments/Worktrees Settings route-shell samples added four
+surface-level candidate tags. The project picker was not selected; the Settings
+surfaces were only reached and checked for overflow. This changes the audit
+queue counts, not the interaction, Browser, Electron, or product-pixel gates.
+A subsequent evidence-map pass also associates the already-recorded Scheduled
+route shell with `integrations.automations`; this is route/sidebar presence only,
+not current task-list content, interaction, or lifecycle evidence.
+
+The follow-up denominator audit found four more distinct 26.924 destinations
+that had been omitted from the inventory: Library, Images, and Customize route
+shells, plus the separate Settings → Notifications route. They are now explicit
+P1 rows with shell-only or route-shell-only evidence; Library and Images have
+local placeholder replays, not product-content implementations. Customize and
+Settings → Notifications now also have local shell-only placeholder replays at
+1180×820; their route bodies and active-rail styling remain unobserved. Explore
+→ GPTs remains an observed entry point whose destination shell has not been
+opened, so it stays an explicit audit question rather than being counted as an
+observed screen. The current candidate report is now 33/99; no product Browser,
+Electron, or regional-pixel acceptance is implied by these tags.
+
 ## Current position
 
-- The installed app now reports `26.917.71314` (`10954`), Chromium
+- The installed app now reports `26.924.22138` (`11645`), Chromium
+  `154.0.8037.57`, with a 480,133,781-byte `app.asar` whose SHA-256 is
+  `d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80`.
+  Its candidate-only shell observation is recorded in
+  [`current-baseline-26.924.22138-candidate.json`](current-baseline-26.924.22138-candidate.json)
+  and summarized in [`26.924.22138.md`](26.924.22138.md). It identifies a
+  persistent 52px icon rail plus a 269.88px content sidebar; explicit collapse
+  leaves the icon rail in place. The empty New chat editor remains 712×44px at
+  1180×820, but the surrounding composition now exposes project/local/branch
+  context and permission/model controls. The legacy Help trigger and fixed
+  Pull requests label were not visible in the sampled New chat shell. These are
+  surface deltas to re-audit, not claims that the features were removed. Stage
+  0 remains open: populated conversations, Review, Terminal, Markdown, MCP,
+  resource execution, light theme, Electron, and installed-product regional
+  pixels still need exact-current-build evidence. The global baseline remains
+  `26.903.71938` until the affected surface families are refreshed.
+  A read-only navigation follow-up confirms that `Help menu` is still present
+  under a new label; the first candidate's exact-label check was a false
+  negative. It also maps Home, Scheduled, Library, Images, Customize, Explore,
+  Explore → Projects/GPTs, Profile → Settings, and 14 Settings sections. The
+  supplement [`26.924.22138.md`](26.924.22138.md) records the current route
+  families and Composer menu anchors without promoting old screenshots or
+  claiming full behavior/pixel parity. A local structural Composer replay now
+  exercises the 26.924 empty editor, responsive width anchors, six measured
+  overlays, and Escape/focus restoration. It uses redacted placeholders for
+  unknown content and does not add product-observation coverage;
+  Browser against the installed product, product Electron, and regional pixels
+  remain unverified. A read-only bundle check on 2026-09-29 confirms the same
+  version, build, and ASAR hash are still installed. That day, the full local
+  `pnpm check` passed (root 149 files / 1,408 tests, Electron 2 / 7, playground
+  47 / 466), and `pnpm check:codex-app:acceptance` passed, including 594 CDP
+  lifecycle frames and 594 visual-contract frames. The acceptance run exposed
+  and fixed a stale three-column Playground override that made the live PR
+  fixture overlap its sidebar after the shell gained a navigation-rail track;
+  the route checker now guards against that regression. These results validate
+  the local implementation/replay only and do not change the zero installed-
+  product Browser, Electron, or regional-pixel coverage above.
+  A subsequent acceptance rerun on 2026-09-29, after adding Projects/Library/
+  Images rail-only fixture coverage and raising only the skill-mode post-tool
+  wait to 180 seconds, passed the complete `pnpm check:codex-app:acceptance`
+  command with exit code 0. It covered 594 CDP lifecycle frames, 594 visual
+  contract frames, 26.924 navigation and Composer replay at 1180/820/721/720px,
+  Electron onboarding and document/PDF previews, and live App Server MCP success,
+  retry, timeout, cancellation, approval, remote/OAuth, and elicitation flows.
+  Every pixel result here is own-fixture repeat/contract evidence; it does not
+  establish installed-product pixel parity. Browser/CDP, Electron, and regional
+  product-pixel acceptance for 26.924 remain at zero.
+- The previous installed candidate was `26.917.71314` (`10954`), Chromium
   `153.0.8010.53`, with a 370,175,042-byte `app.asar` whose SHA-256 is
   `03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804`.
   Its isolated candidate record is
@@ -260,9 +426,9 @@ exit gates; it does not replace the inventory.
   unavailable because the new Renderer no longer exposes the old Fiber provider
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
-- The inventory contains 93 surface groups: 59 P0, 23 P1, and 11 P2.
-- At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 66
-  have previous-build-only runtime evidence, and 9 have not been sampled. The
+- The inventory contains 99 surface groups: 59 P0, 27 P1, and 13 P2.
+- At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 70
+  have previous-build-only runtime evidence, and 11 have not been sampled. The
   `26.917.71314` candidate now maps structural observations to twelve P0
   conversation-destination, shell/navigation, Composer, and Projects groups,
   but does not change promotion or Browser/Electron verification status. The
@@ -1185,8 +1351,8 @@ No surface becomes product-level complete merely because one fixture passes.
 
 ### 0. Refresh the current baseline
 
-The application updated after the previous current-build gates. Before adding
-new parity claims:
+The installed application advanced from `26.917.71314` to `26.924.22138`.
+Before adding new parity claims:
 
 - capture the current main Renderer target by URL, area, and application-shell
   landmarks rather than selecting the first CDP page;
@@ -1194,25 +1360,99 @@ new parity claims:
   measurements;
 - re-observe the shell, left sidebar, conversation, Composer, Review, Terminal,
   Markdown, and MCP anchors;
-- retain previous-build results as regression fixtures while promoting only
-  surfaces re-observed on `26.825.51511`;
-- update inventory evidence prefixes and the current build note.
+- retain previous-build results as regression fixtures; keep the promoted
+  global inventory baseline at `26.903.71938` until the affected families are
+  re-observed;
+- update inventory evidence prefixes and the current build note without
+  inheriting old geometry assertions for the new candidate.
 
 Exit: the current build has a reproducible CDP capture recipe and no
 `verified` status relies solely on a previous build.
 
-The `26.917.71314` package identity and shell/sidebar, empty New chat
-destination/route restoration, Projects/Help/Pull Requests, Composer
-resource-menu, and Settings Connections structures are now captured in
-candidate records. Stage 0 remains open: populated conversation/thread states,
-resource selection/execution, connection mutation/pairing/SSH, Review,
-Terminal, Markdown failure states, other P0 route families, and installed-product
-pixel regions still need their own current-build evidence. MCP's current-build
-success and multi-call activity anchor is recorded separately below; its
-failure semantics and pixel evidence remain open. The exact same installed ASAR was
-revalidated on 2026-09-25 with the isolated baseline recipe; the sanitized
-record now carries that second run and keeps profile-dependent row/scroll counts
-explicitly sample-scoped.
+The new `26.924.22138` candidate record refreshes the shell across the four
+wide/medium/threshold/compact viewport widths and measures the two navigation
+regions separately. It confirms the primary icon rail remains after collapsing
+the content sidebar, and records that the old Help and Pull requests anchors
+are not visible in the sampled New chat shell. This differs from the older
+single-navigation and fixed-route assertions, so the candidate contract checks
+package identity and capture completeness without treating old geometry as a
+failure or promoting it as product truth. The one main-content screenshot used
+for visual spot review remained local-only; this candidate has no installed-
+product pixel comparison.
+
+The 2026-09-28 follow-up resolves the route-entry ambiguity: Help uses the new
+`Help menu` trigger, Projects/GPTs live under Explore, and Settings opens from
+the Profile menu. Library, Images, and Projects use a rail-only main shell in
+their sampled state, while Settings retains the Codex sidebar. GPTs is a
+reachable Explore destination, but its route-specific shell has not been
+separately sampled. A
+read-only pass reached 14 Settings sections and measured the current empty
+Composer permission/Add menus. These results are structural candidate
+observations only; they replace neither per-surface lifecycle replay nor
+current-build Electron and product-pixel gates. A further Composer trigger pass
+measures three context popovers and the trailing selector, verifies Escape
+dismissal, and deliberately retains no values or choice labels.
+
+Because navigation and the Composer composition changed, the previous UI must
+be re-audited before its evidence is treated as current. Use the existing
+99-surface inventory as the denominator: first re-resolve every P0/P1/P2
+surface's visible entry point, owner, and lifecycle on `26.924.22138`; then
+refresh states, computed styles, responsive geometry, Electron behavior, and
+masked regional pixels for each affected family. An absent old label means
+"not visible from this sampled route" until other routes and triggers are
+checked; it does not mean the feature was removed. Keep older captures as
+regression fixtures, and mark unvisited current-build surfaces as unverified.
+
+The first implementation slice adds an optional `AppPrimaryNavigationRail`
+and rail-aware `AppShell` tracks using the measured 26.924 shell geometry; its
+720px pinned dual-navigation state is covered by unit/CSS contracts. A
+dedicated `primary-navigation-current-26-924` playground state now exercises
+the 52px rail and 269.875px content sidebar in dark/light themes at 1180px and
+720px. Its Electron harness checks geometry, zero overflow, accessible route
+names, native window dimensions, and isolation settings. That replay exposed
+and fixed a CSS cascade regression that had reduced rail buttons to 28px wide.
+The 2026-09-29 local Playground/Electron replay also checks the rail-only
+structure for the three sampled Projects, Library, and Images routes at
+1180×820, with explicit unobserved-content placeholders and zero overflow.
+This is an own-fixture layout contract, not product Browser/Electron or pixel
+acceptance.
+The current-build glyph source is still explicitly pending, and the fixture has
+no installed-product pixel comparison; this improves component/replay coverage
+without promoting the product inventory rows.
+
+The 2026-09-28 evidence census used the then-current 93-surface inventory and
+found at least one `26.924.22138` runtime tag on 13/59 P0, 8/23 P1, and 3/11
+P2 surfaces (24/93 total). The 2026-09-29 mapping pass expanded the queue to
+97 surfaces. A subsequent package-presence pass added two not-sampled P2
+cross-layer rows, bringing the inventory to 99. The current audit reports
+candidate tags on 16/59 P0, 14/27 P1, and 3/13 P2 surfaces (33/99 total).
+These runtime tags are navigation/structure probes only; they do not
+count as a refreshed interaction or visual contract. No
+`26.924.22138` Electron product run or installed-product pixel baseline is
+recorded yet. Thus all previous product captures remain regression fixtures
+until their routes and state families are re-resolved; implementation only
+needs rework where the new reference differs.
+
+Generate the candidate-specific re-audit summary with
+`pnpm report:current-build-audit -- 26.924.22138`; add `--json` for the full
+per-surface queue. The JSON form lists every surface, separates target-build
+observation fragments from missing runtime evidence, and keeps Browser/CDP,
+Electron, and regional pixels as explicit outstanding gates. A candidate tag
+never marks a surface accepted; existing Browser or Electron verification is
+carried forward only when the requested build is the promoted baseline.
+Policy-blocked surfaces remain marked for policy-safe observation or explicit
+exclusion rather than being treated as capture tasks.
+
+The earlier `26.917.71314` candidate refreshed shell/sidebar, empty New chat,
+Projects/Help/Pull Requests, Composer resources, and Settings Connections
+structures. Those results remain regression evidence, not current-build proof.
+Stage 0 remains open: populated conversation/thread states, new Composer
+context/actions, resource selection/execution, connection mutation/pairing/SSH,
+Review, Terminal, Markdown failure states, other P0 route families, and
+installed-product pixel regions still need their own `26.924.22138` evidence.
+The MCP success and multi-call activity anchor recorded on 26.917 remains
+historical; 26.924 MCP reachability, failure semantics, and pixel evidence are
+open.
 
 A disposable 2026-09-25 probe on this build reached a populated assistant turn,
 but only observed an assistant-text claim of documentation search: the product

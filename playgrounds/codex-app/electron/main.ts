@@ -1068,6 +1068,9 @@ function createWindow() {
   const summaryState = process.env.CODEX_DEMO_SUMMARY_STATE ?? "";
   const layout = process.env.CODEX_DEMO_LAYOUT ?? "";
   const view = process.env.CODEX_DEMO_VIEW ?? "conversation";
+  const primaryRoute = process.env.CODEX_DEMO_PRIMARY_ROUTE ?? "";
+  const currentPrimaryRouteShell =
+    process.env.CODEX_DEMO_CURRENT_PRIMARY_ROUTE_SHELL ?? "";
   const requestedTheme = process.env.CODEX_DEMO_THEME;
   const allowSidebarLight = frame.startsWith("sidebar-current");
   const allowScopedConversationLight =
@@ -1096,8 +1099,10 @@ function createWindow() {
   const query = new URLSearchParams({
     capture,
     currentSidebar,
+    currentPrimaryRouteShell,
     frame,
     layout,
+    primaryRoute,
     scenario,
     shellState,
     sidebarState,

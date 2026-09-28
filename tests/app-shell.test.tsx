@@ -6,11 +6,13 @@ import {
   fireEvent,
   render,
   screen,
+  within,
   waitFor,
 } from "@testing-library/react";
 import { useState, type CSSProperties } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  AppPrimaryNavigationRail,
   AppShell,
   AppSidebar,
   AppSidebarCollection,
@@ -33,6 +35,100 @@ afterEach(() => {
 });
 
 describe("application shell", () => {
+  it("keeps a separate primary rail accessible while its content sidebar is hidden", () => {
+    const { container } = render(
+      <AppShell
+        navigationRail={
+          <AppPrimaryNavigationRail
+            footer={<button type="button">Help</button>}
+          >
+            <button type="button">Home</button>
+            <button type="button">Explore</button>
+          </AppPrimaryNavigationRail>
+        }
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen={false}
+      >
+        Thread content
+      </AppShell>,
+    );
+
+    const shell = container.querySelector<HTMLElement>(".codex-ui-app-shell")!;
+    const rail = screen.getByRole("complementary", {
+      name: "Application navigation rail",
+    });
+
+    expect(shell.hasAttribute("data-navigation-rail")).toBe(true);
+    expect(
+      within(rail).getByRole("navigation", { name: "Primary navigation" }),
+    ).toBeTruthy();
+    expect(within(rail).getByRole("button", { name: "Home" })).toBeTruthy();
+    expect(within(rail).getByRole("button", { name: "Help" })).toBeTruthy();
+    expect(
+      container.querySelector(
+        ".codex-ui-app-shell__sidebar[aria-hidden='true'][inert]",
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(".codex-ui-app-shell__main")?.hasAttribute("inert"),
+    ).toBe(false);
+    expect(
+      shell.style.getPropertyValue("--codex-ui-app-sidebar-width"),
+    ).toBe("269.875px");
+  });
+
+  it("keeps the measured dual-navigation split pinned at 720px", () => {
+    let resize: ((width: number) => void) | undefined;
+    class ResizeObserverMock {
+      constructor(
+        private readonly callback: ResizeObserverCallback,
+      ) {}
+
+      disconnect() {}
+
+      observe(target: Element) {
+        if (!target.classList.contains("codex-ui-app-shell")) return;
+        resize = (width) =>
+          this.callback(
+            [
+              {
+                contentRect: { height: 680, width },
+                target,
+              } as ResizeObserverEntry,
+            ],
+            this as unknown as ResizeObserver,
+          );
+      }
+
+      unobserve() {}
+    }
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { container } = render(
+      <AppShell
+        navigationRail={<AppPrimaryNavigationRail>Home</AppPrimaryNavigationRail>}
+        onSidebarOpenChange={vi.fn()}
+        sidebar={<button type="button">Projects</button>}
+        sidebarOpen
+      >
+        Conversation
+      </AppShell>,
+    );
+    const shell = container.querySelector(".codex-ui-app-shell")!;
+    const main = container.querySelector(".codex-ui-app-shell__main")!;
+
+    act(() => resize?.(720));
+
+    expect(shell.getAttribute("data-layout-mode")).toBe("narrow");
+    expect(shell.getAttribute("data-narrow-sidebar-behavior")).toBe(
+      "current-build",
+    );
+    expect(shell.hasAttribute("data-sidebar-pinned")).toBe(true);
+    expect(main.hasAttribute("inert")).toBe(false);
+    expect(
+      screen.queryByRole("button", { name: "Close navigation sidebar" }),
+    ).toBeNull();
+  });
+
   it("composes navigation, conversation, side, and bottom landmarks", () => {
     const { rerender } = render(
       <AppShell

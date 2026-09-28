@@ -9,10 +9,12 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
   assertCurrentAccountMenuRecord,
   assertCurrentAppServerCrashRecoveryRecord,
+  assertCurrentBaselineObservationRecord,
   assertCurrentBaselineRecord,
   assertCurrentGlobalNotificationsRecord,
   assertCurrentProjectsIndexObservation,
@@ -20,11 +22,13 @@ import {
   assertCurrentSidebarRowsRecord,
   currentBaselineFingerprint,
   currentBaselineViewports,
+  currentObservedBuildCandidateBaselineFingerprint,
   currentAccountMenuCandidateFingerprints,
   currentInstalledCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
   currentPreviousInstalledCandidateBaselineFingerprint,
   runBestEffortCurrentBaselineCleanup,
+  resolveCurrentBaselineCandidateOutputPath,
   sanitizeCurrentAccountMenuRecord,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
@@ -764,6 +768,23 @@ const currentAppServerCrashRecoveryRecord = () => {
 };
 
 describe("current baseline capture contract", () => {
+  it("restricts candidate repository output to one non-overwriting research artifact", () => {
+    const outputPath = fileURLToPath(
+      new URL(
+        "../research/current-baseline-26.924.22138-candidate.json",
+        import.meta.url,
+      ),
+    );
+    expect(resolveCurrentBaselineCandidateOutputPath(outputPath)).toBe(
+      outputPath,
+    );
+    expect(() =>
+      resolveCurrentBaselineCandidateOutputPath(
+        fileURLToPath(new URL("../research/other.json", import.meta.url)),
+      ),
+    ).toThrow("candidate output must be");
+  });
+
   const projectsObservation = () => ({
     collapsed: { expandedCount: 0, focusOnToggle: true },
     compact: {
@@ -907,6 +928,92 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain(
       '["26.917.62051", currentPreviousInstalledCandidateBaselineFingerprint]',
     );
+  });
+
+  it("records new-build observations without inheriting promoted geometry assertions", () => {
+    const fingerprint = currentObservedBuildCandidateBaselineFingerprint;
+    const bundleSnapshot = {
+      appAsarBytes: fingerprint.appAsarBytes,
+      appAsarSha256: fingerprint.appAsarSha256,
+      changedAtMs: 1_000,
+      checkedAtMs: 12_000,
+      device: "1",
+      inode: "2",
+    };
+    const stateViewports = {
+      compactCollapsed: currentBaselineViewports.compact,
+      compactPinned: currentBaselineViewports.compact,
+      compactPullRequests: currentBaselineViewports.compact,
+      compactRestored: currentBaselineViewports.compact,
+      compactVisibleBeforeCollapse: currentBaselineViewports.compact,
+      mediumNewChat: currentBaselineViewports.medium,
+      thresholdNewChat: currentBaselineViewports.threshold,
+      wideNewChat: currentBaselineViewports.wide,
+    };
+    const record = {
+      baseline: { ...fingerprint, sampledAt: "2026-09-28" },
+      baselineStatus: "candidate-only-observation",
+      captureKind: "renderer_emulation",
+      projectsIndexObservation: { wide: { newLayout: true } },
+      runtimeBundleIdentity: {
+        afterCapture: { ...bundleSnapshot, checkedAtMs: 13_000 },
+        beforeCapture: bundleSnapshot,
+        ownerPid: 12_345,
+        processStartedAtMs: 11_000,
+      },
+      schemaVersion: 1,
+      sidebarLifecycle: { newLayout: true },
+      states: Object.fromEntries(
+        Object.entries(stateViewports).map(([name, viewport]) => [
+          name,
+          {
+            colorScheme: "light",
+            horizontalOverflow: 7,
+            navigation: { width: 0 },
+            viewport: { ...viewport, devicePixelRatio: 2 },
+          },
+        ]),
+      ),
+      targetSelection: {
+        candidates: [
+          {
+            area: 1_000_000,
+            selected: true,
+            url: "app://-/index.html",
+          },
+        ],
+        selected: { url: "app://-/index.html" },
+      },
+    };
+
+    expect(() => assertCurrentBaselineObservationRecord(record)).not.toThrow();
+    expect(() =>
+      assertCurrentBaselineObservationRecord({
+        ...record,
+        baseline: { ...record.baseline, appVersion: "26.917.71314" },
+      }),
+    ).toThrow("candidate package fingerprint");
+    expect(() =>
+      assertCurrentBaselineObservationRecord({
+        ...record,
+        states: { ...record.states, wideNewChat: undefined },
+      }),
+    ).toThrow("wideNewChat viewport sample");
+  });
+
+  it("captures the renamed Help control and current icon-rail destinations", () => {
+    const captureSource = readFileSync(
+      new URL("../scripts/capture-current-baseline.mjs", import.meta.url),
+      "utf8",
+    );
+
+    expect(captureSource).toContain("primaryNavigationItems");
+    expect(captureSource).toContain("primaryRailObservation");
+    expect(captureSource).toContain("pathCount: icon.querySelectorAll(\"path\").length");
+    expect(captureSource).toContain('"Help menu"');
+    expect(captureSource).toContain('button[aria-label="Help menu"]:visible');
+    expect(captureSource).toContain('"Open profile menu"');
+    expect(captureSource).toContain("no-supported-help-trigger-present");
   });
 
   it("keeps the latest 26.917 structural capture machine-verifiable", () => {
@@ -1503,6 +1610,26 @@ describe("current baseline capture contract", () => {
         }),
       ]).index,
     ).toBe(1);
+  });
+
+  it("accepts the current dual-navigation shell as a main Renderer landmark", () => {
+    expect(
+      selectCurrentMainCandidate([
+        candidate({
+          area: 3_374_080,
+          index: 0,
+          landmarks: { main: 1, nav: 2, sidebarTrigger: 0, textbox: 1 },
+          visibleControls: 53,
+        }),
+        candidate({
+          area: 3_145_992,
+          index: 1,
+          landmarks: { main: 1, nav: 0, sidebarTrigger: 0, textbox: 1 },
+          url: "app://-/index.html?initialRoute=%2Favatar-overlay",
+          visibleControls: 0,
+        }),
+      ]).index,
+    ).toBe(0);
   });
 
   it("requires shell landmarks and interactive density", () => {

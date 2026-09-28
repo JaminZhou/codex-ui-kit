@@ -445,6 +445,9 @@ export interface AppShellProps
   mainLabel?: string;
   mainRole?: "main" | "region";
   layoutMode?: AppShellLayoutMode;
+  navigationRail?: ReactNode;
+  navigationRailLabel?: string;
+  navigationRailWidth?: number;
   narrowSidebarBehavior?: AppShellNarrowSidebarBehavior;
   onBottomPanelHeightChange?: (height: number) => void;
   onLayoutModeChange?: (
@@ -480,6 +483,43 @@ export interface AppShellProps
   sidebarResizeLabel?: string;
   sidebarWidth?: number;
   windowChrome?: ReactNode;
+}
+
+export interface AppPrimaryNavigationRailProps
+  extends Omit<HTMLAttributes<HTMLElement>, "aria-label" | "children"> {
+  children: ReactNode;
+  footer?: ReactNode;
+  navigationLabel?: string;
+}
+
+export function AppPrimaryNavigationRail({
+  children,
+  className,
+  footer,
+  navigationLabel = "Primary navigation",
+  ...props
+}: AppPrimaryNavigationRailProps) {
+  return (
+    <nav
+      {...props}
+      aria-label={navigationLabel}
+      className={[
+        "codex-ui-app-primary-navigation-rail",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div className="codex-ui-app-primary-navigation-rail__items">
+        {children}
+      </div>
+      {footer !== undefined && footer !== null ? (
+        <div className="codex-ui-app-primary-navigation-rail__footer">
+          {footer}
+        </div>
+      ) : null}
+    </nav>
+  );
 }
 
 function clampShellTrack(value: number, minimum: number, maximum: number) {
@@ -541,11 +581,14 @@ export function AppShell({
   className,
   defaultBottomPanelHeight = 272,
   defaultSidePanelWidth = 370,
-  defaultSidebarWidth = 274,
+  defaultSidebarWidth,
   layoutMode: layoutModeOverride,
   mainLabel = "Conversation",
   mainRole = "main",
-  narrowSidebarBehavior = "modal",
+  narrowSidebarBehavior,
+  navigationRail,
+  navigationRailLabel = "Application navigation rail",
+  navigationRailWidth = 52,
   onBottomPanelHeightChange,
   onLayoutModeChange,
   onPointerLeave,
@@ -582,6 +625,22 @@ export function AppShell({
   windowChrome,
   ...props
 }: AppShellProps) {
+  const navigationRailIsVisible =
+    navigationRail !== undefined &&
+    navigationRail !== null &&
+    navigationRail !== false;
+  const normalizedNavigationRailWidth = Math.max(
+    1,
+    Number.isFinite(navigationRailWidth) ? navigationRailWidth : 52,
+  );
+  const resolvedNarrowSidebarBehavior =
+    narrowSidebarBehavior ??
+    (navigationRailIsVisible ? "current-build" : "modal");
+  const normalizedDefaultSidebarWidth = Number.isFinite(defaultSidebarWidth)
+    ? defaultSidebarWidth!
+    : navigationRailIsVisible
+      ? 269.875
+      : 274;
   const resolvedResponsiveSidebarContinuity =
     responsiveSidebarContinuity ?? responsivePanelContinuity;
   const bottomPanelOpenRef = useRef(bottomPanelOpen);
@@ -617,7 +676,7 @@ export function AppShell({
     Number.isFinite(defaultSidePanelWidth) ? defaultSidePanelWidth : 370,
   );
   const [internalSidebarWidth, setInternalSidebarWidth] = useState(
-    Number.isFinite(defaultSidebarWidth) ? defaultSidebarWidth : 274,
+    normalizedDefaultSidebarWidth,
   );
   const [bottomPanelResizing, setBottomPanelResizing] = useState(false);
   const [sidePanelResizing, setSidePanelResizing] = useState(false);
@@ -631,7 +690,8 @@ export function AppShell({
   const automaticLayout = useAppShellLayoutMetrics(shellRef);
   const layoutMode = layoutModeOverride ?? automaticLayout.mode;
   const currentBuildNarrowSidebar =
-    narrowSidebarBehavior === "current-build" && layoutMode === "narrow";
+    resolvedNarrowSidebarBehavior === "current-build" &&
+    layoutMode === "narrow";
   const sidebarSurfaceVisible = sidebarOpen;
   const previousLayoutModeRef = useRef(layoutMode);
   const responsivePanelContinuityKeyRef = useRef(
@@ -644,6 +704,14 @@ export function AppShell({
   const responsiveSidebarRequestTokenRef = useRef<symbol | null>(null);
   const responsiveSidePanelRequestTokenRef = useRef<symbol | null>(null);
   const shellWidth = automaticLayout.width;
+  const availableShellWidth =
+    shellWidth === null
+      ? null
+      : Math.max(
+          0,
+          shellWidth -
+            (navigationRailIsVisible ? normalizedNavigationRailWidth : 0),
+        );
   const normalizedBottomPanelMinHeight = Math.max(
     0,
     Number.isFinite(bottomPanelMinHeight) ? bottomPanelMinHeight : 152,
@@ -733,8 +801,8 @@ export function AppShell({
       : (observedSidebarWidth ?? requestedSidebarWidth)
     : 0;
   const wideSidePanelMinimaFit =
-    shellWidth === null ||
-    shellWidth >=
+    availableShellWidth === null ||
+    availableShellWidth >=
       minimumPersistentSidebarWidth +
         normalizedSidePanelMinWidth +
         coordinatedPersistentMainMinWidth;
@@ -760,11 +828,11 @@ export function AppShell({
       : normalizedSidePanelMinMainWidth;
   const responsiveSidebarMaxWidth =
     (layoutMode === "narrow" && !currentBuildNarrowSidebar) ||
-    shellWidth === null
+    availableShellWidth === null
       ? normalizedSidebarMaxWidth
       : Math.max(
           normalizedSidebarMinWidth,
-          shellWidth -
+          availableShellWidth -
             responsiveSidebarMinMainWidth -
             persistentSidePanelMinWidth,
         );
@@ -800,11 +868,11 @@ export function AppShell({
     ? (observedSidebarWidth ?? resolvedSidebarWidth)
     : 0;
   const responsiveSidePanelMaxWidth =
-    shellWidth === null
+    availableShellWidth === null
       ? unmeasuredSidePanelMaxWidth
       : Math.max(
           normalizedSidePanelMinWidth,
-          shellWidth -
+          availableShellWidth -
             occupiedSidebarWidth -
             responsiveSidePanelMinMainWidth,
         );
@@ -819,9 +887,9 @@ export function AppShell({
     sidePanel !== null &&
     layoutMode === "wide";
   const expandedSidePanelWidth =
-    shellWidth === null
+    availableShellWidth === null
       ? requestedSidePanelWidth
-      : Math.max(0, shellWidth - occupiedSidebarWidth);
+      : Math.max(0, availableShellWidth - occupiedSidebarWidth);
   const resolvedSidePanelWidth = resolvedSidePanelExpanded
     ? expandedSidePanelWidth
     : clampShellTrack(
@@ -830,6 +898,7 @@ export function AppShell({
         resolvedSidePanelMaxWidth,
       );
   const shellStyle =
+    navigationRailIsVisible ||
     bottomPanelResizable ||
     bottomPanelHeightIsControlled ||
     sidebarResizable ||
@@ -839,6 +908,12 @@ export function AppShell({
     resolvedSidePanelExpanded
       ? ({
           ...style,
+          ...(navigationRailIsVisible
+            ? {
+                "--codex-ui-app-navigation-rail-width": `${normalizedNavigationRailWidth}px`,
+                "--codex-ui-app-sidebar-width": `${resolvedSidebarWidth}px`,
+              }
+            : {}),
           ...(bottomPanelResizable || bottomPanelHeightIsControlled
             ? {
                 "--codex-ui-app-bottom-panel-height": `${resolvedBottomPanelHeight}px`,
@@ -859,13 +934,13 @@ export function AppShell({
   const currentBuildNarrowSidebarPinned =
     currentBuildNarrowSidebar &&
     sidebarOpen &&
-    (shellWidth === null ||
-      shellWidth >=
+    (availableShellWidth === null ||
+      availableShellWidth >=
         resolvedSidebarWidth + normalizedSidebarMinMainWidth);
   const sidebarModalOpen =
     sidebarOpen &&
     layoutMode === "narrow" &&
-    (narrowSidebarBehavior === "modal" ||
+    (resolvedNarrowSidebarBehavior === "modal" ||
       !currentBuildNarrowSidebarPinned);
   const sidePanelModalOpen =
     sidePanelOpen &&
@@ -1154,9 +1229,15 @@ export function AppShell({
         : appShellContentBoxWidth(shellRef.current);
     const liveShellWidth =
       measuredLiveShellWidth > 0
-        ? measuredLiveShellWidth
+        ? Math.max(
+            0,
+            measuredLiveShellWidth -
+              (navigationRailIsVisible
+                ? normalizedNavigationRailWidth
+                : 0),
+          )
         : shellWidth !== null && shellWidth > 0
-          ? shellWidth
+          ? availableShellWidth
           : null;
     const liveSidebarWidth =
       sidebarOpen && sidebar !== undefined && sidebar !== null
@@ -1271,9 +1352,15 @@ export function AppShell({
         : appShellContentBoxWidth(shellRef.current);
     const liveShellWidth =
       measuredLiveShellWidth > 0
-        ? measuredLiveShellWidth
+        ? Math.max(
+            0,
+            measuredLiveShellWidth -
+              (navigationRailIsVisible
+                ? normalizedNavigationRailWidth
+                : 0),
+          )
         : shellWidth !== null && shellWidth > 0
-          ? shellWidth
+          ? availableShellWidth
           : null;
     const liveResponsiveMaximum =
       layoutMode === "narrow" || liveShellWidth === null
@@ -1691,7 +1778,8 @@ export function AppShell({
       }
       data-side-panel-resizable={sidePanelResizable || undefined}
       data-side-panel-resizing={sidePanelResizing || undefined}
-      data-narrow-sidebar-behavior={narrowSidebarBehavior}
+      data-narrow-sidebar-behavior={resolvedNarrowSidebarBehavior}
+      data-navigation-rail={navigationRailIsVisible || undefined}
       data-sidebar-pinned={currentBuildNarrowSidebarPinned || undefined}
       data-sidebar-resizable={sidebarResizable || undefined}
       data-sidebar-resizing={sidebarResizing || undefined}
@@ -1715,6 +1803,14 @@ export function AppShell({
         </div>
       ) : null}
       <div className="codex-ui-app-shell__layout">
+        {navigationRailIsVisible ? (
+          <aside
+            aria-label={navigationRailLabel}
+            className="codex-ui-app-shell__navigation-rail"
+          >
+            {navigationRail}
+          </aside>
+        ) : null}
         <aside
           aria-hidden={!sidebarSurfaceVisible}
           aria-label={sidebarLabel}

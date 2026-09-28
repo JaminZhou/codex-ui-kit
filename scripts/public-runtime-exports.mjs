@@ -11,6 +11,7 @@ export const publicRuntimeExports = [
   "AgentThreadViewport",
   "AgentTurn",
   "AppNotificationRegion",
+  "AppPrimaryNavigationRail",
   "AppRouteOutlet",
   "AppServerCrashRecovery",
   "AppShell",

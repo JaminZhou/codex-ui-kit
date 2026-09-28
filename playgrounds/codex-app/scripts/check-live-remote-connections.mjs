@@ -91,6 +91,25 @@ try {
       }
 
       const row = route.locator(".codex-ui-remote-connections__row").filter({ hasText: "Loopback runner" });
+      try {
+        await row.waitFor({ state: "visible", timeout: 10000 });
+      } catch (error) {
+        const registryContents = await readFile(registryPath, "utf8").catch((readError) =>
+          JSON.stringify({ code: readError?.code, message: readError?.message }),
+        );
+        const routeState = await route.evaluate((element) => ({
+          html: element.innerHTML.slice(0, 4000),
+          status: element.getAttribute("data-status"),
+          text: element.innerText,
+        }));
+        console.error(JSON.stringify({
+          width,
+          action: "wait for persisted connection row",
+          registryContents,
+          routeState,
+        }));
+        throw error;
+      }
       const firstTestButton = row.getByRole("button", { name: "Test", exact: true });
       await clickWithFailureContext(firstTestButton, row, page, width, "initial test");
       await row.getByText("Connected", { exact: true }).waitFor();
