@@ -48,6 +48,18 @@ for the production channel, with installed version `26.924.22138` / build
 `11645`. This rules out a standard packaged desktop update being offered at
 that check time; it does not rule out staged account/server UI changes.
 
+A fresh production-channel update check on 2026-09-30 supersedes that updater
+status: the installed app is still `26.924.22138` / build `11645`, while
+`26.928.20755` / build `12246` is now available. The installed `app.asar`
+still has SHA-256
+`d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80`; the
+newer package has not been installed or inspected. Treat `26.928.20755` as a
+pending candidate, not as observed UI. Preserve the `26.924.22138` records as
+historical regression evidence, and begin the all-100-surface re-audit only
+after recording the installed package identity and confirming the runtime
+Renderer actually corresponds to that build. This updater check did not launch
+the app or create a CDP process.
+
 OpenAI's [Codex changelog](https://learn.chatgpt.com/docs/changelog) records
 Codex joining the ChatGPT desktop app in 26.707, including in-app editing and
 PR Chat, and later changes to plugin/settings and task-activity surfaces. Its
