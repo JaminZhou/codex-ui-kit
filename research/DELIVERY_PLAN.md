@@ -34,6 +34,15 @@ reported screen has not yet been tied to that exact package, so do not treat
 the 26.924 candidate as proof of the UI Jamin is seeing, and do not extend its
 replay fixtures as if they were new-build observations.
 
+A 2026-09-29 host-path/process check found only `/Applications/ChatGPT.app`
+under the standard system and user Applications locations; Spotlight returned
+the same bundle, and the running desktop executable resolves to that package.
+Its bundle metadata still reports `26.924.22138` / build `11645`. This rules
+out a second normally installed ChatGPT/Codex app as the obvious local source
+of the visual difference, but cannot distinguish a server-side or account-
+scoped rollout. The reported screen's About/build identity is still required
+before promoting any new observations.
+
 OpenAI's [Codex changelog](https://learn.chatgpt.com/docs/changelog) records
 Codex joining the ChatGPT desktop app in 26.707, including in-app editing and
 PR Chat, and later changes to plugin/settings and task-activity surfaces. Its
@@ -58,14 +67,46 @@ reached:
   privacy and lifecycle states.
 - Check Browser site-tool/WebMCP discovery, approval, execution, and resulting
   thread activity where available.
+- Check whether the Apple Messages plugin is exposed in this Codex account and
+  how discovery/detail, enablement, recipient/message confirmation, and
+  read/search/prepare/send outcomes appear. Map its catalog path to
+  `integrations.plugins` and its turn/approval states to the existing thread
+  tool/approval surfaces unless observation proves a distinct route. Use only
+  synthetic test content; do not inspect or send personal Messages data.
+- Re-audit shared thread snapshots end to end: the thread-level share action,
+  copy/open behavior, immutable read-only snapshot, personal-versus-workspace
+  access, and the Shared links revoke path. Keep this as a candidate until the
+  current Codex route is reached; do not equate a package label with a usable
+  share flow.
+- Re-audit sidebar Activity and unified Pinned behavior, including entry-point
+  ownership, attention ordering, pin/unpin, and whether the desktop state stays
+  synchronized with the companion iOS surface. Mobile-only details remain out
+  of the desktop visual denominator.
+- Re-audit multi-folder local projects and cross-repository Review: primary vs
+  secondary folder semantics, edit/remove flows, repository grouping, Review
+  entry and diff navigation. Treat these as state/ownership changes to existing
+  workspace rows unless the current build exposes a separate destination.
+- Re-audit Sources actions for opening a file in the workspace and downloading
+  files without an in-app preview, plus current model-picker availability and
+  unavailable/deprecated model states. Do not infer a visible warning or
+  disabled state from a public retirement notice alone.
+- Check whether Sites co-editing or editable-URL controls are reachable from
+  Codex at all; keep them as scope candidates rather than adding desktop
+  surfaces based only on ChatGPT Work release notes.
 
 Record absent, unavailable, rollout-gated, or policy-blocked states explicitly;
 do not infer them from public release notes or from a different account/build.
 
 A read-only string-presence scan of the installed `26.924.22138` package found
 candidate labels for GPT-6 Sol/Luna, Quick Chat, Show pet, Appshot destination,
-Computer History, and WebMCP/site tools. The inventory records these as package
-evidence only; two not-sampled P2 cross-layer rows now track Appshot capture
+Computer History, and WebMCP/site tools. The scan now also checks an Apple
+Messages label marker; it is absent from this package even though the August
+20 release note describes Apple Messages in the macOS desktop app and Codex.
+That negative string result does not establish that the integration is
+unavailable, because catalog content and rollout can be account-scoped. Keep
+the check mapped to existing plugin and thread-tool/approval surfaces unless a
+distinct route is observed. The inventory records positive markers as package
+evidence only; two not-sampled P2 cross-layer rows track Appshot capture
 routing and Computer History. The version-filtered audit reports these package
 fragments separately from the 33 runtime-observation surfaces. They do not
 increase runtime-observation counts or establish that a feature is reachable
