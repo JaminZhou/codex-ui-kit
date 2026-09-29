@@ -58,6 +58,11 @@ try {
   const initialization = await client.connect();
   assert.equal(client.state, "connected");
   assert.ok(initialization.userAgent, "App Server initialize must return its user agent.");
+  const mcpStatus = await client.call("mcpServerStatus/list", { detail: "full" });
+  assert.ok(
+    Array.isArray(mcpStatus.data),
+    "App Server mcpServerStatus/list must return a data array.",
+  );
 
   process.stdout.write(`${JSON.stringify({
     codexCliVersion: version,
@@ -65,6 +70,7 @@ try {
     appServerState: client.state,
     protocolValidation: "strict",
     initializationUserAgent: initialization.userAgent,
+    configuredMcpServerCount: mcpStatus.data.length,
     credentialHome: "isolated temporary CODEX_HOME",
     modelTurnStarted: false,
   })}\n`);

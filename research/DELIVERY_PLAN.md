@@ -2799,10 +2799,27 @@ and an explicitly supplied `0.159.0` runtime. It uses an isolated temporary
 `CODEX_HOME`, makes no model turn, and is invoked by the playground's
 `check:protocol`; `CODEX_UI_KIT_APP_SERVER_BINARY` and
 `CODEX_UI_KIT_APP_SERVER_EXPECTED_VERSION` allow an exact alternate-binary
-check. This proves only version parsing plus App Server initialization for
-those two binaries, not method-by-method compatibility, the latest runtime in
-every live scenario, or installed-Codex UI parity. The client dependency remains
-exactly pinned until the broader protocol matrix is refreshed.
+check. It proves version parsing, App Server initialization, and a read-only
+`mcpServerStatus/list` request for those two binaries; it does not prove
+method-by-method compatibility, the latest runtime in every live scenario, or
+installed-Codex UI parity. The client dependency remains exactly pinned until
+the broader protocol matrix is refreshed.
+
+A read-only schema comparison generated from those exact CLI packages found
+that App Server v2 grew from 740 to 789 named definitions between `0.153.4`
+and `0.159.0`: 51 definitions were added, 2 removed, and 42 changed. The
+request union grew from 155 to 167 methods, adding Gateway OAuth
+(`account/gatewayOAuth/{cancel,login,read}`), `memory/status`,
+`rollout/compress`, thread attachments (`thread/attachment/{add,list,remove}`),
+and user verification (`userVerification/{cancel,delete,enroll,status,verify}`);
+`thread/rollback` was removed. The server-notification union gained
+`account/gatewayOAuth/changed` and `thread/attachment/updated`. This is a
+schema-level change inventory, not proof that every method is callable or
+enabled for a particular account. The smoke's one read-only MCP status call
+still cannot stand in for compatibility coverage: next, add explicit method
+and notification fixtures for the changed thread, OAuth, user-verification,
+and attachment contracts, then run the safe read-only subset against both
+pinned and current CLI runtimes before changing the client pin.
 
 Live progress (2026-09-08): actual Composer submission, file creation, Node
 assertion, and raw-added-file Review now pass at 1180/720px. The command-oriented
