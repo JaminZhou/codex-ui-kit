@@ -43,6 +43,11 @@ of the visual difference, but cannot distinguish a server-side or account-
 scoped rollout. The reported screen's About/build identity is still required
 before promoting any new observations.
 
+The desktop updater was also checked on 2026-09-29 and returned `up_to_date`
+for the production channel, with installed version `26.924.22138` / build
+`11645`. This rules out a standard packaged desktop update being offered at
+that check time; it does not rule out staged account/server UI changes.
+
 OpenAI's [Codex changelog](https://learn.chatgpt.com/docs/changelog) records
 Codex joining the ChatGPT desktop app in 26.707, including in-app editing and
 PR Chat, and later changes to plugin/settings and task-activity surfaces. Its
@@ -53,7 +58,8 @@ identify audit leads, but do not prove that a capability is enabled for this
 local account/build or specify desktop geometry and state-by-state behavior.
 
 A 2026-09-29 changelog cross-check found the newest dated Codex CLI entry is
-September 26, version 0.157.1; it does not document a desktop renderer change.
+September 28, version 0.158.0; its CLI/TUI, MCP, exec-server, and image-editing
+notes do not document a desktop renderer change.
 The desktop-specific September 25 entry is a macOS security update for
 26.924.20706, not a documented UI redesign. The public changelog therefore
 does not explain the reported large visual change. The unchanged installed
@@ -215,8 +221,9 @@ regional-pixel acceptance.
   overlays, and Escape/focus restoration. It uses redacted placeholders for
   unknown content and does not add product-observation coverage;
   Browser against the installed product, product Electron, and regional pixels
-  remain unverified. A read-only bundle check on 2026-09-29 confirms the same
-  version, build, and ASAR hash are still installed. That day, the full local
+  remain unverified. A read-only bundle check and the desktop updater check on
+  2026-09-29 confirm the same version, build, and ASAR hash are installed and
+  no standard desktop update is offered. That day, the full local
   `pnpm check` passed (root 149 files / 1,408 tests, Electron 2 / 7, playground
   47 / 466), and `pnpm check:codex-app:acceptance` passed, including 594 CDP
   lifecycle frames and 594 visual-contract frames. The acceptance run exposed
