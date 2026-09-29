@@ -15,7 +15,7 @@
     "start": "electron .",
     "typecheck": "tsc --noEmit && tsc -p electron/tsconfig.json --noEmit",
     "test": "vitest run tests",
-    "check:protocol": "node scripts/check-protocol-traces.mjs",
+    "check:protocol": "node scripts/check-protocol-traces.mjs && node scripts/check-app-server-runtime-compat.mjs",
     "check:harness": "node scripts/check-electron-harness.mjs",
     "check:cdp": "node scripts/check-cdp-contract.mjs && node scripts/check-current-primary-navigation-26-924.mjs && node scripts/check-current-composer-26-924.mjs",
     "check:document-preview-electron": "node scripts/check-document-preview-electron.mjs",

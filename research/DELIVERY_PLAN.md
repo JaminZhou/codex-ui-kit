@@ -2793,6 +2793,17 @@ dependencies in the public root package.
 Exit: the demo can reproduce a complete coding workflow in replay and live
 local modes with the same UI state model.
 
+A 2026-09-29 version-compatibility smoke now connects the pinned client under
+strict protocol validation to both its bundled `@openai/codex@0.153.4` runtime
+and an explicitly supplied `0.159.0` runtime. It uses an isolated temporary
+`CODEX_HOME`, makes no model turn, and is invoked by the playground's
+`check:protocol`; `CODEX_UI_KIT_APP_SERVER_BINARY` and
+`CODEX_UI_KIT_APP_SERVER_EXPECTED_VERSION` allow an exact alternate-binary
+check. This proves only version parsing plus App Server initialization for
+those two binaries, not method-by-method compatibility, the latest runtime in
+every live scenario, or installed-Codex UI parity. The client dependency remains
+exactly pinned until the broader protocol matrix is refreshed.
+
 Live progress (2026-09-08): actual Composer submission, file creation, Node
 assertion, and raw-added-file Review now pass at 1180/720px. The command-oriented
 Terminal follow-up reaches real success/failure, stdin, stop and mode-change
