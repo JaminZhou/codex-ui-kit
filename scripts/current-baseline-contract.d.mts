@@ -43,6 +43,14 @@ export const currentLatestInstalledCandidateBaselineFingerprint: Readonly<{
   chromiumVersion: string;
 }>;
 
+export const currentObservedBuildCandidateBaselineFingerprint: Readonly<{
+  appAsarBytes: number;
+  appAsarSha256: string;
+  appVersion: string;
+  buildNumber: string;
+  chromiumVersion: string;
+}>;
+
 export const currentAccountMenuCandidateFingerprints: Readonly<{
   promoted: typeof currentBaselineFingerprint;
   "26.917.71314": typeof currentLatestInstalledCandidateBaselineFingerprint;
@@ -61,6 +69,17 @@ export function selectCurrentMainCandidate<T extends CurrentMainCandidate>(
 ): T;
 
 export function assertCurrentBaselineRecord(
+  record: any,
+  expectedFingerprint?: Readonly<{
+    appAsarBytes: number;
+    appAsarSha256: string;
+    appVersion: string;
+    buildNumber: string;
+    chromiumVersion: string;
+  }>,
+): void;
+
+export function assertCurrentBaselineObservationRecord(
   record: any,
   expectedFingerprint?: Readonly<{
     appAsarBytes: number;
@@ -97,7 +116,17 @@ export function resolveCurrentBaselineOutputPath(
   outputPath: string,
 ): string;
 
+export function resolveCurrentBaselineCandidateOutputPath(
+  outputPath: string,
+): string;
+
 export function writeCurrentBaselineOutput(
+  profilePath: string,
+  outputPath: string,
+  contents: string,
+): Promise<void>;
+
+export function writeCurrentBaselineCandidateOutput(
   profilePath: string,
   outputPath: string,
   contents: string,

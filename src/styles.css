@@ -5033,6 +5033,25 @@ button.codex-ui-login-page__mark {
   padding-block-start: var(--codex-ui-app-window-chrome-height);
 }
 
+.codex-ui-app-shell[data-navigation-rail][data-window-chrome]
+  .codex-ui-app-shell__window-chrome {
+  height: var(--codex-ui-app-navigation-rail-window-chrome-height);
+}
+
+.codex-ui-app-shell[data-navigation-rail][data-window-chrome]
+  .codex-ui-app-shell__layout {
+  height: calc(
+    100% - var(--codex-ui-app-navigation-rail-window-chrome-height) -
+      var(--codex-ui-app-navigation-rail-content-inset-after)
+  );
+  margin-block-start: var(--codex-ui-app-navigation-rail-window-chrome-height);
+}
+
+.codex-ui-app-shell[data-navigation-rail][data-window-chrome]
+  .codex-ui-app-shell__main {
+  padding-block-start: 0;
+}
+
 .codex-ui-app-shell[data-window-chrome]
   .codex-ui-app-shell__side-panel {
   z-index: 40;
@@ -5693,11 +5712,13 @@ button.codex-ui-login-page__mark {
 }
 
 .codex-ui-app-shell__layout {
+  --codex-ui-app-shell-navigation-rail-track: 0rem;
   --codex-ui-app-shell-sidebar-track: 0rem;
   --codex-ui-app-shell-side-panel-track: 0rem;
   --codex-ui-app-shell-bottom-panel-track: 0rem;
   display: grid;
   grid-template-columns:
+    var(--codex-ui-app-shell-navigation-rail-track)
     var(--codex-ui-app-shell-sidebar-track)
     minmax(0, 1fr)
     var(--codex-ui-app-shell-side-panel-track);
@@ -5709,6 +5730,63 @@ button.codex-ui-login-page__mark {
   min-width: 0;
   overflow: hidden;
   position: relative;
+}
+
+.codex-ui-app-primary-navigation-rail {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.5rem 0.5rem 0.25rem;
+  width: 100%;
+}
+
+.codex-ui-app-primary-navigation-rail__items,
+.codex-ui-app-primary-navigation-rail__footer {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--codex-ui-app-navigation-rail-gap);
+  min-width: 0;
+  width: 100%;
+}
+
+.codex-ui-app-primary-navigation-rail__footer {
+  margin-block-start: auto;
+}
+
+.codex-ui-app-shell[data-navigation-rail]
+  .codex-ui-app-primary-navigation-rail__items
+  .codex-ui-icon-button,
+.codex-ui-app-shell[data-navigation-rail]
+  .codex-ui-app-primary-navigation-rail__footer
+  .codex-ui-icon-button {
+  border-radius: 0.78125rem;
+  flex: 0 0 var(--codex-ui-app-navigation-rail-item-size);
+  height: var(--codex-ui-app-navigation-rail-item-size);
+  width: var(--codex-ui-app-navigation-rail-item-size);
+}
+
+.codex-ui-app-shell[data-navigation-rail]
+  .codex-ui-app-primary-navigation-rail__items
+  .codex-ui-icon-button__icon,
+.codex-ui-app-shell[data-navigation-rail]
+  .codex-ui-app-primary-navigation-rail__footer
+  .codex-ui-icon-button__icon {
+  height: var(--codex-ui-app-navigation-rail-icon-size);
+  width: var(--codex-ui-app-navigation-rail-icon-size);
+}
+
+.codex-ui-app-shell[data-navigation-rail]
+  .codex-ui-app-shell__layout {
+  --codex-ui-app-shell-navigation-rail-track: var(
+    --codex-ui-app-navigation-rail-width
+  );
 }
 
 .codex-ui-app-shell[data-sidebar-open] .codex-ui-app-shell__layout {
@@ -5734,6 +5812,7 @@ button.codex-ui-login-page__mark {
 }
 
 .codex-ui-app-shell__sidebar,
+.codex-ui-app-shell__navigation-rail,
 .codex-ui-app-shell__main,
 .codex-ui-app-shell__side-panel,
 .codex-ui-app-shell__bottom-panel {
@@ -5742,10 +5821,17 @@ button.codex-ui-login-page__mark {
   overflow: hidden;
 }
 
+.codex-ui-app-shell__navigation-rail {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  position: relative;
+  z-index: 5;
+}
+
 .codex-ui-app-shell__sidebar {
   background: var(--codex-ui-background-surface-under);
   border-inline-end: 1px solid var(--codex-ui-border);
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1 / 3;
   visibility: hidden;
   z-index: 10;
@@ -5759,7 +5845,7 @@ button.codex-ui-login-page__mark {
   align-self: stretch;
   background: transparent;
   cursor: col-resize;
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1 / 3;
   justify-self: end;
   outline: none;
@@ -5861,7 +5947,10 @@ button.codex-ui-login-page__mark {
   height: 1rem;
   inset-block-end: var(--codex-ui-app-shell-bottom-panel-track);
   inset-inline-end: 0;
-  inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
+  inset-inline-start: calc(
+    var(--codex-ui-app-shell-navigation-rail-track) +
+      var(--codex-ui-app-shell-sidebar-track)
+  );
   outline: none;
   position: absolute;
   touch-action: none;
@@ -5897,7 +5986,7 @@ button.codex-ui-login-page__mark {
 }
 
 .codex-ui-app-shell__main {
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   position: relative;
   z-index: 1;
@@ -5906,7 +5995,7 @@ button.codex-ui-login-page__mark {
 .codex-ui-app-shell__side-panel {
   background: var(--codex-ui-background-surface);
   border-inline-start: 1px solid var(--codex-ui-border);
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 1;
   visibility: hidden;
   z-index: 20;
@@ -5929,7 +6018,10 @@ button.codex-ui-login-page__mark {
   grid-column: 1 / -1;
   grid-row: auto;
   inset-inline-end: 0;
-  max-width: calc(100% - var(--codex-ui-app-shell-sidebar-track));
+  max-width: calc(
+    100% - var(--codex-ui-app-shell-navigation-rail-track) -
+      var(--codex-ui-app-shell-sidebar-track)
+  );
   position: absolute;
   top: 0;
   transform: translateX(100%);
@@ -5954,7 +6046,10 @@ button.codex-ui-login-page__mark {
   .codex-ui-app-shell__backdrop[data-backdrop="side-panel"] {
   bottom: var(--codex-ui-app-shell-bottom-panel-track);
   display: block;
-  inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
+  inset-inline-start: calc(
+    var(--codex-ui-app-shell-navigation-rail-track) +
+      var(--codex-ui-app-shell-sidebar-track)
+  );
   opacity: 1;
   z-index: 50;
 }
@@ -5962,7 +6057,7 @@ button.codex-ui-login-page__mark {
 .codex-ui-app-shell__bottom-panel {
   background: var(--codex-ui-background-surface);
   border-block-start: 1px solid var(--codex-ui-border);
-  grid-column: 2 / 4;
+  grid-column: 3 / 5;
   grid-row: 2;
   position: relative;
   visibility: hidden;
@@ -7344,16 +7439,17 @@ button.codex-ui-login-page__mark {
 
   .codex-ui-app-shell__layout {
     grid-template-columns:
+      var(--codex-ui-app-shell-navigation-rail-track)
       var(--codex-ui-app-shell-sidebar-track)
       minmax(0, 1fr);
   }
 
   .codex-ui-app-shell__main {
-    grid-column: 2;
+    grid-column: 3;
   }
 
   .codex-ui-app-shell__bottom-panel {
-    grid-column: 2;
+    grid-column: 3;
   }
 
   .codex-ui-app-shell__side-panel {
@@ -7363,7 +7459,10 @@ button.codex-ui-login-page__mark {
     grid-column: 1 / -1;
     grid-row: auto;
     inset-inline-end: 0;
-    max-width: calc(100% - var(--codex-ui-app-shell-sidebar-track));
+    max-width: calc(
+      100% - var(--codex-ui-app-shell-navigation-rail-track) -
+        var(--codex-ui-app-shell-sidebar-track)
+    );
     position: absolute;
     top: 0;
     transform: translateX(100%);
@@ -7387,7 +7486,10 @@ button.codex-ui-login-page__mark {
     .codex-ui-app-shell__backdrop[data-backdrop="side-panel"] {
     bottom: var(--codex-ui-app-shell-bottom-panel-track);
     display: block;
-    inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
+    inset-inline-start: calc(
+      var(--codex-ui-app-shell-navigation-rail-track) +
+        var(--codex-ui-app-shell-sidebar-track)
+    );
     opacity: 1;
     z-index: 50;
   }
@@ -7395,16 +7497,20 @@ button.codex-ui-login-page__mark {
 
 @container codex-ui-app-shell (max-width: 45rem) {
   .codex-ui-app-shell__layout {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns:
+      var(--codex-ui-app-shell-navigation-rail-track)
+      minmax(0, 1fr);
   }
 
   .codex-ui-app-shell__main,
   .codex-ui-app-shell__bottom-panel {
-    grid-column: 1;
+    grid-column: 2;
   }
 
   .codex-ui-app-shell__bottom-panel-resizer {
-    inset-inline-start: 0;
+    inset-inline-start: var(
+      --codex-ui-app-shell-navigation-rail-track
+    );
   }
 
   .codex-ui-app-shell__sidebar {
@@ -7412,8 +7518,12 @@ button.codex-ui-login-page__mark {
     box-shadow: var(--codex-ui-shadow-2xl);
     grid-column: auto;
     grid-row: auto;
-    inset-inline-start: 0;
-    max-width: calc(100% - 3rem);
+    inset-inline-start: var(
+      --codex-ui-app-shell-navigation-rail-track
+    );
+    max-width: calc(
+      100% - var(--codex-ui-app-shell-navigation-rail-track) - 3rem
+    );
     position: absolute;
     top: 0;
     transform: translateX(-100%);
@@ -7435,25 +7545,35 @@ button.codex-ui-login-page__mark {
   .codex-ui-app-shell[data-sidebar-open]
     .codex-ui-app-shell__backdrop[data-backdrop="sidebar"] {
     display: block;
+    inset-inline-start: var(
+      --codex-ui-app-shell-navigation-rail-track
+    );
     opacity: 1;
     z-index: 70;
   }
 
   .codex-ui-app-shell__side-panel {
-    max-width: 100%;
+    max-width: calc(
+      100% - var(--codex-ui-app-shell-navigation-rail-track)
+    );
   }
 
   .codex-ui-app-shell[data-side-panel-overlay-modal][data-side-panel-open]
     .codex-ui-app-shell__backdrop[data-backdrop="side-panel"] {
-    inset-inline-start: 0;
+    inset-inline-start: var(
+      --codex-ui-app-shell-navigation-rail-track
+    );
   }
 
   .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__layout {
     grid-template-columns:
+      var(--codex-ui-app-shell-navigation-rail-track)
       min(
         var(--codex-ui-app-shell-sidebar-track),
-        calc(100% - 3rem)
+        calc(
+          100% - var(--codex-ui-app-shell-navigation-rail-track) - 3rem
+        )
       )
       minmax(3rem, 1fr);
   }
@@ -7462,14 +7582,14 @@ button.codex-ui-login-page__mark {
     .codex-ui-app-shell__main,
   .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__bottom-panel {
-    grid-column: 2;
+    grid-column: 3;
   }
 
   .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__sidebar {
     bottom: auto;
     box-shadow: none;
-    grid-column: 1;
+    grid-column: 2;
     grid-row: 1 / 3;
     inset-inline-start: auto;
     max-width: none;
@@ -7488,12 +7608,18 @@ button.codex-ui-login-page__mark {
 
   .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]
     .codex-ui-app-shell__side-panel {
-    max-width: calc(100% - var(--codex-ui-app-shell-sidebar-track));
+    max-width: calc(
+      100% - var(--codex-ui-app-shell-navigation-rail-track) -
+        var(--codex-ui-app-shell-sidebar-track)
+    );
   }
 
   .codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned][data-side-panel-overlay-modal][data-side-panel-open]
     .codex-ui-app-shell__backdrop[data-backdrop="side-panel"] {
-    inset-inline-start: var(--codex-ui-app-shell-sidebar-track);
+    inset-inline-start: calc(
+      var(--codex-ui-app-shell-navigation-rail-track) +
+        var(--codex-ui-app-shell-sidebar-track)
+    );
   }
 }
 

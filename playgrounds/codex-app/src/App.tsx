@@ -1,4 +1,5 @@
 import { PdfWorkspacePreview } from "./PdfWorkspacePreview";
+import { CurrentComposer26924 } from "./CurrentComposer26924";
 import {
   ActivityTimeline,
   AgentComposer,
@@ -6,6 +7,7 @@ import {
   AgentMessage,
   AgentTurn,
   AppShell,
+  AppPrimaryNavigationRail,
   AppNotificationRegion,
   AppRouteOutlet,
   AppServerCrashRecovery,
@@ -762,6 +764,8 @@ function querySelection() {
     "help-menu",
     "help-menu-current-26-915",
     "primary-navigation-current-26-915",
+    "primary-navigation-current-26-924",
+    "composer-current-26-924",
     "project-navigation-current-26-915",
     "project-group-lifecycle-current-26-915",
     "project-actions-current-26-915",
@@ -800,6 +804,23 @@ function querySelection() {
       : params.get("layout") === "narrow"
         ? ("narrow" as const)
         : undefined;
+  const requestedPrimaryRoute = params.get("primaryRoute");
+  const primaryRoute = ["projects", "library", "images"].includes(
+    requestedPrimaryRoute ?? "",
+  )
+    ? (requestedPrimaryRoute as "projects" | "library" | "images")
+    : null;
+  const requestedCurrentPrimaryRouteShell = params.get(
+    "currentPrimaryRouteShell",
+  );
+  const currentPrimaryRouteShell = [
+    "customize",
+    "settings-notifications",
+  ].includes(requestedCurrentPrimaryRouteShell ?? "")
+    ? (requestedCurrentPrimaryRouteShell as
+        | "customize"
+        | "settings-notifications")
+    : null;
   const view: DemoView =
     params.get("view") === "pull-request"
       ? "pull-request"
@@ -842,8 +863,10 @@ function querySelection() {
   return {
     capture,
     currentSidebar,
+    currentPrimaryRouteShell,
     frame,
     layoutMode,
+    primaryRoute,
     scenarioId,
     shellState,
     sidebarState,
@@ -5348,7 +5371,15 @@ export function App() {
         "workspace-mcp-settings-current-26-915",
       ) &&
       initialSelection.sidebarState !== "hidden" &&
-      ((initialSelection.capture &&
+      !(
+        initialSelection.view === "projects" &&
+        initialSelection.sidebarState ===
+          "primary-navigation-current-26-924"
+      ) &&
+      (initialSelection.sidebarState ===
+        "primary-navigation-current-26-924" ||
+        initialSelection.sidebarState === "composer-current-26-924" ||
+        (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
         initialSelection.frame !== "workspace-compact-ready" &&
         initialSelection.frame !== "mcp-current-integration-recovered" &&
@@ -7425,6 +7456,34 @@ export function App() {
     initialSelection.sidebarState === "help-menu-current-26-915";
   const currentSidebarPrimaryNavigation26915Replay =
     initialSelection.sidebarState === "primary-navigation-current-26-915";
+  const currentComposer26924Replay =
+    initialSelection.sidebarState === "composer-current-26-924" &&
+    view === "shell";
+  const currentSidebarPrimaryNavigation26924Replay =
+    initialSelection.sidebarState === "primary-navigation-current-26-924" ||
+    currentComposer26924Replay;
+  const currentPrimaryRailOnlyRoute26924Replay =
+    currentSidebarPrimaryNavigation26924Replay && view === "projects"
+      ? (initialSelection.primaryRoute ?? "projects")
+      : null;
+  const currentPrimaryRailOnlyRouteLabel26924 =
+    currentPrimaryRailOnlyRoute26924Replay === "library"
+      ? "Library"
+      : currentPrimaryRailOnlyRoute26924Replay === "images"
+        ? "Images"
+        : "Projects";
+  const currentPrimaryRouteShell26924Replay =
+    currentSidebarPrimaryNavigation26924Replay &&
+    view === "shell" &&
+    initialSelection.currentPrimaryRouteShell !== null;
+  const currentPrimaryHomeShellOnly26924Replay =
+    currentSidebarPrimaryNavigation26924Replay &&
+    view === "shell" &&
+    !currentPrimaryRouteShell26924Replay;
+  const currentPrimaryRouteShellLabel26924 =
+    initialSelection.currentPrimaryRouteShell === "settings-notifications"
+      ? "Settings → Notifications"
+      : "Customize";
   const currentSidebarProjectNavigation26915Replay =
     initialSelection.sidebarState === "project-navigation-current-26-915";
   const currentSidebarProjectGroupLifecycle26915Replay =
@@ -8536,6 +8595,73 @@ export function App() {
       )}
     </AppSidebar>
   );
+
+  const currentPrimaryNavigationRail26924 =
+    currentSidebarPrimaryNavigation26924Replay ? (
+      <AppPrimaryNavigationRail
+        className="demo-current-primary-navigation-rail"
+        data-current-build="26.924.22138"
+        data-visual-assets="not-captured-for-current-build"
+        footer={
+          <>
+            <IconButton
+              data-visual-asset-status="pending-26.924-capture"
+              icon={
+                <span
+                  aria-hidden="true"
+                  data-current-build-icon-status="pending-26.924-capture"
+                />
+              }
+              label="Help menu"
+            />
+            <IconButton
+              data-visual-asset-status="pending-26.924-capture"
+              icon={
+                <span
+                  aria-hidden="true"
+                  data-current-build-icon-status="pending-26.924-capture"
+                />
+              }
+              label="Open profile menu"
+            />
+          </>
+        }
+        navigationLabel="Primary navigation"
+      >
+        {[
+          "Home",
+          "Scheduled",
+          "Library",
+          "Images",
+          "Customize",
+          "Explore",
+        ].map((label) => (
+          <IconButton
+            aria-current={
+              view === "shell" &&
+              initialSelection.currentPrimaryRouteShell === null &&
+              label === "Home"
+                ? "page"
+                : undefined
+            }
+            data-visual-asset-status="pending-26.924-capture"
+            icon={
+              <span
+                aria-hidden="true"
+                data-current-build-icon-status="pending-26.924-capture"
+              />
+            }
+            key={label}
+            label={label}
+            pressed={
+              view === "shell" &&
+              initialSelection.currentPrimaryRouteShell === null &&
+              label === "Home"
+            }
+          />
+        ))}
+      </AppPrimaryNavigationRail>
+    ) : undefined;
 
   const composerIsRunning =
     mode === "live"
@@ -15853,37 +15979,58 @@ export function App() {
     </div>
   );
   const shellRoute = (
-    <AppRouteOutlet
-      actions={
-        shellState === "offline" || shellState === "error"
-          ? [
-              {
-                label: "Try again",
-                onClick: () => {
-                  setShellState("loading");
-                  window.setTimeout(() => {
-                    setShellState("ready");
-                    setShellNotificationVisible(true);
-                  }, 240);
+    currentComposer26924Replay ? (
+      <CurrentComposer26924 />
+    ) : currentPrimaryHomeShellOnly26924Replay ? (
+      <section
+        aria-label="Home content pending current-build capture"
+        className="demo-current-primary-home-pending"
+        data-content-status="not-observed-on-26-924.22138"
+      >
+        Home / New chat content has not been fully captured for build 26.924.22138.
+      </section>
+    ) : currentPrimaryRouteShell26924Replay ? (
+      <section
+        aria-label={`${currentPrimaryRouteShellLabel26924} route body not observed on 26.924.22138`}
+        className="demo-current-primary-route-pending"
+        data-content-status="not-observed-on-26-924.22138"
+        data-route-shell={initialSelection.currentPrimaryRouteShell ?? undefined}
+      >
+        {currentPrimaryRouteShellLabel26924} route body has not been observed for build 26.924.22138.
+      </section>
+    ) : (
+      <AppRouteOutlet
+        actions={
+          shellState === "offline" || shellState === "error"
+            ? [
+                {
+                  label: "Try again",
+                  onClick: () => {
+                    setShellState("loading");
+                    window.setTimeout(() => {
+                      setShellState("ready");
+                      setShellNotificationVisible(true);
+                    }, 240);
+                  },
+                  primary: true,
                 },
-                primary: true,
-              },
-            ]
-          : []
-      }
-      aria-label="Pull requests route"
-      description={
-        shellState === "loading"
-          ? "Refreshing pull requests…"
-          : undefined
-      }
-      heading={
-        shellState === "loading" ? "Loading pull requests" : undefined
-      }
-      status={shellState}
-    >
-      {shellRouteContent}
-    </AppRouteOutlet>
+              ]
+            : []
+        }
+        aria-label="Pull requests route"
+        description={
+          shellState === "loading"
+            ? "Refreshing pull requests…"
+            : undefined
+        }
+        heading={
+          shellState === "loading" ? "Loading pull requests" : undefined
+        }
+        status={shellState}
+      >
+        {shellRouteContent}
+      </AppRouteOutlet>
+    )
   );
   const onboardingRoute = (
     <div
@@ -18748,6 +18895,24 @@ export function App() {
       data-current-sidebar-primary-navigation-26-915={
         currentSidebarPrimaryNavigation26915Replay || undefined
       }
+      data-current-primary-navigation-26-924={
+        currentSidebarPrimaryNavigation26924Replay || undefined
+      }
+      data-current-primary-projects-shell-26-924={
+        currentPrimaryRailOnlyRoute26924Replay === "projects" || undefined
+      }
+      data-current-primary-rail-only-route-26-924={
+        currentPrimaryRailOnlyRoute26924Replay || undefined
+      }
+      data-current-primary-home-shell-26-924={
+        currentPrimaryHomeShellOnly26924Replay || undefined
+      }
+      data-current-primary-route-shell-26-924={
+        currentPrimaryRouteShell26924Replay
+          ? initialSelection.currentPrimaryRouteShell ?? undefined
+          : undefined
+      }
+      data-current-composer-26-924={currentComposer26924Replay || undefined}
       data-current-sidebar-project-navigation-26-915={
         currentSidebarProjectNavigation26915Replay || undefined
       }
@@ -19050,6 +19215,9 @@ export function App() {
         }
         mainRole={workspaceShowsSettings ? "region" : "main"}
         narrowSidebarBehavior="current-build"
+        navigationRail={currentPrimaryNavigationRail26924}
+        navigationRailLabel="Application navigation rail"
+        navigationRailWidth={52}
         onSidebarOpenChange={setSidebarOpen}
         onSidePanelOpenChange={
           isCurrentPdfReplay ? setPdfOpen : view === "pull-request"
@@ -19216,6 +19384,8 @@ export function App() {
         sidebarWidth={
           view === "plugins"
             ? 322.875
+            : currentSidebarPrimaryNavigation26924Replay
+              ? 269.875
             : currentSidebarHelp26915Replay ||
                 currentSidebarPrimaryNavigation26915Replay ||
                 currentSidebarProjectNavigation26915Replay ||
@@ -19258,7 +19428,8 @@ export function App() {
         sidebarOpen={
           view === "onboarding" ||
           isCurrentPdfReplay ||
-          workspacePage === "connections-settings"
+          workspacePage === "connections-settings" ||
+          currentPrimaryRailOnlyRoute26924Replay
             ? false
             : sidebarOpen
         }
@@ -19327,7 +19498,7 @@ export function App() {
                     : undefined
               }
               endActions={
-                view === "projects" ? (
+                currentPrimaryRailOnlyRoute26924Replay ? undefined : view === "projects" ? (
                   <Button
                     className="demo-projects-create"
                     disabled={projectCreationStatus === "selecting"}
@@ -19401,7 +19572,7 @@ export function App() {
                   : undefined
               }
               sidebarAction={
-                workspaceShowsSettings
+                workspaceShowsSettings || currentPrimaryRailOnlyRoute26924Replay
                   ? undefined
                   : {
                       "aria-expanded": sidebarOpen,
@@ -19448,7 +19619,18 @@ export function App() {
         ) : view === "pull-request" ? (
           mode === "live" ? livePullRequestRoute.index : pullRequestIndex
         ) : view === "projects" ? (
-          projectsRoute
+          currentPrimaryRailOnlyRoute26924Replay ? (
+            <section
+              aria-label={`${currentPrimaryRailOnlyRouteLabel26924} content pending current-build capture`}
+              className="demo-current-primary-projects-pending"
+              data-content-status="not-observed-on-26-924.22138"
+              data-primary-route={currentPrimaryRailOnlyRoute26924Replay}
+            >
+              {currentPrimaryRailOnlyRouteLabel26924} page content has not been captured for build 26.924.22138.
+            </section>
+          ) : (
+            projectsRoute
+          )
         ) : view === "automations" ? (
           scheduledTasksRoute
         ) : view === "sites" ? (

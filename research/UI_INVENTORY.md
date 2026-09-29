@@ -56,11 +56,61 @@ host-owned and are intentionally not claimed by the playground.
 - Package and scoped shell lifecycle sampled on 2026-09-12
 - `app.asar` SHA-256:
   `58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0`
+- The latest installed candidate is Codex Desktop `26.924.22138` (`11645`),
+  Chromium `154.0.8037.57`, ASAR SHA-256
+  `d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80`.
+  The candidate-only shell observation is
+  [`current-baseline-26.924.22138-candidate.json`](current-baseline-26.924.22138-candidate.json),
+  with limits in [`26.924.22138.md`](26.924.22138.md). It records a 52px
+  icon rail plus a 269.88px content sidebar, an explicit collapsed state that
+  retains the icon rail, and a 712×44px empty New chat editor at 1180×820. The
+  follow-up route probe confirms Help as `Help menu`, Explore → Projects/GPTs,
+  Profile → Settings, 14 reachable Settings sections, and structural Composer
+  permission/Add popovers. Library, Images, and Projects use a rail-only main
+  shell in the sampled state. GPTs is a reachable Explore destination, but its
+  route-specific shell has not been separately sampled. These are structural candidate observations;
+  prior conversation/workspace, Electron, and pixel captures remain stale for
+  current-build claims. The 2026-09-29 candidate audit maps runtime fragments to
+  33/99 surfaces (P0 16/59, P1 14/27, P2 3/13); it also maps the project-dialog
+  open/dismiss structure, Environments/Worktrees Settings route shells, the
+  Scheduled route/sidebar shell, and distinct Library, Images, Customize, and
+  Settings → Notifications destinations. The new route rows are shell-only;
+  route bodies and behavior remain unobserved where explicitly noted. Explore
+  → GPTs is a known entry point, but its destination shell remains unsampled.
+  These are not interaction or visual acceptance: target-build Browser,
+  product Electron, and regional-pixel gates remain at zero. It does not promote
+  the global baseline or make older-build surfaces current. A local Electron fixture now replays the
+  empty 26.924 Composer anchor, responsive width samples, and observed overlay
+  bounds with content redacted; this is own-fixture geometry/interaction
+  evidence, not installed-product Browser/CDP, Electron, or pixel acceptance.
+  A local Playground/Electron route-shell replay covers the three sampled
+  rail-only routes (Projects, Library, Images) at 1180×820. It now also covers
+  the sampled expanded-sidebar shells for Customize and Settings → Notifications
+  at 1180×820. All route bodies remain explicit placeholders; active-rail
+  styling for the latter two is unasserted, and these replays are not product
+  Browser/Electron or pixel acceptance.
+  On 2026-09-29, the complete `pnpm check:codex-app:acceptance` then passed with
+  exit code 0: 594 CDP lifecycle frames, 594 visual-contract frames, dedicated
+  26.924 navigation/Composer replays, Electron onboarding and document/PDF
+  previews, and live App Server MCP success/error/approval/OAuth/elicitation
+  cases. Its pixel gates compare controlled local fixtures, not the installed
+  product; current-build product Browser, Electron, and regional-pixel coverage
+  remains zero.
+  A reproducible, read-only scan of the installed `26.924.22138` package found
+  all eight configured marker strings for GPT-6 Sol/Luna, Quick Chat, Show pet,
+  Appshot destination, Computer History, WebMCP, and site tools, with the same
+  ASAR hash before and after the scan. These are package-presence leads only. Two
+  not-sampled P2 cross-layer rows now track Appshot capture routing and Computer
+  History. The audit reports six package-tagged surfaces separately from the
+  33 runtime-fragment surfaces; neither package strings nor public release notes
+  establish runtime availability, behavior, or visual parity.
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
-- Scoped CDP automation: available through a user-authorized second process;
-  the Chromium profile is separate, but Codex application data and navigation
-  are not fully isolated
+- A previous read-only CDP capture used a separate process/profile, but the
+  profile did not fully isolate Codex application data and navigation. Treat
+  that as bounded candidate reconnaissance, not as a generally safe or
+  complete product-acceptance path; do not infer Browser/Electron/pixel gates
+  from CDP reachability alone.
 - The installed application now reports `26.911.61220` (`9647`) with
   Chromium `153.0.8010.36` and ASAR SHA-256
   `f3ea5ab82e0503d283c98ea21b0ecfde4d8fe4c740fb1d81dfc57b6f5c22ce1f`.
@@ -131,7 +181,7 @@ host-owned and are intentionally not claimed by the playground.
   and a 26-row Composer resource list without GitHub). The two samples are
   intentionally kept separate so dynamic counts are not mistaken for stable
   product tokens; no installed-product pixel promotion is inferred.
-- The newest installed package is now `26.917.71314` (`10954`), Chromium
+- The previous installed candidate was `26.917.71314` (`10954`), Chromium
   `153.0.8010.53`, with `app.asar` SHA-256
   `03108a728bdb1616958ab89587c5495cab0cf4cd1bbe109bdfb186df0a113804`.
   Its isolated candidate record is
@@ -403,8 +453,8 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 93 surface groups; at the promoted `26.903.71938` baseline,
-18 have runtime evidence, 66 have previous-build-only runtime evidence, and 9
+Current inventory: 99 surface groups; at the promoted `26.903.71938` baseline,
+18 have runtime evidence, 70 have previous-build-only runtime evidence, and 11
 remain `not_sampled` (0 are `blocked_by_policy`). Current-build Browser
 verification covers 0 groups and Electron verification covers 0. The
 candidate `26.917.71314` maps structural runtime observations to twelve P0

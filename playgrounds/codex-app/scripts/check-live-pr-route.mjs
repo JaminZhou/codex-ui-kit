@@ -96,7 +96,16 @@ for (const [width, theme] of [[1180, "dark"], [720, "dark"], [600, "dark"], [720
     assert.equal(await page.locator("[data-mode]").getAttribute("data-mode"), "live");
     assert.equal(await page.getByRole("button", { name: "Open pull request 80: feat: add terminal session lifecycle", exact: true }).count(), 0);
     await app.evaluate(() => { globalThis.__routeFails = false; });
-    await route.getByRole("button", { name: "Retry PR history", exact: true }).click();
+    const retryHistory = route.getByRole("button", { name: "Retry PR history", exact: true });
+    if (width >= 1024) {
+      const sidebarBounds = await page.locator(".codex-ui-app-shell__sidebar").boundingBox();
+      const mainBounds = await page.locator(".codex-ui-app-shell__main").boundingBox();
+      assert.ok(
+        sidebarBounds && mainBounds && mainBounds.x >= sidebarBounds.x + sidebarBounds.width - 1,
+        `Wide live PR layout must place main content after the sidebar: ${JSON.stringify({ width, sidebarBounds, mainBounds })}`,
+      );
+    }
+    await retryHistory.click();
     const row = route.getByRole("button", { name: "Open repository PR #999: Real-data route fixture", exact: true });
     await row.waitFor();
     assert.equal(await route.getByRole("button", { name: "Open", exact: true }).getAttribute("aria-pressed"), "true");

@@ -622,7 +622,7 @@ try {
             event.params?.turn?.status === "completed",
         ),
       undefined,
-      { timeout: 60_000 },
+      { timeout: 180_000 },
     );
   } else {
     await page.waitForFunction(

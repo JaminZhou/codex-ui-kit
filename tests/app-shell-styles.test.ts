@@ -16,7 +16,7 @@ describe("application shell visual contract", () => {
     expect(styles).toContain("container-name: codex-ui-app-shell");
     expect(styles).toContain(".codex-ui-app-shell__layout");
     expect(styles).toContain("grid-template-columns:");
-    expect(styles).toContain("grid-column: 2 / 4");
+    expect(styles).toContain("grid-column: 3 / 5");
   });
 
   it("turns fixed columns into overlays before they can leave the viewport", () => {
@@ -36,7 +36,9 @@ describe("application shell visual contract", () => {
     expect(styles).toContain(
       '.codex-ui-app-shell__backdrop[data-backdrop="sidebar"]',
     );
-    expect(styles).toContain("max-width: calc(100% - 3rem)");
+    expect(styles).toMatch(
+      /max-width: calc\([\s\S]*?100% - var\(--codex-ui-app-shell-navigation-rail-track\) - 3rem/,
+    );
     expect(styles).toContain(
       ".codex-ui-app-shell[data-side-panel-overlay][data-side-panel-open]",
     );
@@ -56,7 +58,7 @@ describe("application shell visual contract", () => {
       '.codex-ui-app-shell[data-narrow-sidebar-behavior="current-build"][data-sidebar-pinned]',
     );
     expect(styles).toMatch(
-      /\[data-narrow-sidebar-behavior="current-build"\]\[data-sidebar-pinned\][\s\S]*?grid-template-columns:[\s\S]*?calc\(100% - 3rem\)[\s\S]*?minmax\(3rem, 1fr\);/,
+      /\[data-narrow-sidebar-behavior="current-build"\]\[data-sidebar-pinned\][\s\S]*?grid-template-columns:[\s\S]*?calc\([\s\S]*?100% - var\(--codex-ui-app-shell-navigation-rail-track\) - 3rem[\s\S]*?\)[\s\S]*?minmax\(3rem, 1fr\);/,
     );
     expect(styles).not.toContain("data-sidebar-preview-open");
     expect(styles).toMatch(
@@ -66,6 +68,43 @@ describe("application shell visual contract", () => {
       'export type AppShellNarrowSidebarBehavior = "current-build" | "modal"',
     );
     expect(component).not.toContain("inlineStartDistance <= 12");
+  });
+
+  it("locks the optional dual-navigation rail geometry", () => {
+    expect(tokens).toContain("--codex-ui-app-navigation-rail-width: 3.25rem");
+    expect(tokens).toContain(
+      "--codex-ui-app-navigation-rail-item-size: 2.25rem",
+    );
+    expect(tokens).toContain(
+      "--codex-ui-app-navigation-rail-icon-size: 1.25rem",
+    );
+    expect(styles).toContain(".codex-ui-app-primary-navigation-rail {");
+    expect(styles).toContain("padding: 0.5rem 0.5rem 0.25rem");
+    expect(styles).toMatch(
+      /\.codex-ui-app-shell\[data-navigation-rail\][\s\S]*?\.codex-ui-app-primary-navigation-rail__items[\s\S]*?\.codex-ui-icon-button/,
+    );
+    expect(styles).toContain("grid-column: 4");
+    expect(styles).toMatch(
+      /@container codex-ui-app-shell \(max-width: 45rem\) \{[\s\S]*?\.codex-ui-app-shell__side-panel \{[\s\S]*?max-width: calc\([\s\S]*?var\(--codex-ui-app-shell-navigation-rail-track\)/,
+    );
+    expect(component).toContain('data-navigation-rail={navigationRailIsVisible');
+    expect(component).toContain('aria-label={navigationRailLabel}');
+    expect(component).toContain("navigationRailWidth = 52");
+    expect(component).toContain("269.875");
+  });
+
+  it("reserves the sampled 44px chrome and 4px lower inset only for the rail shell", () => {
+    expect(tokens).toContain(
+      "--codex-ui-app-navigation-rail-window-chrome-height: 2.75rem",
+    );
+    expect(styles).toContain(
+      ".codex-ui-app-shell[data-navigation-rail][data-window-chrome]",
+    );
+    expect(styles).toContain(
+      "margin-block-start: var(--codex-ui-app-navigation-rail-window-chrome-height)",
+    );
+    expect(styles).toContain("padding-block-start: 0");
+    expect(component).toContain("export function AppPrimaryNavigationRail");
   });
 
   it("keeps panel tabs, content, and focus semantics explicit", () => {
