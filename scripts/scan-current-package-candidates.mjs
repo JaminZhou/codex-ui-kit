@@ -16,6 +16,7 @@ export const packageCandidateMarkers = [
   { id: "computerHistoryLabel", needle: "Computer History" },
   { id: "webmcpLabel", needle: "WebMCP" },
   { id: "siteToolsLabel", needle: "site tools" },
+  { id: "appleMessagesPluginLabel", needle: "Apple Messages" },
 ];
 
 export function createPackageMarkerMatcher(markers = packageCandidateMarkers) {

@@ -20,6 +20,7 @@ describe("installed package candidate marker scan", () => {
       computerHistoryLabel: false,
       webmcpLabel: false,
       siteToolsLabel: false,
+      appleMessagesPluginLabel: false,
     });
   });
 
@@ -28,11 +29,13 @@ describe("installed package candidate marker scan", () => {
     matcher.observe("gpt-6 luna");
     matcher.observe("APPshot destination");
     matcher.observe("WebMCP tools");
+    matcher.observe("Apple Messages plugin");
 
     const result = matcher.result();
     expect(result.gpt6LunaModelLabel).toBe(true);
     expect(result.appshotDestinationLabel).toBe(true);
     expect(result.webmcpLabel).toBe(true);
+    expect(result.appleMessagesPluginLabel).toBe(true);
     expect(result.gpt6SolModelLabel).toBe(false);
   });
 
@@ -46,6 +49,7 @@ describe("installed package candidate marker scan", () => {
       "computerHistoryLabel",
       "webmcpLabel",
       "siteToolsLabel",
+      "appleMessagesPluginLabel",
     ]);
   });
 });

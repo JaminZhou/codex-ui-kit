@@ -97,12 +97,15 @@ host-owned and are intentionally not claimed by the playground.
   product; current-build product Browser, Electron, and regional-pixel coverage
   remains zero.
   A reproducible, read-only scan of the installed `26.924.22138` package found
-  all eight configured marker strings for GPT-6 Sol/Luna, Quick Chat, Show pet,
-  Appshot destination, Computer History, WebMCP, and site tools, with the same
-  ASAR hash before and after the scan. These are package-presence leads only. Two
-  not-sampled P2 cross-layer rows now track Appshot capture routing and Computer
-  History. The audit reports six package-tagged surfaces separately from the
-  33 runtime-fragment surfaces; neither package strings nor public release notes
+  eight of nine configured marker strings for GPT-6 Sol/Luna, Quick Chat, Show
+  pet, Appshot destination, Computer History, WebMCP, and site tools. The added
+  Apple Messages label marker was absent, despite the August 20 release note
+  describing that integration for the macOS desktop app and Codex; this does
+  not prove account/runtime unavailability. The scan recorded the same ASAR
+  hash before and after. These are package-presence leads only. Two not-sampled
+  P2 cross-layer rows track Appshot capture routing and Computer History. The
+  audit reports six package-tagged surfaces separately from the 33
+  runtime-fragment surfaces; neither package strings nor public release notes
   establish runtime availability, behavior, or visual parity.
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
