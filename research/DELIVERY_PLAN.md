@@ -52,16 +52,15 @@ Computer History and browser site tools in recent updates. These release notes
 identify audit leads, but do not prove that a capability is enabled for this
 local account/build or specify desktop geometry and state-by-state behavior.
 
-A 2026-09-29 changelog cross-check found that the newest dated Codex entry
-(September 28) is Codex CLI 0.158.0, including fullscreen-TUI and terminal
-changes; these must not be attributed to the desktop renderer. The desktop-
-specific September 25 entry is a macOS security update for 26.924, not a
-documented UI redesign. The public changelog therefore does not explain the
-reported large visual change. The unchanged installed ASAR is consistent with
-an account- or server-scoped rollout, but cannot prove one; keep version
-alignment open until the displayed About identity and affected screen are
-captured. Treat CLI-only controls as scope candidates only if the desktop
-route is independently observed.
+A 2026-09-29 changelog cross-check found the newest dated Codex CLI entry is
+September 26, version 0.157.1; it does not document a desktop renderer change.
+The desktop-specific September 25 entry is a macOS security update for
+26.924.20706, not a documented UI redesign. The public changelog therefore
+does not explain the reported large visual change. The unchanged installed
+ASAR is consistent with an account- or server-scoped rollout, but cannot prove
+one; keep version alignment open until the displayed About identity and
+affected screen are captured. Treat CLI-only controls as scope candidates
+only if the desktop route is independently observed.
 
 Add these leads to the version-alignment pass, without counting them as
 observed inventory surfaces until the exact local Codex route or control is
