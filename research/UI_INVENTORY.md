@@ -68,7 +68,12 @@ host-owned and are intentionally not claimed by the playground.
   Profile → Settings, 14 reachable Settings sections, and structural Composer
   permission/Add popovers. Library, Images, and Projects use a rail-only main
   shell in the sampled state. GPTs is a reachable Explore destination, but its
-  route-specific shell has not been separately sampled. These are structural candidate observations;
+  route-specific shell has not been separately sampled. A 2026-09-30
+  read-only candidate probe fingerprinted seven rail SVGs without retaining
+  their paths; none exactly matched the existing manifest or the scoped
+  comparison set from the public MIT-licensed Apps SDK UI icon package. The
+  source remains unresolved, so the playground placeholders stay pending.
+  These are structural candidate observations;
   prior conversation/workspace, Electron, and pixel captures remain stale for
   current-build claims. The 2026-09-29 candidate audit maps runtime fragments to
   34/100 surfaces (P0 16/59, P1 15/28, P2 3/13); runtime tags record the
