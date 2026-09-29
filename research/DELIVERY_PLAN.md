@@ -70,16 +70,24 @@ identify audit leads, but do not prove that a capability is enabled for this
 local account/build or specify desktop geometry and state-by-state behavior.
 
 A fresh 2026-09-30 check of the official changelog confirms the newest dated
-Codex CLI entry is September 28, version 0.158.0; its CLI/TUI, MCP,
-exec-server, and image-editing notes do not document a desktop Renderer
-change. The latest desktop-specific entry remains the September 25 macOS
-security update for 26.924.20706. No public 26.928 desktop UI redesign entry
-is documented as of this check. That absence does not rule out an account- or
-server-scoped rollout and does not disprove Jamin's observation; the current
-package updater says 26.928.20755 is available but not installed. Keep version
-alignment open until the observed window's About/build identity and affected
-screen are captured. Treat CLI-only controls as scope candidates only if the
-desktop route is independently observed.
+Codex CLI entry is September 29, version 0.159.1. The corresponding 0.159.0
+notes include a compact welcome/header, transcript scrolling while deciding
+whether to implement a plan, App Server history pagination, and a macOS TLS
+fix for network-enabled sandboxes and proxy-dependent remote environments.
+These are CLI/App Server leads, not evidence of a desktop Renderer redesign.
+The playground's live App Server runtime is still `0.153.4`; the local
+`check-live-long-thread` acceptance attempt on September 30 failed after two
+turns with `tls handshake eof` / `Connection failed: error sending request`.
+The version gap and matching TLS note warrant a targeted compatibility check,
+but do not establish causation and are not a UI finding. The latest
+desktop-specific public entry remains the September 25 macOS security update
+for 26.924.20706. No public 26.928 desktop UI redesign entry is documented as
+of this check. That absence does not rule out an account- or server-scoped
+rollout and does not disprove Jamin's observation; the current package updater
+says 26.928.20755 is available but not installed. Keep version alignment open
+until the observed window's About/build identity and affected screen are
+captured. Treat CLI-only controls as scope candidates only if the desktop
+route is independently observed.
 
 Add these leads to the version-alignment pass, without counting them as
 observed inventory surfaces until the exact local Codex route or control is
