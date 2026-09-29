@@ -17,6 +17,12 @@ export const packageCandidateMarkers = [
   { id: "webmcpLabel", needle: "WebMCP" },
   { id: "siteToolsLabel", needle: "site tools" },
   { id: "appleMessagesPluginLabel", needle: "Apple Messages" },
+  { id: "layoutIntroductionTitle", needle: "A new layout for ChatGPT desktop" },
+  {
+    id: "layoutIntroductionDescription",
+    needle: "Your chats are now at the top. Find Scheduled, Library, Images, and Plugins on the left.",
+  },
+  { id: "layoutIntroductionCloseDialogLabel", needle: "Close dialog" },
 ];
 
 export function createPackageMarkerMatcher(markers = packageCandidateMarkers) {

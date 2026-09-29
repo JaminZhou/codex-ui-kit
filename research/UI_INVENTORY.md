@@ -71,7 +71,8 @@ host-owned and are intentionally not claimed by the playground.
   route-specific shell has not been separately sampled. These are structural candidate observations;
   prior conversation/workspace, Electron, and pixel captures remain stale for
   current-build claims. The 2026-09-29 candidate audit maps runtime fragments to
-  33/99 surfaces (P0 16/59, P1 14/27, P2 3/13); it also maps the project-dialog
+  34/100 surfaces (P0 16/59, P1 15/28, P2 3/13); runtime tags record the
+  first-run layout-introduction presence/geometry and the project-dialog
   open/dismiss structure, Environments/Worktrees Settings route shells, the
   Scheduled route/sidebar shell, and distinct Library, Images, Customize, and
   Settings → Notifications destinations. The new route rows are shell-only;
@@ -456,8 +457,8 @@ overflow, 1180×820 and 720×680 containment, and an ownership-masked 1.3189%
 product comparison under a 1.5% limit. Browser/CDP and Electron drive both
 rounds, and eight reviewed frames cover the deterministic replay.
 
-Current inventory: 99 surface groups; at the promoted `26.903.71938` baseline,
-18 have runtime evidence, 70 have previous-build-only runtime evidence, and 11
+Current inventory: 100 surface groups; at the promoted `26.903.71938` baseline,
+18 have runtime evidence, 71 have previous-build-only runtime evidence, and 11
 remain `not_sampled` (0 are `blocked_by_policy`). Current-build Browser
 verification covers 0 groups and Electron verification covers 0. The
 candidate `26.917.71314` maps structural runtime observations to twelve P0
