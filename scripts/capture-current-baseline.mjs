@@ -5,9 +5,11 @@ import { homedir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import {
+  assertCurrentBaselineObservationRecord,
   assertCurrentBaselineRecord,
   assertCurrentProjectsIndexObservation,
   currentBaselineViewports,
+  currentObservedBuildCandidateBaselineFingerprint,
   currentCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
   currentLatestCandidateBaselineFingerprint,
@@ -15,13 +17,16 @@ import {
   currentInstalledCandidateBaselineFingerprint,
   currentBaselineFingerprint,
   currentPreviousInstalledCandidateBaselineFingerprint,
+  resolveCurrentBaselineCandidateOutputPath,
   resolveCurrentBaselineOutputPath,
   runBestEffortCurrentBaselineCleanup,
   selectCurrentMainCandidate,
+  writeCurrentBaselineCandidateOutput,
   writeCurrentBaselineOutput,
 } from "./current-baseline-contract.mjs";
 
 const candidateFingerprintsByVersion = new Map([
+  ["26.924.22138", currentObservedBuildCandidateBaselineFingerprint],
   ["26.917.71314", currentLatestInstalledCandidateBaselineFingerprint],
   ["26.917.62051", currentPreviousInstalledCandidateBaselineFingerprint],
   ["26.915.31945", currentInstalledCandidateBaselineFingerprint],
@@ -33,6 +38,25 @@ const expectedFingerprint =
   candidateFingerprintsByVersion.get(
     process.env.CODEX_CURRENT_BASELINE_FINGERPRINT,
   ) ?? currentBaselineFingerprint;
+const candidateObservationOnly =
+  process.env.CODEX_CURRENT_BASELINE_OBSERVATION_ONLY === "1";
+const writeCandidateToResearch =
+  process.env.CODEX_CURRENT_BASELINE_WRITE_RESEARCH_CANDIDATE === "1";
+
+if (
+  candidateObservationOnly &&
+  expectedFingerprint.appVersion !==
+    currentObservedBuildCandidateBaselineFingerprint.appVersion
+) {
+  throw new Error(
+    "Candidate observation-only mode is restricted to the exact 26.924.22138 package fingerprint.",
+  );
+}
+if (writeCandidateToResearch && !candidateObservationOnly) {
+  throw new Error(
+    "Only the exact candidate-observation mode may write a research artifact.",
+  );
+}
 
 const port = Number(process.env.CODEX_CURRENT_BASELINE_CDP_PORT);
 const expectedProfile = process.env.CODEX_CURRENT_BASELINE_PROFILE;
@@ -76,7 +100,9 @@ if (
   );
 }
 const normalizedOutputPath = outputPath
-  ? resolveCurrentBaselineOutputPath(normalizedProfile, outputPath)
+  ? writeCandidateToResearch
+    ? resolveCurrentBaselineCandidateOutputPath(outputPath)
+    : resolveCurrentBaselineOutputPath(normalizedProfile, outputPath)
   : null;
 
 const plistValue = (key) =>
@@ -268,7 +294,7 @@ for (const listener of listeners) {
 }
 
 const inspectShellState = (page) =>
-  page.evaluate(() => {
+  page.evaluate((observationOnly) => {
     const roundValue = (value) => Math.round(value * 100) / 100;
     const rect = (element) => {
       if (!(element instanceof Element)) return null;
@@ -306,13 +332,17 @@ const inspectShellState = (page) =>
       [...document.querySelectorAll(`[aria-label="${CSS.escape(label)}"]`)]
         .filter(visible)
         .map((element) => rect(element));
-    const navigation = [...document.querySelectorAll("nav")].find(visible);
+    const visibleNavigations = [...document.querySelectorAll("nav")].filter(
+      visible,
+    );
+    const navigation = [...visibleNavigations].sort(
+      (left, right) =>
+        right.getBoundingClientRect().width -
+        left.getBoundingClientRect().width,
+    )[0];
     const fixedRouteState = (label) =>
-      [
-        ...(navigation?.querySelectorAll(
-          'a, button, [role="button"], [role="tab"]',
-        ) ?? []),
-      ]
+      visibleNavigations.flatMap((region) =>
+        [...region.querySelectorAll('a, button, [role="button"], [role="tab"]')]
         .filter(
           (element) =>
             visible(element) && element.textContent?.trim() === label,
@@ -321,30 +351,174 @@ const inspectShellState = (page) =>
           ariaCurrent: element.getAttribute("aria-current"),
           ariaSelected: element.getAttribute("aria-selected"),
           rect: rect(element),
-        }));
+        })),
+      );
     const editor = [
       ...document.querySelectorAll(
         'textarea, [contenteditable="true"], [role="textbox"]',
       ),
     ].find(visible);
     const editorStyle = editor ? getComputedStyle(editor) : null;
-    const navigationScrollOwners = navigation
-      ? [...navigation.querySelectorAll("*")]
-          .filter((element) => {
-            const style = getComputedStyle(element);
-            return (
-              visible(element) &&
-              (style.overflowY === "auto" || style.overflowY === "scroll") &&
-              element.scrollHeight > element.clientHeight
-            );
-          })
-          .map((element) => ({
-            clientHeight: element.clientHeight,
-            overflowY: getComputedStyle(element).overflowY,
-            rect: rect(element),
-            scrollHeight: element.scrollHeight,
-          }))
-      : [];
+    const navigationScrollOwners = visibleNavigations.flatMap((region) =>
+      [...region.querySelectorAll("*")]
+        .filter((element) => {
+          const style = getComputedStyle(element);
+          return (
+            visible(element) &&
+            (style.overflowY === "auto" || style.overflowY === "scroll") &&
+            element.scrollHeight > element.clientHeight
+          );
+        })
+        .map((element) => ({
+          clientHeight: element.clientHeight,
+          overflowY: getComputedStyle(element).overflowY,
+          rect: rect(element),
+          scrollHeight: element.scrollHeight,
+        })),
+    );
+    const primaryNavigationItems = observationOnly
+      ? (() => {
+          const primaryRail = visibleNavigations
+            .filter(
+              (region) => region.getBoundingClientRect().width <= 72,
+            )
+            .sort(
+              (left, right) =>
+                left.getBoundingClientRect().left -
+                right.getBoundingClientRect().left,
+            )[0];
+          const allowedLabels = new Set([
+            "Home",
+            "Scheduled",
+            "Library",
+            "Images",
+            "Customize",
+            "Explore",
+            "Help menu",
+            "Open profile menu",
+          ]);
+          return [...(primaryRail?.querySelectorAll("button, a, [role=button]") ?? [])]
+            .filter(visible)
+            .map(
+              (element) =>
+                element.getAttribute("aria-label") ??
+                element.getAttribute("title") ??
+                element.innerText?.trim() ??
+                "",
+            )
+          .filter((label) => allowedLabels.has(label));
+        })()
+      : undefined;
+    const primaryRailObservation = observationOnly
+      ? (() => {
+          const primaryRail = visibleNavigations
+            .filter(
+              (region) => region.getBoundingClientRect().width <= 72,
+            )
+            .sort(
+              (left, right) =>
+                left.getBoundingClientRect().left -
+                right.getBoundingClientRect().left,
+            )[0];
+          if (!primaryRail) return null;
+
+          const allowedLabels = new Set([
+            "Home",
+            "Scheduled",
+            "Library",
+            "Images",
+            "Customize",
+            "Explore",
+            "Help menu",
+            "Open profile menu",
+          ]);
+          const style = getComputedStyle(primaryRail);
+          const items = [
+            ...primaryRail.querySelectorAll("button, a, [role=button]"),
+          ]
+            .filter(visible)
+            .map((element) => ({
+              element,
+              label:
+                element.getAttribute("aria-label") ??
+                element.getAttribute("title") ??
+                element.innerText?.trim() ??
+                "",
+            }))
+            .filter(({ label }) => allowedLabels.has(label))
+            .map(({ element, label }) => {
+              const itemStyle = getComputedStyle(element);
+              const icon = element.querySelector("svg");
+              const iconStyle = icon ? getComputedStyle(icon) : null;
+              return {
+                active:
+                  element.getAttribute("aria-current") === "page" ||
+                  element.getAttribute("aria-pressed") === "true" ||
+                  element.getAttribute("data-active") === "true",
+                icon: icon
+                  ? {
+                      pathCount: icon.querySelectorAll("path").length,
+                      rect: rect(icon),
+                      viewBox: icon.getAttribute("viewBox"),
+                      style: {
+                        color: iconStyle.color,
+                        fill: iconStyle.fill,
+                        height: iconStyle.height,
+                        stroke: iconStyle.stroke,
+                        width: iconStyle.width,
+                      },
+                    }
+                  : null,
+                label,
+                rect: rect(element),
+                style: {
+                  backgroundColor: itemStyle.backgroundColor,
+                  borderRadius: itemStyle.borderRadius,
+                  color: itemStyle.color,
+                  display: itemStyle.display,
+                  fontSize: itemStyle.fontSize,
+                  fontWeight: itemStyle.fontWeight,
+                  height: itemStyle.height,
+                  padding: itemStyle.padding,
+                  width: itemStyle.width,
+                },
+              };
+            });
+          return {
+            rect: rect(primaryRail),
+            style: {
+              alignItems: style.alignItems,
+              backgroundColor: style.backgroundColor,
+              display: style.display,
+              flexDirection: style.flexDirection,
+              gap: style.gap,
+              padding: style.padding,
+              width: style.width,
+            },
+            items,
+          };
+        })()
+      : undefined;
+    const navigationBounds = observationOnly
+      ? visibleNavigations.reduce((bounds, element) => {
+          const value = element.getBoundingClientRect();
+          return {
+            bottom: Math.max(bounds.bottom, value.bottom),
+            height: Math.max(bounds.bottom, value.bottom) -
+              Math.min(bounds.top, value.top),
+            left: Math.min(bounds.left, value.left),
+            right: Math.max(bounds.right, value.right),
+            top: Math.min(bounds.top, value.top),
+            width: Math.max(bounds.right, value.right) -
+              Math.min(bounds.left, value.left),
+          };
+        }, {
+          bottom: 0,
+          left: Number.POSITIVE_INFINITY,
+          right: 0,
+          top: Number.POSITIVE_INFINITY,
+        })
+      : null;
     return {
       colorScheme: getComputedStyle(document.documentElement).colorScheme,
       controls: Object.fromEntries(
@@ -356,6 +530,7 @@ const inspectShellState = (page) =>
           "Hide sidebar",
           "Show sidebar",
           "Start new voice chat",
+          ...(observationOnly ? ["Help menu", "Open profile menu"] : []),
         ].map((label) => [label, labelled(label)]),
       ),
       editor: editor
@@ -375,8 +550,32 @@ const inspectShellState = (page) =>
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
       main: [...document.querySelectorAll("main")].filter(visible).map(rect),
-      navigation: rect(navigation),
+      navigation: observationOnly
+        ? navigationBounds
+          ? {
+              bottom: roundValue(navigationBounds.bottom),
+              height: roundValue(navigationBounds.height),
+              left: roundValue(navigationBounds.left),
+              right: roundValue(navigationBounds.right),
+              top: roundValue(navigationBounds.top),
+              width: roundValue(navigationBounds.width),
+            }
+          : null
+        : rect(navigation),
+      navigationRegions: observationOnly
+        ? visibleNavigations.map((element) => ({
+            rect: rect(element),
+            style: {
+              backgroundColor: getComputedStyle(element).backgroundColor,
+              borderRightColor: getComputedStyle(element).borderRightColor,
+              borderRightWidth: getComputedStyle(element).borderRightWidth,
+              display: getComputedStyle(element).display,
+            },
+          }))
+        : undefined,
       navigationScrollOwners,
+      primaryNavigationItems,
+      primaryRailObservation,
       routeMarkers: {
         newChatHome: [
           ...document.querySelectorAll('[data-testid="home-icon"]'),
@@ -393,7 +592,7 @@ const inspectShellState = (page) =>
         width: innerWidth,
       },
     };
-  });
+  }, candidateObservationOnly);
 
 const inspectCandidate = async (page, index) => {
   const structure = await page.evaluate(() => {
@@ -493,8 +692,15 @@ const cleanupCurrentBaselineRenderer = async (page) => {
         if ((await hideSidebar.count()) === 0) return;
         await hideSidebar.click();
         await page.waitForFunction(
-          () => {
-            const navigation = document.querySelector("nav");
+          (observationOnly) => {
+            const navigations = [...document.querySelectorAll("nav")];
+            const navigation = observationOnly
+              ? navigations.sort(
+                  (left, right) =>
+                    right.getBoundingClientRect().width -
+                    left.getBoundingClientRect().width,
+                )[0]
+              : navigations[0];
             return (
               !(navigation instanceof Element) ||
               !navigation.checkVisibility({
@@ -503,7 +709,7 @@ const cleanupCurrentBaselineRenderer = async (page) => {
               })
             );
           },
-          undefined,
+          candidateObservationOnly,
           { timeout: 5_000 },
         );
       },
@@ -529,7 +735,7 @@ try {
 
   const states = {};
   const readShellGeometrySignature = () =>
-    page.evaluate(() => {
+    page.evaluate((observationOnly) => {
       const sample = (element) => {
         if (!(element instanceof Element)) return null;
         const value = element.getBoundingClientRect();
@@ -555,13 +761,18 @@ try {
           checkVisibilityCSS: true,
         }),
       );
+      const navigationRegions = [
+        ...document.querySelectorAll("nav"),
+      ].map(sample);
       return JSON.stringify({
         editor: sample(editor),
         main: sample(document.querySelector("main")),
-        navigation: sample(document.querySelector("nav")),
+        navigation: observationOnly
+          ? navigationRegions
+          : navigationRegions[0],
         viewport: { height: innerHeight, width: innerWidth },
       });
-    });
+    }, candidateObservationOnly);
   const waitForStableShellGeometry = async () => {
     let previous = null;
     let stableSamples = 0;
@@ -584,7 +795,7 @@ try {
     await waitForStableShellGeometry();
   };
   const inspectSidebarLifecycleBaseline = () =>
-    page.evaluate(() => {
+    page.evaluate((observationOnly) => {
       const visible = (element) =>
         element instanceof Element &&
         element.checkVisibility({
@@ -598,7 +809,16 @@ try {
         ),
       ].filter(visible);
       const first = projectRows[0];
-      const navigation = [...document.querySelectorAll("nav")].find(visible);
+      const visibleNavigations = [...document.querySelectorAll("nav")].filter(
+        visible,
+      );
+      const navigation = observationOnly
+        ? [...visibleNavigations].sort(
+            (left, right) =>
+              right.getBoundingClientRect().width -
+              left.getBoundingClientRect().width,
+          )[0]
+        : visibleNavigations[0];
       const bounds = first?.getBoundingClientRect();
       return {
         expandedProjectGroupCount: projectRows.filter(
@@ -606,15 +826,34 @@ try {
         ).length,
         helpControlCount: [
           ...document.querySelectorAll(
-            'button[aria-label="Open help menu"]',
+            observationOnly
+              ? 'button[aria-label="Open help menu"], button[aria-label="Help menu"]'
+              : 'button[aria-label="Open help menu"]',
           ),
         ].filter(visible).length,
         horizontalOverflow:
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
         navigationWidth: navigation
-          ? round(navigation.getBoundingClientRect().width)
+          ? round(
+              observationOnly
+                ? visibleNavigations.reduce(
+                    (width, element) =>
+                      width + element.getBoundingClientRect().width,
+                    0,
+                  )
+                : navigation.getBoundingClientRect().width,
+            )
           : null,
+        navigationRegions: observationOnly
+          ? visibleNavigations.map((element) => ({
+              rect: {
+                height: round(element.getBoundingClientRect().height),
+                left: round(element.getBoundingClientRect().left),
+                width: round(element.getBoundingClientRect().width),
+              },
+            }))
+          : undefined,
         projectGroupCount: projectRows.length,
         projectRow: first
           ? {
@@ -633,7 +872,7 @@ try {
           ),
         ].filter(visible).length,
       };
-    });
+    }, candidateObservationOnly);
   const inspectProjectExpansion = (projectRow) =>
     projectRow.evaluate((element) => ({
       expanded: element.getAttribute("aria-expanded") === "true",
@@ -898,14 +1137,22 @@ try {
       };
     });
   const inspectResponsiveSidebar = () =>
-    page.evaluate(() => {
+    page.evaluate((observationOnly) => {
       const visible = (element) =>
         element instanceof Element &&
         element.checkVisibility({
           checkOpacity: true,
           checkVisibilityCSS: true,
         });
-      const navigation = [...document.querySelectorAll("nav")].find(visible);
+      const navigations = [...document.querySelectorAll("nav")];
+      const navigation = observationOnly
+        ? [...navigations].sort(
+            (left, right) =>
+              right.getBoundingClientRect().width -
+              left.getBoundingClientRect().width,
+          )[0]
+        : navigations.find(visible);
+      const visibleNavigations = navigations.filter(visible);
       const projectRow = document.querySelector(
         'nav div[role="button"][aria-expanded]:not([aria-haspopup])',
       );
@@ -913,15 +1160,32 @@ try {
         horizontalOverflow:
           document.documentElement.scrollWidth -
           document.documentElement.clientWidth,
-        navigationVisible: Boolean(navigation),
-        navigationWidth: navigation?.getBoundingClientRect().width ?? null,
+        navigationVisible: observationOnly
+          ? Boolean(navigation && visible(navigation))
+          : Boolean(navigation),
+        navigationWidth: observationOnly
+          ? visibleNavigations.reduce(
+              (width, element) =>
+                width + element.getBoundingClientRect().width,
+              0,
+            ) || null
+          : navigation?.getBoundingClientRect().width ?? null,
+        navigationRegions: observationOnly
+          ? visibleNavigations.map((element) => {
+              const bounds = element.getBoundingClientRect();
+              return {
+                left: Math.round(bounds.left * 100) / 100,
+                width: Math.round(bounds.width * 100) / 100,
+              };
+            })
+          : undefined,
         projectExpanded:
           projectRow?.getAttribute("aria-expanded") === "true",
         showSidebarCount: [
           ...document.querySelectorAll('[aria-label="Show sidebar"]'),
         ].filter(visible).length,
       };
-    });
+    }, candidateObservationOnly);
   const waitForShell = async () => {
     await page.waitForFunction(
       () =>
@@ -938,17 +1202,25 @@ try {
   };
   const waitForSidebarVisibility = async (expectedVisible) => {
     await page.waitForFunction(
-      (visible) => {
-        const navigation = document.querySelector("nav");
-        if (!(navigation instanceof Element)) return !visible;
-        return (
-          navigation.checkVisibility({
+      ({ visible, observationOnly }) => {
+        const isVisible = (element) =>
+          element instanceof Element &&
+          element.checkVisibility({
             checkOpacity: true,
             checkVisibilityCSS: true,
-          }) === visible
-        );
+          });
+        if (observationOnly) {
+          const sidebarRegion = [...document.querySelectorAll("nav")].sort(
+            (left, right) =>
+              right.getBoundingClientRect().width -
+              left.getBoundingClientRect().width,
+          )[0];
+          return isVisible(sidebarRegion) === visible;
+        }
+        const navigation = document.querySelector("nav");
+        return isVisible(navigation) === visible;
       },
-      expectedVisible,
+      { visible: expectedVisible, observationOnly: candidateObservationOnly },
       { timeout: 15_000 },
     );
   };
@@ -1473,33 +1745,54 @@ try {
   sidebarLifecycle.projectMenu = projectMenuObservation;
 
   const helpMenuTrigger = page
-    .locator('button[aria-label="Open help menu"]:visible')
+    .locator(
+      candidateObservationOnly
+        ? 'button[aria-label="Open help menu"]:visible, button[aria-label="Help menu"]:visible'
+        : 'button[aria-label="Open help menu"]:visible',
+    )
     .first();
-  await helpMenuTrigger.click();
-  await page.waitForSelector('[role="menu"]:visible');
-  await page.waitForTimeout(100);
-  sidebarLifecycle.helpMenu = { opened: await inspectOpenMenu() };
-  await page.keyboard.press("Escape");
-  await page.waitForFunction(
-    () =>
-      [...document.querySelectorAll('[role="menu"]')].every(
-        (element) =>
-          !element.checkVisibility({
+  if (candidateObservationOnly && (await helpMenuTrigger.count()) === 0) {
+    sidebarLifecycle.helpMenu = {
+      observationStatus: "no-supported-help-trigger-present",
+      visibleTriggerCount: 0,
+    };
+  } else {
+    const triggerAccessibleLabel = await helpMenuTrigger.getAttribute(
+      "aria-label",
+    );
+    await helpMenuTrigger.click();
+    await page.waitForSelector('[role="menu"]:visible');
+    await page.waitForTimeout(100);
+    sidebarLifecycle.helpMenu = {
+      opened: await inspectOpenMenu(),
+      triggerAccessibleLabel,
+    };
+    await page.keyboard.press("Escape");
+    await page.waitForFunction(
+      () =>
+        [...document.querySelectorAll('[role="menu"]')].every(
+          (element) =>
+            !element.checkVisibility({
+              checkOpacity: true,
+              checkVisibilityCSS: true,
+            }),
+        ),
+    );
+    sidebarLifecycle.helpMenu.closed = await page.evaluate(
+      (trigger) => ({
+        focusReturned: document.activeElement === trigger,
+        visibleMenuCount: [
+          ...document.querySelectorAll('[role="menu"]'),
+        ].filter((element) =>
+          element.checkVisibility({
             checkOpacity: true,
             checkVisibilityCSS: true,
           }),
-      ),
-  );
-  sidebarLifecycle.helpMenu.closed = await page.evaluate((trigger) => ({
-    focusReturned: document.activeElement === trigger,
-    visibleMenuCount: [...document.querySelectorAll('[role="menu"]')].filter(
-      (element) =>
-        element.checkVisibility({
-          checkOpacity: true,
-          checkVisibilityCSS: true,
-        }),
-    ).length,
-  }), await helpMenuTrigger.elementHandle());
+        ).length,
+      }),
+      await helpMenuTrigger.elementHandle(),
+    );
+  }
 
   await projectRow.focus();
   await projectRow.press("Space");
@@ -1524,7 +1817,9 @@ try {
     compactVisibleBeforeCollapse: await inspectResponsiveSidebar(),
   };
   if (
+    !candidateObservationOnly &&
     states.compactVisibleBeforeCollapse.navigation === null ||
+    !candidateObservationOnly &&
     states.compactVisibleBeforeCollapse.controls?.["Hide sidebar"]?.length !== 1
   ) {
     throw new Error(
@@ -1541,17 +1836,34 @@ try {
   sidebarLifecycle.responsive.compactPinned =
     await inspectResponsiveSidebar();
 
-  await page.locator("nav").getByText("Pull requests", { exact: true }).first().click();
-  await page.waitForFunction(() => {
-    const candidates = [...document.querySelectorAll("a, button")];
-    return candidates.some(
-      (element) =>
-        element.textContent?.trim() === "Pull requests" &&
-        element.getAttribute("aria-current") === "page",
-    );
-  });
-  await waitForStableShellGeometry();
+  const pullRequestsControl = page
+    .locator("nav:visible")
+    .getByText("Pull requests", { exact: true })
+    .first();
+  const pullRequestsVisible =
+    (await pullRequestsControl.count()) > 0 &&
+    (await pullRequestsControl.isVisible());
+  if (pullRequestsVisible) {
+    await pullRequestsControl.click();
+    if (!candidateObservationOnly) {
+      await page.waitForFunction(() => {
+        const candidates = [...document.querySelectorAll("a, button")];
+        return candidates.some(
+          (element) =>
+            element.textContent?.trim() === "Pull requests" &&
+            element.getAttribute("aria-current") === "page",
+        );
+      });
+    }
+    await waitForStableShellGeometry();
+  }
   states.compactPullRequests = await inspectShellState(page);
+  if (candidateObservationOnly) {
+    states.compactPullRequests.requestedRouteObservation = {
+      route: "Pull requests",
+      status: pullRequestsVisible ? "visible-control-observed" : "not-visible",
+    };
+  }
 
   await newChat().click();
   await waitForNewChat();
@@ -1574,8 +1886,17 @@ try {
   sidebarLifecycle.responsive.keyboardRestored =
     await inspectProjectExpansion(projectRow);
 
-  const projectsIndexObservation =
-    await captureProjectsIndexObservation();
+  const projectsIndexObservation = candidateObservationOnly
+    ? {
+        observationStatus: "candidate-only-navigation-surface",
+        projectTriggerCount: await page
+          .locator("nav:visible")
+          .getByText("Projects", { exact: true })
+          .count(),
+        shell: await inspectShellState(page),
+        sidebar: await inspectSidebarLifecycleBaseline(),
+      }
+    : await captureProjectsIndexObservation();
   const composerResourceObservation = captureComposerResources
     ? await inspectComposerResourceMenu()
     : null;
@@ -1583,6 +1904,9 @@ try {
   const afterCaptureBundle = readAppAsarSnapshot();
   const record = {
     baseline,
+    ...(candidateObservationOnly
+      ? { baselineStatus: "candidate-only-observation" }
+      : {}),
     captureKind: "renderer_emulation",
     ...(composerResourceObservation
       ? { composerResourceObservation }
@@ -1618,15 +1942,27 @@ try {
       },
     },
   };
-  assertCurrentProjectsIndexObservation(projectsIndexObservation);
-  assertCurrentBaselineRecord(record, expectedFingerprint);
+  if (candidateObservationOnly) {
+    assertCurrentBaselineObservationRecord(record, expectedFingerprint);
+  } else {
+    assertCurrentProjectsIndexObservation(projectsIndexObservation);
+    assertCurrentBaselineRecord(record, expectedFingerprint);
+  }
   const output = `${JSON.stringify(record, null, 2)}\n`;
   if (normalizedOutputPath) {
-    await writeCurrentBaselineOutput(
-      normalizedProfile,
-      normalizedOutputPath,
-      output,
-    );
+    if (writeCandidateToResearch) {
+      await writeCurrentBaselineCandidateOutput(
+        normalizedProfile,
+        normalizedOutputPath,
+        output,
+      );
+    } else {
+      await writeCurrentBaselineOutput(
+        normalizedProfile,
+        normalizedOutputPath,
+        output,
+      );
+    }
   }
   process.stdout.write(output);
 } finally {

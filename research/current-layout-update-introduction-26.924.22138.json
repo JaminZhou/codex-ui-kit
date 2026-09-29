@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "captureDate": "2026-09-29",
+  "captureStatus": "candidate-only",
+  "candidateOnly": true,
+  "captureMethod": "isolated-loopback-CDP",
+  "captureKind": "read-only runtime observation plus renderer-emulated underlay re-capture",
+  "fingerprint": {
+    "appVersion": "26.924.22138",
+    "buildNumber": "11645",
+    "chromiumVersion": "154.0.8037.57",
+    "appAsarBytes": 480133781,
+    "appAsarSha256": "d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80"
+  },
+  "scope": "Observe the first-run desktop layout introduction and measure the app shell beneath it. No prompt was submitted, no project action was activated, and no account or message content was retained.",
+  "privacy": {
+    "retainedText": [
+      "A new layout for ChatGPT desktop",
+      "Your chats are now at the top. Find Scheduled, Library, Images, and Plugins on the left.",
+      "Get started",
+      "Close dialog"
+    ],
+    "dynamicProjectAndThreadLabelsRetained": false,
+    "productScreenshotCommitted": false,
+    "temporaryScreenshotMovedToTrash": true
+  },
+  "firstRunIntroduction": {
+    "rendererUrl": "app://-/index.html",
+    "mode": "Codex",
+    "viewport": {
+      "width": 2560,
+      "height": 1318,
+      "devicePixelRatio": 1
+    },
+    "dialog": {
+      "role": "dialog",
+      "title": "A new layout for ChatGPT desktop",
+      "description": "Your chats are now at the top. Find Scheduled, Library, Images, and Plugins on the left.",
+      "bounds": {
+        "left": 1040,
+        "top": 420.55,
+        "width": 480,
+        "height": 476.89
+      },
+      "actions": ["Get started", "Close dialog"],
+      "capturedComposition": {
+        "measurementMethod": "Derived from the local 480x477 modal screenshot with pixel-run and connected-component sampling.",
+        "previewArtBounds": { "left": 0, "top": 0, "width": 480, "height": 259 },
+        "copyAndActionPanelBounds": { "left": 0, "top": 259, "width": 480, "height": 218 },
+        "panelSampledBackground": "#242424",
+        "getStartedOutlineBounds": { "left": 186, "top": 399, "width": 108, "height": 48 }
+      }
+    },
+    "underlayNavigationRegions": [
+      { "left": 0, "top": 44, "width": 52, "height": 1270 },
+      { "left": 52, "top": 44, "width": 269.875, "height": 1270 }
+    ],
+    "pointerInterception": {
+      "observed": true,
+      "blockedControl": "Hide sidebar",
+      "result": "The visible control was found, but the dialog overlay intercepted the Playwright pointer action before a shell lifecycle observation could complete."
+    },
+    "dismissal": {
+      "closeActionOutcome": "unverified",
+      "afterReload": "The dialog was no longer present in the isolated profile.",
+      "persistenceScope": "unknown"
+    }
+  },
+  "packageStringProbe": {
+    "method": "Read-only printable-string scan of the exact fingerprinted app.asar using strings -a -n 16, then exact-text matching.",
+    "reproducibleCommand": "pnpm scan:current-package-candidates -- --app /Applications/ChatGPT.app --expected-version 26.924.22138 --expected-build 11645",
+    "titlePresent": false,
+    "descriptionPresent": false,
+    "genericCloseDialogLabelPresent": true,
+    "interpretation": "The title and description did not occur as printable strings in this scan. Dynamic, encoded, localized, or remotely supplied text remain possible; this does not prove remote delivery or identify the owning component."
+  },
+  "underlayRecapture": {
+    "method": "The dialog and backdrop were hidden with a temporary CSS rule in the isolated renderer only; no product control was used to advance the introduction.",
+    "captureArtifactKind": "renderer_emulation",
+    "matchedCheckedInCandidateGeometry": true,
+    "viewportStatesCompared": [
+      "wideNewChat",
+      "mediumNewChat",
+      "thresholdNewChat",
+      "compactVisibleBeforeCollapse",
+      "compactCollapsed",
+      "compactPinned",
+      "compactPullRequests",
+      "compactRestored"
+    ],
+    "anchors": {
+      "wide1180x820": {
+        "navigationRegions": [52, 269.88],
+        "editor": [712, 44],
+        "horizontalOverflow": 0
+      },
+      "compact720x680Expanded": {
+        "navigationRegions": [52, 269.88],
+        "editor": [337.13, 44],
+        "horizontalOverflow": 0
+      },
+      "compact720x680Collapsed": {
+        "navigationRegions": [52],
+        "editor": [608, 44],
+        "horizontalOverflow": 0
+      }
+    }
+  },
+  "interpretation": "The same installed ASAR identity now presents a first-run layout introduction in Codex mode. The underlying shell anchors sampled here match the existing 26.924 candidate. This does not establish whether the introduction is account-scoped, server-delivered, or locally persisted, and it does not prove that every surface in the user's reported UI matches this candidate.",
+  "remaining": [
+    "Verify the introduction's Get started and Close dialog lifecycle without changing the user's primary profile.",
+    "Trace the preview illustration to its exact ASAR or runtime-served asset; similarly named packaged sidebar-onboarding art inspected here was unrelated.",
+    "Re-resolve the entry point, owner, lifecycle, state variants, theme, and responsive behavior for all inventory surfaces on the exact target UI.",
+    "Current-build Browser, Electron, and installed-product regional-pixel evidence for this surface are not recorded."
+  ]
+}

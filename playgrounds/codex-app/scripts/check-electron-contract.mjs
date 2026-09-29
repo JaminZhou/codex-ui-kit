@@ -190,8 +190,8 @@ try {
       JSON.stringify(["sidebar-more", "sidebar-new-chat"]) ||
     JSON.stringify(projectActionContract.rects) !==
       JSON.stringify([
-        { height: 24, rightInset: 32, width: 24 },
-        { height: 24, rightInset: 2, width: 24 },
+        { height: 24, rightInset: 36, width: 24 },
+        { height: 24, rightInset: 6, width: 24 },
       ]) ||
     taskActionContract.opacity !== "1" ||
     taskActionContract.gap !== 8 ||
@@ -612,6 +612,9 @@ try {
   await accountMenuTrigger.click();
   const accountMenu = page.getByRole("menu", { name: "Account menu" });
   await accountMenu.waitFor({ state: "visible" });
+  await page.waitForFunction(
+    () => document.activeElement?.getAttribute("role") === "menu",
+  );
   const accountMenuContract = await accountMenu.evaluate((menu) => {
     const bounds = menu.getBoundingClientRect();
     return {
@@ -13259,7 +13262,28 @@ try {
       "Electron host mode exposed a replay-only linked worktree fixture.",
     );
   }
-  await linkedWorktreePage.waitForTimeout(1_000);
+  await linkedWorktreePage.waitForFunction(
+    () => {
+      const dialog = Array.from(
+        document.querySelectorAll('[role="dialog"]'),
+      ).find((element) =>
+        element.querySelector("h2")?.textContent?.includes(
+          "Select local environment",
+        ),
+      );
+      const items = dialog?.querySelectorAll("li");
+      const currentCheckout = Array.from(
+        dialog?.querySelectorAll("button") ?? [],
+      ).find(
+        (button) =>
+          button.getAttribute("aria-label") ===
+          "Use local environment Main",
+      );
+      return items?.length === 1 && currentCheckout && !currentCheckout.disabled;
+    },
+    null,
+    { timeout: 10_000 },
+  );
   const hostCurrentCheckout = hostLocalEnvironmentDialog.getByRole("button", {
     name: "Use local environment Main",
   });

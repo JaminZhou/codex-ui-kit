@@ -210,12 +210,128 @@ async function capture(scene) {
       true,
     );
     await page.evaluate(() => document.activeElement?.blur());
+    const currentProjectGroup = page
+      .locator(".codex-ui-app-sidebar__project-group")
+      .nth(2);
+    const currentProjectRow = currentProjectGroup.locator(
+      ":scope > .codex-ui-app-sidebar__item-row",
+    );
+    await currentProjectRow.hover();
+    const currentProjectActions = await currentProjectRow.evaluate((row) => {
+      const toolbar = row.querySelector(
+        ":scope > .codex-ui-app-sidebar__item-actions",
+      );
+      const rowRect = row.getBoundingClientRect();
+      const buttons = Array.from(toolbar?.querySelectorAll("button") ?? []);
+      return {
+        buttons: buttons.map((button) => {
+          const rect = button.getBoundingClientRect();
+          const target = document.elementFromPoint(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+          );
+          return {
+            height: rect.height,
+            hitTargetIsButton: Boolean(target && button.contains(target)),
+            rightInset: Math.round((rowRect.right - rect.right) * 1000) / 1000,
+            topOffset: Math.round((rect.top - rowRect.top) * 1000) / 1000,
+            width: rect.width,
+          };
+        }),
+        opacity: toolbar ? getComputedStyle(toolbar).opacity : null,
+      };
+    });
+    assert.deepEqual(currentProjectActions, {
+      buttons: [
+        {
+          height: 24,
+          hitTargetIsButton: true,
+          rightInset: 36,
+          topOffset: 3,
+          width: 24,
+        },
+        {
+          height: 24,
+          hitTargetIsButton: true,
+          rightInset: 6,
+          topOffset: 3,
+          width: 24,
+        },
+      ],
+      opacity: "1",
+    });
     await page.mouse.move(640, 100);
+    const screenshot = await page.screenshot();
+    const keyboardProject = page.getByRole("button", {
+      exact: true,
+      name: "session-browser",
+    });
+    const keyboardActionTrigger = page.getByRole("button", {
+      exact: true,
+      name: "Project actions for session-browser",
+    });
+    await keyboardProject.focus();
+    await keyboardProject.press("Tab");
+    await page.waitForFunction(
+      () =>
+        document.activeElement?.getAttribute("aria-label") ===
+        "Project actions for session-browser",
+    );
+    const keyboardAction = await keyboardActionTrigger.evaluate((button) => {
+      const toolbar = button.closest(".codex-ui-app-sidebar__item-actions");
+      const bounds = button.getBoundingClientRect();
+      const target = document.elementFromPoint(
+        bounds.left + bounds.width / 2,
+        bounds.top + bounds.height / 2,
+      );
+      const style = getComputedStyle(button);
+      return {
+        focused: document.activeElement === button,
+        height: bounds.height,
+        hitTargetIsButton: Boolean(target && button.contains(target)),
+        opacity: toolbar ? getComputedStyle(toolbar).opacity : null,
+        outlineStyle: style.outlineStyle,
+        outlineWidth: style.outlineWidth,
+        width: bounds.width,
+      };
+    });
+    assert.deepEqual(keyboardAction, {
+      focused: true,
+      height: 24,
+      hitTargetIsButton: true,
+      opacity: "1",
+      outlineStyle: "solid",
+      outlineWidth: "2px",
+      width: 24,
+    });
+    await keyboardActionTrigger.press("Enter");
+    const keyboardMenu = page.getByRole("menu", {
+      name: "session-browser project menu",
+    });
+    await keyboardMenu.waitFor({ state: "visible" });
+    await page.waitForFunction(
+      () => document.activeElement?.getAttribute("role") === "menuitem",
+    );
+    const menuFocusRole = await keyboardMenu.evaluate(
+      (menu) => document.activeElement?.getAttribute("role"),
+    );
+    assert.equal(menuFocusRole, "menuitem");
+    await page.keyboard.press("Escape");
+    await keyboardMenu.waitFor({ state: "hidden" });
+    await page.waitForFunction(
+      () =>
+        document.activeElement?.getAttribute("aria-label") ===
+        "Project actions for session-browser",
+    );
+    const focusReturned = await keyboardActionTrigger.evaluate(
+      (button) => document.activeElement === button,
+    );
+    assert.equal(focusReturned, true);
     await writeFile(
       join(artifactDirectory, `${scene.id}.json`),
-      `${JSON.stringify(shell, null, 2)}\n`,
+      `${JSON.stringify({ keyboard: { ...keyboardAction, focusReturned, menuFocusRole }, shell }, null, 2)}\n`,
     );
-    return { app, screenshot: await page.screenshot() };
+    return { app, screenshot };
   } catch (error) {
     await app.close();
     throw error;
@@ -255,7 +371,7 @@ console.log(
     artifactDirectory,
     passed: true,
     pixelGate: "0% own-fixture drift across 1180/720 and dark/light",
-    replayEvidence: "current 26.915 sidebar project navigation",
+    replayEvidence: "current sidebar project-action pointer and keyboard lifecycle",
     scenes: scenes.map(({ id }) => id),
   }),
 );

@@ -4918,6 +4918,7 @@ export async function launchScene(
     executablePath,
     layoutMode,
     nativeThemeSource,
+    deviceScaleFactor,
     theme,
     windowSize,
   } = {},
@@ -4939,7 +4940,13 @@ export async function launchScene(
   // path explicitly selects the packaged-app path and skips Playwright's loader
   // (ready-event coordination and Chromium automation/backgrounding switches).
   return launchIsolatedElectron({
-    args: ["--force-color-profile=srgb", "."],
+    args: [
+      "--force-color-profile=srgb",
+      ...(deviceScaleFactor
+        ? [`--force-device-scale-factor=${deviceScaleFactor}`]
+        : []),
+      ".",
+    ],
     executablePath,
     env: {
       ...process.env,
@@ -4962,6 +4969,9 @@ export async function launchScene(
       CODEX_DEMO_SHELL_STATE: scene.shellState ?? "ready",
       CODEX_DEMO_THEME: resolvedTheme,
       CODEX_DEMO_VIEW: scene.view ?? "conversation",
+      CODEX_DEMO_PRIMARY_ROUTE: scene.primaryRoute ?? "",
+      CODEX_DEMO_CURRENT_PRIMARY_ROUTE_SHELL:
+        scene.currentPrimaryRouteShell ?? "",
       ...(resolvedWindowSize
         ? {
             CODEX_DEMO_WINDOW_HEIGHT: String(

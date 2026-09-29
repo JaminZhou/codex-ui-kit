@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { constants, realpathSync } from "node:fs";
 import { open } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 export const currentBaselineViewports = Object.freeze({
   compact: Object.freeze({ height: 680, width: 720 }),
@@ -89,6 +90,19 @@ export const currentLatestInstalledCandidateBaselineFingerprint =
     appVersion: "26.917.71314",
     buildNumber: "10954",
     chromiumVersion: "153.0.8010.53",
+  });
+
+// The currently installed desktop build is isolated as a candidate until its
+// broad surface families have been re-observed. This fingerprint identifies
+// the package only; it does not promote old geometry or establish parity.
+export const currentObservedBuildCandidateBaselineFingerprint =
+  Object.freeze({
+    appAsarBytes: 480_133_781,
+    appAsarSha256:
+      "d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80",
+    appVersion: "26.924.22138",
+    buildNumber: "11645",
+    chromiumVersion: "154.0.8037.57",
   });
 
 export const currentAccountMenuCandidateFingerprints = Object.freeze({
@@ -608,6 +622,64 @@ export async function writeCurrentBaselineOutput(
   } catch (error) {
     throw new Error(
       "The optional capture output must be a new non-symlink file inside the isolated profile.",
+      { cause: error },
+    );
+  } finally {
+    await handle?.close();
+  }
+}
+
+export function resolveCurrentBaselineCandidateOutputPath(outputPath) {
+  const normalizedOutput = resolve(outputPath);
+  const expectedResearchDirectory = realpathSync(
+    resolve(dirname(fileURLToPath(import.meta.url)), "../research"),
+  );
+  let normalizedParent;
+  try {
+    normalizedParent = realpathSync(dirname(normalizedOutput));
+  } catch {
+    throw new Error(
+      "The candidate output must be the dedicated file in the repository research directory.",
+    );
+  }
+  if (
+    normalizedParent !== expectedResearchDirectory ||
+    basename(normalizedOutput) !==
+      "current-baseline-26.924.22138-candidate.json"
+  ) {
+    throw new Error(
+      "The candidate output must be current-baseline-26.924.22138-candidate.json in research/.",
+    );
+  }
+  return resolve(normalizedParent, basename(normalizedOutput));
+}
+
+export async function writeCurrentBaselineCandidateOutput(
+  profilePath,
+  outputPath,
+  contents,
+) {
+  const normalizedProfile = realpathSync(profilePath);
+  if (!normalizedProfile.startsWith("/private/tmp/codex-ui-kit-")) {
+    throw new Error(
+      "A repository candidate record may only be generated from an isolated codex-ui-kit temporary profile.",
+    );
+  }
+  const normalizedOutput = resolveCurrentBaselineCandidateOutputPath(outputPath);
+  let handle;
+  try {
+    handle = await open(
+      normalizedOutput,
+      constants.O_CREAT |
+        constants.O_EXCL |
+        constants.O_NOFOLLOW |
+        constants.O_WRONLY,
+      0o644,
+    );
+    await handle.writeFile(contents, "utf8");
+  } catch (error) {
+    throw new Error(
+      "The candidate output must be a new non-symlink research artifact.",
       { cause: error },
     );
   } finally {
@@ -1292,7 +1364,7 @@ export function selectCurrentMainCandidate(candidates) {
         isMainRendererUrl(candidate.url) &&
         candidate.area >= 300_000 &&
         candidate.landmarks.main >= 1 &&
-        (candidate.landmarks.nav === 1 ||
+        (candidate.landmarks.nav >= 1 ||
           candidate.landmarks.sidebarTrigger >= 1) &&
         candidate.visibleControls >= 10,
     )
@@ -2082,6 +2154,113 @@ export function assertCurrentBaselineRecord(
     if (serialized.includes(forbiddenKey)) {
       throw new Error(
         `Current baseline record contains forbidden user-content key ${forbiddenKey}.`,
+      );
+    }
+  }
+}
+
+// Candidate observations deliberately validate identity, provenance, and
+// completeness without applying promoted-build geometry or state assertions.
+// This keeps a major product redesign observable rather than treating it as a
+// failed old contract, while still preventing it from being called verified.
+export function assertCurrentBaselineObservationRecord(
+  record,
+  expectedFingerprint = currentObservedBuildCandidateBaselineFingerprint,
+) {
+  if (record?.schemaVersion !== 1) {
+    throw new Error("Current baseline observation must use schema version 1.");
+  }
+  if (record?.baselineStatus !== "candidate-only-observation") {
+    throw new Error(
+      "Current baseline observation must be marked candidate-only.",
+    );
+  }
+  if (
+    Object.entries(expectedFingerprint).some(
+      ([key, expected]) => record.baseline?.[key] !== expected,
+    )
+  ) {
+    throw new Error(
+      "Current baseline observation does not match the candidate package fingerprint.",
+    );
+  }
+  if (
+    !provesRuntimeBundleIdentity(record.runtimeBundleIdentity, expectedFingerprint)
+  ) {
+    throw new Error(
+      "Current baseline observation does not prove the running Renderer bundle identity.",
+    );
+  }
+  if (
+    record.captureKind !== "renderer_emulation" ||
+    !isMainRendererUrl(record.targetSelection?.selected?.url ?? "")
+  ) {
+    throw new Error(
+      "Current baseline observation must identify the exact main Renderer.",
+    );
+  }
+  const selectedCandidates = record.targetSelection?.candidates?.filter(
+    (candidate) => candidate.selected === true,
+  );
+  if (
+    selectedCandidates?.length !== 1 ||
+    !isMainRendererUrl(selectedCandidates[0]?.url ?? "") ||
+    !Number.isFinite(selectedCandidates[0]?.area) ||
+    selectedCandidates[0].area <= 0
+  ) {
+    throw new Error(
+      "Current baseline observation has no unique, structurally selected main Renderer candidate.",
+    );
+  }
+
+  const expectedViewportByState = {
+    compactCollapsed: currentBaselineViewports.compact,
+    compactPinned: currentBaselineViewports.compact,
+    compactPullRequests: currentBaselineViewports.compact,
+    compactRestored: currentBaselineViewports.compact,
+    compactVisibleBeforeCollapse: currentBaselineViewports.compact,
+    mediumNewChat: currentBaselineViewports.medium,
+    thresholdNewChat: currentBaselineViewports.threshold,
+    wideNewChat: currentBaselineViewports.wide,
+  };
+  for (const [name, expectedViewport] of Object.entries(
+    expectedViewportByState,
+  )) {
+    const state = record.states?.[name];
+    if (
+      state?.viewport?.width !== expectedViewport.width ||
+      state?.viewport?.height !== expectedViewport.height ||
+      !Number.isFinite(state.viewport.devicePixelRatio) ||
+      state.viewport.devicePixelRatio <= 0 ||
+      typeof state.colorScheme !== "string" ||
+      state.colorScheme.length === 0 ||
+      !Number.isFinite(state.horizontalOverflow)
+    ) {
+      throw new Error(
+        `Current baseline observation is incomplete for the ${name} viewport sample.`,
+      );
+    }
+  }
+  if (
+    !record.projectsIndexObservation ||
+    !record.sidebarLifecycle ||
+    !Number.isFinite(Date.parse(record.baseline?.sampledAt ?? ""))
+  ) {
+    throw new Error(
+      "Current baseline observation is missing sidebar, Projects, or sampling metadata.",
+    );
+  }
+  const serialized = JSON.stringify(record);
+  for (const forbiddenKey of [
+    '"account"',
+    '"bodyText"',
+    '"projectName"',
+    '"taskTitle"',
+    '"threadTitle"',
+  ]) {
+    if (serialized.includes(forbiddenKey)) {
+      throw new Error(
+        `Current baseline observation contains forbidden user-content key ${forbiddenKey}.`,
       );
     }
   }
