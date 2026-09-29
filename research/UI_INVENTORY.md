@@ -113,6 +113,12 @@ host-owned and are intentionally not claimed by the playground.
   audit reports six package-tagged surfaces separately from the 33
   runtime-fragment surfaces; neither package strings nor public release notes
   establish runtime availability, behavior, or visual parity.
+- A production-channel updater check on 2026-09-30 reports `26.928.20755`
+  (`12246`) available but not installed; `26.924.22138` remains the latest
+  installed candidate and the only build covered by this record. The available
+  version has no runtime or pixel evidence here; see the alignment gate in
+  [`DELIVERY_PLAN.md`](DELIVERY_PLAN.md) before refreshing the 100-surface
+  denominator.
 - Computer Use automation: blocked by the environment safety policy for
   `com.openai.codex`
 - A previous read-only CDP capture used a separate process/profile, but the
