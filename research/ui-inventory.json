@@ -1342,7 +1342,8 @@
         "cdp-26.924.22138:new-chat-and-scheduled-visible-no-pull-requests-anchor-sampled",
         "cdp-26.924.22138:home-scheduled-library-images-customize-explore-help-profile-rail-labels",
         "cdp-26.924.22138:rail-52px-items-36px-icons-20px-gap-8px-padding-8-8-4-window-44-bottom-4",
-        "cdp-26.924.22138:explore-projects-and-gpts-route-entry"
+        "cdp-26.924.22138:explore-projects-and-gpts-route-entry",
+        "cdp-26.924.22138:seven-rail-svg-icons-20px-source-unresolved-profile-avatar-excluded"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
