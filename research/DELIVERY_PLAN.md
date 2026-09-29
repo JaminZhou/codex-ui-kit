@@ -73,6 +73,26 @@ reached:
   `integrations.plugins` and its turn/approval states to the existing thread
   tool/approval surfaces unless observation proves a distinct route. Use only
   synthetic test content; do not inspect or send personal Messages data.
+- Re-audit shared thread snapshots end to end: the thread-level share action,
+  copy/open behavior, immutable read-only snapshot, personal-versus-workspace
+  access, and the Shared links revoke path. Keep this as a candidate until the
+  current Codex route is reached; do not equate a package label with a usable
+  share flow.
+- Re-audit sidebar Activity and unified Pinned behavior, including entry-point
+  ownership, attention ordering, pin/unpin, and whether the desktop state stays
+  synchronized with the companion iOS surface. Mobile-only details remain out
+  of the desktop visual denominator.
+- Re-audit multi-folder local projects and cross-repository Review: primary vs
+  secondary folder semantics, edit/remove flows, repository grouping, Review
+  entry and diff navigation. Treat these as state/ownership changes to existing
+  workspace rows unless the current build exposes a separate destination.
+- Re-audit Sources actions for opening a file in the workspace and downloading
+  files without an in-app preview, plus current model-picker availability and
+  unavailable/deprecated model states. Do not infer a visible warning or
+  disabled state from a public retirement notice alone.
+- Check whether Sites co-editing or editable-URL controls are reachable from
+  Codex at all; keep them as scope candidates rather than adding desktop
+  surfaces based only on ChatGPT Work release notes.
 
 Record absent, unavailable, rollout-gated, or policy-blocked states explicitly;
 do not infer them from public release notes or from a different account/build.
