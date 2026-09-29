@@ -1982,6 +1982,22 @@
       "priority": "p1"
     },
     {
+      "id": "app.layout-update-introduction",
+      "area": "app-shell",
+      "ownership": "app",
+      "packageEvidence": [
+        "app-shell-layout-update-introduction"
+      ],
+      "runtimeStatus": "runtime_observed",
+      "runtimeEvidence": [
+        "cdp-26.924.22138:first-run-desktop-layout-introduction-dialog-and-dual-navigation-shell"
+      ],
+      "implementationStatus": "not_started",
+      "browserStatus": "not_started",
+      "electronStatus": "not_started",
+      "priority": "p1"
+    },
+    {
       "id": "app.quick-hotkey-windows",
       "area": "app-shell",
       "ownership": "app",

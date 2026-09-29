@@ -118,9 +118,13 @@ the check mapped to existing plugin and thread-tool/approval surfaces unless a
 distinct route is observed. The inventory records positive markers as package
 evidence only; two not-sampled P2 cross-layer rows track Appshot capture
 routing and Computer History. The version-filtered audit reports these package
-fragments separately from the 33 runtime-observation surfaces. They do not
+fragments separately from the 34 runtime-observation surfaces. They do not
 increase runtime-observation counts or establish that a feature is reachable
-or enabled for this account. Reproduce the bounded marker scan with:
+or enabled for this account. The bounded marker scan now also checks the new
+layout-introduction title, body, and generic close label; the current 26.924
+package returns false/false/true. This is string-presence evidence only, not
+source attribution or lifecycle evidence. Reproduce the bounded marker scan
+with:
 
 ```sh
 pnpm scan:current-package-candidates -- --app /Applications/ChatGPT.app --expected-version 26.924.22138 --expected-build 11645
@@ -135,7 +139,7 @@ Jamin's screen is a later staged rollout, capture its exact About/build
 identity before promoting any 26.924 result to that UI.
 
 The next gate is to align the exact app build with the reported UI, then audit
-all 99 inventory surfaces for presence, entry point, ownership, lifecycle,
+all 100 inventory surfaces for presence, entry point, ownership, lifecycle,
 state variants, viewport, and theme. Preserve old implementations and captures
 as regression material; only rewrite or extend a component where the aligned
 build's evidence shows a delta. Prioritize the shared shell/navigation and
@@ -145,8 +149,8 @@ resolved, product Browser, Electron, and regional-pixel claims remain
 unverified.
 
 For the `26.924.22138` candidate, the full-denominator report currently finds
-candidate runtime fragments on 33/99 surfaces (P0 16/59, P1 14/27, P2 3/13).
-By area: app shell 12/23, Composer 4/8, conversation 3/28, cross-layer 0/5,
+candidate runtime fragments on 34/100 surfaces (P0 16/59, P1 15/28, P2 3/13).
+By area: app shell 13/24, Composer 4/8, conversation 3/28, cross-layer 0/5,
 integrations 2/6, scope candidates 0/2, Settings 10/12, and workspace 2/15.
 These counts are reconnaissance coverage, not acceptance; target-build Browser,
 Electron, and regional-pixel coverage are all still zero. Audit in this order:
@@ -175,8 +179,12 @@ Settings → Notifications now also have local shell-only placeholder replays at
 1180×820; their route bodies and active-rail styling remain unobserved. Explore
 → GPTs remains an observed entry point whose destination shell has not been
 opened, so it stays an explicit audit question rather than being counted as an
-observed screen. The current candidate report is now 33/99; no product Browser,
-Electron, or regional-pixel acceptance is implied by these tags.
+observed screen. The 2026-09-29 first-run layout-introduction dialog is now
+tracked as a separate P1 app-shell surface from login onboarding, bringing the
+candidate report to 34/100. Its dismissal lifecycle is unresolved, and the
+underlay re-capture used renderer-only CSS to hide the modal; neither that
+structural observation nor the shell-geometry match is Browser, Electron, or
+regional-pixel acceptance.
 
 ## Current position
 
@@ -477,8 +485,8 @@ Electron, or regional-pixel acceptance is implied by these tags.
   unavailable because the new Renderer no longer exposes the old Fiber provider
   and CDP cannot inspect native windows. No unsampled menu contents are
   promoted.
-- The inventory contains 99 surface groups: 59 P0, 27 P1, and 13 P2.
-- At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 70
+- The inventory contains 100 surface groups: 59 P0, 28 P1, and 13 P2.
+- At the promoted `26.903.71938` baseline, 18 groups have runtime evidence, 71
   have previous-build-only runtime evidence, and 11 have not been sampled. The
   `26.917.71314` candidate now maps structural observations to twelve P0
   conversation-destination, shell/navigation, Composer, and Projects groups,
@@ -1444,9 +1452,10 @@ current-build Electron and product-pixel gates. A further Composer trigger pass
 measures three context popovers and the trailing selector, verifies Escape
 dismissal, and deliberately retains no values or choice labels.
 
-Because navigation and the Composer composition changed, the previous UI must
-be re-audited before its evidence is treated as current. Use the existing
-99-surface inventory as the denominator: first re-resolve every P0/P1/P2
+Because navigation, the first-run layout introduction, and the Composer
+composition changed, the previous UI must be re-audited before its evidence is
+treated as current. Use the existing 100-surface inventory as the denominator:
+first re-resolve every P0/P1/P2
 surface's visible entry point, owner, and lifecycle on `26.924.22138`; then
 refresh states, computed styles, responsive geometry, Electron behavior, and
 masked regional pixels for each affected family. An absent old label means
@@ -1475,8 +1484,10 @@ The 2026-09-28 evidence census used the then-current 93-surface inventory and
 found at least one `26.924.22138` runtime tag on 13/59 P0, 8/23 P1, and 3/11
 P2 surfaces (24/93 total). The 2026-09-29 mapping pass expanded the queue to
 97 surfaces. A subsequent package-presence pass added two not-sampled P2
-cross-layer rows, bringing the inventory to 99. The current audit reports
-candidate tags on 16/59 P0, 14/27 P1, and 3/13 P2 surfaces (33/99 total).
+cross-layer rows, bringing the inventory to 99. Recording the first-run
+layout-introduction dialog adds one P1 row, bringing the inventory to 100. The
+current audit reports candidate tags on 16/59 P0, 15/28 P1, and 3/13 P2
+surfaces (34/100 total).
 These runtime tags are navigation/structure probes only; they do not
 count as a refreshed interaction or visual contract. No
 `26.924.22138` Electron product run or installed-product pixel baseline is

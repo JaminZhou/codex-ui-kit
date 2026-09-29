@@ -21,6 +21,9 @@ describe("installed package candidate marker scan", () => {
       webmcpLabel: false,
       siteToolsLabel: false,
       appleMessagesPluginLabel: false,
+      layoutIntroductionTitle: false,
+      layoutIntroductionDescription: false,
+      layoutIntroductionCloseDialogLabel: false,
     });
   });
 
@@ -30,6 +33,11 @@ describe("installed package candidate marker scan", () => {
     matcher.observe("APPshot destination");
     matcher.observe("WebMCP tools");
     matcher.observe("Apple Messages plugin");
+    matcher.observe("A new layout for ChatGPT desktop");
+    matcher.observe(
+      "Your chats are now at the top. Find Scheduled, Library, Images, and Plugins on the left.",
+    );
+    matcher.observe("Close dialog");
 
     const result = matcher.result();
     expect(result.gpt6LunaModelLabel).toBe(true);
@@ -37,6 +45,9 @@ describe("installed package candidate marker scan", () => {
     expect(result.webmcpLabel).toBe(true);
     expect(result.appleMessagesPluginLabel).toBe(true);
     expect(result.gpt6SolModelLabel).toBe(false);
+    expect(result.layoutIntroductionTitle).toBe(true);
+    expect(result.layoutIntroductionDescription).toBe(true);
+    expect(result.layoutIntroductionCloseDialogLabel).toBe(true);
   });
 
   it("keeps its marker catalog explicit and bounded", () => {
@@ -50,6 +61,9 @@ describe("installed package candidate marker scan", () => {
       "webmcpLabel",
       "siteToolsLabel",
       "appleMessagesPluginLabel",
+      "layoutIntroductionTitle",
+      "layoutIntroductionDescription",
+      "layoutIntroductionCloseDialogLabel",
     ]);
   });
 });
