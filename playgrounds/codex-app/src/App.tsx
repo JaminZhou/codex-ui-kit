@@ -19665,8 +19665,19 @@ export function App() {
                   <LiveMcpElicitation
                     key={`${request.threadId}:${typeof request.requestId}:${request.requestId}`}
                     request={request}
+                    verificationAvailable={mode === "live"}
                     onSubmit={async (action, content) => {
-                      if (mode === "live") {
+                      if (action === "verify") {
+                        if (mode !== "live" || !window.codexDemo) {
+                          throw new Error("Device verification is available only in a live Codex session.");
+                        }
+                        await window.codexDemo.verifyMcpElicitation({
+                          requestId: request.requestId,
+                          threadId: request.threadId,
+                        });
+                        dispatchLiveMcpElicitation({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
+                        dispatchLiveNotification({ method: "serverRequest/resolved", params: { requestId: request.requestId, threadId: request.threadId } });
+                      } else if (mode === "live") {
                         if (!window.codexDemo) throw new Error("Live host unavailable.");
                         await window.codexDemo.respondToMcpElicitation({
                           action,

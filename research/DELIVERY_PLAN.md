@@ -60,6 +60,19 @@ after recording the installed package identity and confirming the runtime
 Renderer actually corresponds to that build. This updater check did not launch
 the app or create a CDP process.
 
+On 2026-09-30, Jamin reported that the new Codex UI looks substantially
+different and asked whether the prior UI should be reviewed again. Treat this
+as a trigger for a full-denominator refresh, not as proof that the visible
+window is build 26.928: the local updater still identifies 26.924.22138 as
+installed and 26.928.20755 as merely available. First tie the reported window
+to its About/build identity or explicitly record an account/server rollout.
+Once aligned, quickly recheck presence, entry point, owner, lifecycle, and
+affected states across all 100 inventory surfaces. Then spend deep CDP,
+computed-style, Electron, and pixel effort on changed shared-shell geometry and
+the P0/P1 families whose structure or appearance moved, with a few unchanged
+anchors as controls. Keep all prior captures as historical regression
+evidence; do not discard them or promote them to current-build observations.
+
 OpenAI's [Codex changelog](https://learn.chatgpt.com/docs/changelog) records
 Codex joining the ChatGPT desktop app in 26.707, including in-app editing and
 PR Chat, and later changes to plugin/settings and task-activity surfaces. Its
@@ -75,19 +88,35 @@ notes include a compact welcome/header, transcript scrolling while deciding
 whether to implement a plan, App Server history pagination, and a macOS TLS
 fix for network-enabled sandboxes and proxy-dependent remote environments.
 These are CLI/App Server leads, not evidence of a desktop Renderer redesign.
-The playground's live App Server runtime is still `0.153.4`; the local
-`check-live-long-thread` acceptance attempt on September 30 failed after two
+The playground had been pinned to client commit
+`8cf5823ee12c00f7bc9c5eaeef80049e65f0e881`, whose live App Server runtime is
+`0.153.4`. Its September 30 `check-live-long-thread` attempt failed after two
 turns with `tls handshake eof` / `Connection failed: error sending request`.
-The version gap and matching TLS note warrant a targeted compatibility check,
-but do not establish causation and are not a UI finding. The latest
-desktop-specific public entry remains the September 25 macOS security update
-for 26.924.20706. No public 26.928 desktop UI redesign entry is documented as
-of this check. That absence does not rule out an account- or server-scoped
-rollout and does not disprove Jamin's observation; the current package updater
-says 26.928.20755 is available but not installed. Keep version alignment open
-until the observed window's About/build identity and affected screen are
-captured. Treat CLI-only controls as scope candidates only if the desktop
-route is independently observed.
+The separate `codex-app-server-client` repository's current `main` is now
+`97ba564e771621b90219ef9bec978732599c2bec` (PR #54), which aligns that client
+to runtime `0.159.0`. A local kit dependency update to that exact commit
+resolved correctly, but `check:protocol` stopped before executing because six
+platform-specific `0.159.0` packages were inside pnpm's active 24-hour
+minimum-release-age window (latest reported publish time
+`2026-09-29T08:15:54Z`; check time `2026-09-29T21:32:40Z`). The automatically
+added minimum-age exclusions were removed; do not bypass this gate. Retry after
+`2026-09-30T08:15:54Z`. The newer runtime's TLS note and the earlier network
+failure make this a targeted compatibility check, not proven causation and not
+a UI finding. With the already-downloaded `0.159.0` candidate, a direct
+targeted `check-live-long-thread` run subsequently passed all 12 live turns,
+kept one thread across 12 bindings, and verified scroll-away/follow with no
+horizontal overflow at 1180px and 720px. This is useful candidate evidence,
+not a replacement for the full acceptance command after the age gate permits a
+clean install and lockfile verification.
+
+The latest desktop-specific public entry remains the September 25 macOS
+security update for 26.924.20706. No public 26.928 desktop UI redesign entry
+is documented as of this check. That absence does not rule out an account- or
+server-scoped rollout and does not disprove Jamin's observation; the current
+package updater says 26.928.20755 is available but not installed. Keep version
+alignment open until the observed window's About/build identity and affected
+screen are captured. Treat CLI-only controls as scope candidates only if the
+desktop route is independently observed.
 
 Add these leads to the version-alignment pass, without counting them as
 observed inventory surfaces until the exact local Codex route or control is
@@ -2022,6 +2051,32 @@ Accept completes the same tool with `MCP_ELICITATION_OK:{}` at wide/compact
 sizes. This promotes the sampled local form/URL-to-tool decision lifecycle,
 not authentication, permission variants, multi-turn/multi-tool behavior,
 production server reachability, or installed-product pixel parity.
+
+A 2026-09-30 negative live-boundary probe with the pinned Codex App Server
+`0.159.0` invoked the MCP tool and then sent `elicitation/create` with
+`mode: "openai/userVerification"`. The server rejected that wire request with
+JSON-RPC `-32602` (`ElicitRequestParamsWire`) before emitting a renderer
+request. This does not disprove the generated App Server server-request union
+for user verification, but it proves that an ordinary MCP server cannot be
+used as its producer on this runtime. Do not add this invalid external-MCP
+shape to full acceptance. Current gate/state/UI tests cover local handling;
+the probe itself never reached a verification request or called
+`userVerification/verify`.
+
+A separate 2026-09-30 Electron fixture now sends the valid App Server
+`mcpServer/elicitation/request` `openai/userVerification` server-request from a
+disposable fake App Server through the actual main/preload/renderer bridge. It
+checks the wide and 720px pending card, confirms that display alone does not
+call verification, verifies exact challenge/title/description forwarding to
+`userVerification/verify`, and returns fixture-only proof as the original
+elicitation response. Its in-flight cancel case requires
+`userVerification/cancel` to carry the exact verification request ID and the
+original request to resolve as canceled. The targeted script is
+`check:app-server-user-verification-electron` and is now in full acceptance.
+This identifies and tests the protocol producer boundary locally, but does
+not establish that a signed-in production App Server/account emits the variant,
+and does not test native biometrics or product UI parity.
+
 The same live acceptance now adds a URL-mode request with an exact
 authorization link, `_blank` target, no implicit browser navigation, and safe
 Cancel response. This proves the public URL-mode forwarding boundary only;

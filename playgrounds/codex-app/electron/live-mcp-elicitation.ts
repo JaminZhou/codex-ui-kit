@@ -13,15 +13,35 @@ type McpJsonValue =
   | { [key: string]: McpJsonValue | undefined }
   | null;
 
-export interface LiveMcpElicitationRequest {
-  elicitationId?: string;
-  message: string;
-  mode: "form" | "openai/form" | "openaiForm" | "url";
-  requestedSchema?: unknown;
+interface LiveMcpElicitationRequestContext {
   serverName: string;
   threadId: string;
   turnId?: string | null;
-  url?: string;
+}
+
+export type LiveMcpElicitationRequest = LiveMcpElicitationRequestContext & (
+  | {
+      challenge: string;
+      description: string;
+      mode: "openai/userVerification";
+      title: string;
+    }
+  | {
+      message: string;
+      mode: "form" | "openai/form" | "openaiForm";
+      requestedSchema?: unknown;
+    }
+  | {
+      elicitationId?: string;
+      message: string;
+      mode: "url";
+      url: string;
+    }
+);
+
+export interface LiveUserVerificationProof {
+  credentialId: string;
+  signature: string;
 }
 
 export interface LiveMcpElicitationResponse {
@@ -32,7 +52,9 @@ export interface LiveMcpElicitationResponse {
 
 type Pending = {
   finish: (response: LiveMcpElicitationResponse) => void;
+  id: McpElicitationRequestId;
   request: LiveMcpElicitationRequest;
+  verificationRequestId?: McpElicitationRequestId;
 };
 
 const key = (id: McpElicitationRequestId) => `${typeof id}:${id}`;
@@ -42,7 +64,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function schemaProperties(request: LiveMcpElicitationRequest) {
-  const schema = isRecord(request.requestedSchema) ? request.requestedSchema : {};
+  const requestedSchema = "requestedSchema" in request ? request.requestedSchema : undefined;
+  const schema = isRecord(requestedSchema) ? requestedSchema : {};
   const properties = schema.properties;
   return isRecord(properties) ? properties : {};
 }
@@ -51,6 +74,9 @@ function validateContent(request: LiveMcpElicitationRequest, raw: unknown) {
   if (request.mode === "url") {
     if (raw !== undefined && !isRecord(raw)) throw new TypeError("Elicitation content must be an object.");
     return raw === undefined ? undefined : raw;
+  }
+  if (request.mode === "openai/userVerification") {
+    throw new Error("Device verification must be completed by the local app-server.");
   }
   if (!isRecord(raw)) throw new TypeError("Elicitation content must be an object.");
   const properties = schemaProperties(request);
@@ -86,7 +112,84 @@ export class LiveMcpElicitationGate {
 
   request(id: McpElicitationRequestId, request: LiveMcpElicitationRequest): Promise<LiveMcpElicitationResponse> {
     this.cancel(id);
-    return new Promise((finish) => this.pending.set(key(id), { finish, request }));
+    return new Promise((finish) => this.pending.set(key(id), { finish, id, request }));
+  }
+
+  userVerificationRequest(
+    id: McpElicitationRequestId,
+    threadId: string,
+  ): Extract<LiveMcpElicitationRequest, { mode: "openai/userVerification" }> | null {
+    const pending = this.pending.get(key(id));
+    if (!pending) return null;
+    if (pending.request.threadId !== threadId) throw new Error("The elicitation belongs to another thread.");
+    return pending.request.mode === "openai/userVerification" ? pending.request : null;
+  }
+
+  setUserVerificationRequestId(
+    id: McpElicitationRequestId,
+    threadId: string,
+    verificationRequestId: McpElicitationRequestId,
+  ): boolean {
+    const pending = this.pending.get(key(id));
+    if (!pending) return false;
+    if (pending.request.threadId !== threadId) throw new Error("The elicitation belongs to another thread.");
+    if (pending.request.mode !== "openai/userVerification" || pending.verificationRequestId !== undefined) return false;
+    pending.verificationRequestId = verificationRequestId;
+    return true;
+  }
+
+  userVerificationRequestId(
+    id: McpElicitationRequestId,
+    threadId: string,
+  ): McpElicitationRequestId | null {
+    const pending = this.pending.get(key(id));
+    if (!pending) return null;
+    if (pending.request.threadId !== threadId) throw new Error("The elicitation belongs to another thread.");
+    return pending.verificationRequestId ?? null;
+  }
+
+  pendingUserVerificationRequests(
+    threadId?: string,
+    turnId?: string,
+  ): Array<{ elicitationRequestId: McpElicitationRequestId; threadId: string; verificationRequestId: McpElicitationRequestId }> {
+    return [...this.pending.values()].flatMap((pending) => {
+      if (pending.request.mode !== "openai/userVerification" || pending.verificationRequestId === undefined) return [];
+      if (threadId !== undefined && pending.request.threadId !== threadId) return [];
+      if (turnId !== undefined && pending.request.turnId !== turnId) return [];
+      return [{ elicitationRequestId: pending.id, threadId: pending.request.threadId, verificationRequestId: pending.verificationRequestId }];
+    });
+  }
+
+  clearUserVerificationRequestId(id: McpElicitationRequestId, threadId: string) {
+    const pending = this.pending.get(key(id));
+    if (!pending || pending.request.threadId !== threadId) return false;
+    pending.verificationRequestId = undefined;
+    return true;
+  }
+
+  respondWithUserVerificationProof(
+    id: McpElicitationRequestId,
+    threadId: string,
+    rawProof: unknown,
+  ): boolean {
+    const pending = this.pending.get(key(id));
+    if (!pending) return false;
+    if (pending.request.threadId !== threadId) throw new Error("The elicitation belongs to another thread.");
+    if (pending.request.mode !== "openai/userVerification") {
+      throw new Error("The pending elicitation does not require device verification.");
+    }
+    if (
+      !isRecord(rawProof) ||
+      typeof rawProof.credentialId !== "string" || rawProof.credentialId.length === 0 ||
+      typeof rawProof.signature !== "string" || rawProof.signature.length === 0
+    ) throw new TypeError("The local app-server returned an invalid verification proof.");
+    const proof: LiveUserVerificationProof = {
+      credentialId: rawProof.credentialId,
+      signature: rawProof.signature,
+    };
+    this.pending.delete(key(id));
+    pending.finish({ _meta: null, action: "accept", content: proof as unknown as McpJsonValue });
+    return true;
   }
 
   respond(

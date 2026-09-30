@@ -206,6 +206,29 @@ function historyRegistry() {
   );
 }
 
+function cancelUserVerificationRpc(requestId: number | string): Promise<void> {
+  const activeClient = client;
+  if (!activeClient || activeClient.state !== "connected") return Promise.resolve();
+  return new Promise((resolveCancellation) => {
+    const timeout = setTimeout(resolveCancellation, 1_000);
+    void activeClient.call("userVerification/cancel", { requestId }).then(
+      () => { clearTimeout(timeout); resolveCancellation(); },
+      () => { clearTimeout(timeout); resolveCancellation(); },
+    );
+  });
+}
+
+async function cancelPendingUserVerificationRequests(threadId?: string, turnId?: string) {
+  await Promise.all(liveMcpElicitationGate
+    .pendingUserVerificationRequests(threadId, turnId)
+    .map(({ verificationRequestId }) => cancelUserVerificationRpc(verificationRequestId)));
+}
+
+async function cancelPendingUserVerificationRequest(requestId: string | number, threadId: string) {
+  const verificationRequestId = liveMcpElicitationGate.userVerificationRequestId(requestId, threadId);
+  if (verificationRequestId !== null) await cancelUserVerificationRpc(verificationRequestId);
+}
+
 function environmentRegistry() {
   return liveEnvironmentRegistry ??= new LiveEnvironmentRegistry(
     process.env.CODEX_UI_KIT_LIVE_ENVIRONMENTS_PATH ?? join(app.getPath("userData"), "codex-ui-kit", "live-environments.json"),
@@ -378,6 +401,7 @@ function broadcastNotification(notification: JsonRpcNotification) {
   if (notification.method === "turn/completed") {
     const params = notification.params as { threadId?: unknown; turn?: { id?: unknown } } | undefined;
     if (typeof params?.threadId === "string" && typeof params.turn?.id === "string") {
+      void cancelPendingUserVerificationRequests(params.threadId, params.turn.id);
       liveInputGate.clearTurn(params.threadId, params.turn.id);
       liveMcpElicitationGate.clearTurn(params.threadId, params.turn.id);
     }
@@ -385,6 +409,7 @@ function broadcastNotification(notification: JsonRpcNotification) {
   if (notification.method === "serverRequest/resolved") {
     const params = notification.params as { requestId?: unknown; threadId?: unknown } | undefined;
     if (params && (typeof params.requestId === "string" || typeof params.requestId === "number") && typeof params.threadId === "string") {
+      void cancelPendingUserVerificationRequest(params.requestId, params.threadId);
       liveInputGate.cancel(params.requestId, params.threadId);
       liveMcpElicitationGate.cancel(params.requestId, params.threadId);
     }
@@ -524,7 +549,9 @@ function openAllowedExternalUrl(url: string) {
 
 async function ensureClient() {
   if (client?.state === "connected") return client;
+  await cancelPendingUserVerificationRequests();
   liveInputGate.clear();
+  liveMcpElicitationGate.clear();
   liveSession.clear();
   mainWindow?.webContents.send("demo:live:session", { kind: "live-reset" });
   if (client) {
@@ -672,6 +699,7 @@ async function compactLive(event: IpcMainInvokeEvent, raw: unknown) {
 }
 
 async function stopLive() {
+  await cancelPendingUserVerificationRequests();
   if (!activeTurn) return;
   liveApprovalGate.declineAll();
   liveMcpElicitationGate.clear();
@@ -732,6 +760,7 @@ async function closeTerminals() {
 }
 
 async function closeLive() {
+  await cancelPendingUserVerificationRequests();
   liveInputGate.clear();
   liveMcpElicitationGate.clear();
   activeTurn = null;
@@ -1544,7 +1573,7 @@ ipcMain.handle("demo:input:respond", (event, rawInput: unknown) => {
     throw new Error("The question is no longer pending.");
   }
 });
-ipcMain.handle("demo:mcp-elicitation:respond", (event, rawInput: unknown) => {
+ipcMain.handle("demo:mcp-elicitation:respond", async (event, rawInput: unknown) => {
   assertTrustedIpc(event);
   if (!rawInput || typeof rawInput !== "object") throw new TypeError("Invalid MCP elicitation response.");
   const input = rawInput as { requestId?: unknown; threadId?: unknown; action?: unknown; content?: unknown };
@@ -1553,12 +1582,47 @@ ipcMain.handle("demo:mcp-elicitation:respond", (event, rawInput: unknown) => {
     typeof input.threadId !== "string" ||
     !["accept", "decline", "cancel"].includes(input.action as string)
   ) throw new TypeError("A request, owning thread, and valid action are required.");
+  if (input.action !== "accept") {
+    await cancelPendingUserVerificationRequest(input.requestId, input.threadId);
+  }
   if (!liveMcpElicitationGate.respond(
     input.requestId,
     input.threadId,
     input.action as "accept" | "decline" | "cancel",
     input.content,
   )) throw new Error("The MCP elicitation is no longer pending.");
+});
+ipcMain.handle("demo:mcp-elicitation:verify", async (event, rawInput: unknown) => {
+  assertTrustedIpc(event);
+  if (!rawInput || typeof rawInput !== "object") throw new TypeError("Invalid device verification request.");
+  const input = rawInput as { requestId?: unknown; threadId?: unknown };
+  if (
+    (typeof input.requestId !== "string" && typeof input.requestId !== "number") ||
+    typeof input.threadId !== "string"
+  ) throw new TypeError("A request and owning thread are required.");
+  const request = liveMcpElicitationGate.userVerificationRequest(input.requestId, input.threadId);
+  if (!request) throw new Error("The device verification request is no longer pending.");
+  const activeClient = client;
+  if (!activeClient || activeClient.state !== "connected") {
+    throw new Error("The local Codex app-server is not connected.");
+  }
+  const verification = activeClient.callWithId("userVerification/verify", {
+    challenge: request.challenge,
+    description: request.description,
+    title: request.title,
+  });
+  if (!liveMcpElicitationGate.setUserVerificationRequestId(input.requestId, input.threadId, verification.id)) {
+    void cancelUserVerificationRpc(verification.id);
+    throw new Error("The device verification request ended before verification could start.");
+  }
+  try {
+    const { proof } = await verification.promise;
+    if (!liveMcpElicitationGate.respondWithUserVerificationProof(input.requestId, input.threadId, proof)) {
+      throw new Error("The device verification request ended before its proof could be delivered.");
+    }
+  } finally {
+    liveMcpElicitationGate.clearUserVerificationRequestId(input.requestId, input.threadId);
+  }
 });
 ipcMain.handle("demo:live:close", handleCloseLive);
 ipcMain.handle("demo:terminal:start", async (event, input) => {
