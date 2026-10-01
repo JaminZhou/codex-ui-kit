@@ -11,6 +11,8 @@
 .live-mcp-elicitation header strong, .live-mcp-elicitation header span { display: block; }
 .live-mcp-elicitation header span, .live-mcp-elicitation__mode { font-size: 12px; opacity: .72; }
 .live-mcp-elicitation p { margin: 10px 0; overflow-wrap: anywhere; }
+.live-mcp-elicitation__verification-title { font-weight: 650; }
+.live-mcp-elicitation__verification-note { padding: 9px 11px; border-radius: 9px; background: color-mix(in srgb, #d99b3d 12%, transparent); font-size: 12px; }
 .live-mcp-elicitation__url { padding: 8px; border-radius: 8px; background: color-mix(in srgb, currentColor 8%, transparent); font-size: 12px; }
 .live-mcp-elicitation__fields { display: grid; gap: 10px; }
 .live-mcp-elicitation__fields label { display: grid; gap: 5px; font-size: 13px; }

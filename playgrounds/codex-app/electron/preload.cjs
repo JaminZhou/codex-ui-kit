@@ -105,6 +105,8 @@ contextBridge.exposeInMainWorld("codexDemo", {
   respondToUserInput: (input) => ipcRenderer.invoke("demo:input:respond", input),
   respondToMcpElicitation: (input) =>
     ipcRenderer.invoke("demo:mcp-elicitation:respond", input),
+  verifyMcpElicitation: (input) =>
+    ipcRenderer.invoke("demo:mcp-elicitation:verify", input),
   startLive: (input) => ipcRenderer.invoke("demo:live:start", input),
   compactLive: (input) => ipcRenderer.invoke("demo:live:compact", input),
   listLiveThreads: (input) => ipcRenderer.invoke("demo:live:threads", input),

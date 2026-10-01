@@ -105,6 +105,24 @@ zero server-side `tools/call` executions, and a failed UI item. The remote mode
 now covers a real loopback Streamable HTTP server; OAuth provider behavior and
 credential exchange remain host-owned boundaries.
 
+### App Server user-verification bridge — 2026-09-30
+
+Run `pnpm build:codex-app` followed by
+`pnpm --filter @codex-ui-kit/codex-app-playground check:app-server-user-verification-electron`.
+A disposable fake App Server sends the valid App Server
+`mcpServer/elicitation/request` `openai/userVerification` server-request through
+the actual Electron main/preload/renderer bridge. The fixture checks the
+pending card at wide and 720px widths, confirms rendering alone does not call
+verification, then exercises `userVerification/verify` and verifies that the
+exact fixture proof is returned to the original request. A second case cancels
+while verification is in flight and requires `userVerification/cancel` to use
+the matching verification request ID before the original elicitation resolves
+as canceled. Screenshots and computed geometry are retained in the printed
+temporary directory. The proof is synthetic test data: this validates local
+protocol wiring only, not an enrolled device, native biometrics, production
+server reachability, or installed-product pixels. `check:acceptance:full`
+includes this deterministic bridge check.
+
 Full acceptance also runs the cancel mode. It holds a real stdio MCP
 `tools/call`, clicks the Composer `Stop` control while the call is active, and
 requires the public App Server turn to settle as `interrupted`, keeps the

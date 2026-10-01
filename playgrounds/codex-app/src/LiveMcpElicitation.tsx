@@ -4,7 +4,8 @@ import "./live-mcp-elicitation.css";
 
 type Props = {
   request: PendingMcpElicitation;
-  onSubmit: (action: "accept" | "decline" | "cancel", content?: Record<string, unknown>) => Promise<void>;
+  verificationAvailable: boolean;
+  onSubmit: (action: "accept" | "decline" | "cancel" | "verify", content?: Record<string, unknown>) => Promise<void>;
 };
 
 type Schema = Record<string, unknown>;
@@ -24,13 +25,14 @@ function choices(schema: Schema): string[] {
   return [];
 }
 
-export function LiveMcpElicitation({ request, onSubmit }: Props) {
-  const properties = useMemo(() => record(request.requestedSchema?.properties), [request.requestedSchema]);
+export function LiveMcpElicitation({ request, verificationAvailable, onSubmit }: Props) {
+  const requestedSchema = "requestedSchema" in request ? request.requestedSchema : undefined;
+  const properties = useMemo(() => record(requestedSchema?.properties), [requestedSchema]);
   const required = useMemo(() => new Set(
-    Array.isArray(request.requestedSchema?.required)
-      ? request.requestedSchema.required.filter((value): value is string => typeof value === "string")
+    Array.isArray(requestedSchema?.required)
+      ? requestedSchema.required.filter((value): value is string => typeof value === "string")
       : [],
-  ), [request.requestedSchema]);
+  ), [requestedSchema]);
   const [values, setValues] = useState<Record<string, unknown>>(() => {
     const initial: Record<string, unknown> = {};
     for (const [name, raw] of Object.entries(properties)) {
@@ -39,33 +41,54 @@ export function LiveMcpElicitation({ request, onSubmit }: Props) {
     }
     return initial;
   });
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<"accept" | "decline" | "cancel" | "verify" | null>(null);
   const [error, setError] = useState("");
-  const valid = request.mode === "url" || [...required].every((name) => {
+  const valid = request.mode === "url" || request.mode === "openai/userVerification" || [...required].every((name) => {
     const value = values[name];
     return value !== undefined && value !== null && (typeof value !== "string" || value.trim().length > 0);
   });
-  const submit = (action: "accept" | "decline" | "cancel") => {
-    if (busy || (action === "accept" && !valid)) return;
-    setBusy(true);
+  const submit = (action: "accept" | "decline" | "cancel" | "verify") => {
+    const canInterruptVerification = busyAction === "verify" && (action === "cancel" || action === "decline");
+    if ((busyAction !== null && !canInterruptVerification) || (action === "accept" && !valid)) return;
+    if (action === "verify" && (request.mode !== "openai/userVerification" || !verificationAvailable)) return;
+    setBusyAction(action);
     setError("");
-    void onSubmit(action, action === "accept" && request.mode !== "url" ? values : undefined)
-      .catch(() => setError("Could not answer the MCP request. It may have already ended."))
-      .finally(() => setBusy(false));
+    void onSubmit(
+      action,
+      action === "accept" && request.mode !== "url" && request.mode !== "openai/userVerification"
+        ? values
+        : undefined,
+    )
+      .catch(() => setError(
+        action === "verify"
+          ? "Device verification failed or is unavailable. You can retry, decline, or cancel."
+          : "Could not answer the MCP request. It may have already ended.",
+      ))
+      .finally(() => setBusyAction(null));
   };
-  return <form className="live-mcp-elicitation" aria-label="MCP server request" onSubmit={(event) => { event.preventDefault(); submit("accept"); }}>
+  return <form className="live-mcp-elicitation" aria-label="MCP server request" data-mode={request.mode} onSubmit={(event) => { event.preventDefault(); submit(request.mode === "openai/userVerification" ? "verify" : "accept"); }}>
     <header>
       <div>
         <strong>MCP server request</strong>
         <span>{request.serverName}</span>
       </div>
-      <span className="live-mcp-elicitation__mode">{request.mode === "url" ? "Open externally" : "Input required"}</span>
+      <span className="live-mcp-elicitation__mode">
+        {request.mode === "url" ? "Open externally" : request.mode === "openai/userVerification" ? "Device verification" : "Input required"}
+      </span>
     </header>
-    <p>{request.message}</p>
+    {request.mode === "openai/userVerification" ? <>
+      <p className="live-mcp-elicitation__verification-title">{request.title}</p>
+      <p>{request.description}</p>
+      <p className="live-mcp-elicitation__verification-note">
+        {verificationAvailable
+          ? "Approving will ask the local Codex app-server to verify this request with your enrolled device credential."
+          : "Device verification is available only for a live Codex session."}
+      </p>
+    </> : <p>{request.message}</p>}
     {request.mode === "url" ? <>
       <p className="live-mcp-elicitation__url" title={request.url}>{request.url}</p>
       <a href={request.url} target="_blank" rel="noreferrer">Open authorization URL</a>
-    </> : <div className="live-mcp-elicitation__fields">
+    </> : request.mode !== "openai/userVerification" && <div className="live-mcp-elicitation__fields">
       {Object.entries(properties).map(([name, raw]) => {
         const schema = record(raw);
         const label = typeof schema.title === "string" ? schema.title : name;
@@ -78,9 +101,14 @@ export function LiveMcpElicitation({ request, onSubmit }: Props) {
     </div>}
     {error && <p role="alert">{error}</p>}
     <footer>
-      <button type="button" disabled={busy} onClick={() => submit("cancel")}>Cancel</button>
-      <button type="button" disabled={busy} onClick={() => submit("decline")}>Decline</button>
-      <button type="submit" disabled={busy || !valid}>{busy ? "Sending…" : "Accept"}</button>
+      <button type="button" disabled={busyAction !== null && busyAction !== "verify"} onClick={() => submit("cancel")}>Cancel</button>
+      <button type="button" disabled={busyAction !== null && busyAction !== "verify"} onClick={() => submit("decline")}>Decline</button>
+      <button
+        type="submit"
+        disabled={busyAction !== null || !valid || (request.mode === "openai/userVerification" && !verificationAvailable)}
+      >
+        {busyAction ? busyAction === "verify" ? "Verifying…" : "Sending…" : request.mode === "openai/userVerification" ? "Verify and approve" : "Accept"}
+      </button>
     </footer>
   </form>;
 }

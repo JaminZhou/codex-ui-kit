@@ -65,6 +65,70 @@ describe("live MCP elicitation gate", () => {
     expect(gate.cancel("oauth", "thread-a")).toBe(false);
   });
 
+  it("requires a main-process device proof before accepting user verification", async () => {
+    const gate = new LiveMcpElicitationGate();
+    const verificationRequest: LiveMcpElicitationRequest = {
+      challenge: "opaque-challenge",
+      description: "Confirm this account change.",
+      mode: "openai/userVerification",
+      serverName: "account-tools",
+      threadId: "thread-verification",
+      title: "Approve account change",
+      turnId: "turn-verification",
+    };
+    const pending = gate.request("verify-1", verificationRequest);
+
+    expect(gate.userVerificationRequest("verify-1", "thread-verification")).toEqual(verificationRequest);
+    expect(() => gate.userVerificationRequest("verify-1", "thread-other")).toThrow("another thread");
+    expect(() => gate.respond("verify-1", "thread-verification", "accept", {
+      credentialId: "renderer-controlled",
+      signature: "renderer-controlled",
+    })).toThrow("local app-server");
+
+    expect(gate.setUserVerificationRequestId("verify-1", "thread-verification", 501)).toBe(true);
+    expect(gate.pendingUserVerificationRequests("thread-verification", "turn-verification")).toEqual([{
+      elicitationRequestId: "verify-1",
+      threadId: "thread-verification",
+      verificationRequestId: 501,
+    }]);
+    expect(gate.setUserVerificationRequestId("verify-1", "thread-verification", 502)).toBe(false);
+    expect(() => gate.respondWithUserVerificationProof("verify-1", "thread-other", {
+      credentialId: "credential",
+      signature: "signature",
+    })).toThrow("another thread");
+    expect(() => gate.respondWithUserVerificationProof("verify-1", "thread-verification", {
+      credentialId: "credential",
+    })).toThrow("invalid verification proof");
+
+    expect(gate.respondWithUserVerificationProof("verify-1", "thread-verification", {
+      credentialId: "credential",
+      signature: "signed-challenge",
+    })).toBe(true);
+    await expect(pending).resolves.toEqual({
+      _meta: null,
+      action: "accept",
+      content: { credentialId: "credential", signature: "signed-challenge" },
+    });
+    expect(gate.clearUserVerificationRequestId("verify-1", "thread-verification")).toBe(false);
+  });
+
+  it("cancels the outstanding local verification request when the elicitation is declined", async () => {
+    const gate = new LiveMcpElicitationGate();
+    const pending = gate.request("verify-cancel", {
+      challenge: "opaque-challenge",
+      description: "Confirm this account change.",
+      mode: "openai/userVerification",
+      serverName: "account-tools",
+      threadId: "thread-verification",
+      title: "Approve account change",
+    });
+    expect(gate.setUserVerificationRequestId("verify-cancel", "thread-verification", 700)).toBe(true);
+    expect(gate.userVerificationRequestId("verify-cancel", "thread-verification")).toBe(700);
+    expect(gate.respond("verify-cancel", "thread-verification", "decline")).toBe(true);
+    await expect(pending).resolves.toEqual({ _meta: null, action: "decline", content: null });
+    expect(gate.userVerificationRequestId("verify-cancel", "thread-verification")).toBeNull();
+  });
+
   it("settles replaced and cleared requests as cancellation", async () => {
     const gate = new LiveMcpElicitationGate();
     const first = gate.request(1, request);

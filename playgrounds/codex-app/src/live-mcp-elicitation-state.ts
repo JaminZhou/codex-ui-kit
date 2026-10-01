@@ -1,16 +1,31 @@
 export type McpElicitationAction = "accept" | "decline" | "cancel";
 
-export interface PendingMcpElicitation {
-  elicitationId?: string;
-  message: string;
-  mode: "form" | "openai/form" | "openaiForm" | "url";
+interface PendingMcpElicitationContext {
   requestId: number | string;
-  requestedSchema?: Record<string, unknown>;
   serverName: string;
   threadId: string;
   turnId?: string | null;
-  url?: string;
 }
+
+export type PendingMcpElicitation = PendingMcpElicitationContext & (
+  | {
+      challenge: string;
+      description: string;
+      mode: "openai/userVerification";
+      title: string;
+    }
+  | {
+      message: string;
+      mode: "form" | "openai/form" | "openaiForm";
+      requestedSchema?: Record<string, unknown>;
+    }
+  | {
+      elicitationId?: string;
+      message: string;
+      mode: "url";
+      url: string;
+    }
+);
 
 export interface McpElicitationResolution {
   action: McpElicitationAction;
@@ -32,21 +47,47 @@ function validRequest(event: Record<string, unknown>): PendingMcpElicitation | n
     (typeof event.id !== "string" && typeof event.id !== "number")
   ) return null;
   const params = record(event.params);
-  if (!params || typeof params.threadId !== "string" || typeof params.serverName !== "string" || typeof params.message !== "string") return null;
-  if (params.mode !== "form" && params.mode !== "openai/form" && params.mode !== "openaiForm" && params.mode !== "url") return null;
-  if (params.mode === "url" && typeof params.url !== "string") return null;
-  if (params.mode !== "url" && params.requestedSchema !== undefined && !record(params.requestedSchema)) return null;
-  return {
-    elicitationId: typeof params.elicitationId === "string" ? params.elicitationId : undefined,
-    message: params.message,
-    mode: params.mode,
+  if (!params || typeof params.threadId !== "string" || typeof params.serverName !== "string") return null;
+  const context = {
     requestId: event.id,
-    requestedSchema: record(params.requestedSchema) ?? undefined,
     serverName: params.serverName,
     threadId: params.threadId,
     turnId: typeof params.turnId === "string" ? params.turnId : null,
-    url: typeof params.url === "string" ? params.url : undefined,
   };
+  if (
+    params.mode === "openai/userVerification" &&
+    typeof params.challenge === "string" &&
+    typeof params.title === "string" &&
+    typeof params.description === "string"
+  ) {
+    return {
+      ...context,
+      challenge: params.challenge,
+      description: params.description,
+      mode: "openai/userVerification",
+      title: params.title,
+    };
+  }
+  if (typeof params.message !== "string") return null;
+  if (params.mode === "url" && typeof params.url === "string") {
+    return {
+      ...context,
+      elicitationId: typeof params.elicitationId === "string" ? params.elicitationId : undefined,
+      message: params.message,
+      mode: "url",
+      url: params.url,
+    };
+  }
+  if (params.mode === "form" || params.mode === "openai/form" || params.mode === "openaiForm") {
+    if (params.requestedSchema !== undefined && !record(params.requestedSchema)) return null;
+    return {
+      ...context,
+      message: params.message,
+      mode: params.mode,
+      requestedSchema: record(params.requestedSchema) ?? undefined,
+    };
+  }
+  return null;
 }
 
 export function reduceLiveMcpElicitations(

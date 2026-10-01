@@ -197,18 +197,33 @@ export interface DemoMcpToolCall {
   turnId: string | null;
 }
 
-export interface DemoMcpElicitation {
-  elicitationId?: string;
+interface DemoMcpElicitationContext {
   id: string;
-  message: string;
-  mode: "form" | "openai/form" | "openaiForm" | "url";
   requestId: number | string;
-  requestedSchema?: Record<string, unknown>;
   serverName: string;
   threadId: string;
   turnId: string | null;
-  url?: string;
 }
+
+export type DemoMcpElicitation = DemoMcpElicitationContext & (
+  | {
+      challenge: string;
+      description: string;
+      mode: "openai/userVerification";
+      title: string;
+    }
+  | {
+      message: string;
+      mode: "form" | "openai/form" | "openaiForm";
+      requestedSchema?: Record<string, unknown>;
+    }
+  | {
+      elicitationId?: string;
+      message: string;
+      mode: "url";
+      url: string;
+    }
+);
 
 export type DemoWebSearchAction =
   | "findInPage"
@@ -1374,35 +1389,60 @@ export function reduceProtocolNotification(
     const requestId = notification.id;
     const threadId = asString(params.threadId);
     const serverName = asString(params.serverName);
-    const message = asString(params.message);
     const mode = params.mode;
-    if (
-      requestId === undefined ||
-      !threadId ||
-      !serverName ||
-      !message ||
-      (mode !== "form" &&
-        mode !== "openai/form" &&
-        mode !== "openaiForm" &&
-        mode !== "url")
-    ) {
-      return next;
+    if (requestId === undefined || !threadId || !serverName) return next;
+    const base = {
+      id: `mcp-elicitation:${String(requestId)}`,
+      requestId,
+      serverName,
+      threadId,
+      turnId: asString(params.turnId),
+    };
+    if (mode === "openai/userVerification") {
+      const challenge = asString(params.challenge);
+      const title = asString(params.title);
+      const description = asString(params.description);
+      if (challenge === null || title === null || description === null) return next;
+      return {
+        ...next,
+        mcpElicitations: upsertById(state.mcpElicitations, {
+          ...base,
+          challenge,
+          description,
+          mode,
+          title,
+        }),
+        status: "running",
+      };
     }
+    if (mode === "url") {
+      const message = asString(params.message);
+      const url = asString(params.url);
+      if (!message || !url) return next;
+      return {
+        ...next,
+        mcpElicitations: upsertById(state.mcpElicitations, {
+          ...base,
+          elicitationId: asString(params.elicitationId) ?? undefined,
+          message,
+          mode,
+          url,
+        }),
+        status: "running",
+      };
+    }
+    if (mode !== "form" && mode !== "openai/form" && mode !== "openaiForm") return next;
+    const message = asString(params.message);
+    if (!message) return next;
     return {
       ...next,
       mcpElicitations: upsertById(state.mcpElicitations, {
-        elicitationId: asString(params.elicitationId) ?? undefined,
-        id: `mcp-elicitation:${String(requestId)}`,
+        ...base,
         message,
         mode,
-        requestId,
         requestedSchema: isRecord(params.requestedSchema)
           ? params.requestedSchema
           : undefined,
-        serverName,
-        threadId,
-        turnId: asString(params.turnId),
-        url: asString(params.url) ?? undefined,
       }),
       status: "running",
     };

@@ -114,6 +114,10 @@ interface CodexDemoBridge {
     requestId: number | string;
     threadId: string;
   }): Promise<void>;
+  verifyMcpElicitation(input: {
+    requestId: number | string;
+    threadId: string;
+  }): Promise<void>;
   listLiveThreads(input: { projectToken: string; cursor?: string; archived?: boolean }): Promise<{ threads: Array<{ id: string; title: string; updatedAt: number }>; nextCursor: string | null; archivedThreadIds: string[] }>;
   readLiveThread(input: { projectToken: string; threadId: string }): Promise<{ threadId: string; turns: import("./live-history-state").StoredLiveTurn[] }>;
   listLiveBackgroundTerminals(input: { projectToken: string; threadId: string }): Promise<LiveBackgroundTerminal[]>;

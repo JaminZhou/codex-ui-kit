@@ -17582,6 +17582,8 @@ button.codex-ui-file-revert-error-dialog__file:hover {
 }
 
 .codex-ui-composer-resource-picker--current-26-917[data-current-resource-catalog="26.917.71314"] {
+  border-color: rgba(255, 255, 255, 0.082);
+  box-shadow: none;
   transform: translateX(0.5px);
 }
 

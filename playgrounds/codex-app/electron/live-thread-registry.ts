@@ -1,8 +1,8 @@
 import { readFile, mkdir, writeFile, rename } from "node:fs/promises";
-import { watch as watchDirectory } from "node:fs";
 import { basename, dirname, isAbsolute } from "node:path";
 import { randomUUID } from "node:crypto";
 import { acquireRegistryLock } from "./registry-lock.js";
+import { watchAtomicRegistryFile } from "./registry-watch.js";
 
 export interface OwnedLiveThread {
   id: string;
@@ -123,24 +123,7 @@ export class LiveThreadRegistry {
    * decide when it is safe to refresh their current project/draft.
    */
   async watch(onChange: () => void): Promise<() => void> {
-    if (typeof onChange !== "function") throw new TypeError("A registry change callback is required.");
-    await mkdir(dirname(this.path), { recursive: true });
-    const target = basename(this.path);
-    let timer: NodeJS.Timeout | null = null;
-    const watcher = watchDirectory(dirname(this.path), { persistent: false }, (_event, filename) => {
-      const name = filename?.toString();
-      if (name && name !== target) return;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        timer = null;
-        try { onChange(); } catch { /* observers must not tear down the watcher */ }
-      }, 25);
-    });
-    return () => {
-      if (timer) clearTimeout(timer);
-      timer = null;
-      watcher.close();
-    };
+    return watchAtomicRegistryFile(this.path, onChange);
   }
 
   rememberProject(project: OwnedLiveProject): Promise<void> {
