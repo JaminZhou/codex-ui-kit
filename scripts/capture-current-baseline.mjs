@@ -10,6 +10,8 @@ import {
   assertCurrentProjectsIndexObservation,
   currentBaselineViewports,
   currentObservedBuildCandidateBaselineFingerprint,
+  currentUpdatedBuildCandidateBaselineFingerprint,
+  currentObservationCandidateFingerprints,
   currentCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
   currentLatestCandidateBaselineFingerprint,
@@ -26,6 +28,7 @@ import {
 } from "./current-baseline-contract.mjs";
 
 const candidateFingerprintsByVersion = new Map([
+  ["26.928.21956", currentUpdatedBuildCandidateBaselineFingerprint],
   ["26.924.22138", currentObservedBuildCandidateBaselineFingerprint],
   ["26.917.71314", currentLatestInstalledCandidateBaselineFingerprint],
   ["26.917.62051", currentPreviousInstalledCandidateBaselineFingerprint],
@@ -45,11 +48,10 @@ const writeCandidateToResearch =
 
 if (
   candidateObservationOnly &&
-  expectedFingerprint.appVersion !==
-    currentObservedBuildCandidateBaselineFingerprint.appVersion
+  !Object.hasOwn(currentObservationCandidateFingerprints, expectedFingerprint.appVersion)
 ) {
   throw new Error(
-    "Candidate observation-only mode is restricted to the exact 26.924.22138 package fingerprint.",
+    "Candidate observation-only mode requires a known observation package fingerprint.",
   );
 }
 if (writeCandidateToResearch && !candidateObservationOnly) {
@@ -101,7 +103,7 @@ if (
 }
 const normalizedOutputPath = outputPath
   ? writeCandidateToResearch
-    ? resolveCurrentBaselineCandidateOutputPath(outputPath)
+    ? resolveCurrentBaselineCandidateOutputPath(outputPath, expectedFingerprint)
     : resolveCurrentBaselineOutputPath(normalizedProfile, outputPath)
   : null;
 
@@ -389,6 +391,9 @@ const inspectShellState = (page) =>
             )[0];
           const allowedLabels = new Set([
             "Home",
+            "Space",
+            "Plugins",
+            "Code Review",
             "Scheduled",
             "Library",
             "Images",
@@ -424,6 +429,9 @@ const inspectShellState = (page) =>
 
           const allowedLabels = new Set([
             "Home",
+            "Space",
+            "Plugins",
+            "Code Review",
             "Scheduled",
             "Library",
             "Images",
@@ -1756,6 +1764,48 @@ try {
       observationStatus: "no-supported-help-trigger-present",
       visibleTriggerCount: 0,
     };
+    if (expectedFingerprint.appVersion === "26.928.21956") {
+      const profileTrigger = page.locator('[aria-label="Open profile menu"]:visible').first();
+      await profileTrigger.click();
+      const help = page.getByText("Help", { exact: true });
+      await help.waitFor();
+      await help.hover();
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll('[role="menu"]')].filter((element) =>
+          element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }),
+        ).length === 2,
+      );
+      await page.waitForTimeout(100);
+      sidebarLifecycle.helpMenu = {
+        observationStatus: "profile-submenu-observed",
+        entryPoint: "Open profile menu > Help",
+        opened: await page.evaluate(() => ({
+          menus: [...document.querySelectorAll('[role="menu"]')]
+            .filter((element) => element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))
+            .map((element) => {
+              const bounds = element.getBoundingClientRect();
+              return {
+                rect: { height: Math.round(bounds.height * 100) / 100, width: Math.round(bounds.width * 100) / 100 },
+                controlCount: element.querySelectorAll('button, a, [role="menuitem"]').length,
+              };
+            }),
+        })),
+      };
+      await page.keyboard.press("Escape");
+      await page.waitForFunction(() =>
+        [...document.querySelectorAll('[role="menu"]')].every((element) =>
+          !element.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }),
+        ),
+      );
+      await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Open profile menu");
+      sidebarLifecycle.helpMenu.closed = await profileTrigger.evaluate((element) => ({
+        escapePressCount: 1,
+        focusReturned: document.activeElement === element,
+        visibleMenuCount: [...document.querySelectorAll('[role="menu"]')].filter((menu) =>
+          menu.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }),
+        ).length,
+      }));
+    }
   } else {
     const triggerAccessibleLabel = await helpMenuTrigger.getAttribute(
       "aria-label",
@@ -1955,6 +2005,7 @@ try {
         normalizedProfile,
         normalizedOutputPath,
         output,
+        expectedFingerprint,
       );
     } else {
       await writeCurrentBaselineOutput(

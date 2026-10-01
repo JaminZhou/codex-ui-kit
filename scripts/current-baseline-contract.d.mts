@@ -51,6 +51,14 @@ export const currentObservedBuildCandidateBaselineFingerprint: Readonly<{
   chromiumVersion: string;
 }>;
 
+export const currentUpdatedBuildCandidateBaselineFingerprint:
+  typeof currentObservedBuildCandidateBaselineFingerprint;
+
+export const currentObservationCandidateFingerprints: Readonly<{
+  "26.924.22138": typeof currentObservedBuildCandidateBaselineFingerprint;
+  "26.928.21956": typeof currentUpdatedBuildCandidateBaselineFingerprint;
+}>;
+
 export const currentAccountMenuCandidateFingerprints: Readonly<{
   promoted: typeof currentBaselineFingerprint;
   "26.917.71314": typeof currentLatestInstalledCandidateBaselineFingerprint;
@@ -118,6 +126,7 @@ export function resolveCurrentBaselineOutputPath(
 
 export function resolveCurrentBaselineCandidateOutputPath(
   outputPath: string,
+  expectedFingerprint?: typeof currentObservedBuildCandidateBaselineFingerprint,
 ): string;
 
 export function writeCurrentBaselineOutput(
@@ -130,6 +139,7 @@ export function writeCurrentBaselineCandidateOutput(
   profilePath: string,
   outputPath: string,
   contents: string,
+  expectedFingerprint?: typeof currentObservedBuildCandidateBaselineFingerprint,
 ): Promise<void>;
 
 export function runBestEffortCurrentBaselineCleanup(

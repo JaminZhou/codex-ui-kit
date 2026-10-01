@@ -25,6 +25,17 @@ explicitly rather than inferring them.
 
 ### Reported major UI change: version alignment gate
 
+The 2026-10-01 installed-package and runtime check supersedes the historical
+alignment checks below: `/Applications/ChatGPT.app` is now `26.928.21956` /
+build `12404`, not the previously available `26.928.20755`. The isolated
+Renderer's process-start and stable ASAR identity were verified during the
+capture. Its six-entry rail now contains Home, Space, Scheduled, Plugins,
+Explore, and Code Review; Help moved into Profile. Use the new
+[`26.928.21956.md`](26.928.21956.md) structural candidate for ongoing audit.
+This aligns the installed runtime, but does not prove every account rollout,
+route body, state, theme, or product pixel. Keep older entries below as dated
+history and older fixtures as regression evidence.
+
 On 2026-09-29, Jamin reported that the Codex UI now looks substantially
 different and may invalidate the earlier surface work. The local
 `/Applications/ChatGPT.app` metadata still identifies Codex Desktop
@@ -188,14 +199,12 @@ pnpm scan:current-package-candidates -- --app /Applications/ChatGPT.app --expect
 
 It emits build identity, ASAR hash, and booleans only, never source excerpts.
 
-For immediate progress, use the installed `26.924.22138` package as the
-working audit candidate. Continue its version-scoped structural replays where
-existing evidence supports them, but label them only as 26.924 fixtures. If
-Jamin's screen is a later staged rollout, capture its exact About/build
-identity before promoting any 26.924 result to that UI.
+For immediate progress, use the installed `26.928.21956` package as the
+working audit candidate. Preserve the 26.924 structural replays under their
+original version labels. Do not relabel an unchanged anchor as a full current
+surface or infer a current route body from an older fixture.
 
-The next gate is to align the exact app build with the reported UI, then audit
-all 100 inventory surfaces for presence, entry point, ownership, lifecycle,
+The next gate is to audit all 100 inventory surfaces for presence, entry point, ownership, lifecycle,
 state variants, viewport, and theme. Preserve old implementations and captures
 as regression material; only rewrite or extend a component where the aligned
 build's evidence shows a delta. Prioritize the shared shell/navigation and
@@ -244,7 +253,26 @@ regional-pixel acceptance.
 
 ## Current position
 
-- The installed app now reports `26.924.22138` (`11645`), Chromium
+- The installed app reports `26.928.21956` (`12404`), Chromium
+  `154.0.8037.57`, with a 538,323,145-byte `app.asar` whose SHA-256 is
+  `3bda98f2265ad23677dfe0163d1cc7855beade6bef11d27f830f6663d7658406`.
+  The sanitized candidate record and scope are in
+  [`26.928.21956.md`](26.928.21956.md). The shared shell retains a 52px rail,
+  269.88px expanded sidebar, 44px top inset, and 4px bottom inset at
+  1180/820/721/720px. The changed rail has six entries and a Code Review
+  separator; its footer now has only Profile. Profile → Help opens on hover,
+  has a 389.41×300.63px nine-control submenu, and one Escape closes both menus
+  with focus returned to Profile. The local, version-scoped structural replay
+  tests those bounds, dark/light replay responsiveness, hover, Escape focus,
+  hide/show restoration, and repeat-pixel stability; unknown glyphs, account
+  rows, and route bodies remain explicit placeholders. Dark product Renderer
+  observations are not native-product Electron, light-theme, or product-pixel
+  acceptance. The promoted global baseline remains `26.903.71938`.
+  Next: current populated thread/Composer context and resource lifecycle,
+  followed by route-dependent workspace/review/tool surfaces, then integrations
+  and Settings. New rail assets still require exact source matching and review
+  before claiming pixel fidelity. Stage 0 and the overall roadmap remain open.
+- The prior installed candidate reported `26.924.22138` (`11645`), Chromium
   `154.0.8037.57`, with a 480,133,781-byte `app.asar` whose SHA-256 is
   `d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80`.
   Its candidate-only shell observation is recorded in

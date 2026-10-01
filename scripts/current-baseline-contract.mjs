@@ -105,6 +105,22 @@ export const currentObservedBuildCandidateBaselineFingerprint =
     chromiumVersion: "154.0.8037.57",
   });
 
+// Package identity for the installed 26.928 update. Its observations remain
+// separate from both the 26.924 candidate and the promoted product baseline.
+export const currentUpdatedBuildCandidateBaselineFingerprint = Object.freeze({
+  appAsarBytes: 538_323_145,
+  appAsarSha256:
+    "3bda98f2265ad23677dfe0163d1cc7855beade6bef11d27f830f6663d7658406",
+  appVersion: "26.928.21956",
+  buildNumber: "12404",
+  chromiumVersion: "154.0.8037.57",
+});
+
+export const currentObservationCandidateFingerprints = Object.freeze({
+  "26.924.22138": currentObservedBuildCandidateBaselineFingerprint,
+  "26.928.21956": currentUpdatedBuildCandidateBaselineFingerprint,
+});
+
 export const currentAccountMenuCandidateFingerprints = Object.freeze({
   promoted: currentBaselineFingerprint,
   "26.917.71314": currentLatestInstalledCandidateBaselineFingerprint,
@@ -629,7 +645,23 @@ export async function writeCurrentBaselineOutput(
   }
 }
 
-export function resolveCurrentBaselineCandidateOutputPath(outputPath) {
+export function resolveCurrentBaselineCandidateOutputPath(
+  outputPath,
+  expectedFingerprint = currentObservedBuildCandidateBaselineFingerprint,
+) {
+  const version = expectedFingerprint?.appVersion;
+  const knownFingerprint = Object.hasOwn(currentObservationCandidateFingerprints, version)
+    ? currentObservationCandidateFingerprints[version]
+    : null;
+  if (
+    !knownFingerprint ||
+    Object.entries(knownFingerprint).some(
+      ([key, value]) => expectedFingerprint[key] !== value,
+    )
+  ) {
+    throw new Error("The candidate output requires a known package fingerprint.");
+  }
+  const expectedName = `current-baseline-${knownFingerprint.appVersion}-candidate.json`;
   const normalizedOutput = resolve(outputPath);
   const expectedResearchDirectory = realpathSync(
     resolve(dirname(fileURLToPath(import.meta.url)), "../research"),
@@ -644,11 +676,10 @@ export function resolveCurrentBaselineCandidateOutputPath(outputPath) {
   }
   if (
     normalizedParent !== expectedResearchDirectory ||
-    basename(normalizedOutput) !==
-      "current-baseline-26.924.22138-candidate.json"
+    basename(normalizedOutput) !== expectedName
   ) {
     throw new Error(
-      "The candidate output must be current-baseline-26.924.22138-candidate.json in research/.",
+      `The candidate output must be ${expectedName} in research/.`,
     );
   }
   return resolve(normalizedParent, basename(normalizedOutput));
@@ -658,6 +689,7 @@ export async function writeCurrentBaselineCandidateOutput(
   profilePath,
   outputPath,
   contents,
+  expectedFingerprint = currentObservedBuildCandidateBaselineFingerprint,
 ) {
   const normalizedProfile = realpathSync(profilePath);
   if (!normalizedProfile.startsWith("/private/tmp/codex-ui-kit-")) {
@@ -665,7 +697,10 @@ export async function writeCurrentBaselineCandidateOutput(
       "A repository candidate record may only be generated from an isolated codex-ui-kit temporary profile.",
     );
   }
-  const normalizedOutput = resolveCurrentBaselineCandidateOutputPath(outputPath);
+  const normalizedOutput = resolveCurrentBaselineCandidateOutputPath(
+    outputPath,
+    expectedFingerprint,
+  );
   let handle;
   try {
     handle = await open(
