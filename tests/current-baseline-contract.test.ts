@@ -807,6 +807,18 @@ describe("current baseline capture contract", () => {
     ).toThrow("candidate output must be");
   });
 
+  it("rejects inherited object keys as candidate build identities", () => {
+    const outputPath = fileURLToPath(new URL(
+      "../research/current-baseline-undefined-candidate.json", import.meta.url,
+    ));
+    for (const appVersion of ["__proto__", "constructor", "toString"]) {
+      expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath, {
+        ...currentUpdatedBuildCandidateBaselineFingerprint,
+        appVersion,
+      })).toThrow("known package fingerprint");
+    }
+  });
+
   const projectsObservation = () => ({
     collapsed: { expandedCount: 0, focusOnToggle: true },
     compact: {

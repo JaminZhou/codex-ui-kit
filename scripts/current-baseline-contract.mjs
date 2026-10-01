@@ -649,8 +649,10 @@ export function resolveCurrentBaselineCandidateOutputPath(
   outputPath,
   expectedFingerprint = currentObservedBuildCandidateBaselineFingerprint,
 ) {
-  const knownFingerprint =
-    currentObservationCandidateFingerprints[expectedFingerprint?.appVersion];
+  const version = expectedFingerprint?.appVersion;
+  const knownFingerprint = Object.hasOwn(currentObservationCandidateFingerprints, version)
+    ? currentObservationCandidateFingerprints[version]
+    : null;
   if (
     !knownFingerprint ||
     Object.entries(knownFingerprint).some(
