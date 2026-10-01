@@ -83,6 +83,7 @@ for (const viewport of viewports) {
     assert.deepEqual(layout.separator, { height: 1, left: 14, top: 272, width: 24 });
     assert.deepEqual([...new Set(layout.iconStatuses)], ['pending-26.928-capture']);
     assert.equal(await page.getByRole('button', { name: 'Help menu', exact: true }).count(), 0);
+    assert.equal(await page.locator('.codex-ui-app-sidebar__footer').count(), 0);
 
     // Stable replay pixels only. Product glyphs and personal account content
     // remain absent, so these bytes must never be counted as product parity.

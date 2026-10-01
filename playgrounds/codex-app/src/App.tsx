@@ -7719,7 +7719,7 @@ export function App() {
   ));
   const sidebar = (
     <AppSidebar
-      footer={
+      footer={currentSidebarPrimaryNavigation26928Replay ? null : (
         <AppSidebarFooter
           account="Demo account"
           accountAvatar={<span className="demo-sidebar-avatar">D</span>}
@@ -7911,7 +7911,7 @@ export function App() {
             )
           }
         />
-      }
+      )}
       header={currentSidebarComposition ? (
         <div className="demo-sidebar-header">
           <div className="demo-sidebar-brand-row">
