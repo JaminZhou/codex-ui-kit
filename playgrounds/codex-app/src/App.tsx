@@ -1,5 +1,6 @@
 import { PdfWorkspacePreview } from "./PdfWorkspacePreview";
 import { CurrentComposer26924 } from "./CurrentComposer26924";
+import { CurrentPrimaryNavigation26928 } from "./CurrentPrimaryNavigation26928";
 import {
   ActivityTimeline,
   AgentComposer,
@@ -765,6 +766,7 @@ function querySelection() {
     "help-menu-current-26-915",
     "primary-navigation-current-26-915",
     "primary-navigation-current-26-924",
+    "primary-navigation-current-26-928",
     "composer-current-26-924",
     "project-navigation-current-26-915",
     "project-group-lifecycle-current-26-915",
@@ -5378,6 +5380,7 @@ export function App() {
       ) &&
       (initialSelection.sidebarState ===
         "primary-navigation-current-26-924" ||
+        initialSelection.sidebarState === "primary-navigation-current-26-928" ||
         initialSelection.sidebarState === "composer-current-26-924" ||
         (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
@@ -7462,6 +7465,8 @@ export function App() {
   const currentSidebarPrimaryNavigation26924Replay =
     initialSelection.sidebarState === "primary-navigation-current-26-924" ||
     currentComposer26924Replay;
+  const currentSidebarPrimaryNavigation26928Replay =
+    initialSelection.sidebarState === "primary-navigation-current-26-928";
   const currentPrimaryRailOnlyRoute26924Replay =
     currentSidebarPrimaryNavigation26924Replay && view === "projects"
       ? (initialSelection.primaryRoute ?? "projects")
@@ -15979,7 +15984,15 @@ export function App() {
     </div>
   );
   const shellRoute = (
-    currentComposer26924Replay ? (
+    currentSidebarPrimaryNavigation26928Replay ? (
+      <section
+        aria-label="Home content pending current-build capture"
+        className="demo-current-primary-home-pending"
+        data-content-status="not-observed-on-26-928.21956"
+      >
+        Home / New chat content has not been fully captured for build 26.928.21956.
+      </section>
+    ) : currentComposer26924Replay ? (
       <CurrentComposer26924 />
     ) : currentPrimaryHomeShellOnly26924Replay ? (
       <section
@@ -18898,6 +18911,9 @@ export function App() {
       data-current-primary-navigation-26-924={
         currentSidebarPrimaryNavigation26924Replay || undefined
       }
+      data-current-primary-navigation-26-928={
+        currentSidebarPrimaryNavigation26928Replay || undefined
+      }
       data-current-primary-projects-shell-26-924={
         currentPrimaryRailOnlyRoute26924Replay === "projects" || undefined
       }
@@ -19215,7 +19231,9 @@ export function App() {
         }
         mainRole={workspaceShowsSettings ? "region" : "main"}
         narrowSidebarBehavior="current-build"
-        navigationRail={currentPrimaryNavigationRail26924}
+        navigationRail={currentSidebarPrimaryNavigation26928Replay
+          ? <CurrentPrimaryNavigation26928 />
+          : currentPrimaryNavigationRail26924}
         navigationRailLabel="Application navigation rail"
         navigationRailWidth={52}
         onSidebarOpenChange={setSidebarOpen}
@@ -19384,7 +19402,7 @@ export function App() {
         sidebarWidth={
           view === "plugins"
             ? 322.875
-            : currentSidebarPrimaryNavigation26924Replay
+            : currentSidebarPrimaryNavigation26924Replay || currentSidebarPrimaryNavigation26928Replay
               ? 269.875
             : currentSidebarHelp26915Replay ||
                 currentSidebarPrimaryNavigation26915Replay ||

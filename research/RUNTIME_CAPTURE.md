@@ -103,6 +103,40 @@ profile directory. Never use a broad `pkill` or delete a shared profile.
 CDP evidence covers Renderer behavior only. Record native window, menu,
 system-dialog, and real resize behavior separately.
 
+### Current `26.928.21956` structural observation
+
+The installed package and exact runtime fingerprint on 2026-10-01 are recorded
+in [`26.928.21956.md`](26.928.21956.md). One isolated loopback process supplied
+the new rail/sidebar and empty Composer observations at 1180/820/721/720px.
+Profile → Help is a hover submenu; one Escape dismisses the entire menu group
+and restores Profile focus. Do not impose the older generic nested-menu
+assumption of one Escape per level on this product observation.
+
+Repeat with the already-verified isolated port/profile, writing stdout only to
+a fresh temporary capture file so the checked-in record remains immutable:
+
+```sh
+capture_dir=$(mktemp -d /private/tmp/codex-ui-kit-26.928.XXXXXX)
+CODEX_CURRENT_BASELINE_ALLOW_NAVIGATION=1 \
+CODEX_CURRENT_BASELINE_CAPTURE_COMPOSER_RESOURCES=1 \
+CODEX_CURRENT_BASELINE_OUTPUT= \
+CODEX_CURRENT_BASELINE_WRITE_RESEARCH_CANDIDATE= \
+  pnpm capture:current-baseline-26-928 \
+  > "$capture_dir/current-baseline-26.928.21956-candidate.json"
+```
+
+Set `CODEX_CURRENT_BASELINE_CDP_PORT` and `CODEX_CURRENT_BASELINE_PROFILE` to
+the verified isolated process before running it. The command checks package
+version/build/ASAR/Chromium and process-start provenance, emits sanitized
+structural JSON, and restores sampled sidebar state. The optional dedicated
+research-output path remains create-only and fingerprint-locked; it cannot
+overwrite an earlier candidate or write a 26.928 record into a 26.924 file.
+Only public navigation labels are retained. Dynamic account/project/thread
+content, bundled glyph paths, and product screenshots are not committed.
+The six local Electron replay checks are independent implementation evidence,
+including two light-theme replays, not a claim of product-native or light-theme
+observation. Repeat-pixel equality is not installed-product pixel parity.
+
 ### Previous `26.803.41515` approval-variant boundary
 
 The previously installed `/Applications/ChatGPT.app` reported version `26.803.41515`, build

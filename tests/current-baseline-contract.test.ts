@@ -23,6 +23,7 @@ import {
   currentBaselineFingerprint,
   currentBaselineViewports,
   currentObservedBuildCandidateBaselineFingerprint,
+  currentUpdatedBuildCandidateBaselineFingerprint,
   currentAccountMenuCandidateFingerprints,
   currentInstalledCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
@@ -768,6 +769,27 @@ const currentAppServerCrashRecoveryRecord = () => {
 };
 
 describe("current baseline capture contract", () => {
+  it("keeps the 26.928 output bound to its package without overwriting the previous candidate", () => {
+    const outputPath = fileURLToPath(
+      new URL("../research/current-baseline-26.928.21956-candidate.json", import.meta.url),
+    );
+    const fingerprint = currentUpdatedBuildCandidateBaselineFingerprint;
+    expect(resolveCurrentBaselineCandidateOutputPath(outputPath, fingerprint)).toBe(outputPath);
+    expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath)).toThrow("26.924.22138");
+    expect(() => resolveCurrentBaselineCandidateOutputPath(
+      fileURLToPath(new URL("../research/current-baseline-26.924.22138-candidate.json", import.meta.url)),
+      fingerprint,
+    )).toThrow("26.928.21956");
+    expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath, {
+      ...fingerprint,
+      appAsarSha256: "a".repeat(64),
+    })).toThrow("known package fingerprint");
+    expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath, {
+      ...fingerprint,
+      appVersion: "../../other",
+    })).toThrow("known package fingerprint");
+  });
+
   it("restricts candidate repository output to one non-overwriting research artifact", () => {
     const outputPath = fileURLToPath(
       new URL(
