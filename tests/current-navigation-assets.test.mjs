@@ -1,9 +1,20 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { assertNavigationAssets, navigationMaskDataUri, navigationHash } from "../scripts/current-navigation-assets-contract.mjs";
+import { navigationPngColorProfile } from "../scripts/navigation-png-color.mjs";
 const original = JSON.parse(readFileSync(new URL("../research/current-navigation-26.928.31416/assets.json", import.meta.url), "utf8"));
 const mask = original.samples[0].items[5].icon.maskSvg;
 describe("current public navigation provenance", () => {
+  it("records the original PNG ICC profile instead of treating device RGB as sRGB", () => {
+    const bytes = readFileSync(new URL("../research/current-navigation-26.928.31416/dark-1180-rest.png", import.meta.url));
+    expect(navigationPngColorProfile(bytes)).toEqual(original.source.pngColorProfile);
+    expect(original.source.pngColorProfile.bytes).toBe(512);
+  });
+  it("rejects invalid/truncated PNG color metadata", () => {
+    expect(() => navigationPngColorProfile(Buffer.from("not a PNG"))).toThrow();
+    const bytes = readFileSync(new URL("../research/current-navigation-26.928.31416/dark-1180-rest.png", import.meta.url));
+    expect(() => navigationPngColorProfile(bytes.subarray(0, 100))).toThrow();
+  });
   it("validates all source states without promoting global parity", () => expect(assertNavigationAssets(original)).toBe(original));
   it("keeps the original alpha mask rather than drawing an approximate review icon", () => {
     expect(navigationMaskDataUri(mask)).toBe(original.samples[0].items[5].icon.dataUri);

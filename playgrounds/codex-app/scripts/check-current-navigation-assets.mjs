@@ -4,12 +4,15 @@ import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { launchScene } from "./electron-harness.mjs";
 import { assertNavigationAssets, navigationCrop, navigationLabels, navigationHash } from "../../../scripts/current-navigation-assets-contract.mjs";
+import { navigationPngColorProfile, normalizeNavigationPng } from "../../../scripts/navigation-png-color.mjs";
 
 const root = new URL("../../../research/current-navigation-26.928.31416/", import.meta.url);
 const manifest = assertNavigationAssets(JSON.parse(await readFile(new URL("assets.json", root), "utf8")));
 const artifacts = new URL("../artifacts/current-navigation-26.928.31416/", import.meta.url);
 await mkdir(artifacts, { recursive: true });
 let worstRatio = 0;
+let worstStrictRatio = 0;
+let worstChannelDelta = 0;
 for (const theme of ["dark", "light"]) for (const width of [1180, 820, 721, 720]) {
   const height = width === 1180 ? 820 : 680;
   const scene = { currentSidebar: true, frame: "sidebar-current", id: `current-navigation-assets-${theme}-${width}`,
@@ -44,17 +47,21 @@ for (const theme of ["dark", "light"]) for (const width of [1180, 820, 721, 720]
       const actualBytes = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
       const expectedBytes = await readFile(new URL(sample.png, root));
       assert.equal(navigationHash(expectedBytes), sample.pngSha256);
-      const actual = PNG.sync.read(actualBytes), expected = PNG.sync.read(expectedBytes);
+      assert.deepEqual(navigationPngColorProfile(expectedBytes), manifest.source.pngColorProfile);
+      const actual = PNG.sync.read(await normalizeNavigationPng(actualBytes));
+      const expected = PNG.sync.read(await normalizeNavigationPng(expectedBytes));
       assert.equal(actual.width, expected.width); assert.equal(actual.height, expected.height);
       const diff = new PNG({ width: actual.width, height: actual.height });
       const ratio = pixelmatch(actual.data, expected.data, diff.data, actual.width, actual.height, { threshold: 0.1 }) / (actual.width * actual.height);
       worstRatio = Math.max(worstRatio, ratio);
+      worstStrictRatio = Math.max(worstStrictRatio, pixelmatch(actual.data, expected.data, null, actual.width, actual.height, { threshold: 0, includeAA: true }) / (actual.width * actual.height));
+      for (let index = 0; index < actual.data.length; index += 1) worstChannelDelta = Math.max(worstChannelDelta, Math.abs(actual.data[index] - expected.data[index]));
       await writeFile(new URL(sample.png, artifacts), actualBytes);
       await writeFile(new URL(sample.png.replace(".png", "-diff.png"), artifacts), PNG.sync.write(diff));
       assert.ok(ratio <= 0.008, `${sample.png}: ${(ratio * 100).toFixed(4)}% exceeds the 0.8% actual-product regional gate`);
-      console.log(`${sample.png}: ${(ratio * 100).toFixed(4)}% actual-product difference`);
+      console.log(`${sample.png}: ${(ratio * 100).toFixed(4)}% sRGB perceptual actual-product difference`);
     }
     assert.deepEqual(errors, [], "Current navigation must not produce runtime or React attribute errors");
   } finally { await app.close(); }
 }
-console.log(`104 real-product navigation comparisons, native Electron bounds, CDP geometry/keyboard states: passed; worst ${(worstRatio * 100).toFixed(4)}%`);
+console.log(`104 real-product navigation comparisons, native Electron bounds, CDP geometry/keyboard states: passed; worst sRGB perceptual ${(worstRatio * 100).toFixed(4)}%, strict RGBA ${(worstStrictRatio * 100).toFixed(4)}%, max channel delta ${worstChannelDelta}. Not byte-identical parity.`);

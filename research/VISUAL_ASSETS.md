@@ -20,6 +20,9 @@ focus at four widths in both themes. References are restricted to the public
 52×280px navigation region, excluding the profile/footer and private sidebar.
 Use `pnpm --filter @codex-ui-kit/codex-app-playground check:current-navigation-assets`
 for actual-product regional comparison, not own-fixture repeatability. This
+comparison first normalizes embedded ICC profiles to sRGB with ColorSync; its
+0.8% perceptual gate is separate from the diagnostic strict-RGBA result. A 0%
+perceptual result does not mean byte-identical equality. This
 does not establish whole-window parity or route-body completeness. Source:
 OpenAI Codex Desktop `26.928.31416` / build `12553`, ASAR fingerprint in the
 manifest and [`26.928.31416.md`](26.928.31416.md). These visuals remain OpenAI

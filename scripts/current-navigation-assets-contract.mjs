@@ -86,6 +86,8 @@ export function assertNavigationAssets(record) {
   assert.equal(record.source.ownership, "OpenAI; exploratory reference, not MIT relicensed");
   assert.equal(record.source.originalThemePreference, "System");
   assert.equal(record.source.restoredThemePreference, "System");
+  assert.match(record.source.pngColorProfile.sha256, /^[0-9a-f]{64}$/);
+  assert.ok(record.source.pngColorProfile.bytes >= 128 && record.source.pngColorProfile.bytes <= 4096);
   assert.equal(record.source.before.sha256, navigationFingerprint.appAsarSha256);
   assert.equal(record.source.before.bytes, navigationFingerprint.appAsarBytes);
   assert.deepEqual(record.source.before, record.source.after);

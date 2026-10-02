@@ -15,6 +15,11 @@
   },
   "source": {
     "ownership": "OpenAI; exploratory reference, not MIT relicensed",
+    "pngColorProfile": {
+      "name": "_",
+      "bytes": 512,
+      "sha256": "ae6352a7e59c81b180855f7124d96b36c5c16707cd938c0a23a34f238fee3326"
+    },
     "originalThemePreference": "System",
     "restoredThemePreference": "System",
     "capturedAt": "2026-10-02T03:11:20.772Z",

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/index.mjs";
 import { assertCurrentBaselineObservationRecord } from "./current-baseline-contract.mjs";
 import { allowedSvgAttributes } from "./visual-asset-contract.mjs";
+import { navigationPngColorProfile } from "./navigation-png-color.mjs";
 import {
   assertNavigationAssets, navigationCrop, navigationFingerprint, navigationHash,
   navigationLabels, navigationMaskDataUri, navigationWidths,
@@ -172,6 +173,9 @@ try {
         }
         const png = `${theme}-${width}-${state === "rest" ? "rest" : `${state.split(":")[0]}-${navigationLabels.indexOf(state.split(":")[1])}`}.png`;
         const first = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
+        const colorProfile = navigationPngColorProfile(first);
+        if (!record.source.pngColorProfile) record.source.pngColorProfile = colorProfile;
+        assert.deepEqual(colorProfile, record.source.pngColorProfile, "Display color profile changed during capture");
         await page.waitForTimeout(100);
         const second = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
         assert.equal(navigationHash(first), navigationHash(second), "Product crop must be stable before reference capture");
