@@ -28,6 +28,7 @@ import {
 } from "./current-baseline-contract.mjs";
 
 const candidateFingerprintsByVersion = new Map([
+  ["26.928.31416", currentObservationCandidateFingerprints["26.928.31416"]],
   ["26.928.21956", currentUpdatedBuildCandidateBaselineFingerprint],
   ["26.924.22138", currentObservedBuildCandidateBaselineFingerprint],
   ["26.917.71314", currentLatestInstalledCandidateBaselineFingerprint],
@@ -1764,7 +1765,7 @@ try {
       observationStatus: "no-supported-help-trigger-present",
       visibleTriggerCount: 0,
     };
-    if (expectedFingerprint.appVersion === "26.928.21956") {
+    if (["26.928.21956", "26.928.31416"].includes(expectedFingerprint.appVersion)) {
       const profileTrigger = page.locator('[aria-label="Open profile menu"]:visible').first();
       await profileTrigger.click();
       const help = page.getByText("Help", { exact: true });

@@ -52,11 +52,22 @@ host-owned and are intentionally not claimed by the playground.
 
 ## Promoted baseline and latest candidate
 
+The 2026-10-02 installed candidate is `26.928.31416` / build `12553`;
+[`26.928.31416.md`](26.928.31416.md) supersedes the installed-version labels
+in the dated observations below. Its six-entry public navigation slice retains
+original SVG paths/alpha-mask resources and 478 resolved standard style
+properties for rest, six hover states, and six keyboard-focus states, in dark
+and light at 1180/820/721/720px. The 104 reference crops contain only the
+52×280px public rail region; account avatars, projects, and conversation text
+are excluded. This adds narrow current-source evidence, not complete-surface
+coverage or promotion of the global baseline. Destination bodies remain
+explicitly pending. Older-build captures remain regression evidence.
+
 - Codex Desktop `26.903.71938` (`8576`)
 - Package and scoped shell lifecycle sampled on 2026-09-12
 - `app.asar` SHA-256:
   `58fef82480b9064e209b5b2fd934992e8d71515aea8084482369cfeaff1b8ee0`
-- The latest installed candidate is Codex Desktop `26.924.22138` (`11645`),
+- The 2026-09-29 installed candidate was Codex Desktop `26.924.22138` (`11645`),
   Chromium `154.0.8037.57`, ASAR SHA-256
   `d0ba973179d2f717affd39e012b64a095464a54a51c6bccb7bc6b3d2a1cfba80`.
   The candidate-only shell observation is

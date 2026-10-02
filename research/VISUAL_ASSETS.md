@@ -4,6 +4,28 @@ Pixel comparison is useful only after every visible element in the compared
 surface has a known source. Approximate icons, fallback fonts, and inferred
 geometry otherwise create permanent noise that can hide regressions.
 
+The latest narrow manifest is
+[`current-navigation-26.928.31416/assets.json`](current-navigation-26.928.31416/assets.json).
+It retains six public navigation glyphs from the fingerprinted installed
+Renderer: five direct SVGs and Code Review's original embedded SVG alpha mask.
+No paths are hand-redrawn. The mask replay uses an independently namespaced
+mask ID and a validated inert SVG resource (only its original group and three
+solid paths); it does not allow arbitrary data URLs or weaken the generic SVG
+sanitizer. Dark and light retain their actual white/black resource variants.
+Its source owns 478 computed-style fields; the older 475-field contract remains
+unchanged, with the three new fields separately validated. Deduplicated full
+styles (including button pseudo-layers, superellipse corners, and public
+tooltips) and 104 stable product crops cover resting, each hover, and keyboard
+focus at four widths in both themes. References are restricted to the public
+52×280px navigation region, excluding the profile/footer and private sidebar.
+Use `pnpm --filter @codex-ui-kit/codex-app-playground check:current-navigation-assets`
+for actual-product regional comparison, not own-fixture repeatability. This
+does not establish whole-window parity or route-body completeness. Source:
+OpenAI Codex Desktop `26.928.31416` / build `12553`, ASAR fingerprint in the
+manifest and [`26.928.31416.md`](26.928.31416.md). These visuals remain OpenAI
+property under the exploration boundary below and are not MIT-relicensed or
+included in the npm package.
+
 [`visual-assets.json`](visual-assets.json) is the machine-checked broad manifest
 for 120 exact visual primitives. Its broad resting-state baseline remains Codex
 Desktop `26.810.52044`, while independently fingerprinted current slices include

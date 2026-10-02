@@ -767,6 +767,7 @@ function querySelection() {
     "primary-navigation-current-26-915",
     "primary-navigation-current-26-924",
     "primary-navigation-current-26-928",
+    "primary-navigation-current-26-928-31416",
     "composer-current-26-924",
     "project-navigation-current-26-915",
     "project-group-lifecycle-current-26-915",
@@ -5381,6 +5382,7 @@ export function App() {
       (initialSelection.sidebarState ===
         "primary-navigation-current-26-924" ||
         initialSelection.sidebarState === "primary-navigation-current-26-928" ||
+        initialSelection.sidebarState === "primary-navigation-current-26-928-31416" ||
         initialSelection.sidebarState === "composer-current-26-924" ||
         (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
@@ -7466,7 +7468,8 @@ export function App() {
     initialSelection.sidebarState === "primary-navigation-current-26-924" ||
     currentComposer26924Replay;
   const currentSidebarPrimaryNavigation26928Replay =
-    initialSelection.sidebarState === "primary-navigation-current-26-928";
+    initialSelection.sidebarState === "primary-navigation-current-26-928" ||
+    initialSelection.sidebarState === "primary-navigation-current-26-928-31416";
   const currentPrimaryRailOnlyRoute26924Replay =
     currentSidebarPrimaryNavigation26924Replay && view === "projects"
       ? (initialSelection.primaryRoute ?? "projects")
@@ -15988,9 +15991,9 @@ export function App() {
       <section
         aria-label="Home content pending current-build capture"
         className="demo-current-primary-home-pending"
-        data-content-status="not-observed-on-26-928.21956"
+        data-content-status={initialSelection.sidebarState === "primary-navigation-current-26-928-31416" ? "not-fully-observed-on-26-928.31416" : "not-observed-on-26-928.21956"}
       >
-        Home / New chat content has not been fully captured for build 26.928.21956.
+        Home / New chat content has not been fully captured for build {initialSelection.sidebarState === "primary-navigation-current-26-928-31416" ? "26.928.31416" : "26.928.21956"}.
       </section>
     ) : currentComposer26924Replay ? (
       <CurrentComposer26924 />
@@ -19232,7 +19235,7 @@ export function App() {
         mainRole={workspaceShowsSettings ? "region" : "main"}
         narrowSidebarBehavior="current-build"
         navigationRail={currentSidebarPrimaryNavigation26928Replay
-          ? <CurrentPrimaryNavigation26928 />
+          ? <CurrentPrimaryNavigation26928 assets={initialSelection.sidebarState === "primary-navigation-current-26-928-31416"} theme={appliedTheme} />
           : currentPrimaryNavigationRail26924}
         navigationRailLabel="Application navigation rail"
         navigationRailWidth={52}

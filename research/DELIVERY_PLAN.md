@@ -25,6 +25,17 @@ explicitly rather than inferring them.
 
 ### Reported major UI change: version alignment gate
 
+The 2026-10-02 package/runtime check advances the candidate to
+`26.928.31416` / build `12553`, SHA-256
+`9d4dda5c04d42e32cbd378557359c8c06fa798805a3c991f8a7b4b2295a8b732`.
+See [`26.928.31416.md`](26.928.31416.md). The next implementation slice uses
+the six original public rail glyphs, including the Code Review alpha mask,
+resolved resting/hover/keyboard-focus styles in both actual product themes,
+and product-cropped regional pixels at 1180, 820, 721, and 720px. Keep this
+narrow rail slice separate from the complete navigation surface: route
+destinations, account content, thread/Composer, workspace, and P1 bodies still
+need the major-build re-audit. It does not promote the global baseline.
+
 The 2026-10-01 installed-package and runtime check supersedes the historical
 alignment checks below: `/Applications/ChatGPT.app` is now `26.928.21956` /
 build `12404`, not the previously available `26.928.20755`. The isolated
