@@ -119,6 +119,13 @@ export const currentUpdatedBuildCandidateBaselineFingerprint = Object.freeze({
 export const currentObservationCandidateFingerprints = Object.freeze({
   "26.924.22138": currentObservedBuildCandidateBaselineFingerprint,
   "26.928.21956": currentUpdatedBuildCandidateBaselineFingerprint,
+  "26.928.31416": Object.freeze({
+    appAsarBytes: 538_323_704,
+    appAsarSha256: "9d4dda5c04d42e32cbd378557359c8c06fa798805a3c991f8a7b4b2295a8b732",
+    appVersion: "26.928.31416",
+    buildNumber: "12553",
+    chromiumVersion: "154.0.8037.57",
+  }),
 });
 
 export const currentAccountMenuCandidateFingerprints = Object.freeze({

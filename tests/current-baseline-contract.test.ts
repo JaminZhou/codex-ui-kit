@@ -24,6 +24,7 @@ import {
   currentBaselineViewports,
   currentObservedBuildCandidateBaselineFingerprint,
   currentUpdatedBuildCandidateBaselineFingerprint,
+  currentObservationCandidateFingerprints,
   currentAccountMenuCandidateFingerprints,
   currentInstalledCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
@@ -769,6 +770,15 @@ const currentAppServerCrashRecoveryRecord = () => {
 };
 
 describe("current baseline capture contract", () => {
+  it("isolates the 26.928.31416 runtime candidate from the earlier package", () => {
+    const fingerprint = currentObservationCandidateFingerprints["26.928.31416"];
+    const outputPath = fileURLToPath(new URL("../research/current-baseline-26.928.31416-candidate.json", import.meta.url));
+    expect(resolveCurrentBaselineCandidateOutputPath(outputPath, fingerprint)).toBe(outputPath);
+    expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath, currentUpdatedBuildCandidateBaselineFingerprint)).toThrow();
+    const record = JSON.parse(readFileSync(outputPath, "utf8"));
+    expect(() => assertCurrentBaselineObservationRecord(record, fingerprint)).not.toThrow();
+    expect(() => assertCurrentBaselineObservationRecord(record, currentUpdatedBuildCandidateBaselineFingerprint)).toThrow();
+  });
   it("keeps the 26.928 output bound to its package without overwriting the previous candidate", () => {
     const outputPath = fileURLToPath(
       new URL("../research/current-baseline-26.928.21956-candidate.json", import.meta.url),

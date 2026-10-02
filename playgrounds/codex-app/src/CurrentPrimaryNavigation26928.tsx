@@ -1,5 +1,6 @@
 import { AppPrimaryNavigationRail, IconButton, Popover } from "codex-ui-kit";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CurrentNavigationAssetButton, currentNavigationBackdrop, currentNavigationSeparator } from "./CurrentNavigationAssetButton";
 
 const helpLabels = [
   "macOS security update",
@@ -17,16 +18,26 @@ function PendingIcon() {
   return <span aria-hidden="true" data-current-build-icon-status="pending-26.928-capture" />;
 }
 
-/** Structural replay only: account content, route bodies, and glyphs are not captured. */
-export function CurrentPrimaryNavigation26928() {
+/** Historical structural replay; optional latest public glyph slice excludes account and route bodies. */
+export function CurrentPrimaryNavigation26928({ assets = false, theme = "dark" }: { assets?: boolean; theme?: "dark" | "light" | "system" }) {
+  const [systemLight, setSystemLight] = useState(() => window.matchMedia("(prefers-color-scheme: light)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: light)");
+    const update = () => setSystemLight(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  const assetTheme = theme === "system" ? systemLight ? "light" : "dark" : theme;
   const [profileOpen, setProfileOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const profileButton = useRef<HTMLButtonElement | null>(null);
   return (
     <AppPrimaryNavigationRail
       className="demo-current-primary-navigation-rail"
-      data-current-build="26.928.21956"
-      data-visual-assets="not-captured-for-current-build"
+      data-current-build={assets ? "26.928.31416" : "26.928.21956"}
+      data-visual-assets={assets ? "six-exact-public-navigation-glyphs" : "not-captured-for-current-build"}
+      style={assets ? currentNavigationBackdrop(assetTheme) : undefined}
       footer={
         <Popover
           align="end"
@@ -88,8 +99,8 @@ export function CurrentPrimaryNavigation26928() {
     >
       {["Home", "Space", "Scheduled", "Plugins", "Explore", "Code Review"].map((label) => (
         <div className="demo-current-primary-navigation-26-928__entry" key={label}>
-          {label === "Code Review" ? <div className="demo-current-primary-navigation-26-928__separator" role="separator" /> : null}
-          <IconButton
+          {label === "Code Review" ? <div className="demo-current-primary-navigation-26-928__separator" role="separator" style={assets ? currentNavigationSeparator(assetTheme) : undefined} /> : null}
+          {assets ? <CurrentNavigationAssetButton label={label} theme={assetTheme} /> : <IconButton
             aria-current={label === "Home" ? "page" : undefined}
             aria-disabled={label === "Home" ? undefined : true}
             data-route-status="entry-observed-destination-not-replayed"
@@ -97,7 +108,7 @@ export function CurrentPrimaryNavigation26928() {
             icon={<PendingIcon />}
             label={label}
             pressed={label === "Home"}
-          />
+          />}
         </div>
       ))}
     </AppPrimaryNavigationRail>
