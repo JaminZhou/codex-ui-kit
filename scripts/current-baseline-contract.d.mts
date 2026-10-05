@@ -55,6 +55,7 @@ export const currentUpdatedBuildCandidateBaselineFingerprint:
   typeof currentObservedBuildCandidateBaselineFingerprint;
 
 export const currentObservationCandidateFingerprints: Readonly<{
+  "26.930.31730": typeof currentUpdatedBuildCandidateBaselineFingerprint;
   "26.924.22138": typeof currentObservedBuildCandidateBaselineFingerprint;
   "26.928.21956": typeof currentUpdatedBuildCandidateBaselineFingerprint;
   "26.928.31416": typeof currentUpdatedBuildCandidateBaselineFingerprint;

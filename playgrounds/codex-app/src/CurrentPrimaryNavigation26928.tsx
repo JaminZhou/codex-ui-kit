@@ -1,6 +1,6 @@
 import { AppPrimaryNavigationRail, IconButton, Popover } from "codex-ui-kit";
 import { useEffect, useRef, useState } from "react";
-import { CurrentNavigationAssetButton, currentNavigationBackdrop, currentNavigationSeparator } from "./CurrentNavigationAssetButton";
+import { CurrentNavigationAssetButton, currentNavigationBackdrop, currentNavigationSeparator, currentNavigationSharedCard, type NavigationAssetBuild } from "./CurrentNavigationAssetButton";
 
 const helpLabels = [
   "macOS security update",
@@ -19,7 +19,7 @@ function PendingIcon() {
 }
 
 /** Historical structural replay; optional latest public glyph slice excludes account and route bodies. */
-export function CurrentPrimaryNavigation26928({ assets = false, theme = "dark" }: { assets?: boolean; theme?: "dark" | "light" | "system" }) {
+export function CurrentPrimaryNavigation26928({ assets = false, assetBuild = "26.928.31416", theme = "dark" }: { assets?: boolean; assetBuild?: NavigationAssetBuild; theme?: "dark" | "light" | "system" }) {
   const [systemLight, setSystemLight] = useState(() => window.matchMedia("(prefers-color-scheme: light)").matches);
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: light)");
@@ -29,15 +29,23 @@ export function CurrentPrimaryNavigation26928({ assets = false, theme = "dark" }
     return () => media.removeEventListener("change", update);
   }, []);
   const assetTheme = theme === "system" ? systemLight ? "light" : "dark" : theme;
+  const [sourceState, setSourceState] = useState("rest");
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const update = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const sourceWidth = [1180, 820, 721, 720].includes(viewportWidth) ? viewportWidth : 1180;
   const [profileOpen, setProfileOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const profileButton = useRef<HTMLButtonElement | null>(null);
   return (
     <AppPrimaryNavigationRail
       className="demo-current-primary-navigation-rail"
-      data-current-build={assets ? "26.928.31416" : "26.928.21956"}
+      data-current-build={assets ? assetBuild : "26.928.21956"}
       data-visual-assets={assets ? "six-exact-public-navigation-glyphs" : "not-captured-for-current-build"}
-      style={assets ? currentNavigationBackdrop(assetTheme) : undefined}
+      style={assets ? currentNavigationBackdrop(assetTheme, assetBuild, sourceState, sourceWidth) : undefined}
       footer={
         <Popover
           align="end"
@@ -97,10 +105,12 @@ export function CurrentPrimaryNavigation26928({ assets = false, theme = "dark" }
       }
       navigationLabel="Primary navigation"
     >
+      {assets && assetBuild === "26.930.31730" ? <div aria-hidden="true" data-current-navigation-shared-card="true"
+        style={currentNavigationSharedCard(assetTheme, assetBuild, sourceState, sourceWidth)} /> : null}
       {["Home", "Space", "Scheduled", "Plugins", "Explore", "Code Review"].map((label) => (
         <div className="demo-current-primary-navigation-26-928__entry" key={label}>
-          {label === "Code Review" ? <div className="demo-current-primary-navigation-26-928__separator" role="separator" style={assets ? currentNavigationSeparator(assetTheme) : undefined} /> : null}
-          {assets ? <CurrentNavigationAssetButton label={label} theme={assetTheme} /> : <IconButton
+          {label === "Code Review" ? <div className="demo-current-primary-navigation-26-928__separator" role="separator" style={assets ? currentNavigationSeparator(assetTheme, assetBuild) : undefined} /> : null}
+          {assets ? <CurrentNavigationAssetButton label={label} theme={assetTheme} build={assetBuild} sourceState={sourceState} onInteractionChange={setSourceState} /> : <IconButton
             aria-current={label === "Home" ? "page" : undefined}
             aria-disabled={label === "Home" ? undefined : true}
             data-route-status="entry-observed-destination-not-replayed"

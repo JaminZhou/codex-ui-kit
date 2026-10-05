@@ -4,7 +4,20 @@ Pixel comparison is useful only after every visible element in the compared
 surface has a known source. Approximate icons, fallback fonts, and inferred
 geometry otherwise create permanent noise that can hide regressions.
 
-The latest narrow manifest is
+The latest installed candidate is `26.930.31730` / build `12947`; see
+[`26.930.31730.md`](26.930.31730.md) and
+[`current-navigation-26.930.31730/assets.json`](current-navigation-26.930.31730/assets.json).
+Its version-scoped rail capture retains
+the full ancestor paint stack and explicitly standardizes output to sRGB,
+calibrated using project-authored CSS in a separate temporary target. The
+historical default-display ICC comparison remains intact: converting its PNG
+after capture cannot undo alpha composition in that display profile. New
+references and local Electron replay must both pass the independent calibration;
+do not change UI colors/opacity to compensate. These observations do not promote
+the global baseline or establish whole-window parity. Calibration PNGs contain
+only project-authored test colors, not OpenAI artwork or account content.
+
+The previous narrow manifest is
 [`current-navigation-26.928.31416/assets.json`](current-navigation-26.928.31416/assets.json).
 It retains six public navigation glyphs from the fingerprinted installed
 Renderer: five direct SVGs and Code Review's original embedded SVG alpha mask.

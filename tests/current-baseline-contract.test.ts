@@ -770,6 +770,16 @@ const currentAppServerCrashRecoveryRecord = () => {
 };
 
 describe("current baseline capture contract", () => {
+  it("keeps the 26.930 package observation isolated from 26.928 and the promoted baseline", () => {
+    const fingerprint = currentObservationCandidateFingerprints["26.930.31730"];
+    const outputPath = fileURLToPath(new URL("../research/current-baseline-26.930.31730-candidate.json", import.meta.url));
+    const record = JSON.parse(readFileSync(outputPath, "utf8"));
+    expect(resolveCurrentBaselineCandidateOutputPath(outputPath, fingerprint)).toBe(outputPath);
+    expect(() => assertCurrentBaselineObservationRecord(record, fingerprint)).not.toThrow();
+    expect(() => assertCurrentBaselineObservationRecord(record, currentObservationCandidateFingerprints["26.928.31416"])).toThrow();
+    expect(() => assertCurrentBaselineObservationRecord(record, currentBaselineFingerprint)).toThrow();
+    expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath, currentObservationCandidateFingerprints["26.928.31416"])).toThrow();
+  });
   it("isolates the 26.928.31416 runtime candidate from the earlier package", () => {
     const fingerprint = currentObservationCandidateFingerprints["26.928.31416"];
     const outputPath = fileURLToPath(new URL("../research/current-baseline-26.928.31416-candidate.json", import.meta.url));

@@ -124,6 +124,8 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
+      - name: Reproduce native ColorSync calibration
+        run: pnpm check:paint-calibration:native
       - name: Build acceptance app
         run: pnpm build && pnpm --filter @codex-ui-kit/codex-app-playground build
       - name: Verify Electron session isolation and cleanup

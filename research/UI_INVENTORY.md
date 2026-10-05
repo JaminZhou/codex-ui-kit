@@ -52,7 +52,17 @@ host-owned and are intentionally not claimed by the playground.
 
 ## Promoted baseline and latest candidate
 
-The 2026-10-02 installed candidate is `26.928.31416` / build `12553`;
+The 2026-10-05 installed candidate is `26.930.31730` / build `12947`;
+[`26.930.31730.md`](26.930.31730.md) records shell/sidebar and Profile → Help
+lifecycle plus empty Composer observations. A project-authored CSS calibration
+shows that post-hoc ICC conversion does not undo native-profile alpha
+composition. New rail capture uses a disclosed sRGB environment with separate
+strict RGBA diagnostics, per-frame root appearance, ancestor and sibling card
+paint provenance, and contextual Home status indicators; this does not
+establish the default native product window's responsive behavior, route bodies,
+Home/Composer parity, or whole-surface completion. All global status fields
+remain unchanged and partial. The prior 2026-10-02 candidate is
+`26.928.31416` / build `12553`;
 [`26.928.31416.md`](26.928.31416.md) supersedes the installed-version labels
 in the dated observations below. Its six-entry public navigation slice retains
 original SVG paths/alpha-mask resources and 478 resolved standard style

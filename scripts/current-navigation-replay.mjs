@@ -17,11 +17,13 @@ const replayProperties = new Set([
 ]);
 export function navigationReplayData(record) {
   assertNavigationAssets(record);
-  const samples = record.samples.filter(sample => sample.width === 1180).map(sample => ({
+  const samples = record.samples.map(sample => ({
     theme: sample.theme, width: sample.width, state: sample.state, backdropColors: sample.backdropColors,
     separatorStyleId: sample.separatorStyleId,
+    ...(sample.sharedCard ? { sharedCard: sample.sharedCard } : {}),
     tooltip: sample.tooltip,
     items: sample.items.map(item => ({ label: item.label, styleId: item.styleId, beforeStyleId: item.beforeStyleId, afterStyleId: item.afterStyleId,
+      ...(item.decorations ? { rect: item.rect, decorations: item.decorations } : {}),
       icon: { kind: item.icon.kind, rootAttributes: item.icon.rootAttributes, styleId: item.icon.styleId, renderSize: item.icon.renderSize,
         ...(item.icon.kind === "vector" ? { viewBox: item.icon.viewBox, primitives: item.icon.primitives } : { dataUri: item.icon.dataUri }) } })),
   }));
@@ -29,16 +31,18 @@ export function navigationReplayData(record) {
   const visit = node => { needed.add(node.styleId); node.children?.forEach(visit); };
   for (const sample of samples) {
     needed.add(sample.separatorStyleId);
+    if (sample.sharedCard) needed.add(sample.sharedCard.styleId);
     if (sample.tooltip) needed.add(sample.tooltip.styleId);
-    for (const item of sample.items) { needed.add(item.styleId); needed.add(item.beforeStyleId); needed.add(item.afterStyleId); needed.add(item.icon.styleId); item.icon.primitives?.forEach(visit); }
+    for (const item of sample.items) { needed.add(item.styleId); needed.add(item.beforeStyleId); needed.add(item.afterStyleId); needed.add(item.icon.styleId); item.icon.primitives?.forEach(visit); item.decorations?.forEach(node => needed.add(node.styleId)); }
   }
   return { baseline: record.baseline, samples, styles: Object.fromEntries([...needed].sort().map(id => [id,
     Object.fromEntries(Object.entries(record.styles[id]).filter(([name]) => replayProperties.has(name))) ])) };
 }
 
 if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) {
-  const source = JSON.parse(await readFile(new URL("../research/current-navigation-26.928.31416/assets.json", import.meta.url), "utf8"));
-  const output = new URL("../playgrounds/codex-app/src/currentNavigationAssets2692831416.json", import.meta.url);
+  const version = process.argv.includes("--latest") ? "26.930.31730" : "26.928.31416";
+  const source = JSON.parse(await readFile(new URL(`../research/current-navigation-${version}/assets.json`, import.meta.url), "utf8"));
+  const output = new URL(`../playgrounds/codex-app/src/currentNavigationAssets${version.replaceAll(".", "")}.json`, import.meta.url);
   const text = `${JSON.stringify(navigationReplayData(source), null, 2)}\n`;
   if (process.argv.includes("--write")) await writeFile(output, text);
   else assert.equal(await readFile(output, "utf8"), text, "Regenerate the exact current navigation renderer subset");

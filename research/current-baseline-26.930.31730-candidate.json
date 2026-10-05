@@ -1,0 +1,5151 @@
+{
+  "baseline": {
+    "appAsarBytes": 546863116,
+    "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
+    "appVersion": "26.930.31730",
+    "buildNumber": "12947",
+    "chromiumVersion": "154.0.8037.98",
+    "sampledAt": "2026-10-05"
+  },
+  "baselineStatus": "candidate-only-observation",
+  "captureKind": "renderer_emulation",
+  "composerResourceObservation": {
+    "editor": {
+      "contentEditable": true,
+      "rect": {
+        "height": 44,
+        "left": 393.4375,
+        "top": 716,
+        "width": 712
+      },
+      "style": {
+        "color": "rgb(255, 255, 255)",
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px"
+      }
+    },
+    "horizontalOverflow": 0,
+    "menu": {
+      "backgroundColor": "rgb(45, 45, 45)",
+      "borderRadius": "20px",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "13px",
+      "fontWeight": "430",
+      "itemHeight": 28.5625,
+      "publicItems": [
+        "Files and folders",
+        "Work in a project",
+        "Goal",
+        "Plan mode",
+        "Record a skill",
+        "Sketch",
+        "GitHub",
+        "Documents",
+        "PDF",
+        "Spreadsheets",
+        "Presentations"
+      ],
+      "publicItemDetails": [
+        {
+          "description": null,
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 409.5625,
+            "width": 726
+          },
+          "title": "Files and folders"
+        },
+        {
+          "description": "Choose project for new chats",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 466.6875,
+            "width": 726
+          },
+          "title": "Work in a project"
+        },
+        {
+          "description": "Set a goal to keep pursuing",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 495.25,
+            "width": 726
+          },
+          "title": "Goal"
+        },
+        {
+          "description": "Turn plan mode on",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 523.8125,
+            "width": 726
+          },
+          "title": "Plan mode"
+        },
+        {
+          "description": null,
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 552.375,
+            "width": 726
+          },
+          "title": "Record a skill"
+        },
+        {
+          "description": "Draw a sketch",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 580.9375,
+            "width": 726
+          },
+          "title": "Sketch"
+        },
+        {
+          "description": "Triage PRs, issues, CI, and publish flows",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 754.3125,
+            "width": 726
+          },
+          "title": "GitHub"
+        },
+        {
+          "description": "Create and edit documents",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 782.875,
+            "width": 726
+          },
+          "title": "Documents"
+        },
+        {
+          "description": "Read, create, and verify PDFs",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 811.4375,
+            "width": 726
+          },
+          "title": "PDF"
+        },
+        {
+          "description": "Create and edit spreadsheets",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 840,
+            "width": 726
+          },
+          "title": "Spreadsheets"
+        },
+        {
+          "description": "Create and edit presentations",
+          "rect": {
+            "height": 28.5625,
+            "left": 386.4375,
+            "top": 868.5625,
+            "width": 726
+          },
+          "title": "Presentations"
+        }
+      ],
+      "rect": {
+        "height": 320,
+        "left": 381.4375,
+        "top": 378,
+        "width": 736
+      },
+      "scrollOwner": {
+        "clientHeight": 310,
+        "rect": {
+          "height": 310,
+          "left": 386.4375,
+          "top": 383,
+          "width": 726
+        },
+        "scrollHeight": 1297,
+        "scrollTop": 0
+      },
+      "visibleItemCount": 34
+    },
+    "trigger": {
+      "ariaExpanded": "true",
+      "dataState": "open",
+      "rect": {
+        "height": 28,
+        "left": 389.4375,
+        "top": 764,
+        "width": 28
+      }
+    },
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 820,
+      "width": 1180
+    }
+  },
+  "runtimeBundleIdentity": {
+    "afterCapture": {
+      "appAsarBytes": 546863116,
+      "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
+      "changedAtMs": 1791040982466,
+      "checkedAtMs": 1791173290528,
+      "device": "16777234",
+      "inode": "396935123"
+    },
+    "beforeCapture": {
+      "appAsarBytes": 546863116,
+      "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
+      "changedAtMs": 1791040982466,
+      "checkedAtMs": 1791173282284,
+      "device": "16777234",
+      "inode": "396935123"
+    },
+    "ownerPid": 37787,
+    "processStartedAtMs": 1791173268000
+  },
+  "schemaVersion": 1,
+  "projectsIndexObservation": {
+    "observationStatus": "candidate-only-navigation-surface",
+    "projectTriggerCount": 1,
+    "shell": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 792,
+            "height": 28,
+            "left": 389.44,
+            "right": 417.44,
+            "top": 764,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 792,
+            "height": 28,
+            "left": 1045.44,
+            "right": 1073.44,
+            "top": 764,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 792,
+            "height": 28,
+            "left": 1081.44,
+            "right": 1109.44,
+            "top": 764,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 812,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 776,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 760,
+          "height": 44,
+          "left": 393.44,
+          "right": 1105.44,
+          "top": 716,
+          "width": 712
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 816,
+          "height": 772,
+          "left": 321.88,
+          "right": 1176,
+          "top": 44,
+          "width": 854.13
+        }
+      ],
+      "navigation": {
+        "bottom": 816,
+        "height": 772,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 816,
+            "height": 772,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 816,
+            "height": 772,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 651,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 816,
+            "height": 651,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 720
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 816,
+          "height": 772,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 812,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 776,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 820,
+        "width": 1180
+      }
+    },
+    "sidebar": {
+      "expandedProjectGroupCount": 5,
+      "helpControlCount": 0,
+      "horizontalOverflow": 0,
+      "navigationWidth": 321.88,
+      "navigationRegions": [
+        {
+          "rect": {
+            "height": 772,
+            "left": 0,
+            "width": 52
+          }
+        },
+        {
+          "rect": {
+            "height": 772,
+            "left": 52,
+            "width": 269.88
+          }
+        }
+      ],
+      "projectGroupCount": 5,
+      "projectRow": {
+        "rect": {
+          "height": 30,
+          "width": 253.88
+        },
+        "role": "button",
+        "tabIndex": 0,
+        "tag": "div"
+      },
+      "settingsControlCount": 0
+    }
+  },
+  "sidebarLifecycle": {
+    "baseline": {
+      "expandedProjectGroupCount": 5,
+      "helpControlCount": 0,
+      "horizontalOverflow": 0,
+      "navigationWidth": 321.88,
+      "navigationRegions": [
+        {
+          "rect": {
+            "height": 772,
+            "left": 0,
+            "width": 52
+          }
+        },
+        {
+          "rect": {
+            "height": 772,
+            "left": 52,
+            "width": 269.88
+          }
+        }
+      ],
+      "projectGroupCount": 5,
+      "projectRow": {
+        "rect": {
+          "height": 30,
+          "width": 253.88
+        },
+        "role": "button",
+        "tabIndex": 0,
+        "tag": "div"
+      },
+      "settingsControlCount": 0
+    },
+    "pointerCollapsed": {
+      "expanded": false,
+      "focusOnRow": true
+    },
+    "enterExpanded": {
+      "expanded": true,
+      "focusOnRow": true
+    },
+    "spaceCollapsed": {
+      "expanded": false,
+      "focusOnRow": true
+    },
+    "spaceExpanded": {
+      "expanded": true,
+      "focusOnRow": true
+    },
+    "projectMenu": {
+      "bridge": {
+        "available": true,
+        "frozen": true
+      },
+      "items": null,
+      "observationStatus": "native-items-unavailable",
+      "renderMode": "electron-native-context-menu",
+      "trigger": {
+        "ariaExpanded": "false",
+        "ariaHaspopup": "menu",
+        "rect": {
+          "height": 20,
+          "width": 20
+        },
+        "tag": "button"
+      }
+    },
+    "helpMenu": {
+      "observationStatus": "profile-submenu-observed",
+      "entryPoint": "Open profile menu > Help",
+      "opened": {
+        "menus": [
+          {
+            "rect": {
+              "height": 239.94,
+              "width": 228
+            },
+            "controlCount": 7
+          },
+          {
+            "rect": {
+              "height": 300.63,
+              "width": 389.41
+            },
+            "controlCount": 9
+          }
+        ]
+      },
+      "closed": {
+        "escapePressCount": 1,
+        "focusReturned": true,
+        "visibleMenuCount": 0
+      }
+    },
+    "responsive": {
+      "compactVisibleBeforeCollapse": {
+        "horizontalOverflow": 0,
+        "navigationVisible": true,
+        "navigationWidth": 321.875,
+        "navigationRegions": [
+          {
+            "left": 0,
+            "width": 52
+          },
+          {
+            "left": 52,
+            "width": 269.88
+          }
+        ],
+        "projectExpanded": false,
+        "showSidebarCount": 0
+      },
+      "compactCollapsed": {
+        "horizontalOverflow": 0,
+        "navigationVisible": false,
+        "navigationWidth": 52,
+        "navigationRegions": [
+          {
+            "left": 0,
+            "width": 52
+          }
+        ],
+        "projectExpanded": false,
+        "showSidebarCount": 1
+      },
+      "compactPinned": {
+        "horizontalOverflow": 0,
+        "navigationVisible": true,
+        "navigationWidth": 321.875,
+        "navigationRegions": [
+          {
+            "left": 0,
+            "width": 52
+          },
+          {
+            "left": 52,
+            "width": 269.88
+          }
+        ],
+        "projectExpanded": false,
+        "showSidebarCount": 0
+      },
+      "wideRestored": {
+        "horizontalOverflow": 0,
+        "navigationVisible": true,
+        "navigationWidth": 321.875,
+        "navigationRegions": [
+          {
+            "left": 0,
+            "width": 52
+          },
+          {
+            "left": 52,
+            "width": 269.88
+          }
+        ],
+        "projectExpanded": false,
+        "showSidebarCount": 0
+      },
+      "keyboardRestored": {
+        "expanded": true,
+        "focusOnRow": true
+      }
+    }
+  },
+  "states": {
+    "wideNewChat": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 792,
+            "height": 28,
+            "left": 389.44,
+            "right": 417.44,
+            "top": 764,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 792,
+            "height": 28,
+            "left": 1045.44,
+            "right": 1073.44,
+            "top": 764,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 792,
+            "height": 28,
+            "left": 1081.44,
+            "right": 1109.44,
+            "top": 764,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 812,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 776,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 760,
+          "height": 44,
+          "left": 393.44,
+          "right": 1105.44,
+          "top": 716,
+          "width": 712
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 816,
+          "height": 772,
+          "left": 321.88,
+          "right": 1176,
+          "top": 44,
+          "width": 854.13
+        }
+      ],
+      "navigation": {
+        "bottom": 816,
+        "height": 772,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 816,
+            "height": 772,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 816,
+            "height": 772,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 651,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 816,
+            "height": 651,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 746
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 816,
+          "height": 772,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 812,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 776,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 820,
+        "width": 1180
+      }
+    },
+    "mediumNewChat": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 728,
+            "right": 756,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 764,
+            "right": 792,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 350.88,
+          "right": 788,
+          "top": 576,
+          "width": 437.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 321.88,
+          "right": 816,
+          "top": 44,
+          "width": 494.13
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 511,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 676,
+            "height": 511,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 707
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 820
+      }
+    },
+    "thresholdNewChat": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 629,
+            "right": 657,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 665,
+            "right": 693,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 350.88,
+          "right": 689,
+          "top": 576,
+          "width": 338.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 321.88,
+          "right": 717,
+          "top": 44,
+          "width": 395.13
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 511,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 676,
+            "height": 511,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 707
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 721
+      }
+    },
+    "compactVisibleBeforeCollapse": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 628,
+            "right": 656,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 664,
+            "right": 692,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 350.88,
+          "right": 688,
+          "top": 576,
+          "width": 337.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 321.88,
+          "right": 716,
+          "top": 44,
+          "width": 394.13
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 511,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 676,
+            "height": 511,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 707
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactCollapsed": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 76,
+            "right": 104,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 628,
+            "right": 656,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [],
+        "Show sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 664,
+            "right": 692,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 80,
+          "right": 688,
+          "top": 576,
+          "width": 608
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 52,
+          "right": 716,
+          "top": 44,
+          "width": 664
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 52,
+        "top": 44,
+        "width": 52
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactPinned": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 628,
+            "right": 656,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 664,
+            "right": 692,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 350.88,
+          "right": 688,
+          "top": 576,
+          "width": 337.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 321.88,
+          "right": 716,
+          "top": 44,
+          "width": 394.13
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 511,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 676,
+            "height": 511,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 707
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    },
+    "compactPullRequests": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 628,
+            "right": 656,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 664,
+            "right": 692,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 350.88,
+          "right": 688,
+          "top": 576,
+          "width": 337.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 321.88,
+          "right": 716,
+          "top": 44,
+          "width": 394.13
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 511,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 676,
+            "height": 511,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 707
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      },
+      "requestedRouteObservation": {
+        "route": "Pull requests",
+        "status": "not-visible"
+      }
+    },
+    "compactRestored": {
+      "colorScheme": "dark",
+      "controls": {
+        "Add files and more": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 346.88,
+            "right": 374.88,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Back": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 88,
+            "right": 116,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Dictate": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 628,
+            "right": 656,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Forward": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 122,
+            "right": 150,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Hide sidebar": [
+          {
+            "bottom": 36,
+            "height": 28,
+            "left": 156,
+            "right": 184,
+            "top": 8,
+            "width": 28
+          }
+        ],
+        "Show sidebar": [],
+        "Start new voice chat": [
+          {
+            "bottom": 652,
+            "height": 28,
+            "left": 664,
+            "right": 692,
+            "top": 624,
+            "width": 28
+          }
+        ],
+        "Help menu": [],
+        "Open profile menu": [
+          {
+            "bottom": 672,
+            "height": 36,
+            "left": 8,
+            "right": 44,
+            "top": 636,
+            "width": 36
+          }
+        ]
+      },
+      "editor": {
+        "contenteditable": "true",
+        "rect": {
+          "bottom": 620,
+          "height": 44,
+          "left": 350.88,
+          "right": 688,
+          "top": 576,
+          "width": 337.13
+        },
+        "style": {
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+          "fontSize": "14px",
+          "fontWeight": "430",
+          "lineHeight": "20px"
+        }
+      },
+      "horizontalOverflow": 0,
+      "main": [
+        {
+          "bottom": 676,
+          "height": 632,
+          "left": 321.88,
+          "right": 716,
+          "top": 44,
+          "width": 394.13
+        }
+      ],
+      "navigation": {
+        "bottom": 676,
+        "height": 632,
+        "left": 0,
+        "right": 321.88,
+        "top": 44,
+        "width": 321.88
+      },
+      "navigationRegions": [
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 0,
+            "right": 52,
+            "top": 44,
+            "width": 52
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        },
+        {
+          "rect": {
+            "bottom": 676,
+            "height": 632,
+            "left": 52,
+            "right": 321.88,
+            "top": 44,
+            "width": 269.88
+          },
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "borderRightColor": "rgb(255, 255, 255)",
+            "borderRightWidth": "0px",
+            "display": "flex"
+          }
+        }
+      ],
+      "navigationScrollOwners": [
+        {
+          "clientHeight": 511,
+          "overflowY": "auto",
+          "rect": {
+            "bottom": 676,
+            "height": 511,
+            "left": 52,
+            "right": 321.88,
+            "top": 165,
+            "width": 269.88
+          },
+          "scrollHeight": 707
+        }
+      ],
+      "primaryNavigationItems": [
+        "Home",
+        "Space",
+        "Scheduled",
+        "Plugins",
+        "Explore",
+        "Code Review",
+        "Open profile menu"
+      ],
+      "primaryRailObservation": {
+        "rect": {
+          "bottom": 676,
+          "height": 632,
+          "left": 0,
+          "right": 52,
+          "top": 44,
+          "width": 52
+        },
+        "style": {
+          "alignItems": "center",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "display": "flex",
+          "flexDirection": "column",
+          "gap": "8px",
+          "padding": "8px 8px 4px",
+          "width": "52px"
+        },
+        "items": [
+          {
+            "active": true,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 80,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 60,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgb(255, 255, 255)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Home",
+            "rect": {
+              "bottom": 88,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 52,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgb(255, 255, 255)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 124,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 104,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "none",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Space",
+            "rect": {
+              "bottom": 132,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 96,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 2,
+              "rect": {
+                "bottom": 168,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 148,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Scheduled",
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 1,
+              "rect": {
+                "bottom": 212,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 192,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Plugins",
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 3,
+              "rect": {
+                "bottom": 256,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 236,
+                "width": 20
+              },
+              "viewBox": "0 0 20 20",
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Explore",
+            "rect": {
+              "bottom": 264,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 228,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": {
+              "pathCount": 0,
+              "rect": {
+                "bottom": 309,
+                "height": 20,
+                "left": 16,
+                "right": 36,
+                "top": 289,
+                "width": 20
+              },
+              "viewBox": null,
+              "style": {
+                "color": "rgba(255, 255, 255, 0.498)",
+                "fill": "rgb(0, 0, 0)",
+                "height": "20px",
+                "stroke": "none",
+                "width": "20px"
+              }
+            },
+            "label": "Code Review",
+            "rect": {
+              "bottom": 317,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 281,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          },
+          {
+            "active": false,
+            "icon": null,
+            "label": "Open profile menu",
+            "rect": {
+              "bottom": 672,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 636,
+              "width": 36
+            },
+            "style": {
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "borderRadius": "12.5px",
+              "color": "rgba(255, 255, 255, 0.498)",
+              "display": "block",
+              "fontSize": "13px",
+              "fontWeight": "400",
+              "height": "36px",
+              "padding": "0px",
+              "width": "36px"
+            }
+          }
+        ]
+      },
+      "routeMarkers": {
+        "newChatHome": 1
+      },
+      "routes": {
+        "New chat": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 126,
+              "height": 30,
+              "left": 60,
+              "right": 285.88,
+              "top": 96,
+              "width": 225.88
+            }
+          }
+        ],
+        "Plugins": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 220,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 184,
+              "width": 36
+            }
+          }
+        ],
+        "Pull requests": [],
+        "Scheduled": [
+          {
+            "ariaCurrent": null,
+            "ariaSelected": null,
+            "rect": {
+              "bottom": 176,
+              "height": 36,
+              "left": 8,
+              "right": 44,
+              "top": 140,
+              "width": 36
+            }
+          }
+        ],
+        "Sites": []
+      },
+      "viewport": {
+        "devicePixelRatio": 1,
+        "height": 680,
+        "width": 720
+      }
+    }
+  },
+  "targetSelection": {
+    "candidates": [
+      {
+        "area": 691200,
+        "height": 720,
+        "index": 0,
+        "landmarks": {
+          "main": 0,
+          "nav": 0,
+          "sidebarTrigger": 0,
+          "textbox": 0
+        },
+        "selected": false,
+        "url": "non-app-page",
+        "visibleControls": 0,
+        "width": 960
+      },
+      {
+        "area": 967600,
+        "height": 820,
+        "index": 1,
+        "landmarks": {
+          "main": 2,
+          "nav": 2,
+          "sidebarTrigger": 2,
+          "textbox": 1
+        },
+        "selected": true,
+        "url": "app://-/index.html",
+        "visibleControls": 51,
+        "width": 1180
+      },
+      {
+        "area": 113920,
+        "height": 320,
+        "index": 2,
+        "landmarks": {
+          "main": 0,
+          "nav": 0,
+          "sidebarTrigger": 0,
+          "textbox": 0
+        },
+        "selected": false,
+        "url": "app://-/index.html?initialRoute=%2Favatar-overlay",
+        "visibleControls": 0,
+        "width": 356
+      }
+    ],
+    "selected": {
+      "area": 967600,
+      "landmarks": {
+        "main": 2,
+        "nav": 2,
+        "sidebarTrigger": 2,
+        "textbox": 1
+      },
+      "url": "app://-/index.html",
+      "visibleControls": 51
+    }
+  }
+}
