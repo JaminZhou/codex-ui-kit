@@ -264,7 +264,29 @@ regional-pixel acceptance.
 
 ## Current position
 
-- The installed app reports `26.928.21956` (`12404`), Chromium
+- The 2026-10-05 installed candidate is `26.930.31730` / build `12947`,
+  Chromium `154.0.8037.98`, ASAR 546,863,116 bytes / SHA-256
+  `87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836`.
+  [`26.930.31730.md`](26.930.31730.md) records the refreshed shell/sidebar,
+  Profile → Help, and empty Composer observations. Independent CSS calibration
+  isolates a native-output-profile alpha-composition difference that post-hoc
+  ICC conversion cannot undo. New rail references therefore record an explicit
+  sRGB capture environment, with default-display calibration retained as a
+  diagnostic; historical fixtures are not overwritten. The full ancestor paint
+  stack, sibling content-card shadow, contextual Home indicator, and
+  screenshot/style/screenshot stability transaction are captured. Per-frame
+  root backgrounds and Renderer alpha remain explicit; native desktop material
+  is not inferred from a CDP crop. Replay uses the exact width and one shared
+  rail interaction state, including the indicator's observed presence/absence.
+  Product widths are Renderer emulation, not native product resizing. Replay
+  requires independent sRGB calibration and real native Electron bounds;
+  perceptual, strict RGBA, and channel residuals remain separate. Next: finish
+  same-engine independent Browser control and remaining hover/portal paint
+  accounting (product Chromium 154 vs local Electron's Chromium 150), then
+  re-observe and implement the actual
+  new Home/Composer composition and affected route bodies. All stages 0–7
+  remain open; the promoted global baseline stays `26.903.71938`.
+- The prior installed app reported `26.928.21956` (`12404`), Chromium
   `154.0.8037.57`, with a 538,323,145-byte `app.asar` whose SHA-256 is
   `3bda98f2265ad23677dfe0163d1cc7855beade6bef11d27f830f6663d7658406`.
   The sanitized candidate record and scope are in

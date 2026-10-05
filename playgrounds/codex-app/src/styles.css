@@ -174,15 +174,15 @@ textarea {
   width: 24px;
 }
 
-.demo-current-primary-navigation-rail [data-visual-asset-status="exact-public-26.928.31416"]::before,
-.demo-current-primary-navigation-rail [data-visual-asset-status="exact-public-26.928.31416"]::after {
+.demo-current-primary-navigation-rail [data-current-navigation-asset="true"]::before,
+.demo-current-primary-navigation-rail [data-current-navigation-asset="true"]::after {
   content: "";
   inset: 0;
   pointer-events: none;
   position: absolute;
 }
 
-.demo-current-primary-navigation-rail [data-visual-asset-status="exact-public-26.928.31416"]::before {
+.demo-current-primary-navigation-rail [data-current-navigation-asset="true"]::before {
   background-color: var(--current-nav-before-background-color);
   border-color: var(--current-nav-before-border-color);
   border-style: var(--current-nav-before-border-style);
@@ -198,7 +198,7 @@ textarea {
   corner-shape: var(--current-nav-before-corner-shape);
 }
 
-.demo-current-primary-navigation-rail [data-visual-asset-status="exact-public-26.928.31416"]::after {
+.demo-current-primary-navigation-rail [data-current-navigation-asset="true"]::after {
   background-color: var(--current-nav-after-background-color);
   border-color: var(--current-nav-after-border-color);
   border-style: var(--current-nav-after-border-style);
@@ -214,8 +214,18 @@ textarea {
   corner-shape: var(--current-nav-after-corner-shape);
 }
 
-.demo-current-primary-navigation-rail [data-visual-asset-status="exact-public-26.928.31416"] .codex-ui-icon-button__icon {
+.demo-current-primary-navigation-rail [data-current-navigation-asset="true"] .codex-ui-icon-button__icon {
   position: relative;
+}
+
+/* Compare the observed Renderer RGBA, including native-transparent root modes.
+   Source backdrop layers are replayed on the rail; do not add an opaque host
+   layer underneath them. This affects only the explicit reference replay. */
+html:has(.demo-current-primary-navigation-rail[data-visual-assets="six-exact-public-navigation-glyphs"]),
+body:has(.demo-current-primary-navigation-rail[data-visual-assets="six-exact-public-navigation-glyphs"]),
+.demo-root:has(.demo-current-primary-navigation-rail[data-visual-assets="six-exact-public-navigation-glyphs"]),
+.codex-ui-app-shell:has(.demo-current-primary-navigation-rail[data-visual-assets="six-exact-public-navigation-glyphs"]) {
+  background: transparent;
 }
 
 .demo-current-profile-26-928 {

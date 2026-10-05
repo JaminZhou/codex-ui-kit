@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "appVersion": "26.930.31730",
+  "buildNumber": "12947",
+  "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
+  "chromiumVersion": "154.0.8037.98",
+  "ownership": "Project-authored independent CSS calibration; no product UI or account content",
+  "surface": "Temporary about:blank CDP target; closed after capture",
+  "crop": { "x": 0, "y": 0, "width": 300, "height": 200 },
+  "native": {
+    "png": "paint-calibration-26.930.31730/native-display.png",
+    "sha256": "fc3ea36954ccf7b7b7ed2f7908926caf6b5a18912685947279e9122a4c2b345c",
+    "profile": { "name": "_", "bytes": 512, "sha256": "ae6352a7e59c81b180855f7124d96b36c5c16707cd938c0a23a34f238fee3326" },
+    "rawRgb": [144, 134, 33],
+    "colorSyncSrgbRgb": [155, 145, 36]
+  },
+  "standardized": {
+    "png": "paint-calibration-26.930.31730/srgb.png",
+    "sha256": "145a628a3cdb691919daf741e394e6f340a4fc7e1526b1f40ec8ac4e02ceb7d9",
+    "launchArgument": "--force-color-profile=srgb",
+    "profile": null,
+    "rawRgb": [145, 145, 36],
+    "colorSyncSrgbRgb": [145, 145, 36]
+  },
+  "pointOrder": ["alpha-white-over-dark", "opaque-mid-gray", "opaque-background"],
+  "conclusion": "Post-hoc ICC conversion corrects opaque colors but cannot undo alpha composition in the native output profile. Standardize capture and independently calibrate both product reference and replay; do not alter UI paint to compensate."
+}

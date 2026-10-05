@@ -31,6 +31,7 @@
       "cdp-26.924.22138": "26.924.22138",
       "cdp-26.928.21956": "26.928.21956",
       "cdp-26.928.31416": "26.928.31416",
+      "cdp-26.930.31730": "26.930.31730",
       "playground": "playground-owned"
     }
   },
@@ -978,7 +979,8 @@
         "cdp-26.924.22138:empty-editor-geometry-wide-medium-threshold-and-compact",
         "cdp-26.924.22138:empty-editor-wide-and-context-composition-anchor",
         "cdp-26.924.22138:trailing-composer-selector-popover-bounds-and-escape-dismissal-labels-redacted",
-        "cdp-26.928.21956:empty-editor-712x44-wide-responsive-width-and-system-font-430-anchor"
+        "cdp-26.928.21956:empty-editor-712x44-wide-responsive-width-and-system-font-430-anchor",
+        "cdp-26.930.31730:empty-editor-712x44-wide-337.13x44-compact-visible-608x44-collapsed-and-system-font-430"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1163,7 +1165,8 @@
         "cdp-26.917.62051:unified-add-menu-public-catalog-736x320-726x310-scroller",
         "cdp-26.917.71314:unified-add-menu-736x320-726x310-scroller-19-allowlisted-public-titles",
         "cdp-26.924.22138:open-add-menu-736x320-context-dependent-fourteen-entry-sample",
-        "cdp-26.928.21956:add-menu-736x320-scroll-581px-nine-descendants-six-public-labels-only"
+        "cdp-26.928.21956:add-menu-736x320-scroll-581px-nine-descendants-six-public-labels-only",
+        "cdp-26.930.31730:add-menu-public-allowlist-scroll-and-escape-restoration-no-selection-or-execution"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1297,7 +1300,8 @@
         "cdp-26.917.71314:project-new-chat-action-hover-hit-test-1728x1003",
         "cdp-26.924.22138:dual-navigation-52px-rail-269.88px-sidebar-and-720-collapse",
         "cdp-26.924.22138:route-dependent-secondary-sidebar-width",
-        "cdp-26.928.21956:52px-rail-269.88px-sidebar-four-widths-hide-show-zero-overflow"
+        "cdp-26.928.21956:52px-rail-269.88px-sidebar-four-widths-hide-show-zero-overflow",
+        "cdp-26.930.31730:52px-rail-269.88px-sidebar-four-renderer-widths-hide-show-and-project-keyboard-lifecycle"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1352,7 +1356,9 @@
         "cdp-26.924.22138:explore-projects-and-gpts-route-entry",
         "cdp-26.924.22138:seven-rail-svg-icons-20px-source-unresolved-profile-avatar-excluded",
         "cdp-26.928.21956:home-space-scheduled-plugins-explore-code-review-six-entry-rail-and-profile-only-footer",
-        "cdp-26.928.31416:six-original-public-svg-glyphs-alpha-mask-478-computed-properties-rest-hover-keyboard-focus-dark-light-four-widths"
+        "cdp-26.928.31416:six-original-public-svg-glyphs-alpha-mask-478-computed-properties-rest-hover-keyboard-focus-dark-light-four-widths",
+        "cdp-26.930.31730:six-entry-public-rail-shell-landmarks-and-profile-help-lifecycle",
+        "cdp-26.930.31730:six-original-glyphs-104-stable-srgb-public-crops-full-ancestor-paint-stack-dark-light-four-renderer-widths"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1662,7 +1668,8 @@
         "cdp-26.915.31945:sidebar-footer-account-current-build-menu-wide-compact-dark-light-focus-return",
         "cdp-26.917.71314:account-menu-six-items-305.875x202.375-42.563px-identity-row-430-weight-show-pet-shortcut-dark-light-wide-compact-focus-return-zero-overflow",
         "cdp-26.924.22138:profile-menu-228x202.38-six-controls-settings-route-focus-return",
-        "cdp-26.928.21956:profile-menu-228x239.94-seven-controls-account-content-redacted"
+        "cdp-26.928.21956:profile-menu-228x239.94-seven-controls-account-content-redacted",
+        "cdp-26.930.31730:profile-menu-228x239.94-seven-controls-account-content-redacted"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1700,7 +1707,8 @@
         "cdp-26.917.71314:help-menu-content-dependent-nine-item-320x300.63-focus-return",
         "cdp-26.924.22138:legacy-open-help-trigger-not-visible-in-new-chat-shell",
         "cdp-26.924.22138:renamed-help-menu-320x300.63-nine-controls-escape-focus-return",
-        "cdp-26.928.21956:profile-help-hover-submenu-389.41x300.63-nine-controls-single-escape-close-all-focus-return"
+        "cdp-26.928.21956:profile-help-hover-submenu-389.41x300.63-nine-controls-single-escape-close-all-focus-return",
+        "cdp-26.930.31730:profile-help-hover-submenu-389.41x300.63-nine-controls-single-escape-close-all-focus-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

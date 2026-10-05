@@ -7,9 +7,11 @@ import { chromium } from "../playgrounds/codex-app/node_modules/playwright-core/
 import { assertCurrentBaselineObservationRecord } from "./current-baseline-contract.mjs";
 import { allowedSvgAttributes } from "./visual-asset-contract.mjs";
 import { navigationPngColorProfile } from "./navigation-png-color.mjs";
+import { PNG } from "../playgrounds/codex-app/node_modules/pngjs/lib/png.js";
+import { paintCalibrationHtml, paintCalibrationCrop, paintCalibrationPixels, assertSrgbPaintCalibration } from "./paint-calibration-contract.mjs";
 import {
-  assertNavigationAssets, navigationCrop, navigationFingerprint, navigationHash,
-  navigationLabels, navigationMaskDataUri, navigationWidths,
+  assertNavigationAssets, navigationCrop, navigationHash,
+  navigationLabels, navigationMaskDataUri, navigationWidths, navigationFingerprints,
 } from "./current-navigation-assets-contract.mjs";
 
 const port = Number(process.env.CODEX_NAVIGATION_CDP_PORT);
@@ -17,15 +19,21 @@ assert.ok(Number.isInteger(port) && port >= 1024 && port <= 65535);
 const profile = realpathSync(process.env.CODEX_NAVIGATION_PROFILE ?? "");
 assert.match(profile, /^\/private\/tmp\/codex-ui-kit-cdp\.[A-Za-z0-9]+$/);
 assert.equal(process.env.CODEX_NAVIGATION_ORIGINAL_THEME, "System", "Declare the observed original preference, not merely its resolved color");
-const baseline = JSON.parse(await readFile(new URL("../research/current-baseline-26.928.31416-candidate.json", import.meta.url), "utf8"));
-assertCurrentBaselineObservationRecord(baseline, navigationFingerprint);
-const owner = String(baseline.runtimeBundleIdentity.ownerPid);
+const version = process.env.CODEX_NAVIGATION_VERSION ?? "26.928.31416";
+const fingerprint = navigationFingerprints[version];
+assert.ok(fingerprint, "Unknown navigation capture build");
+const standardizedSrgb = version === "26.930.31730";
+const baseline = JSON.parse(await readFile(new URL(`../research/current-baseline-${version}-candidate.json`, import.meta.url), "utf8"));
+assertCurrentBaselineObservationRecord(baseline, fingerprint);
+const owner = standardizedSrgb ? process.env.CODEX_NAVIGATION_OWNER_PID : String(baseline.runtimeBundleIdentity.ownerPid);
+assert.match(owner ?? "", /^[1-9][0-9]*$/);
 const processInfo = pid => JSON.parse(execFileSync("/usr/bin/python3", [fileURLToPath(new URL("./read-macos-process-info.py", import.meta.url)), pid], { encoding: "utf8" }));
 const argv = processInfo(owner);
 assert.equal(argv.executablePath, "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT");
 for (const argument of [`--user-data-dir=${profile}`, `--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1"]) assert.equal(argv.argv.filter(value => value === argument).length, 1);
+if (standardizedSrgb) assert.equal(argv.argv.filter(value => value === "--force-color-profile=srgb").length, 1);
 const ownerStart = Date.parse(execFileSync("/bin/ps", ["-p", owner, "-o", "lstart="], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } }).trim());
-assert.equal(ownerStart, baseline.runtimeBundleIdentity.processStartedAtMs, "Probe PID was recycled after the baseline capture");
+if (!standardizedSrgb) assert.equal(ownerStart, baseline.runtimeBundleIdentity.processStartedAtMs, "Probe PID was recycled after the baseline capture");
 const fields = execFileSync("/usr/sbin/lsof", ["-nP", "-a", `-iTCP:${port}`, "-sTCP:LISTEN", "-Fpn"], { encoding: "utf8" }).trim().split("\n");
 assert.ok(fields.includes(`p${owner}`));
 for (const field of fields) {
@@ -42,14 +50,14 @@ for (const field of fields) {
 const bundleFile = "/Applications/ChatGPT.app/Contents/Resources/app.asar";
 const bundleIdentity = async () => {
   const info = await stat(bundleFile);
-  assert.equal(info.size, navigationFingerprint.appAsarBytes);
-  assert.ok(info.ctimeMs < baseline.runtimeBundleIdentity.processStartedAtMs, "Probe predates the installed bundle");
+  assert.equal(info.size, fingerprint.appAsarBytes);
+  assert.ok(info.ctimeMs < ownerStart, "Probe predates the installed bundle");
   const sha = execFileSync("/usr/bin/shasum", ["-a", "256", bundleFile], { encoding: "utf8" }).split(/\s/)[0];
-  assert.equal(sha, navigationFingerprint.appAsarSha256);
+  assert.equal(sha, fingerprint.appAsarSha256);
   return { bytes: info.size, sha256: sha, inode: info.ino, changedAtMs: info.ctimeMs };
 };
 const before = await bundleIdentity();
-const output = new URL("../research/current-navigation-26.928.31416/", import.meta.url);
+const output = new URL(`../research/current-navigation-${version}/`, import.meta.url);
 if (process.env.CODEX_NAVIGATION_FINALIZE_EXISTING === "1") {
   const recovered = JSON.parse(await readFile(`${profile}/navigation-unvalidated.json`, "utf8"));
   assertNavigationAssets(recovered);
@@ -62,15 +70,15 @@ if (process.env.CODEX_NAVIGATION_FINALIZE_EXISTING === "1") {
 }
 await mkdir(output); // create-only: never overwrite a reviewed reference set
 const record = {
-  schemaVersion: 1, baseline: navigationFingerprint, crop: navigationCrop,
+  schemaVersion: 1, baseline: fingerprint, crop: navigationCrop,
   source: { ownership: "OpenAI; exploratory reference, not MIT relicensed", originalThemePreference: "System", restoredThemePreference: null,
-    capturedAt: new Date().toISOString(), ownerPid: Number(owner), processStartedAtMs: baseline.runtimeBundleIdentity.processStartedAtMs, before },
+    capturedAt: new Date().toISOString(), ownerPid: Number(owner), processStartedAtMs: ownerStart, before },
   styles: {}, samples: [],
 };
 const styleId = style => { const id = navigationHash(style); record.styles[id] = style; return id; };
 const compactPrimitive = node => ({ tag: node.tag, attributes: node.attributes, styleId: styleId(node.computedStyle), ...(node.children ? { children: node.children.map(compactPrimitive) } : {}) });
 const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`);
-assert.ok(browser.version().includes(navigationFingerprint.chromiumVersion));
+assert.ok(browser.version().includes(fingerprint.chromiumVersion));
 const page = browser.contexts().flatMap(context => context.pages()).find(candidate => candidate.url() === "app://-/index.html");
 assert.ok(page);
 const originalViewport = page.viewportSize();
@@ -90,6 +98,23 @@ const setTheme = async label => {
   if (label !== "System") await page.waitForFunction(theme => document.documentElement.dataset.theme === theme, label.toLowerCase());
 };
 try {
+  if (standardizedSrgb) {
+    let calibrationPage;
+    try {
+      calibrationPage = await page.context().newPage();
+      await calibrationPage.setViewportSize({ width: 300, height: 200 });
+      await calibrationPage.setContent(paintCalibrationHtml);
+      const pngBytes = await calibrationPage.screenshot({ clip: paintCalibrationCrop });
+      assert.equal(navigationPngColorProfile(pngBytes), null);
+      const png = PNG.sync.read(pngBytes);
+      assertSrgbPaintCalibration(png);
+      record.source.colorProfileMode = "srgb";
+      record.source.pngColorProfile = null;
+      record.source.viewportMode = "renderer-emulation-not-native-product-resize";
+      record.source.rasterMode = "renderer-rgba-with-observed-root-background";
+      record.source.calibration = { kind: "independent-css-alpha-composition", pixels: paintCalibrationPixels(png) };
+    } finally { await calibrationPage?.close(); }
+  }
   await openAppearance();
   assert.ok(await page.getByRole("radio", { name: "System", exact: true }).isChecked(), "Declared original theme must match the observed preference");
   for (const theme of ["dark", "light"]) {
@@ -100,6 +125,7 @@ try {
       await page.waitForFunction(({width, height}) => innerWidth === width && innerHeight === height, {width, height});
       for (const state of ["rest", ...navigationLabels.map(label => `hover:${label}`), ...navigationLabels.map(label => `focus:${label}`)]) {
         await page.keyboard.press("Escape");
+        await page.bringToFront();
         await page.mouse.move(width - 2, height - 2);
         await page.evaluate(() => document.activeElement?.blur());
         const railLocator = page.getByRole("navigation", { name: "App navigation", exact: true });
@@ -114,8 +140,11 @@ try {
         // Include the settled public tooltip state, not the context-dependent
         // initial/skip-delay phase shared by Radix triggers.
         await page.waitForTimeout(1250);
-        const sample = await page.evaluate(({ labels, attributeNames }) => {
-          const style = (e, pseudo = null) => Object.fromEntries([...getComputedStyle(e, pseudo)].filter(name => !name.startsWith("--")).sort().map(name => [name, getComputedStyle(e, pseudo).getPropertyValue(name)]));
+        const inspectSample = () => page.evaluate(({ labels, attributeNames }) => {
+          const style = (e, pseudo = null) => {
+            const computed = getComputedStyle(e, pseudo);
+            return Object.fromEntries([...computed].filter(name => !name.startsWith("--")).sort().map(name => [name, computed.getPropertyValue(name)]));
+          };
           const rect = e => { const r = e.getBoundingClientRect(); return { left: r.left, top: r.top, width: r.width, height: r.height }; };
           const attributes = e => Object.fromEntries([...e.attributes].filter(a => attributeNames.includes(a.name.toLowerCase())).map(a => [a.name, a.value]));
           const primitive = e => ({ tag: e.tagName.toLowerCase(), attributes: attributes(e), computedStyle: style(e), ...(e.children.length ? { children: [...e.children].map(primitive) } : {}) });
@@ -135,7 +164,13 @@ try {
               const maskNode = node => ({ tag: node.tagName, attributes: Object.fromEntries([...node.attributes].filter(a => a.name !== "xmlns").map(a => [a.name, a.value])), ...(node.children.length ? { children: [...node.children].map(maskNode) } : {}) });
               icon = { ...common, kind: "alpha-mask", maskType: svg.querySelector("mask").getAttribute("mask-type"), maskSvg: maskNode(doc.documentElement) };
             } else icon = { ...common, kind: "vector", viewBox: svg.getAttribute("viewBox"), primitives: [...svg.children].map(primitive) };
-            return { label: e.innerText.trim(), rect: rect(e), computedStyle: style(e), beforeComputedStyle: style(e, "::before"), afterComputedStyle: style(e, "::after"), icon };
+            // Public status dots can be sibling DOM paint, not part of SVG.
+            // Retain only empty, visible, solid-painted inert primitives.
+            const decorations = [...e.querySelectorAll("span,div")].filter(node => {
+              const r = node.getBoundingClientRect();
+              return !node.textContent.trim() && node.checkVisibility() && r.width > 0 && r.height > 0 && getComputedStyle(node).backgroundColor !== "rgba(0, 0, 0, 0)";
+            }).map(node => ({ tag: node.tagName.toLowerCase(), rect: rect(node), computedStyle: style(node) }));
+            return { label: e.innerText.trim(), rect: rect(e), computedStyle: style(e), beforeComputedStyle: style(e, "::before"), afterComputedStyle: style(e, "::after"), icon, decorations };
           });
           const separators = [...rail.querySelectorAll("*")].filter(e => {
             const r = e.getBoundingClientRect();
@@ -143,20 +178,49 @@ try {
           });
           if (separators.length !== 1) throw new Error("Ambiguous public rail separator");
           const backdropColors = [];
+          const paintStack = [];
           for (let ancestor = rail; ancestor; ancestor = ancestor.parentElement) {
             const color = getComputedStyle(ancestor).backgroundColor;
             if (color !== "rgba(0, 0, 0, 0)") backdropColors.unshift(color);
+            paintStack.push({ tag: ancestor.tagName.toLowerCase(), rect: rect(ancestor), computedStyle: style(ancestor) });
           }
           const tips = [...document.querySelectorAll('[role="tooltip"]')].filter(e => labels.includes(e.textContent.trim()) && e.checkVisibility());
           if (tips.length > 1) throw new Error("Ambiguous public navigation tooltip");
           const tooltip = tips.length ? { label: tips[0].textContent.trim(), rect: rect(tips[0]), computedStyle: style(tips[0]) } : null;
-          return { theme: document.documentElement.dataset.theme, backdropColors, tooltip, railComputedStyle: style(rail), separatorComputedStyle: style(separators[0]), items };
+          const cards = [...document.querySelectorAll("div,main")].filter(e => {
+            const r = e.getBoundingClientRect();
+            return r.left === 52 && r.top === 44 && r.width > 100 && getComputedStyle(e).boxShadow !== "none";
+          });
+          if (cards.length !== 1) throw new Error("Ambiguous shared shell card paint");
+          const sharedCard = { rect: rect(cards[0]), computedStyle: style(cards[0]) };
+          return { theme: document.documentElement.dataset.theme, rendererFocused: document.hasFocus(), sharedCard, backdropColors, paintStack, tooltip, railComputedStyle: style(rail), separatorComputedStyle: style(separators[0]), items };
         }, { labels: navigationLabels, attributeNames: [...allowedSvgAttributes] });
+        let first, sample;
+        // Settle the entire screenshot/style/screenshot transaction, not just
+        // two adjacent frames. Late tooltip/compositor updates must never pair
+        // an old raster with newer styles. The bounded retry still fails closed.
+        for (let attempt = 0; attempt < 6; attempt += 1) {
+          first = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
+          await page.waitForTimeout(250);
+          const second = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
+          sample = await inspectSample();
+          const third = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
+          if (navigationHash(first) === navigationHash(second) && navigationHash(first) === navigationHash(third)) break;
+          console.log(`retry unsettled public navigation: ${theme} ${width}px ${state}, attempt ${attempt + 1}`);
+          if (attempt === 5) assert.fail(`Product crop/style transaction is still moving: ${theme} ${width} ${state}`);
+          await page.waitForTimeout(500);
+        }
         assert.equal(sample.theme, theme);
         sample.railStyleId = styleId(sample.railComputedStyle); delete sample.railComputedStyle;
+        if (standardizedSrgb) sample.sharedCard = { rect: sample.sharedCard.rect, styleId: styleId(sample.sharedCard.computedStyle) };
+        else { delete sample.sharedCard; delete sample.rendererFocused; }
+        if (standardizedSrgb) sample.paintStack = sample.paintStack.map(layer => ({ tag: layer.tag, rect: layer.rect, styleId: styleId(layer.computedStyle) }));
+        else delete sample.paintStack;
         sample.separatorStyleId = styleId(sample.separatorComputedStyle); delete sample.separatorComputedStyle;
         if (sample.tooltip) { sample.tooltip.styleId = styleId(sample.tooltip.computedStyle); delete sample.tooltip.computedStyle; }
         for (const item of sample.items) {
+          if (standardizedSrgb) item.decorations = item.decorations.map(node => ({ tag: node.tag, rect: node.rect, styleId: styleId(node.computedStyle) }));
+          else delete item.decorations;
           item.styleId = styleId(item.computedStyle); delete item.computedStyle;
           item.beforeStyleId = styleId(item.beforeComputedStyle); delete item.beforeComputedStyle;
           item.afterStyleId = styleId(item.afterComputedStyle); delete item.afterComputedStyle;
@@ -172,13 +236,9 @@ try {
           }
         }
         const png = `${theme}-${width}-${state === "rest" ? "rest" : `${state.split(":")[0]}-${navigationLabels.indexOf(state.split(":")[1])}`}.png`;
-        const first = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
         const colorProfile = navigationPngColorProfile(first);
-        if (!record.source.pngColorProfile) record.source.pngColorProfile = colorProfile;
+        if (!Object.hasOwn(record.source, "pngColorProfile")) record.source.pngColorProfile = colorProfile;
         assert.deepEqual(colorProfile, record.source.pngColorProfile, "Display color profile changed during capture");
-        await page.waitForTimeout(100);
-        const second = await page.screenshot({ clip: navigationCrop, animations: "disabled", caret: "hide" });
-        assert.equal(navigationHash(first), navigationHash(second), "Product crop must be stable before reference capture");
         await writeFile(new URL(png, output), first, { flag: "wx" });
         record.samples.push({ ...sample, width, height, state, png, pngSha256: navigationHash(first) });
       }
