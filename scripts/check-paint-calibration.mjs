@@ -6,6 +6,11 @@ import { navigationHash } from "./current-navigation-assets-contract.mjs";
 import { navigationPngColorProfile, normalizeNavigationPng } from "./navigation-png-color.mjs";
 import { paintCalibrationPixels, assertSrgbPaintCalibration } from "./paint-calibration-contract.mjs";
 
+const args = process.argv.slice(2);
+assert.ok(args.length === 0 || (args.length === 1 && args[0] === "--portable"), "Usage: check-paint-calibration.mjs [--portable]");
+const native = args.length === 0;
+if (native) assert.equal(process.platform, "darwin", "Native calibration requires macOS ColorSync; portable evidence is a separate check");
+
 const root = new URL("../research/", import.meta.url);
 const record = JSON.parse(await readFile(new URL("paint-calibration-26.930.31730.json", root), "utf8"));
 const fingerprint = currentObservationCandidateFingerprints[record.appVersion];
@@ -22,11 +27,17 @@ for (const mode of ["native", "standardized"]) {
   const points = paintCalibrationPixels(png);
   assert.deepEqual(points.map(point => point.name), record.pointOrder);
   assert.deepEqual(points.map(point => point.rgba), sample.rawRgb.map(value => [value, value, value, 255]));
-  const normalized = paintCalibrationPixels(PNG.sync.read(await normalizeNavigationPng(bytes)));
-  assert.deepEqual(normalized.map(point => point.rgba), sample.colorSyncSrgbRgb.map(value => [value, value, value, 255]));
+  // Portable checks authenticate the source PNG/profile and raw pixels; they
+  // must not claim to have reproduced a platform-native ColorSync transform.
+  if (native || mode === "standardized") {
+    const normalized = paintCalibrationPixels(PNG.sync.read(await normalizeNavigationPng(bytes)));
+    assert.deepEqual(normalized.map(point => point.rgba), sample.colorSyncSrgbRgb.map(value => [value, value, value, 255]));
+  }
   if (mode === "standardized") assertSrgbPaintCalibration(png);
   else assert.throws(() => assertSrgbPaintCalibration(png));
 }
 assert.notEqual(record.native.colorSyncSrgbRgb[0], record.standardized.rawRgb[0]);
 assert.deepEqual(record.native.colorSyncSrgbRgb.slice(1), record.standardized.rawRgb.slice(1));
-console.log("Independent CSS calibration proves native ICC alpha composition is not post-hoc sRGB equivalence");
+console.log(native
+  ? "Native ColorSync calibration reproduced: ICC alpha composition is not post-hoc sRGB equivalence"
+  : "Portable calibration evidence verified: PNG hashes, ICC identity, raw pixels and untagged sRGB; native ColorSync reproduction is separate");

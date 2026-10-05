@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { paintCalibrationPoints, paintCalibrationPixels, assertSrgbPaintCalibration } from "../scripts/paint-calibration-contract.mjs";
 
 const calibration = () => {
@@ -25,5 +27,23 @@ describe("independent output-profile calibration", () => {
   it("rejects wrong dimensions or truncated raster data", () => {
     expect(() => paintCalibrationPixels({ ...calibration(), width: 299 })).toThrow();
     expect(() => assertSrgbPaintCalibration({ ...calibration(), data: Buffer.alloc(0) })).toThrow();
+  });
+  it("verifies portable evidence without claiming a native ColorSync result", () => {
+    const script = new URL("../scripts/check-paint-calibration.mjs", import.meta.url);
+    const output = execFileSync(process.execPath, [script.pathname, "--portable"], { encoding: "utf8" });
+    expect(output).toContain("Portable calibration evidence verified");
+    expect(output).toContain("native ColorSync reproduction is separate");
+    expect(output).not.toContain("Native ColorSync calibration reproduced");
+  });
+  it("keeps native reproduction required on the macOS acceptance runner", () => {
+    const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
+    const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+    expect(pkg.scripts["check:research"]).toContain("check-paint-calibration.mjs --portable");
+    expect(pkg.scripts["check:paint-calibration:native"]).toBe("node scripts/check-paint-calibration.mjs");
+    expect(workflow).toContain("run: pnpm check:paint-calibration:native");
+  });
+  it("rejects unsupported modes rather than silently downgrading to portable", () => {
+    const script = new URL("../scripts/check-paint-calibration.mjs", import.meta.url);
+    expect(() => execFileSync(process.execPath, [script.pathname, "--native-ish"], { stdio: "pipe" })).toThrow();
   });
 });
