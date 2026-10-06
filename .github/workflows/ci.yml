@@ -31,7 +31,10 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
+      - name: Run quality checks with a virtual display
+        # The package check includes Electron-backed Home/Composer geometry
+        # coverage, so Linux needs a display server even though it is headless.
+        run: xvfb-run -a -s "-screen 0 1920x1200x24" pnpm check
       - name: Audit the packed release candidate
         run: pnpm check:release:candidate
 
