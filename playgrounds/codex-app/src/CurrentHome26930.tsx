@@ -5,6 +5,7 @@ import {
   ComposerEditor,
   IconButton,
 } from "codex-ui-kit";
+import { CurrentBuildIcon } from "./currentBuildIcons";
 import {
   useEffect,
   useRef,
@@ -163,21 +164,24 @@ export function CurrentHome26930() {
       data-copy-status="synthetic"
       data-lifecycle-evidence="local-synthetic-only; no App Server turn"
       data-lifecycle-state={lifecycleState}
-      data-scene-status="observed-geometry-local-reference-candidates-product-pixels-unverified"
-      data-visual-asset-status="optional-gitignored-local-svg-candidates; no-vector-bytes-tracked; product-control-mapping-and-pixels-unverified"
+      data-scene-status="observed-geometry-home-mark-path-match-remaining-assets-and-product-pixels-unverified"
+      data-visual-asset-status="home-mark-reuses-existing-four-path-match; five-optional-local-candidates-remain; tint-and-product-pixels-unverified"
     >
       {turns.length === 0 ? (
         <div
           className="demo-current-home-composer-26-930__welcome"
           data-home-composer-region="welcome"
         >
-          <LocalReferenceGlyph
+          <span
+            aria-hidden="true"
             className="demo-current-home-composer-26-930__mark"
-            fileName="codex-d905da579253.svg"
-            fallbackGlyph="mark"
-            assetStatus="local-reference-candidate-unverified"
-            size={56}
-          />
+            data-asset-status="existing-home-mark-four-path-match; tint-and-product-pixels-unverified"
+          >
+            <CurrentBuildIcon
+              name="home-mark"
+              style={{ height: 56, width: 56 }}
+            />
+          </span>
           <span className="demo-current-home-composer-26-930__title">
             What would you like to work on?
           </span>

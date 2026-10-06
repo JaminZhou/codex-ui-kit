@@ -207,9 +207,12 @@ assert.deepEqual(
 
 assert.doesNotMatch(
   currentHomeSource,
-  /CurrentBuildIcon|current-home-assets-26\.930|<svg\b|path\s+d=/,
-  "the current Home fixture must not embed bundled brand/glyph vector bytes",
+  /current-home-assets-26\.930|<svg\b|path\s+d=/,
+  "the current Home fixture must not embed current-build vector bytes",
 );
+assert.match(currentHomeSource, /import \{ CurrentBuildIcon \} from "\.\/currentBuildIcons"/);
+assert.match(currentHomeSource, /name="home-mark"/);
+assert.match(currentHomeSource, /existing-home-mark-four-path-match/);
 assert.doesNotMatch(
   iconRegistrySource,
   /currentHomeAssets26930|home-mark-candidate-26-930/,
@@ -218,7 +221,6 @@ assert.doesNotMatch(
 assert.match(gitignore, /^playgrounds\/codex-app\/public\/local-reference-assets\/$/m);
 assert.match(currentHomeSource, /local-reference-assets\/26\.930\.31730\//);
 for (const fileName of [
-  "codex-d905da579253.svg",
   "plus_composer-86a041c72466.svg",
   "mic_lg_dictate-9b125ec2975b.svg",
   "voice-ae407024968a.svg",
@@ -242,7 +244,12 @@ const trackedLocalAssets = execFileSync("git", ["ls-files", "--", localAssetDire
 });
 assert.equal(trackedLocalAssets.trim(), "", "local reference assets must never be tracked");
 assert.match(currentHomeSource, /no-vector-bytes-tracked/);
+assert.doesNotMatch(
+  currentHomeSource,
+  /codex-d905da579253\.svg/,
+  "the Home mark must use the verified existing vector rather than the nearest optional candidate",
+);
 
 console.log(
-  `current Home assets ok: ${manifest.candidates.length} metadata-only tracked candidates; local SVG references are optional and gitignored`,
+  `current Home assets ok: existing Home-mark vector path match plus five optional local SVG references; ${manifest.candidates.length} metadata-only candidates remain tracked`,
 );

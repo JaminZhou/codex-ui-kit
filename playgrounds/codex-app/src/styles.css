@@ -9866,20 +9866,18 @@ html body .demo-root[data-scenario="mcp-current-26-903-recovery"]
 
 .demo-root[data-current-home-composer-26-930="true"]
   .demo-current-home-composer-26-930__mark {
-  border: 1px dashed currentColor;
-  border-radius: 8px;
   box-sizing: border-box;
   color: var(--codex-ui-text);
   display: block;
   height: 56px;
-  opacity: 0.35;
   width: 56px;
 }
 
 .demo-root[data-current-home-composer-26-930="true"]
-  .demo-current-home-composer-26-930__mark[data-local-reference-load-state="loaded"] {
-  border: 0;
-  opacity: 1;
+  .demo-current-home-composer-26-930__mark .demo-current-build-icon {
+  display: block;
+  height: 56px;
+  width: 56px;
 }
 
 .demo-root[data-current-home-composer-26-930="true"]

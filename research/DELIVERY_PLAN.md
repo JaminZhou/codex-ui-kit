@@ -276,22 +276,34 @@ regional-pixel acceptance.
 
 ## Current position
 
-- A fresh production-channel updater check on 2026-10-06 still reports
-  `26.930.31730` / build `12947` installed, and offers
-  `26.930.51102` / build `13100`. The offered package has not been installed or
-  inspected, so the 26.930.31730 observations below remain the last verified
-  local baseline, not evidence about the available update. Re-align the full
-  inventory and affected-state captures after that package is installed; do
-  not silently promote the older candidate.
-- Re-running `pnpm report:current-build-audit -- 26.930.31730` on 2026-10-06,
-  after rechecking the installed package identity, confirms the candidate queue
-  is still sparse: 6/100 surfaces carry target-
-  build observation tags (P0 5/59, P1 1/28, P2 0/13), 94 have none, and
-  current-build Browser/Electron acceptance remains 0/100. The six tags are
-  concentrated in the shell/sidebar and empty Composer/resource menu; this is
-  a capture queue, not a promotion or completeness claim. The installed app's
-  read-only package identity/hash still match the candidate record below.
-- The 2026-10-05 installed candidate is `26.930.31730` / build `12947`,
+- A fresh production-channel updater check on 2026-10-06 reports
+  `26.930.61225` / build `13232` installed and up to date. The installed
+  `Info.plist` agrees; its 546,868,805-byte `app.asar` has SHA-256
+  `88b8cce6f627771bf341f5a6bb464ad220749b0d442d44f618d7741c2de7318b`.
+  The application bundle also ships Codex CLI runtime `0.160.1`; its strict,
+  read-only compatibility smoke is recorded in
+  [`current-app-server-runtime-26.930.61225.json`](current-app-server-runtime-26.930.61225.json).
+  The read-only package-string scan is recorded in
+  [`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json).
+  Package identity and string markers are candidate evidence only: no
+  26.930.61225 installed-product DOM, computed styles, screenshot, Browser/CDP,
+  Electron, or regional-pixel observation has been captured. The 26.930.31730
+  UI records below are historical regression evidence, not observations of
+  26.930.61225; the promoted global baseline remains `26.903.71938`.
+- `pnpm report:current-build-audit -- 26.930.61225` now registers the candidate
+  queue without promoting it: 0/100 surfaces have target-build observation
+  tags (P0 0/59, P1 0/28, P2 0/13), with Browser and Electron acceptance at
+  0/100. By area, app-shell is 0/24, composer 0/8, conversation 0/28,
+  cross-layer 0/5, integrations 0/6, scope-candidate 0/2, settings 0/12, and
+  workspace 0/15. This is the full capture queue, not a completeness claim.
+- The root `pnpm check` passed on 2026-10-06 with the exact desktop-binary
+  override; its `check:protocol` smoke asserted runtime `0.160.1`. The overall
+  command passed 155 root files / 1,458 tests, 49 Codex-playground files / 474
+  tests, Electron playground 2 files / 7 tests, package consumers, demo,
+  accessibility, and builds. Its Home/Composer contract is still keyed to the
+  historical `26.930.31730` candidate; this is repository/local-playground
+  validation, not installed-product UI or pixel evidence for `26.930.61225`.
+- The prior installed candidate was `26.930.31730` / build `12947`,
   Chromium `154.0.8037.98`, ASAR 546,863,116 bytes / SHA-256
   `87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836`.
   [`26.930.31730.md`](26.930.31730.md) records the refreshed shell/sidebar,
@@ -344,9 +356,12 @@ regional-pixel acceptance.
   hash-verified extractor can now place exact current-build SVG references only
   in `playgrounds/codex-app/public/local-reference-assets/26.930.31730/`, a
   gitignored local folder; no asset bytes, vector paths, or Renderer source are
-  committed. The Home mark, add-resource, dictation, voice, model chevron, and
-  adjacent context toggle render these optional local candidates with neutral
-  fallbacks when the local files are absent. A fresh read-only audit of the
+  committed. Add-resource, dictation, voice, model chevron, and adjacent
+  context toggle render optional local candidates with neutral fallbacks when
+  the local files are absent. The Home mark now reuses the already-tracked
+  `home-mark` vector because its viewBox and all four path strings exactly
+  match the 26.930 live observation; this establishes shape identity only, not
+  current DOM ownership, tint, or pixel parity. A fresh read-only audit of the
   fingerprinted `src-47eedec2abf2.js` module tied the nine SVGs to package asset
   catalog keys: `codex`, `codexNew`, `home`, `homeAlt`, `plusComposer`,
   `micLgDictate`, `voice`, `chevronDown`, and `slidersHorizontal`. This confirms
@@ -367,19 +382,54 @@ regional-pixel acceptance.
   not retained, so this does not establish DOM identity or close the
   asset/control mapping. Only chunk hashes and abstract declarations are
   tracked; no source text or style selectors are retained.
-  The Home copy remains synthetic. DOM identity, final asset sizing/tint,
-  product-pixel comparison, and a content-safe reference region remain open;
-  no parity claim follows from loading these vectors. Next, bind the package
-  keys to exact current-build DOM controls and measured sizes, then add a
-  regional pixel gate from an approved content-safe capture. To prevent
+  A second read-only capture on 2026-10-06 sampled the naturally sized
+  2560×1318 dark Renderer viewport without changing its dimensions. It records
+  the Home mark/title, context controls, Composer card/editor, and five toolbar
+  glyph regions as text-free geometry in
+  [`current-home-composer-live-viewport-26.930.31730.json`](current-home-composer-live-viewport-26.930.31730.json).
+  The title's runtime class includes the shared `heading-xl` utility and its
+  measured width is copy-dependent; account-specific copy was not retained.
+  The 736×98px Composer card remains centered on the content column and anchored
+  20px above the viewport bottom, with the same 712×44px editor measured at
+  1180×820. The live 56px Home mark's four exact path strings and viewBox match
+  the historical 26.818 Home-mark record, and the four paths were found in the
+  fingerprinted 26.930 primary chunk. Exact path-string scans also bind several
+  Composer glyphs to fingerprinted current-build chunks, while the first
+  context glyph and dictation paths remain unresolved.
+  Importantly, the optional 26.930 catalog candidates are not all exact runtime
+  matches: same-Chromium alpha-only raster checks still show residuals for the
+  nearest local Home-mark candidate (15.2% changed pixels), Add (3.1%), and
+  Dictation (12.9%). The Home mark's separate four-path match is from the
+  existing historical vector, not that nearest candidate. This is diagnostic
+  silhouette comparison, not a product-pixel gate; candidates remain local-only
+  and no SVG paths or screenshots were added to the new record.
+  The Electron structural fixture now renders the Home mark through the
+  existing `CurrentBuildIcon name="home-mark"` entry and checks its four-path
+  count and viewBox against the text-free live observation. Five other visible
+  glyphs remain optional local candidates; mark tint, direct product DOM
+  ownership, and product-pixel parity remain open.
+  The older static Home CSS declarations therefore remain candidate evidence,
+  not a proved mapping to the live title node. The runtime sample is one wide,
+  dark, empty Home state; it does not close light-theme, compact-width,
+  dynamic-copy, populated Composer, App Server, Electron, or regional-pixel
+  acceptance. Next, bind the remaining visible glyphs to exact package/runtime
+  assets, retain unresolved candidates in the ignored local reference
+  directory, and use content-safe icon/card crops to establish a
+  current-product-to-Electron regional pixel gate. Keep account-dependent Home
+  copy outside reference images and gate constants.
+  The Home copy remains synthetic. The mark's path match is encoded in the
+  fixture and Electron structure gate, but its current product DOM consumer,
+  final tint, product-pixel comparison, and a content-safe reference region
+  remain open; no parity claim follows from loading these vectors. To prevent
   accidental distribution, the playground now disables Vite's `public/`
   copying in ordinary builds; only the explicit local-reference acceptance
   enables it, and the harness removes those copied files from `dist` on exit.
   The ordinary-build Electron replay asserts that no local SVG is exposed.
   This narrows packaging risk but does not resolve runtime control mapping or
-  pixel parity. The explicit local-reference Electron acceptance was rerun on
-  2026-10-06: all six Home/Composer SVG candidates loaded from the gitignored
-  reference folder, the measured 1180×820 geometry/styles passed, and the
+  pixel parity. Before the Home-mark refactor, the explicit local-reference
+  Electron acceptance on 2026-10-06 loaded all six then-rendered candidates.
+  After the refactor, the targeted rerun loaded the five remaining local SVGs
+  and preserved the measured 1180×820 geometry/styles; the
   820/721/720 compact layouts plus four-width synthetic turn lifecycle passed.
   Generated reference copies were removed from `dist`; this is still structural
   and local-asset evidence, not an installed-product pixel comparison. The
@@ -421,9 +471,10 @@ regional-pixel acceptance.
   The earlier monolithic `pnpm check:codex-app:acceptance` invocation did not
   exit zero and was not restarted per the no-repeat instruction; component
   results are staged evidence, not a claim that one uninterrupted command
-  passed. The shared harness script passes Node syntax validation. The offered
-  26.930.51102 update remains uninstalled, so current-build Browser/Electron and
-  product-pixel acceptance remain outstanding.
+  passed. The shared harness script passes Node syntax validation. The former
+  26.930.51102 offer has been superseded by installed candidate `26.930.61225`;
+  no current-build Browser/Electron or product-pixel captures exist, so those
+  acceptance gates remain outstanding.
   On 2026-10-06, the repository `pnpm check` passed (root 154 files / 1,454
   tests, Codex playground 49 / 474, Electron playground 2 / 7, plus builds,
   package consumers, demo, and accessibility). A subsequent full local
@@ -461,9 +512,10 @@ regional-pixel acceptance.
   run verifies captured 26.930.31730 geometry at 1180×820, compact containment
   at 820/721/720, and only the playground's synthetic draft/send/streaming/
   completion/reset lifecycle; it does not verify the installed product's
-  post-submit DOM, exact control-to-asset mapping, or product pixels. The offered
-  26.930.51102 update remains uninstalled, so all stages 0–7 remain open and
-  the promoted global baseline remains `26.903.71938`.
+  post-submit DOM, exact control-to-asset mapping, or product pixels. Although
+  `26.930.61225` is now installed, no current-build runtime captures exist, so
+  all stages 0–7 remain open and the promoted global baseline remains
+  `26.903.71938`.
   Revisit the rail edge only if new compositor evidence gives a testable
   hypothesis. All stages 0–7
   remain open; the promoted global baseline stays `26.903.71938`.
@@ -1712,8 +1764,11 @@ No surface becomes product-level complete merely because one fixture passes.
 
 ### 0. Refresh the current baseline
 
-The installed application advanced from `26.917.71314` to `26.924.22138`.
-Before adding new parity claims:
+The active installed target is `26.930.61225` / build `13232`, confirmed by
+the production updater and installed bundle metadata on 2026-10-06. The
+`26.924.22138` candidate observations described below are historical
+regression evidence only; they are not the current capture baseline. Before
+adding any new `26.930.61225` parity claims:
 
 - capture the current main Renderer target by URL, area, and application-shell
   landmarks rather than selecting the first CDP page;
@@ -1730,7 +1785,7 @@ Before adding new parity claims:
 Exit: the current build has a reproducible CDP capture recipe and no
 `verified` status relies solely on a previous build.
 
-The new `26.924.22138` candidate record refreshes the shell across the four
+The historical `26.924.22138` candidate record refreshed the shell across the four
 wide/medium/threshold/compact viewport widths and measures the two navigation
 regions separately. It confirms the primary icon rail remains after collapsing
 the content sidebar, and records that the old Help and Pull requests anchors
@@ -3230,8 +3285,10 @@ isolated runtime smoke verifies only the read-only gateway policy snapshot;
 gateway login/cancel/callback and user-verification enroll/verify remain open
 because they cross authentication or signing boundaries. The safe read-only
 subset has now passed against both the npm-pinned runtime and the installed
-desktop's bundled runtime; both resolve to `0.160.0`, so this does not prove
-cross-version compatibility. The sanitized fixtures cover the two notification
+desktop's bundled runtime for the prior `26.930.31730` build; both then
+resolved to `0.160.0`. A new `26.930.61225` / `0.160.1` read-only smoke is
+recorded below, but it does not prove full cross-version compatibility. The
+sanitized fixtures cover the two notification
 methods added in the inspected schema delta: `account/gatewayOAuth/changed` and
 `thread/attachment/updated`. They do not exhaustively cover the broader thread
 notification union. The generated `ServerNotification` schema contains no
@@ -3253,6 +3310,26 @@ called a mutating method. The focused Electron acceptance passed synthetic
 verify and cancel paths at wide and compact layouts (710×208 and 388×241). Its
 proof and server are fixtures only: this provides protocol and own-playground
 functional evidence, not native-device or installed-product pixel evidence.
+
+After installing desktop build `26.930.61225` on 2026-10-06, its bundled
+`codex-cli/codex-package.json` identified runtime `0.160.1`. The exact-binary
+override then passed the strict compatibility smoke with client `0.5.2` and an
+exact `0.160.1` assertion. Registry readback the same day confirmed `0.160.1`
+as the latest `@openai/codex` package and `0.5.2` as the latest published
+`@jaminzhou/codex-app-server-client`; that client release still pins its
+transitive Codex runtime to `0.160.0`. The five read-only calls returned valid shapes;
+the isolated temporary `CODEX_HOME` had zero configured MCP servers and
+threads, eight models, user-verification readiness `providerUnavailable`, and
+gateway OAuth not required. No model turn or mutating protocol method ran.
+This verifies only that narrow request/response subset on desktop runtime
+`0.160.1`; it does not validate full App Server compatibility, authentication,
+provider readiness, mutations, or installed-product UI behavior.
+The complete playground-local `pnpm --dir playgrounds/codex-app check` also
+passed with the same exact-binary override: strict protocol smoke, TypeScript,
+49 test files / 474 tests, Renderer and Electron builds, and the existing
+Home/Composer structural gate. That final UI gate still uses the historical
+26.930.31730 geometry and loaded 0/5 optional local reference SVGs, so this
+advances Stage 5 compatibility only and adds no 26.930.61225 UI or pixel proof.
 
 Live progress (2026-09-08): actual Composer submission, file creation, Node
 assertion, and raw-added-file Review now pass at 1180/720px. The command-oriented
