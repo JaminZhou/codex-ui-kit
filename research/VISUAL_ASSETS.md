@@ -4,10 +4,20 @@ Pixel comparison is useful only after every visible element in the compared
 surface has a known source. Approximate icons, fallback fonts, and inferred
 geometry otherwise create permanent noise that can hide regressions.
 
-The latest installed candidate is `26.930.31730` / build `12947`; see
-[`26.930.31730.md`](26.930.31730.md) and
+The version-scoped rail assets below are historical evidence for Codex Desktop
+`26.930.31730` / build `12947`; see [`26.930.31730.md`](26.930.31730.md) and
 [`current-navigation-26.930.31730/assets.json`](current-navigation-26.930.31730/assets.json).
-Its version-scoped rail capture retains
+They are not verified assets for the active installed candidate. On
+2026-10-07, the production updater still reported `26.930.61225` / build
+`13232` as installed and up to date. Its package and structural candidate
+records are [`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json)
+and [`current-baseline-26.930.61225-candidate.json`](current-baseline-26.930.61225-candidate.json).
+Those records do not include a version-scoped visual asset manifest or
+installed-product regional-pixel comparison. Keep the `26.930.31730` assets
+as historical regression evidence; re-fingerprint and match each source on
+`26.930.61225` before treating it as current-build evidence.
+
+The historical candidate's rail capture retains
 the full ancestor paint stack and explicitly standardizes output to sRGB,
 calibrated using project-authored CSS in a separate temporary target. The
 historical default-display ICC comparison remains intact: converting its PNG
