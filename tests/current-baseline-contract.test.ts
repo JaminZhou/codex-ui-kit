@@ -780,6 +780,27 @@ describe("current baseline capture contract", () => {
     expect(() => assertCurrentBaselineObservationRecord(record, currentBaselineFingerprint)).toThrow();
     expect(() => resolveCurrentBaselineCandidateOutputPath(outputPath, currentObservationCandidateFingerprints["26.928.31416"])).toThrow();
   });
+  it("registers the installed 26.930.61225 package only as its own capture candidate", () => {
+    const fingerprint = currentObservationCandidateFingerprints["26.930.61225"];
+    const candidatePath = fileURLToPath(
+      new URL("../research/current-baseline-26.930.61225-candidate.json", import.meta.url),
+    );
+    expect(fingerprint).toMatchObject({
+      appVersion: "26.930.61225",
+      buildNumber: "13232",
+      appAsarBytes: 546_868_805,
+      appAsarSha256: "88b8cce6f627771bf341f5a6bb464ad220749b0d442d44f618d7741c2de7318b",
+      chromiumVersion: "154.0.8037.98",
+    });
+    expect(
+      resolveCurrentBaselineCandidateOutputPath(candidatePath, fingerprint),
+    ).toBe(candidatePath);
+    expect(currentBaselineFingerprint.appVersion).not.toBe(fingerprint.appVersion);
+    expect(() => resolveCurrentBaselineCandidateOutputPath(
+      fileURLToPath(new URL("../research/current-baseline-26.930.31730-candidate.json", import.meta.url)),
+      fingerprint,
+    )).toThrow("26.930.61225");
+  });
   it("isolates the 26.928.31416 runtime candidate from the earlier package", () => {
     const fingerprint = currentObservationCandidateFingerprints["26.928.31416"];
     const outputPath = fileURLToPath(new URL("../research/current-baseline-26.928.31416-candidate.json", import.meta.url));
