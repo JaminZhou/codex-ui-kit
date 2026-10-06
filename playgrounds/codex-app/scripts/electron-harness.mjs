@@ -4936,9 +4936,9 @@ export async function launchScene(
   const resolvedLayoutMode = layoutMode ?? scene.layoutMode;
   const resolvedTheme = theme ?? scene.theme ?? "dark";
   report("launching");
-  // Let Playwright resolve the workspace Electron by default. Supplying its
-  // path explicitly selects the packaged-app path and skips Playwright's loader
-  // (ready-event coordination and Chromium automation/backgrounding switches).
+  // The session helper resolves Electron from this workspace and preserves
+  // Playwright's coordinated startup loader under pnpm's isolated linker.
+  // Explicit paths can still override the executable without dropping it.
   return launchIsolatedElectron({
     args: [
       "--force-color-profile=srgb",
