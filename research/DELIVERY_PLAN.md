@@ -344,9 +344,12 @@ regional-pixel acceptance.
   hash-verified extractor can now place exact current-build SVG references only
   in `playgrounds/codex-app/public/local-reference-assets/26.930.31730/`, a
   gitignored local folder; no asset bytes, vector paths, or Renderer source are
-  committed. The Home mark, add-resource, dictation, voice, model chevron, and
-  adjacent context toggle render these optional local candidates with neutral
-  fallbacks when the local files are absent. A fresh read-only audit of the
+  committed. Add-resource, dictation, voice, model chevron, and adjacent
+  context toggle render optional local candidates with neutral fallbacks when
+  the local files are absent. The Home mark now reuses the already-tracked
+  `home-mark` vector because its viewBox and all four path strings exactly
+  match the 26.930 live observation; this establishes shape identity only, not
+  current DOM ownership, tint, or pixel parity. A fresh read-only audit of the
   fingerprinted `src-47eedec2abf2.js` module tied the nine SVGs to package asset
   catalog keys: `codex`, `codexNew`, `home`, `homeAlt`, `plusComposer`,
   `micLgDictate`, `voice`, `chevronDown`, and `slidersHorizontal`. This confirms
@@ -367,19 +370,54 @@ regional-pixel acceptance.
   not retained, so this does not establish DOM identity or close the
   asset/control mapping. Only chunk hashes and abstract declarations are
   tracked; no source text or style selectors are retained.
-  The Home copy remains synthetic. DOM identity, final asset sizing/tint,
-  product-pixel comparison, and a content-safe reference region remain open;
-  no parity claim follows from loading these vectors. Next, bind the package
-  keys to exact current-build DOM controls and measured sizes, then add a
-  regional pixel gate from an approved content-safe capture. To prevent
+  A second read-only capture on 2026-10-06 sampled the naturally sized
+  2560×1318 dark Renderer viewport without changing its dimensions. It records
+  the Home mark/title, context controls, Composer card/editor, and five toolbar
+  glyph regions as text-free geometry in
+  [`current-home-composer-live-viewport-26.930.31730.json`](current-home-composer-live-viewport-26.930.31730.json).
+  The title's runtime class includes the shared `heading-xl` utility and its
+  measured width is copy-dependent; account-specific copy was not retained.
+  The 736×98px Composer card remains centered on the content column and anchored
+  20px above the viewport bottom, with the same 712×44px editor measured at
+  1180×820. The live 56px Home mark's four exact path strings and viewBox match
+  the historical 26.818 Home-mark record, and the four paths were found in the
+  fingerprinted 26.930 primary chunk. Exact path-string scans also bind several
+  Composer glyphs to fingerprinted current-build chunks, while the first
+  context glyph and dictation paths remain unresolved.
+  Importantly, the optional 26.930 catalog candidates are not all exact runtime
+  matches: same-Chromium alpha-only raster checks still show residuals for the
+  nearest local Home-mark candidate (15.2% changed pixels), Add (3.1%), and
+  Dictation (12.9%). The Home mark's separate four-path match is from the
+  existing historical vector, not that nearest candidate. This is diagnostic
+  silhouette comparison, not a product-pixel gate; candidates remain local-only
+  and no SVG paths or screenshots were added to the new record.
+  The Electron structural fixture now renders the Home mark through the
+  existing `CurrentBuildIcon name="home-mark"` entry and checks its four-path
+  count and viewBox against the text-free live observation. Five other visible
+  glyphs remain optional local candidates; mark tint, direct product DOM
+  ownership, and product-pixel parity remain open.
+  The older static Home CSS declarations therefore remain candidate evidence,
+  not a proved mapping to the live title node. The runtime sample is one wide,
+  dark, empty Home state; it does not close light-theme, compact-width,
+  dynamic-copy, populated Composer, App Server, Electron, or regional-pixel
+  acceptance. Next, bind the remaining visible glyphs to exact package/runtime
+  assets, retain unresolved candidates in the ignored local reference
+  directory, and use content-safe icon/card crops to establish a
+  current-product-to-Electron regional pixel gate. Keep account-dependent Home
+  copy outside reference images and gate constants.
+  The Home copy remains synthetic. The mark's path match is encoded in the
+  fixture and Electron structure gate, but its current product DOM consumer,
+  final tint, product-pixel comparison, and a content-safe reference region
+  remain open; no parity claim follows from loading these vectors. To prevent
   accidental distribution, the playground now disables Vite's `public/`
   copying in ordinary builds; only the explicit local-reference acceptance
   enables it, and the harness removes those copied files from `dist` on exit.
   The ordinary-build Electron replay asserts that no local SVG is exposed.
   This narrows packaging risk but does not resolve runtime control mapping or
-  pixel parity. The explicit local-reference Electron acceptance was rerun on
-  2026-10-06: all six Home/Composer SVG candidates loaded from the gitignored
-  reference folder, the measured 1180×820 geometry/styles passed, and the
+  pixel parity. Before the Home-mark refactor, the explicit local-reference
+  Electron acceptance on 2026-10-06 loaded all six then-rendered candidates.
+  After the refactor, the targeted rerun loaded the five remaining local SVGs
+  and preserved the measured 1180×820 geometry/styles; the
   820/721/720 compact layouts plus four-width synthetic turn lifecycle passed.
   Generated reference copies were removed from `dist`; this is still structural
   and local-asset evidence, not an installed-product pixel comparison. The

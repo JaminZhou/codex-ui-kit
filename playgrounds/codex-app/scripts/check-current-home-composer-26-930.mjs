@@ -28,6 +28,15 @@ const reference = JSON.parse(
     "utf8",
   ),
 );
+const liveViewportObservation = JSON.parse(
+  await readFile(
+    new URL(
+      "../../../research/current-home-composer-live-viewport-26.930.31730.json",
+      import.meta.url,
+    ),
+    "utf8",
+  ),
+);
 const localReferenceBuildPath = new URL(
   "../dist/local-reference-assets/26.930.31730/",
   import.meta.url,
@@ -85,7 +94,7 @@ async function waitForLocalReferenceAssets(targetPage) {
         state: element.getAttribute("data-local-reference-load-state"),
       })),
     );
-  assert.equal(assets.length, 6);
+  assert.equal(assets.length, 5);
   assert.ok(
     assets.every((asset) => asset.state === "loaded" || asset.state === "missing"),
     "each optional local reference asset must resolve or fall back before measurement",
@@ -157,6 +166,9 @@ try {
     const mark = document.querySelector(
       ".demo-current-home-composer-26-930__mark",
     );
+    const markVector = mark?.querySelector(
+      'svg[data-current-build-icon="home-mark"]',
+    );
     const styles = (element) => {
       const value = getComputedStyle(element);
       return {
@@ -198,6 +210,12 @@ try {
       main: rect(document.querySelector(".codex-ui-app-shell__main")),
       mark: rect(mark),
       markAssetStatus: mark.getAttribute("data-asset-status"),
+      markVector: markVector
+        ? {
+            pathCount: markVector.querySelectorAll("path").length,
+            viewBox: markVector.getAttribute("viewBox"),
+          }
+        : null,
       localReferenceAssets: [...document.querySelectorAll("[data-local-reference-asset]")].map((element) => ({
         fileName: element.getAttribute("data-local-reference-asset"),
         state: element.getAttribute("data-local-reference-load-state"),
@@ -227,13 +245,20 @@ try {
   assert.equal(actual.rootCopyStatus, "synthetic");
   assert.equal(
     actual.rootSceneStatus,
-    "observed-geometry-local-reference-candidates-product-pixels-unverified",
+    "observed-geometry-home-mark-path-match-remaining-assets-and-product-pixels-unverified",
   );
   assert.equal(
     actual.visualAssetStatus,
-    "optional-gitignored-local-svg-candidates; no-vector-bytes-tracked; product-control-mapping-and-pixels-unverified",
+    "home-mark-reuses-existing-four-path-match; five-optional-local-candidates-remain; tint-and-product-pixels-unverified",
   );
-  assert.equal(actual.markAssetStatus, "local-reference-candidate-unverified");
+  assert.equal(
+    actual.markAssetStatus,
+    "existing-home-mark-four-path-match; tint-and-product-pixels-unverified",
+  );
+  assert.deepEqual(actual.markVector, {
+    pathCount: liveViewportObservation.layout.home.mark.pathCount,
+    viewBox: liveViewportObservation.layout.home.mark.viewBox,
+  });
   assert.deepEqual(actual.localReferenceAssets, localReferenceAssets);
   assert.equal(actual.documentOverflow, reference.main.horizontalOverflow);
   assert.equal(actual.editorEditable, "true");
