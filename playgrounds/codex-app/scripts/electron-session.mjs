@@ -1,7 +1,10 @@
 import { mkdtemp, rm } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { _electron as electron } from "playwright-core";
+
+const require = createRequire(import.meta.url);
 
 // Every process owns its Chromium profile as well as its replay history. Sharing
 // a profile makes parallel scenes contend for cookies, caches and database locks.
@@ -11,6 +14,9 @@ export async function launchIsolatedElectron(options, prepare) {
   try {
     app = await electron.launch({
       ...options,
+      // Resolve Electron from this playground. Playwright's own package path
+      // cannot see workspace dependencies under pnpm's isolated node linker.
+      executablePath: options.executablePath ?? require("electron"),
       env: {
         ...options.env,
         CODEX_UI_KIT_TEST_USER_DATA_DIR: directory,
