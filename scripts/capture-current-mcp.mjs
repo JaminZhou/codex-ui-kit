@@ -360,30 +360,181 @@ try {
       };
     });
 
+  const callGroupContainer = async (group) => {
+    const containerHandle = await group.evaluateHandle((groupElement) => {
+      const normalize = (value) => value.trim().replace(/\s+/g, " ");
+      const accessibleName = (element) => {
+        const labelledBy = element
+          .getAttribute("aria-labelledby")
+          ?.split(/\s+/)
+          .filter(Boolean)
+          .map((id) => document.getElementById(id)?.textContent ?? "")
+          .join(" ");
+        return normalize(
+          element.getAttribute("aria-label") ||
+            labelledBy ||
+            element.innerText ||
+            element.textContent ||
+            "",
+        );
+      };
+      const groupName = accessibleName(groupElement);
+      for (
+        let ancestor = groupElement.parentElement;
+        ancestor;
+        ancestor = ancestor.parentElement
+      ) {
+        const names = [...ancestor.querySelectorAll('button, [role="button"]')]
+          .filter(
+            (element) =>
+              element instanceof HTMLElement &&
+              element.checkVisibility({
+                checkOpacity: true,
+                checkVisibilityCSS: true,
+              }),
+          )
+          .map(accessibleName);
+        if (
+          names.filter((name) => name === groupName).length === 1 &&
+          names.includes("Search OpenAI docs") &&
+          names.includes("Fetch OpenAI doc")
+        ) {
+          return ancestor;
+        }
+      }
+      return null;
+    });
+    const container = containerHandle.asElement();
+    if (!container) {
+      await containerHandle.dispose();
+      throw new Error("MCP tool rows could not be scoped to one integration group.");
+    }
+    return container;
+  };
+
+  const readAccessibleCallLabel = (element) =>
+    element.evaluate((node) => {
+      const labelledBy = node
+        .getAttribute("aria-labelledby")
+        ?.split(/\s+/)
+        .filter(Boolean)
+        .map((id) => document.getElementById(id)?.textContent ?? "")
+        .join(" ");
+      return (node.getAttribute("aria-label") || labelledBy || node.innerText || "")
+        .trim()
+        .replace(/\s+/g, " ");
+    });
+
+  const captureFailedFetchDetails = async (group) => {
+    const container = await callGroupContainer(group);
+    const buttons = await container.$$('button, [role="button"]');
+    const fetchRows = [];
+    for (const candidate of buttons) {
+      if ((await readAccessibleCallLabel(candidate)) === "Fetch OpenAI doc") {
+        fetchRows.push(candidate);
+      }
+    }
+    const failedFetch = fetchRows[0];
+    if (!failedFetch) {
+      throw new Error("The recovery integration has no failed Fetch row.");
+    }
+    const initialDisclosure = await failedFetch.getAttribute("aria-expanded");
+    if (initialDisclosure === null) {
+      throw new Error("The failed Fetch row is not an explicit disclosure control.");
+    }
+    if (initialDisclosure !== "true") {
+      if (initialDisclosure !== "false") {
+        throw new Error("The failed Fetch disclosure state is ambiguous.");
+      }
+      await failedFetch.click();
+      await page.waitForTimeout(180);
+    }
+    const detailBounds = await failedFetch.evaluate((button) => {
+      const failurePattern = /\b(invalid|failed|error|not\s+valid)\b/i;
+      const buttonRect = button.getBoundingClientRect();
+      for (
+        let ancestor = button.parentElement;
+        ancestor;
+        ancestor = ancestor.parentElement
+      ) {
+        if (
+          !(ancestor instanceof HTMLElement) ||
+          !ancestor.checkVisibility({
+            checkOpacity: true,
+            checkVisibilityCSS: true,
+          }) ||
+          !failurePattern.test(ancestor.innerText ?? "")
+        ) {
+          continue;
+        }
+        const rect = ancestor.getBoundingClientRect();
+        if (rect.height <= buttonRect.height + 1) continue;
+        const round = (value) => Math.round(value * 1_000) / 1_000;
+        return {
+          height: round(rect.height),
+          left: round(rect.left),
+          top: round(rect.top),
+          width: round(rect.width),
+        };
+      }
+      return null;
+    });
+    if (!detailBounds) {
+      throw new Error("No expanded failure detail is visible for the failed Fetch.");
+    }
+    const right = Math.min(
+      currentBaselineViewports.wide.width,
+      Math.ceil(detailBounds.left + Math.min(detailBounds.width, 420) + 4),
+    );
+    const bottom = Math.min(
+      currentBaselineViewports.wide.height,
+      Math.ceil(detailBounds.top + detailBounds.height + 4),
+    );
+    const left = Math.max(0, Math.floor(detailBounds.left - 4));
+    const top = Math.max(0, Math.floor(detailBounds.top - 4));
+    return {
+      disclosureExpanded:
+        (await failedFetch.getAttribute("aria-expanded")) === "true",
+      details: detailBounds,
+      failureSignalVisible: true,
+      row: await measureElement(failedFetch),
+      screenshotClip: {
+        height: bottom - top,
+        x: left,
+        y: top,
+        width: right - left,
+      },
+    };
+  };
+
   const readActivity = async ({ button, group }) => {
     const activity = await measureElement(button);
     const groupMeasurement = await measureElement(group);
     const groupBox = await group.boundingBox();
+    const callContainer = await callGroupContainer(group);
     const callRows = [];
-    for (const label of ["Fetch OpenAI doc", "Search OpenAI docs"]) {
-      const candidates = page.getByRole("button", { name: label, exact: true });
-      for (let index = 0; index < (await candidates.count()); index += 1) {
-        const candidate = candidates.nth(index);
-        const box = await candidate.boundingBox();
-        if (
-          !box ||
-          !groupBox ||
-          box.y < groupBox.y ||
-          box.y >= groupBox.y + 130 ||
-          box.x < groupBox.x - 1 ||
-          box.x > groupBox.x + groupBox.width ||
-          Math.abs(box.height - 21) >= 0.1
-        ) {
-          continue;
-        }
-        const measured = await measureElement(candidate);
-        callRows.push({ label, ...measured });
+    for (const candidate of await callContainer.$$('button, [role="button"]')) {
+      const label = await readAccessibleCallLabel(candidate);
+      if (label !== "Fetch OpenAI doc" && label !== "Search OpenAI docs") {
+        continue;
       }
+      const box = await candidate.boundingBox();
+      if (
+        !box ||
+        !groupBox ||
+        box.x < groupBox.x - 1 ||
+        box.x > groupBox.x + groupBox.width ||
+        Math.abs(box.height - 21) >= 0.1
+      ) {
+        continue;
+      }
+      const measured = await measureElement(candidate);
+      callRows.push({
+        label,
+        disclosureExpanded:
+          (await candidate.getAttribute("aria-expanded")) === "true",
+        ...measured,
+      });
     }
     const uniqueCallRows = [
       ...new Map(
@@ -409,12 +560,30 @@ try {
   await page.mouse.move(600, 600);
   await page.screenshot({ path: successWideScreenshot });
 
-  const recoveryWide = await readActivity(
-    await expandActivity(recoveryDuration),
+  await page.setViewportSize(currentBaselineViewports.compact);
+  const successCompact = await readActivity(
+    await expandActivity(successDuration),
   );
+  const successCompactScreenshot = screenshotPath("mcp-success-compact");
+  await page.mouse.move(500, 500);
+  await page.screenshot({ path: successCompactScreenshot });
+
+  await page.setViewportSize(currentBaselineViewports.wide);
+  const recoveryWideActivity = await expandActivity(recoveryDuration);
+  const recoveryFailureDetails = await captureFailedFetchDetails(
+    recoveryWideActivity.group,
+  );
+  const recoveryWide = await readActivity(recoveryWideActivity);
   const recoveryWideScreenshot = screenshotPath("mcp-recovery-wide");
   await page.mouse.move(600, 600);
   await page.screenshot({ path: recoveryWideScreenshot });
+  const recoveryFailureDetailsScreenshot = screenshotPath(
+    "mcp-recovery-failed-fetch-details-wide",
+  );
+  await page.screenshot({
+    path: recoveryFailureDetailsScreenshot,
+    clip: recoveryFailureDetails.screenshotClip,
+  });
 
   await page.setViewportSize(currentBaselineViewports.compact);
   const recoveryCompact = await readActivity(
@@ -503,12 +672,21 @@ try {
     mutationsSubmitted: false,
     recoveryCompact,
     recoveryCompactScreenshot,
+    recoveryFailureDetails: {
+      disclosureExpanded: recoveryFailureDetails.disclosureExpanded,
+      details: recoveryFailureDetails.details,
+      failureSignalVisible: recoveryFailureDetails.failureSignalVisible,
+      row: recoveryFailureDetails.row,
+    },
+    recoveryFailureDetailsScreenshot,
     recoveryWide,
     recoveryWideScreenshot,
     sources,
     sourcesScreenshot,
     success,
     successWideScreenshot,
+    successCompact,
+    successCompactScreenshot,
     taskTitleSha256,
   };
   await writeFile(recordPath, `${JSON.stringify(record, null, 2)}\n`, {
