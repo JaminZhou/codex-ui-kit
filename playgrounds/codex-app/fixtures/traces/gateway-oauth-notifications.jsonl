@@ -1,0 +1,4 @@
+{"atMs":0,"method":"account/gatewayOAuth/changed","params":{"authUrl":null,"error":null,"providerId":"fixture-gateway-provider","status":"notReady"}}
+{"atMs":25,"method":"account/gatewayOAuth/changed","params":{"authUrl":"https://oauth.example.invalid/authorize?fixture=1","error":null,"providerId":"fixture-gateway-provider","status":"started"}}
+{"atMs":50,"method":"account/gatewayOAuth/changed","params":{"authUrl":null,"error":"fixture failure","providerId":"fixture-gateway-provider","status":"failed"}}
+{"atMs":75,"method":"account/gatewayOAuth/changed","params":{"authUrl":null,"error":null,"providerId":"fixture-gateway-provider","status":"succeeded"}}

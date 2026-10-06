@@ -9841,3 +9841,463 @@ html body .demo-root[data-scenario="mcp-current-26-903-recovery"]
   transform: translateX(-50%);
   width: min(44.5rem, calc(100% - 3.5rem));
 }
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930 {
+  height: 100%;
+  min-height: 0;
+  position: relative;
+  width: 100%;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__welcome {
+  align-items: center;
+  display: grid;
+  justify-items: center;
+  left: calc(50% + 0.5px);
+  position: absolute;
+  row-gap: 24px;
+  top: 236.41px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 24px);
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__mark {
+  border: 1px dashed currentColor;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: var(--codex-ui-text);
+  display: block;
+  height: 56px;
+  opacity: 0.35;
+  width: 56px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__mark[data-local-reference-load-state="loaded"] {
+  border: 0;
+  opacity: 1;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__title {
+  color: var(--codex-ui-text);
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 33.6px;
+  text-align: center;
+  white-space: normal;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__dock {
+  bottom: 16px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(calc(-50% + 0.5px));
+  width: min(736px, calc(100% - 32px));
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__dock
+  > .codex-ui-composer-dock__context {
+  margin-bottom: 5px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__context {
+  gap: 8px;
+  height: 28px;
+  min-height: 28px;
+  overflow: visible;
+  padding: 0 25px 0 17px;
+  position: relative;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__project,
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__location {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  font-weight: 430;
+  height: 28px;
+  justify-content: flex-start;
+  max-width: none;
+  overflow: hidden;
+  padding: 4px 6px;
+  white-space: nowrap;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__project {
+  width: 105.02px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__location {
+  width: 127.38px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__context-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--codex-ui-text-secondary);
+  display: flex;
+  height: 14px;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 25px;
+  top: 7px;
+  width: 14px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__context-toggle span {
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  height: 8px;
+  width: 10px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__context-toggle
+  .demo-current-home-composer-26-930__reference-glyph {
+  border: 0;
+  height: 14px;
+  width: 14px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__context-toggle
+  .demo-current-home-composer-26-930__reference-mask {
+  border: 0;
+  border-radius: 0;
+  height: 14px;
+  width: 14px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__surface {
+  background: rgb(54, 54, 54);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 22px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 44px 28px;
+  height: 98px;
+  min-width: 0;
+  padding: 13px 11px 7px;
+  row-gap: 4px;
+  width: 100%;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__editor {
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+  color: var(--codex-ui-text);
+  font-family: -apple-system, "system-ui", "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 430;
+  height: 44px;
+  line-height: 20px;
+  min-height: 44px;
+  outline: none;
+  padding: 0;
+  width: 100%;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__toolbar {
+  align-items: center;
+  display: flex;
+  height: 28px;
+  justify-content: space-between;
+  margin-inline: -4px;
+  min-width: 0;
+  width: calc(100% + 8px);
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__leading,
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__trailing {
+  align-items: center;
+  display: flex;
+  min-width: 0;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__leading {
+  gap: 5px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__trailing {
+  gap: 0;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__icon {
+  box-sizing: border-box;
+  height: 28px;
+  min-height: 28px;
+  min-width: 28px;
+  padding: 0;
+  width: 28px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__icon svg {
+  height: 16px;
+  width: 16px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__reference-glyph {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 var(--reference-glyph-size);
+  height: var(--reference-glyph-size);
+  justify-content: center;
+  position: relative;
+  width: var(--reference-glyph-size);
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__reference-mask {
+  background: currentColor;
+  display: block;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__reference-probe {
+  height: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 0;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder {
+  color: currentColor;
+  display: block;
+  height: 16px;
+  position: relative;
+  width: 16px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="add"]::before,
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="add"]::after {
+  background: currentColor;
+  content: "";
+  inset: 7px 2px auto;
+  height: 1px;
+  position: absolute;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="add"]::after {
+  inset: 2px auto 2px 7px;
+  height: auto;
+  width: 1px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="microphone"]::before {
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  content: "";
+  height: 8px;
+  left: 5px;
+  position: absolute;
+  top: 1px;
+  width: 4px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="microphone"]::after {
+  border: 1px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+  bottom: 1px;
+  content: "";
+  height: 8px;
+  left: 3px;
+  position: absolute;
+  width: 8px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="voice"]::before,
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="voice"]::after {
+  border-right: 1px solid currentColor;
+  border-radius: 50%;
+  content: "";
+  height: 8px;
+  position: absolute;
+  top: 4px;
+  width: 4px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="voice"]::before {
+  left: 3px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__glyph-placeholder[data-glyph="voice"]::after {
+  right: 3px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__permission {
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--codex-ui-font-size-sm);
+  font-weight: 430;
+  height: 28px;
+  padding: 0 8px;
+  width: 101.06px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__model {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--codex-ui-radius-md);
+  color: var(--codex-ui-text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 178.44px;
+  font: inherit;
+  font-size: var(--codex-ui-font-size-sm);
+  font-weight: 430;
+  height: 28px;
+  justify-content: space-between;
+  padding: 0 8px;
+  width: 178.44px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__model-chevron {
+  align-items: center;
+  border: 0;
+  display: inline-flex;
+  flex: 0 0 16px;
+  height: 16px;
+  justify-content: center;
+  margin-top: 0;
+  transform: none;
+  width: 16px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__model-chevron
+  > .demo-current-home-composer-26-930__glyph-placeholder {
+  border-bottom: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  display: block;
+  height: 6px;
+  margin-top: -3px;
+  transform: rotate(45deg);
+  width: 6px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__trailing
+  .demo-current-home-composer-26-930__icon:last-child {
+  margin-left: 8px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__conversation {
+  bottom: 152px;
+  color: var(--codex-ui-text);
+  left: 50%;
+  max-height: calc(100% - 184px);
+  overflow: auto;
+  position: absolute;
+  scrollbar-width: thin;
+  top: 32px;
+  transform: translateX(-50%);
+  width: min(640px, calc(100% - 32px));
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__turn + .demo-current-home-composer-26-930__turn {
+  margin-top: 28px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__user-message {
+  background: color-mix(in srgb, var(--codex-ui-text) 8%, transparent);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 18px;
+  box-sizing: border-box;
+  margin: 0 0 18px auto;
+  max-width: 88%;
+  padding: 10px 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  width: max-content;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__assistant-message {
+  color: var(--codex-ui-text);
+  line-height: 1.55;
+  margin: 0;
+  min-height: 24px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__new-conversation,
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__send {
+  background: color-mix(in srgb, var(--codex-ui-text) 8%, transparent);
+  border: 1px solid var(--codex-ui-border);
+  border-radius: 999px;
+  color: var(--codex-ui-text);
+  cursor: pointer;
+  font: inherit;
+  min-height: 28px;
+  padding: 4px 10px;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__new-conversation {
+  display: block;
+  margin: 18px 0 0 auto;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930__send:disabled {
+  cursor: default;
+  opacity: 0.55;
+}

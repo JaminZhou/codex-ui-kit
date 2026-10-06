@@ -10,9 +10,22 @@ import { CodexAppServerClient } from "@jaminzhou/codex-app-server-client";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
+const liveModel = process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna";
+const liveReasoningEffort =
+  process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max";
+const formatAppServerError = (error) => {
+  const errorInfo = error?.codexErrorInfo;
+  const infoLabel =
+    typeof errorInfo === "string"
+      ? errorInfo
+      : errorInfo
+        ? JSON.stringify(errorInfo)
+        : null;
+  return `${infoLabel ? ` (${infoLabel})` : ""}: ${error?.message ?? "unknown error"}`;
+};
 assert.ok(
-  ["single", "multi", "retry", "timeout", "approval-denied", "cancel", "remote", "oauth", "skill"].includes(mode),
-  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, cancel, remote, oauth, or skill.",
+  ["single", "multi", "retry", "timeout", "approval-denied", "cancel", "remote", "oauth", "skill", "attachments"].includes(mode),
+  "CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE must be single, multi, retry, timeout, approval-denied, cancel, remote, oauth, skill, or attachments.",
 );
 const mcpServerName = mode === "skill" ? "openaiDeveloperDocs" : "ui_kit_echo";
 const toolDefinitions = mode === "skill"
@@ -345,33 +358,28 @@ assert.ok(selectedScene, "A required scene is missing for Live MCP mode.");
   const { app, page } = await launchScene(selectedScene, {
     capture: false,
     environment: {
-      CODEX_UI_KIT_LIVE_EPHEMERAL: "1",
+      CODEX_UI_KIT_LIVE_EPHEMERAL: mode === "attachments" ? "0" : "1",
       CODEX_UI_KIT_LIVE_HISTORY_PATH: historyPath,
-      ...(mode === "skill"
-        ? {
-            CODEX_UI_KIT_LIVE_MODEL:
-              process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna",
-            CODEX_UI_KIT_LIVE_REASONING_EFFORT:
-              process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max",
-          }
-        : {}),
+      CODEX_UI_KIT_LIVE_MODEL: liveModel,
+      CODEX_UI_KIT_LIVE_REASONING_EFFORT: liveReasoningEffort,
       CODEX_UI_KIT_LIVE_WORKSPACE_WRITE: "0",
       CODEX_UI_KIT_WORKSPACE: directory,
   },
 });
 
 const evidence = [];
+let evidenceCaptured = false;
 const result = {
   directory,
   liveAppServer: true,
   mode,
-  model: mode === "skill" ? process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna" : null,
+  model: liveModel,
   mcpServerStatus: null,
   mcpServer: mcpServerName,
   modelTurns: mode === "multi" ? 2 : 1,
   passed: false,
   tool: mode === "skill" ? "search_openai_docs + fetch_openai_doc" : "ui_kit_echo",
-  reasoningEffort: mode === "skill" ? process.env.CODEX_UI_KIT_LIVE_REASONING_EFFORT ?? "max" : null,
+  reasoningEffort: liveReasoningEffort,
   tools: toolDefinitions.map(({ name }) => name),
 };
 let threadId = null;
@@ -524,6 +532,85 @@ try {
     exact: true,
   });
   const expectedCallCount = mode === "multi" || mode === "retry" || mode === "skill" ? 2 : 1;
+  const waitForMcpToolCompletions = async (expectedCount, timeout = 180_000) => {
+    await page.waitForFunction(
+      (count) => {
+        const events = window.__liveMcpEvidence ?? [];
+        const completedCount = events.filter(
+          (event) =>
+            event.method === "item/completed" &&
+            event.params?.item?.type === "mcpToolCall",
+        ).length;
+        return (
+          completedCount >= count ||
+          events.some(
+            (event) =>
+              event.method === "error" ||
+              (event.method === "turn/completed" &&
+                event.params?.turn?.status !== "completed"),
+          )
+        );
+      },
+      expectedCount,
+      { timeout },
+    );
+    const events = await page.evaluate(() => window.__liveMcpEvidence ?? []);
+    const completedCount = events.filter(
+      (event) =>
+        event.method === "item/completed" &&
+        event.params?.item?.type === "mcpToolCall",
+    ).length;
+    if (completedCount >= expectedCount) return events;
+
+    const error = events.find((event) => event.method === "error");
+    if (error) {
+      const detail = error.params?.error;
+      throw new Error(
+        `App Server failed before the expected MCP tool completion${formatAppServerError(detail)}`,
+      );
+    }
+    const failedTurn = events.find(
+      (event) =>
+        event.method === "turn/completed" &&
+        event.params?.turn?.status !== "completed",
+    );
+    if (failedTurn) {
+      const error = failedTurn.params?.turn?.error;
+      throw new Error(
+        `App Server turn ${failedTurn.params?.turn?.status ?? "failed"} before the expected MCP tool completion: ${error?.message ?? "no error detail"}`,
+      );
+    }
+    throw new Error(
+      `App Server produced ${completedCount} of ${expectedCount} expected MCP tool completions.`,
+    );
+  };
+  const waitForSuccessfulTurn = async (timeout = 60_000) => {
+    await page.waitForFunction(
+      () =>
+        (window.__liveMcpEvidence ?? []).some(
+          (event) => event.method === "error" || event.method === "turn/completed",
+        ),
+      undefined,
+      { timeout },
+    );
+    const events = await page.evaluate(() => window.__liveMcpEvidence ?? []);
+    const error = events.find((event) => event.method === "error");
+    if (error) {
+      const detail = error.params?.error;
+      throw new Error(
+        `App Server failed before completing the MCP turn${formatAppServerError(detail)}`,
+      );
+    }
+    const completedTurn = events
+      .filter((event) => event.method === "turn/completed")
+      .at(-1);
+    assert.equal(
+      completedTurn?.params?.turn?.status,
+      "completed",
+      `The MCP turn must complete successfully; got ${completedTurn?.params?.turn?.status ?? "no completion"}.`,
+    );
+    return completedTurn;
+  };
   const multiEchoPrompt = 'Call the tool named ui_kit_echo on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_OK:pixel-check.';
   const multiUpperPrompt = 'Call the tool named ui_kit_upper on the MCP server ui_kit_echo with the argument message set to "pixel-check". Do not use shell, files, network, browser, search, or any other tool. After receiving the tool result, reply exactly MCP_TOOL_CALL_UPPER:PIXEL-CHECK.';
   const livePrompt =
@@ -571,74 +658,22 @@ try {
       { timeout: 60_000 },
     );
   } else if (mode === "multi") {
-    await page.waitForFunction(
-      () =>
-        (window.__liveMcpEvidence ?? []).filter(
-          (event) =>
-            event.method === "item/completed" &&
-            event.params?.item?.type === "mcpToolCall",
-        ).length >= 1,
-      undefined,
-      { timeout: 180_000 },
-    );
-    await page.waitForFunction(
-      () =>
-        (window.__liveMcpEvidence ?? []).some(
-          (event) =>
-            event.method === "turn/completed" &&
-            event.params?.turn?.status === "completed",
-        ),
-      undefined,
-      { timeout: 60_000 },
-    );
+    await waitForMcpToolCompletions(1);
+    await waitForSuccessfulTurn();
     await composer.fill(multiUpperPrompt);
     await composer.press("Enter");
-    await page.waitForFunction(
-      (expectedCount) =>
-        (window.__liveMcpEvidence ?? []).filter(
-          (event) =>
-            event.method === "item/completed" &&
-            event.params?.item?.type === "mcpToolCall",
-        ).length >= expectedCount,
-      expectedCallCount,
-      { timeout: 180_000 },
-    );
+    await waitForMcpToolCompletions(expectedCallCount);
   } else if (mode === "skill") {
-    await page.waitForFunction(
-      (expectedCount) =>
-        (window.__liveMcpEvidence ?? []).filter(
-          (event) =>
-            event.method === "item/completed" &&
-            event.params?.item?.type === "mcpToolCall",
-        ).length >= expectedCount,
-      expectedCallCount,
-      { timeout: 180_000 },
-    );
-    await page.waitForFunction(
-      () =>
-        (window.__liveMcpEvidence ?? []).some(
-          (event) =>
-            event.method === "turn/completed" &&
-            event.params?.turn?.status === "completed",
-        ),
-      undefined,
-      { timeout: 180_000 },
-    );
+    await waitForMcpToolCompletions(expectedCallCount);
+    await waitForSuccessfulTurn(180_000);
   } else {
-    await page.waitForFunction(
-      (expectedCount) =>
-        (window.__liveMcpEvidence ?? []).filter(
-          (event) =>
-            event.method === "item/completed" &&
-            event.params?.item?.type === "mcpToolCall",
-        ).length >= expectedCount,
-      expectedCallCount,
-      { timeout: 180_000 },
-    );
+    await waitForMcpToolCompletions(expectedCallCount);
+    if (mode === "attachments") await waitForSuccessfulTurn();
   }
 
   const events = await page.evaluate(() => window.__liveMcpEvidence);
   evidence.push(...events);
+  evidenceCaptured = true;
   const completedItems = events
     .filter(
       (event) =>
@@ -805,6 +840,129 @@ try {
   const displayedItems = mode === "cancel" ? [] : completedItems;
   const lastEvidence = (completedItems.at(-1) ?? startedItems.at(-1));
   threadId = lastEvidence.threadId;
+  if (mode === "attachments") {
+    const attachmentClient = new CodexAppServerClient({
+      capabilities: { experimentalApi: true },
+      protocolValidation: "strict",
+    });
+    const attachmentType = "codex-ui-kit.acceptance-fixture";
+    const identityKey = "live-thread-attachment-lifecycle-v1";
+    let addedAttachment;
+    let attachmentRemoved = false;
+    let unsubscribeAttachmentNotifications;
+    try {
+      await attachmentClient.connect();
+      const attachmentNotifications = [];
+      unsubscribeAttachmentNotifications = attachmentClient.onNotification(
+        "thread/attachment/updated",
+        (notification) => attachmentNotifications.push(notification),
+      );
+      const waitForAttachmentNotification = async (predicate) => {
+        const deadline = Date.now() + 5_000;
+        while (Date.now() < deadline) {
+          const notification = attachmentNotifications.find(predicate);
+          if (notification) return notification;
+          await new Promise((resolve) => setTimeout(resolve, 25));
+        }
+        return attachmentNotifications.find(predicate);
+      };
+      const persistedThreads = await attachmentClient.call("thread/list", {
+        limit: 100,
+        useStateDbOnly: true,
+      });
+      assert.ok(
+        persistedThreads.data.some((thread) => thread.id === threadId),
+        "The completed live turn must be present in the disposable App Server history before attachment mutation.",
+      );
+      const payload = {
+        fixture: "codex-ui-kit",
+        purpose: "thread-attachment lifecycle acceptance only",
+      };
+      const added = await attachmentClient.call("thread/attachment/add", {
+        attachmentType,
+        identityKey,
+        payload,
+        threadId,
+      });
+      addedAttachment = added.attachment;
+      assert.equal(added.outcome, "created");
+      assert.deepEqual(added.attachment.payload, payload);
+      const createdNotification = await waitForAttachmentNotification(
+        (notification) =>
+          notification.operation === "created" &&
+          notification.attachmentId === added.attachment.id,
+      );
+      assert.deepEqual(
+        createdNotification,
+        {
+          attachmentId: added.attachment.id,
+          attachmentType,
+          identityKey,
+          operation: "created",
+          threadId,
+        },
+        "Creating a thread attachment must publish its typed update notification.",
+      );
+      const afterAdd = await attachmentClient.call("thread/attachment/list", {
+        limit: 10,
+        threadId,
+      });
+      assert.ok(
+        afterAdd.data.some((attachment) => attachment.id === added.attachment.id),
+        "thread/attachment/list must return the created test attachment.",
+      );
+      await attachmentClient.call("thread/attachment/remove", {
+        attachmentType,
+        identityKey,
+        threadId,
+      });
+      attachmentRemoved = true;
+      const afterRemove = await attachmentClient.call("thread/attachment/list", {
+        limit: 10,
+        threadId,
+      });
+      assert.ok(
+        !afterRemove.data.some((attachment) => attachment.id === added.attachment.id),
+        "thread/attachment/remove must remove the test attachment.",
+      );
+      const deletedNotification = await waitForAttachmentNotification(
+        (notification) =>
+          notification.operation === "deleted" &&
+          notification.attachmentId === added.attachment.id,
+      );
+      assert.deepEqual(
+        deletedNotification,
+        {
+          attachmentId: added.attachment.id,
+          attachmentType,
+          identityKey,
+          operation: "deleted",
+          threadId,
+        },
+        "Removing a thread attachment must publish its typed update notification.",
+      );
+      unsubscribeAttachmentNotifications();
+      result.threadAttachmentLifecycle = {
+        added: true,
+        createdOutcome: added.outcome,
+        createdNotification: true,
+        deletedNotification: true,
+        listed: true,
+        removed: true,
+        scope: "completed thread in temporary CODEX_HOME",
+      };
+    } finally {
+      if (addedAttachment && !attachmentRemoved) {
+        await attachmentClient.call("thread/attachment/remove", {
+          attachmentType,
+          identityKey,
+          threadId,
+        }).catch(() => {});
+      }
+      unsubscribeAttachmentNotifications?.();
+      await attachmentClient.close();
+    }
+  }
   result.completedItems = completedItems.map(({ item }) => ({
     id: item.id,
     result: item.result,
@@ -1011,6 +1169,23 @@ try {
   result.passed = true;
 } catch (error) {
   result.error = String(error);
+  const failureEvents = await page
+    .evaluate(() => window.__liveMcpEvidence ?? [])
+    .catch(() => []);
+  if (!evidenceCaptured) evidence.push(...failureEvents);
+  result.eventSummary = failureEvents.map((event) => ({
+    method: event.method,
+    error:
+      event.method === "error"
+        ? {
+            codexErrorInfo: event.params?.error?.codexErrorInfo ?? null,
+            message: event.params?.error?.message ?? null,
+          }
+        : undefined,
+    itemStatus: event.params?.item?.status,
+    itemType: event.params?.item?.type,
+    turnStatus: event.params?.turn?.status,
+  }));
   process.exitCode = 1;
   await page.screenshot({ path: join(directory, "failed.png") }).catch(() => undefined);
 } finally {

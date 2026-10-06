@@ -37,8 +37,13 @@ for (const width of [1180, 720]) {
     });
     if (width === 1180) {
       await page.getByText("Couldn’t restore projects.", { exact: true }).waitFor();
+      const retryProjects = page.getByRole("button", { name: "Retry projects", exact: true });
+      await retryProjects.waitFor();
+      // Exercise Retry while the registry is still corrupt. Repairing the file
+      // first races the file watcher: it can correctly recover and unmount the
+      // Retry button before Playwright dispatches the click.
+      await retryProjects.click();
       await writeFile(registry, JSON.stringify(records));
-      await page.getByRole("button", { name: "Retry projects", exact: true }).click();
     }
     const available = page.getByRole("button", { name: "restored-project", exact: true });
     if (width === 720) {
