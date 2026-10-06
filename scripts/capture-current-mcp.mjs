@@ -8,6 +8,7 @@ import {
   currentBaselineViewports,
   currentInstalledCandidateBaselineFingerprint,
   currentLatestInstalledCandidateBaselineFingerprint,
+  currentObservationCandidateFingerprints,
   selectCurrentMainCandidate,
 } from "./current-baseline-contract.mjs";
 
@@ -34,6 +35,10 @@ const expectedFingerprintByVersion = new Map([
   [
     "26.917.71314",
     currentLatestInstalledCandidateBaselineFingerprint,
+  ],
+  [
+    "26.930.61225",
+    currentObservationCandidateFingerprints["26.930.61225"],
   ],
 ]);
 const expectedFingerprint =
@@ -257,7 +262,6 @@ try {
     throw new Error("Could not resolve exactly one disposable MCP task.");
   }
   const titleNode = titleNodes.nth(matchingTitles[0].index);
-  const title = matchingTitles[0].title;
   await titleNode.evaluate((element) => {
     const target = element.closest(
       '[data-app-action-sidebar-thread-row], button, a',
@@ -267,10 +271,12 @@ try {
     }
     target.click();
   });
-  await page.getByText(title, { exact: true }).first().waitFor({
-    state: "visible",
-    timeout: 10_000,
-  });
+  await page
+    .getByRole("button", { exact: true, name: successDuration })
+    .waitFor({
+      state: "visible",
+      timeout: 10_000,
+    });
 
   await page.setViewportSize(currentBaselineViewports.wide);
   await page.evaluate(async () => document.fonts.ready);
@@ -325,122 +331,95 @@ try {
       await group.click();
       await page.waitForTimeout(180);
     }
+    await button.evaluate((element) =>
+      element.scrollIntoView({ block: "center", inline: "nearest" }),
+    );
+    await page.waitForTimeout(250);
     return { button, group };
   };
 
-  const readActivity = async (name) =>
-    page.evaluate((expectedName) => {
-      const visible = (element) =>
-        element instanceof HTMLElement &&
-        element.checkVisibility({
-          checkOpacity: true,
-          checkVisibilityCSS: true,
-        });
-      const rect = (element) => {
-        if (!(element instanceof Element)) return null;
-        const value = element.getBoundingClientRect();
-        return {
-          height: Math.round(value.height * 1_000) / 1_000,
-          left: Math.round(value.left * 1_000) / 1_000,
-          top: Math.round(value.top * 1_000) / 1_000,
-          width: Math.round(value.width * 1_000) / 1_000,
-        };
-      };
-      const style = (element) => {
-        if (!(element instanceof Element)) return null;
-        const value = getComputedStyle(element);
-        return {
-          color: value.color,
-          fontFamily: value.fontFamily,
-          fontSize: value.fontSize,
-          fontWeight: value.fontWeight,
-          lineHeight: value.lineHeight,
-        };
-      };
-      const activity = [...document.querySelectorAll("button")].find(
-        (button) => visible(button) && button.textContent?.trim() === expectedName,
-      );
-      const activityRect = rect(activity);
-      const groups = [...document.querySelectorAll("button")]
-        .filter(
-          (button) =>
-            visible(button) &&
-            /^(Used|Using) OpenAI Developer Docs integration$/.test(
-              button.textContent?.trim() ?? "",
-            ),
-        )
-        .filter((button) => {
-          const value = button.getBoundingClientRect();
-          return activityRect && value.top >= activityRect.top;
-        })
-        .sort(
-          (left, right) =>
-            left.getBoundingClientRect().top -
-            right.getBoundingClientRect().top,
-        );
-      const group = groups[0];
-      const groupRect = rect(group);
-      const labels = [...document.querySelectorAll("span")]
-        .filter(
-          (element) =>
-            visible(element) &&
-            ["Fetch OpenAI doc", "Search OpenAI docs"].includes(
-              element.textContent?.trim() ?? "",
-            ),
-        )
-        .filter((element) => {
-          const value = element.getBoundingClientRect();
-          return (
-            groupRect &&
-            value.top >= groupRect.top &&
-            value.top < groupRect.top + 130
-          );
-        });
-      const callRows = [
-        ...new Map(
-          labels
-            .map((element) => ({
-              label: element.textContent?.trim(),
-              rect: rect(element),
-              style: style(element),
-            }))
-            .filter(
-              (row) =>
-                row.rect &&
-                groupRect &&
-                row.rect.left >= groupRect.left + 20 &&
-                Math.abs(row.rect.height - 21) < 0.1,
-            )
-            .map((row) => [`${row.rect.top}:${row.label}`, row]),
-        ).values(),
-      ].sort((left, right) => left.rect.top - right.rect.top);
+  const measureElement = async (locator) =>
+    locator.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const computed = getComputedStyle(element);
+      const round = (value) => Math.round(value * 1_000) / 1_000;
       return {
-        activity: { rect: activityRect, style: style(activity) },
-        callRows,
-        group: { rect: groupRect, style: style(group) },
-        horizontalOverflow: Math.max(
-          0,
-          document.documentElement.scrollWidth - innerWidth,
-        ),
-        window: { height: innerHeight, width: innerWidth },
+        rect: {
+          height: round(rect.height),
+          left: round(rect.left),
+          top: round(rect.top),
+          width: round(rect.width),
+        },
+        style: {
+          color: computed.color,
+          fontFamily: computed.fontFamily,
+          fontSize: computed.fontSize,
+          fontWeight: computed.fontWeight,
+          lineHeight: computed.lineHeight,
+        },
       };
-    }, name);
+    });
 
-  await expandActivity(successDuration);
-  const success = await readActivity(successDuration);
+  const readActivity = async ({ button, group }) => {
+    const activity = await measureElement(button);
+    const groupMeasurement = await measureElement(group);
+    const groupBox = await group.boundingBox();
+    const callRows = [];
+    for (const label of ["Fetch OpenAI doc", "Search OpenAI docs"]) {
+      const candidates = page.getByRole("button", { name: label, exact: true });
+      for (let index = 0; index < (await candidates.count()); index += 1) {
+        const candidate = candidates.nth(index);
+        const box = await candidate.boundingBox();
+        if (
+          !box ||
+          !groupBox ||
+          box.y < groupBox.y ||
+          box.y >= groupBox.y + 130 ||
+          box.x < groupBox.x - 1 ||
+          box.x > groupBox.x + groupBox.width ||
+          Math.abs(box.height - 21) >= 0.1
+        ) {
+          continue;
+        }
+        const measured = await measureElement(candidate);
+        callRows.push({ label, ...measured });
+      }
+    }
+    const uniqueCallRows = [
+      ...new Map(
+        callRows.map((row) => [`${row.rect.top}:${row.label}`, row]),
+      ).values(),
+    ].sort((left, right) => left.rect.top - right.rect.top);
+    const viewport = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      height: innerHeight,
+      width: innerWidth,
+    }));
+    return {
+      activity,
+      callRows: uniqueCallRows,
+      group: groupMeasurement,
+      horizontalOverflow: Math.max(0, viewport.documentWidth - viewport.width),
+      window: { height: viewport.height, width: viewport.width },
+    };
+  };
+
+  const success = await readActivity(await expandActivity(successDuration));
   const successWideScreenshot = screenshotPath("mcp-success-wide");
   await page.mouse.move(600, 600);
   await page.screenshot({ path: successWideScreenshot });
 
-  await expandActivity(recoveryDuration);
-  const recoveryWide = await readActivity(recoveryDuration);
+  const recoveryWide = await readActivity(
+    await expandActivity(recoveryDuration),
+  );
   const recoveryWideScreenshot = screenshotPath("mcp-recovery-wide");
   await page.mouse.move(600, 600);
   await page.screenshot({ path: recoveryWideScreenshot });
 
   await page.setViewportSize(currentBaselineViewports.compact);
-  await expandActivity(recoveryDuration);
-  const recoveryCompact = await readActivity(recoveryDuration);
+  const recoveryCompact = await readActivity(
+    await expandActivity(recoveryDuration),
+  );
   const recoveryCompactScreenshot = screenshotPath("mcp-recovery-compact");
   await page.mouse.move(500, 500);
   await page.screenshot({ path: recoveryCompactScreenshot });
@@ -485,10 +464,6 @@ try {
           .map((element) => {
             const value = element.getBoundingClientRect();
             return {
-              label:
-                element.getAttribute("aria-label") ??
-                element.textContent?.replace(/\s+/g, " ").trim() ??
-                "",
               rect: {
                 height: round(value.height),
                 left: round(value.left),
@@ -507,8 +482,8 @@ try {
             width: round(rect.width),
           }
         : null,
-      text: panel?.textContent?.replace(/\s+/g, " ").trim() ?? null,
       rows,
+      rowCount: rows.length,
     };
   });
 

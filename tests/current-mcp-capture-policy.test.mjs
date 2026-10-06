@@ -20,6 +20,9 @@ describe("current MCP capture policy", () => {
     expect(packageJson.scripts["capture:current-mcp-26-917-71314"]).toBe(
       "CODEX_CURRENT_MCP_FINGERPRINT=26.917.71314 node scripts/capture-current-mcp.mjs",
     );
+    expect(packageJson.scripts["capture:current-mcp-26-930-61225"]).toBe(
+      "CODEX_CURRENT_MCP_FINGERPRINT=26.930.61225 node scripts/capture-current-mcp.mjs",
+    );
     expect(packageJson.scripts["capture:current-mcp-settings-26-915"]).toBe(
       "CODEX_CURRENT_MCP_SETTINGS_FINGERPRINT=26.915.31945 node scripts/capture-current-mcp-settings.mjs",
     );
@@ -31,6 +34,7 @@ describe("current MCP capture policy", () => {
     );
     expect(captureScript).toContain("currentInstalledCandidateBaselineFingerprint");
     expect(captureScript).toContain("currentLatestInstalledCandidateBaselineFingerprint");
+    expect(captureScript).toContain("currentObservationCandidateFingerprints");
     expect(captureScript).toContain('captureMode: "native-viewport-only"');
     expect(captureScript).toContain("mutationsSubmitted: false");
     expect(captureScript).toContain("Unsupported MCP capture fingerprint");
@@ -48,5 +52,15 @@ describe("current MCP capture policy", () => {
     expect(captureScript).toContain("taskTitleSha256");
     expect(captureScript).toContain("currentBaselineFingerprint");
     expect(captureScript).toContain("current-mcp-capture-");
+  });
+
+  it("measures rendered MCP rows through accessible names without retaining project labels", () => {
+    expect(captureScript).toContain(
+      'page.getByRole("button", { name: label, exact: true })',
+    );
+    expect(captureScript).toContain('"Fetch OpenAI doc", "Search OpenAI docs"');
+    expect(captureScript).toContain("rowCount: rows.length");
+    expect(captureScript).not.toContain("panel?.textContent");
+    expect(captureScript).not.toContain("aria-label: element.getAttribute");
   });
 });
