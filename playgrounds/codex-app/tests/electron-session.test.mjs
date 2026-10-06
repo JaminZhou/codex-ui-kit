@@ -1,7 +1,10 @@
 import { access } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 const { launch } = vi.hoisted(() => ({ launch: vi.fn() }));
+const require = createRequire(import.meta.url);
 vi.mock("playwright-core", () => ({ _electron: { launch } }));
 const { launchIsolatedElectron } = await import("../scripts/electron-session.mjs");
 
@@ -11,6 +14,10 @@ describe("isolated Electron sessions", () => {
     launch.mockImplementation(async ({ env }) => ({ directory: env.CODEX_UI_KIT_TEST_USER_DATA_DIR, close }));
     const sessions = await Promise.all([1, 2].map(() => launchIsolatedElectron({ env: {} }, async (app) => app)));
     try {
+      expect(launch).toHaveBeenCalledWith(expect.objectContaining({
+        executablePath: require("electron"),
+        args: ["-r", join(dirname(require.resolve("playwright-core")), "lib/server/electron/loader.js")],
+      }));
       expect(sessions[0].directory).not.toBe(sessions[1].directory);
       await Promise.all(sessions.map(({ directory }) => access(directory)));
       await sessions[0].close();
