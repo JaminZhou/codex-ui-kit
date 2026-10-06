@@ -101,6 +101,17 @@ export function assertCurrentBaselineObservationRecord(
   }>,
 ): void;
 
+export function sanitizeCurrentBaselineObservationRecord(
+  record: any,
+  expectedFingerprint?: Readonly<{
+    appAsarBytes: number;
+    appAsarSha256: string;
+    appVersion: string;
+    buildNumber: string;
+    chromiumVersion: string;
+  }>,
+): any;
+
 export function assertCurrentAccountMenuRecord(
   record: any,
   expectedFingerprint?: any,
