@@ -55,12 +55,28 @@ describe("current MCP capture policy", () => {
   });
 
   it("measures rendered MCP rows through accessible names without retaining project labels", () => {
-    expect(captureScript).toContain(
-      'page.getByRole("button", { name: label, exact: true })',
-    );
-    expect(captureScript).toContain('"Fetch OpenAI doc", "Search OpenAI docs"');
+    expect(captureScript).toContain('getAttribute("aria-labelledby")');
+    expect(captureScript).toContain('"Search OpenAI docs"');
+    expect(captureScript).toContain('"Fetch OpenAI doc"');
     expect(captureScript).toContain("rowCount: rows.length");
     expect(captureScript).not.toContain("panel?.textContent");
     expect(captureScript).not.toContain("aria-label: element.getAttribute");
+  });
+
+  it("captures current-build success at compact width and exposes all grouped recovery rows", () => {
+    expect(captureScript).toContain('screenshotPath("mcp-success-compact")');
+    expect(captureScript).toContain("const successCompact = await readActivity(");
+    expect(captureScript).toContain("const callGroupContainer = async (group) =>");
+    expect(captureScript).not.toContain("groupBox.y + 130");
+  });
+
+  it("captures only bounded, redacted failed-Fetch detail geometry", () => {
+    expect(captureScript).toContain("captureFailedFetchDetails");
+    expect(captureScript).toContain(
+      '"mcp-recovery-failed-fetch-details-wide"',
+    );
+    expect(captureScript).toContain("failureSignalVisible: true");
+    expect(captureScript).not.toContain("failureDetailsText");
+    expect(captureScript).not.toContain("detailsText:");
   });
 });

@@ -516,7 +516,7 @@ for (const viewport of [
           .querySelector(selector)
           ?.getAttribute("data-lifecycle-state") === "completed",
       rootSelector,
-      { timeout: 2_000 },
+      lifecycleTransitionWait,
     );
     assert.match(
       (await page.locator("[data-synthetic-assistant-message]").first().textContent()) ??
@@ -548,7 +548,7 @@ for (const viewport of [
         );
       },
       rootSelector,
-      { timeout: 2_000 },
+      lifecycleTransitionWait,
     );
     const geometry = await page.evaluate((selector) => {
       const rect = (element) => {
@@ -595,14 +595,14 @@ for (const viewport of [
           .querySelector(selector)
           ?.getAttribute("data-lifecycle-state") === "home",
       rootSelector,
-      { timeout: 2_000 },
+      lifecycleTransitionWait,
     );
     await page.waitForFunction(
       () =>
         document.activeElement?.getAttribute("aria-label") ===
         "Synthetic message editor",
       null,
-      { timeout: 2_000 },
+      lifecycleTransitionWait,
     );
     assert.equal(
       await page.locator("[data-synthetic-turn]").count(),
