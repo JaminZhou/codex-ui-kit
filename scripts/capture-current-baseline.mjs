@@ -28,6 +28,7 @@ import {
 } from "./current-baseline-contract.mjs";
 
 const candidateFingerprintsByVersion = new Map([
+  ["26.930.61225", currentObservationCandidateFingerprints["26.930.61225"]],
   ["26.930.31730", currentObservationCandidateFingerprints["26.930.31730"]],
   ["26.928.31416", currentObservationCandidateFingerprints["26.928.31416"]],
   ["26.928.21956", currentUpdatedBuildCandidateBaselineFingerprint],

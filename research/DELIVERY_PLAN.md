@@ -290,6 +290,10 @@ regional-pixel acceptance.
   Electron, or regional-pixel observation has been captured. The 26.930.31730
   UI records below are historical regression evidence, not observations of
   26.930.61225; the promoted global baseline remains `26.903.71938`.
+  A dedicated `pnpm capture:current-baseline-26-930-61225` entry now targets
+  only `current-baseline-26.930.61225-candidate.json`; it still requires an
+  isolated loopback-CDP process and explicit route-navigation authorization.
+  Registering the capture path does not mean a capture has been taken.
 - `pnpm report:current-build-audit -- 26.930.61225` now registers the candidate
   queue without promoting it: 0/100 surfaces have target-build observation
   tags (P0 0/59, P1 0/28, P2 0/13), with Browser and Electron acceptance at
