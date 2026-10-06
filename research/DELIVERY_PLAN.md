@@ -301,15 +301,23 @@ regional-pixel acceptance.
   A dedicated `pnpm capture:current-baseline-26-930-61225` entry now targets
   only `current-baseline-26.930.61225-candidate.json`; it still requires an
   isolated loopback-CDP process and explicit route-navigation authorization.
-  Registering the capture path does not mean a capture has been taken.
-- `pnpm report:current-build-audit -- 26.930.61225` still reports 0/100
-  inventory surfaces with target-build evidence tags (P0 0/59, P1 0/28, P2
-  0/13), and Browser/Electron acceptance at 0/100. The new baseline capture
-  is a sanitized shell/navigation anchor only; it has not yet been mapped to
-  surface-level lifecycle evidence. By area, app-shell is 0/24, composer 0/8,
-  conversation 0/28, cross-layer 0/5, integrations 0/6, scope-candidate 0/2,
-  settings 0/12, and workspace 0/15. This is the full capture queue, not a
-  completeness claim.
+  A 2026-10-07 production updater read still reports this exact build as up to
+  date, and its ASAR SHA-256 remains unchanged.
+  The 2026-10-07 loopback-CDP follow-up is summarized in
+  [`current-baseline-26.930.61225-shell-follow-up-2026-10-07.md`](current-baseline-26.930.61225-shell-follow-up-2026-10-07.md).
+  It confirms Profile → Help, corrects the prior not-sampled interpretation,
+  and records the current shell fragment without retaining product text or
+  screenshots.
+- The 2026-10-07 inventory mapping now reports candidate runtime fragments on
+  9/100 surfaces (P0 9/59, P1 0/28, P2 0/13): app-shell 7/24, Composer 1/8,
+  conversation 1/28, and 0 in cross-layer, integrations, scope-candidate,
+  Settings, and workspace. The mapped capture covers only the sampled dark
+  New chat/sidebar shell, empty Composer, project-group interactions, one
+  native-menu trigger boundary, and Profile → Help. Browser and Electron
+  acceptance remain 0/100 for this candidate; no regional product-pixel gate
+  was captured. The remaining 91 surfaces and all unobserved states stay in
+  the audit queue; this mapping is not a completeness or baseline-promotion
+  claim.
 - The root `pnpm check` passed on 2026-10-06 with the exact desktop-binary
   override; its `check:protocol` smoke asserted runtime `0.160.1`. The overall
   command passed 155 root files / 1,459 tests, 49 Codex-playground files / 474
@@ -527,7 +535,8 @@ regional-pixel acceptance.
   at 820/721/720, and only the playground's synthetic draft/send/streaming/
   completion/reset lifecycle; it does not verify the installed product's
   post-submit DOM, exact control-to-asset mapping, or product pixels. Although
-  `26.930.61225` is now installed, no current-build runtime captures exist, so
+  `26.930.61225` is now installed, one current-build shell/navigation
+  candidate capture exists, and populated route/runtime captures remain open;
   all stages 0–7 remain open and the promoted global baseline remains
   `26.903.71938`.
   Revisit the rail edge only if new compositor evidence gives a testable

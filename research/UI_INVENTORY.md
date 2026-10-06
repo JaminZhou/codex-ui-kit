@@ -57,11 +57,18 @@ build `13232`; its package identity and string scan are in
 [`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json).
 The sanitized Renderer capture is
 [`current-baseline-26.930.61225-candidate.json`](current-baseline-26.930.61225-candidate.json).
+The 2026-10-07 Profile → Help and shell follow-up is
+[`current-baseline-26.930.61225-shell-follow-up-2026-10-07.md`](current-baseline-26.930.61225-shell-follow-up-2026-10-07.md).
 It records the main New chat shell and left navigation at 1180/820/721/720px,
 including compact collapse/restore, but is candidate-only structural and
-computed-style evidence. It contains no product screenshots and provides no
-Electron or regional-pixel acceptance. No surface-level target-build tags
-have been promoted; the global baseline remains `26.903.71938`.
+computed-style evidence. A 2026-10-07 production updater check still reports
+this exact version/build as up to date, and the installed ASAR hash matches the
+capture. Its observed fragments are now mapped to nine inventory surfaces:
+New chat destination, empty Composer, shell, primary rail, project groups and
+their keyboard lifecycle, native project-menu trigger boundary, Profile → Help,
+and titlebar/sidebar controls. These are candidate observations only; no
+current-build Browser, Electron, or product regional-pixel gate is promoted,
+and the global baseline remains `26.903.71938`.
 
 The prior 2026-10-05 candidate is `26.930.31730` / build `12947`;
 [`26.930.31730.md`](26.930.31730.md) records shell/sidebar, Profile → Help,

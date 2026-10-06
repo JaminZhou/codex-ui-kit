@@ -62,7 +62,8 @@
         "cdp-26.917.71314:new-chat-current-route-marker-wide-medium-721-720-and-compact-restore",
         "cdp-26.924.22138:empty-new-chat-route-restoration-in-dual-navigation-shell",
         "cdp-26.924.22138:home-primary-rail-destination-and-route-restore",
-        "cdp-26.928.21956:empty-new-chat-route-restoration-wide-medium-threshold-and-compact"
+        "cdp-26.928.21956:empty-new-chat-route-restoration-wide-medium-threshold-and-compact",
+        "cdp-26.930.61225:new-chat-route-marker-wide-medium-threshold-and-compact"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -981,7 +982,8 @@
         "cdp-26.924.22138:empty-editor-wide-and-context-composition-anchor",
         "cdp-26.924.22138:trailing-composer-selector-popover-bounds-and-escape-dismissal-labels-redacted",
         "cdp-26.928.21956:empty-editor-712x44-wide-responsive-width-and-system-font-430-anchor",
-        "cdp-26.930.31730:empty-editor-712x44-wide-337.13x44-compact-visible-608x44-collapsed-and-system-font-430"
+        "cdp-26.930.31730:empty-editor-712x44-wide-337.13x44-compact-visible-608x44-collapsed-and-system-font-430",
+        "cdp-26.930.61225:empty-editor-712x44-wide-and-four-width-navigation-matrix"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1303,7 +1305,8 @@
         "cdp-26.924.22138:dual-navigation-52px-rail-269.88px-sidebar-and-720-collapse",
         "cdp-26.924.22138:route-dependent-secondary-sidebar-width",
         "cdp-26.928.21956:52px-rail-269.88px-sidebar-four-widths-hide-show-zero-overflow",
-        "cdp-26.930.31730:52px-rail-269.88px-sidebar-four-renderer-widths-hide-show-and-project-keyboard-lifecycle"
+        "cdp-26.930.31730:52px-rail-269.88px-sidebar-four-renderer-widths-hide-show-and-project-keyboard-lifecycle",
+        "cdp-26.930.61225:52px-rail-269.88px-sidebar-wide-medium-threshold-compact-collapse-restore"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1360,7 +1363,8 @@
         "cdp-26.928.21956:home-space-scheduled-plugins-explore-code-review-six-entry-rail-and-profile-only-footer",
         "cdp-26.928.31416:six-original-public-svg-glyphs-alpha-mask-478-computed-properties-rest-hover-keyboard-focus-dark-light-four-widths",
         "cdp-26.930.31730:six-entry-public-rail-shell-landmarks-and-profile-help-lifecycle",
-        "cdp-26.930.31730:six-original-glyphs-104-stable-srgb-public-crops-full-ancestor-paint-stack-dark-light-four-renderer-widths"
+        "cdp-26.930.31730:six-original-glyphs-104-stable-srgb-public-crops-full-ancestor-paint-stack-dark-light-four-renderer-widths",
+        "cdp-26.930.61225:six-entry-rail-labels-and-control-bounds-dark-four-widths"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1403,7 +1407,8 @@
         "cdp-26.917.71314:project-new-chat-action-hover-hit-test-1728x1003",
         "cdp-26.924.22138:project-group-count-and-two-region-sidebar-observation",
         "cdp-26.924.22138:codex-mode-activity-search-new-chat-pinned-projects-recents-sidebar-anchors",
-        "cdp-26.928.21956:project-group-presence-30px-rows-private-labels-not-retained"
+        "cdp-26.928.21956:project-group-presence-30px-rows-private-labels-not-retained",
+        "cdp-26.930.61225:five-project-groups-253.88px-project-row-and-owned-scroll"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1441,7 +1446,8 @@
         "cdp-26.917.71314:project-group-pointer-collapse-keyboard-enter-space-focus",
         "cdp-26.924.22138:project-group-pointer-keyboard-collapse-and-expand",
         "cdp-26.924.22138:read-only-current-project-group-keyboard-lifecycle",
-        "cdp-26.928.21956:project-pointer-enter-space-collapse-expand-focus-and-compact-restore"
+        "cdp-26.928.21956:project-pointer-enter-space-collapse-expand-focus-and-compact-restore",
+        "cdp-26.930.61225:project-group-click-enter-space-expand-collapse-focus"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1477,7 +1483,8 @@
         "cdp-26.911.61220:project-action-trigger-native-boundary-items-unavailable",
         "cdp-26.915.31945:project-actions-current-build-menu-submenu-icons-focus-dark-light",
         "cdp-26.924.22138:project-action-menu-public-items-boundary-observed",
-        "cdp-26.928.21956:project-native-menu-20px-trigger-boundary-only-items-unavailable"
+        "cdp-26.928.21956:project-native-menu-20px-trigger-boundary-only-items-unavailable",
+        "cdp-26.930.61225:native-project-menu-trigger-present-items-unavailable"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1710,7 +1717,8 @@
         "cdp-26.924.22138:legacy-open-help-trigger-not-visible-in-new-chat-shell",
         "cdp-26.924.22138:renamed-help-menu-320x300.63-nine-controls-escape-focus-return",
         "cdp-26.928.21956:profile-help-hover-submenu-389.41x300.63-nine-controls-single-escape-close-all-focus-return",
-        "cdp-26.930.31730:profile-help-hover-submenu-389.41x300.63-nine-controls-single-escape-close-all-focus-return"
+        "cdp-26.930.31730:profile-help-hover-submenu-389.41x300.63-nine-controls-single-escape-close-all-focus-return",
+        "cdp-26.930.61225:profile-help-hover-submenu-nine-controls-single-escape-focus-return"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",
@@ -1740,7 +1748,8 @@
         "cdp-26.915.31945:sidebar-back-forward-pull-request-route-and-responsive-delta",
         "cdp-26.917.62051:titlebar-sidebar-navigation-and-responsive-collapse-restore",
         "cdp-26.917.71314:titlebar-sidebar-navigation-and-responsive-collapse-restore",
-        "cdp-26.924.22138:projects-route-back-forward-hide-sidebar-control-geometry"
+        "cdp-26.924.22138:projects-route-back-forward-hide-sidebar-control-geometry",
+        "cdp-26.930.61225:titlebar-back-forward-hide-sidebar-and-compact-restoration"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

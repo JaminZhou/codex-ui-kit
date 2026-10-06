@@ -1134,6 +1134,7 @@ describe("current baseline capture contract", () => {
     expect(captureSource).toContain('button[aria-label="Help menu"]:visible');
     expect(captureSource).toContain('"Open profile menu"');
     expect(captureSource).toContain("no-supported-help-trigger-present");
+    expect(captureSource).toContain('"26.930.61225"].includes(expectedFingerprint.appVersion)');
   });
 
   it("keeps the latest 26.917 structural capture machine-verifiable", () => {
