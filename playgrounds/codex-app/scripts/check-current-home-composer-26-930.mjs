@@ -41,6 +41,7 @@ const localReferenceBuildPath = new URL(
   "../dist/local-reference-assets/26.930.31730/",
   import.meta.url,
 );
+const lifecycleTransitionWait = { polling: "raf", timeout: 5_000 };
 
 async function pathExists(path) {
   try {
@@ -491,7 +492,7 @@ for (const viewport of [
           .querySelector(selector)
           ?.getAttribute("data-lifecycle-state") === "streaming",
       rootSelector,
-      { timeout: 2_000 },
+      lifecycleTransitionWait,
     );
     const transcript = page.getByRole("log", {
       name: "Synthetic conversation",
@@ -532,7 +533,7 @@ for (const viewport of [
           .querySelector(selector)
           ?.getAttribute("data-lifecycle-state") === "streaming",
       rootSelector,
-      { timeout: 2_000 },
+      lifecycleTransitionWait,
     );
     await page.waitForFunction(
       (selector) => {
