@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "evidenceClass": "installed-package-string-presence",
+  "runtimeReachabilityEstablished": false,
+  "appVersion": "26.930.61225",
+  "buildNumber": "13232",
+  "sampledAt": "2026-10-06",
+  "appAsarBytes": 546868805,
+  "appAsarSha256": "88b8cce6f627771bf341f5a6bb464ad220749b0d442d44f618d7741c2de7318b",
+  "verification": {
+    "updaterStatus": "up_to_date",
+    "infoPlistMatches": true,
+    "asarHashStableDuringScan": true,
+    "cdpListenerOnPort9874": false
+  },
+  "markers": {
+    "gpt6SolModelLabel": true,
+    "gpt6LunaModelLabel": true,
+    "quickChatLabel": true,
+    "showPetLabel": true,
+    "appshotDestinationLabel": true,
+    "computerHistoryLabel": true,
+    "webmcpLabel": true,
+    "siteToolsLabel": true,
+    "appleMessagesPluginLabel": false,
+    "layoutIntroductionTitle": false,
+    "layoutIntroductionDescription": false,
+    "layoutIntroductionCloseDialogLabel": true
+  },
+  "note": "Package strings are candidate leads only; they do not prove runtime availability, behavior, state completeness, or visual parity."
+}

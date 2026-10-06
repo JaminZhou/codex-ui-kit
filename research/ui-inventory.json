@@ -32,6 +32,7 @@
       "cdp-26.928.21956": "26.928.21956",
       "cdp-26.928.31416": "26.928.31416",
       "cdp-26.930.31730": "26.930.31730",
+      "cdp-26.930.61225": "26.930.61225",
       "playground": "playground-owned"
     }
   },
@@ -1064,6 +1065,7 @@
       "packageEvidence": [
         "home-composer-mode-toggle",
         "package-26.924.22138:gpt-6-sol-and-gpt-6-luna-model-labels",
+        "package-26.930.61225:gpt-6-sol-and-gpt-6-luna-model-labels",
         "browser-cdp:current-wide-compact-goal-plan-geometry-and-focus",
         "electron:current-wide-compact-goal-plan-geometry-and-focus",
         "pixel:current-wide-compact-goal-plan-surfaces",
@@ -2009,7 +2011,8 @@
       "area": "app-shell",
       "ownership": "app",
       "packageEvidence": [
-        "app-shell-layout-update-introduction"
+        "app-shell-layout-update-introduction",
+        "package-26.930.61225:layout-introduction-close-dialog-label"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -2029,7 +2032,9 @@
         "hotkey-window-home-page",
         "hotkey-window-thread-page",
         "package-26.924.22138:quick-chat-label",
-        "package-26.924.22138:show-pet-label"
+        "package-26.924.22138:show-pet-label",
+        "package-26.930.61225:quick-chat-label",
+        "package-26.930.61225:show-pet-label"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
@@ -2292,6 +2297,7 @@
         "thread-browser-panel-tabs",
         "browser-workspace-panel",
         "package-26.924.22138:webmcp-site-tools-label",
+        "package-26.930.61225:webmcp-site-tools-label",
         "legacy-browser-cdp:26.825.31414-one-tab-shell-and-toolbar",
         "legacy-electron:26.825.31414-browser-workspace-shell",
         "legacy-pixel:26.825.31414-browser-chrome-region",
@@ -3091,7 +3097,8 @@
       "area": "cross-layer",
       "ownership": "cross-layer",
       "packageEvidence": [
-        "package-26.924.22138:appshot-destination-label"
+        "package-26.924.22138:appshot-destination-label",
+        "package-26.930.61225:appshot-destination-label"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
@@ -3104,7 +3111,8 @@
       "area": "cross-layer",
       "ownership": "cross-layer",
       "packageEvidence": [
-        "package-26.924.22138:computer-history-label"
+        "package-26.924.22138:computer-history-label",
+        "package-26.930.61225:computer-history-label"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "not_started",
@@ -3135,7 +3143,8 @@
         "codex-micro-settings",
         "pets-settings",
         "avatar-overlay-page",
-        "package-26.924.22138:show-pet-label"
+        "package-26.924.22138:show-pet-label",
+        "package-26.930.61225:show-pet-label"
       ],
       "runtimeStatus": "not_sampled",
       "implementationStatus": "scope_pending",
