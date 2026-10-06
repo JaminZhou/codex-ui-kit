@@ -43,6 +43,13 @@ For CDP captures:
 - distinguish emulated Renderer viewport metrics from a real native-window
   resize and verify the latter separately.
 
+The New chat/Home body may still show the active project and recent-task copy
+from the product session when a new Chromium profile is used. Inspect the
+capture before retaining it; prefer geometry/computed-style records that never
+serialize text or a full Home screenshot. Composer resource counts also depend
+on currently connected integrations, so do not lock provider-specific entries
+or the full visible-item count as a global invariant.
+
 ## Reproducible CDP double-open probe
 
 Use this only for an explicitly authorized, non-mutating Renderer observation.

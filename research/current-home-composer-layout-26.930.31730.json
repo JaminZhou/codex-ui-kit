@@ -1,0 +1,176 @@
+{
+  "baseline": {
+    "appAsarBytes": 546863116,
+    "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
+    "appVersion": "26.930.31730",
+    "buildNumber": "12947",
+    "chromiumVersion": "154.0.8037.98"
+  },
+  "capture": {
+    "capturedAt": "2026-10-05",
+    "kind": "candidate-only loopback CDP structural observation",
+    "viewport": {
+      "devicePixelRatio": 1,
+      "height": 820,
+      "width": 1180
+    },
+    "theme": "dark",
+    "target": "New chat selected by visible home marker, main landmark, and editable Composer",
+    "pixelReferenceRetained": false,
+    "textContentRetained": false,
+    "privacyNote": "The Home view included account-specific project and recent-task text. Only geometry and computed style were retained; the source crop was deleted."
+  },
+  "main": {
+    "rect": {
+      "height": 772,
+      "left": 321.88,
+      "top": 44,
+      "width": 854.13
+    },
+    "horizontalOverflow": 0
+  },
+  "centerTextBlock": {
+    "rect": {
+      "height": 33.59,
+      "left": 530.89,
+      "top": 360.41,
+      "width": 437.08
+    },
+    "tag": "span",
+    "textCaptured": false,
+    "style": {
+      "color": "rgb(255, 255, 255)",
+      "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+      "fontSize": "28px",
+      "fontWeight": "400",
+      "lineHeight": "33.6px",
+      "textAlign": "center"
+    }
+  },
+  "centerMark": {
+    "rect": {
+      "height": 56,
+      "left": 721.44,
+      "top": 280.41,
+      "width": 56
+    },
+    "vectorPathCaptured": false
+  },
+  "composer": {
+    "card": {
+      "backgroundColor": "rgb(54, 54, 54)",
+      "borderRadius": "22px",
+      "rect": {
+        "height": 98,
+        "left": 381.44,
+        "top": 702,
+        "width": 736
+      }
+    },
+    "editor": {
+      "contentEditable": true,
+      "rect": {
+        "height": 44,
+        "left": 393.44,
+        "top": 716,
+        "width": 712
+      },
+      "style": {
+        "color": "rgb(255, 255, 255)",
+        "fontFamily": "-apple-system, \"system-ui\", \"Segoe UI\", sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px"
+      }
+    },
+    "contextControls": [
+      {
+        "kind": "project-context",
+        "labelCaptured": false,
+        "rect": {
+          "height": 28,
+          "left": 398.44,
+          "top": 669,
+          "width": 105.02
+        }
+      },
+      {
+        "kind": "location-context",
+        "labelCaptured": false,
+        "rect": {
+          "height": 28,
+          "left": 511.45,
+          "top": 669,
+          "width": 127.38
+        }
+      },
+      {
+        "kind": "adjacent-toggle",
+        "labelCaptured": false,
+        "rect": {
+          "height": 14,
+          "left": 1078.44,
+          "top": 676,
+          "width": 14
+        }
+      }
+    ],
+    "actions": [
+      {
+        "kind": "add-resource",
+        "rect": {
+          "height": 28,
+          "left": 389.44,
+          "top": 764,
+          "width": 28
+        }
+      },
+      {
+        "kind": "permission",
+        "rect": {
+          "height": 28,
+          "left": 422.44,
+          "top": 764,
+          "width": 101.06
+        }
+      },
+      {
+        "kind": "model-picker",
+        "rect": {
+          "height": 28,
+          "left": 867,
+          "top": 764,
+          "width": 178.44
+        }
+      },
+      {
+        "kind": "dictation",
+        "rect": {
+          "height": 28,
+          "left": 1045.44,
+          "top": 764,
+          "width": 28
+        }
+      },
+      {
+        "kind": "voice-chat",
+        "rect": {
+          "height": 28,
+          "left": 1081.44,
+          "top": 764,
+          "width": 28
+        }
+      }
+    ],
+    "resourceCatalog": {
+      "candidateArtifact": "current-baseline-26.930.31730-candidate.json",
+      "visibleItemCountsAcrossSamples": [
+        34,
+        31
+      ],
+      "countIsStableContract": false,
+      "accountConnectedEntriesCaptured": false
+    }
+  },
+  "evidenceBoundary": "Renderer-emulated structure only; no source screenshot, product SVG path, account text, Browser acceptance, Electron parity, or pixel parity is claimed."
+}

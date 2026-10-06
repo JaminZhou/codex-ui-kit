@@ -1,5 +1,6 @@
 import { PdfWorkspacePreview } from "./PdfWorkspacePreview";
 import { CurrentComposer26924 } from "./CurrentComposer26924";
+import { CurrentHome26930 } from "./CurrentHome26930";
 import { CurrentPrimaryNavigation26928 } from "./CurrentPrimaryNavigation26928";
 import {
   ActivityTimeline,
@@ -7473,6 +7474,9 @@ export function App() {
     initialSelection.sidebarState === "primary-navigation-current-26-928" ||
     initialSelection.sidebarState === "primary-navigation-current-26-928-31416" ||
     initialSelection.sidebarState === "primary-navigation-current-26-930-31730";
+  const currentHomeComposer26930Replay =
+    initialSelection.sidebarState === "primary-navigation-current-26-930-31730" &&
+    view === "shell";
   const currentNavigationAssetBuild = initialSelection.sidebarState === "primary-navigation-current-26-930-31730"
     ? "26.930.31730" : "26.928.31416";
   const currentPrimaryRailOnlyRoute26924Replay =
@@ -15992,7 +15996,9 @@ export function App() {
     </div>
   );
   const shellRoute = (
-    currentSidebarPrimaryNavigation26928Replay ? (
+    currentHomeComposer26930Replay ? (
+      <CurrentHome26930 />
+    ) : currentSidebarPrimaryNavigation26928Replay ? (
       <section
         aria-label="Home content pending current-build capture"
         className="demo-current-primary-home-pending"
@@ -18921,6 +18927,9 @@ export function App() {
       }
       data-current-primary-navigation-26-928={
         currentSidebarPrimaryNavigation26928Replay || undefined
+      }
+      data-current-home-composer-26-930={
+        currentHomeComposer26930Replay || undefined
       }
       data-current-primary-projects-shell-26-924={
         currentPrimaryRailOnlyRoute26924Replay === "projects" || undefined

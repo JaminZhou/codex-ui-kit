@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "purpose": "A/B the replay shared-card position, stacking parent/order, and the product's recorded root-backdrop composition; compare against the installed-product crop.",
+  "source": {
+    "appVersion": "26.930.31730",
+    "sample": "light-820-hover-4.png",
+    "viewport": {
+      "width": 820,
+      "height": 680
+    },
+    "crop": {
+      "x": 0,
+      "y": 44,
+      "width": 52,
+      "height": 280
+    },
+    "sha256": "b67e9c03ef5ad482e2486f040aadacc64a9aa99943e3d3f2b74ce72a97fb93bf",
+    "sourceCardStyleId": "63d3429204200418f95f766d8fd367b5073cafb7d402c44094366f845c9623bc",
+    "sourceCardBoxShadow": "color(srgb 0.101961 0.109804 0.121569 / 0.04) 0px 0px 0px 0.5px, rgba(0, 0, 0, 0.05) 0px 4px 16px 0px"
+  },
+  "replay": {
+    "electron": "43.5.0",
+    "chromium": "150.0.7871.250"
+  },
+  "currentReplayCard": {
+    "rect": {
+      "left": 52,
+      "top": 44,
+      "width": 764,
+      "height": 632
+    },
+    "position": "fixed",
+    "zIndex": "auto",
+    "boxShadow": "color(srgb 0.101961 0.109804 0.121569 / 0.04) 0px 0px 0px 0.5px, rgba(0, 0, 0, 0.05) 0px 4px 16px 0px",
+    "ancestors": [
+      {
+        "tag": "div",
+        "className": "codex-ui-app-primary-navigation-rail__items",
+        "position": "static",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "visible"
+      },
+      {
+        "tag": "nav",
+        "className": "codex-ui-app-primary-navigation-rail demo-current-primary-navigation-rail",
+        "position": "static",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "aside",
+        "className": "codex-ui-app-shell__navigation-rail",
+        "position": "relative",
+        "zIndex": "5",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "div",
+        "className": "codex-ui-app-shell__layout",
+        "position": "relative",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "div",
+        "className": "codex-ui-app-shell",
+        "position": "relative",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "isolate",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "div",
+        "className": "demo-root",
+        "position": "static",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "div",
+        "className": "",
+        "position": "static",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "body",
+        "className": "",
+        "position": "static",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      },
+      {
+        "tag": "html",
+        "className": "",
+        "position": "static",
+        "zIndex": "auto",
+        "transform": "none",
+        "contain": "none",
+        "isolation": "auto",
+        "overflow": "hidden"
+      }
+    ]
+  },
+  "results": [
+    {
+      "id": "current-card-nested-in-navigation-rail",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "fixed",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-primary-navigation-rail__items"
+      },
+      "changedPixels": 2282,
+      "changedRatio": 0.15673076923076923,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 19,
+      "meanMaximumChannelDelta": 0.6449862637362638,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 1645,
+        "changedRatio": 0.5875,
+        "maximumChannelDelta": 19
+      }
+    },
+    {
+      "id": "source-like-root-backdrop-and-transparent-rail",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "fixed",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-primary-navigation-rail__items"
+      },
+      "changedPixels": 2282,
+      "changedRatio": 0.15673076923076923,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 19,
+      "meanMaximumChannelDelta": 0.6449862637362638,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 1645,
+        "changedRatio": 0.5875,
+        "maximumChannelDelta": 19
+      }
+    },
+    {
+      "id": "card-sibling-before-navigation",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "fixed",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-shell__navigation-rail"
+      },
+      "changedPixels": 2282,
+      "changedRatio": 0.15673076923076923,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 19,
+      "meanMaximumChannelDelta": 0.6449862637362638,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 1645,
+        "changedRatio": 0.5875,
+        "maximumChannelDelta": 19
+      }
+    },
+    {
+      "id": "card-sibling-after-navigation",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "fixed",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-shell__navigation-rail"
+      },
+      "changedPixels": 4549,
+      "changedRatio": 0.3124313186813187,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 19,
+      "meanMaximumChannelDelta": 0.8096153846153846,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 1685,
+        "changedRatio": 0.6017857142857143,
+        "maximumChannelDelta": 19
+      }
+    },
+    {
+      "id": "card-as-child-of-main-z-index-1",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "fixed",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-shell__main"
+      },
+      "changedPixels": 5998,
+      "changedRatio": 0.41195054945054943,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 21,
+      "meanMaximumChannelDelta": 1.248489010989011,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 2785,
+        "changedRatio": 0.9946428571428572,
+        "maximumChannelDelta": 21
+      }
+    },
+    {
+      "id": "card-as-body-child-root-auto-layer",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "fixed",
+        "zIndex": "auto",
+        "parentClassName": ""
+      },
+      "changedPixels": 4549,
+      "changedRatio": 0.3124313186813187,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 19,
+      "meanMaximumChannelDelta": 0.8096153846153846,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 1685,
+        "changedRatio": 0.6017857142857143,
+        "maximumChannelDelta": 19
+      }
+    },
+    {
+      "id": "source-absolute-card-under-appshell-layout",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "absolute",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-shell"
+      },
+      "changedPixels": 5998,
+      "changedRatio": 0.41195054945054943,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 21,
+      "meanMaximumChannelDelta": 1.248489010989011,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 2785,
+        "changedRatio": 0.9946428571428572,
+        "maximumChannelDelta": 21
+      }
+    },
+    {
+      "id": "source-absolute-card-over-appshell-layout",
+      "cardPlacement": {
+        "rect": {
+          "left": 52,
+          "top": 44,
+          "width": 764,
+          "height": 632
+        },
+        "position": "absolute",
+        "zIndex": "auto",
+        "parentClassName": "codex-ui-app-shell"
+      },
+      "changedPixels": 5998,
+      "changedRatio": 0.41195054945054943,
+      "perceptualChangedPixels": 0,
+      "perceptualChangedRatio": 0,
+      "maximumChannelDelta": 21,
+      "meanMaximumChannelDelta": 1.248489010989011,
+      "shellEdgeStrip": {
+        "x": 42,
+        "width": 10,
+        "changedPixels": 2785,
+        "changedRatio": 0.9946428571428572,
+        "maximumChannelDelta": 21
+      }
+    }
+  ],
+  "interpretation": "Each capture changes only the card DOM parent/order/position or backdrop owner. It can establish whether these replay-layer choices account for this sample's residual; it does not prove the full product source DOM ancestry or fix other viewports/states."
+}

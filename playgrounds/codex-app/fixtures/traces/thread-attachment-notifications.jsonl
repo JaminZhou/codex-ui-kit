@@ -1,0 +1,2 @@
+{"atMs":0,"method":"thread/attachment/updated","params":{"attachmentId":"fixture-attachment","attachmentType":"codex-ui-kit.acceptance-fixture","identityKey":"thread-attachment-notifications-v1","operation":"created","threadId":"fixture-thread"}}
+{"atMs":1,"method":"thread/attachment/updated","params":{"attachmentId":"fixture-attachment","attachmentType":"codex-ui-kit.acceptance-fixture","identityKey":"thread-attachment-notifications-v1","operation":"deleted","threadId":"fixture-thread"}}

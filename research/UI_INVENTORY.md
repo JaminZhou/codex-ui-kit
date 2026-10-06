@@ -53,10 +53,19 @@ host-owned and are intentionally not claimed by the playground.
 ## Promoted baseline and latest candidate
 
 The 2026-10-05 installed candidate is `26.930.31730` / build `12947`;
-[`26.930.31730.md`](26.930.31730.md) records shell/sidebar and Profile → Help
-lifecycle plus empty Composer observations. A project-authored CSS calibration
+[`26.930.31730.md`](26.930.31730.md) records shell/sidebar, Profile → Help,
+empty Composer, and text-redacted Home composition observations. The Home
+capture is geometry/style only because its rendered body includes account-
+specific project and recent-task content. A project-authored CSS calibration
 shows that post-hoc ICC conversion does not undo native-profile alpha
-composition. New rail capture uses a disclosed sRGB environment with separate
+composition. A geometry-first Home/Composer replay now has exact wide-layout
+Electron checks and compact-width containment checks. A current-build Home
+vector candidate is fingerprinted and its four paths match the 26.930 package.
+The pinned `app-primary` module statically links that SVG through the mark
+renderer into the Home hero; the runtime DOM fingerprint and regional
+product-pixel comparison are still pending. Composer glyph mapping also
+remains unverified, so there is not yet a product pixel gate.
+New rail capture uses a disclosed sRGB environment with separate
 strict RGBA diagnostics, per-frame root appearance, ancestor and sibling card
 paint provenance, and contextual Home status indicators; this does not
 establish the default native product window's responsive behavior, route bodies,

@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appVersion": "26.930.31730",
+    "buildNumber": "12947",
+    "capturedAt": "2026-10-06",
+    "appAsarBytes": 546863116,
+    "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836"
+  },
+  "policy": {
+    "retainedData": "tracked files retain metadata only; exact SVG candidates are optional local references in a gitignored directory",
+    "assetBytesRetained": false,
+    "vectorPathDataRetained": false,
+    "rendererSourceRetained": false,
+    "localReferenceExtraction": "hash-verified candidates only; fixed version-scoped gitignored playground path",
+    "runtimeControlMapping": "packaged asset catalog keys are verified; exact DOM control binding and rendered states remain unverified",
+    "staticHomeStyles": "fingerprinted Home CSS/JS and abstract hero declarations only; no source text or exact CDP-node mapping",
+    "productPixelParity": "unverified"
+  },
+  "assetModule": {
+    "fileName": "src-47eedec2abf2.js",
+    "sha256": "fbc4b56688ff32a617e40a42fb9dd5cfe9b7c328502a0c597e9c2acc614b0d97",
+    "byteLength": 912577
+  },
+  "homeStyleEvidence": {
+    "auditedAt": "2026-10-06",
+    "stylesheet": {
+      "fileName": "home-49f9c30a8c63.css",
+      "sha256": "7f0df130262375735fdbeed70f75771d82fa70f1f41acd872351b0b201040e6a",
+      "byteLength": 15551
+    },
+    "componentChunk": {
+      "fileName": "home-f7f8584d4748.js",
+      "sha256": "b269296f0f975ee3f9282103298a854d1cc77dadde1b1f89525a0a26567da340",
+      "byteLength": 112455
+    },
+    "classTokenPairing": "the fingerprinted Home chunk and stylesheet share the Home hero class tokens; this does not identify the captured CDP node",
+    "ruleCandidates": {
+      "heroWrapper": {
+        "max-width": "616px"
+      },
+      "heroTitle": {
+        "letter-spacing": ".38px",
+        "font-size": "28px",
+        "font-weight": "400",
+        "line-height": "34px"
+      }
+    },
+    "boundary": "static package CSS/JS evidence only; runtime DOM binding and product-pixel parity remain unverified"
+  },
+  "candidates": [
+    {
+      "fileName": "codex-d905da579253.svg",
+      "id": "codex-mark-candidate-26-930",
+      "assetCatalogKey": "codex",
+      "sha256": "a82453719b4ebdcc53eb7582063c1751f4fa5324ccdc1a45d4eaa9a96fa058d1",
+      "byteLength": 876,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 1,
+      "primitiveKinds": {
+        "path": 1
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "codex_new-f14177b03534.svg",
+      "id": "codex-new-mark-candidate-26-930",
+      "assetCatalogKey": "codexNew",
+      "sha256": "0b490f33f9c5b62c7db578f5101497efb87b774720f91b9e878243e761952c52",
+      "byteLength": 2302,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 3,
+      "primitiveKinds": {
+        "path": 3
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "home-53fa00df0b9e.svg",
+      "id": "home-icon-candidate-26-930",
+      "assetCatalogKey": "home",
+      "sha256": "c13db831d6a643a5d3b70c5c0e9fc8c6d45de8d11cd3c761f1331dd7ba506b3b",
+      "byteLength": 1520,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 1,
+      "primitiveKinds": {
+        "path": 1
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "home_alt-82a060d5e35f.svg",
+      "id": "home-alt-icon-candidate-26-930",
+      "assetCatalogKey": "homeAlt",
+      "sha256": "cf06ce886abb0e3b988ee3113270537617dbe812ba4478cf90ddc04111d339f8",
+      "byteLength": 454,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 1,
+      "primitiveKinds": {
+        "path": 1
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "plus_composer-86a041c72466.svg",
+      "id": "composer-add-candidate-26-930",
+      "assetCatalogKey": "plusComposer",
+      "sha256": "d419e5785b31d79fbd7e1d0e76ce8382343beb93496b5a8dac0f10524069ae37",
+      "byteLength": 551,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 1,
+      "primitiveKinds": {
+        "path": 1
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "mic_lg_dictate-9b125ec2975b.svg",
+      "id": "composer-dictation-candidate-26-930",
+      "assetCatalogKey": "micLgDictate",
+      "sha256": "afc7610ed1b4518cace4b85b5108dbbde337dc5727bad6e15b16c72e829737d7",
+      "byteLength": 1203,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 2,
+      "primitiveKinds": {
+        "path": 2
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "voice-ae407024968a.svg",
+      "id": "composer-voice-candidate-26-930",
+      "assetCatalogKey": "voice",
+      "sha256": "7f4831e370f8259a46d90d050ef6cc6ca61dea3af18abac4f41972e60f45955a",
+      "byteLength": 1259,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 1,
+      "primitiveKinds": {
+        "path": 1
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "chevron_down-6d8fb03d85b2.svg",
+      "id": "composer-chevron-candidate-26-930",
+      "assetCatalogKey": "chevronDown",
+      "sha256": "60f528fbe29743a6d8f3f1f3710a7ff443c45ec71652a4d8f7370628015cd3ef",
+      "byteLength": 283,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 1,
+      "primitiveKinds": {
+        "path": 1
+      },
+      "packagedAssetModuleReferenceCount": 1
+    },
+    {
+      "fileName": "sliders_horizontal-9d3361006ff8.svg",
+      "id": "context-sliders-candidate-26-930",
+      "assetCatalogKey": "slidersHorizontal",
+      "sha256": "3caaccd41e38261f8f7418cf4479ba730bb1145953f628203bf45262d5ecc42e",
+      "byteLength": 536,
+      "viewBox": "0 0 24 24",
+      "intrinsicSize": {
+        "width": 24,
+        "height": 24
+      },
+      "primitiveCount": 9,
+      "primitiveKinds": {
+        "line": 9
+      },
+      "packagedAssetModuleReferenceCount": 1
+    }
+  ]
+}

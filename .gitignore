@@ -8,3 +8,4 @@ coverage/
 *.log
 playgrounds/codex-app/artifacts/
 playgrounds/codex-app/dist-electron/
+playgrounds/codex-app/public/local-reference-assets/

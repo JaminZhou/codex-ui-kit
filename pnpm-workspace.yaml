@@ -6,6 +6,5 @@ overrides:
   "undici@>=7.0.0 <7.29.1": 7.29.1
 
 allowBuilds:
-  "@jaminzhou/codex-app-server-client@https://codeload.github.com/JaminZhou/codex-app-server-client/tar.gz/97ba564e771621b90219ef9bec978732599c2bec": true
   electron: true
   esbuild: true

@@ -110,26 +110,38 @@ notes include a compact welcome/header, transcript scrolling while deciding
 whether to implement a plan, App Server history pagination, and a macOS TLS
 fix for network-enabled sandboxes and proxy-dependent remote environments.
 These are CLI/App Server leads, not evidence of a desktop Renderer redesign.
-The playground had been pinned to client commit
-`8cf5823ee12c00f7bc9c5eaeef80049e65f0e881`, whose live App Server runtime is
+The playground was previously pinned to client commit
+`8cf5823ee12c00f7bc9c5eaeef80049e65f0e881`, whose live App Server runtime was
 `0.153.4`. Its September 30 `check-live-long-thread` attempt failed after two
 turns with `tls handshake eof` / `Connection failed: error sending request`.
-The separate `codex-app-server-client` repository's current `main` is now
-`97ba564e771621b90219ef9bec978732599c2bec` (PR #54), which aligns that client
-to runtime `0.159.0`. A local kit dependency update to that exact commit
-resolved correctly, but `check:protocol` stopped before executing because six
-platform-specific `0.159.0` packages were inside pnpm's active 24-hour
-minimum-release-age window (latest reported publish time
-`2026-09-29T08:15:54Z`; check time `2026-09-29T21:32:40Z`). The automatically
-added minimum-age exclusions were removed; do not bypass this gate. Retry after
-`2026-09-30T08:15:54Z`. The newer runtime's TLS note and the earlier network
-failure make this a targeted compatibility check, not proven causation and not
-a UI finding. With the already-downloaded `0.159.0` candidate, a direct
-targeted `check-live-long-thread` run subsequently passed all 12 live turns,
-kept one thread across 12 bindings, and verified scroll-away/follow with no
-horizontal overflow at 1180px and 720px. This is useful candidate evidence,
-not a replacement for the full acceptance command after the age gate permits a
-clean install and lockfile verification.
+The `0.159.0` candidate's targeted `check-live-long-thread` later passed all 12
+live turns, kept one thread across 12 bindings, and verified scroll-away/follow
+without horizontal overflow at 1180px and 720px. That remains historical
+candidate evidence, not proof of causation or a UI finding.
+
+As of 2026-10-05, `codex-app-server-client` main is
+[`da4288830fbdf4fd6025d2ecab0a2e8b7f5cd1d4`](https://github.com/JaminZhou/codex-app-server-client/commit/da4288830fbdf4fd6025d2ecab0a2e8b7f5cd1d4),
+the published `0.5.2` package, which advances its bundled Codex runtime to
+`0.160.0`; its changelog reports no generated-protocol or public-API migration
+from `0.159.0`. The exact runtime and client releases had both passed the
+24-hour minimum age at verification. The kit now pins npm `0.5.2` exactly with
+registry integrity rather than a mutable branch or Git tarball. The client
+repository's full `pnpm check` passed (194 tests, generated protocol and
+compatibility-matrix checks, typecheck, and build), and all checks on that
+source commit were green. The kit's full `pnpm check` then passed with the new
+dependency; its strict protocol smoke connected to the pinned `0.160.0` runtime
+under an isolated temporary `CODEX_HOME` and read `mcpServerStatus/list`,
+`thread/list` with state-DB-only access, and `model/list`, including their list
+and pagination response shapes, without starting a model turn or calling a
+mutating method. It now also calls the documented read-only
+`userVerification/status` method, validates the optional credential/readiness
+fields without logging credential IDs or message text, and reports only a
+readiness category. On the isolated home the runtime returned
+`providerUnavailable`; this is a local readiness observation, not a credential
+or remote-provider test. This proves a broader read-only consumer/runtime path only,
+not every protocol method, live workflow, or installed-product UI parity. The
+earlier minimum-age window was allowed to expire; no release-age exclusions or
+protection settings were changed.
 
 The latest desktop-specific public entry remains the September 25 macOS
 security update for 26.924.20706. No public 26.928 desktop UI redesign entry
@@ -264,6 +276,21 @@ regional-pixel acceptance.
 
 ## Current position
 
+- A fresh production-channel updater check on 2026-10-06 still reports
+  `26.930.31730` / build `12947` installed, and offers
+  `26.930.51102` / build `13100`. The offered package has not been installed or
+  inspected, so the 26.930.31730 observations below remain the last verified
+  local baseline, not evidence about the available update. Re-align the full
+  inventory and affected-state captures after that package is installed; do
+  not silently promote the older candidate.
+- Re-running `pnpm report:current-build-audit -- 26.930.31730` on 2026-10-06,
+  after rechecking the installed package identity, confirms the candidate queue
+  is still sparse: 6/100 surfaces carry target-
+  build observation tags (P0 5/59, P1 1/28, P2 0/13), 94 have none, and
+  current-build Browser/Electron acceptance remains 0/100. The six tags are
+  concentrated in the shell/sidebar and empty Composer/resource menu; this is
+  a capture queue, not a promotion or completeness claim. The installed app's
+  read-only package identity/hash still match the candidate record below.
 - The 2026-10-05 installed candidate is `26.930.31730` / build `12947`,
   Chromium `154.0.8037.98`, ASAR 546,863,116 bytes / SHA-256
   `87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836`.
@@ -280,11 +307,165 @@ regional-pixel acceptance.
   rail interaction state, including the indicator's observed presence/absence.
   Product widths are Renderer emulation, not native product resizing. Replay
   requires independent sRGB calibration and real native Electron bounds;
-  perceptual, strict RGBA, and channel residuals remain separate. Next: finish
-  same-engine independent Browser control and remaining hover/portal paint
-  accounting (product Chromium 154 vs local Electron's Chromium 150), then
-  re-observe and implement the actual
-  new Home/Composer composition and affected route bodies. All stages 0–7
+  perceptual, strict RGBA, and channel residuals remain separate. The
+  current-product source/replay style and bounds comparison is recorded in
+  [`navigation-card-shadow-components-region-ab-26.930.31730.json`](navigation-card-shadow-components-region-ab-26.930.31730.json).
+  Three independent same-fixture controls now show
+  exact style and pixel agreement for eighteen generic/product-color shell
+  states across product Chromium 154 and Electron Chromium 150, including the
+  real 820×680 viewport and 764×632 card geometry; they narrow, but do not
+  eliminate, engine uncertainty for proprietary assets and native composition.
+  The focused real-frame A/B also tested root-backdrop substitution, ancestor
+  overflow, card order/owner, and source-like absolute positioning. Source and
+  replay rail/button/card bounds match, but no tested backdrop or overflow
+  change reduces the 2,282 strict pixels; alternate card order/owners worsen
+  them. Regional accounting puts 1,588 strict differences outside Explore's
+  row in the 10px card edge; the button has 199 (max channel 3) and its SVG 22
+  (max 1). Disabling the card shadow increases total differences from 2,282 to
+  5,998, so the recorded two-layer shadow is closer than none or outline-only.
+  Do not change the renderer on the rejected ownership/backdrop/overflow
+  hypotheses or tune the shadow by guesswork. Keep this nonzero strict but
+  zero-perceptual result as a regional regression. The installed-app CDP pass
+  now records the empty Home/Composer layout as text-free structure: 736×98px
+  card, 712×44px editor, 56px center mark, and 28px centered title at 1180×820.
+  See [`current-home-composer-layout-26.930.31730.json`](current-home-composer-layout-26.930.31730.json).
+  The observed Composer card fill is `rgb(54, 54, 54)`, while the kit's dark
+  `--codex-ui-background-elevated-primary-opaque` resolves to `#282828`; do not
+  replace the measured candidate fill with that generic token by assumption.
+  A current-build light Home/Composer reference is still needed before adding
+  light-theme parity.
+  A full Home screenshot was deleted because its selected project and recent-
+  task copy were account-specific; the isolated Chromium profile does not
+  isolate product session data. Two resource-menu samples had 34 vs 31 visible
+  entries, so provider count and connected integrations stay dynamic, not
+  pixel-gate constants. A synthetic Home/Composer structural candidate now
+  passes measured wide geometry/styles and compact containment in Electron.
+  Its nine SVG candidates remain metadata-only in tracked research. A
+  hash-verified extractor can now place exact current-build SVG references only
+  in `playgrounds/codex-app/public/local-reference-assets/26.930.31730/`, a
+  gitignored local folder; no asset bytes, vector paths, or Renderer source are
+  committed. The Home mark, add-resource, dictation, voice, model chevron, and
+  adjacent context toggle render these optional local candidates with neutral
+  fallbacks when the local files are absent. A fresh read-only audit of the
+  fingerprinted `src-47eedec2abf2.js` module tied the nine SVGs to package asset
+  catalog keys: `codex`, `codexNew`, `home`, `homeAlt`, `plusComposer`,
+  `micLgDictate`, `voice`, `chevronDown`, and `slidersHorizontal`. This confirms
+  package-catalog semantics, not which runtime DOM controls consume each key.
+  A follow-up literal-key search across 14,526 bundled webview JavaScript
+  assets did not locate a direct Home/Composer consumer: the searched keys were
+  absent outside the asset module except `chevronDown` in unrelated date-picker,
+  payment, automation, tooltip, and transaction bundles. Source-map entries
+  were also absent for the inspected asset, home-beacon, and page chunks. This
+  negative search cannot prove the keys are unused because minified consumers
+  may import aliased exports or use another runtime layer; it is specifically
+  not a substitute for an allowed current-build DOM trace.
+  A 2026-10-06 static audit also paired the fingerprinted Home JS and CSS
+  chunks through their shared compiled hero class tokens. The stylesheet
+  declares a 616px hero-wrapper maximum and a 28px/400/34px hero title; the
+  text-free CDP record measured 28px/400 with 33.6px computed line-height. The
+  source values are useful corroboration, but the captured node's class was
+  not retained, so this does not establish DOM identity or close the
+  asset/control mapping. Only chunk hashes and abstract declarations are
+  tracked; no source text or style selectors are retained.
+  The Home copy remains synthetic. DOM identity, final asset sizing/tint,
+  product-pixel comparison, and a content-safe reference region remain open;
+  no parity claim follows from loading these vectors. Next, bind the package
+  keys to exact current-build DOM controls and measured sizes, then add a
+  regional pixel gate from an approved content-safe capture. To prevent
+  accidental distribution, the playground now disables Vite's `public/`
+  copying in ordinary builds; only the explicit local-reference acceptance
+  enables it, and the harness removes those copied files from `dist` on exit.
+  The ordinary-build Electron replay asserts that no local SVG is exposed.
+  This narrows packaging risk but does not resolve runtime control mapping or
+  pixel parity. The explicit local-reference Electron acceptance was rerun on
+  2026-10-06: all six Home/Composer SVG candidates loaded from the gitignored
+  reference folder, the measured 1180×820 geometry/styles passed, and the
+  820/721/720 compact layouts plus four-width synthetic turn lifecycle passed.
+  Generated reference copies were removed from `dist`; this is still structural
+  and local-asset evidence, not an installed-product pixel comparison. The
+  candidate now includes a deterministic synthetic
+  conversation lifecycle: Home draft, Enter submit, visible streaming state,
+  completed response, a second turn, and new-conversation reset. Its Electron
+  structural gate measures the wide 1180×820 geometry/styles and checks compact
+  containment at 820×680, 721×680, and 720×680. The lifecycle gate now runs at
+  all four widths, including the 721/720 breakpoint boundary, and checks
+  Shift+Enter, live-region semantics, focus restoration, Composer separation,
+  and zero horizontal overflow. This closes only the playground-owned
+  synthetic lifecycle; current-product post-submit DOM, product-bound App
+  Server behavior, and regional pixels remain open.
+  On 2026-10-05 the expanded matrix passed the full `pnpm check` (root 154
+  files / 1,454 tests; Codex playground 49 / 474; Electron playground 2 / 7,
+  plus package consumers, demo, and accessibility). This verifies repository
+  contracts for the local candidate; installed-product Browser/Electron/pixel
+  gates remain outstanding.
+  A staged continuation of `pnpm check:codex-app:acceptance` exercised the
+  remaining live App Server, Electron, and pixel stages without restarting
+  checks that had already completed. The long-thread/history lifecycle,
+  594-frame CDP and visual contracts, current 26.917 account/sidebar and
+  Composer resources, 26.928 navigation, MCP multi-tool/retry/timeout/approval/
+  cancellation, loopback remote/OAuth MCP, form/URL elicitation, user-verification
+  Electron flow, and live Composer-resource layouts all passed. Transient
+  `serverOverloaded` results for Luna on live-stop, session approval, MCP tool
+  call, and history passed on their isolated retry; one account-menu same-fixture
+  capture drifted once and passed the next complete rerun. The complete
+  `check:live-thread-attachments` initially timed out twice after the fixture
+  server initialized but before it received `tools/call`; the first failure
+  recorded an App Server transport error to `chatgpt.com/backend-api/ps/mcp`.
+  The shared live-MCP harness now fails promptly on App Server error/failed-turn
+  events and writes a prompt-free event summary on failure. The attachment
+  scenario subsequently passed its full create/notification/list/remove/
+  notification lifecycle in a disposable App Server home. All shared MCP
+  harness modes (single, multi, retry, timeout, approval denied, cancel,
+  remote, OAuth, skill, and attachments) passed targeted regression runs;
+  one skill-mode `responseStreamDisconnected` also passed on isolated retry.
+  The earlier monolithic `pnpm check:codex-app:acceptance` invocation did not
+  exit zero and was not restarted per the no-repeat instruction; component
+  results are staged evidence, not a claim that one uninterrupted command
+  passed. The shared harness script passes Node syntax validation. The offered
+  26.930.51102 update remains uninstalled, so current-build Browser/Electron and
+  product-pixel acceptance remain outstanding.
+  On 2026-10-06, the repository `pnpm check` passed (root 154 files / 1,454
+  tests, Codex playground 49 / 474, Electron playground 2 / 7, plus builds,
+  package consumers, demo, and accessibility). A subsequent full local
+  acceptance run advanced through the live App Server/Electron scenarios but
+  stopped at project discovery: repairing the watched registry raced with a
+  Playwright click on the Retry control. The test now clicks Retry while the
+  registry is still invalid, then repairs it; the focused 1180/720 project
+  discovery gate passed. The explicit local Home/Composer reference build also
+  passed with 6/6 SVG candidates loaded and the structural/lifecycle checks
+  green. Rather than rerun the already-passed prefix, the remaining acceptance
+  suffix was then executed to exit 0. It passed 594 CDP lifecycle frames, 594
+  pixel-contract frames, the 26.917 sidebar-shell gate, current 26.924 Composer
+  and 26.928/26.930 navigation comparisons, all local MCP call modes (skill,
+  multi, retry, timeout, approval-denied, cancel, loopback remote, OAuth), form
+  and URL elicitation actions, Electron user-verification verify/cancel, and
+  wide/compact Composer-resource layouts. The current 26.930.31730 navigation
+  comparison passed all 104 sampled product regions at 0% sRGB perceptual
+  difference; strict RGBA still differs by 15.6731% (maximum channel delta 51),
+  so this is not byte-identical parity. The earlier prefix, focused repaired
+  gate, and resumed suffix together cover the acceptance suite, but there was
+  no single uninterrupted post-fix invocation of the umbrella command; report
+  this as staged full-gate evidence, not a monolithic command exit code. These
+  local gates require neither Mac unlock nor a live product CDP session and do
+  not establish unobserved installed-product control mappings or global UI
+  parity. After adding `check:current-home-composer-26-930` to
+  `check:acceptance:full`, a fresh, uninterrupted
+  `pnpm --dir playgrounds/codex-app check:acceptance:full` completed with exit
+  code 0 on 2026-10-06. It includes the full acceptance prefix, 594 CDP and 594
+  pixel-contract frames, the Home/Composer structural and synthetic lifecycle
+  gate, current-build navigation samples, live App Server MCP variants and
+  elicitation, user-verification Electron, and Composer resources. The separate
+  root `pnpm check` also completed with exit code 0: 154 root files / 1,454
+  tests, 49 Codex playground files / 474 tests, Electron 2 files / 7 tests,
+  package/demo/a11y/build contracts, and the new Home/Composer check. The Home
+  run verifies captured 26.930.31730 geometry at 1180×820, compact containment
+  at 820/721/720, and only the playground's synthetic draft/send/streaming/
+  completion/reset lifecycle; it does not verify the installed product's
+  post-submit DOM, exact control-to-asset mapping, or product pixels. The offered
+  26.930.51102 update remains uninstalled, so all stages 0–7 remain open and
+  the promoted global baseline remains `26.903.71938`.
+  Revisit the rail edge only if new compositor evidence gives a testable
+  hypothesis. All stages 0–7
   remain open; the promoted global baseline stays `26.903.71938`.
 - The prior installed app reported `26.928.21956` (`12404`), Chromium
   `154.0.8037.57`, with a 538,323,145-byte `app.asar` whose SHA-256 is
@@ -2061,6 +2242,11 @@ streaming beyond this bounded retry, and installed-product pixels remain open
 follow-up boundaries. The live timeout mode now adds a
 deliberately slow MCP server with a one-second tool limit and verifies the
 failed item state without a retry; OAuth/permission variants remain open. The
+new `check:live-thread-attachments` acceptance mode writes and removes a
+synthetic test attachment only on its completed temporary thread, waits for
+and validates the exact `thread/attachment/updated` created/deleted
+notifications, and removes the test attachment on failure before archiving;
+the default deterministic check remains non-mutating. The
 approval-denied mode now verifies the real MCP approval request, rejects it
 before the server's `tools/call`, and locks the failed item and 1180/720 card
 geometry. A remote mode now serves the same tool over a loopback Streamable
@@ -2072,6 +2258,34 @@ provider, runs DCR plus authorization-code/token exchange through the public
 `mcpServer/oauth/login` method, and proves the resulting authenticated remote
 MCP tool call with the same card and 1180/720 geometry. Production provider
 discovery, account policy, and installed-product parity remain open.
+That OAuth mode was rerun on 2026-10-05 against pinned client `0.5.2` / runtime
+`0.160.0`, with `gpt-5.6-luna` and `max` supplied to the local Electron process.
+One turn completed the local DCR and authorization-code callback/token flow,
+then issued a Streamable HTTP `tools/call` and rendered the deterministic
+`MCP_TOOL_CALL_OK:pixel-check` result. The OAuth and MCP endpoints were
+loopback-only; this confirms the local protocol/UI path, not any production
+provider or account credential flow.
+After the exact client/runtime upgrade to `0.5.2` / `0.160.0`, the focused
+`check:live-skill-try-now` mode passed on 2026-10-05 with `gpt-5.6-luna` at
+`max`: one real App Server model turn issued sequential `search_openai_docs`
+and `fetch_openai_doc` stdio MCP calls, both completed, and the wide/compact
+same-run repeat captures had zero pixel differences. This is live local
+App-Server/Electron/stdio transport evidence only: the test server returns
+deterministic fixture content, so it did not fetch the linked documentation,
+execute an installed-product skill, or establish product pixel parity.
+The same focused mode was rerun on 2026-10-06 against the current exact
+`0.5.2` / `0.160.0` pin with `gpt-5.6-luna` at `max`. The one-turn ordered
+stdio round trip again completed both tools; the MCP group measured 736px wide
+and 414px compact, with zero drift in repeated captures at both sizes. The
+temporary App Server home, loopback test server, and Electron scene were
+isolated; the result remains local fixture evidence, not a fetch of official
+docs or installed-product parity.
+On the same date, the ordinary single-tool echo mode passed one App Server
+turn and rendered the exact `MCP_TOOL_CALL_OK:pixel-check` result. The shared
+runner now explicitly defaults every live MCP mode to `gpt-5.6-luna` / `max`
+(both remain overrideable), instead of leaving non-Skill modes on an implicit
+model. This run measured 736×53px wide and 414×53px compact; those are local
+Electron geometry observations, not product-reference pixels.
 The cancellation follow-up now holds a real stdio `tools/call`, drives the
 Composer `Stop` action while that item is active, and proves the public turn
 settles as `interrupted` while the started MCP item does not fabricate a
@@ -2940,17 +3154,40 @@ dependencies in the public root package.
 Exit: the demo can reproduce a complete coding workflow in replay and live
 local modes with the same UI state model.
 
-A 2026-09-29 version-compatibility smoke now connects the pinned client under
-strict protocol validation to both its bundled `@openai/codex@0.153.4` runtime
-and an explicitly supplied `0.159.0` runtime. It uses an isolated temporary
-`CODEX_HOME`, makes no model turn, and is invoked by the playground's
-`check:protocol`; `CODEX_UI_KIT_APP_SERVER_BINARY` and
-`CODEX_UI_KIT_APP_SERVER_EXPECTED_VERSION` allow an exact alternate-binary
-check. It proves version parsing, App Server initialization, and a read-only
-`mcpServerStatus/list` request for those two binaries; it does not prove
-method-by-method compatibility, the latest runtime in every live scenario, or
-installed-Codex UI parity. The client dependency remains exactly pinned until
-the broader protocol matrix is refreshed.
+A 2026-10-05 version-compatibility smoke connects the kit's exact npm-pinned
+client `0.5.2` under strict protocol validation to its bundled
+`@openai/codex@0.160.0` runtime. It uses an isolated temporary `CODEX_HOME`,
+makes no model turn, and runs from the playground's `check:protocol`;
+`CODEX_UI_KIT_APP_SERVER_BINARY` and
+`CODEX_UI_KIT_APP_SERVER_EXPECTED_VERSION` still allow an exact alternate-binary
+check. The smoke now resolves the default binary's owning `@openai/codex`
+package manifest and fails if the executable's `--version` differs from that
+exact runtime dependency, rather than merely logging the discovered version.
+The observed result reported `0.160.0`, connected state, strict validation,
+and successful read-only `mcpServerStatus/list`, state-DB-only `thread/list`,
+and `model/list` calls with their list/cursor response contracts. No mutating
+protocol method or model turn ran. A fresh cross-repository check on
+2026-10-05 confirmed `codex-app-server-client` main at
+`da4288830fbdf4fd6025d2ecab0a2e8b7f5cd1d4`, package/npm latest `0.5.2`,
+compatibility matrix through `0.160.0`, and 12/12 current-main GitHub checks
+successful. Thus no dependency bump is indicated; this is still a narrow
+read-only protocol/consumer path, not method-by-method compatibility, every
+live workflow, or installed-Codex UI parity.
+
+An exploratory `thread/attachment/add` after `thread/start` with no model turn
+returned `thread not found` in a disposable `CODEX_HOME`, both with an
+ephemeral thread and with the default persisted-thread mode. That was a thread
+lifecycle issue, not evidence that attachments are unsupported. The new
+`check:live-thread-attachments` mode first completes one model turn on a
+non-ephemeral thread in temporary `CODEX_HOME`, verifies the thread in
+`thread/list`, exercises `thread/attachment/add`, `list`, and `remove`, and
+checks the matching `thread/attachment/updated` notifications before
+archiving the exact test thread. An initial immediate assertion raced the
+asynchronous notification; a no-model-turn follow-up on that same disposable
+thread observed both created and deleted events. The bounded wait version then
+passed against `0.160.0` on 2026-10-05 with one `gpt-5.6-luna` / `max` turn.
+The mutation is included in full playground acceptance, not the default
+repository check.
 
 A read-only schema comparison generated from those exact CLI packages found
 that App Server v2 grew from 740 to 789 named definitions between `0.153.4`
@@ -2962,11 +3199,60 @@ and user verification (`userVerification/{cancel,delete,enroll,status,verify}`);
 `thread/rollback` was removed. The server-notification union gained
 `account/gatewayOAuth/changed` and `thread/attachment/updated`. This is a
 schema-level change inventory, not proof that every method is callable or
-enabled for a particular account. The smoke's one read-only MCP status call
-still cannot stand in for compatibility coverage: next, add explicit method
-and notification fixtures for the changed thread, OAuth, user-verification,
-and attachment contracts, then run the safe read-only subset against both
-pinned and current CLI runtimes before changing the client pin.
+enabled for a particular account. Runtime `0.160.0` introduces no generated
+protocol delta from `0.159.0` in client `0.5.2`, while the smoke exercises
+three read-only listing methods plus `userVerification/status` and
+`account/gatewayOAuth/read`. For the latter, it validates provider metadata
+types but emits only the required flag, readiness status, and error-present
+boolean—never provider names/IDs or error text. The isolated home returned
+`providerUnavailable` for user verification; this does not expose a credential
+or remote-provider readiness result. No OAuth login, token refresh, or model
+turn ran.
+
+On 2026-10-06, the same strict read-only compatibility smoke was run against
+the App Server executable bundled inside the installed
+`/Applications/ChatGPT.app` (`26.930.31730`, CLI runtime `0.160.0`), with the
+exact version asserted. It connected successfully and returned the expected
+MCP-server, thread, model, user-verification-status, and gateway-OAuth-read
+shapes using a disposable `CODEX_HOME`; no model turn or mutating protocol
+method ran. This confirms this narrow client path against the installed
+desktop's bundled runtime as well as the npm-pinned runtime. The unrelated
+`codex` command on the shell `PATH` reports `0.154.0` and was not used as a
+surrogate for the desktop runtime. This still does not validate authentication,
+provider readiness, OAuth mutation, or installed-product UI behavior.
+
+The sanitized `thread-attachment-notifications` trace fixture now validates
+both created and deleted notification shapes, and the live attachment mode
+verifies their thread/attachment ownership. A separate sanitized
+`gateway-oauth-notifications` fixture validates all four public readiness
+statuses without recording a real authorization URL or provider identity. The
+isolated runtime smoke verifies only the read-only gateway policy snapshot;
+gateway login/cancel/callback and user-verification enroll/verify remain open
+because they cross authentication or signing boundaries. The safe read-only
+subset has now passed against both the npm-pinned runtime and the installed
+desktop's bundled runtime; both resolve to `0.160.0`, so this does not prove
+cross-version compatibility. The sanitized fixtures cover the two notification
+methods added in the inspected schema delta: `account/gatewayOAuth/changed` and
+`thread/attachment/updated`. They do not exhaustively cover the broader thread
+notification union. The generated `ServerNotification` schema contains no
+`userVerification/*` notification; user verification is represented by an
+`mcpServer/elicitation/request` server request with mode
+`openai/userVerification`, followed by client verify/cancel methods. The fake
+server Electron acceptance covers that request boundary, but the installed
+runtime reported `providerUnavailable`, so native enrolled-device verification
+remains unvalidated. A separate schema-validated sanitized trace now exercises
+the user-verification request variant with a cancel response only; it contains
+no real challenge or credential proof. The environment/capability limit is
+native enrolled-device verification, not protocol-shape coverage.
+
+On 2026-10-06, protocol validation passed all 67 trace fixtures / 739 events,
+and the playground test suite passed 49 files / 474 tests. Both the pinned
+`check:protocol` runtime and an explicit override to the installed desktop CLI
+connected under strict validation as `0.160.0`; neither started a model turn or
+called a mutating method. The focused Electron acceptance passed synthetic
+verify and cancel paths at wide and compact layouts (710×208 and 388×241). Its
+proof and server are fixtures only: this provides protocol and own-playground
+functional evidence, not native-device or installed-product pixel evidence.
 
 Live progress (2026-09-08): actual Composer submission, file creation, Node
 assertion, and raw-added-file Review now pass at 1180/720px. The command-oriented
