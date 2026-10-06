@@ -25,7 +25,11 @@ assert.ok(fingerprint, "Unknown navigation capture build");
 const standardizedSrgb = version === "26.930.31730";
 const baseline = JSON.parse(await readFile(new URL(`../research/current-baseline-${version}-candidate.json`, import.meta.url), "utf8"));
 assertCurrentBaselineObservationRecord(baseline, fingerprint);
-const owner = standardizedSrgb ? process.env.CODEX_NAVIGATION_OWNER_PID : String(baseline.runtimeBundleIdentity.ownerPid);
+const owner = String(
+  process.env.CODEX_NAVIGATION_OWNER_PID ??
+    baseline.runtimeBundleIdentity.ownerPid ??
+    "",
+);
 assert.match(owner ?? "", /^[1-9][0-9]*$/);
 const processInfo = pid => JSON.parse(execFileSync("/usr/bin/python3", [fileURLToPath(new URL("./read-macos-process-info.py", import.meta.url)), pid], { encoding: "utf8" }));
 const argv = processInfo(owner);
@@ -33,7 +37,7 @@ assert.equal(argv.executablePath, "/Applications/ChatGPT.app/Contents/MacOS/Chat
 for (const argument of [`--user-data-dir=${profile}`, `--remote-debugging-port=${port}`, "--remote-debugging-address=127.0.0.1"]) assert.equal(argv.argv.filter(value => value === argument).length, 1);
 if (standardizedSrgb) assert.equal(argv.argv.filter(value => value === "--force-color-profile=srgb").length, 1);
 const ownerStart = Date.parse(execFileSync("/bin/ps", ["-p", owner, "-o", "lstart="], { encoding: "utf8", env: { ...process.env, LC_ALL: "C" } }).trim());
-if (!standardizedSrgb) assert.equal(ownerStart, baseline.runtimeBundleIdentity.processStartedAtMs, "Probe PID was recycled after the baseline capture");
+if (!standardizedSrgb && Number.isSafeInteger(baseline.runtimeBundleIdentity.processStartedAtMs)) assert.equal(ownerStart, baseline.runtimeBundleIdentity.processStartedAtMs, "Probe PID was recycled after the baseline capture");
 const fields = execFileSync("/usr/sbin/lsof", ["-nP", "-a", `-iTCP:${port}`, "-sTCP:LISTEN", "-Fpn"], { encoding: "utf8" }).trim().split("\n");
 assert.ok(fields.includes(`p${owner}`));
 for (const field of fields) {

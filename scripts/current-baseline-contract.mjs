@@ -246,6 +246,41 @@ const provesRuntimeBundleIdentity = (
   );
 };
 
+const candidateBundleCaptureVerification =
+  "isolated-live-renderer-bundle-verified";
+
+const candidateBundleSnapshotMatches = (snapshot, expectedFingerprint) =>
+  Number.isSafeInteger(snapshot?.appAsarBytes) &&
+  snapshot.appAsarBytes === expectedFingerprint.appAsarBytes &&
+  snapshot.appAsarSha256 === expectedFingerprint.appAsarSha256;
+
+const provesSanitizedRuntimeBundleIdentity = (
+  runtimeIdentity,
+  expectedFingerprint,
+) => {
+  const expectedIdentityKeys = [
+    "afterCapture",
+    "beforeCapture",
+    "captureVerification",
+  ];
+  const expectedSnapshotKeys = ["appAsarBytes", "appAsarSha256"];
+  const beforeBundle = runtimeIdentity?.beforeCapture;
+  const afterBundle = runtimeIdentity?.afterCapture;
+  return (
+    JSON.stringify(Object.keys(runtimeIdentity ?? {}).sort()) ===
+      JSON.stringify(expectedIdentityKeys) &&
+    runtimeIdentity.captureVerification === candidateBundleCaptureVerification &&
+    JSON.stringify(Object.keys(beforeBundle ?? {}).sort()) ===
+      JSON.stringify(expectedSnapshotKeys) &&
+    JSON.stringify(Object.keys(afterBundle ?? {}).sort()) ===
+      JSON.stringify(expectedSnapshotKeys) &&
+    candidateBundleSnapshotMatches(beforeBundle, expectedFingerprint) &&
+    candidateBundleSnapshotMatches(afterBundle, expectedFingerprint) &&
+    beforeBundle.appAsarBytes === afterBundle.appAsarBytes &&
+    beforeBundle.appAsarSha256 === afterBundle.appAsarSha256
+  );
+};
+
 const projectIndexScrollOwnerMatches = (
   owners,
   { clientHeight, height, top },
@@ -2241,7 +2276,11 @@ export function assertCurrentBaselineObservationRecord(
     );
   }
   if (
-    !provesRuntimeBundleIdentity(record.runtimeBundleIdentity, expectedFingerprint)
+    !provesRuntimeBundleIdentity(record.runtimeBundleIdentity, expectedFingerprint) &&
+    !provesSanitizedRuntimeBundleIdentity(
+      record.runtimeBundleIdentity,
+      expectedFingerprint,
+    )
   ) {
     throw new Error(
       "Current baseline observation does not prove the running Renderer bundle identity.",
@@ -2320,4 +2359,38 @@ export function assertCurrentBaselineObservationRecord(
       );
     }
   }
+}
+
+export function sanitizeCurrentBaselineObservationRecord(
+  record,
+  expectedFingerprint = currentObservedBuildCandidateBaselineFingerprint,
+) {
+  assertCurrentBaselineObservationRecord(record, expectedFingerprint);
+  const snapshotFingerprint = (snapshot) => ({
+    appAsarBytes: snapshot.appAsarBytes,
+    appAsarSha256: snapshot.appAsarSha256,
+  });
+  const sanitized = {
+    ...record,
+    runtimeBundleIdentity: {
+      afterCapture: snapshotFingerprint(
+        record.runtimeBundleIdentity.afterCapture,
+      ),
+      beforeCapture: snapshotFingerprint(
+        record.runtimeBundleIdentity.beforeCapture,
+      ),
+      captureVerification: candidateBundleCaptureVerification,
+    },
+  };
+  for (const key of [
+    "ownerPid",
+    "profileOwnerPid",
+    "processStartedAtMs",
+    "profilePath",
+    "debuggingPort",
+  ]) {
+    delete sanitized[key];
+  }
+  assertCurrentBaselineObservationRecord(sanitized, expectedFingerprint);
+  return sanitized;
 }

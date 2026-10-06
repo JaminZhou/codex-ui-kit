@@ -111,6 +111,8 @@ export function CurrentHome26930() {
   useEffect(() => {
     if (lifecycleState !== "streaming" || !pendingTurn) return;
     const pendingId = pendingTurn.id;
+    // Keep the synthetic streaming state observable in slower virtualized
+    // Electron runners before the deterministic response completes.
     const timer = window.setTimeout(() => {
       setTurns((current) =>
         current.map((turn) =>
@@ -123,7 +125,7 @@ export function CurrentHome26930() {
             : turn,
         ),
       );
-    }, 240);
+    }, 900);
     return () => window.clearTimeout(timer);
   }, [lifecycleState, pendingTurn]);
 

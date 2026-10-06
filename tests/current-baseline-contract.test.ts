@@ -32,6 +32,7 @@ import {
   runBestEffortCurrentBaselineCleanup,
   resolveCurrentBaselineCandidateOutputPath,
   sanitizeCurrentAccountMenuRecord,
+  sanitizeCurrentBaselineObservationRecord,
   selectCurrentMainCandidate,
   writeCurrentBaselineOutput,
 } from "../scripts/current-baseline-contract.mjs";
@@ -795,6 +796,22 @@ describe("current baseline capture contract", () => {
     expect(
       resolveCurrentBaselineCandidateOutputPath(candidatePath, fingerprint),
     ).toBe(candidatePath);
+    const candidateRecord = JSON.parse(readFileSync(candidatePath, "utf8"));
+    expect(() => assertCurrentBaselineObservationRecord(candidateRecord, fingerprint)).not.toThrow();
+    expect(candidateRecord.runtimeBundleIdentity).toEqual({
+      afterCapture: {
+        appAsarBytes: fingerprint.appAsarBytes,
+        appAsarSha256: fingerprint.appAsarSha256,
+      },
+      beforeCapture: {
+        appAsarBytes: fingerprint.appAsarBytes,
+        appAsarSha256: fingerprint.appAsarSha256,
+      },
+      captureVerification: "isolated-live-renderer-bundle-verified",
+    });
+    expect(JSON.stringify(candidateRecord)).not.toMatch(
+      /"(?:ownerPid|profileOwnerPid|processStartedAtMs|profilePath|debuggingPort|changedAtMs|checkedAtMs|device|inode)"\s*:/,
+    );
     expect(currentBaselineFingerprint.appVersion).not.toBe(fingerprint.appVersion);
     expect(() => resolveCurrentBaselineCandidateOutputPath(
       fileURLToPath(new URL("../research/current-baseline-26.930.31730-candidate.json", import.meta.url)),
@@ -1062,6 +1079,22 @@ describe("current baseline capture contract", () => {
     };
 
     expect(() => assertCurrentBaselineObservationRecord(record)).not.toThrow();
+    const sanitizedRecord = sanitizeCurrentBaselineObservationRecord(record);
+    expect(() => assertCurrentBaselineObservationRecord(sanitizedRecord)).not.toThrow();
+    expect(sanitizedRecord.runtimeBundleIdentity).toEqual({
+      afterCapture: {
+        appAsarBytes: fingerprint.appAsarBytes,
+        appAsarSha256: fingerprint.appAsarSha256,
+      },
+      beforeCapture: {
+        appAsarBytes: fingerprint.appAsarBytes,
+        appAsarSha256: fingerprint.appAsarSha256,
+      },
+      captureVerification: "isolated-live-renderer-bundle-verified",
+    });
+    expect(JSON.stringify(sanitizedRecord)).not.toMatch(
+      /"(?:ownerPid|profileOwnerPid|processStartedAtMs|profilePath|debuggingPort|changedAtMs|checkedAtMs|device|inode)"\s*:/,
+    );
     expect(() =>
       assertCurrentBaselineObservationRecord({
         ...record,

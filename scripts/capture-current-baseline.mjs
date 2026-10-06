@@ -22,6 +22,7 @@ import {
   resolveCurrentBaselineCandidateOutputPath,
   resolveCurrentBaselineOutputPath,
   runBestEffortCurrentBaselineCleanup,
+  sanitizeCurrentBaselineObservationRecord,
   selectCurrentMainCandidate,
   writeCurrentBaselineCandidateOutput,
   writeCurrentBaselineOutput,
@@ -2001,7 +2002,10 @@ try {
     assertCurrentProjectsIndexObservation(projectsIndexObservation);
     assertCurrentBaselineRecord(record, expectedFingerprint);
   }
-  const output = `${JSON.stringify(record, null, 2)}\n`;
+  const outputRecord = candidateObservationOnly
+    ? sanitizeCurrentBaselineObservationRecord(record, expectedFingerprint)
+    : record;
+  const output = `${JSON.stringify(outputRecord, null, 2)}\n`;
   if (normalizedOutputPath) {
     if (writeCandidateToResearch) {
       await writeCurrentBaselineCandidateOutput(
