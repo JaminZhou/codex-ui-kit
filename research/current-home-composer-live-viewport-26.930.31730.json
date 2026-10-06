@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appVersion": "26.930.31730",
+    "buildNumber": "12947",
+    "chromiumVersion": "154.0.8037.98",
+    "appAsarBytes": 546863116,
+    "appAsarSha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836"
+  },
+  "capture": {
+    "capturedAt": "2026-10-06",
+    "kind": "read-only isolated-process Renderer CDP observation",
+    "viewport": {
+      "width": 2560,
+      "height": 1318,
+      "devicePixelRatio": 1,
+      "emulated": false
+    },
+    "theme": "dark",
+    "textContentRetained": false,
+    "fullScreenshotRetained": false,
+    "runtimeSvgBytesRetained": false,
+    "vectorPathDataRetained": false,
+    "privacyNote": "Only geometry, computed styles, primitive counts, and package/path fingerprints were retained. Account-specific Home copy and all screenshots were excluded."
+  },
+  "layout": {
+    "rootColorScheme": "dark",
+    "main": {
+      "rect": {
+        "x": 321.88,
+        "y": 44,
+        "width": 2234.13,
+        "height": 1270
+      },
+      "backgroundColor": "rgb(24, 24, 24)"
+    },
+    "home": {
+      "heroContainer": {
+        "rect": {
+          "x": 1055.44,
+          "y": 529.41,
+          "width": 768,
+          "height": 113.59
+        },
+        "layout": "centered flex column, 24px gap"
+      },
+      "mark": {
+        "rect": {
+          "x": 1411.44,
+          "y": 529.41,
+          "width": 56,
+          "height": 56
+        },
+        "viewBox": "149 149 418 418",
+        "pathCount": 4
+      },
+      "title": {
+        "rect": {
+          "x": 1302.94,
+          "y": 609.41,
+          "width": 273,
+          "height": 33.59
+        },
+        "fontFamily": "-apple-system, system-ui, Segoe UI, sans-serif",
+        "fontSize": "28px",
+        "fontWeight": "400",
+          "lineHeight": "33.6px",
+          "textAlign": "center",
+          "runtimeClassTokens": [
+            "heading-xl",
+            "flex",
+            "max-w-full",
+            "min-w-0",
+            "items-end",
+            "justify-center",
+            "text-center",
+            "font-normal"
+          ],
+          "textCaptured": false,
+        "widthIsCopyDependent": true
+      }
+    },
+    "composer": {
+      "contextControls": [
+        {
+          "rect": {
+            "x": 1088.44,
+            "y": 1167,
+            "width": 132.28,
+            "height": 28
+          },
+          "labelCaptured": false
+        },
+        {
+          "rect": {
+            "x": 1228.72,
+            "y": 1167,
+            "width": 127.38,
+            "height": 28
+          },
+          "labelCaptured": false
+        }
+      ],
+      "card": {
+        "rect": {
+          "x": 1071.44,
+          "y": 1200,
+          "width": 736,
+          "height": 98
+        },
+        "backgroundColor": "rgb(54, 54, 54)",
+        "borderRadius": "22px",
+        "insetShadow": "rgba(255, 255, 255, 0.2) 0px 0px 1px 0px"
+      },
+      "editor": {
+        "rect": {
+          "x": 1083.44,
+          "y": 1214,
+          "width": 712,
+          "height": 44
+        },
+        "fontFamily": "-apple-system, system-ui, Segoe UI, sans-serif",
+        "fontSize": "14px",
+        "fontWeight": "430",
+        "lineHeight": "20px"
+      },
+      "toolbar": [
+        {
+          "kind": "add-resource",
+          "controlRect": {
+            "x": 1079.44,
+            "y": 1262,
+            "width": 28,
+            "height": 28
+          },
+          "iconRect": {
+            "x": 1085.44,
+            "y": 1268,
+            "width": 16,
+            "height": 16
+          },
+          "viewBox": "0 0 16 16",
+          "pathCount": 1
+        },
+        {
+          "kind": "left-context-control",
+          "controlRect": {
+            "x": 1112.44,
+            "y": 1262,
+            "width": 101.06,
+            "height": 28
+          },
+          "iconRect": {
+            "x": 1119.44,
+            "y": 1268,
+            "width": 16,
+            "height": 16
+          },
+          "viewBox": "0 0 20 20",
+          "pathCount": 3
+        },
+        {
+          "kind": "model-control",
+          "controlRect": {
+            "x": 1596.11,
+            "y": 1262,
+            "width": 139.33,
+            "height": 28
+          },
+          "iconRect": {
+            "x": 1710.44,
+            "y": 1268,
+            "width": 16,
+            "height": 16
+          },
+          "viewBox": "0 0 16 16",
+          "pathCount": 1
+        },
+        {
+          "kind": "dictation",
+          "controlRect": {
+            "x": 1735.44,
+            "y": 1262,
+            "width": 28,
+            "height": 28
+          },
+          "iconRect": {
+            "x": 1741.44,
+            "y": 1268,
+            "width": 16,
+            "height": 16
+          },
+          "viewBox": "0 0 20 20",
+          "pathCount": 2
+        },
+        {
+          "kind": "trailing-voice-control",
+          "controlRect": {
+            "x": 1771.44,
+            "y": 1262,
+            "width": 28,
+            "height": 28
+          },
+          "iconRect": {
+            "x": 1777.44,
+            "y": 1268,
+            "width": 16,
+            "height": 16
+          },
+          "viewBox": "0 0 16 16",
+          "pathCount": 4
+        }
+      ]
+    }
+  },
+  "resourceAudit": {
+    "directHistoricalMarkMatch": {
+      "researchArtifact": "current-home-assets.json",
+      "iconId": "home-mark",
+      "exactPathDataMatches": 4,
+      "runtimePathCount": 4,
+      "sameViewBox": true,
+      "buildDifference": "historical 26.818 source record matches the 26.930.31730 runtime mark; current-build promotion still requires its own product-pixel acceptance"
+    },
+    "fingerprintedRuntimeChunkMatches": [
+      {
+        "category": "hero-mark",
+        "matchedPathCount": 4,
+        "pathCount": 4,
+        "chunk": "app-primary-5fc751535eb1.js",
+        "chunkBytes": 2327862,
+        "chunkSha256": "1dc9e9984988ae435e3e5f58db33690c5cef04790b91fb019e970dbe89f7439b"
+      },
+      {
+        "category": "context-control-a",
+        "matchedPathCount": 0,
+        "pathCount": 1
+      },
+      {
+        "category": "context-control-b",
+        "matchedPathCount": 1,
+        "pathCount": 1,
+        "chunk": "app-shared-b72e16382796.js",
+        "chunkBytes": 7778704,
+        "chunkSha256": "df6152796a7762d3956cbf2030bd8b17de90a4554513d786f11cd41f88b892d4"
+      },
+      {
+        "category": "add-resource",
+        "matchedPathCount": 1,
+        "pathCount": 1,
+        "chunk": "app-shared-b72e16382796.js",
+        "chunkBytes": 7778704,
+        "chunkSha256": "df6152796a7762d3956cbf2030bd8b17de90a4554513d786f11cd41f88b892d4"
+      },
+      {
+        "category": "left-context-control",
+        "matchedPathCount": 3,
+        "pathCount": 3,
+        "chunk": "app-primary-5fc751535eb1.js",
+        "chunkBytes": 2327862,
+        "chunkSha256": "1dc9e9984988ae435e3e5f58db33690c5cef04790b91fb019e970dbe89f7439b",
+        "alsoFoundIn": "shield-code-301f58b077a6.js"
+      },
+      {
+        "category": "model-control",
+        "matchedPathCount": 1,
+        "pathCount": 1,
+        "chunk": "app-shared-b72e16382796.js",
+        "chunkBytes": 7778704,
+        "chunkSha256": "df6152796a7762d3956cbf2030bd8b17de90a4554513d786f11cd41f88b892d4"
+      },
+      {
+        "category": "dictation",
+        "matchedPathCount": 0,
+        "pathCount": 2
+      },
+      {
+        "category": "trailing-voice-control",
+        "matchedPathCount": 4,
+        "pathCount": 4,
+        "chunk": "app-shared-b72e16382796.js",
+        "chunkBytes": 7778704,
+        "chunkSha256": "df6152796a7762d3956cbf2030bd8b17de90a4554513d786f11cd41f88b892d4"
+      }
+    ],
+    "localCandidateSilhouetteComparison": {
+      "method": "same Chromium 154 canvas rasterization; exact current-runtime SVG clones with computed paint inlined vs optional local SVG candidates; alpha silhouette only; no screenshot or vector bytes retained",
+      "notAProductPixelGate": true,
+      "nearestByMeanAlphaDelta": [
+        {
+          "runtimeRegion": "hero-mark",
+          "candidate": "codex_new-f14177b03534.svg",
+          "changedPixels": 477,
+          "totalPixels": 3136,
+          "changedRatio": 0.152105,
+          "meanAbsoluteAlphaDelta": 23.187
+        },
+        {
+          "runtimeRegion": "context-control-a",
+          "candidate": "chevron_down-6d8fb03d85b2.svg",
+          "changedPixels": 116,
+          "totalPixels": 256,
+          "changedRatio": 0.453125,
+          "meanAbsoluteAlphaDelta": 39.211
+        },
+        {
+          "runtimeRegion": "context-control-b",
+          "candidate": "codex_new-f14177b03534.svg",
+          "changedPixels": 114,
+          "totalPixels": 256,
+          "changedRatio": 0.445313,
+          "meanAbsoluteAlphaDelta": 58.027
+        },
+        {
+          "runtimeRegion": "add-resource",
+          "candidate": "plus_composer-86a041c72466.svg",
+          "changedPixels": 8,
+          "totalPixels": 256,
+          "changedRatio": 0.03125,
+          "meanAbsoluteAlphaDelta": 2.984
+        },
+        {
+          "runtimeRegion": "left-context-control",
+          "candidate": "codex-d905da579253.svg",
+          "changedPixels": 87,
+          "totalPixels": 256,
+          "changedRatio": 0.339844,
+          "meanAbsoluteAlphaDelta": 36.637
+        },
+        {
+          "runtimeRegion": "model-control",
+          "candidate": "chevron_down-6d8fb03d85b2.svg",
+          "changedPixels": 37,
+          "totalPixels": 256,
+          "changedRatio": 0.144531,
+          "meanAbsoluteAlphaDelta": 18.949
+        },
+        {
+          "runtimeRegion": "dictation",
+          "candidate": "mic_lg_dictate-9b125ec2975b.svg",
+          "changedPixels": 33,
+          "totalPixels": 256,
+          "changedRatio": 0.128906,
+          "meanAbsoluteAlphaDelta": 11.453
+        },
+        {
+          "runtimeRegion": "trailing-voice-control",
+          "candidate": "chevron_down-6d8fb03d85b2.svg",
+          "changedPixels": 78,
+          "totalPixels": 256,
+          "changedRatio": 0.304688,
+          "meanAbsoluteAlphaDelta": 43.836
+        }
+      ]
+    }
+  },
+  "evidenceBoundary": {
+    "runtimeDomObserved": true,
+    "staticChunkFingerprintsVerified": true,
+    "htmlTextRetained": false,
+    "imageReferenceRetained": false,
+    "productPixelParity": "unverified",
+    "lightTheme": "not sampled",
+    "compactWidths": "not sampled in this native viewport observation",
+    "populatedComposerLifecycle": "not sampled",
+    "appServerLifecycle": "not sampled"
+  }
+}
