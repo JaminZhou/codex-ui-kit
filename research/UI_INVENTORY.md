@@ -52,7 +52,18 @@ host-owned and are intentionally not claimed by the playground.
 
 ## Promoted baseline and latest candidate
 
-The 2026-10-05 installed candidate is `26.930.31730` / build `12947`;
+The latest installed candidate recorded on 2026-10-06 is `26.930.61225` /
+build `13232`; its package identity and string scan are in
+[`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json).
+The sanitized Renderer capture is
+[`current-baseline-26.930.61225-candidate.json`](current-baseline-26.930.61225-candidate.json).
+It records the main New chat shell and left navigation at 1180/820/721/720px,
+including compact collapse/restore, but is candidate-only structural and
+computed-style evidence. It contains no product screenshots and provides no
+Electron or regional-pixel acceptance. No surface-level target-build tags
+have been promoted; the global baseline remains `26.903.71938`.
+
+The prior 2026-10-05 candidate is `26.930.31730` / build `12947`;
 [`26.930.31730.md`](26.930.31730.md) records shell/sidebar, Profile → Help,
 empty Composer, and text-redacted Home composition observations. The Home
 capture is geometry/style only because its rendered body includes account-

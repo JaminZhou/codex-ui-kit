@@ -222,10 +222,11 @@ pnpm scan:current-package-candidates -- --app /Applications/ChatGPT.app --expect
 
 It emits build identity, ASAR hash, and booleans only, never source excerpts.
 
-For immediate progress, use the installed `26.928.21956` package as the
-working audit candidate. Preserve the 26.924 structural replays under their
-original version labels. Do not relabel an unchanged anchor as a full current
-surface or infer a current route body from an older fixture.
+For immediate progress, use the exact installed package and build recorded in
+the dated `Current position` section below; do not hard-code a moving “latest”
+version here. Preserve every older structural replay under its original
+version label. Do not relabel an unchanged anchor as a full current surface or
+infer a current route body from an older fixture.
 
 The next gate is to audit all 100 inventory surfaces for presence, entry point, ownership, lifecycle,
 state variants, viewport, and theme. Preserve old implementations and captures
@@ -285,24 +286,33 @@ regional-pixel acceptance.
   [`current-app-server-runtime-26.930.61225.json`](current-app-server-runtime-26.930.61225.json).
   The read-only package-string scan is recorded in
   [`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json).
-  Package identity and string markers are candidate evidence only: no
-  26.930.61225 installed-product DOM, computed styles, screenshot, Browser/CDP,
-  Electron, or regional-pixel observation has been captured. The 26.930.31730
-  UI records below are historical regression evidence, not observations of
+  Package identity and string markers remain candidate evidence only. A
+  2026-10-06 isolated CDP capture is now recorded in
+  [`current-baseline-26.930.61225-candidate.json`](current-baseline-26.930.61225-candidate.json):
+  it selected the main `app://-/index.html` Renderer by viewport area and
+  structural landmarks, then sampled eight dark New chat/sidebar states at
+  1180×820, 820×680, 721×680, and 720×680. The sanitized record contains
+  measured DOM/computed-style geometry and the public navigation labels; it
+  contains no screenshot or task text. It is candidate-only Renderer-emulation
+  evidence—not Electron or regional-pixel evidence—and does not establish the
+  remaining route bodies or full surface lifecycles. The 26.930.31730 UI
+  records below remain historical regression evidence, not observations of
   26.930.61225; the promoted global baseline remains `26.903.71938`.
   A dedicated `pnpm capture:current-baseline-26-930-61225` entry now targets
   only `current-baseline-26.930.61225-candidate.json`; it still requires an
   isolated loopback-CDP process and explicit route-navigation authorization.
   Registering the capture path does not mean a capture has been taken.
-- `pnpm report:current-build-audit -- 26.930.61225` now registers the candidate
-  queue without promoting it: 0/100 surfaces have target-build observation
-  tags (P0 0/59, P1 0/28, P2 0/13), with Browser and Electron acceptance at
-  0/100. By area, app-shell is 0/24, composer 0/8, conversation 0/28,
-  cross-layer 0/5, integrations 0/6, scope-candidate 0/2, settings 0/12, and
-  workspace 0/15. This is the full capture queue, not a completeness claim.
+- `pnpm report:current-build-audit -- 26.930.61225` still reports 0/100
+  inventory surfaces with target-build evidence tags (P0 0/59, P1 0/28, P2
+  0/13), and Browser/Electron acceptance at 0/100. The new baseline capture
+  is a sanitized shell/navigation anchor only; it has not yet been mapped to
+  surface-level lifecycle evidence. By area, app-shell is 0/24, composer 0/8,
+  conversation 0/28, cross-layer 0/5, integrations 0/6, scope-candidate 0/2,
+  settings 0/12, and workspace 0/15. This is the full capture queue, not a
+  completeness claim.
 - The root `pnpm check` passed on 2026-10-06 with the exact desktop-binary
   override; its `check:protocol` smoke asserted runtime `0.160.1`. The overall
-  command passed 155 root files / 1,458 tests, 49 Codex-playground files / 474
+  command passed 155 root files / 1,459 tests, 49 Codex-playground files / 474
   tests, Electron playground 2 files / 7 tests, package consumers, demo,
   accessibility, and builds. Its Home/Composer contract is still keyed to the
   historical `26.930.31730` candidate; this is repository/local-playground

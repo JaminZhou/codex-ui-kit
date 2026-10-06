@@ -21,16 +21,16 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 
 - The current components are a partial coding-agent UI foundation, not a
   complete Codex Desktop reconstruction.
-- The promoted cross-surface inventory baseline is the installed
-  `26.903.71938` (`8576`) build. The latest installed candidate is
-  `26.915.31945` (`9922`), with scoped shell/sidebar, settings, integrations,
-  Composer, and resource refreshes recorded separately in
+- UI coverage is incremental and build-scoped. The promoted baseline, latest
+  installed candidate, per-surface evidence, and remaining gaps are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md) and the
-  [`delivery plan`](research/DELIVERY_PLAN.md). Current-build captures,
-  previous-build regression fixtures, and unsampled rows remain explicitly
-  separated; a passing replay is not silently promoted to installed-product
-  parity. This remains a partial UI foundation rather than a global
-  reconstruction claim.
+  [`delivery plan`](research/DELIVERY_PLAN.md); both are refreshed as the
+  installed app changes.
+- Package candidates, older-build regression fixtures, current-build runtime
+  captures, and unsampled surfaces remain explicitly distinct. A passing
+  component or replay suite is not silently promoted to installed-product
+  parity or a global reconstruction claim; see the
+  [coverage policy](research/PARITY.md).
 - [`codex-ui-kit`](https://www.npmjs.com/package/codex-ui-kit) is published
   on npm. The package was verified against fresh npm and pnpm consumers using
   React 18 and React 19.
@@ -52,10 +52,10 @@ review the [coverage policy](research/PARITY.md), or follow the
   current-build window navigation, route lifecycle feedback, portalled global
   notifications, responsive restoration rules, and pointer- and
   keyboard-resizable navigation and bottom-panel tracks.
-- Current `26.730.61639` Terminal evidence for project-labelled multi-session
+- Build-scoped `26.730.61639` Terminal evidence for project-labelled multi-session
   tabs, real running/completed close/reopen persistence, close-last/fresh
   creation, compact fit, and cross-worktree mismatch recovery.
-- Current `26.730.61639` subagent evidence for active/completed timeline,
+- Build-scoped `26.730.61639` subagent evidence for active/completed timeline,
   populated summary, wide list, nested transcript, and explicit 820px/720px
   responsive reopen, backed by CDP styles, Electron interaction, and regional
   pixels.
