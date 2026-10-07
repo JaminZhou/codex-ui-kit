@@ -50,6 +50,24 @@ nested Profile → Help path for 26.930.61225. It must not be read as evidence
 that Help was absent. The capture now includes this build in its nested Help
 probe, and the 2026-10-07 follow-up above records the observed path.
 
+## Main-surface paint observation
+
+A separate read-only inspection of the same fingerprinted dark main Renderer
+measured the primary rail at `x=0..52`, the content sidebar at
+`x=52..321.875`, and the main surface beginning at `x=321.875`. The main
+surface resolved to `rgb(24, 24, 24)`, `box-shadow: none`, and a 1px left
+border with `rgba(255, 255, 255, 0.082)`. The rail, sidebar, and aside had
+transparent backgrounds and no box shadow; the app root used a translucent
+dark surface over `rgb(20, 20, 20)`. The observation used only the selected
+main Renderer and retained no account or task content.
+
+The current playground's generic `.demo-root .codex-ui-app-shell__main` rule
+adds a half-pixel shadow edge plus two diffuse shadows. That is a concrete
+dark-shell mismatch candidate for a version-scoped replay correction; it does
+not establish how light theme or other routes paint the same element. The
+localized navigation-edge residual remains unexplained and is not evidence
+that this main-surface shadow caused it.
+
 ## Evidence boundary and inventory mapping
 
 This is current-build CDP structural/computed-style evidence only. Renderer
