@@ -18,7 +18,7 @@ function PendingIcon() {
   return <span aria-hidden="true" data-current-build-icon-status="pending-26.928-capture" />;
 }
 
-/** Historical structural replay; optional latest public glyph slice excludes account and route bodies. */
+/** Version-scoped structural replay; public glyph slices exclude account and route bodies. */
 export function CurrentPrimaryNavigation26928({ assets = false, assetBuild = "26.928.31416", theme = "dark" }: { assets?: boolean; assetBuild?: NavigationAssetBuild; theme?: "dark" | "light" | "system" }) {
   const [systemLight, setSystemLight] = useState(() => window.matchMedia("(prefers-color-scheme: light)").matches);
   useEffect(() => {
@@ -105,7 +105,7 @@ export function CurrentPrimaryNavigation26928({ assets = false, assetBuild = "26
       }
       navigationLabel="Primary navigation"
     >
-      {assets && assetBuild === "26.930.31730" ? <div aria-hidden="true" data-current-navigation-shared-card="true"
+      {assets && ["26.930.31730", "26.930.61225"].includes(assetBuild) ? <div aria-hidden="true" data-current-navigation-shared-card="true"
         style={currentNavigationSharedCard(assetTheme, assetBuild, sourceState, sourceWidth)} /> : null}
       {["Home", "Space", "Scheduled", "Plugins", "Explore", "Code Review"].map((label) => (
         <div className="demo-current-primary-navigation-26-928__entry" key={label}>

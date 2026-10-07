@@ -12,6 +12,7 @@ import { paintCalibrationHtml, paintCalibrationCrop, paintCalibrationPixels, ass
 import {
   assertNavigationAssets, navigationCrop, navigationHash,
   navigationLabels, navigationMaskDataUri, navigationWidths, navigationFingerprints,
+  standardizedSrgbNavigationBuilds,
 } from "./current-navigation-assets-contract.mjs";
 
 const port = Number(process.env.CODEX_NAVIGATION_CDP_PORT);
@@ -22,7 +23,7 @@ assert.equal(process.env.CODEX_NAVIGATION_ORIGINAL_THEME, "System", "Declare the
 const version = process.env.CODEX_NAVIGATION_VERSION ?? "26.928.31416";
 const fingerprint = navigationFingerprints[version];
 assert.ok(fingerprint, "Unknown navigation capture build");
-const standardizedSrgb = version === "26.930.31730";
+const standardizedSrgb = standardizedSrgbNavigationBuilds.includes(version);
 const baseline = JSON.parse(await readFile(new URL(`../research/current-baseline-${version}-candidate.json`, import.meta.url), "utf8"));
 assertCurrentBaselineObservationRecord(baseline, fingerprint);
 const owner = String(
@@ -60,13 +61,23 @@ const bundleIdentity = async () => {
   assert.equal(sha, fingerprint.appAsarSha256);
   return { bytes: info.size, sha256: sha, inode: info.ino, changedAtMs: info.ctimeMs };
 };
-const before = await bundleIdentity();
+const publicBundleIdentity = ({ bytes, sha256 }) => ({ bytes, sha256 });
+const withoutRuntimeIdentity = record => {
+  const { ownerPid: _ownerPid, processStartedAtMs: _processStartedAtMs, before: rawBefore, after: rawAfter, ...safeSource } = record.source;
+  return { ...record, source: { ...safeSource, before: publicBundleIdentity(rawBefore), after: publicBundleIdentity(rawAfter) } };
+};
+const beforeRuntimeIdentity = await bundleIdentity();
+assert.ok(ownerStart > beforeRuntimeIdentity.changedAtMs, "Probe must start after the installed bundle was written");
+const before = publicBundleIdentity(beforeRuntimeIdentity);
 const output = new URL(`../research/current-navigation-${version}/`, import.meta.url);
 if (process.env.CODEX_NAVIGATION_FINALIZE_EXISTING === "1") {
-  const recovered = JSON.parse(await readFile(`${profile}/navigation-unvalidated.json`, "utf8"));
+  const unvalidated = JSON.parse(await readFile(`${profile}/navigation-unvalidated.json`, "utf8"));
+  assert.equal(unvalidated.source.ownerPid, Number(owner));
+  assert.equal(unvalidated.source.processStartedAtMs, ownerStart);
+  assert.ok(unvalidated.source.processStartedAtMs > unvalidated.source.before.changedAtMs);
+  assert.deepEqual(publicBundleIdentity(unvalidated.source.before), before);
+  const recovered = withoutRuntimeIdentity(unvalidated);
   assertNavigationAssets(recovered);
-  assert.equal(recovered.source.ownerPid, Number(owner));
-  assert.deepEqual(recovered.source.after, before);
   for (const sample of recovered.samples) assert.equal(navigationHash(await readFile(new URL(sample.png, output))), sample.pngSha256);
   await writeFile(new URL("assets.json", output), `${JSON.stringify(recovered, null, 2)}\n`, { flag: "wx" });
   console.log("Finalized existing complete capture after validator repair; all 104 original PNG hashes verified, no capture restarted");
@@ -76,16 +87,36 @@ await mkdir(output); // create-only: never overwrite a reviewed reference set
 const record = {
   schemaVersion: 1, baseline: fingerprint, crop: navigationCrop,
   source: { ownership: "OpenAI; exploratory reference, not MIT relicensed", originalThemePreference: "System", restoredThemePreference: null,
-    capturedAt: new Date().toISOString(), ownerPid: Number(owner), processStartedAtMs: ownerStart, before },
+    capturedAt: new Date().toISOString(), before },
   styles: {}, samples: [],
 };
 const styleId = style => { const id = navigationHash(style); record.styles[id] = style; return id; };
 const compactPrimitive = node => ({ tag: node.tag, attributes: node.attributes, styleId: styleId(node.computedStyle), ...(node.children ? { children: node.children.map(compactPrimitive) } : {}) });
 const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`);
 assert.ok(browser.version().includes(fingerprint.chromiumVersion));
-const page = browser.contexts().flatMap(context => context.pages()).find(candidate => candidate.url() === "app://-/index.html");
-assert.ok(page);
-const originalViewport = page.viewportSize();
+const pages = browser.contexts().flatMap(context => context.pages()).filter(candidate => candidate.url() === "app://-/index.html");
+const rendererCandidates = [];
+for (const candidate of pages) {
+  const structure = await candidate.evaluate(() => {
+    const navs = [...document.querySelectorAll("nav")];
+    const appNavigation = navs.filter(node => node.getAttribute("aria-label") === "App navigation");
+    const labels = appNavigation.length === 1
+      ? [...appNavigation[0].querySelectorAll("button")].map(node => node.getAttribute("aria-label") || node.innerText.trim()).filter(Boolean)
+      : [];
+    return { width: innerWidth, height: innerHeight, mainCount: document.querySelectorAll("main").length,
+      appNavigationCount: appNavigation.length, labels };
+  });
+  if (structure.width <= 0 || structure.height <= 0) continue;
+  if (structure.mainCount !== 1 || structure.appNavigationCount !== 1) continue;
+  if (!navigationLabels.every((label, index) => structure.labels[index] === label)) continue;
+  rendererCandidates.push({ page: candidate, area: structure.width * structure.height,
+    originalViewport: { width: structure.width, height: structure.height } });
+}
+assert.ok(rendererCandidates.length > 0, "No structurally valid main app Renderer target");
+const largestArea = Math.max(...rendererCandidates.map(candidate => candidate.area));
+const largestCandidates = rendererCandidates.filter(candidate => candidate.area === largestArea);
+assert.equal(largestCandidates.length, 1, "Main app Renderer target is structurally ambiguous at the largest viewport");
+const { page, originalViewport } = largestCandidates[0];
 const openAppearance = async () => {
   if (await page.getByRole("radiogroup", { name: "Theme", exact: true }).count()) return;
   await page.getByRole("button", { name: "Open profile menu", exact: true }).click();
@@ -258,8 +289,9 @@ try {
     if (originalViewport) await page.setViewportSize(originalViewport);
   } finally { await browser.close(); }
 }
-record.source.after = await bundleIdentity();
-assert.deepEqual(record.source.before, record.source.after);
+const afterRuntimeIdentity = await bundleIdentity();
+record.source.after = publicBundleIdentity(afterRuntimeIdentity);
+assert.deepEqual(beforeRuntimeIdentity, afterRuntimeIdentity);
 // Preserve de-identified intermediate evidence if a protocol validator rejects
 // a newly observed field. It is not a reviewed repository reference.
 await writeFile(`${profile}/navigation-unvalidated.json`, `${JSON.stringify(record, null, 2)}\n`);

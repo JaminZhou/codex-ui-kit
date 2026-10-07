@@ -67,8 +67,13 @@ capture. Its observed fragments are now mapped to nine inventory surfaces:
 New chat destination, empty Composer, shell, primary rail, project groups and
 their keyboard lifecycle, native project-menu trigger boundary, Profile → Help,
 and titlebar/sidebar controls. These are candidate observations only; no
-current-build Browser, Electron, or product regional-pixel gate is promoted,
-and the global baseline remains `26.903.71938`.
+full surface is promoted to current-build Browser/Electron-complete status, and
+the global baseline remains `26.903.71938`. A separate narrow rail slice now
+has a 104-crop `.61225` sRGB product reference and an Electron comparison:
+rest/hover/keyboard-focus × dark/light × four widths. All 104 comparisons are
+0.0000% perceptual difference, but strict RGBA still differs on 15.6181% of
+pixels (maximum channel delta 51). This is useful regional evidence, not
+byte-identical parity or completion of the broader sidebar surface.
 
 The prior 2026-10-05 candidate is `26.930.31730` / build `12947`;
 [`26.930.31730.md`](26.930.31730.md) records shell/sidebar, Profile → Help,

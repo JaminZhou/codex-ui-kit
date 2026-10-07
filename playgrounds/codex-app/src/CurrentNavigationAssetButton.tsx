@@ -1,7 +1,8 @@
 import { IconButton } from "codex-ui-kit";
 import { useEffect, useId, useState, type CSSProperties } from "react";
 import manifest from "./currentNavigationAssets2692831416.json";
-import latestManifest from "./currentNavigationAssets2693031730.json";
+import historicalManifest from "./currentNavigationAssets2693031730.json";
+import latestManifest from "./currentNavigationAssets2693061225.json";
 import { VisualAssetIcon, type VisualPrimitive } from "./VisualAssetIcon";
 
 type CompactPrimitive = {
@@ -27,10 +28,12 @@ type Sample = { theme: string; width: number; state: string; backdropColors: str
   tooltip: null | { label: string; styleId: string; rect: { left: number; top: number; width: number; height: number } } };
 const samples = manifest.samples as unknown as Sample[];
 const styles = manifest.styles as Record<string, Record<string, string>>;
-export type NavigationAssetBuild = "26.928.31416" | "26.930.31730";
-const dataFor = (build: NavigationAssetBuild) => build === "26.930.31730"
+export type NavigationAssetBuild = "26.928.31416" | "26.930.31730" | "26.930.61225";
+const dataFor = (build: NavigationAssetBuild) => build === "26.930.61225"
   ? { samples: latestManifest.samples as unknown as Sample[], styles: latestManifest.styles as Record<string, Record<string, string>> }
-  : { samples, styles };
+  : build === "26.930.31730"
+    ? { samples: historicalManifest.samples as unknown as Sample[], styles: historicalManifest.styles as Record<string, Record<string, string>> }
+    : { samples, styles };
 const paintProperties = [
   "background-color", "border-color", "border-style", "border-width", "border-radius",
   "box-shadow", "color", "opacity", "outline-color", "outline-style", "outline-width", "outline-offset", "corner-shape",

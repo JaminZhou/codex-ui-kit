@@ -4,24 +4,27 @@ Pixel comparison is useful only after every visible element in the compared
 surface has a known source. Approximate icons, fallback fonts, and inferred
 geometry otherwise create permanent noise that can hide regressions.
 
-The version-scoped rail assets below are historical evidence for Codex Desktop
-`26.930.31730` / build `12947`; see [`26.930.31730.md`](26.930.31730.md) and
-[`current-navigation-26.930.31730/assets.json`](current-navigation-26.930.31730/assets.json).
-They are not verified assets for the active installed candidate. On
-2026-10-07, the production updater still reported `26.930.61225` / build
-`13232` as installed and up to date. Its package and structural candidate
-records are [`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json)
+The active installed candidate remains Codex Desktop `26.930.61225` / build
+`13232`; the production updater reported it up to date on 2026-10-07. Its
+package and structural records are
+[`current-baseline-26.930.61225-package-candidate.json`](current-baseline-26.930.61225-package-candidate.json)
 and [`current-baseline-26.930.61225-candidate.json`](current-baseline-26.930.61225-candidate.json).
-Those records do not include a version-scoped visual asset manifest or
-installed-product regional-pixel comparison. Keep the `26.930.31730` assets
-as historical regression evidence; re-fingerprint and match each source on
-`26.930.61225` before treating it as current-build evidence.
+The version-scoped rail manifest
+[`current-navigation-26.930.61225/assets.json`](current-navigation-26.930.61225/assets.json)
+now contains 104 stable sRGB product crops across dark/light, four Renderer
+widths, rest, hover, and keyboard focus. Its exact product-region comparison
+passes the perceptual threshold at 0.0000%, while strict RGBA still reports
+15.6181% changed pixels (maximum channel delta 51); do not describe it as
+byte-identical. This is only the public 52×280px rail, not a full-window or
+route-body baseline. The prior `26.930.31730` assets remain historical
+regression evidence at
+[`current-navigation-26.930.31730/assets.json`](current-navigation-26.930.31730/assets.json).
 
-The historical candidate's rail capture retains
-the full ancestor paint stack and explicitly standardizes output to sRGB,
-calibrated using project-authored CSS in a separate temporary target. The
-historical default-display ICC comparison remains intact: converting its PNG
-after capture cannot undo alpha composition in that display profile. New
+Both sRGB candidate rail captures retain the full ancestor paint stack and
+explicitly standardize their output to sRGB, calibrated with project-authored
+CSS in a separate temporary target. The older `26.928.31416` default-display
+ICC comparison remains intact: converting its PNG after capture cannot undo
+alpha composition in that display profile. New
 references and local Electron replay must both pass the independent calibration;
 do not change UI colors/opacity to compensate. These observations do not promote
 the global baseline or establish whole-window parity. Calibration PNGs contain
@@ -41,8 +44,14 @@ styles (including button pseudo-layers, superellipse corners, and public
 tooltips) and 104 stable product crops cover resting, each hover, and keyboard
 focus at four widths in both themes. References are restricted to the public
 52×280px navigation region, excluding the profile/footer and private sidebar.
-Use `pnpm --filter @codex-ui-kit/codex-app-playground check:current-navigation-assets`
-for actual-product regional comparison, not own-fixture repeatability. This
+Use the following command from the repository root for the current
+actual-product regional comparison, not own-fixture repeatability:
+
+```sh
+pnpm --filter @codex-ui-kit/codex-app-playground check:current-navigation-assets -- --version=26.930.61225
+```
+
+This
 comparison first normalizes embedded ICC profiles to sRGB with ColorSync; its
 0.8% perceptual gate is separate from the diagnostic strict-RGBA result. A 0%
 perceptual result does not mean byte-identical equality. This

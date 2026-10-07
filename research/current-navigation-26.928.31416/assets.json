@@ -23,19 +23,13 @@
     "originalThemePreference": "System",
     "restoredThemePreference": "System",
     "capturedAt": "2026-10-02T03:11:20.772Z",
-    "ownerPid": 91928,
-    "processStartedAtMs": 1790907988000,
     "before": {
       "bytes": 538323704,
-      "sha256": "9d4dda5c04d42e32cbd378557359c8c06fa798805a3c991f8a7b4b2295a8b732",
-      "inode": 395711743,
-      "changedAtMs": 1790857617443.6707
+      "sha256": "9d4dda5c04d42e32cbd378557359c8c06fa798805a3c991f8a7b4b2295a8b732"
     },
     "after": {
       "bytes": 538323704,
-      "sha256": "9d4dda5c04d42e32cbd378557359c8c06fa798805a3c991f8a7b4b2295a8b732",
-      "inode": 395711743,
-      "changedAtMs": 1790857617443.6707
+      "sha256": "9d4dda5c04d42e32cbd378557359c8c06fa798805a3c991f8a7b4b2295a8b732"
     }
   },
   "styles": {
