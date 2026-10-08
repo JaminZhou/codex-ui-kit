@@ -1276,7 +1276,10 @@
         "playground:current-sidebar-shell-26-917",
         "browser-cdp:current-sidebar-shell-26-917",
         "electron:current-sidebar-shell-26-917",
-        "pixel:current-sidebar-shell-26-917-own-fixture-zero-drift"
+        "pixel:current-sidebar-shell-26-917-own-fixture-zero-drift",
+        "playground:current-26.930.61225-dark-main-edge-replay",
+        "electron:current-26.930.61225-dark-main-edge-1180x820-dpr1",
+        "pixel:current-26.930.61225-dark-main-edge-16x640-composited-with-raw-rgba-diagnostic"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1306,7 +1309,8 @@
         "cdp-26.924.22138:route-dependent-secondary-sidebar-width",
         "cdp-26.928.21956:52px-rail-269.88px-sidebar-four-widths-hide-show-zero-overflow",
         "cdp-26.930.31730:52px-rail-269.88px-sidebar-four-renderer-widths-hide-show-and-project-keyboard-lifecycle",
-        "cdp-26.930.61225:52px-rail-269.88px-sidebar-wide-medium-threshold-compact-collapse-restore"
+        "cdp-26.930.61225:52px-rail-269.88px-sidebar-wide-medium-threshold-compact-collapse-restore",
+        "cdp-26.930.61225:dark-main-edge-1180x820-background-border-shadow-and-rail-sidebar-bounds"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

@@ -314,6 +314,14 @@ regional-pixel acceptance.
   The matching Electron comparison passes all 104 regional crops at 0.0000%
   perceptual difference; strict RGBA still differs on 15.6181% of pixels
   (maximum channel delta 51), so this is not byte-identical parity.
+  A separate 16×640px dark main-edge reference is now recorded under
+  [`current-shell-26.930.61225/assets.json`](current-shell-26.930.61225/assets.json).
+  Its scoped Electron gate pins DPR 1 to the CDP viewport and checks bounds,
+  computed paint, independent sRGB calibration, and the visible seam. Composite
+  perceptual difference is 0.0000% (maximum RGB delta 11); strict RGBA differs
+  on 12.5000% of pixels (maximum channel delta 59), confined to the two
+  fractional seam columns. The shell-edge slice is not byte-identical or
+  whole-shell parity; other themes, routes, and shell regions remain unverified.
 - The 2026-10-07 inventory mapping now reports candidate runtime fragments on
   9/100 surfaces (P0 9/59, P1 0/28, P2 0/13): app-shell 7/24, Composer 1/8,
   conversation 1/28, and 0 in cross-layer, integrations, scope-candidate,
@@ -554,6 +562,20 @@ regional-pixel acceptance.
   Revisit the rail edge only if new compositor evidence gives a testable
   hypothesis. All stages 0–7
   remain open; the promoted global baseline stays `26.903.71938`.
+- On 2026-10-07, the unchanged installed fingerprint `26.930.61225` received a
+  second, sanitized shell capture and a nested Profile → Help observation; see
+  [`current-baseline-26.930.61225-shell-follow-up-2026-10-07.md`](current-baseline-26.930.61225-shell-follow-up-2026-10-07.md).
+  The current-navigation slice now has 104 version-scoped product crops across
+  four Renderer widths, two themes, and rest/hover/focus. Its sRGB perceptual
+  comparison is 0.0000%; strict RGBA still reports 15.6181% changed pixels and
+  maximum channel delta 51. This is only the 52×280px public rail; it is not
+  byte-identical, whole-window, or route-body parity. A second, separate
+  16×640px main-left-edge crop now passes its dark 1180×820 composited Electron
+  gate at 0.0000% perceptual difference (maximum RGB delta 11); strict RGBA
+  differs on 12.5000% of pixels only at the two fractional edge columns. This
+  is not full-shell parity. Current-build whole-shell and populated-conversation
+  Browser/CDP, Electron, and regional-pixel gates remain open, as do the other
+  P0 families. The promoted global baseline stays `26.903.71938`.
 - The prior installed app reported `26.928.21956` (`12404`), Chromium
   `154.0.8037.57`, with a 538,323,145-byte `app.asar` whose SHA-256 is
   `3bda98f2265ad23677dfe0163d1cc7855beade6bef11d27f830f6663d7658406`.
@@ -1903,10 +1925,12 @@ structures. Those results remain regression evidence, not current-build proof.
 Stage 0 remains open: populated conversation/thread states, new Composer
 context/actions, resource selection/execution, connection mutation/pairing/SSH,
 Review, Terminal, Markdown failure states, other P0 route families, and
-installed-product pixel regions still need their own `26.924.22138` evidence.
-The MCP success and multi-call activity anchor recorded on 26.917 remains
-historical; 26.924 MCP reachability, failure semantics, and pixel evidence are
-open.
+installed-product pixel regions still need their own `26.930.61225` evidence;
+the `26.924.22138` captures are historical regression evidence only. The MCP
+success and multi-call activity anchor recorded on 26.917 remains historical;
+current-build UI reachability, failure semantics, and product-pixel evidence
+are open. The separate `0.160.1` App Server compatibility smoke does not close
+those UI evidence gaps.
 
 A disposable 2026-09-25 probe on this build reached a populated assistant turn,
 but only observed an assistant-text claim of documentation search: the product
@@ -4100,11 +4124,16 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the fast local merge gate: latest-head `pnpm check` plus complete
-`pnpm check:codex-app:acceptance`. Once those pass, squash merge and clean the
-exact branch immediately. GitHub CI and bot review are not queried or awaited
-for this exploration workflow; failures discovered by the required local gates
-still block the merge.
+Each PR uses the fast local merge gate: full `pnpm check` plus complete
+`pnpm check:codex-app:acceptance` for the candidate tree. Once those pass, use
+`gh` to verify the live PR head and required status checks, then attempt the
+authorized administrator squash merge against that exact SHA. Do not trigger
+or wait for bot review, optional remote CI, or post-merge CI. A queued, pending,
+or `Expected` check is not a test failure and does not delay the first merge
+attempt; a completed failure on the current head blocks it. If GitHub rejects
+the attempt for a required status, report that gate and continue after a
+meaningful state change without changing protection or fabricating a status.
+After a confirmed merge, synchronize `main` and clean only the exact PR branch.
 
 ## Local staged commit follow-up
 

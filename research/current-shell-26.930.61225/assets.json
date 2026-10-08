@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "baseline": {
+    "appAsarBytes": 546868805,
+    "appAsarSha256": "88b8cce6f627771bf341f5a6bb464ad220749b0d442d44f618d7741c2de7318b",
+    "appVersion": "26.930.61225",
+    "buildNumber": "13232",
+    "chromiumVersion": "154.0.8037.98"
+  },
+  "source": {
+    "ownership": "OpenAI; exploratory reference, not MIT relicensed",
+    "capturedAt": "2026-10-07",
+    "captureKind": "isolated-read-only-renderer-cdp",
+    "colorProfileMode": "forced-srgb-with-independent-calibration",
+    "pngColorProfile": null,
+    "viewportMode": "renderer-emulation-not-native-product-resize",
+    "rasterMode": "unflattened-renderer-rgba",
+    "calibration": {
+      "kind": "independent-css-alpha-composition",
+      "pixels": [
+        { "name": "alpha-white-over-dark", "rgba": [145, 145, 145, 255] },
+        { "name": "opaque-mid-gray", "rgba": [145, 145, 145, 255] },
+        { "name": "opaque-background", "rgba": [36, 36, 36, 255] }
+      ]
+    },
+    "readOnlyBoundary": "No prompt, task text, account identity, or route content was recorded."
+  },
+  "comparisonMode": "composite-both-srgb-rasters-over-observed-main-background",
+  "scope": "Dark main-surface left-edge fragment only at 1180x820; not a Home-body, whole-window, light-theme, or global-baseline claim.",
+  "crop": { "x": 321, "y": 120, "width": 16, "height": 640 },
+  "observations": {
+    "theme": "dark",
+    "main": {
+      "rect": { "x": 321.875, "y": 44, "width": 854.125, "height": 772 },
+      "background": "rgb(24, 24, 24)",
+      "boxShadow": "none",
+      "borderLeft": "1px solid rgba(255, 255, 255, 0.082)"
+    },
+    "navigationRail": { "rect": { "x": 0, "y": 44, "width": 52, "height": 772 } },
+    "contentSidebar": { "rect": { "x": 52, "y": 44, "width": 269.875, "height": 772 } }
+  },
+  "reference": {
+    "file": "main-edge-dark-1180x820.png",
+    "sha256": "a5218c4102499520716a17237d0dbd2d8e03898b034309be30eec0eb8ab90d0f",
+    "width": 16,
+    "height": 640
+  }
+}
