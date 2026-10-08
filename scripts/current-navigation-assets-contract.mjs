@@ -16,7 +16,9 @@ export const navigationFingerprint = currentObservationCandidateFingerprints["26
 export const navigationFingerprints = Object.freeze({
   "26.928.31416": navigationFingerprint,
   "26.930.31730": currentObservationCandidateFingerprints["26.930.31730"],
+  "26.930.61225": currentObservationCandidateFingerprints["26.930.61225"],
 });
+export const standardizedSrgbNavigationBuilds = Object.freeze(["26.930.31730", "26.930.61225"]);
 export const navigationCrop = Object.freeze({ x: 0, y: 44, width: 52, height: 280 });
 const canonical = (value) => Array.isArray(value) ? value.map(canonical)
   : value && typeof value === "object"
@@ -92,7 +94,9 @@ export function assertNavigationAssets(record) {
   assert.equal(record.source.ownership, "OpenAI; exploratory reference, not MIT relicensed");
   assert.equal(record.source.originalThemePreference, "System");
   assert.equal(record.source.restoredThemePreference, "System");
-  if (fingerprint.appVersion === "26.930.31730") {
+  for (const key of ["ownerPid", "processStartedAtMs", "profile", "port"]) assert.equal(Object.hasOwn(record.source, key), false, `Do not persist runtime identity: ${key}`);
+  for (const side of ["before", "after"]) assert.deepEqual(Object.keys(record.source[side]).sort(), ["bytes", "sha256"]);
+  if (standardizedSrgbNavigationBuilds.includes(fingerprint.appVersion)) {
     assert.equal(record.source.colorProfileMode, "srgb");
     assert.equal(record.source.pngColorProfile, null);
     assert.deepEqual(record.source.calibration, {
@@ -112,7 +116,6 @@ export function assertNavigationAssets(record) {
   assert.equal(record.source.before.sha256, fingerprint.appAsarSha256);
   assert.equal(record.source.before.bytes, fingerprint.appAsarBytes);
   assert.deepEqual(record.source.before, record.source.after);
-  assert.ok(record.source.processStartedAtMs > record.source.before.changedAtMs);
   for (const [id, style] of Object.entries(record.styles)) {
     assertCurrentStyle(style);
     assert.equal(id, navigationHash(style));
@@ -132,7 +135,7 @@ export function assertNavigationAssets(record) {
     assert.match(sample.pngSha256, /^[0-9a-f]{64}$/);
     assert.ok(record.styles[sample.railStyleId]);
     assert.ok(record.styles[sample.separatorStyleId]);
-    if (fingerprint.appVersion === "26.930.31730") {
+    if (standardizedSrgbNavigationBuilds.includes(fingerprint.appVersion)) {
       assert.ok(Array.isArray(sample.paintStack) && sample.paintStack.length >= 3 && sample.paintStack.length <= 24);
       for (const layer of sample.paintStack) {
         assert.ok(["nav", "div", "aside", "body", "html"].includes(layer.tag));
@@ -140,15 +143,18 @@ export function assertNavigationAssets(record) {
         assert.deepEqual(Object.keys(layer.rect).sort(), ["height", "left", "top", "width"]);
         assert.ok(Object.values(layer.rect).every(Number.isFinite));
       }
-      for (const tag of ["body", "html"]) {
-        const layer = sample.paintStack.find(layer => layer.tag === tag);
-        assert.ok(layer);
-        assert.ok(["rgba(0, 0, 0, 0)", sample.theme === "dark" ? "rgb(20, 20, 20)" : "rgb(246, 246, 246)"].includes(record.styles[layer.styleId]["background-color"]));
-      }
+      for (const tag of ["body", "html"]) assert.ok(sample.paintStack.some(layer => layer.tag === tag));
       assert.equal(typeof sample.rendererFocused, "boolean");
-      assert.deepEqual(sample.sharedCard.rect, { left: 52, top: 44, width: sample.width - 56, height: sample.height - 48 });
+      assert.ok(sample.sharedCard && Object.values(sample.sharedCard.rect).every(Number.isFinite));
       assert.ok(record.styles[sample.sharedCard.styleId]);
-      assert.equal(record.styles[sample.sharedCard.styleId]["background-color"], "rgba(0, 0, 0, 0)");
+      if (fingerprint.appVersion === "26.930.31730") {
+        for (const tag of ["body", "html"]) {
+          const layer = sample.paintStack.find(layer => layer.tag === tag);
+          assert.ok(["rgba(0, 0, 0, 0)", sample.theme === "dark" ? "rgb(20, 20, 20)" : "rgb(246, 246, 246)"].includes(record.styles[layer.styleId]["background-color"]));
+        }
+        assert.deepEqual(sample.sharedCard.rect, { left: 52, top: 44, width: sample.width - 56, height: sample.height - 48 });
+        assert.equal(record.styles[sample.sharedCard.styleId]["background-color"], "rgba(0, 0, 0, 0)");
+      }
     }
     assert.ok(Array.isArray(sample.backdropColors) && sample.backdropColors.length >= 1 && sample.backdropColors.length <= 6);
     for (const color of sample.backdropColors) {
@@ -164,14 +170,17 @@ export function assertNavigationAssets(record) {
     sample.items.forEach((item, index) => {
       assert.deepEqual(item.rect, { left: 8, top: [52, 96, 140, 184, 228, 281][index], width: 36, height: 36 });
       assert.ok(record.styles[item.styleId]);
-      if (fingerprint.appVersion === "26.930.31730") {
+      if (standardizedSrgbNavigationBuilds.includes(fingerprint.appVersion)) {
         assert.ok(Array.isArray(item.decorations));
-        assert.ok(item.decorations.length <= (index === 0 ? 1 : 0), "Only a sampled contextual Home status dot is supported");
+        if (fingerprint.appVersion === "26.930.31730") assert.ok(item.decorations.length <= (index === 0 ? 1 : 0), "Only a sampled contextual Home status dot is supported");
         for (const node of item.decorations) {
-          assert.equal(node.tag, "span");
-          assert.deepEqual(node.rect, { left: 30, top: 58, width: 8, height: 8 });
+          assert.ok(["span", "div"].includes(node.tag));
+          assert.ok(Object.values(node.rect).every(Number.isFinite));
           assert.ok(record.styles[node.styleId]);
-          assert.equal(record.styles[node.styleId]["background-color"], "rgb(58, 131, 247)");
+          if (fingerprint.appVersion === "26.930.31730") {
+            assert.deepEqual(node.rect, { left: 30, top: 58, width: 8, height: 8 });
+            assert.equal(record.styles[node.styleId]["background-color"], "rgb(58, 131, 247)");
+          }
         }
       }
       for (const id of [item.beforeStyleId, item.afterStyleId]) {

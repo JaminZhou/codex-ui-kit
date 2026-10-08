@@ -5,7 +5,9 @@ import { PNG } from "../playgrounds/codex-app/node_modules/pngjs/lib/png.js";
 import { assertCurrentBaselineObservationRecord } from "./current-baseline-contract.mjs";
 import { navigationReplayData } from "./current-navigation-replay.mjs";
 import { navigationPngColorProfile } from "./navigation-png-color.mjs";
-for (const version of Object.keys(navigationFingerprints)) {
+const requestedVersion = process.argv.find(value => value.startsWith("--version="))?.slice("--version=".length);
+if (requestedVersion) assert.ok(navigationFingerprints[requestedVersion], `Unknown current navigation source build: ${requestedVersion}`);
+for (const version of requestedVersion ? [requestedVersion] : Object.keys(navigationFingerprints)) {
 const root = new URL(`../research/current-navigation-${version}/`, import.meta.url);
 const manifest = assertNavigationAssets(JSON.parse(await readFile(new URL("assets.json", root), "utf8")));
 assertCurrentBaselineObservationRecord(JSON.parse(await readFile(new URL(`../research/current-baseline-${version}-candidate.json`, import.meta.url), "utf8")), navigationFingerprints[version]);

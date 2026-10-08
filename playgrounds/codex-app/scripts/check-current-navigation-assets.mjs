@@ -3,7 +3,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { launchScene } from "./electron-harness.mjs";
-import { assertNavigationAssets, navigationCrop, navigationLabels, navigationHash, navigationFingerprints } from "../../../scripts/current-navigation-assets-contract.mjs";
+import { assertNavigationAssets, navigationCrop, navigationLabels, navigationHash, navigationFingerprints, standardizedSrgbNavigationBuilds } from "../../../scripts/current-navigation-assets-contract.mjs";
 import { navigationPngColorProfile, normalizeNavigationPng } from "../../../scripts/navigation-png-color.mjs";
 import { paintCalibrationHtml, paintCalibrationCrop, assertSrgbPaintCalibration } from "../../../scripts/paint-calibration-contract.mjs";
 
@@ -94,7 +94,7 @@ for (const theme of ["dark", "light"]) for (const width of [1180, 820, 721, 720]
       console.log(`${sample.png}: ${(ratio * 100).toFixed(4)}% sRGB perceptual actual-product difference`);
     }
     assert.deepEqual(errors, [], "Current navigation must not produce runtime or React attribute errors");
-    if (version === "26.930.31730") {
+    if (standardizedSrgbNavigationBuilds.includes(version)) {
       await page.setContent(paintCalibrationHtml);
       const calibrationBytes = await page.screenshot({ clip: paintCalibrationCrop });
       assert.equal(navigationPngColorProfile(calibrationBytes), null);

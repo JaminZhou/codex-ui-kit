@@ -18,13 +18,9 @@
     "originalThemePreference": "System",
     "restoredThemePreference": "System",
     "capturedAt": "2026-10-05T04:50:46.978Z",
-    "ownerPid": 38630,
-    "processStartedAtMs": 1791173506000,
     "before": {
       "bytes": 546863116,
-      "sha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
-      "inode": 396935123,
-      "changedAtMs": 1791040982465.8577
+      "sha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836"
     },
     "colorProfileMode": "srgb",
     "pngColorProfile": null,
@@ -64,9 +60,7 @@
     },
     "after": {
       "bytes": 546863116,
-      "sha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836",
-      "inode": 396935123,
-      "changedAtMs": 1791040982465.8577
+      "sha256": "87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836"
     }
   },
   "styles": {

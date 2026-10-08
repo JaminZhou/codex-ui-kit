@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import assert from "node:assert/strict";
-import { assertNavigationAssets } from "./current-navigation-assets-contract.mjs";
+import { assertNavigationAssets, navigationFingerprints } from "./current-navigation-assets-contract.mjs";
 
 // Full source styles stay in research. Only SVG paint and the observed control
 // layers reach the private renderer; no paths or interaction states are inferred.
@@ -40,7 +40,9 @@ export function navigationReplayData(record) {
 }
 
 if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) {
-  const version = process.argv.includes("--latest") ? "26.930.31730" : "26.928.31416";
+  const requestedVersion = process.argv.find(value => value.startsWith("--version="))?.slice("--version=".length);
+  const version = requestedVersion ?? (process.argv.includes("--latest") ? "26.930.61225" : "26.928.31416");
+  assert.ok(navigationFingerprints[version], `Unknown current navigation source build: ${version}`);
   const source = JSON.parse(await readFile(new URL(`../research/current-navigation-${version}/assets.json`, import.meta.url), "utf8"));
   const output = new URL(`../playgrounds/codex-app/src/currentNavigationAssets${version.replaceAll(".", "")}.json`, import.meta.url);
   const text = `${JSON.stringify(navigationReplayData(source), null, 2)}\n`;

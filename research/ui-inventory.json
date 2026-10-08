@@ -1330,7 +1330,11 @@
         "playground:current-sidebar-project-navigation-26-915",
         "browser-cdp:current-sidebar-project-navigation-26-915",
         "electron:current-sidebar-project-navigation-26-915",
-        "pixel:current-sidebar-project-navigation-26-915"
+        "pixel:current-sidebar-project-navigation-26-915",
+        "playground:current-navigation-26-930-61225",
+        "browser-cdp:current-navigation-26-930-61225-104-product-crops",
+        "electron:current-navigation-26-930-61225-104-geometry-and-pixel-comparison",
+        "pixel:current-navigation-26-930-61225-perceptual-0-strict-rgba-15.6181pct"
       ],
       "runtimeStatus": "runtime_observed",
       "runtimeEvidence": [
@@ -1364,7 +1368,8 @@
         "cdp-26.928.31416:six-original-public-svg-glyphs-alpha-mask-478-computed-properties-rest-hover-keyboard-focus-dark-light-four-widths",
         "cdp-26.930.31730:six-entry-public-rail-shell-landmarks-and-profile-help-lifecycle",
         "cdp-26.930.31730:six-original-glyphs-104-stable-srgb-public-crops-full-ancestor-paint-stack-dark-light-four-renderer-widths",
-        "cdp-26.930.61225:six-entry-rail-labels-and-control-bounds-dark-four-widths"
+        "cdp-26.930.61225:six-entry-rail-labels-and-control-bounds-dark-four-widths",
+        "cdp-26.930.61225:public-rail-six-glyphs-104-srgb-crops-rest-hover-focus-dark-light-four-widths"
       ],
       "implementationStatus": "partial",
       "browserStatus": "partial_legacy",

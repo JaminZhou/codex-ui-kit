@@ -770,6 +770,7 @@ function querySelection() {
     "primary-navigation-current-26-928",
     "primary-navigation-current-26-928-31416",
     "primary-navigation-current-26-930-31730",
+    "primary-navigation-current-26-930-61225",
     "composer-current-26-924",
     "project-navigation-current-26-915",
     "project-group-lifecycle-current-26-915",
@@ -5386,6 +5387,7 @@ export function App() {
         initialSelection.sidebarState === "primary-navigation-current-26-928" ||
         initialSelection.sidebarState === "primary-navigation-current-26-928-31416" ||
         initialSelection.sidebarState === "primary-navigation-current-26-930-31730" ||
+        initialSelection.sidebarState === "primary-navigation-current-26-930-61225" ||
         initialSelection.sidebarState === "composer-current-26-924" ||
         (initialSelection.capture &&
         initialSelection.frame !== "pr-compact-detail" &&
@@ -7473,12 +7475,15 @@ export function App() {
   const currentSidebarPrimaryNavigation26928Replay =
     initialSelection.sidebarState === "primary-navigation-current-26-928" ||
     initialSelection.sidebarState === "primary-navigation-current-26-928-31416" ||
-    initialSelection.sidebarState === "primary-navigation-current-26-930-31730";
+    initialSelection.sidebarState === "primary-navigation-current-26-930-31730" ||
+    initialSelection.sidebarState === "primary-navigation-current-26-930-61225";
   const currentHomeComposer26930Replay =
     initialSelection.sidebarState === "primary-navigation-current-26-930-31730" &&
     view === "shell";
-  const currentNavigationAssetBuild = initialSelection.sidebarState === "primary-navigation-current-26-930-31730"
-    ? "26.930.31730" : "26.928.31416";
+  const currentNavigationAssetBuild = initialSelection.sidebarState === "primary-navigation-current-26-930-61225"
+    ? "26.930.61225"
+    : initialSelection.sidebarState === "primary-navigation-current-26-930-31730"
+      ? "26.930.31730" : "26.928.31416";
   const currentPrimaryRailOnlyRoute26924Replay =
     currentSidebarPrimaryNavigation26924Replay && view === "projects"
       ? (initialSelection.primaryRoute ?? "projects")

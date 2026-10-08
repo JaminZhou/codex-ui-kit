@@ -308,23 +308,35 @@ regional-pixel acceptance.
   It confirms Profile → Help, corrects the prior not-sampled interpretation,
   and records the current shell fragment without retaining product text or
   screenshots.
+  A separate 2026-10-07 isolated sRGB CDP capture now records the public rail
+  at rest, hover, and keyboard focus in dark/light across 1180/820/721/720px
+  in [`current-navigation-26.930.61225/assets.json`](current-navigation-26.930.61225/assets.json).
+  The matching Electron comparison passes all 104 regional crops at 0.0000%
+  perceptual difference; strict RGBA still differs on 15.6181% of pixels
+  (maximum channel delta 51), so this is not byte-identical parity.
 - The 2026-10-07 inventory mapping now reports candidate runtime fragments on
   9/100 surfaces (P0 9/59, P1 0/28, P2 0/13): app-shell 7/24, Composer 1/8,
   conversation 1/28, and 0 in cross-layer, integrations, scope-candidate,
   Settings, and workspace. The mapped capture covers only the sampled dark
   New chat/sidebar shell, empty Composer, project-group interactions, one
-  native-menu trigger boundary, and Profile → Help. Browser and Electron
-  acceptance remain 0/100 for this candidate; no regional product-pixel gate
-  was captured. The remaining 91 surfaces and all unobserved states stay in
-  the audit queue; this mapping is not a completeness or baseline-promotion
-  claim.
-- The root `pnpm check` passed on 2026-10-06 with the exact desktop-binary
-  override; its `check:protocol` smoke asserted runtime `0.160.1`. The overall
-  command passed 155 root files / 1,459 tests, 49 Codex-playground files / 474
-  tests, Electron playground 2 files / 7 tests, package consumers, demo,
-  accessibility, and builds. Its Home/Composer contract is still keyed to the
-  historical `26.930.31730` candidate; this is repository/local-playground
-  validation, not installed-product UI or pixel evidence for `26.930.61225`.
+  native-menu trigger boundary, and Profile → Help. The rail now has one narrow
+  current-build CDP reference and Electron product-region comparison, but no
+  full surface is promoted to current-build Browser/Electron-complete status;
+  strict RGBA residuals also remain. The remaining 91 surfaces and all
+  unobserved states stay in the audit queue; this is not a completeness or
+  baseline-promotion claim.
+- On 2026-10-07, the full root `pnpm check` passed against the current working
+  candidate with the exact desktop-binary override; its `check:protocol` smoke
+  asserted runtime `0.160.1`. It passed 155 root files / 1,462 tests, 49
+  Codex-playground files / 474 tests, Electron playground 2 files / 7 tests,
+  package consumers, demo, accessibility, and builds. The full
+  `pnpm check:codex-app:acceptance` also exited 0 on 2026-10-07, covering 594
+  CDP lifecycle frames, 594 pixel-contract frames, and all 104 current
+  `.61225` product-rail comparisons. The current rail still has strict-RGBA
+  residuals documented above. These repository/local-playground and narrow
+  acceptance results do not promote the global baseline or establish full
+  installed-product UI parity; the Home/Composer contract remains keyed to the
+  historical `26.930.31730` candidate.
 - The prior installed candidate was `26.930.31730` / build `12947`,
   Chromium `154.0.8037.98`, ASAR 546,863,116 bytes / SHA-256
   `87a934de9a00a04d2e534693db87756321ca4f3413f6caa55d3a0d32a5543836`.
