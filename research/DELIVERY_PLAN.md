@@ -4141,16 +4141,22 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the fast local merge gate: full `pnpm check` plus complete
-`pnpm check:codex-app:acceptance` for the candidate tree. Once those pass, use
-`gh` to verify the live PR head and required status checks, then attempt the
-authorized administrator squash merge against that exact SHA. Do not trigger
-or wait for bot review, optional remote CI, or post-merge CI. A queued, pending,
-or `Expected` check is not a test failure and does not delay the first merge
-attempt; a completed failure on the current head blocks it. If GitHub rejects
-the attempt for a required status, report that gate and continue after a
-meaningful state change without changing protection or fabricating a status.
-After a confirmed merge, synchronize `main` and clean only the exact PR branch.
+The current per-PR validation and fast-merge policy is maintained in
+[`AGENTS.md`](../AGENTS.md#validation-and-pull-requests), confirmed by Jamin on
+2026-10-08. It supersedes the former blanket requirement to run all online
+acceptance on every small PR. Record a diff-based acceptance scope; expand it
+for shared shell/state/protocol, general harness changes or uncertain impact.
+Full acceptance remains mandatory for stage closure, important integration
+batches and release, so none of the 0–7 exit gates or evidence boundaries is
+reduced. Retain valid exact-tree stage evidence without presenting partial
+execution as full-suite success. Follow that policy for bounded network
+retries, test isolation, administrator merge and exact-branch/main cleanup.
+
+PR #667's impact and validation boundaries are recorded in
+[`validation/pr-667-impact.md`](validation/pr-667-impact.md). Its Home
+geometry/style slice does not establish current asset identity or product
+pixels, and its MCP wait correction is expanded to all modes consuming the
+changed helper, rather than being treated as a small UI-only change.
 
 ## Local staged commit follow-up
 
