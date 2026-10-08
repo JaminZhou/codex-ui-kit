@@ -6,6 +6,7 @@ import {
   IconButton,
 } from "codex-ui-kit";
 import { CurrentBuildIcon } from "./currentBuildIcons";
+import { CurrentHomeObservedIcon } from "./CurrentHomeObservedIcon";
 import {
   useEffect,
   useRef,
@@ -85,17 +86,29 @@ function LocalReferenceGlyph({
 }
 
 /**
- * Geometry-first replay for the 26.930 Home / Composer.
+ * Build-scoped Home / Composer replay; turn lifecycle remains synthetic.
  *
  * Geometry and control placement follow the 26.930.31730 capture. When the
  * optional hash-verified SVG candidates have been extracted locally, this
- * fixture renders them from a gitignored folder; the vector bytes are never
- * tracked. Their exact runtime control mapping and product pixels remain
- * unverified. The deterministic local turn lifecycle does not call App Server.
+ * historical fixture renders them from a gitignored folder. The .61225 scene
+ * uses observed public Home/Add/Dictate/Voice vectors in the private playground;
+ * context/model glyphs and non-rest product states remain unverified.
+ * The deterministic local turn lifecycle does not call App Server.
  */
-export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
+export function CurrentHome26930({ currentBuild = "26.930.31730", theme = "dark" }: {
   currentBuild?: "26.930.31730" | "26.930.61225";
+  theme?: "dark" | "light" | "system";
 }) {
+  const [systemDark, setSystemDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+  useEffect(() => {
+    if (theme !== "system") return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const update = () => setSystemDark(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [theme]);
+  const iconTheme = theme === "system" ? (systemDark ? "dark" : "light") : theme;
   const editorRef = useRef<HTMLDivElement>(null);
   const turnIdRef = useRef(0);
   const [draft, setDraft] = useState("");
@@ -165,12 +178,12 @@ export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
       aria-label="Current Home and Composer structural and synthetic replay"
       className="demo-current-home-composer-26-930"
       data-current-build={currentBuild}
-      data-asset-reference-build="26.930.31730"
+      data-asset-reference-build={currentBuild}
       data-copy-status="synthetic"
       data-lifecycle-evidence="local-synthetic-only; no App Server turn"
       data-lifecycle-state={lifecycleState}
-      data-scene-status="observed-geometry-home-mark-path-match-remaining-assets-and-product-pixels-unverified"
-      data-visual-asset-status="home-mark-reuses-existing-four-path-match; five-optional-local-candidates-remain; tint-and-product-pixels-unverified"
+      data-scene-status={currentBuild === "26.930.61225" ? "observed-empty-home-geometry-and-four-rest-control-vectors; lifecycle-and-other-assets-unverified" : "observed-geometry-home-mark-path-match-remaining-assets-and-product-pixels-unverified"}
+      data-visual-asset-status={currentBuild === "26.930.61225" ? "four-runtime-observed-rest-control-vectors; context-model-candidates-unverified" : "home-mark-reuses-existing-four-path-match; five-optional-local-candidates-remain; tint-and-product-pixels-unverified"}
     >
       {turns.length === 0 ? (
         <div
@@ -180,12 +193,12 @@ export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
           <span
             aria-hidden="true"
             className="demo-current-home-composer-26-930__mark"
-            data-asset-status="existing-home-mark-four-path-match; tint-and-product-pixels-unverified"
+            data-asset-status={currentBuild === "26.930.61225" ? "runtime-observed-local-mask-vector" : "existing-home-mark-four-path-match; tint-and-product-pixels-unverified"}
           >
-            <CurrentBuildIcon
+            {currentBuild === "26.930.61225" ? <CurrentHomeObservedIcon name="home-mark" theme={iconTheme} /> : <CurrentBuildIcon
               name="home-mark"
               style={{ height: 56, width: 56 }}
-            />
+            />}
           </span>
           <span className="demo-current-home-composer-26-930__title">
             What would you like to work on?
@@ -291,7 +304,7 @@ export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
             <div
             aria-label="Synthetic Composer actions"
             className="demo-current-home-composer-26-930__toolbar"
-            data-visual-asset-status="optional-gitignored-local-svg-candidates; no-vector-bytes-tracked"
+            data-visual-asset-status={currentBuild === "26.930.61225" ? "runtime-observed-add-dictation-voice; model-chevron-candidate-unverified" : "optional-gitignored-local-svg-candidates; no-vector-bytes-tracked"}
               role="toolbar"
             >
               <div className="demo-current-home-composer-26-930__leading">
@@ -299,7 +312,7 @@ export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
                   className="demo-current-home-composer-26-930__icon"
                   data-home-composer-region="add-resource"
                   icon={
-                    <LocalReferenceGlyph
+                    currentBuild === "26.930.61225" ? <CurrentHomeObservedIcon name="add-resource" theme={iconTheme} /> : <LocalReferenceGlyph
                       fileName="plus_composer-86a041c72466.svg"
                       fallbackGlyph="add"
                     />
@@ -331,7 +344,7 @@ export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
                   className="demo-current-home-composer-26-930__icon"
                   data-home-composer-region="dictation"
                   icon={
-                    <LocalReferenceGlyph
+                    currentBuild === "26.930.61225" ? <CurrentHomeObservedIcon name="dictation" theme={iconTheme} /> : <LocalReferenceGlyph
                       fileName="mic_lg_dictate-9b125ec2975b.svg"
                       fallbackGlyph="microphone"
                     />
@@ -342,7 +355,7 @@ export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
                   className="demo-current-home-composer-26-930__icon"
                   data-home-composer-region="voice-chat"
                   icon={
-                    <LocalReferenceGlyph
+                    currentBuild === "26.930.61225" ? <CurrentHomeObservedIcon name="voice-chat" theme={iconTheme} /> : <LocalReferenceGlyph
                       fileName="voice-ae407024968a.svg"
                       fallbackGlyph="voice"
                     />

@@ -4,7 +4,7 @@
 
 This project studies interaction patterns from OpenAI Codex Desktop and other coding-agent products. Research may include read-only inspection of a locally installed Codex distribution, including its packaged Renderer assets, to understand component boundaries, layout behavior, state models, accessibility semantics, and design-token architecture.
 
-Raw extracted files stay outside this repository. The repository contains only abstract observations, measurements, and independently written implementation code. It does not redistribute bundled JavaScript, CSS, fonts, images, icons, logos, or other extracted assets.
+Raw extracted implementation files stay outside this repository. The repository contains observations, measurements, and independently written implementation code. It does not redistribute bundled JavaScript, CSS, fonts, or business logic. The narrowly documented exception for runtime-observed public visual primitives is governed by [`research/VISUAL_ASSETS.md`](research/VISUAL_ASSETS.md): OpenAI-owned exploratory references may remain in research/private playgrounds with exact provenance and hashes, but are excluded from the npm package and are not MIT-relicensed.
 
 The project intentionally separates research from implementation:
 
@@ -21,9 +21,9 @@ in [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md) and
 ## Boundaries
 
 - Do not copy or mechanically transform bundled implementation code into this project.
-- Do not commit extracted files or private OpenAI assets.
+- Do not commit extracted implementation files or private OpenAI assets. Public visual references require the manifest, ownership, and distribution boundaries above.
 - Do not depend on private Electron IPC, private service behavior, or undocumented authentication flows.
-- Do not ship OpenAI or Codex logos, fonts, sounds, illustrations, or other brand assets.
+- Do not ship OpenAI or Codex logos, fonts, sounds, illustrations, or other brand assets in the published npm package.
 - Do not present this project as an official OpenAI package.
 
 ## Public references

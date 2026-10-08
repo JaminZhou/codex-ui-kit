@@ -253,3 +253,5 @@ assert.doesNotMatch(
 console.log(
   `current Home assets ok: existing Home-mark vector path match plus five optional local SVG references; ${manifest.candidates.length} metadata-only candidates remain tracked`,
 );
+
+await import("./check-current-home-observed-assets.mjs");

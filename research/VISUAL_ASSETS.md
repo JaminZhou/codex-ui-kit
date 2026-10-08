@@ -29,6 +29,30 @@ background and reports the raw RGBA residual separately; it is neither
 byte-identical nor whole-shell parity. The reference remains excluded from the
 npm package.
 
+The 2026-10-09 empty-Home observation retains four public resting controls in
+[`current-home-assets-26.930.61225.json`](current-home-assets-26.930.61225.json):
+Home mark (including its original local SVG mask), Add, Dictate, and Voice.
+It records the same installed fingerprint, source vector hashes, resolved
+paint, two themes, four Renderer widths, and 32 local-only product-crop hashes.
+The independent replay namespaces mask IDs per instance and uses layout
+centering rather than a fractional transformed paint layer. The 32 resting
+control comparisons reached strict RGBA equality locally after independent
+sRGB calibration; this is not a Home-body, whole-window, hover/focus, native
+resize, or turn-lifecycle parity claim. Context/model glyph candidates remain
+unverified. The original public visual primitives are OpenAI property under
+the exploration boundary below, not MIT-relicensed or published in npm.
+
+```sh
+cd playgrounds/codex-app
+CODEX_UI_KIT_CURRENT_HOME_ASSET_REFERENCES=/absolute/path/to/public-control-crops \
+  node scripts/check-current-home-assets-26-930-61225.mjs
+```
+
+Add `--browser` for the independent headless Browser/CDP comparison.
+References stay outside version control and must match every recorded hash;
+the checker preserves both perceptual and strict RGBA results and does not
+accept a missing or mismatched reference as a skip.
+
 Both sRGB candidate rail captures retain the full ancestor paint stack and
 explicitly standardize their output to sRGB, calibrated with project-authored
 CSS in a separate temporary target. The older `26.928.31416` default-display
