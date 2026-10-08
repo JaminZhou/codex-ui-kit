@@ -138,8 +138,8 @@ importers:
         specifier: 5.0.1
         version: 5.0.1(@types/node@24.19.0)(happy-dom@20.14.5)(vite@8.2.1(@types/node@24.19.0)(esbuild@0.28.1))
       ws:
-        specifier: 8.21.3
-        version: 8.21.3
+        specifier: 8.22.0
+        version: 8.22.0
 
   playgrounds/electron:
     dependencies:
@@ -2403,6 +2403,18 @@ packages:
       utf-8-validate:
         optional: true
 
+  ws@8.22.0:
+    resolution: {integrity: sha512-Ydggc987+RO0AnWtZ/7Wq9FtNvcrL1b/RO0ud9mWjUPgDrsAAwQSF51sm2hm1XofbU/4jkpGEsLFsZZxU+1DOg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
@@ -4632,6 +4644,8 @@ snapshots:
   ws@8.21.1: {}
 
   ws@8.21.3: {}
+
+  ws@8.22.0: {}
 
   y18n@5.0.8: {}
 
