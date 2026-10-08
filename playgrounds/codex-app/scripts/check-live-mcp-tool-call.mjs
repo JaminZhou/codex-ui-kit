@@ -8,6 +8,7 @@ import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { CodexAppServerClient } from "@jaminzhou/codex-app-server-client";
 import { launchScene, visualScenes } from "./electron-harness.mjs";
+import { firstTerminalMcpError, mcpToolEvidenceReady, mcpTurnEvidenceReady } from "./live-mcp-waits.mjs";
 
 const mode = process.env.CODEX_UI_KIT_LIVE_MCP_TOOL_CALL_MODE ?? "single";
 const liveModel = process.env.CODEX_UI_KIT_LIVE_MODEL ?? "gpt-5.6-luna";
@@ -534,23 +535,7 @@ try {
   const expectedCallCount = mode === "multi" || mode === "retry" || mode === "skill" ? 2 : 1;
   const waitForMcpToolCompletions = async (expectedCount, timeout = 180_000) => {
     await page.waitForFunction(
-      (count) => {
-        const events = window.__liveMcpEvidence ?? [];
-        const completedCount = events.filter(
-          (event) =>
-            event.method === "item/completed" &&
-            event.params?.item?.type === "mcpToolCall",
-        ).length;
-        return (
-          completedCount >= count ||
-          events.some(
-            (event) =>
-              event.method === "error" ||
-              (event.method === "turn/completed" &&
-                event.params?.turn?.status !== "completed"),
-          )
-        );
-      },
+      mcpToolEvidenceReady,
       expectedCount,
       { timeout },
     );
@@ -562,7 +547,7 @@ try {
     ).length;
     if (completedCount >= expectedCount) return events;
 
-    const error = events.find((event) => event.method === "error");
+    const error = firstTerminalMcpError(events);
     if (error) {
       const detail = error.params?.error;
       throw new Error(
@@ -586,15 +571,12 @@ try {
   };
   const waitForSuccessfulTurn = async (timeout = 60_000) => {
     await page.waitForFunction(
-      () =>
-        (window.__liveMcpEvidence ?? []).some(
-          (event) => event.method === "error" || event.method === "turn/completed",
-        ),
+      mcpTurnEvidenceReady,
       undefined,
       { timeout },
     );
     const events = await page.evaluate(() => window.__liveMcpEvidence ?? []);
-    const error = events.find((event) => event.method === "error");
+    const error = firstTerminalMcpError(events);
     if (error) {
       const detail = error.params?.error;
       throw new Error(
