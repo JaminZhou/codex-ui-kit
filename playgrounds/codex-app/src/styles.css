@@ -9879,6 +9879,38 @@ html body .demo-root[data-scenario="mcp-current-26-903-recovery"]
   width: 56px;
 }
 
+/* Current dark empty-Home observation only; historical replay stays unchanged. */
+.demo-root[data-frame="home-current-26-930-61225"]
+  .codex-ui-app-shell:not([data-sidebar-open]) .codex-ui-app-shell__main {
+  border-left-width: 0;
+}
+
+.demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  .demo-current-home-composer-26-930__welcome {
+  left: 50%;
+  top: calc(50% - 149.59375px);
+  width: calc(100% - 24px);
+}
+
+.demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  .demo-current-home-composer-26-930__mark {
+  opacity: 0.3;
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  .demo-current-home-composer-26-930__dock {
+  transform: translateX(-50%);
+}
+
+.demo-root[data-current-home-composer-26-930="true"]
+  .demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  .demo-current-home-composer-26-930__surface {
+  border: 0;
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.2);
+  padding: 14px 12px 8px;
+}
+
 .demo-root[data-current-home-composer-26-930="true"]
   .demo-current-home-composer-26-930__mark .demo-current-build-icon {
   display: block;

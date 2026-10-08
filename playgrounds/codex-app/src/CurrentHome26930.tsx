@@ -93,7 +93,9 @@ function LocalReferenceGlyph({
  * tracked. Their exact runtime control mapping and product pixels remain
  * unverified. The deterministic local turn lifecycle does not call App Server.
  */
-export function CurrentHome26930() {
+export function CurrentHome26930({ currentBuild = "26.930.31730" }: {
+  currentBuild?: "26.930.31730" | "26.930.61225";
+}) {
   const editorRef = useRef<HTMLDivElement>(null);
   const turnIdRef = useRef(0);
   const [draft, setDraft] = useState("");
@@ -162,7 +164,8 @@ export function CurrentHome26930() {
     <section
       aria-label="Current Home and Composer structural and synthetic replay"
       className="demo-current-home-composer-26-930"
-      data-current-build="26.930.31730"
+      data-current-build={currentBuild}
+      data-asset-reference-build="26.930.31730"
       data-copy-status="synthetic"
       data-lifecycle-evidence="local-synthetic-only; no App Server turn"
       data-lifecycle-state={lifecycleState}

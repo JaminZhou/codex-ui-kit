@@ -277,6 +277,20 @@ regional-pixel acceptance.
 
 ## Current position
 
+- On 2026-10-08, a separate read-only empty-Home observation records the dark
+  1180/820/721/720 Renderer-emulated matrix in
+  [`current-home-composer-layout-26.930.61225.json`](current-home-composer-layout-26.930.61225.json).
+  Only fixed-region bounds and computed styles are retained; account-dependent
+  title/context/model copy, their widths, vectors and screenshots are excluded.
+  Compact samples have the content sidebar closed; they do not establish an
+  automatic responsive transition. The dedicated current-build replay corrects
+  half-pixel centering, height-relative hero placement, mark opacity and inset
+  Composer paint while preserving the historical `.31730` scene. Its four-width
+  Electron/CDP geometry/style gate passed, alongside the unchanged historical
+  wide geometry, compact containment and synthetic lifecycle gates. Assets remain explicitly
+  historical candidates, and light theme, populated lifecycle, native resizing
+  and regional product pixels remain open. No surface or global baseline is
+  promoted by this geometry-only follow-up.
 - A fresh production-channel updater check on 2026-10-06 reports
   `26.930.61225` / build `13232` installed and up to date. The installed
   `Info.plist` agrees; its 546,868,805-byte `app.asar` has SHA-256
