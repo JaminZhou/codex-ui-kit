@@ -277,6 +277,17 @@ regional-pixel acceptance.
 
 ## Current position
 
+- On 2026-10-09, the same fingerprinted `.61225` candidate supplies four public
+  empty-Home resting vectors (mark/Add/Dictate/Voice), resolved paint in both
+  themes, and 32 local-only control crops at 1180/820/721/720. The versioned
+  [`current-home-assets-26.930.61225.json`](current-home-assets-26.930.61225.json)
+  retains hashes and ownership, not account text or process/profile data.
+  Independent layout centering removes fractional transformed paint layers;
+  the 32 Electron product-control comparisons reach strict RGBA equality.
+  This supplements rather than promotes the earlier geometry slice: whole
+  Home body, context/model assets, hover/focus, populated turns and native
+  responsive transitions remain open. The global baseline is unchanged.
+
 - On 2026-10-08, a separate read-only empty-Home observation records the dark/light
   1180/820/721/720 Renderer-emulated matrix in
   [`current-home-composer-layout-26.930.61225.json`](current-home-composer-layout-26.930.61225.json).

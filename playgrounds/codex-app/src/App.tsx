@@ -16005,7 +16005,7 @@ export function App() {
   );
   const shellRoute = (
     currentHomeComposer26930Replay ? (
-      <CurrentHome26930 currentBuild={currentNavigationAssetBuild === "26.930.61225" ? "26.930.61225" : "26.930.31730"} />
+      <CurrentHome26930 theme={appliedTheme} currentBuild={currentNavigationAssetBuild === "26.930.61225" ? "26.930.61225" : "26.930.31730"} />
     ) : currentSidebarPrimaryNavigation26928Replay ? (
       <section
         aria-label="Home content pending current-build capture"

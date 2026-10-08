@@ -9893,8 +9893,9 @@ html body .demo-root[data-scenario="mcp-current-26-903-recovery"]
 
 .demo-current-home-composer-26-930[data-current-build="26.930.61225"]
   .demo-current-home-composer-26-930__welcome {
-  left: 50%;
+  left: 12px;
   top: calc(50% - 149.59375px);
+  transform: none;
   width: calc(100% - 24px);
 }
 
@@ -9903,10 +9904,34 @@ html body .demo-root[data-scenario="mcp-current-26-903-recovery"]
   opacity: 0.3;
 }
 
+.demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  .demo-current-home-composer-26-930__icon {
+  border-radius: 9999px;
+}
+
+.demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  [data-home-composer-region="voice-chat"] {
+  background: rgb(255, 255, 255);
+}
+
+.demo-root[data-theme="light"] .demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+  [data-home-composer-region="voice-chat"] {
+  background: rgb(0, 0, 0);
+}
+
+@media (prefers-color-scheme: light) {
+  .demo-root[data-theme="system"] .demo-current-home-composer-26-930[data-current-build="26.930.61225"]
+    [data-home-composer-region="voice-chat"] {
+    background: rgb(0, 0, 0);
+  }
+}
+
 .demo-root[data-current-home-composer-26-930="true"]
   .demo-current-home-composer-26-930[data-current-build="26.930.61225"]
   .demo-current-home-composer-26-930__dock {
-  transform: translateX(-50%);
+  /* Layout centering avoids a fractional transformed paint layer. */
+  left: max(16px, calc(50% - 368px));
+  transform: none;
 }
 
 .demo-root[data-current-home-composer-26-930="true"]
