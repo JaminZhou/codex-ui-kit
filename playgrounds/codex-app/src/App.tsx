@@ -7478,8 +7478,11 @@ export function App() {
     initialSelection.sidebarState === "primary-navigation-current-26-930-31730" ||
     initialSelection.sidebarState === "primary-navigation-current-26-930-61225";
   const currentHomeComposer26930Replay =
-    initialSelection.sidebarState === "primary-navigation-current-26-930-31730" &&
-    view === "shell";
+    view === "shell" && (
+      initialSelection.sidebarState === "primary-navigation-current-26-930-31730" ||
+      (initialSelection.sidebarState === "primary-navigation-current-26-930-61225" &&
+        initialSelection.frame === "home-current-26-930-61225")
+    );
   const currentNavigationAssetBuild = initialSelection.sidebarState === "primary-navigation-current-26-930-61225"
     ? "26.930.61225"
     : initialSelection.sidebarState === "primary-navigation-current-26-930-31730"
@@ -16002,7 +16005,7 @@ export function App() {
   );
   const shellRoute = (
     currentHomeComposer26930Replay ? (
-      <CurrentHome26930 />
+      <CurrentHome26930 currentBuild={currentNavigationAssetBuild === "26.930.61225" ? "26.930.61225" : "26.930.31730"} />
     ) : currentSidebarPrimaryNavigation26928Replay ? (
       <section
         aria-label="Home content pending current-build capture"

@@ -61,17 +61,45 @@ commands.
 
 ## Validation and pull requests
 
-- `pnpm check` is the full repository check. For product acceptance work, use
-  `pnpm check:codex-app:acceptance` as required by the affected scope. Reuse a
-  successful result only when it is tied to the exact tree being merged; do not
-  restart an already completed exact-head acceptance run without a change that
-  invalidates it.
+- Jamin's fast mode (confirmed 2026-10-08) remains effective until changed by
+  Jamin. Every PR requires full `pnpm check` for its exact candidate tree and
+  acceptance justified by the actual diff. Explicitly record affected files,
+  component families, Browser/CDP, Electron, pixel and necessary live public-
+  protocol checks, commands, head/tree, results and exit codes. Do not narrow
+  the scope merely to obtain a pass. Prefer complete component-family PRs.
+- Ordinary small UI PRs need not run every online acceptance scenario. Full
+  `pnpm check:codex-app:acceptance` is required at stage closure, important
+  integration batches and before release. Shared shell, public state/protocol,
+  general acceptance infrastructure or unclear impact requires expanded
+  validation, including the full suite when needed. Stage/release completion
+  still requires full successful evidence; the delivery plan's 0–7 goal is
+  unchanged. Replay, installed-product evidence, live protocol and product
+  pixels cannot substitute for one another or promote the global baseline.
+- Retain auditable stage results for the exact tree. Retry failed stages and
+  their dependencies only when tree, tools/environment, prerequisite state
+  and dependency validity are proven; changes invalidate affected evidence.
+  Document-only descendants may reuse execution evidence only with an explicit
+  diff/content-identity proof. Never call partial results a full command exit
+  0, or manufacture success with skips, relaxed thresholds/timeouts or removed
+  assertions. Known failures must be diagnosed before merging.
+- Classify retry notices, terminal errors, timeouts, UI/process exits and quota/
+  service errors separately. After two equivalent external/network failures,
+  stop blind full-suite retries, diagnose/report the external gate and pursue
+  independent work. Retry affected online scenarios only within a bounded
+  plan; do not change global proxy/account/model/timeout settings unilaterally.
+- Parallel tests need isolated instances and outputs; do not race builds or
+  acceptance suites in the same directories. Clean only the exact processes
+  and children created for that run, never the user's Codex/CDP instance.
 - Use `gh` to read live PR/check state and perform authorized PR operations.
-- Jamin's current fast-mode instruction is: after full local `pnpm check` and
-  full local acceptance pass for the exact candidate, do not wait for bot
-  review, optional remote CI, or post-merge CI before attempting an authorized
-  squash merge. Required GitHub checks still apply. If GitHub rejects the
+- After applicable local gates pass, attempt an authorized administrator
+  squash merge against the verified head. Do not trigger, poll or wait for bot
+  review, optional remote CI or post-merge CI. Required GitHub checks still
+  apply; pending/queued/Expected is neither success nor an actual failure and
+  does not delay the first merge attempt. A current-head actual failure blocks
+  merging. If GitHub rejects the
   merge for a required status, do not change branch protection or fabricate a
   status; report the exact gate and continue only when it is satisfied.
 - Preserve unrelated work. After an authorized merge, synchronize local
-  `main` with `origin/main` and delete only that PR's exact merged branch.
+  `main` ff-only with `origin/main`, verify the merged PR and exact head branch,
+  delete only that branch locally/remotely, and confirm a clean worktree with
+  `main == origin/main`. Report the current branch.

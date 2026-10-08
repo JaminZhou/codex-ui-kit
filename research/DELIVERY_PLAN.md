@@ -277,6 +277,23 @@ regional-pixel acceptance.
 
 ## Current position
 
+- On 2026-10-08, a separate read-only empty-Home observation records the dark/light
+  1180/820/721/720 Renderer-emulated matrix in
+  [`current-home-composer-layout-26.930.61225.json`](current-home-composer-layout-26.930.61225.json).
+  Only fixed-region bounds and computed styles are retained; account-dependent
+  title/context/model copy, their widths, vectors and screenshots are excluded.
+  Compact samples have the content sidebar closed; they do not establish an
+  automatic responsive transition. The dedicated current-build replay corrects
+  half-pixel centering, height-relative hero placement, mark opacity and inset
+  Composer paint while preserving the historical `.31730` scene. The follow-up
+  adds the observed light card fill/shadow and editor color, and independently
+  reserves the expanded light Home child-layout inset without claiming shell
+  paint parity. Its two-theme, four-width Electron/CDP geometry/style gate passed;
+  the earlier dark-only candidate also passed the unchanged historical
+  wide geometry, compact containment and synthetic lifecycle gates. Assets remain explicitly
+  historical candidates, and populated lifecycle, native resizing
+  and regional product pixels remain open. No surface or global baseline is
+  promoted by this geometry-only follow-up.
 - A fresh production-channel updater check on 2026-10-06 reports
   `26.930.61225` / build `13232` installed and up to date. The installed
   `Info.plist` agrees; its 546,868,805-byte `app.asar` has SHA-256
@@ -4124,16 +4141,22 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the fast local merge gate: full `pnpm check` plus complete
-`pnpm check:codex-app:acceptance` for the candidate tree. Once those pass, use
-`gh` to verify the live PR head and required status checks, then attempt the
-authorized administrator squash merge against that exact SHA. Do not trigger
-or wait for bot review, optional remote CI, or post-merge CI. A queued, pending,
-or `Expected` check is not a test failure and does not delay the first merge
-attempt; a completed failure on the current head blocks it. If GitHub rejects
-the attempt for a required status, report that gate and continue after a
-meaningful state change without changing protection or fabricating a status.
-After a confirmed merge, synchronize `main` and clean only the exact PR branch.
+The current per-PR validation and fast-merge policy is maintained in
+[`AGENTS.md`](../AGENTS.md#validation-and-pull-requests), confirmed by Jamin on
+2026-10-08. It supersedes the former blanket requirement to run all online
+acceptance on every small PR. Record a diff-based acceptance scope; expand it
+for shared shell/state/protocol, general harness changes or uncertain impact.
+Full acceptance remains mandatory for stage closure, important integration
+batches and release, so none of the 0–7 exit gates or evidence boundaries is
+reduced. Retain valid exact-tree stage evidence without presenting partial
+execution as full-suite success. Follow that policy for bounded network
+retries, test isolation, administrator merge and exact-branch/main cleanup.
+
+PR #667's impact and validation boundaries are recorded in
+[`validation/pr-667-impact.md`](validation/pr-667-impact.md). Its Home
+geometry/style slice does not establish current asset identity or product
+pixels, and its MCP wait correction is expanded to all modes consuming the
+changed helper, rather than being treated as a small UI-only change.
 
 ## Local staged commit follow-up
 
