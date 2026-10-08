@@ -4124,11 +4124,16 @@ without confusing package readiness with full product reconstruction.
     pixels, public contract freeze, compatibility matrix, and release
     checklist.
 
-Each PR uses the fast local merge gate: latest-head `pnpm check` plus complete
-`pnpm check:codex-app:acceptance`. Once those pass, squash merge and clean the
-exact branch immediately. GitHub CI and bot review are not queried or awaited
-for this exploration workflow; failures discovered by the required local gates
-still block the merge.
+Each PR uses the fast local merge gate: full `pnpm check` plus complete
+`pnpm check:codex-app:acceptance` for the candidate tree. Once those pass, use
+`gh` to verify the live PR head and required status checks, then attempt the
+authorized administrator squash merge against that exact SHA. Do not trigger
+or wait for bot review, optional remote CI, or post-merge CI. A queued, pending,
+or `Expected` check is not a test failure and does not delay the first merge
+attempt; a completed failure on the current head blocks it. If GitHub rejects
+the attempt for a required status, report that gate and continue after a
+meaningful state change without changing protection or fabricating a status.
+After a confirmed merge, synchronize `main` and clean only the exact PR branch.
 
 ## Local staged commit follow-up
 
