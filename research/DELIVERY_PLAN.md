@@ -314,6 +314,14 @@ regional-pixel acceptance.
   The matching Electron comparison passes all 104 regional crops at 0.0000%
   perceptual difference; strict RGBA still differs on 15.6181% of pixels
   (maximum channel delta 51), so this is not byte-identical parity.
+  A separate 16×640px dark main-edge reference is now recorded under
+  [`current-shell-26.930.61225/assets.json`](current-shell-26.930.61225/assets.json).
+  Its scoped Electron gate pins DPR 1 to the CDP viewport and checks bounds,
+  computed paint, independent sRGB calibration, and the visible seam. Composite
+  perceptual difference is 0.0000% (maximum RGB delta 11); strict RGBA differs
+  on 12.5000% of pixels (maximum channel delta 59), confined to the two
+  fractional seam columns. The shell-edge slice is not byte-identical or
+  whole-shell parity; other themes, routes, and shell regions remain unverified.
 - The 2026-10-07 inventory mapping now reports candidate runtime fragments on
   9/100 surfaces (P0 9/59, P1 0/28, P2 0/13): app-shell 7/24, Composer 1/8,
   conversation 1/28, and 0 in cross-layer, integrations, scope-candidate,
@@ -561,10 +569,13 @@ regional-pixel acceptance.
   four Renderer widths, two themes, and rest/hover/focus. Its sRGB perceptual
   comparison is 0.0000%; strict RGBA still reports 15.6181% changed pixels and
   maximum channel delta 51. This is only the 52×280px public rail; it is not
-  byte-identical, whole-window, or route-body parity. Current-build full-shell
-  and populated-conversation Browser/CDP, Electron, and regional-pixel gates
-  remain open, as do the other P0 families. The promoted global baseline stays
-  `26.903.71938`.
+  byte-identical, whole-window, or route-body parity. A second, separate
+  16×640px main-left-edge crop now passes its dark 1180×820 composited Electron
+  gate at 0.0000% perceptual difference (maximum RGB delta 11); strict RGBA
+  differs on 12.5000% of pixels only at the two fractional edge columns. This
+  is not full-shell parity. Current-build whole-shell and populated-conversation
+  Browser/CDP, Electron, and regional-pixel gates remain open, as do the other
+  P0 families. The promoted global baseline stays `26.903.71938`.
 - The prior installed app reported `26.928.21956` (`12404`), Chromium
   `154.0.8037.57`, with a 538,323,145-byte `app.asar` whose SHA-256 is
   `3bda98f2265ad23677dfe0163d1cc7855beade6bef11d27f830f6663d7658406`.

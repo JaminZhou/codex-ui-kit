@@ -13,10 +13,10 @@
   selection by app URL, viewport area, and structural landmarks. It navigated
   only the fixed New chat and Pull requests controls and read-only menus; no
   task was submitted. The isolated profile did not isolate account content.
-- The generated record was sanitized before inspection; no screenshot, task
-  copy, account identity, project name, or process/port identity is retained.
-  The exact spawned process and its temporary profile were removed after the
-  structural observations were recorded.
+- The generated structural record was sanitized before inspection; it retains
+  no screenshot, task copy, account identity, project name, or process/port
+  identity. A separate, narrow shell-edge reference is documented below. The
+  exact spawned process and its temporary profile were removed after capture.
 
 ## Observed shell fragments
 
@@ -68,17 +68,44 @@ not establish how light theme or other routes paint the same element. The
 localized navigation-edge residual remains unexplained and is not evidence
 that this main-surface shadow caused it.
 
+## Dark main-edge Browser/CDP-to-Electron pixel slice
+
+The replay now removes that generic shadow and applies the observed 1px left
+border only to `primary-navigation-current-26-930-61225` in dark theme. The
+product reference is the 16×640px crop at `(321,120)` in
+[`current-shell-26.930.61225/assets.json`](current-shell-26.930.61225/assets.json)
+and `main-edge-dark-1180x820.png`; it contains no route copy. The dedicated
+Electron gate also checks the 1180×820 native bounds, DPR 1, 52px rail, 269.875px
+sidebar, main bounds/background/border/shadow, no overflow, and an independent
+sRGB alpha-composition control. DPR 1 is explicit because an unconstrained
+Electron launch inherited the host Retina DPR 2 and resampled the fractional
+edge, making its screenshot incomparable with the CDP reference.
+
+The gate composites both sRGB renderer rasters over the observed opaque main
+surface `rgb(24,24,24)` before perceptual comparison. This preserves visible
+appearance while separating renderer-specific edge alpha from actual color
+drift. The scoped run passed at 0.0000% perceptual changed pixels with maximum
+visible RGB delta 11 (16-level cap). Raw strict RGBA still differs on 12.5000%
+of the crop, with maximum raw channel delta 59; those differences are limited
+to the two fractional seam columns, while the 14 interior columns are exact.
+This is a cross-renderer, composited regional gate—not byte-identical or
+whole-shell parity. It does not cover light theme, other routes, native window
+resizing, populated content, or the remaining inventory surfaces.
+
 ## Evidence boundary and inventory mapping
 
-This is current-build CDP structural/computed-style evidence only. Renderer
-viewport emulation is not native-window resizing; it does not establish
-Browser interaction acceptance, Electron behavior, or installed-product
-regional-pixel parity. Dynamic project content changed the observed sidebar
-scroll height between captures, so that value remains diagnostic, not a
-pixel-gate constant. The global promoted baseline remains `26.903.71938`.
+The shell follow-up contains current-build CDP structure/styles plus one
+version-scoped Browser/CDP-to-Electron composited pixel fragment. Renderer
+viewport emulation is not native-window resizing, and this fragment does not
+establish full-shell Browser interaction acceptance or whole-surface Electron
+parity. Dynamic project content changed the observed sidebar scroll height
+between captures, so that value remains diagnostic, not a pixel-gate constant.
+The global promoted baseline remains `26.903.71938`.
 
 The corresponding candidate fragments are mapped in `ui-inventory.json` to
 the New chat destination, empty Composer, shared shell, primary rail, project
 navigation/group lifecycle, native project-menu boundary, Profile → Help, and
-titlebar/sidebar controls. All nine remain candidate-only; Browser, Electron,
-and regional-pixel promotion gates are still outstanding.
+titlebar/sidebar controls. All nine remain candidate-only. This narrow main
+edge gate is evidence for one paint fragment only; full Browser interaction,
+whole-shell Electron, and surface-level regional-pixel promotion gates remain
+outstanding.

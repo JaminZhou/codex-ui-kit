@@ -340,6 +340,12 @@ body:has(.demo-current-primary-navigation-rail[data-visual-assets="six-exact-pub
     rgba(0, 0, 0, 0.05) 0 0 20px;
 }
 
+.demo-root[data-sidebar-state="primary-navigation-current-26-930-61225"][data-theme="dark"]
+  .codex-ui-app-shell__main {
+  border-left: 1px solid rgba(255, 255, 255, 0.082);
+  box-shadow: none;
+}
+
 .demo-root[data-frame^="workspace-git-settings"]
   .codex-ui-app-shell__layout,
 .demo-root[data-frame^="workspace-appearance-settings"]

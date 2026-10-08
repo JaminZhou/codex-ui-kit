@@ -20,6 +20,15 @@ route-body baseline. The prior `26.930.31730` assets remain historical
 regression evidence at
 [`current-navigation-26.930.31730/assets.json`](current-navigation-26.930.31730/assets.json).
 
+The independent [`current-shell-26.930.61225/assets.json`](current-shell-26.930.61225/assets.json)
+manifest retains one 16×640px dark main-left-edge reference from the same
+fingerprinted build. It is OpenAI-owned exploratory material, carries no route
+copy, and is consumed only by the private playground's narrow shell-paint gate.
+That gate compares sRGB rasters after compositing over the observed main
+background and reports the raw RGBA residual separately; it is neither
+byte-identical nor whole-shell parity. The reference remains excluded from the
+npm package.
+
 Both sRGB candidate rail captures retain the full ancestor paint stack and
 explicitly standardize their output to sRGB, calibrated with project-authored
 CSS in a separate temporary target. The older `26.928.31416` default-display

@@ -102,6 +102,37 @@ viewport, landmark counts, and interactive-element counts. Do not use private
 thread text, project names, PR titles, account content, or repository content
 as selectors.
 
+### Version-scoped main-shell edge reference
+
+The `26.930.61225` dark main-surface edge capture is a narrower read-only
+variant of the same probe. It requires exactly one separately opened process
+with `--force-color-profile=srgb`; the capture script verifies the installed
+ASAR fingerprint, exact owner/profile/loopback listener, and main Renderer
+structure before sampling a 16×640px crop. It does not navigate, submit a task,
+or serialize route text. Supply the validated values from the exact probe:
+
+```bash
+CODEX_CURRENT_SHELL_CDP_PORT=${codex_cdp_port} \
+CODEX_CURRENT_SHELL_PROFILE=${codex_probe_dir} \
+CODEX_CURRENT_SHELL_OWNER_PID=${codex_owner_pid} \
+pnpm capture:current-shell-edge-26-930-61225
+```
+
+The crop is written only inside that profile. Promote it into research only
+after reviewing the sanitized observation, confirming the manifest hash, and
+keeping the OpenAI ownership/package-exclusion note. When comparing the replay,
+pin Electron to the capture's DPR 1; otherwise a Retina host can resample the
+fractional seam. The checker composites both calibrated sRGB rasters over the
+observed main background and reports unflattened strict RGBA separately.
+
+Before running a playground checker directly with `node`, build both the
+renderer and Electron main process (`pnpm --filter
+@codex-ui-kit/codex-app-playground build`). A renderer-only build can leave a
+stale `dist-electron/main.js` with a different device scale. Read back
+`window.devicePixelRatio` before diagnosing fractional border or line-box
+drift; the general replay fixes DPR 1, while a dedicated reference checker
+may explicitly select the DPR recorded in its manifest.
+
 For cleanup, resolve the exact main PID from the unique
 `--user-data-dir` argument, terminate only that spawned process, verify its
 children and listening port are gone, and then delete only the exact temporary
