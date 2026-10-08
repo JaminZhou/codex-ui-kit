@@ -277,7 +277,7 @@ regional-pixel acceptance.
 
 ## Current position
 
-- On 2026-10-08, a separate read-only empty-Home observation records the dark
+- On 2026-10-08, a separate read-only empty-Home observation records the dark/light
   1180/820/721/720 Renderer-emulated matrix in
   [`current-home-composer-layout-26.930.61225.json`](current-home-composer-layout-26.930.61225.json).
   Only fixed-region bounds and computed styles are retained; account-dependent
@@ -285,10 +285,13 @@ regional-pixel acceptance.
   Compact samples have the content sidebar closed; they do not establish an
   automatic responsive transition. The dedicated current-build replay corrects
   half-pixel centering, height-relative hero placement, mark opacity and inset
-  Composer paint while preserving the historical `.31730` scene. Its four-width
-  Electron/CDP geometry/style gate passed, alongside the unchanged historical
+  Composer paint while preserving the historical `.31730` scene. The follow-up
+  adds the observed light card fill/shadow and editor color, and independently
+  reserves the expanded light Home child-layout inset without claiming shell
+  paint parity. Its two-theme, four-width Electron/CDP geometry/style gate passed;
+  the earlier dark-only candidate also passed the unchanged historical
   wide geometry, compact containment and synthetic lifecycle gates. Assets remain explicitly
-  historical candidates, and light theme, populated lifecycle, native resizing
+  historical candidates, and populated lifecycle, native resizing
   and regional product pixels remain open. No surface or global baseline is
   promoted by this geometry-only follow-up.
 - A fresh production-channel updater check on 2026-10-06 reports
