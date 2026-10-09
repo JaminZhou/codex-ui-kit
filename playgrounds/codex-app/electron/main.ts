@@ -41,6 +41,8 @@ import {
   type LiveMcpElicitationRequest,
 } from "./live-mcp-elicitation.js";
 import { liveCollaborationMode, resolveLiveMode } from "./live-collaboration.js";
+import { readLiveModelCatalog, resolveLiveModelSelection } from "./live-model-catalog.js";
+import { LiveConnectionGate } from "./live-connection-gate.js";
 import {
   LiveThreadRegistry,
   type DiscoveredLiveThread,
@@ -167,6 +169,7 @@ app.commandLine.appendSwitch("disable-renderer-backgrounding");
 
 let mainWindow: BrowserWindow | null = null;
 let client: CodexAppServerClient | null = null;
+const liveConnectionGate = new LiveConnectionGate<CodexAppServerClient>();
 let terminalHost: { client: CodexAppServerClient; manager: LiveTerminalManager; ready: Promise<unknown> } | null = null;
 const liveSession = new LiveProjectSession<{
   thread: CodexThread;
@@ -548,6 +551,7 @@ function openAllowedExternalUrl(url: string) {
 }
 
 async function ensureClient() {
+  return liveConnectionGate.connect(async () => {
   if (client?.state === "connected") return client;
   await cancelPendingUserVerificationRequests();
   liveInputGate.clear();
@@ -598,6 +602,7 @@ async function ensureClient() {
   ];
   await client.connect();
   return client;
+  });
 }
 
 async function startLive(
@@ -614,6 +619,10 @@ async function startLive(
   const policy = liveWorkspacePolicy(directory, liveWriteOptIn);
   return liveTurnStartGate.run(() => activeTurn !== null, async () => {
     const connectedClient = await ensureClient();
+    const rawModelSelection = (rawInput as { modelSelection?: unknown }).modelSelection;
+    const modelSelection = resolveLiveModelSelection(rawModelSelection,
+      rawModelSelection === undefined ? [] : await readLiveModelCatalog(connectedClient));
+    if (client !== connectedClient || connectedClient.state !== "connected") throw new Error("The live session closed while validating model selection.");
     const registry = historyRegistry();
     const session = await liveSession.replace(directory, async () => {
       // Validate persisted ownership before opening or resuming any server thread.
@@ -625,7 +634,7 @@ async function startLive(
           ephemeral: process.env.CODEX_UI_KIT_LIVE_EPHEMERAL === "1",
           historyMode: "paginated",
           sandbox: policy.sandbox,
-          ...(requestedLiveModel ? { model: requestedLiveModel } : {}),
+          ...((modelSelection?.model ?? requestedLiveModel) ? { model: modelSelection?.model ?? requestedLiveModel } : {}),
         });
         try {
           await registry.remember({ id: response.thread.id, directory, title: prompt.replace(/\s+/g, " ").slice(0, 100), updatedAt: Date.now() });
@@ -656,16 +665,20 @@ async function startLive(
       projectToken: (rawInput as { projectToken: string }).projectToken,
       threadId: thread.id,
     });
+    const turnModel = modelSelection?.model ?? requestedLiveModel ?? session.settings.model;
+    const turnEffort = modelSelection?.effort ?? requestedLiveReasoningEffort ?? session.settings.reasoningEffort;
     const turn = await thread.startTurn(prompt, {
       collaborationMode: liveCollaborationMode(collaborationMode, {
-        model: requestedLiveModel ?? session.settings.model,
-        reasoningEffort: requestedLiveReasoningEffort ?? session.settings.reasoningEffort,
+        model: turnModel,
+        reasoningEffort: turnEffort,
       }),
-      ...(requestedLiveReasoningEffort ? { effort: requestedLiveReasoningEffort } : {}),
+      model: turnModel,
+      ...(turnEffort ? { effort: turnEffort } : {}),
       approvalPolicy: policy.approvalPolicy,
       cwd: directory,
       sandboxPolicy: policy.sandboxPolicy,
     });
+    session.settings = { model: turnModel, reasoningEffort: turnEffort };
     activeTurn = turn;
     activeTurnThreadId = thread.id;
     void turn
@@ -760,6 +773,7 @@ async function closeTerminals() {
 }
 
 async function closeLive() {
+  return liveConnectionGate.close(async () => {
   await cancelPendingUserVerificationRequests();
   liveInputGate.clear();
   liveMcpElicitationGate.clear();
@@ -775,6 +789,7 @@ async function closeLive() {
   const closingClient = client;
   client = null;
   await Promise.all([closingClient?.close(), closeTerminals()]);
+  });
 }
 
 async function ensureTerminalHost() {
@@ -1187,6 +1202,16 @@ function createWindow() {
 
 ipcMain.handle("demo:live:start", startLive);
 ipcMain.handle("demo:live:compact", compactLive);
+ipcMain.handle("demo:live:models", async (event, raw: unknown) => {
+  assertTrustedIpc(event);
+  resolveHistoryProject(raw);
+  const connectedClient = await ensureClient();
+  const result = await readLiveModelCatalog(connectedClient);
+  if (client !== connectedClient || connectedClient.state !== "connected") {
+    throw new Error("The live session closed while reading model capabilities.");
+  }
+  return result;
+});
 ipcMain.handle("demo:environment:status", async (event, raw: unknown) => {
   assertTrustedIpc(event);
   const { input } = resolveHistoryProject(raw);
