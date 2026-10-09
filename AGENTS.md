@@ -61,12 +61,39 @@ commands.
 
 ## Validation and pull requests
 
-- Jamin's fast mode (confirmed 2026-10-08) remains effective until changed by
-  Jamin. Every PR requires full `pnpm check` for its exact candidate tree and
+- Jamin's impact-based fast mode (reconfirmed 2026-10-09) remains effective
+  until changed by Jamin and overrides older task, heartbeat and memory gates
+  requiring fresh bot review or blanket full acceptance on every small PR.
+  Jamin explicitly adopted the side-discussion mode on 2026-10-09; treat this
+  section as the canonical execution policy, not a temporary exception.
+  Do not ask for another mode or merge confirmation within this authorization.
+  On resume, report changed gates or meaningful results; reuse proven exact-
+  tree evidence instead of restarting completed validation by default.
+  Apply this policy to existing uncommitted work as well as newly created
+  branches; an older goal or automation must not silently restore bot gates.
+  Default execution order is: inspect the diff and valid evidence, declare the
+  impact scope, run full `pnpm check` plus the applicable acceptance, then push,
+  create a ready PR and attempt matched-head administrator squash merge. Do
+  not silently revert to older blanket review/acceptance gates after a model
+  switch, interruption or context compaction. A failed applicable gate remains
+  a failure in fast mode; diagnose it instead of dropping it from the scope.
+  Prefer bounded, hypothesis-driven diagnostics over repeated unchanged full
+  suites. Preserve failing evidence, continue independent in-scope work, and
+  rerun only invalidated stages while preparing the final candidate gates.
+  Every PR requires full `pnpm check` for its exact candidate tree and
   acceptance justified by the actual diff. Explicitly record affected files,
   component families, Browser/CDP, Electron, pixel and necessary live public-
   protocol checks, commands, head/tree, results and exit codes. Do not narrow
   the scope merely to obtain a pass. Prefer complete component-family PRs.
+- Work continuously through a component family's observation, implementation,
+  applicable validation and delivery while an authorized, safe, meaningful next
+  step remains. A local finding or probe cleanup alone is not a handoff that
+  requires Jamin to say "continue" again. End at a clear delivery, an actual
+  external/authority boundary, or a necessary user choice; do not promise work
+  will keep running after the turn ends. Set a hypothesis and attempt/time
+  budget for micro-diagnostics; at the budget limit retain the failed gate and
+  pursue independent work in scope instead of cycling the same investigation.
+  Give concise updates on completed work, remaining gates and delivery progress.
 - Ordinary small UI PRs need not run every online acceptance scenario. Full
   `pnpm check:codex-app:acceptance` is required at stage closure, important
   integration batches and before release. Shared shell, public state/protocol,

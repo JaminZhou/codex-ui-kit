@@ -4434,6 +4434,22 @@ Turn-level render errors now use the same explicit disabled retry boundary.
 
 ## Planning rules
 
+### 2026-10-09 public live model-choice family
+
+The private App Server playground adds a read-only complete model catalog and
+project-scoped next-turn model/effort choice, with fresh trusted-host validation
+and shared connection initialization/shutdown. It does not implement or claim
+the installed Codex Power picker. Client/runtime remain pinned at 0.5.2/0.160.0.
+See [the family receipt](validation/live-model-choice-family.md) for exact
+candidate scope, source/host identity, full local health, real inference and
+Browser/Electron/pixel evidence.
+
+The separate Home interaction/composition work remains on
+`feat/current-home-interactions`; its strict source-region pixel gate is still
+failed and is not waived by this functional delivery. The global baseline and
+0–7 stage/release gates are unchanged. Next mainline work remains Home/Composer
+geometry and compositing convergence, followed by theme/width/state expansion.
+
 - Split an inventory ID whenever independently owned states or transitions can
   pass and fail separately.
 - Do not promote evidence from an older installed build to the current build.

@@ -1302,6 +1302,22 @@ on-request approvals. It opens the repository root by default; set
 Live turns can use the signed-in Codex account and are never required by CI.
 Replay mode is deterministic and is the default test path.
 
+In `Live local`, **Runtime model capabilities** reads the complete public
+runtime catalog without starting a task. **Choose live model** lets you choose
+a model and its supported reasoning effort for the next sent turn. The choice
+is scoped to the selected project; changing projects clears it. Selection alone
+does not create a thread or consume an inference turn. The host validates the
+choice against a fresh catalog before starting/resuming a thread, so removed
+models or unsupported efforts require a refresh instead of silent fallback.
+These are independent playground controls, not a reproduction of the installed
+Codex Power picker or proof of account entitlement. Without an explicit choice,
+the configured model/effort and saved thread settings retain their precedence.
+
+The targeted gates are `check:live-model-catalog` (public metadata plus isolated
+renderer failure contracts) and `check:live-model-selection` (two real turns
+using `gpt-5.6-luna`, medium then max, on a disposable owned thread). Both are
+included in the full acceptance route; the latter uses signed-in usage.
+
 The macOS Electron acceptance suite combines CDP geometry and computed styles,
 native-window contracts, and reviewed pixel baselines:
 

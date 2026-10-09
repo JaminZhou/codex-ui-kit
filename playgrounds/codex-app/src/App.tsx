@@ -251,6 +251,8 @@ import {
 } from "./live-mcp-elicitation-state";
 import { LiveThreadList } from "./LiveThreadList";
 import { LiveCommitPreview } from "./LiveCommitPreview";
+import { LiveModelCatalog } from "./LiveModelCatalog";
+import { LiveModelSelectionControl, type LiveModelSelection } from "./LiveModelSelection";
 import { LivePushPreview } from "./LivePushPreview";
 import { LivePullRequest } from "./LivePullRequest";
 import { useLivePullRequestRoute } from "./useLivePullRequestRoute";
@@ -4394,6 +4396,7 @@ export function App() {
       : "codex-ui-kit",
   );
   const workspaceProjectIdRef = useRef(workspaceProjectId);
+  const [liveModelChoice, setLiveModelChoice] = useState<{ projectToken?: string; selection?: LiveModelSelection }>({});
   const workspaceBranchCheckoutActiveRef = useRef(false);
   const workspaceRunLocationVersionRef = useRef(0);
   const [projectIndexQuery, setProjectIndexQuery] = useState(
@@ -6918,7 +6921,8 @@ export function App() {
     setMode("live");
     setLiveError(null);
     try {
-      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken, collaborationMode: composerMode === "plan" ? "plan" : "default", threadId: liveState.threadId ?? null });
+      await window.codexDemo.startLive({ prompt, projectToken: workspaceProjectToken, collaborationMode: composerMode === "plan" ? "plan" : "default", threadId: liveState.threadId ?? null,
+        ...(liveModelChoice.projectToken === workspaceProjectToken && liveModelChoice.selection ? { modelSelection: liveModelChoice.selection } : {}) });
       setComposerValue((current) => (current === prompt ? "" : current));
       return true;
     } catch (error) {
@@ -8554,6 +8558,11 @@ export function App() {
         toggleLabel="Toggle recent tasks"
       >
         {mode === "live" && <LiveCommitPreview projectToken={workspaceProjectToken} />}
+        {mode === "live" && <LiveModelCatalog projectToken={workspaceProjectToken} />}
+        {mode === "live" && <LiveModelSelectionControl projectToken={workspaceProjectToken}
+          selection={liveModelChoice.projectToken === workspaceProjectToken ? liveModelChoice.selection : undefined}
+          disabled={liveStartPending}
+          onChange={selection => setLiveModelChoice({ projectToken: workspaceProjectToken, selection })} />}
         {mode === "live" && <LivePushPreview projectToken={workspaceProjectToken} />}
         {mode === "live" && <LivePullRequest projectToken={workspaceProjectToken} onWorkspaceChanged={() => setWorkspaceBranchRefreshEpoch(value => value + 1)} />}
         {mode === "live" ? <LiveThreadList projectToken={workspaceProjectToken} selectedId={liveState.threadId}

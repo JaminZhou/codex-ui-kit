@@ -119,11 +119,12 @@ interface CodexDemoBridge {
     threadId: string;
   }): Promise<void>;
   listLiveThreads(input: { projectToken: string; cursor?: string; archived?: boolean }): Promise<{ threads: Array<{ id: string; title: string; updatedAt: number }>; nextCursor: string | null; archivedThreadIds: string[] }>;
+  listLiveModels(input: { projectToken: string }): Promise<import("../electron/live-model-catalog").LiveModelCapability[]>;
   readLiveThread(input: { projectToken: string; threadId: string }): Promise<{ threadId: string; turns: import("./live-history-state").StoredLiveTurn[] }>;
   listLiveBackgroundTerminals(input: { projectToken: string; threadId: string }): Promise<LiveBackgroundTerminal[]>;
   terminateLiveBackgroundTerminal(input: { projectToken: string; threadId: string; processId: string }): Promise<{ terminated: boolean }>;
   cleanLiveBackgroundTerminals(input: { projectToken: string; threadId: string }): Promise<Record<string, never>>;
-  startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan"; threadId?: string | null }): Promise<{
+  startLive(input: { prompt: string; projectToken: string; collaborationMode?: "default" | "plan"; threadId?: string | null; modelSelection?: import("../electron/live-model-catalog").LiveModelSelection }): Promise<{
     threadId: string;
     turnId: string;
   }>;
