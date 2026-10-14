@@ -49,19 +49,87 @@ Required: full `pnpm check`; fresh npm/pnpm packed math consumers with normal
 math, inherited-trust attack, resolved graph, audit and notices; React 18/19
 consumer matrix; existing Markdown Electron/CDP and pixel regression family.
 These are replay/regression checks, not installed-product captures or parity
-claims. Schema traces/tests in `pnpm check` cover AJV. No live public-protocol
-request or paid model turn is necessary. Full online
+claims. Schema traces/tests in `pnpm check` cover AJV. The existing isolated
+public-runtime compatibility smoke also performs initialization and read-only
+thread/model listing; it reports no model turn and no mutating protocol method.
+No additional live scenario or paid model turn is needed. Full online
 `check:codex-app:acceptance` is not applicable to this maintenance batch.
 Push/PR CI, weekly CodeQL, Pages and release workflow files are unchanged.
 
 ## Execution results
 
-Exact tree, commands and terminal exit codes are recorded after execution.
-Initial targeted regression failed because the fixture made inherited `trust`
-non-writable, preventing normal assignment. Making pollution writable matches
-the advisory; assertions were retained. Targeted Markdown then passed 30/30.
-The failed diagnostic log is retained. Workspace audit reported zero
-vulnerabilities at all severities.
+Execution head: `8c9e6a810c3d0c100ca5bdf1bfca215acb632ae4`; tree:
+`87236748bcc473d5e1e8f0b881ddbf3d3c039632`. Node 22.22.2, pnpm 11.7.0.
+Final documentation-only descendants reuse this evidence: the 1,648 tracked
+non-Markdown files have identical path/content SHA-256
+`e80cb3e60d14cc0e5d16e7e2e0a55db022da15ce16cfa109709393d56da742e0`.
+Only AGENTS formatting and this validation record changed after execution.
+
+| Command / evidence | Result | Exit |
+| --- | --- | --- |
+| `pnpm check` (final tree) | Full command passed; 1,476 package tests, 7 Electron-playground tests, 485 app-playground tests; research/type/package/build/browser/a11y/protocol/geometry stages passed. | 0 |
+| `pnpm audit --json` | Zero vulnerabilities at all severities. Resolved graph contains only KaTeX 0.18.7, fast-uri 3.1.8, source-map-js 1.2.2 for these packages. | 0 |
+| `node scripts/check-math-consumer.mjs <candidate.tgz> npm` | Fresh isolated npm consumer: safe runtime graph, normal MathML, inherited-trust attack blocked, notices present, zero audit findings. One service-endpoint retry was needed. | 0 |
+| Same command with `pnpm` | Fresh isolated pnpm consumer, same assertions, zero audit findings. | 0 |
+| `node scripts/react-compatibility-smoke.mjs 18.3.1 18.3.1 18.3.27 18.3.7 Bundler --tarball <candidate.tgz>` | React 18 complete export/type/SSR contract. | 0 |
+| Same smoke with `19.2.7 19.2.7 19.2.17 19.2.3 Bundler` | React 19 Bundler contract. | 0 |
+| Same smoke with `19.2.7 19.2.7 19.2.17 19.2.3 NodeNext` | React 19 NodeNext contract. | 0 |
+| `node scripts/check-cdp-contract.mjs --scenes=<Markdown family>` in app playground | All 20 selected lifecycle frames, local Electron/CDP contracts. | 0 |
+| `node scripts/check-visual-contract.mjs --scenes=<Markdown family>` in app playground | All 20 selected pixel frames; existing baselines/thresholds unchanged. | 0 |
+
+The exact Markdown family is every `markdown*` ID in `visualScenes` from
+`playgrounds/codex-app/scripts/electron-harness.mjs` at the execution tree:
+
+```text
+markdown-complete
+markdown-current-26-818
+markdown-current-26-818-compact
+markdown-current-26-820-media
+markdown-current-26-820-media-compact
+markdown-current-26-825
+markdown-current-26-825-compact
+markdown-current-26-825-media-loaded
+markdown-current-26-825-media-loaded-compact
+markdown-current-26-825-media-preview
+markdown-current-26-825-media-unavailable
+markdown-current-26-825-media-unavailable-compact
+markdown-table-actions-hover
+markdown-table-actions-narrow
+markdown-table-actions-preview
+markdown-stream-fence
+markdown-stream-table
+markdown-stream-large
+markdown-stream-tail
+markdown-stream-complete
+```
+
+The tested archive has 219 entries and SHA-256
+`48e8060619a2e80a379f61f3d694952e8514066477ad7d074308698ccd39d3b3`,
+SHA-512 integrity
+`sha512-qgdUuXX3RtfeJWi/A7kKJ9S3rqJeANRSnYoX6elSBtPgEk6VrhHj7W0vH4jCPOQmNyCLMNOUg+IZjHaWyq+YiA==`.
+It was packed from the full-check build, then every archived file was compared
+byte-for-byte to the final candidate. Consumers run against these exact bytes;
+subsequent test-fixture and documentation edits do not change the archive.
+Raw command logs, exit receipts, hashes and replay artifacts remain local.
+
+Diagnostics retained, not relabeled as passes:
+
+- Initial pollution fixture used a non-writable inherited property; making it
+  writable matched the advisory and preserved every security assertion.
+- The new consumer harness needed an explicit test DOM and ESM import
+  resolution for this ESM-only package. Both installers passed after correction.
+- npm audit once returned HTTP 400 from its retiring quick-audit endpoint; one
+  unchanged retry succeeded. No global registry/proxy/auth setting changed.
+- A full check exposed an existing table-copy test race: observing the host
+  callback did not imply React had committed the asynchronous `Copied` state.
+  Awaiting that same state with the existing default timeout fixed the test;
+  no assertion or threshold was removed. The final full command passed.
+- Public Pages HTTPS probes twice failed locally at TLS negotiation. GitHub
+  Pages configuration and the base deployment check were verified; no public
+  HTTP-success claim or global network-setting change is made.
+
+All five workflow files are byte-identical to the base. Existing Home
+pixel/calibration failures on the parked branch remain unrelated open evidence.
 
 ## Release boundary
 

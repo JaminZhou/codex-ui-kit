@@ -76,7 +76,8 @@ commands.
 
 - Jamin's impact-based fast mode (reconfirmed 2026-10-09) remains effective
   until changed by Jamin. It overrides older bot-review and blanket acceptance
-  requirements; do not ask for another mode or merge confirmation. Every PR requires full `pnpm check` for its exact candidate tree and
+  requirements; do not ask for another mode or merge confirmation. Every PR
+  requires full `pnpm check` for its exact candidate tree and
   acceptance justified by the actual diff. Explicitly record affected files,
   component families, Browser/CDP, Electron, pixel and necessary live public-
   protocol checks, commands, head/tree, results and exit codes. Do not narrow
@@ -87,7 +88,8 @@ commands.
   general acceptance infrastructure or unclear impact requires expanded
   validation, including the full suite when needed. Stage/release completion
   still requires full successful evidence if explicitly resumed; historical
-  stages 0–7 are paused under the current maintenance scope. Replay, installed-product evidence, live protocol and product
+  stages 0–7 are paused under the current maintenance scope. Replay,
+  installed-product evidence, live protocol and product
   pixels cannot substitute for one another or promote the global baseline.
 - Retain auditable stage results for the exact tree. Retry failed stages and
   their dependencies only when tree, tools/environment, prerequisite state
