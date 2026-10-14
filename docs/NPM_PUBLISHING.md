@@ -11,7 +11,7 @@ Merge a reviewed release change to protected `main`, then wait for the exact
 commit's required CI, including all macOS acceptance shards, to pass. Dispatch:
 
 ```bash
-gh workflow run npm-release-candidate.yml --ref main -f version=0.1.1
+gh workflow run npm-release-candidate.yml --ref main -f version=0.1.2
 ```
 
 The candidate workflow verifies the current `main` and CI, checks npm version

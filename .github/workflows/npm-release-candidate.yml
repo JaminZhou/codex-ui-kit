@@ -45,7 +45,8 @@ jobs:
           version: 11.7.0
           dest: ${{ runner.temp }}/setup-pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
+      - name: Run quality checks with a virtual display
+        run: xvfb-run -a -s "-screen 0 1920x1200x24" pnpm check
       - name: Build and test one immutable archive
         run: node scripts/release-pack.mjs
       - name: Recheck main and print candidate identity
