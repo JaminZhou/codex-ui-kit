@@ -384,7 +384,7 @@ After.`;
     );
     expect(onCopyTable.mock.calls[0][0].html).toContain("<table>");
     expect(onCopyTable.mock.calls[0][0].html).toContain(">Alpha</th>");
-    expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: "Copied" })).toBeTruthy();
   });
 
   it.each([
