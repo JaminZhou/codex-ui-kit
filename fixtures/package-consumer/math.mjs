@@ -4,6 +4,13 @@ import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 
+// The lazy adapter runs in the browser after React mounts. Supply a test DOM
+// from the harness, without adding it to the consumer's dependency graph.
+const { Window } = await import(process.argv[2]);
+const window = new Window();
+globalThis.document = window.document;
+globalThis.DOMParser = window.DOMParser;
+
 const require = createRequire(import.meta.url);
 const dist = dirname(require.resolve("codex-ui-kit"));
 const kitRequire = createRequire(join(dist, "index.js"));

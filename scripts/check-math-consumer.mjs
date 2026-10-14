@@ -33,7 +33,9 @@ try {
   assert(Object.values(counts).every((count) => count === 0), JSON.stringify(counts));
   writeFileSync(join(directory, "math.mjs"),
     readFileSync(new URL("../fixtures/package-consumer/math.mjs", import.meta.url)));
-  process.stdout.write(run(process.execPath, [join(directory, "math.mjs")]));
+  process.stdout.write(run(process.execPath, [
+    join(directory, "math.mjs"), import.meta.resolve("happy-dom"),
+  ]));
   console.log(JSON.stringify({ installer, vulnerabilities: counts, passed: true }));
 } finally {
   rmSync(directory, { recursive: true, force: true });
