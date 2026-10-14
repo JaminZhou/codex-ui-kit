@@ -3,13 +3,25 @@
 This file records public-package changes. Registry publication is a separate
 step from building or merging the reviewed source.
 
-## 0.1.1 README correction (unpublished candidate)
+## Security maintenance (unpublished candidate)
+
+- Resolve vulnerable transitive `source-map-js` and `fast-uri` versions in the
+  build/private playground and use patched KaTeX for both math plugins.
+- Bundle the math adapters while keeping KaTeX as a fixed external runtime
+  dependency, so package consumers do not reinstall their vulnerable KaTeX
+  0.16 dependency ranges. Public component APIs are unchanged.
+- Move the project to on-demand maintenance; pause routine dependency version
+  PRs while retaining security updates, CI, CodeQL, demo and release workflows.
+- npm latest remains 0.1.1. No version bump or publication is part of this
+  change. A separately authorized security patch release is needed for users
+  of the published runtime package.
+
+## 0.1.1 README correction (published)
 
 - Correct the npm package README to reflect registry availability without
   hard-coding a version that will become stale at the next release.
 - No runtime API, dependency, or stylesheet changes from 0.1.0.
-- Registry availability is established only after this candidate's own
-  publication read-back succeeds.
+- Registry latest was read back as 0.1.1 on 2026-10-14.
 
 ## 0.1.0 foundation (published 2026-09-26)
 

@@ -2,7 +2,12 @@
 
 ## Supported versions
 
-Until the first npm release, security fixes are developed against the latest `main` revision.
+Security fixes are developed against `main` for the latest published release.
+Older releases do not have separate maintenance branches. The project is
+[maintained on demand](MAINTENANCE.md); security reports, Dependabot alerts and
+security updates, push/PR CI, and weekly CodeQL remain enabled. A source fix
+does not update an already published package: consumer fixes require a
+separately authorized patch release.
 
 ## Reporting a vulnerability
 

@@ -3,6 +3,19 @@
 This file is a short routing guide, not a second source of truth. Keep build-
 specific findings in the research records linked below.
 
+## Current scope: on-demand maintenance
+
+Jamin moved this project to on-demand maintenance on 2026-10-14. Follow
+[`MAINTENANCE.md`](MAINTENANCE.md). Stop feature expansion and automatic
+tracking or pixel replication of new Codex builds. The historical delivery
+plan is retained evidence, not an instruction to keep working through stages
+0–7. Completing reconstruction is not a prerequisite for pausing. New work
+requires a concrete maintenance need or an explicit request. Preserve pending
+branches, failed evidence and open PRs; do not merge or close them to empty a
+backlog. Existing impact-based validation and delivery gates still apply to
+authorized maintenance. Do not run paid live model conversations or new
+installed-app captures for the maintenance transition.
+
 ## Read before parity work
 
 - [`research/DELIVERY_PLAN.md`](research/DELIVERY_PLAN.md) for sequence, open
@@ -61,8 +74,10 @@ commands.
 
 ## Validation and pull requests
 
-- Jamin's fast mode (confirmed 2026-10-08) remains effective until changed by
-  Jamin. Every PR requires full `pnpm check` for its exact candidate tree and
+- Jamin's impact-based fast mode (reconfirmed 2026-10-09) remains effective
+  until changed by Jamin. It overrides older bot-review and blanket acceptance
+  requirements; do not ask for another mode or merge confirmation. Every PR
+  requires full `pnpm check` for its exact candidate tree and
   acceptance justified by the actual diff. Explicitly record affected files,
   component families, Browser/CDP, Electron, pixel and necessary live public-
   protocol checks, commands, head/tree, results and exit codes. Do not narrow
@@ -72,8 +87,9 @@ commands.
   integration batches and before release. Shared shell, public state/protocol,
   general acceptance infrastructure or unclear impact requires expanded
   validation, including the full suite when needed. Stage/release completion
-  still requires full successful evidence; the delivery plan's 0–7 goal is
-  unchanged. Replay, installed-product evidence, live protocol and product
+  still requires full successful evidence if explicitly resumed; historical
+  stages 0–7 are paused under the current maintenance scope. Replay,
+  installed-product evidence, live protocol and product
   pixels cannot substitute for one another or promote the global baseline.
 - Retain auditable stage results for the exact tree. Retry failed stages and
   their dependencies only when tree, tools/environment, prerequisite state

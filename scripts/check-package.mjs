@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { publicRuntimeExports } from "./public-runtime-exports.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -33,6 +33,29 @@ assert(
   "CSS must remain marked as a side effect",
 );
 const highlightJsVersion = packageJson.dependencies?.["highlight.js"];
+assert(
+  packageJson.dependencies?.katex === "0.18.7",
+  "math rendering must use the reviewed, patched KaTeX runtime",
+);
+for (const adapter of ["rehype-katex", "remark-math"]) {
+  assert(
+    !packageJson.dependencies?.[adapter],
+    `${adapter} must be bundled; its transitive KaTeX range is vulnerable`,
+  );
+}
+const javascript = readdirSync(new URL("dist/", root))
+  .filter((name) => name.endsWith(".js"))
+  .map((name) => readFileSync(new URL(`dist/${name}`, root), "utf8"))
+  .join("\n");
+assert(
+  !/(?:from\s*|import\s*\()\s*["'](?:rehype-katex|remark-math)["']/.test(javascript),
+  "built math adapters must not resolve vulnerable packages in a consumer",
+);
+assert(/from\s*["']katex["']/.test(javascript), "bundled math must use external patched KaTeX");
+const dependencyNotices = readFileSync(new URL("dist/THIRD_PARTY_LICENSES.md", root), "utf8");
+for (const dependency of ["rehype-katex", "remark-math", "micromark-extension-math"]) {
+  assert(dependencyNotices.includes(dependency), `missing bundled notice for ${dependency}`);
+}
 assert(
   typeof highlightJsVersion === "string" &&
     /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/.test(
@@ -107,6 +130,7 @@ for (const requiredPath of [
   "dist/styles.d.ts",
   "dist/tokens.css",
   "dist/tokens.d.ts",
+  "dist/THIRD_PARTY_LICENSES.md",
 ]) {
   assert(packedPaths.has(requiredPath), `package is missing ${requiredPath}`);
 }

@@ -17,6 +17,14 @@ Coding-agent interfaces need more than a chat bubble. They must present streamin
 
 Codex UI Kit turns those interaction patterns into protocol-neutral React primitives. Its public API, markup, styles, icons, and assets are independently written; Codex-specific transport mapping stays outside the component package.
 
+## Maintenance
+
+This project is maintained on demand for security issues and concrete user
+needs. New feature expansion and continuous tracking of the official Codex
+interface, including pixel matching, are paused. There is no synchronization
+or release cadence commitment. Existing packages and the Pages demo remain
+available; see [MAINTENANCE.md](MAINTENANCE.md) for scope and retained work.
+
 ## Status
 
 - The current components are a partial coding-agent UI foundation, not a
@@ -24,8 +32,8 @@ Codex UI Kit turns those interaction patterns into protocol-neutral React primit
 - UI coverage is incremental and build-scoped. The promoted baseline, latest
   installed candidate, per-surface evidence, and remaining gaps are tracked in
   [`research/UI_INVENTORY.md`](research/UI_INVENTORY.md) and the
-  [`delivery plan`](research/DELIVERY_PLAN.md); both are refreshed as the
-  installed app changes.
+  [`delivery plan`](research/DELIVERY_PLAN.md); both retain dated observations and are updated only when explicitly
+  scoped maintenance requires it.
 - Package candidates, older-build regression fixtures, current-build runtime
   captures, and unsampled surfaces remain explicitly distinct. A passing
   component or replay suite is not silently promoted to installed-product
