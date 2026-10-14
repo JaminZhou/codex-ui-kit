@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 // The lazy adapter runs in the browser after React mounts. Supply a test DOM
 // from the harness, without adding it to the consumer's dependency graph.
@@ -11,10 +11,9 @@ const window = new Window();
 globalThis.document = window.document;
 globalThis.DOMParser = window.DOMParser;
 
-const require = createRequire(import.meta.url);
-const dist = dirname(require.resolve("codex-ui-kit"));
+const dist = dirname(fileURLToPath(import.meta.resolve("codex-ui-kit")));
 const kitRequire = createRequire(join(dist, "index.js"));
-assert.equal(kitRequire("katex/package.json").version, "0.18.7");
+assert.equal(kitRequire("katex").version, "0.18.7");
 const files = readdirSync(dist);
 const rehypeFile = files.find((name) => /^rehype-katex-.*\.js$/.test(name));
 const remarkFile = files.find((name) => /^remark-math-.*\.js$/.test(name));
