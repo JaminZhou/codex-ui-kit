@@ -3,7 +3,7 @@
 This file records public-package changes. Registry publication is a separate
 step from building or merging the reviewed source.
 
-## Security maintenance (unpublished candidate)
+## 0.1.2 security maintenance (unpublished candidate)
 
 - Resolve vulnerable transitive `source-map-js` and `fast-uri` versions in the
   build/private playground and use patched KaTeX for both math plugins.
@@ -12,9 +12,12 @@ step from building or merging the reviewed source.
   0.16 dependency ranges. Public component APIs are unchanged.
 - Move the project to on-demand maintenance; pause routine dependency version
   PRs while retaining security updates, CI, CodeQL, demo and release workflows.
-- npm latest remains 0.1.1. No version bump or publication is part of this
-  change. A separately authorized security patch release is needed for users
-  of the published runtime package.
+- Upgrade with `npm install codex-ui-kit@0.1.2` after publication. Public
+  exports, component props and stylesheet entrypoints are unchanged; no host
+  migration is required. Registry publication is verified separately from
+  this release preparation.
+- Run candidate quality checks under the same Linux virtual display used by
+  CI, so Electron geometry checks can start on the hosted release runner.
 
 ## 0.1.1 README correction (published)
 
