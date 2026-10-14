@@ -4,7 +4,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    # Pause routine version updates; security updates have a separate limit.
+    open-pull-requests-limit: 0
     groups:
       build-tooling:
         applies-to: version-updates
@@ -50,4 +51,5 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    # Pause routine version updates; security updates have a separate limit.
+    open-pull-requests-limit: 0

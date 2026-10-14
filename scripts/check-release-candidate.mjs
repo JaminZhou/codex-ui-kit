@@ -91,6 +91,7 @@ try {
     "dist/styles.d.ts",
     "dist/tokens.css",
     "dist/tokens.d.ts",
+    "dist/THIRD_PARTY_LICENSES.md",
   ]) {
     assert(fileSet.has(required), `release tarball is missing ${required}`);
   }

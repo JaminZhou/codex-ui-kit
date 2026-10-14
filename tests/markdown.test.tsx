@@ -98,6 +98,29 @@ Footnote reference.[^1]
     expect(html).not.toContain("data-footnotes");
   });
 
+  it("does not inherit trusted math rendering from a polluted prototype", async () => {
+    const original = Object.getOwnPropertyDescriptor(Object.prototype, "trust");
+    Object.defineProperty(Object.prototype, "trust", {
+      configurable: true,
+      value: true,
+      writable: true,
+    });
+    try {
+      const { container } = render(
+        <AgentMarkdown>{String.raw`$$
+\href{javascript:alert(1)}{unsafe}\includegraphics{https://example.invalid/tracker.png}
+$$`}</AgentMarkdown>,
+      );
+      await waitFor(() => expect(container.querySelector(".katex")).toBeTruthy());
+      expect(container.querySelector(".katex a, .katex img")).toBeNull();
+      expect(container.innerHTML).not.toContain('href="javascript:');
+      expect(container.innerHTML).not.toContain('src="https://example.invalid');
+    } finally {
+      if (original) Object.defineProperty(Object.prototype, "trust", original);
+      else Reflect.deleteProperty(Object.prototype, "trust");
+    }
+  });
+
   it("exposes compact density and host code-block presentation slots", () => {
     const html = renderToStaticMarkup(
       <AgentMarkdown

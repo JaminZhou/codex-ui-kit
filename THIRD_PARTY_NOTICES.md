@@ -1,6 +1,9 @@
 # Third-party notices
 
 The npm package includes KaTeX's stylesheet and font files in `dist/`.
+Bundled JavaScript dependencies, including the Markdown math adapters, have
+their full notices in `dist/THIRD_PARTY_LICENSES.md`, generated from the exact
+build inputs. The KaTeX JavaScript renderer remains an external dependency.
 
 ## KaTeX
 

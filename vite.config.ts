@@ -56,6 +56,9 @@ export default defineConfig({
     },
   ],
   build: {
+    // Math adapters are bundled so their old KaTeX ranges cannot reach consumers.
+    // Keep the actual renderer external and pinned by our runtime manifest.
+    license: { fileName: "THIRD_PARTY_LICENSES.md" },
     lib: {
       cssFileName: "style",
       entry: "src/index.ts",
@@ -68,9 +71,8 @@ export default defineConfig({
         "react-dom",
         "react/jsx-runtime",
         "react-markdown",
-        "rehype-katex",
+        /^katex(?:\/.*)?$/,
         "remark-gfm",
-        "remark-math",
         /^highlight\.js(?:\/.*)?$/,
       ],
     },

@@ -11,6 +11,13 @@ holds only named app-integration rasters whose exact bytes are required by a
 pixel scene; it records the same build fingerprint and remains excluded from
 the published npm package.
 
+## Maintenance status
+
+Continuous installed-app observation and parity expansion are paused as of
+2026-10-14. The records below remain dated evidence. Follow
+[MAINTENANCE.md](../MAINTENANCE.md); this workflow applies only to explicitly
+resumed research, not automatic tracking of new builds.
+
 ## Workflow
 
 1. Identify the installed application version and hash the local `app.asar`.

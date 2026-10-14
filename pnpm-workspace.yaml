@@ -2,7 +2,9 @@ packages:
   - playgrounds/*
 
 overrides:
-  "fast-uri@>=3.0.0 <3.1.7": 3.1.7
+  "fast-uri@>=3.0.0 <3.1.8": 3.1.8
+  "source-map-js@<1.2.2": 1.2.2
+  "katex@<0.18.2": 0.18.7
   "undici@>=7.0.0 <7.29.1": 7.29.1
 
 allowBuilds:

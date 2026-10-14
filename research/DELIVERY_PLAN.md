@@ -1,5 +1,10 @@
 # Delivery plan
 
+> **Paused 2026-10-14:** This is a historical plan, not an active backlog.
+> [On-demand maintenance](../MAINTENANCE.md) supersedes continuous UI tracking
+> and stage 0–7 delivery. Unfinished stages and failed gates remain recorded;
+> no completion or parity claim is made. Resume only on an explicit request.
+
 This plan turns the current component foundation into a broad, evidence-backed
 Codex-style application surface. It does not treat a passing test suite, a
 single screenshot, or a generic primitive as product-level parity.

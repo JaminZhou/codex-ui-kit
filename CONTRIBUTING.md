@@ -1,5 +1,9 @@
 # Contributing
 
+The project is [maintained on demand](MAINTENANCE.md). Focus contributions on
+security fixes and concrete user needs. Feature expansion and continuous
+official-interface synchronization are paused.
+
 ## Development setup
 
 Use Node.js 22 and the pnpm version declared in `package.json`.
